@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv33.xsd http://www.walmartmexico.com.mx http://www.walmartmexico.com.mx/AddendaKioscos.xsd" Version="3.3" Fecha="2020-06-30T12:46:51" Moneda="MXN" TipoCambio="1" SubTotal="14596.10" Descuento="976.34" Total="15798.92" FormaPago="28" CondicionesDePago="Inmediato" TipoDeComprobante="I" MetodoPago="PUE" LugarExpedicion="50010" NoCertificado="00001000000406092473" Serie="ICAJA" Folio="355328" Certificado="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" Sello="cbRb1hF5eFCKSJbeaLtmJiRkjs7D1EzdRRWLbYjdFhhBsZQ/D2yrgaJTuf20dsj29ivThp1haU8jI4AlNUYTA6GV7tIpdWSrkznN2NxvKz5syat2iJRtC3w3AGfrX+3McvIbM0zoxopLRZRBGjbSxU2gsrjx1wRsnPlaKwkj1JeCGZ2xTpgElgZP5IcETK6GJnfZtYaGn6f/q0IvFG0TtYl2kAnrD6INOKkAhsmqaz+wj93FkCBZhmC65EUpi+hYAey+hwGoiblWscAsi1lFAd1qvuGvOTcS96lCot1V3Og1t1m4vSrRRcI25hZCofRBKUMQ2fGxFZvhFfWWc7FG9w==" xmlns:otro="http://www.walmartmexico.com.mx">
+	<cfdi:Emisor Rfc="NWM9709244W4" Nombre="Nueva Wal Mart de México, S. de R. L. de C.V." RegimenFiscal="601" />
+	<cfdi:Receptor Rfc="UTP1301229U6" Nombre="usados tractocamiones y partes refaccionarias sa de cv" UsoCFDI="G03" />
+	<cfdi:Conceptos>
+		<cfdi:Concepto ClaveProdServ="01010101" NoIdentificacion="000007874205656" Cantidad="2" ClaveUnidad="H87" Unidad="PIEZAS" Descripcion="CONSOLA DERECHA PARA DEFENSA CENTRAL" ValorUnitario="209.49" Importe="418.98" Descuento="33.52">
+			<cfdi:Impuestos>
+				<cfdi:Traslados>
+					<cfdi:Traslado Base="385.46" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="61.67" />
+				</cfdi:Traslados>
+			</cfdi:Impuestos>
+		</cfdi:Concepto>
+		<cfdi:Concepto ClaveProdServ="25174200" NoIdentificacion="000007874212103" Cantidad="1" ClaveUnidad="H87" Unidad="PIEZAS" Descripcion="CAJA DE DIRECCION" ValorUnitario="4609.49" Importe="4609.49" Descuento="368.76">
+			<cfdi:Impuestos>
+				<cfdi:Traslados>
+					<cfdi:Traslado Base="4240.73" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="678.52" />
+				</cfdi:Traslados>
+			</cfdi:Impuestos>
+		</cfdi:Concepto>
+		<cfdi:Concepto ClaveProdServ="01010101" NoIdentificacion="000750300785910" Cantidad="3" ClaveUnidad="H87" Unidad="PIEZAS" Descripcion="KIT DE REPARACION PARA COMPRESOR DE AIRE" ValorUnitario="3189.21" Importe="9567.63" Descuento="574.06">
+			<cfdi:Impuestos>
+				<cfdi:Traslados>
+					<cfdi:Traslado Base="8993.57" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="1438.97" />
+				</cfdi:Traslados>
+			</cfdi:Impuestos>
+		</cfdi:Concepto>
+	</cfdi:Conceptos>
+	<cfdi:Impuestos TotalImpuestosTrasladados="2179.16">
+		<cfdi:Traslados>
+			<cfdi:Traslado Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="2179.16" />
+		</cfdi:Traslados>
+	</cfdi:Impuestos>
+	<cfdi:Complemento>
+		<tfd:TimbreFiscalDigital xmlns:tfd="http://www.sat.gob.mx/TimbreFiscalDigital" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sat.gob.mx/TimbreFiscalDigital http://www.sat.gob.mx/sitio_internet/cfd/timbrefiscaldigital/TimbreFiscalDigitalv11.xsd" Version="1.1" UUID="6EB912DB-08DF-4F1C-A6D3-E1578E2E3F34" FechaTimbrado="2020-06-30T12:47:51" RfcProvCertif="SST060807KU0" SelloCFD="cbRb1hF5eFCKSJbeaLtmJiRkjs7D1EzdRRWLbYjdFhhBsZQ/D2yrgaJTuf20dsj29ivThp1haU8jI4AlNUYTA6GV7tIpdWSrkznN2NxvKz5syat2iJRtC3w3AGfrX+3McvIbM0zoxopLRZRBGjbSxU2gsrjx1wRsnPlaKwkj1JeCGZ2xTpgElgZP5IcETK6GJnfZtYaGn6f/q0IvFG0TtYl2kAnrD6INOKkAhsmqaz+wj93FkCBZhmC65EUpi+hYAey+hwGoiblWscAsi1lFAd1qvuGvOTcS96lCot1V3Og1t1m4vSrRRcI25hZCofRBKUMQ2fGxFZvhFfWWc7FG9w==" NoCertificadoSAT="00001000000405179095" SelloSAT="RovuDHv7SihmM4HzKKuF4NoreHt7rfiNhNx1Wj9y8quUt98Sp4SSZ5vufOgoIe81xrcGUhp/VgER3eYSw+zh2gGndELbPRk8MjafNwfuUSLB8t4QUIjtyv3ilFono5qp5p8lcnvRLr4eRpCJnIyvUicVHvGQPgYPYKpQcjc00FhBG6z6FqxqGjcczaKZaTZywFGxoerPqk3wK6EryTp96fQINXZTohEYDBDNmLiuoSP8LO75cQ2at+WwHB/xpNtqY08/qK76rQ+V8IyQSv42FsTTfz0b/nBARePlP2qPAi/Wd2MJvAdJvdVET/rGqf6IHwabDF0Qjp78Bvy8ahq8wA==" />
+	</cfdi:Complemento>
+	<cfdi:Addenda>
+		<otro:AddendaEmisor>
+			<otro:AddendaMG>
+				<otro:MG descripcion=" TICKET No: 2342450170272541003980" />
+			</otro:AddendaMG>
+			<otro:InformacionAdicionalPuntoDeVenta />
+		</otro:AddendaEmisor>
+	</cfdi:Addenda>
+</cfdi:Comprobante>

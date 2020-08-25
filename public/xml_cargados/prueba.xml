@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<cfdi:Comprobante xsi:schemaLocation="http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv33.xsd" Version="3.3" Serie="PJM" Folio="35447" Fecha="2020-06-13T12:56:24" FormaPago="01" NoCertificado="00001000000407951211" Certificado="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" SubTotal="1069.83" Moneda="MXN" Total="1241.00" TipoDeComprobante="I" MetodoPago="PUE" LugarExpedicion="50140" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:cfdi="http://www.sat.gob.mx/cfd/3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Sello="L2mZ1+WoNpouiWRGdHJNwzwOUdcOZL287L3g7pYYaxQIS+80OatYOeutuDxgjMvYTr/xKXuzqhrT6Tcn2pXdg7whtI3HTP2f1TMLrwQXemr5Kv9xiisqIyTsRkPXx9yU6J9qarOAO2ofHwO8lhmAfP61ExkY+j8pvsJElZbgyiweyufieLK3CCaAI7bbRSjBJdrBvOSMouhf6vv7EyWmtKIELX/1y3/KMWGbzUAV4Aqv6nYHDV1rWP4UcOUZqj887r2eEW7Usta4C5zvxLVOztI5kJhMCjQN5UVe4PTAQ5EHAdlEMYNkn1+gCn0pxI0nw6y8LiHAAv3pDvoFVCabcg==">
+	<cfdi:Emisor Rfc="PJM860618FU7" Nombre="PINTURAS JM, S.A. DE C.V." RegimenFiscal="601"></cfdi:Emisor>
+	<cfdi:Receptor Rfc="UTP1301229U6" Nombre="USADOS TRACTOCAMIONES Y PARTES REFACCIONARIAS SA DE CV" UsoCFDI="G01"></cfdi:Receptor>
+	<cfdi:Conceptos>
+		<cfdi:Concepto ClaveProdServ="31211501" Cantidad="1" ClaveUnidad="H87" Unidad="G" Descripcion="EZ-COLOR ESMALTE ALQUIDAL AMARILLO CROMO" ValorUnitario="388.00" Importe="388.00">
+			<cfdi:Impuestos>
+				<cfdi:Traslados>
+					<cfdi:Traslado Base="388.00" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="62.08"></cfdi:Traslado>
+				</cfdi:Traslados>
+			</cfdi:Impuestos>
+		</cfdi:Concepto>
+		<cfdi:Concepto ClaveProdServ="31211501" Cantidad="1" ClaveUnidad="H87" Unidad="G" Descripcion="EZ-COLOR ESMALTE ALQUIDAL ROJO FUEGO" ValorUnitario="337.00" Importe="337.00">
+			<cfdi:Impuestos>
+				<cfdi:Traslados>
+					<cfdi:Traslado Base="337.00" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="53.92"></cfdi:Traslado>
+				</cfdi:Traslados>
+			</cfdi:Impuestos>
+		</cfdi:Concepto>
+		<cfdi:Concepto ClaveProdServ="12191602" Cantidad="20" ClaveUnidad="LTR" Unidad="LTR" Descripcion="THINNER STANDAR ECO-SOLV (1 LTS)" ValorUnitario="17.2414" Importe="344.828">
+			<cfdi:Impuestos>
+				<cfdi:Traslados>
+					<cfdi:Traslado Base="344.828" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="55.17248"></cfdi:Traslado>
+				</cfdi:Traslados>
+			</cfdi:Impuestos>
+		</cfdi:Concepto>
+	</cfdi:Conceptos>
+	<cfdi:Impuestos TotalImpuestosTrasladados="171.17">
+		<cfdi:Traslados>
+			<cfdi:Traslado Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="171.17"></cfdi:Traslado>
+		</cfdi:Traslados>
+	</cfdi:Impuestos>
+	<cfdi:Complemento>
+		<tfd:TimbreFiscalDigital RfcProvCertif="TSP080724QW6" Version="1.1" UUID="EB7A52EA-B4E4-431A-BE5A-EE88A174EED2" FechaTimbrado="2020-06-13T12:56:24" SelloCFD="L2mZ1+WoNpouiWRGdHJNwzwOUdcOZL287L3g7pYYaxQIS+80OatYOeutuDxgjMvYTr/xKXuzqhrT6Tcn2pXdg7whtI3HTP2f1TMLrwQXemr5Kv9xiisqIyTsRkPXx9yU6J9qarOAO2ofHwO8lhmAfP61ExkY+j8pvsJElZbgyiweyufieLK3CCaAI7bbRSjBJdrBvOSMouhf6vv7EyWmtKIELX/1y3/KMWGbzUAV4Aqv6nYHDV1rWP4UcOUZqj887r2eEW7Usta4C5zvxLVOztI5kJhMCjQN5UVe4PTAQ5EHAdlEMYNkn1+gCn0pxI0nw6y8LiHAAv3pDvoFVCabcg==" NoCertificadoSAT="00001000000501960426" SelloSAT="HkDsGdxBwttEzewL+W/lEcakA8olGaKaOQ7rb8xvW+OOVbyp4fSDcXhc0YhaeQxEAtJB2tOYT1vS062xU9SN0rzlqLwouJSxmsDAu1f0lWk8oOvyR8HTyfms59pawyzTfC3289/ldkMpOtWTdOiDQmeuU+LfPCqy+wWvKvv5ywQ/JWKFYTNc+BMmf3niUX6nWM2CYU7M2lmJy9KiZ9hBZiHWPtSmJ/CjpM1JGdDeU55Fov9XXwbh7su7pjKV6Km3IqFmFg8/ZZQ39FrjVC01rN9lZSM88CkSsq5m2DvEHMmmDYJzEPBzNAOSOAQz8NhHc3hkk8qFNdzLPK4TvifwvQ==" xsi:schemaLocation="http://www.sat.gob.mx/TimbreFiscalDigital http://www.sat.gob.mx/sitio_internet/cfd/timbrefiscaldigital/TimbreFiscalDigitalv11.xsd" xmlns:tfd="http://www.sat.gob.mx/TimbreFiscalDigital" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" />
+	</cfdi:Complemento>
+</cfdi:Comprobante>

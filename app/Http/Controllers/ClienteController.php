@@ -1,0 +1,415 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+use Helpers;
+use DataTables;
+use DB;
+use App\Cliente;
+use App\Pais; 
+use App\CodigoPostal;
+use App\Estado;
+use App\Municipio;
+use App\Agente;
+use App\FormaPago;
+use App\MetodoPago;
+use App\UsoCFDI;
+use App\Empresa;
+use App\Marca;
+use App\ProductoPrecio;
+use App\Producto;
+
+class ClienteController extends ConfiguracionSistemaController{
+
+    public function __construct(){
+        parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
+    }
+
+    public function clientes(){
+        return view('catalogos.clientes.clientes');
+    }
+    //obtener todos los registros
+    public function clientes_obtener(Request $request){
+        if($request->ajax()){
+            $data = Cliente::orderBy("Numero", "DESC")->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        if($data->Status == 'ALTA'){
+                            $boton =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos('.$data->Numero.')"><i class="material-icons">mode_edit</i></div> '. 
+                                        '<div class="btn bg-red btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar('.$data->Numero.')"><i class="material-icons">cancel</i></div>';
+                        }else{
+                            $boton = '';
+                            //$boton =    '<div class="btn bg-green btn-xs waves-effect" onclick="desactivar('.$data->Numero.')">Altas</div>';
+                        } 
+                        return $boton;
+                    })
+                    ->addColumn('Credito', function($data){
+                        $credito = Helpers::convertirvalorcorrecto($data->Credito);
+                        return $credito;
+                    })
+                    ->addColumn('Saldo', function($data){
+                        $saldo = Helpers::convertirvalorcorrecto($data->Saldo);
+                        return $saldo;
+                    })
+                    ->setRowClass(function ($data) {
+                        return $data->Status == 'ALTA' ? '' : 'bg-orange';
+                    })
+                    ->rawColumns(['operaciones','Credito', 'Saldo'])
+                    ->make(true);
+        } 
+    }
+    //obtener ultimo numero de tabla
+    public function clientes_obtener_ultimo_numero(){
+        $id = Helpers::ultimoidtabla('App\Cliente');
+        return response()->json($id);
+    }
+    //obtener paises
+    public function clientes_obtener_paises(Request $request){
+        if($request->ajax()){
+            $data = Pais::orderBy("Numero", "ASC")->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarpais('.$data->Numero.',\''.$data->Clave .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }  
+    }
+    //obtener estados
+    public function clientes_obtener_estados(Request $request){
+        if($request->ajax()){
+            if ($request->numeropais != '') {
+                $pais = Pais::where('Numero', $request->numeropais)->first();
+                $data = Estado::where('Pais', $pais->Clave )->orderBy("Numero", "ASC")->get();
+            }else{
+                $data = Estado::query();
+            }
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarestado('.$data->Numero.',\''.$data->Nombre .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        } 
+    }
+    //obtener codigos postales
+    public function clientes_obtener_codigos_postales(Request $request){
+        if($request->ajax()){
+            if ($request->numeroestado != '') {
+                $estado = Estado::where('Numero', $request->numeroestado)->first();
+                $data = CodigoPostal::where('Estado', $estado->Clave )->get();
+            }else{
+                $data = CodigoPostal::query();
+            }
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarcodigopostal(\''.$data->Clave .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }  
+    }    
+    //obtener municipios
+    public function clientes_obtener_municipios(Request $request){
+        if($request->ajax()){
+            if ($request->numeroestado != '') {
+                $estado = Estado::where('Numero', $request->numeroestado)->first();
+                $data = Municipio::where('Estado', $estado->Clave )->orderBy("Numero", "ASC")->get();
+            }else{
+                $data = Municipio::query();
+            }
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarmunicipio(\''.$data->Nombre .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }  
+    }   
+    //obtener agentes
+    public function clientes_obtener_agentes(Request $request){
+        if($request->ajax()){
+            $data = Agente::where('Status', 'ALTA')->orderBy('Numero', 'DESC')->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionaragente('.$data->Numero.',\''.$data->Nombre .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }  
+    }
+    //obtener formas de pago
+    public function clientes_obtener_formas_pago(Request $request){
+        if($request->ajax()){
+            $data = FormaPago::orderBy("Numero", "ASC")->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarformapago(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+    //obtener metodos de pago
+    public function clientes_obtener_metodos_pago(Request $request){
+        if($request->ajax()){
+            $data = MetodoPago::orderBy("Numero", "ASC")->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarmetodopago(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    } 
+    //obtener uso cfdi
+    public function clientes_obtener_uso_cfdi(Request $request){
+        if($request->ajax()){
+            $data = UsoCFDI::orderBy("Numero", "ASC")->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarusocfdi(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }   
+    //obtener productos
+    public function clientes_obtener_productos(Request $request){
+        if($request->ajax()){
+            $codigoabuscar = $request->codigoabuscar;
+            $data = DB::table('Productos as t')
+            ->leftJoin('Marcas as m', 'm.Numero', '=', 't.Marca')
+            ->leftJoin(DB::raw("(select codigo, sum(existencias) as existencias from existencias group by codigo) as e"),
+            function($join){
+                $join->on("e.codigo","=","t.codigo");
+            })
+            ->select('t.Codigo as Codigo', 't.Producto as Producto', 't.Ubicacion as Ubicacion', 'e.Existencias as Existencias', 't.Costo as Costo', 't.SubTotal as SubTotal', 't.Marca as Marca', 't.Status as Status')
+            ->where('t.Codigo', 'like', '%' . $codigoabuscar . '%')
+            ->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->addColumn('Existencias', function($data){
+                        $existencias = Helpers::convertirvalorcorrecto($data->Existencias);
+                        return $existencias;
+                    })
+                    ->addColumn('Costo', function($data){
+                        $costo = Helpers::convertirvalorcorrecto($data->Costo);
+                        return $costo;
+                    })
+                    ->addColumn('SubTotal', function($data){
+                        $subtotal = Helpers::convertirvalorcorrecto($data->SubTotal);
+                        return $subtotal;
+                    })
+                    ->rawColumns(['operaciones', 'Existencias', 'Costo', 'SubTotal'])
+                    ->make(true);
+        } 
+    }     
+    //guardar en catalogo
+    public function clientes_guardar(Request $request){
+	    $rfc=$request->rfc;
+	    $ExisteCliente = Cliente::where('Rfc', $rfc )->first();
+	    if($ExisteCliente == true){
+	        $Cliente = 1;
+	    }else{
+            //obtener el ultimo id de la tabla
+            $id = Helpers::ultimoidtabla('App\Cliente');
+		    $Cliente = new Cliente;
+		    $Cliente->Numero=$id;
+		    $Cliente->Nombre=$request->nombre;
+		    $Cliente->Rfc=$request->rfc;
+		    $Cliente->Calle=$request->calle;
+            $Cliente->noExterior=$request->noexterior;
+		    $Cliente->noInterior=$request->nointerior;
+		    $Cliente->Colonia=$request->colonia;
+		    $Cliente->Localidad=$request->localidad;
+		    $Cliente->Referencia=$request->referencia;
+            $Cliente->Pais=$request->clavepais;
+            $Cliente->Estado=$request->nombreestado;
+            $Cliente->Municipio=$request->municipio;  
+            $Cliente->CodigoPostal=$request->codigopostal;
+            $Cliente->Plazo=$request->plazo;
+            $Cliente->Agente=$request->agente;
+            $Cliente->FormaPago=$request->claveformapago;
+            $Cliente->MetodoPago=$request->clavemetodopago;
+            $Cliente->UsoCfdi=$request->claveusocfdi;
+            $Cliente->Tipo=$request->tipo;
+            $Cliente->Credito=$request->creditomaximo;
+            $Cliente->Contacto=$request->contacto;
+            $Cliente->Telefonos=$request->telefonos;
+            $Cliente->Celular=$request->celular;
+            $Cliente->Email1=$request->email1;
+            $Cliente->Cuenta=$request->cuentaref;
+            $Cliente->CuentaServicio=$request->cuentaser;
+            $Cliente->Anotaciones=$request->anotaciones;
+            $Cliente->Status='ALTA';
+            Log::channel('cliente')->info('Se registro un nuevo cliente: '.$Cliente.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
+		    $Cliente->save();
+      	}
+    	return response()->json($Cliente); 
+    }
+    //dar de baja o alta en catalogo
+    public function clientes_alta_o_baja(Request $request){
+        $numerocliente=$request->numerocliente;
+	    $Cliente = Cliente::where('Numero', $numerocliente )->first();
+	    if($Cliente->Status == 'ALTA'){
+           $Cliente->Status = 'BAJA';
+           Log::channel('cliente')->info('El cliente fue dado de baja: '.$Cliente.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
+	    }else{
+	       $Cliente->Status = 'ALTA';
+           Log::channel('cliente')->info('El cliente fue dado de alta: '.$Cliente.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
+        }
+	    $Cliente->save();
+	    return response()->json($Cliente);
+    }
+    //obtener datos del catalogo
+    public function clientes_obtener_cliente(Request $request){
+        $cliente = Cliente::where('Numero', $request->numerocliente)->first();
+        $clavepais = $cliente->Pais;
+        $pais = Pais::select('Numero', 'Clave')->where('Clave', $clavepais)->first();
+        $nombreestado = $cliente->Estado;
+        $estado = Estado::select('Numero', 'Nombre')->where('Nombre', mb_strtolower($nombreestado))->first(); 
+        $nombremunicipio = $cliente->Municipio;
+        $municipio = Municipio::select('Nombre')->where('Nombre', mb_strtolower($nombremunicipio))->first(); 
+        $clavecodigopostal = $cliente->CodigoPostal;
+        $codigopostal = CodigoPostal::select('Clave')->where('Clave', $clavecodigopostal)->first();
+        $claveformadepago = $cliente->FormaPago;
+        $formadepago = FormaPago::select('Clave', 'Nombre')->where('Clave', $claveformadepago)->first();
+        $clavemetododepago = $cliente->MetodoPago;
+        $metododepago = MetodoPago::select('Clave', 'Nombre')->where('Clave', $clavemetododepago)->first();
+        $claveusocfdi = $cliente->UsoCfdi;
+        $usocfdi = UsoCFDI::select('Clave', 'Nombre')->where('Clave', $claveusocfdi)->first();
+        $claveagente = $cliente->Agente;
+        $agente = Agente::select('Numero', 'Nombre')->where('Numero', $claveagente)->first();
+        //tab utilidades
+        $utilidadesmarcas = Marca::where('Status', 'ALTA')->get();
+        $numerofilasutilidadesmarcas = Marca::where('Status', 'ALTA')->count();
+        if($numerofilasutilidadesmarcas > 0){
+            $filasutilidadesmarcas  = '';
+            $contadorutilidadesmarcas  = 0;
+            foreach($utilidadesmarcas as $um){
+                $filasutilidadesmarcas= $filasutilidadesmarcas.
+                '<tr>'.
+                    '<td><input type="hidden" name="numeromarca[]"  value="'.$um->Numero.'" readonly>'.$um->Numero.'</td>'.
+                    '<td><input type="hidden" name="nombremarca[]"  value="'.$um->Nombre.'" readonly>'.$um->Nombre.'</td>'.
+                    '<td><input type="hidden" name="utilidad1marca[]" value="'.Helpers::convertirvalorcorrecto($um->Utilidad1).'" readonly>'.Helpers::convertirvalorcorrecto($um->Utilidad1).'</td>'.
+                    '<td><input type="hidden" name="utilidad1marca[]" value="'.Helpers::convertirvalorcorrecto($um->Utilidad2).'" readonly>'.Helpers::convertirvalorcorrecto($um->Utilidad2).'</td>'.
+                    '<td><input type="hidden" name="utilidad1marca[]" value="'.Helpers::convertirvalorcorrecto($um->Utilidad3).'" readonly>'.Helpers::convertirvalorcorrecto($um->Utilidad3).'</td>'.
+                    '<td><input type="hidden" name="utilidad1marca[]" value="'.Helpers::convertirvalorcorrecto($um->Utilidad4).'" readonly>'.Helpers::convertirvalorcorrecto($um->Utilidad4).'</td>'.
+                    '<td><input type="hidden" name="utilidad1marca[]" value="'.Helpers::convertirvalorcorrecto($um->Utilidad5).'" readonly>'.Helpers::convertirvalorcorrecto($um->Utilidad5).'</td>'.
+                    '<td><input type="text" name="utilidadmarcaseleccionada[]" ></td><td><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" name="dctoutilidadmarca[]" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);"></td>'.
+                '</tr>';
+                $contadorutilidadesmarcas++;
+            }
+        }else{
+            $filasutilidadesmarcas = '';
+        }
+        //tab precios productos
+        $preciosproductos = ProductoPrecio::where('Cliente', $request->numerocliente)->get();
+        $numerofilaspreciosproductos = ProductoPrecio::where('Cliente', $request->numerocliente)->count();
+        if($numerofilaspreciosproductos > 0){
+            $filaspreciosproductos = '';
+            $contadorpreciosproductos = 0;
+            foreach($preciosproductos as $pp){
+                $p = Producto::where('Codigo', $pp->Codigo)->first();
+                $filaspreciosproductos= $filaspreciosproductos.
+                '<tr class="filaspreciosproductos" id="filaprecioproducto'.$contadorpreciosproductos.'">'.
+                    '<td><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('.$contadorpreciosproductos.')">X</div></td>'.
+                    '<td><input type="hidden" name="codigoproducto[]" value="'.$pp->Codigo.'" readonly>'.$pp->Codigo.'</td>'.
+                    '<td><input type="hidden" name="nombreproducto[]" value="'.$p->Producto.'" readonly>'.$p->Producto.'</td>'.
+                    '<td><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'"" name="subtotalprecioproducto[]" required value="'.Helpers::convertirvalorcorrecto($pp->Precio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);"></td>'.
+                '</tr>';
+                $contadorpreciosproductos++;
+            }
+        }else{
+            $filaspreciosproductos = '';
+        }        
+        $data = array(
+            "cliente" => $cliente,
+            "pais" => $pais,
+            "estado" => $estado,
+            "municipio" => $municipio,
+            "codigopostal" => $codigopostal,
+            "formadepago" => $formadepago,
+            "metododepago" => $metododepago,
+            "usocfdi" => $usocfdi,
+            "agente" => $agente,
+            "filasutilidadesmarcas" => $filasutilidadesmarcas,
+            "filaspreciosproductos" => $filaspreciosproductos,
+            "numerofilaspreciosproductos" => $numerofilaspreciosproductos,
+            "credito" => Helpers::convertirvalorcorrecto($cliente->Credito)
+        );
+        return response()->json($data);
+    }
+    //modificar en catalogo
+    public function clientes_guardar_modificacion(Request $request){
+        $rfc=$request->rfc;
+        $numerocliente = $request->numero;
+	    $ExisteCliente = Cliente::where('Numero','<>', $numerocliente)->where('Rfc', $rfc )->first();
+	    if($ExisteCliente == true){
+            $Cliente = 1;
+	    }else{
+            //modificar registro
+            $Cliente = Cliente::where('Numero', $numerocliente )->first();
+		    $Cliente->Nombre=$request->nombre;
+		    $Cliente->Rfc=$request->rfc;
+		    $Cliente->Calle=$request->calle;
+            $Cliente->noExterior=$request->noexterior;
+		    $Cliente->noInterior=$request->nointerior;
+		    $Cliente->Colonia=$request->colonia;
+		    $Cliente->Localidad=$request->localidad;
+		    $Cliente->Referencia=$request->referencia;
+            $Cliente->Pais=$request->clavepais;
+            $Cliente->Estado=$request->nombreestado;
+            $Cliente->Municipio=$request->municipio;  
+            $Cliente->CodigoPostal=$request->codigopostal;
+            $Cliente->Plazo=$request->plazo;
+            $Cliente->Agente=$request->agente;
+            $Cliente->FormaPago=$request->claveformapago;
+            $Cliente->MetodoPago=$request->clavemetodopago;
+            $Cliente->UsoCfdi=$request->claveusocfdi;
+            $Cliente->Tipo=$request->tipo;
+            $Cliente->Credito=$request->creditomaximo;
+            $Cliente->Contacto=$request->contacto;
+            $Cliente->Telefonos=$request->telefonos;
+            $Cliente->Celular=$request->celular;
+            $Cliente->Email1=$request->email1;
+            $Cliente->Cuenta=$request->cuentaref;
+            $Cliente->CuentaServicio=$request->cuentaser;
+            $Cliente->Anotaciones=$request->anotaciones;
+            Log::channel('cliente')->info('Se modifico el cliente: '.$Cliente.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
+            $Cliente->save();
+            //Tabla Precios Productos
+            $eliminarpreciosproductos = ProductoPrecio::where('Cliente', $numerocliente)->forceDelete();
+            if($request->numerofilaspreciosproducto > 0){
+                $contador = 1;
+                foreach ($request->codigoproducto as $key => $codigoproducto){
+                    //alta tabla detalle productos precios
+                    $ProductoPrecio=new ProductoPrecio;
+                    $ProductoPrecio->Codigo = $codigoproducto;
+                    $ProductoPrecio->Cliente = $numerocliente;
+                    $ProductoPrecio->Precio = $request->subtotalprecioproducto [$key];
+                    $ProductoPrecio->Item = $contador;
+                    $ProductoPrecio->save();	
+                    $contador++;
+                }   
+            } 
+      	}
+    	return response()->json($Cliente); 
+    }
+}
