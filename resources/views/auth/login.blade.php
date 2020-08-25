@@ -21,7 +21,7 @@
 <body class="login-page">
     <div class="login-box">
         <div class="logo text-center">
-            <img  src="images/iniciarsesion2.png" height="135px" width="140px;">
+            <img  src="images/iniciarsesion2.png" height="130px" width="135px;">
         </div>
         <div class="card">
             <div class="body">
