@@ -114,7 +114,10 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                     ->addColumn('Fecha', function($data){
                         return Helpers::fecha_espanol($data->Fecha);
                     })
-                    ->rawColumns(['operaciones','Fecha'])
+                    ->addColumn('Total', function($data){
+                        return Helpers::convertirvalorcorrecto($data->Total);
+                    })
+                    ->rawColumns(['operaciones','Fecha','Total'])
                     ->make(true);
         }
     }
