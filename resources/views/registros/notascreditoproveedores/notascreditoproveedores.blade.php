@@ -300,15 +300,17 @@
         var notas_credito_proveedores_obtener_proveedores = '{!!URL::to('notas_credito_proveedores_obtener_proveedores')!!}';
         var notas_credito_proveedores_obtener_almacenes = '{!!URL::to('notas_credito_proveedores_obtener_almacenes')!!}';
         var notas_credito_proveedores_obtener_compras = '{!!URL::to('notas_credito_proveedores_obtener_compras')!!}'; 
-        
-        var compras_cargar_xml_alta = '{!!URL::to('compras_cargar_xml_alta')!!}';
-        var compras_obtener_ordenes_compra = '{!!URL::to('compras_obtener_ordenes_compra')!!}';
+        var notas_credito_proveedores_obtener_compra = '{!!URL::to('notas_credito_proveedores_obtener_compra')!!}';
+        var notas_credito_proveedor_obtener_codigos_compra = '{!!URL::to('notas_credito_proveedor_obtener_codigos_compra')!!}';
+        var notas_credito_proveedor_guardar = '{!!URL::to('notas_credito_proveedor_guardar')!!}';
+        var notas_credito_proveedor_cargar_xml_alta = '{!!URL::to('notas_credito_proveedor_cargar_xml_alta')!!}';
+        var notas_credito_proveedor_obtener_existencias_partida = '{!!URL::to('notas_credito_proveedor_obtener_existencias_partida')!!}';
+
+
         var compras_obtener_claves_productos = '{!!URL::to('compras_obtener_claves_productos')!!}'; 
         var compras_obtener_claves_unidades = '{!!URL::to('compras_obtener_claves_unidades')!!}'; 
-        var compras_guardar = '{!!URL::to('compras_guardar')!!}';
         var compras_obtener_movimientos_compra = '{!!URL::to('compras_obtener_movimientos_compra')!!}';
         var compras_obtener_compra = '{!!URL::to('compras_obtener_compra')!!}';
-        var compras_obtener_existencias_partida = '{!!URL::to('compras_obtener_existencias_partida')!!}';
         var compras_guardar_modificacion = '{!!URL::to('compras_guardar_modificacion')!!}';
         var compras_verificar_uso_en_modulos =  '{!!URL::to('compras_verificar_uso_en_modulos')!!}';
         var compras_alta_o_baja = '{!!URL::to('compras_alta_o_baja')!!}'; 
@@ -316,5 +318,5 @@
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="scripts_inaasys/registros/notascreditoproveedores/notascreditoproveedores.js"></script>
-
+    
 @endsection

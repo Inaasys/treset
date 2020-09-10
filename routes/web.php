@@ -34,10 +34,16 @@ Route::group(['middleware' => ['auth']], function () {
 Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/pruebas', 'ProductoController@pruebas')->name('pruebas');
+    Route::post('/enviar_msj_whatsapp', 'PruebaController@enviar_msj_whatsapp')->name('enviar_msj_whatsapp');
     Route::get('/artisan', function () { 
         //return Artisan::call('config:cache');
 
     });
+
+
+
+    Route::get('/obtener_valor_dolar_dof', 'MonedaController@obtener_valor_dolar_dof')->name('obtener_valor_dolar_dof');
+
 
     /* -----------------------------------||||||||||||||||||||CATALOGOS||||||||||||||||||||||-------------------------------------*/
     //Clientes
@@ -262,7 +268,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/notas_credito_proveedores_obtener_proveedores', 'NotasCreditoProveedoresController@notas_credito_proveedores_obtener_proveedores')->name('notas_credito_proveedores_obtener_proveedores')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     Route::get('/notas_credito_proveedores_obtener_almacenes', 'NotasCreditoProveedoresController@notas_credito_proveedores_obtener_almacenes')->name('notas_credito_proveedores_obtener_almacenes')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     Route::get('/notas_credito_proveedores_obtener_compras', 'NotasCreditoProveedoresController@notas_credito_proveedores_obtener_compras')->name('notas_credito_proveedores_obtener_compras')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
-
+    Route::get('/notas_credito_proveedores_obtener_compra', 'NotasCreditoProveedoresController@notas_credito_proveedores_obtener_compra')->name('notas_credito_proveedores_obtener_compra')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
+    Route::get('/notas_credito_proveedor_obtener_codigos_compra', 'NotasCreditoProveedoresController@notas_credito_proveedor_obtener_codigos_compra')->name('notas_credito_proveedor_obtener_codigos_compra')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
+    Route::post('/notas_credito_proveedor_cargar_xml_alta', 'NotasCreditoProveedoresController@notas_credito_proveedor_cargar_xml_alta')->name('notas_credito_proveedor_cargar_xml_alta')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
+    Route::get('/notas_credito_proveedor_obtener_existencias_partida', 'NotasCreditoProveedoresController@notas_credito_proveedor_obtener_existencias_partida')->name('notas_credito_proveedor_obtener_existencias_partida')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
+    Route::post('/notas_credito_proveedor_guardar', 'NotasCreditoProveedoresController@notas_credito_proveedor_guardar')->name('notas_credito_proveedor_guardar')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
+    
     Route::get('/notas_credito_proveedores_buscar_folio_string_like', 'NotasCreditoProveedoresController@notas_credito_proveedores_buscar_folio_string_like')->name('notas_credito_proveedores_buscar_folio_string_like')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     Route::post('/notas_credito_proveedores_generar_pdfs', 'NotasCreditoProveedoresController@notas_credito_proveedores_generar_pdfs')->name('notas_credito_proveedores_generar_pdfs')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
    

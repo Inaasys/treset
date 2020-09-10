@@ -190,6 +190,24 @@ class Helpers{
         return $serieusuario;
     }
 
+    //calcular porcentaje de iva
+    public static function calcular_porcentaje_iva_aritmetico($iva, $subtotal){
+        $porcentajeiva = ($iva * 100) / $subtotal;
+        return $porcentajeiva;
+    }
+
+
+    public static function obtener_valor_dolar_por_fecha_diario_oficial_federacion($fecha){
+        $fecha_explode = explode("-", $fecha);
+        $ano = $fecha_explode[0];
+        $mes = $fecha_explode[1];
+        $dia = $fecha_explode[2];
+        $pagina_inicio = file_get_contents('https://www.dof.gob.mx/indicadores_detalle.php?cod_tipo_indicador=158&dfecha='.$dia.'%2F'.$mes.'%2F'.$ano.'&hfecha='.$dia.'%2F'.$mes.'%2F'.$ano);
+        $explode_pagina = explode('<td width="52%" align="center" class="txt">', $pagina_inicio);
+        $ultimo_explode = explode('</td>', $explode_pagina[1]);
+        return $ultimo_explode[0];
+    }
+
     //quitar acentos
     public static function quitaracentos($string){
         $string = trim($string);

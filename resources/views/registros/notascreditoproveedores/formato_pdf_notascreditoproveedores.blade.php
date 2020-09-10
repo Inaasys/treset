@@ -14,6 +14,7 @@
             page-break-after: auto
         }
         body {
+            letter-spacing: 1px;
 	        font-family: 'Roboto', Arial, Tahoma, sans-serif;
         }
     </style>

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <link rel="icon" type="image/png" href="images/iniciarsesion2.png" sizes="16x16">
-    <link rel="icon" type="image/png" href="images/iniciarsesion2.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="images/iconapp1.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="images/iconapp1.png" sizes="32x32">
     <title>inaasys - login</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">

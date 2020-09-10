@@ -187,12 +187,26 @@ class ProductoController extends ConfiguracionSistemaController{
     }    
     public function pruebas(){
 
-        //DB::unprepared(DB::raw("BACKUP DATABASE SISTEMA TO DISK = 'C:\backuphoy.bak'"));
+
+        return view ('pruebas.pruebas');
 
         
 
+/*
+        $endpoint = config('app.endpointapicurrencylayer');
+        $access_key = config('app.keyapicurrencylayer');
+        define('VT_URL', 'http://api.currencylayer.com/'.$endpoint.'?access_key='.$access_key.'&currencies=MXN');
+        //crear cliente Guzzle HTTP
+        $cliente = new Client();
+        //respuesta de API
+        $respuesta = $cliente->request('GET', VT_URL, []);
+        $resultado = json_decode($respuesta->getBody());
+        //obtener valor del dolar
+        $valor_dolar = $resultado->quotes->USDMXN;
+        dd($valor_dolar);*/
 
-		
+
+		/*
 		$nombre = 'Receptor envio de correos';
         $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
         $correos = ['al221410832@gmail.com','marco.baltazar@utpcamiones.com.mx'];
@@ -210,7 +224,7 @@ class ProductoController extends ConfiguracionSistemaController{
                     ->subject('Respaldo');
                     //->attach($urlinventarioactual)
                     //->attach($urlreporteventas);
-        });
+        });*/
 		
 
         /*$pdf = \PDF::loadView('pruebas.pruebas');

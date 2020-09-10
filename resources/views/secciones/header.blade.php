@@ -373,11 +373,11 @@
                   <li><a href="#">Generar Pólizas</a></li>
                   -->
                   <li><a href="#" data-toggle="modal" onclick="datosutileriasempresa()">Empresa</a></li>
-                  <li>
+                  <li class="bg-deep-orange">
                         <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                            Cerrar sesión
+                            <b>CERRAR SESIÓN</b>
                         </a>
-                    </li>  
+                  </li>  
                 </ul>
               </li>              
               <!--<li class="dropdown">
@@ -391,11 +391,11 @@
               </li>-->
             </ul>
             <ul class="nav navbar-nav navbar-right infousuario">
-                <!--<li>
-                    <div class="image">
-                        <img src="images/user3.png" width="50px" height="50px" alt="User" />
-                    </div>
-                </li>-->
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
+                      Valor Dolar DOF: <b>{{$valor_dolar_hoy}}</b>
+                    </a>
+                </li>    
                 <!-- Notificaciones -->
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">

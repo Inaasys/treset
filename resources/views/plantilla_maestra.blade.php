@@ -3,8 +3,8 @@
   <head>
         <meta charset="UTF-8">
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-        <link rel="icon" type="image/png" href="logotipo_empresa/{{$empresa->Logo}}" sizes="16x16">
-        <link rel="icon" type="image/png" href="logotipo_empresa/{{$empresa->Logo}}" sizes="32x32">
+        <link rel="icon" type="image/png" href="images/iconapp1.png" sizes="16x16">
+        <link rel="icon" type="image/png" href="images/iconapp1.png" sizes="32x32">
         <title>INAASYS - @yield('titulo')</title>
             @include('secciones.head')
             @yield('additionals_css')

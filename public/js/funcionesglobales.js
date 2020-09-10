@@ -271,6 +271,14 @@ function msj_errorproductoyaagregado(){
         "extendedTImeout": "5000"
     });
 }
+//mensaje error la compra ya fue agregada
+function msj_errorcomprayaagregada(){
+    toastr.error( "El código de la compra ya fue agregado", "Mensaje", {
+        "timeOut": "5000",
+        "progressBar": true,
+        "extendedTImeout": "5000"
+    }); 
+}
 //mensaje error la fecha debe ser del año y mes en curso
 function msj_errorfechaanoymesactual(){
     toastr.error( "Error la fecha debe ser del mes y año en curso", "Mensaje", {
