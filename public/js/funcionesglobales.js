@@ -112,18 +112,23 @@ function validasolomesactual(){
 }
 //FIN VALIDAR EN TODOS LOS MODULOS QUE LA FECHA DE ALTA SOLO SE DE EN EL MES ACTUAL
 //FUNCIONES EXPORTACION DE PDF EN MODULOS
+//muestra la exportacion por folio
 function mostrartiposeleccionfolios(){
     $("#tiposeleccionfolios").show();
 }
+//muestra la exportacion por filtrado de fechas
 function mostrartipofiltracionfechas(){
     $("#tipofiltracionfechas").show();
 }
+//oculta la exportacion por folio
 function ocultartiposeleccionfolios(){
     $("#tiposeleccionfolios").hide();
 }
+//oculta la exportacion por filtrado de fechas
 function ocultartipofiltracionfechas(){
     $("#tipofiltracionfechas").hide();
 }
+//destruye la tabla de folio encontrados
 function destruirtablafoliosexportacion(){
     $('#tablafoliosencontrados').DataTable().clear().destroy();
 }
@@ -132,7 +137,6 @@ function mostrarmodalgenerarpdf(){
     ocultartipofiltracionfechas();
     ocultartiposeleccionfolios();
     $("#arraypdf").empty();
-    destruirtablafoliosexportacion();
     $("#formgenerarpdf")[0].reset();
     $("#formgenerarpdf").parsley().reset();
     $("#modalgenerarpdf").modal('show');
@@ -140,6 +144,7 @@ function mostrarmodalgenerarpdf(){
 //mostrar o ocultar div dependiendo el tipo de filtrado que  ocuparan para realizar los pdf
 function mostrartipogeneracionpdf(){
     if($('input:radio[name=tipogeneracionpdf]:checked').val() == 0){
+        buscarstringlike();
         mostrartiposeleccionfolios();
         ocultartipofiltracionfechas();
         $("#fechainiciopdf").removeAttr('required');
@@ -151,6 +156,7 @@ function mostrartipogeneracionpdf(){
         $("#fechainiciopdf").attr('required', 'required');
         $("#fechaterminacionpdf").attr('required', 'required');
         $("#arraypdf").removeAttr('required');
+        $('#tablafoliosencontrados').DataTable().clear().destroy();
     }
 }
 //agregar al multiple select el folio seleccionado
@@ -169,7 +175,6 @@ function agregararraypdf(foliomodulo){
     }
 }
 //FIN FUNCIONES EXPORTACION DE PDF EN MODULOS
-
 ////////////////////////////////////////MENSAJES TOASTR.JS INAASYS//////////////////////////////////////////
 //error en permisos del usuario
 function msj_errorenpermisos(){
@@ -312,3 +317,38 @@ function msj_errorentradacontrarecibo(){
     });
 }
 ///////////////////////////////////FIN MENSAJES TOASTR.JS INAASYS///////////////////////////////////////
+//////////////////////////////FUNCIONES PARA CONFIGURACION DE COLUMNAS DE TABLAS/////////////////////////////////////////
+//ordenar las columnas para vista de tabla
+function ordenarcolumnas(){
+    var string_datos_ordenamiento_columnas = [];
+    var lista = document.getElementsByClassName("inputnestable");
+    for (var i = 0; i < lista.length; i++) {
+        string_datos_ordenamiento_columnas.push(lista[i].value);
+    }
+    $("#string_datos_ordenamiento_columnas").val(string_datos_ordenamiento_columnas);
+}
+//permitir o reestringir acceso al menu
+function construirarraydatostabla(e){
+    //agregar columna seleccionada en la nestable ordenamiento de columnas
+    var columna =   '<li class="dd-item nestable'+e.value+'">'+
+                        '<div class="dd-handle">'+e.value+'</div>'+
+                        '<input type="hidden" class="inputnestable" value="'+e.value+'">'+
+                    '</li>';
+    $("#columnasnestable").append(columna);
+    $("#string_datos_ordenamiento_columnas").val($("#string_datos_ordenamiento_columnas").val()+","+e.value);
+    var string_datos_tabla_true = [];
+    var string_datos_table_false = [];
+    var lista = document.getElementsByClassName("datotabla");
+    for (var i = 0; i < lista.length; i++) {
+        if(lista[i].checked){
+            string_datos_tabla_true.push(lista[i].name);
+        }else{
+            $(".nestable"+lista[i].name).remove();
+            string_datos_table_false.push(lista[i].name);
+        }
+    }
+    $("#string_datos_tabla_true").val(string_datos_tabla_true);
+    $("#string_datos_tabla_false").val(string_datos_table_false);
+    ordenarcolumnas();
+}
+//////////////////////////////FIN FUNCIONES PARA CONFIGURACION DE COLUMNAS DE TABLAS/////////////////////////////////////////

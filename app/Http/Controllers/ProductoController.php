@@ -10,6 +10,8 @@ use SoapClient;
 use Helpers;
 use DB;
 use DataTables;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ProductosExport;
 use App\Producto;
 use App\Tabla;
 use App\ClaveProdServ;
@@ -22,7 +24,8 @@ use App\ProductoPrecio;
 use App\ProductoConsumo;
 use App\Almacen;
 use App\Existencia;
-
+use App\Configuracion_Tabla;
+use App\VistaProducto;
 use App\ContraReciboDetalle;
 
 use GuzzleHttp\Client;
@@ -32,24 +35,26 @@ use Mail;
 class ProductoController extends ConfiguracionSistemaController{
 
     public function __construct(){
+        
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
+        //CONFIGURACIONES DE LA TABLA DEL CATALOGO O MODULO//
+        $this->configuracion_tabla = Configuracion_Tabla::where('tabla', 'Productos')->first();
+        $this->campos_consulta = [];
+        foreach (explode(",", $this->configuracion_tabla->columnas_ordenadas) as $campo){
+            array_push($this->campos_consulta, $campo);
+        }
+        //FIN CONFIGURACIONES DE LA TABLA//
     }
 
     public function productos(){
-        return view('catalogos.productos.productos');
+        $configuracion_tabla = $this->configuracion_tabla;
+        $rutaconfiguraciontabla = route('productos_guardar_configuracion_tabla');
+        return view('catalogos.productos.productos', compact('configuracion_tabla','rutaconfiguraciontabla'));
     }
     //obtener todos los registros
     public function productos_obtener(Request $request){
         if($request->ajax()){
-            $data = DB::table('Productos as t')
-                        ->leftJoin('Marcas as m', 'm.Numero', '=', 't.Marca')
-                        ->leftJoin('Lineas as l', 'l.Numero', '=', 't.Linea')
-                        ->leftJoin(DB::raw("(select codigo, sum(existencias) as existencias from Existencias group by codigo) as e"),
-                        function($join){
-                            $join->on("e.codigo","=","t.codigo");
-                        })
-                        ->select('t.Codigo as Codigo', 't.ClaveProducto as ClaveProducto', 't.ClaveUnidad as ClaveUnidad', 't.Producto as Producto', 't.Unidad as Unidad', 't.Ubicacion as Ubicacion', 'e.Existencias as Existencias', 't.Costo as Costo', 't.CostoDeLista as CostoDeLista', 't.Moneda as Moneda', 't.CostoDeVenta as CostoDeVenta', 't.Utilidad as Utilidad', 't.SubTotal as SubTotal', 't.Iva as Iva', 't.Total as Total', 't.Marca as Marca', 't.Linea as Linea', 't.Status as Status', 'm.Nombre as NombreMarca', 'l.Nombre as NombreLinea')
-                        ->get();
+            $data = VistaProducto::select($this->campos_consulta)->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
                         if($data->Status == 'ALTA'){
@@ -61,42 +66,26 @@ class ProductoController extends ConfiguracionSistemaController{
                         } 
                         return $boton;
                     })
-                    ->addColumn('Existencias', function($data){
-                        $existencias = Helpers::convertirvalorcorrecto($data->Existencias);
-                        return $existencias;
-                    })
-                    ->addColumn('Costo', function($data){
-                        $costo = Helpers::convertirvalorcorrecto($data->Costo);
-                        return $costo;
-                    })
-                    ->addColumn('CostoDeLista', function($data){
-                        $costodelista = Helpers::convertirvalorcorrecto($data->CostoDeLista);
-                        return $costodelista;
-                    })
-                    ->addColumn('CostoDeVenta', function($data){
-                        $costodeventa = Helpers::convertirvalorcorrecto($data->CostoDeVenta);
-                        return $costodeventa;
-                    })
-                    ->addColumn('Utilidad', function($data){
-                        $utilidad = Helpers::convertirvalorcorrecto($data->Utilidad);
-                        return $utilidad;
-                    })
-                    ->addColumn('SubTotal', function($data){
-                        $subtotal = Helpers::convertirvalorcorrecto($data->SubTotal);
-                        return $subtotal;
-                    })
-                    ->addColumn('Iva', function($data){
-                        $iva = Helpers::convertirvalorcorrecto($data->Iva);
-                        return $iva;
-                    })
-                    ->addColumn('Total', function($data){
-                        $total = Helpers::convertirvalorcorrecto($data->Total);
-                        return $total;
-                    })
-                    ->setRowClass(function ($data) {
-                        return $data->Status == 'ALTA' ? '' : 'bg-orange';
-                    })
-                    ->rawColumns(['operaciones','Existencias','Costo','CostoDeLista','CostoDeVenta','Utilidad','SubTotal','Iva','Total'])
+                    ->addColumn('Existencias', function($data){ return $data->Existencias; })
+                    ->addColumn('Costo', function($data){ return $data->Costo; })
+                    ->addColumn('CostoDeLista', function($data){ return $data->CostoDeLista; })
+                    ->addColumn('CostoDeVenta', function($data){ return $data->CostoDeVenta; })
+                    ->addColumn('Utilidad', function($data){ return $data->Utilidad; })
+                    ->addColumn('SubTotal', function($data){ return $data->SubTotal; })
+                    ->addColumn('Iva', function($data){ return $data->Iva; })
+                    ->addColumn('Total', function($data){ return $data->Total; })
+                    ->addColumn('Precio', function($data){ return $data->Precio; })
+                    ->addColumn('Impuesto', function($data){ return $data->Impuesto; })
+                    ->addColumn('Venta', function($data){ return $data->Venta; })
+                    ->addColumn('UltimoCosto', function($data){ return $data->UltimoCosto; })
+                    ->addColumn('UltimaVenta', function($data){ return $data->UltimaVenta; })
+                    ->addColumn('Utilidad1Marca', function($data){ return $data->Utilidad1Marca; })
+                    ->addColumn('Utilidad2Marca', function($data){ return $data->Utilidad2Marca; })
+                    ->addColumn('Utilidad3Marca', function($data){ return $data->Utilidad3Marca; })
+                    ->addColumn('Utilidad4Marca', function($data){ return $data->Utilidad4Marca; })
+                    ->addColumn('Utilidad5Marca', function($data){ return $data->Utilidad5Marca; })
+                    ->setRowClass(function ($data) { return $data->Status == 'ALTA' ? '' : 'bg-orange'; })
+                    ->rawColumns(['operaciones'])
                     ->make(true);
         } 
     }  
@@ -582,11 +571,25 @@ class ProductoController extends ConfiguracionSistemaController{
         } 
     	return response()->json($Producto); 
     }
-
-
-
-
-
-
-
+    //exportar a excel
+    public function productos_exportar_excel(){
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        return Excel::download(new ProductosExport($this->campos_consulta), "productos.xlsx");
+    }
+    //guardar cambios en confguraxion de la tabla
+    public function productos_guardar_configuracion_tabla(Request $request){
+        if($request->string_datos_tabla_false == null){
+            $string_datos_tabla_false = "todos los campos fueron seleccionados";
+        }else{
+            $string_datos_tabla_false = $request->string_datos_tabla_false;
+        }
+        $Configuracion_Tabla = Configuracion_Tabla::where('tabla', 'Productos')->first();
+        $Configuracion_Tabla->campos_activados = $request->string_datos_tabla_true;
+        $Configuracion_Tabla->campos_desactivados = $string_datos_tabla_false;
+        $Configuracion_Tabla->columnas_ordenadas = $request->string_datos_ordenamiento_columnas;
+        $Configuracion_Tabla->usuario = Auth::user()->user;
+        $Configuracion_Tabla->save();
+        return redirect()->route('productos');
+    }
 }

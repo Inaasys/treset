@@ -9,6 +9,8 @@
     <!-- Jquery DataTable Plugin Js -->
     <script src="plugins/jquery-datatable/jquery.dataTables.js"></script>
     <script src="plugins/jquery-datatable/skin/bootstrap/js/dataTables.bootstrap.js"></script>
+    <!-- Jquery Nestable ORDERNAR COLUMNAS TABLAS -->
+    <script src="plugins/nestable/jquery.nestable.js"></script>
     <!-- Custom Js -->
     <script src="js/pages/ui/modals.js"></script>
     <!--Libreria para operaciones aritmeticas correctas en javascript-->

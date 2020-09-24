@@ -10,6 +10,8 @@ use Helpers;
 use DataTables;
 use DB;
 use PDF;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\NotasCreditoProveedoresExport;
 use App\NotaProveedor;
 use App\NotaProveedorDetalle;
 use App\Compra;
@@ -18,16 +20,28 @@ use App\Proveedor;
 use App\Almacen;
 use App\BitacoraDocumento;
 Use App\Existencia;
+use App\Configuracion_Tabla;
+use App\VistaNotaCreditoProveedor;
 
 class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
 
     public function __construct(){
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
+        //CONFIGURACIONES DE LA TABLA DEL CATALOGO O MODULO//
+        $this->configuracion_tabla = Configuracion_Tabla::where('tabla', 'NotasCreditoProveedor')->first();
+        $this->campos_consulta = [];
+        foreach (explode(",", $this->configuracion_tabla->columnas_ordenadas) as $campo){
+            array_push($this->campos_consulta, $campo);
+        }
+        //FIN CONFIGURACIONES DE LA TABLA//
     }
     
     public function notas_credito_proveedores(){
         $serieusuario = Helpers::obtenerserieusuario(Auth::user()->email, 'ContraRecibos');
-        return view('registros.notascreditoproveedores.notascreditoproveedores', compact('serieusuario'));
+        $configuracion_tabla = $this->configuracion_tabla;
+        $rutaconfiguraciontabla = route('notas_credito_proveedor_guardar_configuracion_tabla');
+        $rutacreardocumento = route('notas_credito_proveedores_generar_pdfs');
+        return view('registros.notascreditoproveedores.notascreditoproveedores', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','rutacreardocumento'));
     }
     //obtener registros tabla
     public function notas_credito_proveedores_obtener(Request $request){
@@ -35,12 +49,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             $fechahoy = Carbon::now()->toDateString();
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = DB::table('Notas Proveedor AS np')
-            ->Join('Proveedores AS p', 'np.Proveedor', '=', 'p.Numero')
-            ->select('np.Nota AS Nota', 'np.Serie AS Serie', 'np.Folio AS Folio', 'np.Proveedor AS Proveedor', 'p.Nombre AS Nombre', 'np.Fecha AS Fecha', 'np.NotaProveedor AS NotaProveedor', 'np.Almacen AS Almacen', 'np.UUID AS UUID', 'np.SubTotal AS SubTotal', 'np.Iva AS Iva', 'np.Total AS Total', 'np.Obs AS Obs', 'np.Status AS Status', 'np.MotivoBaja AS MotivoBaja', 'np.Equipo AS Equipo', 'np.Usuario AS Usuario', 'np.Periodo AS Periodo')
-            ->where('np.Periodo', $periodo)
-            ->orderBy('np.Folio', 'DESC')
-            ->get();
+            $data = VistaNotaCreditoProveedor::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Folio', 'DESC')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
                         if($data->Status != 'BAJA'){
@@ -51,19 +60,19 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                         }
                         return $boton;
                     })
-                    ->addColumn('SubTotal', function($data){
-                        $subtotal = Helpers::convertirvalorcorrecto($data->SubTotal);
-                        return $subtotal;
-                    })
-                    ->addColumn('Iva', function($data){
-                        $iva = Helpers::convertirvalorcorrecto($data->Iva);
-                        return $iva;
-                    })
-                    ->addColumn('Total', function($data){
-                        $total = Helpers::convertirvalorcorrecto($data->Total);
-                        return $total;
-                    })
-                    ->rawColumns(['operaciones','SubTotal','Iva','Total'])
+                    ->addColumn('SubTotal', function($data){ return $data->SubTotal; })
+                    ->addColumn('Iva', function($data){ return $data->Iva; })
+                    ->addColumn('Total', function($data){ return $data->Total; })
+                    ->addColumn('ImpLocTraslados', function($data){ return $data->ImpLocTraslados; })
+                    ->addColumn('ImpLocRetenciones', function($data){ return $data->ImpLocRetenciones; })
+                    ->addColumn('IepsRetencion', function($data){ return $data->IepsRetencion; })
+                    ->addColumn('IsrRetencion', function($data){ return $data->IsrRetencion; })
+                    ->addColumn('IvaRetencion', function($data){ return $data->IvaRetencion; })
+                    ->addColumn('Ieps', function($data){ return $data->Ieps; })
+                    ->addColumn('Descuento', function($data){ return $data->Descuento; })
+                    ->addColumn('Importe', function($data){ return $data->Importe; })
+                    ->addColumn('TipoCambio', function($data){ return $data->TipoCambio; })
+                    ->rawColumns(['operaciones'])
                     ->make(true);
         } 
     }
@@ -527,5 +536,25 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
         //return $pdf->download('contrarecibos.pdf');
         return $pdf->stream();
     }
-
+    //exportar a excel
+    public function notas_credito_proveedores_exportar_excel(){
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        return Excel::download(new NotasCreditoProveedoresExport($this->campos_consulta), "notascreditoproveedores.xlsx");  
+    }
+    //configuracion tabla
+    public function notas_credito_proveedor_guardar_configuracion_tabla(Request $request){
+        if($request->string_datos_tabla_false == null){
+            $string_datos_tabla_false = "todos los campos fueron seleccionados";
+        }else{
+            $string_datos_tabla_false = $request->string_datos_tabla_false;
+        }
+        $Configuracion_Tabla = Configuracion_Tabla::where('tabla', 'NotasCreditoProveedor')->first();
+        $Configuracion_Tabla->campos_activados = $request->string_datos_tabla_true;
+        $Configuracion_Tabla->campos_desactivados = $string_datos_tabla_false;
+        $Configuracion_Tabla->columnas_ordenadas = $request->string_datos_ordenamiento_columnas;
+        $Configuracion_Tabla->usuario = Auth::user()->user;
+        $Configuracion_Tabla->save();
+        return redirect()->route('notas_credito_proveedores');
+    }
 }

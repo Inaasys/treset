@@ -45,6 +45,18 @@ function ocultarformulario(){
 }
 //listar todos los registros de la tabla
 function listar(){
+    //Campos ordenados a mostras
+    var campos = columnas_ordenadas.split(",");
+    var campos_tabla  = [];
+    campos_tabla.push({ 'data':'operaciones', 'name':'operaciones', 'orderable':false, 'searchable':false});
+    for (var i = 0; i < campos.length; i++) {
+        campos_tabla.push({ 
+            'data'    : campos[i],
+            'name'  : campos[i],
+            'orderable': false,
+            'searchable': false
+        });
+    }
     tabla=$('#tbllistado').DataTable({
         "sScrollX": "110%",
         "sScrollY": "350px",
@@ -56,29 +68,7 @@ function listar(){
         },
         serverSide: true,
         ajax: productos_obtener,
-        columns: [
-            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
-            { data: 'Codigo', name: 'Codigo' },
-            { data: 'ClaveProducto', name: 'ClaveProducto' },
-            { data: 'ClaveUnidad', name: 'ClaveUnidad', orderable: false, searchable: false },
-            { data: 'Producto', name: 'Producto', orderable: false, searchable: false },
-            { data: 'Unidad', name: 'Unidad', orderable: false, searchable: false },
-            { data: 'Ubicacion', name: 'Ubicacion', orderable: false, searchable: false },
-            { data: 'Existencias', name: 'Existencias', orderable: false, searchable: false },
-            { data: 'Costo', name: 'Costo', orderable: false, searchable: false },
-            { data: 'CostoDeLista', name: 'CostoDeLista', orderable: false, searchable: false },
-            { data: 'Moneda', name: 'Moneda', orderable: false, searchable: false },
-            { data: 'CostoDeVenta', name: 'CostoDeVenta', orderable: false, searchable: false },
-            { data: 'Utilidad', name: 'Utilidad', orderable: false, searchable: false },
-            { data: 'SubTotal', name: 'SubTotal', orderable: false, searchable: false },
-            { data: 'Iva', name: 'Iva', orderable: false, searchable: false },
-            { data: 'Total', name: 'Total', orderable: false, searchable: false },
-            { data: 'Marca', name: 'Marca', orderable: false, searchable: false },
-            { data: 'Linea', name: 'Linea', orderable: false, searchable: false },
-            { data: 'NombreMarca', name: 'NombreMarca', orderable: false, searchable: false },
-            { data: 'NombreLinea', name: 'NombreLinea', orderable: false, searchable: false },
-            { data: 'Status', name: 'Status', orderable: false, searchable: false }
-        ],
+        columns: campos_tabla,
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
             $buscar.unbind();
@@ -1289,4 +1279,238 @@ $("#btnGuardarModificacion").on('click', function (e) {
         msj_verificartodoslosdatos();
     }
 });
+//configurar tabla
+function configurar_tabla(){
+        //formulario modificacion
+        var tabs =  '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                        '<li role="presentation" class="active">'+
+                            '<a href="#tabcamposamostrar" data-toggle="tab">Campos a mostrar</a>'+
+                        '</li>'+
+                        '<li role="presentation">'+
+                            '<a href="#tabordenarcolumnas" data-toggle="tab">Ordenar Columnas</a>'+
+                        '</li>'+
+                    '</ul>'+
+                    '<div class="tab-content">'+
+                        '<div role="tabpanel" class="tab-pane fade in active" id="tabcamposamostrar">'+
+                            '<div class="row">'+
+                                '<div class="col-md-6">'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<label>DATOS PRODUCTO</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Codigo" id="idCodigo" class="filled-in datotabla" value="Codigo"  onchange="construirarraydatostabla(this);" onclick="javascript: return false;"/>'+
+                                        '<label for="idCodigo">Codigo</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Status" id="idStatus" class="filled-in datotabla" value="Status" onchange="construirarraydatostabla(this);" onclick="javascript: return false;"/>'+
+                                        '<label for="idStatus">Status</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="ClaveProducto" id="idClaveProducto" class="filled-in datotabla" value="ClaveProducto" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idClaveProducto">ClaveProducto</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="ClaveUnidad" id="idClaveUnidad" class="filled-in datotabla" value="ClaveUnidad" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idClaveUnidad">ClaveUnidad</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Producto" id="idProducto" class="filled-in datotabla" value="Producto" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idProducto">Producto</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Unidad" id="idUnidad" class="filled-in datotabla" value="Unidad" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idUnidad">Unidad</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Ubicacion" id="idUbicacion" class="filled-in datotabla" value="Ubicacion" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idUbicacion">Ubicacion</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Costo" id="idCosto" class="filled-in datotabla" value="Costo" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idCosto">Costo</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="CostoDeLista" id="idCostoDeLista" class="filled-in datotabla" value="CostoDeLista" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idCostoDeLista">CostoDeLista</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+    
+                                        '<input type="checkbox" name="Moneda" id="idMoneda" class="filled-in datotabla" value="Moneda" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idMoneda">Moneda</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="CostoDeVenta" id="idCostoDeVenta" class="filled-in datotabla" value="CostoDeVenta" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idCostoDeVenta">CostoDeVenta</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Utilidad" id="idUtilidad" class="filled-in datotabla" value="Utilidad" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idUtilidad">Utilidad</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="SubTotal" id="idSubTotal" class="filled-in datotabla" value="SubTotal" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idSubTotal">SubTotal</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Iva" id="idIva" class="filled-in datotabla" value="Iva" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idIva">Iva</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Total" id="idTotal" class="filled-in datotabla" value="Total" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idTotal">Total</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Marca" id="idMarca" class="filled-in datotabla" value="Marca" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idMarca">Marca</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Linea" id="idLinea" class="filled-in datotabla" value="Linea" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idLinea">Linea</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Supercedido" id="idSupercedido" class="filled-in datotabla" value="Supercedido" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idSupercedido">Supercedido</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Grupo" id="idGrupo" class="filled-in datotabla" value="Grupo" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idGrupo">Grupo</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Precio" id="idPrecio" class="filled-in datotabla" value="Precio" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idPrecio">Precio</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Impuesto" id="idImpuesto" class="filled-in datotabla" value="Impuesto" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idImpuesto">Impuesto</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="TasaIeps" id="idTasaIeps" class="filled-in datotabla" value="TasaIeps" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idTasaIeps">TasaIeps</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Venta" id="idVenta" class="filled-in datotabla" value="Venta" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idVenta">Venta</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Insumo" id="idInsumo" class="filled-in datotabla" value="Insumo" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idInsumo">Insumo</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="FechaUltimaCompra" id="idFechaUltimaCompra" class="filled-in datotabla" value="FechaUltimaCompra" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idFechaUltimaCompra">FechaUltimaCompra</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="FechaUltimaVenta" id="idFechaUltimaVenta" class="filled-in datotabla" value="FechaUltimaVenta" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idFechaUltimaVenta">FechaUltimaVenta</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="UltimoCosto" id="idUltimoCosto" class="filled-in datotabla" value="UltimoCosto" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idUltimoCosto">UltimoCosto</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="UltimaVenta" id="idUltimaVenta" class="filled-in datotabla" value="UltimaVenta" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idUltimaVenta">UltimaVenta</label>'+
+                                    '</div>'+
+                                    '<input type="hidden" class="form-control" name="string_datos_tabla_true" id="string_datos_tabla_true" required>'+
+                                    '<input type="hidden" class="form-control" name="string_datos_tabla_false" id="string_datos_tabla_false" required>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<label>DATOS MARCA PRODUCTO</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="NumeroMarca" id="idNumeroMarca" class="filled-in datotabla" value="NumeroMarca"  onchange="construirarraydatostabla(this);"/>'+
+                                        '<label for="idNumeroMarca">NumeroMarca</label>'+  
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+  
+                                        '<input type="checkbox" name="NombreMarca" id="idNombreMarca" class="filled-in datotabla" value="NombreMarca"  onchange="construirarraydatostabla(this);"/>'+
+                                        '<label for="idNombreMarca">NombreMarca</label>'+ 
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Utilidad1Marca" id="idUtilidad1Marca" class="filled-in datotabla" value="Utilidad1Marca"  onchange="construirarraydatostabla(this);"/>'+
+                                        '<label for="idUtilidad1Marca">Utilidad1Marca</label>'+ 
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Utilidad2Marca" id="idUtilidad2Marca" class="filled-in datotabla" value="Utilidad2Marca"  onchange="construirarraydatostabla(this);"/>'+
+                                        '<label for="idUtilidad2Marca">Utilidad2Marca</label>'+ 
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Utilidad3Marca" id="idUtilidad3Marca" class="filled-in datotabla" value="Utilidad3Marca"  onchange="construirarraydatostabla(this);"/>'+
+                                        '<label for="idUtilidad3Marca">Utilidad3Marca</label>'+ 
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Utilidad4Marca" id="idUtilidad4Marca" class="filled-in datotabla" value="Utilidad4Marca"  onchange="construirarraydatostabla(this);"/>'+
+                                        '<label for="idUtilidad4Marca">Utilidad4Marca</label>'+ 
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Utilidad5Marca" id="idUtilidad5Marca" class="filled-in datotabla" value="Utilidad5Marca"  onchange="construirarraydatostabla(this);"/>'+
+                                        '<label for="idUtilidad5Marca">Utilidad5Marca</label>'+                                     
+                                    '</div>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<label>DATOS LINEA PRODUCTO</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="NumeroLinea" id="idNumeroLinea" class="filled-in datotabla" value="NumeroLinea"  onchange="construirarraydatostabla(this);"/>'+
+                                        '<label for="idNumeroLinea">NumeroLinea</label>'+ 
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="NombreLinea" id="idNombreLinea" class="filled-in datotabla" value="NombreLinea"  onchange="construirarraydatostabla(this);"/>'+
+                                        '<label for="idNombreLinea">NombreLinea</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<label>DATOS EXISTENCIAS PRODUCTO</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="Existencias" id="idExistencias" class="filled-in datotabla" value="Existencias"  onchange="construirarraydatostabla(this);"/>'+
+                                        '<label for="idExistencias">Existencias</label>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+ 
+                        '<div role="tabpanel" class="tab-pane fade" id="tabordenarcolumnas">'+
+                            '<div class="row">'+
+                                '<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">'+
+                                    '<div class="card">'+
+                                        '<div class="header">'+
+                                            '<h2>'+
+                                                'Ordenar Columnas'+
+                                                '<small>Ordena las columnas arrastrándolas hacia arriba o hacia abajo. </small>'+
+                                            '</h2>'+
+                                        '</div>'+
+                                        '<div class="body">'+
+                                            '<div class="clearfix m-b-20">'+
+                                                '<div class="dd" onchange="ordenarcolumnas()">'+
+                                                    '<ol class="dd-list" id="columnasnestable">'+
+                                                    '</ol>'+
+                                                '</div>'+
+                                            '</div>'+
+                                            '<input type="hidden" id="string_datos_ordenamiento_columnas" name="string_datos_ordenamiento_columnas" class="form-control" required>'+
+                                        '</div>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+      
+                        '</div>'+
+                    '</div>';
+        $("#tabsconfigurartabla").html(tabs);
+        $("#string_datos_ordenamiento_columnas").val(columnas_ordenadas);
+        $("#string_datos_tabla_true").val(campos_activados);
+        $("#string_datos_tabla_false").val(campos_desactivados);
+        $("#modalconfigurartabla").modal('show');
+        $("#titulomodalconfiguraciontabla").html("Configuración de la tabla");
+        $('.dd').nestable();
+        //campos activados
+        var campos = campos_activados.split(",");
+        for (var i = 0; i < campos.length; i++) {
+            $("input[name='"+campos[i]+"']").prop('checked', true);
+
+        }
+        //crear lista para ordenar columnas
+        var campos_ordenados = columnas_ordenadas.split(",");
+        $("#columnasnestable").empty();
+        for (var i = 0; i < campos_ordenados.length; i++) {
+            var columna =   '<li class="dd-item nestable'+campos_ordenados[i]+'">'+
+                                '<div class="dd-handle">'+campos_ordenados[i]+'</div>'+
+                                '<input type="hidden" class="inputnestable" value="'+campos_ordenados[i]+'">'+
+                            '</li>';
+            $("#columnasnestable").append(columna);
+        }
+}
 init();

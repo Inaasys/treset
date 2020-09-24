@@ -10,33 +10,43 @@ use Helpers;
 use DataTables;
 use DB;
 use PDF;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ContraRecibosExport;
 use App\ContraRecibo;
 use App\ContraReciboDetalle;
 use App\Proveedor;
 use App\Compra;
 use App\BitacoraDocumento;
+use App\Configuracion_Tabla;
+use App\VistaContraRecibo;
+
 
 class ContraRecibosController extends ConfiguracionSistemaController{
 
     public function __construct(){
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
+        //CONFIGURACIONES DE LA TABLA DEL CATALOGO O MODULO//
+        $this->configuracion_tabla = Configuracion_Tabla::where('tabla', 'ContraRecibos')->first();
+        $this->campos_consulta = [];
+        foreach (explode(",", $this->configuracion_tabla->columnas_ordenadas) as $campo){
+            array_push($this->campos_consulta, $campo);
+        }
+        //FIN CONFIGURACIONES DE LA TABLA//
     }
 
     public function contrarecibos(){
         $serieusuario = Helpers::obtenerserieusuario(Auth::user()->email, 'ContraRecibos');
-        return view('registros.contrarecibos.contrarecibos', compact('serieusuario'));
+        $configuracion_tabla = $this->configuracion_tabla;
+        $rutaconfiguraciontabla = route('contrarecibos_guardar_configuracion_tabla');
+        $rutacreardocumento = route('contrarecibos_generar_pdfs');
+        return view('registros.contrarecibos.contrarecibos', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','rutacreardocumento'));
     }
     //obtener registro tabla
     public function contrarecibos_obtener(Request $request){
         if($request->ajax()){
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = DB::table('ContraRecibos as cr')
-            ->Join('Proveedores as p', 'cr.Proveedor', '=', 'p.Numero')
-            ->select('cr.ContraRecibo AS ContraRecibo', 'cr.Serie AS Serie', 'cr.Folio AS Folio', 'cr.Fecha AS Fecha', 'cr.Proveedor AS Proveedor', 'p.Nombre AS Nombre', 'cr.Total AS Total', 'cr.Obs AS Obs', 'cr.Status AS Status', 'cr.Periodo AS Periodo')
-            ->where('cr.Periodo', $periodo)
-            ->orderBy('cr.Folio', 'DESC')
-            ->get();
+            $data = VistaContraRecibo::select($this->campos_consulta)->orderBy('Folio', 'DESC')->where('Periodo', $periodo)->get();
             return DataTables::of($data)
                 ->addColumn('operaciones', function($data){
                     if($data->Status != 'BAJA'){
@@ -47,10 +57,7 @@ class ContraRecibosController extends ConfiguracionSistemaController{
                     }
                     return $boton;
                 })
-                ->addColumn('Total', function($data){
-                    $total = Helpers::convertirvalorcorrecto($data->Total);
-                    return $total;
-                })
+                ->addColumn('Total', function($data){ return $data->Total; })
                 ->rawColumns(['operaciones','Total'])
                 ->make(true);
         } 
@@ -286,5 +293,26 @@ class ContraRecibosController extends ConfiguracionSistemaController{
         ->setOption('margin-bottom', 10);
         //return $pdf->download('contrarecibos.pdf');
         return $pdf->stream();
+    }
+    //exportar excel
+    public function contrarecibos_exportar_excel(){
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        return Excel::download(new ContraRecibosExport($this->campos_consulta), "contrarecibos.xlsx");     
+    }
+    //configuracion tabla
+    public function contrarecibos_guardar_configuracion_tabla(Request $request){
+        if($request->string_datos_tabla_false == null){
+            $string_datos_tabla_false = "todos los campos fueron seleccionados";
+        }else{
+            $string_datos_tabla_false = $request->string_datos_tabla_false;
+        }
+        $Configuracion_Tabla = Configuracion_Tabla::where('tabla', 'ContraRecibos')->first();
+        $Configuracion_Tabla->campos_activados = $request->string_datos_tabla_true;
+        $Configuracion_Tabla->campos_desactivados = $string_datos_tabla_false;
+        $Configuracion_Tabla->columnas_ordenadas = $request->string_datos_ordenamiento_columnas;
+        $Configuracion_Tabla->usuario = Auth::user()->user;
+        $Configuracion_Tabla->save();
+        return redirect()->route('contrarecibos');
     }
 }

@@ -12,6 +12,8 @@ use Helpers;
 use DataTables;
 use DB;
 use PDF;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ComprasExport;
 use App\Compra;
 use App\CompraDetalle;
 use App\TipoOrdenCompra;
@@ -28,16 +30,28 @@ use App\Existencia;
 use App\CuentaXPagar;
 use App\CuentaXPagarDetalle;
 use App\Marca;
+use App\Configuracion_Tabla;
+use App\VistaCompra;
 
 class CompraController extends ConfiguracionSistemaController{
 
     public function __construct(){
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
+        //CONFIGURACIONES DE LA TABLA DEL CATALOGO O MODULO//
+        $this->configuracion_tabla = Configuracion_Tabla::where('tabla', 'Compras')->first();
+        $this->campos_consulta = [];
+        foreach (explode(",", $this->configuracion_tabla->columnas_ordenadas) as $campo){
+            array_push($this->campos_consulta, $campo);
+        }
+        //FIN CONFIGURACIONES DE LA TABLA//
     }
 
     public function compras(){
         $serieusuario = Helpers::obtenerserieusuario(Auth::user()->email, 'Compras');
-        return view('registros.compras.compras', compact('serieusuario'));
+        $configuracion_tabla = $this->configuracion_tabla;
+        $rutaconfiguraciontabla = route('compras_guardar_configuracion_tabla');
+        $rutacreardocumento = route('compras_generar_pdfs');
+        return view('registros.compras.compras', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','rutacreardocumento'));
     }
     //obtener todos los registros
     public function compras_obtener(Request $request){
@@ -45,12 +59,13 @@ class CompraController extends ConfiguracionSistemaController{
             $fechahoy = Carbon::now()->toDateString();
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = DB::table('Compras AS c')
+            $data = VistaCompra::select($this->campos_consulta)->orderBy('Folio', 'DESC')->where('Periodo', $periodo)->get();
+            /*$data = DB::table('Compras AS c')
             ->Join('Proveedores AS p', 'c.Proveedor', '=', 'p.Numero')
             ->select('c.Compra AS Compra', 'c.Serie AS Serie', 'c.Folio AS Folio', 'c.Proveedor AS Proveedor', 'p.Nombre AS Nombre', 'c.Plazo AS Plazo', 'c.Fecha AS Fecha', 'c.FechaEmitida AS FechaEmitida', 'c.Remision AS Remision', 'c.Factura AS Factura', 'c.Tipo AS Tipo', 'c.Almacen AS Almacen', 'c.Movimiento AS Movimiento', 'c.UUID AS UUID', 'c.Orden AS Orden', 'c.SubTotal AS SubTotal', 'c.Iva AS Iva', 'c.Total AS Total', 'c.Abonos AS Abonos', 'c.Descuentos AS Descuentos', 'c.Saldo AS Saldo', 'c.TipoCambio AS TipoCambio', 'c.Obs AS Obs', 'c.Equipo AS Equipo', 'c.Usuario AS Usuario', 'c.Status AS Status', 'c.Periodo AS Periodo')
             ->where('c.Periodo', $periodo)
             ->orderBy('c.Folio', 'DESC')
-            ->get();
+            ->get();*/
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($fechahoy,$tipousuariologueado){
                         if($data->Status == "LIQUIDADA" && $tipousuariologueado <> 1){
@@ -68,35 +83,22 @@ class CompraController extends ConfiguracionSistemaController{
                         }
                         return $boton;
                     })
-                    ->addColumn('SubTotal', function($data){
-                        $subtotal = Helpers::convertirvalorcorrecto($data->SubTotal);
-                        return $subtotal;
-                    })
-                    ->addColumn('Iva', function($data){
-                        $iva = Helpers::convertirvalorcorrecto($data->Iva);
-                        return $iva;
-                    })
-                    ->addColumn('Total', function($data){
-                        $total = Helpers::convertirvalorcorrecto($data->Total);
-                        return $total;
-                    })
-                    ->addColumn('Abonos', function($data){
-                        $abonos = Helpers::convertirvalorcorrecto($data->Abonos);
-                        return $abonos;
-                    })
-                    ->addColumn('Descuentos', function($data){
-                        $descuentos = Helpers::convertirvalorcorrecto($data->Descuentos);
-                        return $descuentos;
-                    })
-                    ->addColumn('Saldo', function($data){
-                        $saldo = Helpers::convertirvalorcorrecto($data->Saldo);
-                        return $saldo;
-                    })
-                    ->addColumn('TipoCambio', function($data){
-                        $tipocambio = Helpers::convertirvalorcorrecto($data->TipoCambio);
-                        return $tipocambio;
-                    })
-                    ->rawColumns(['operaciones','SubTotal','Iva','Total','Abonos','Descuentos','Saldo','TipoCambio'])
+                    ->addColumn('SubTotal', function($data){ return $data->SubTotal; })
+                    ->addColumn('Iva', function($data){ return $data->Iva; })
+                    ->addColumn('Total', function($data){ return $data->Total; })
+                    ->addColumn('Abonos', function($data){ return $data->Abonos; })
+                    ->addColumn('Descuentos', function($data){ return $data->Descuentos; })
+                    ->addColumn('Saldo', function($data){ return $data->Saldo; })
+                    ->addColumn('TipoCambio', function($data){ return $data->TipoCambio; })
+                    ->addColumn('ImpLocTraslados', function($data){ return $data->ImpLocTraslados; })
+                    ->addColumn('ImpLocRetenciones', function($data){ return $data->ImpLocRetenciones; })
+                    ->addColumn('IepsRetencion', function($data){ return $data->IepsRetencion; })
+                    ->addColumn('IsrRetencion', function($data){ return $data->IsrRetencion; })
+                    ->addColumn('IvaRetencion', function($data){ return $data->IvaRetencion; })
+                    ->addColumn('Ieps', function($data){ return $data->Ieps; })
+                    ->addColumn('Descuento', function($data){ return $data->Descuento; })
+                    ->addColumn('Importe', function($data){ return $data->Importe; })
+                    ->rawColumns(['operaciones'])
                     ->make(true);
         } 
     }
@@ -876,7 +878,6 @@ class CompraController extends ConfiguracionSistemaController{
                       "descuentocompra"=>Helpers::convertirvalorcorrecto($c->Descuento),
                       "subtotalcompra"=>Helpers::convertirvalorcorrecto($c->SubTotal),
                       "ivacompra"=>Helpers::convertirvalorcorrecto($c->Iva),
-                      //"retencioncompra"=>Helpers::convertirvalorcorrecto($c->IvaRetencion),
                       "totalcompra"=>Helpers::convertirvalorcorrecto($c->Total),
                       "proveedor" => $proveedor,
                       "fechaformato"=> $fechaformato,
@@ -893,6 +894,27 @@ class CompraController extends ConfiguracionSistemaController{
         ->setOption('margin-bottom', 10);
         //return $pdf->download('contrarecibos.pdf');
         return $pdf->stream();
+    }
+    //exportar a excel
+    public function compras_exportar_excel(){
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        return Excel::download(new ComprasExport($this->campos_consulta), "compras.xlsx");     
+    }
+    //configuracion tabla
+    public function compras_guardar_configuracion_tabla(Request $request){
+        if($request->string_datos_tabla_false == null){
+            $string_datos_tabla_false = "todos los campos fueron seleccionados";
+        }else{
+            $string_datos_tabla_false = $request->string_datos_tabla_false;
+        }
+        $Configuracion_Tabla = Configuracion_Tabla::where('tabla', 'Compras')->first();
+        $Configuracion_Tabla->campos_activados = $request->string_datos_tabla_true;
+        $Configuracion_Tabla->campos_desactivados = $string_datos_tabla_false;
+        $Configuracion_Tabla->columnas_ordenadas = $request->string_datos_ordenamiento_columnas;
+        $Configuracion_Tabla->usuario = Auth::user()->user;
+        $Configuracion_Tabla->save();
+        return redirect()->route('compras');
     }
 
 }

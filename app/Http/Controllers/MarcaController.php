@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Helpers;
 use DataTables;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\MarcasExport;
 use App\Marca;
 
 class MarcaController extends ConfiguracionSistemaController{
@@ -124,5 +126,9 @@ class MarcaController extends ConfiguracionSistemaController{
         Log::channel('marca')->info('Se modifico la marca: '.$Marca.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
 		$Marca->save();
     	return response()->json($Marca); 
+    }
+    //exportar a excel
+    public function marcas_exportar_excel(){
+        return Excel::download(new MarcasExport, 'marcas.xlsx');
     }
 }

@@ -9,6 +9,8 @@ use Carbon\Carbon;
 use DB;
 use Helpers;
 use DataTables;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\VinesExport;
 use App\Vine;
 use App\Cliente;
 
@@ -126,5 +128,9 @@ class VineController extends ConfiguracionSistemaController{
         Log::channel('vin')->info('Se modifico el vin: '.$Vin.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());	      
 		$Vin->save();
     	return response()->json($Vin); 
+    }
+    //exportar a excel
+    public function vines_exportar_excel(){
+        return Excel::download(new VinesExport, 'vines.xlsx');
     }  
 }

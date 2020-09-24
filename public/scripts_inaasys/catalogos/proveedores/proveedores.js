@@ -51,6 +51,18 @@ function ocultarformulario(){
 }
 //listar todos los registros de la tabla
 function listar(){
+  //Campos ordenados a mostras
+  var campos = columnas_ordenadas.split(",");
+  var campos_tabla  = [];
+  campos_tabla.push({ 'data':'operaciones', 'name':'operaciones', 'orderable':false, 'searchable':false});
+  for (var i = 0; i < campos.length; i++) {
+      campos_tabla.push({ 
+          'data'    : campos[i],
+          'name'  : campos[i],
+          'orderable': true,
+          'searchable': false
+      });
+  }
     tabla=$('#tbllistado').DataTable({
         "sScrollX": "110%",
         "sScrollY": "350px",
@@ -62,17 +74,7 @@ function listar(){
         },
         serverSide: true,
         ajax: proveedores_obtener,
-        columns: [
-            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
-            { data: 'Numero', name: 'Numero' },
-            { data: 'Nombre', name: 'Nombre' },
-            { data: 'Rfc', name: 'Rfc', orderable: false, searchable: false },
-            { data: 'CodigoPostal', name: 'CodigoPostal', orderable: false, searchable: false },
-            { data: 'Email1', name: 'Email1', orderable: false, searchable: false },
-            { data: 'Plazo', name: 'Plazo', orderable: false, searchable: false },
-            { data: 'Telefonos', name: 'Telefonos', orderable: false, searchable: false },
-            { data: 'Status', name: 'Status', orderable: false, searchable: false }
-        ],
+        columns: campos_tabla,
         "initComplete": function() {
           var $buscar = $('div.dataTables_filter input');
           $buscar.unbind();
@@ -376,4 +378,106 @@ $("#btnGuardarModificacion").on('click', function (e) {
     form.parsley().validate();
   }
 });
+//configurar tabla
+function configurar_tabla(){
+  //formulario modificacion
+  var tabs =  '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                  '<li role="presentation" class="active">'+
+                      '<a href="#tabcamposamostrar" data-toggle="tab">Campos a mostrar</a>'+
+                  '</li>'+
+                  '<li role="presentation">'+
+                      '<a href="#tabordenarcolumnas" data-toggle="tab">Ordenar Columnas</a>'+
+                  '</li>'+
+              '</ul>'+
+              '<div class="tab-content">'+
+                  '<div role="tabpanel" class="tab-pane fade in active" id="tabcamposamostrar">'+
+                      '<div class="row">'+
+                          '<div class="col-md-12">'+
+                              '<div class="col-md-12 form-check">'+
+                                  '<label>DATOS PROVEEDOR</label>'+
+                              '</div>'+
+                              '<div class="col-md-3 form-check">'+
+                                  '<input type="checkbox" name="Numero" id="idNumero" class="filled-in datotabla" value="Numero" readonly onchange="construirarraydatostabla(this);" onclick="javascript: return false;"/>'+
+                                  '<label for="idNumero">Numero</label>'+
+                              '</div>'+
+                              '<div class="col-md-3 form-check">'+
+                                  '<input type="checkbox" name="Status" id="idStatus" class="filled-in datotabla" value="Status" readonly onchange="construirarraydatostabla(this);" onclick="javascript: return false;"/>'+
+                                  '<label for="idStatus">Status</label>'+
+                              '</div>'+
+                              '<div class="col-md-3 form-check">'+
+                                  '<input type="checkbox" name="Rfc" id="idRfc" class="filled-in datotabla" value="Rfc" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idRfc">Rfc</label>'+
+                              '</div>'+
+                              '<div class="col-md-3 form-check">'+
+                                  '<input type="checkbox" name="Nombre" id="idNombre" class="filled-in datotabla" value="Nombre" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idNombre">Nombre</label>'+
+                              '</div>'+
+                              '<div class="col-md-3 form-check">'+
+                                  '<input type="checkbox" name="CodigoPostal" id="idCodigoPostal" class="filled-in datotabla" value="CodigoPostal" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idCodigoPostal">CodigoPostal</label>'+
+                              '</div>'+
+                              '<div class="col-md-3 form-check">'+
+                                  '<input type="checkbox" name="Email1" id="idEmail1" class="filled-in datotabla" value="Email1" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idEmail1">Email1</label>'+
+                              '</div>'+
+                              '<div class="col-md-3 form-check">'+
+                                  '<input type="checkbox" name="Plazo" id="idPlazo" class="filled-in datotabla" value="Plazo" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idPlazo">Plazo</label>'+
+                              '</div>'+
+                              '<div class="col-md-3 form-check">'+
+                                  '<input type="checkbox" name="Telefonos" id="idTelefonos" class="filled-in datotabla" value="Telefonos" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idTelefonos">Telefonos</label>'+
+                              '</div>'+
+                              '<input type="hidden" class="form-control" name="string_datos_tabla_true" id="string_datos_tabla_true" required>'+
+                              '<input type="hidden" class="form-control" name="string_datos_tabla_false" id="string_datos_tabla_false" required>'+
+                          '</div>'+
+                      '</div>'+
+                  '</div>'+ 
+                  '<div role="tabpanel" class="tab-pane fade" id="tabordenarcolumnas">'+
+                      '<div class="row">'+
+                          '<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">'+
+                              '<div class="card">'+
+                                  '<div class="header">'+
+                                      '<h2>'+
+                                          'Ordenar Columnas'+
+                                          '<small>Ordena las columnas arrastrándolas hacia arriba o hacia abajo. </small>'+
+                                      '</h2>'+
+                                  '</div>'+
+                                  '<div class="body">'+
+                                      '<div class="clearfix m-b-20">'+
+                                          '<div class="dd" onchange="ordenarcolumnas()">'+
+                                              '<ol class="dd-list" id="columnasnestable">'+
+                                              '</ol>'+
+                                          '</div>'+
+                                      '</div>'+
+                                      '<input type="hidden" id="string_datos_ordenamiento_columnas" name="string_datos_ordenamiento_columnas" class="form-control" required>'+
+                                  '</div>'+
+                              '</div>'+
+                          '</div>'+
+                      '</div>'+      
+                  '</div>'+
+              '</div>';
+  $("#tabsconfigurartabla").html(tabs);
+  $("#string_datos_ordenamiento_columnas").val(columnas_ordenadas);
+  $("#string_datos_tabla_true").val(campos_activados);
+  $("#string_datos_tabla_false").val(campos_desactivados);
+  $("#modalconfigurartabla").modal('show');
+  $("#titulomodalconfiguraciontabla").html("Configuración de la tabla");
+  $('.dd').nestable();
+  //campos activados
+  var campos = campos_activados.split(",");
+  for (var i = 0; i < campos.length; i++) {
+      $("input[name='"+campos[i]+"']").prop('checked', true);
+  }
+  //crear lista para ordenar columnas
+  var campos_ordenados = columnas_ordenadas.split(",");
+  $("#columnasnestable").empty();
+  for (var i = 0; i < campos_ordenados.length; i++) {
+      var columna =   '<li class="dd-item nestable'+campos_ordenados[i]+'">'+
+                          '<div class="dd-handle">'+campos_ordenados[i]+'</div>'+
+                          '<input type="hidden" class="inputnestable" value="'+campos_ordenados[i]+'">'+
+                      '</li>';
+      $("#columnasnestable").append(columna);
+  }
+}
 init();

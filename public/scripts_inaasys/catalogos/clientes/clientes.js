@@ -51,6 +51,18 @@ function ocultarformulario(){
 }
 //listar todos los registros de la tabla
 function listar(){
+  //Campos ordenados a mostras
+  var campos = columnas_ordenadas.split(",");
+  var campos_tabla  = [];
+  campos_tabla.push({ 'data':'operaciones', 'name':'operaciones', 'orderable':false, 'searchable':false});
+  for (var i = 0; i < campos.length; i++) {
+      campos_tabla.push({ 
+          'data'    : campos[i],
+          'name'  : campos[i],
+          'orderable': true,
+          'searchable': false
+      });
+  }
   tabla=$('#tbllistado').DataTable({
     "sScrollX": "110%",
     "sScrollY": "350px",
@@ -62,24 +74,7 @@ function listar(){
     },
     serverSide: true,
     ajax: clientes_obtener,
-    columns: [
-        { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
-        { data: 'Numero', name: 'Numero' },
-        { data: 'Nombre', name: 'Nombre' },
-        { data: 'Rfc', name: 'Rfc', orderable: false  },
-        { data: 'Municipio', name: 'Municipio', orderable: false, searchable: false  },
-        { data: 'Bloquear', name: 'Bloquear', orderable: false, searchable: false  },
-        { data: 'FacturarAlCosto', name: 'FacturarAlCosto', orderable: false, searchable: false  },
-        { data: 'Plazo', name: 'Plazo', orderable: false, searchable: false  },
-        { data: 'Credito', name: 'Credito', orderable: false, searchable: false  },
-        { data: 'Saldo', name: 'Saldo', orderable: false, searchable: false },
-        { data: 'FormaPago', name: 'FormaPago', orderable: false, searchable: false  },
-        { data: 'Email1', name: 'Email1', orderable: false, searchable: false  },
-        { data: 'Telefonos', name: 'Telefonos', orderable: false, searchable: false  },
-        { data: 'Agente', name: 'Agente', orderable: false, searchable: false  },
-        { data: 'Agente', name: 'Agente', orderable: false, searchable: false  },
-        { data: 'Status', name: 'Status', orderable: false, searchable: false  }
-    ],
+    columns: campos_tabla,
     "initComplete": function() {
       var $buscar = $('div.dataTables_filter input');
       $buscar.unbind();
@@ -1458,4 +1453,232 @@ $("#btnGuardarModificacion").on('click', function (e) {
     form.parsley().validate();
   }
 });
+//configurar tabla
+function configurar_tabla(){
+  //formulario configuracion tabla
+  var tabs =  '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                  '<li role="presentation" class="active">'+
+                      '<a href="#tabcamposamostrar" data-toggle="tab">Campos a mostrar</a>'+
+                  '</li>'+
+                  '<li role="presentation">'+
+                      '<a href="#tabordenarcolumnas" data-toggle="tab">Ordenar Columnas</a>'+
+                  '</li>'+
+              '</ul>'+
+              '<div class="tab-content">'+
+                  '<div role="tabpanel" class="tab-pane fade in active" id="tabcamposamostrar">'+
+                      '<div class="row">'+
+                          '<div class="col-md-6">'+
+                              '<div class="col-md-12 form-check">'+
+                                  '<label>DATOS CLIENTE</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="Numero" id="idNumero" class="filled-in datotabla" value="Numero" readonly onchange="construirarraydatostabla(this);" onclick="javascript: return false;"/>'+
+                                  '<label for="idNumero">Numero</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="Status" id="idStatus" class="filled-in datotabla" value="Status" readonly onchange="construirarraydatostabla(this);" onclick="javascript: return false;"/>'+
+                                  '<label for="idStatus">Status</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="Nombre" id="idNombre" class="filled-in datotabla" value="Nombre" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idNombre">Nombre</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="Rfc" id="idRfc" class="filled-in datotabla" value="Rfc" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idRfc">Rfc</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="Municipio" id="idMunicipio" class="filled-in datotabla" value="Municipio" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idMunicipio">Municipio</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="Bloquear" id="idBloquear" class="filled-in datotabla" value="Bloquear" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idBloquear">Bloquear</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="FacturarAlCosto" id="idFacturarAlCosto" class="filled-in datotabla" value="FacturarAlCosto" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idFacturarAlCosto">FacturarAlCosto</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="Plazo" id="idPlazo" class="filled-in datotabla" value="Plazo" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idPlazo">Plazo</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="Credito" id="idCredito" class="filled-in datotabla" value="Credito" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idCredito">Credito</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+    
+                                  '<input type="checkbox" name="Saldo" id="idSaldo" class="filled-in datotabla" value="Saldo" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idSaldo">Saldo</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="FormaPago" id="idFormaPago" class="filled-in datotabla" value="FormaPago" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idFormaPago">FormaPago</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="Email1" id="idEmail1" class="filled-in datotabla" value="Email1" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idEmail1">Email1</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="Telefonos" id="idTelefonos" class="filled-in datotabla" value="Telefonos" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idTelefonos">Telefonos</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="Agente" id="idAgente" class="filled-in datotabla" value="Agente" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idAgente">Agente</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="Calle" id="idCalle" class="filled-in datotabla" value="Calle" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idCalle">Calle</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="noExterior" id="idnoExterior" class="filled-in datotabla" value="noExterior" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idnoExterior">noExterior</label>'+
+                              '</div>'+
+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="noInterior" id="idnoInterior" class="filled-in datotabla" value="noInterior" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idnoInterior">noInterior</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="Colonia" id="idColonia" class="filled-in datotabla" value="Colonia" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idColonia">Colonia</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="Localidad" id="idLocalidad" class="filled-in datotabla" value="Localidad" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idLocalidad">Localidad</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="Referencia" id="idReferencia" class="filled-in datotabla" value="Referencia" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idReferencia">Referencia</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="Estado" id="idEstado" class="filled-in datotabla" value="Estado" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idEstado">Estado</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="Pais" id="idPais" class="filled-in datotabla" value="Pais" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idPais">Pais</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="CodigoPostal" id="idCodigoPostal" class="filled-in datotabla" value="CodigoPostal" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idCodigoPostal">CodigoPostal</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="MetodoPago" id="idMetodoPago" class="filled-in datotabla" value="MetodoPago" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idMetodoPago">MetodoPago</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="UsoCfdi" id="idUsoCfdi" class="filled-in datotabla" value="UsoCfdi" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idUsoCfdi">UsoCfdi</label>'+
+                              '</div>'+
+                              '<input type="hidden" class="form-control" name="string_datos_tabla_true" id="string_datos_tabla_true" required>'+
+                              '<input type="hidden" class="form-control" name="string_datos_tabla_false" id="string_datos_tabla_false" required>'+
+                          '</div>'+
+                          '<div class="col-md-6">'+
+                              '<div class="col-md-12 form-check">'+
+                                  '<label>DATOS AGENTE</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="NumeroAgente" id="idNumeroAgente" class="filled-in datotabla" value="NumeroAgente"  onchange="construirarraydatostabla(this);"/>'+
+                                  '<label for="idNumeroAgente">NumeroAgente</label>'+  
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+  
+                                  '<input type="checkbox" name="NombreAgente" id="idNombreAgente" class="filled-in datotabla" value="NombreAgente"  onchange="construirarraydatostabla(this);"/>'+
+                                  '<label for="idNombreAgente">NombreAgente</label>'+ 
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="DireccionAgente" id="idDireccionAgente" class="filled-in datotabla" value="DireccionAgente"  onchange="construirarraydatostabla(this);"/>'+
+                                  '<label for="idDireccionAgente">DireccionAgente</label>'+ 
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="ColoniaAgente" id="idColoniaAgente" class="filled-in datotabla" value="ColoniaAgente"  onchange="construirarraydatostabla(this);"/>'+
+                                  '<label for="idColoniaAgente">ColoniaAgente</label>'+ 
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="CiudadAgente" id="idCiudadAgente" class="filled-in datotabla" value="CiudadAgente"  onchange="construirarraydatostabla(this);"/>'+
+                                  '<label for="idCiudadAgente">CiudadAgente</label>'+ 
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="CpAgente" id="idCpAgente" class="filled-in datotabla" value="CpAgente"  onchange="construirarraydatostabla(this);"/>'+
+                                  '<label for="idCpAgente">CpAgente</label>'+ 
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="RfcAgente" id="idRfcAgente" class="filled-in datotabla" value="RfcAgente"  onchange="construirarraydatostabla(this);"/>'+
+                                  '<label for="idRfcAgente">RfcAgente</label>'+                                     
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="ContactoAgente" id="idContactoAgente" class="filled-in datotabla" value="ContactoAgente"  onchange="construirarraydatostabla(this);"/>'+
+                                  '<label for="idContactoAgente">ContactoAgente</label>'+                                     
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="TelefonosAgente" id="idTelefonosAgente" class="filled-in datotabla" value="TelefonosAgente"  onchange="construirarraydatostabla(this);"/>'+
+                                  '<label for="idTelefonosAgente">TelefonosAgente</label>'+                                     
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="EmailAgente" id="idEmailAgente" class="filled-in datotabla" value="EmailAgente"  onchange="construirarraydatostabla(this);"/>'+
+                                  '<label for="idEmailAgente">EmailAgente</label>'+                                     
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="CuentaAgente" id="idCuentaAgente" class="filled-in datotabla" value="CuentaAgente"  onchange="construirarraydatostabla(this);"/>'+
+                                  '<label for="idCuentaAgente">CuentaAgente</label>'+                                     
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="ComisionAgente" id="idComisionAgente" class="filled-in datotabla" value="ComisionAgente"  onchange="construirarraydatostabla(this);"/>'+
+                                  '<label for="idComisionAgente">ComisionAgente</label>'+                                     
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="AnotiacionesAgente" id="idAnotiacionesAgente" class="filled-in datotabla" value="AnotiacionesAgente"  onchange="construirarraydatostabla(this);"/>'+
+                                  '<label for="idAnotiacionesAgente">AnotiacionesAgente</label>'+                                     
+                              '</div>'+
+                          '</div>'+
+                      '</div>'+
+                  '</div>'+ 
+                  '<div role="tabpanel" class="tab-pane fade" id="tabordenarcolumnas">'+
+                      '<div class="row">'+
+                          '<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">'+
+                              '<div class="card">'+
+                                  '<div class="header">'+
+                                      '<h2>'+
+                                          'Ordenar Columnas'+
+                                          '<small>Ordena las columnas arrastrándolas hacia arriba o hacia abajo. </small>'+
+                                      '</h2>'+
+                                  '</div>'+
+                                  '<div class="body">'+
+                                      '<div class="clearfix m-b-20">'+
+                                          '<div class="dd" onchange="ordenarcolumnas()">'+
+                                              '<ol class="dd-list" id="columnasnestable">'+
+                                              '</ol>'+
+                                          '</div>'+
+                                      '</div>'+
+                                      '<input type="hidden" id="string_datos_ordenamiento_columnas" name="string_datos_ordenamiento_columnas" class="form-control" required>'+
+                                  '</div>'+
+                              '</div>'+
+                          '</div>'+
+                      '</div>'+      
+                  '</div>'+
+              '</div>';
+  $("#tabsconfigurartabla").html(tabs);
+  $("#string_datos_ordenamiento_columnas").val(columnas_ordenadas);
+  $("#string_datos_tabla_true").val(campos_activados);
+  $("#string_datos_tabla_false").val(campos_desactivados);
+  $("#modalconfigurartabla").modal('show');
+  $("#titulomodalconfiguraciontabla").html("Configuración de la tabla");
+  $('.dd').nestable();
+  //campos activados
+  var campos = campos_activados.split(",");
+  for (var i = 0; i < campos.length; i++) {
+      $("input[name='"+campos[i]+"']").prop('checked', true);
+  }
+  //crear lista para ordenar columnas
+  var campos_ordenados = columnas_ordenadas.split(",");
+  $("#columnasnestable").empty();
+  for (var i = 0; i < campos_ordenados.length; i++) {
+      var columna =   '<li class="dd-item nestable'+campos_ordenados[i]+'">'+
+                          '<div class="dd-handle">'+campos_ordenados[i]+'</div>'+
+                          '<input type="hidden" class="inputnestable" value="'+campos_ordenados[i]+'">'+
+                      '</li>';
+      $("#columnasnestable").append(columna);
+  }
+}
 init();

@@ -10,6 +10,8 @@ use Helpers;
 use DataTables;
 use DB;
 use PDF;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\CuentasPorPagarExport;
 use App\CuentaXPagar;
 use App\CuentaXPagarDetalle;
 use App\Banco;
@@ -20,30 +22,36 @@ use App\NotaProveedor;
 use App\NotaProveedorDetalle;
 use App\BitacoraDocumento;
 use Luecano\NumeroALetras\NumeroALetras;
+use App\Configuracion_Tabla;
+use App\VistaCuentaPorPagar;
 
 
 class CuentasPorPagarController extends ConfiguracionSistemaController{
 
     public function __construct(){
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
+        //CONFIGURACIONES DE LA TABLA DEL CATALOGO O MODULO//
+        $this->configuracion_tabla = Configuracion_Tabla::where('tabla', 'CuentasPorPagar')->first();
+        $this->campos_consulta = [];
+        foreach (explode(",", $this->configuracion_tabla->columnas_ordenadas) as $campo){
+            array_push($this->campos_consulta, $campo);
+        }
+        //FIN CONFIGURACIONES DE LA TABLA//
     }
 
     public function cuentas_por_pagar(){
         $serieusuario = Helpers::obtenerserieusuario(Auth::user()->email, 'Ordenes de Trabajo');
-        return view('registros.cuentasporpagar.cuentasporpagar', compact('serieusuario'));
+        $configuracion_tabla = $this->configuracion_tabla;
+        $rutaconfiguraciontabla = route('cuentas_por_pagar_guardar_configuracion_tabla');
+        $rutacreardocumento = route('cuentas_por_pagar_generar_pdfs');
+        return view('registros.cuentasporpagar.cuentasporpagar', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','rutacreardocumento'));
     }
     //obtener registro tabla
     public function cuentas_por_pagar_obtener(Request $request){
         if($request->ajax()){
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = DB::table('CxP as cp')
-            ->Join('Proveedores as p', 'cp.Proveedor', '=', 'p.Numero')
-            ->Join('Bancos as b', 'cp.Banco', '=', 'b.Numero')
-            ->select('cp.Pago AS Pago', 'cp.Serie AS Serie', 'cp.Folio AS Folio', 'cp.Fecha AS Fecha', 'cp.Proveedor AS Proveedor', 'p.Nombre AS Nombre', 'b.nombre AS Banco', 'cp.Transferencia AS Transferencia', 'cp.Abono AS Abono', 'cp.Status AS Status', 'cp.MotivoBaja AS MotivoBaja', 'cp.Periodo AS Periodo')
-            ->where('cp.Periodo', $periodo)
-            ->orderBy('cp.Folio', 'DESC')
-            ->get();
+            $data = VistaCuentaPorPagar::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Folio', 'DESC')->get();
             return DataTables::of($data)
                 ->addColumn('operaciones', function($data){
                     if($data->Status != 'BAJA'){
@@ -54,11 +62,8 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                     }
                     return $boton;
                 })
-                ->addColumn('Abono', function($data){
-                    $abono = Helpers::convertirvalorcorrecto($data->Abono);
-                    return $abono;
-                })
-                ->rawColumns(['operaciones','Abono'])
+                ->addColumn('Abono', function($data){ return $data->Abono; })
+                ->rawColumns(['operaciones'])
                 ->make(true);
         } 
     }
@@ -354,5 +359,25 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
         //return $pdf->download('contrarecibos.pdf');
         return $pdf->stream();
     }
-
+    //exportar a excel
+    public function cuentas_por_pagar_exportar_excel(){
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        return Excel::download(new CuentasPorPagarExport($this->campos_consulta), "cuentasporpagar.xlsx");      
+    }
+    //configuracion de la tabla
+    public function cuentas_por_pagar_guardar_configuracion_tabla(Request $request){
+        if($request->string_datos_tabla_false == null){
+            $string_datos_tabla_false = "todos los campos fueron seleccionados";
+        }else{
+            $string_datos_tabla_false = $request->string_datos_tabla_false;
+        }
+        $Configuracion_Tabla = Configuracion_Tabla::where('tabla', 'CuentasPorPagar')->first();
+        $Configuracion_Tabla->campos_activados = $request->string_datos_tabla_true;
+        $Configuracion_Tabla->campos_desactivados = $string_datos_tabla_false;
+        $Configuracion_Tabla->columnas_ordenadas = $request->string_datos_ordenamiento_columnas;
+        $Configuracion_Tabla->usuario = Auth::user()->user;
+        $Configuracion_Tabla->save();
+        return redirect()->route('cuentas_por_pagar');
+    }
 }

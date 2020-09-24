@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Helpers;
 use DataTables;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\BancosExport;
 use App\Banco;
 
 class BancoController extends ConfiguracionSistemaController{
@@ -93,5 +95,9 @@ class BancoController extends ConfiguracionSistemaController{
         Log::channel('banco')->info('Se modifico el banco: '.$Banco.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
 		$Banco->save();
     	return response()->json($Banco); 
+    }
+    //exportar a excel
+    public function bancos_exportar_excel(){
+        return Excel::download(new BancosExport, 'bancos.xlsx');
     }
 }

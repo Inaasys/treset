@@ -10,6 +10,8 @@ use Helpers;
 use DataTables;
 use DB;
 use PDF;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\OrdenesDeCompraExport;
 use App\OrdenCompra;
 use App\OrdenCompraDetalle;
 use App\TipoOrdenCompra;
@@ -21,28 +23,35 @@ use App\Compra;
 use App\CompraDetalle;
 use App\Producto;
 use App\Marca;
+use App\Configuracion_Tabla;
+use App\VistaOrdenCompra;
 
 class OrdenCompraController extends ConfiguracionSistemaController{
 
     public function __construct(){
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
+        //CONFIGURACIONES DE LA TABLA DEL CATALOGO O MODULO//
+        $this->configuracion_tabla = Configuracion_Tabla::where('tabla', 'OrdenesDeCompra')->first();
+        $this->campos_consulta = [];
+        foreach (explode(",", $this->configuracion_tabla->columnas_ordenadas) as $campo){
+            array_push($this->campos_consulta, $campo);
+        }
+        //FIN CONFIGURACIONES DE LA TABLA//
     }
 
     public function ordenes_compra(){
         $serieusuario = Helpers::obtenerserieusuario(Auth::user()->email, 'Ordenes de Compra');
-        return view('registros.ordenescompra.ordenescompra', compact('serieusuario'));
+        $configuracion_tabla = $this->configuracion_tabla;
+        $rutaconfiguraciontabla = route('ordenes_compra_guardar_configuracion_tabla');
+        $rutacreardocumento = route('ordenes_compra_generar_pdfs');
+        return view('registros.ordenescompra.ordenescompra', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','rutacreardocumento'));
     }
     //obtener todos los registros
     public function ordenes_compra_obtener(Request $request){
         if($request->ajax()){
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = DB::table('Ordenes de Compra as oc')
-            ->Join('Proveedores as p', 'oc.Proveedor', '=', 'p.Numero')
-            ->select('oc.Orden AS Orden', 'oc.Serie AS Serie', 'oc.Folio AS Folio', 'oc.Proveedor AS Proveedor', 'p.Nombre AS Nombre', 'oc.Fecha AS Fecha', 'oc.AutorizadoPor AS AutorizadoPor', 'oc.AutorizadoFecha AS AutorizadoFecha', 'oc.Tipo AS Tipo', 'oc.Almacen AS Almacen', 'oc.SubTotal AS SubTotal', 'oc.Iva AS Iva', 'oc.Total AS Total', 'oc.Status AS Status', 'oc.Equipo AS Equipo', 'oc.Usuario AS Usuario', 'oc.Periodo AS Periodo')
-            ->where('oc.Periodo', $periodo)
-            ->orderBy('oc.Folio', 'DESC')
-            ->get();
+            $data = VistaOrdenCompra::select($this->campos_consulta)->orderBy('Folio', 'DESC')->where('Periodo', $periodo)->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($tipousuariologueado){
                         if($tipousuariologueado == 1){
@@ -59,19 +68,11 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                         }
                         return $boton;
                     })
-                    ->addColumn('SubTotal', function($data){
-                        $subtotal = Helpers::convertirvalorcorrecto($data->SubTotal);
-                        return $subtotal;
-                    })
-                    ->addColumn('Iva', function($data){
-                        $iva = Helpers::convertirvalorcorrecto($data->Iva);
-                        return $iva;
-                    })
-                    ->addColumn('Total', function($data){
-                        $total = Helpers::convertirvalorcorrecto($data->Total);
-                        return $total;
-                    })
-                    ->rawColumns(['operaciones','SubTotal','Iva','Total'])
+                    ->addColumn('SubTotal', function($data){ return $data->SubTotal; })
+                    ->addColumn('Iva', function($data){ return $data->Iva; })
+                    ->addColumn('Total', function($data){ return $data->Total; })
+                    ->addColumn('Descuento', function($data){ return $data->Descuento; })
+                    ->rawColumns(['operaciones'])
                     ->make(true);
         } 
     } 
@@ -463,5 +464,26 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         //return $pdf->download('contrarecibos.pdf');
         return $pdf->stream();
     }
-
+    //exportar ordenes de compra en excel
+    public function ordenes_compra_exportar_excel(){
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        return Excel::download(new OrdenesDeCompraExport($this->campos_consulta), "ordenesdecompra.xlsx");    
+    }
+    //configurar tabla
+    public function ordenes_compra_guardar_configuracion_tabla(Request $request){
+        if($request->string_datos_tabla_false == null){
+            $string_datos_tabla_false = "todos los campos fueron seleccionados";
+        }else{
+            $string_datos_tabla_false = $request->string_datos_tabla_false;
+        }
+        $Configuracion_Tabla = Configuracion_Tabla::where('tabla', 'OrdenesDeCompra')->first();
+        $Configuracion_Tabla->campos_activados = $request->string_datos_tabla_true;
+        $Configuracion_Tabla->campos_desactivados = $string_datos_tabla_false;
+        $Configuracion_Tabla->columnas_ordenadas = $request->string_datos_ordenamiento_columnas;
+        $Configuracion_Tabla->usuario = Auth::user()->user;
+        $Configuracion_Tabla->save();
+        return redirect()->route('ordenes_compra');
+    }
+    
 }

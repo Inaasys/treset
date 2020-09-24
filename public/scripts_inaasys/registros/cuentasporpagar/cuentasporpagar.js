@@ -65,6 +65,18 @@ function relistar(){
 }
 //listar todos los registros de la tabla
 function listar(){
+    //Campos ordenados a mostras
+    var campos = columnas_ordenadas.split(",");
+    var campos_tabla  = [];
+    campos_tabla.push({ 'data':'operaciones', 'name':'operaciones', 'orderable':false, 'searchable':false});
+    for (var i = 0; i < campos.length; i++) {
+        campos_tabla.push({ 
+            'data'    : campos[i],
+            'name'  : campos[i],
+            'orderable': true,
+            'searchable': false
+        });
+    }
     tabla=$('#tbllistado').DataTable({
         "sScrollX": "110%",
         "sScrollY": "350px",
@@ -85,19 +97,7 @@ function listar(){
             if( data.Status ==  `BAJA`){ $(row).addClass('bg-orange');}
             else{ $(row).addClass(''); }
         },
-        columns: [
-            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
-            { data: 'Pago', name: 'Pago' },
-            { data: 'Fecha', name: 'Fecha' },
-            { data: 'Proveedor', name: 'Proveedor', orderable: false, searchable: false },
-            { data: 'Nombre', name: 'Nombre', orderable: false, searchable: false },
-            { data: 'Banco', name: 'Banco' },
-            { data: 'Transferencia', name: 'Transferencia', orderable: false, searchable: false  },
-            { data: 'Abono', name: 'Abono', orderable: false, searchable: false  },
-            { data: 'Status', name: 'Status', orderable: false, searchable: false  },
-            { data: 'MotivoBaja', name: 'MotivoBaja', orderable: false, searchable: false  },
-            { data: 'Periodo', name: 'Periodo', orderable: false, searchable: false  }
-        ],
+        columns: campos_tabla,
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
             $buscar.unbind();
@@ -519,8 +519,19 @@ $("#btnGuardarModificacion").on('click', function (e) {
 });
 
 //hacer busqueda de folio para exportacion en pdf
-function buscarstringlike(string){
-    destruirtablafoliosexportacion();
+function relistarbuscarstringlike(){
+    var tabla = $('#tablafoliosencontrados').DataTable();
+    tabla.ajax.reload();
+}
+function buscarstringlike(){
+    var columnastablafoliosencontrados =    '<tr>'+
+                                                '<th><div style="width:80px !important;">Generar Documento en PDF</div></th>'+
+                                                '<th>Pago</th>'+
+                                                '<th>Proveedor</th>'+
+                                                '<th>Abono</th>'+
+                                                '<th>Status</th>'+
+                                            '</tr>';
+    $("#columnastablafoliosencontrados").html(columnastablafoliosencontrados);
     tabla=$('#tablafoliosencontrados').DataTable({
         "paging":   false,
         "ordering": false,
@@ -531,7 +542,7 @@ function buscarstringlike(string){
         ajax: {
             url: cuentas_por_pagar_buscar_folio_string_like,
             data: function (d) {
-                d.string = string;
+                d.string = $("#buscarfolio").val();
             },
         },
         columns: [
@@ -542,5 +553,191 @@ function buscarstringlike(string){
             { data: 'Status', name: 'Status', orderable: false, searchable: false  },
         ],
     });
+  }
+//configurar tabla
+function configurar_tabla(){
+    //formulario configuracion tabla
+    var tabs =  '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                    '<li role="presentation" class="active">'+
+                        '<a href="#tabcamposamostrar" data-toggle="tab">Campos a mostrar</a>'+
+                    '</li>'+
+                    '<li role="presentation">'+
+                        '<a href="#tabordenarcolumnas" data-toggle="tab">Ordenar Columnas</a>'+
+                    '</li>'+
+                '</ul>'+
+                '<div class="tab-content">'+
+                    '<div role="tabpanel" class="tab-pane fade in active" id="tabcamposamostrar">'+
+                        '<div class="row">'+
+                            '<div class="col-md-6">'+
+                                '<div class="col-md-12 form-check">'+
+                                    '<label>DATOS CUENTA POR PAGAR</label>'+
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="Pago" id="idPago" class="filled-in datotabla" value="Pago" readonly onchange="construirarraydatostabla(this);" />'+
+                                    '<label for="idPago">Pago</label>'+
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="Status" id="idStatus" class="filled-in datotabla" value="Status" onchange="construirarraydatostabla(this);" />'+
+                                    '<label for="idStatus">Status</label>'+
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="Fecha" id="idFecha" class="filled-in datotabla" value="Fecha" readonly onchange="construirarraydatostabla(this);" />'+
+                                    '<label for="idFecha">Fecha</label>'+
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="Proveedor" id="idProveedor" class="filled-in datotabla" value="Proveedor" onchange="construirarraydatostabla(this);" />'+
+                                    '<label for="idProveedor">Proveedor</label>'+
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="Transferencia" id="idTransferencia" class="filled-in datotabla" value="Transferencia" onchange="construirarraydatostabla(this);" />'+
+                                    '<label for="idTransferencia">Transferencia</label>'+
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="Abono" id="idAbono" class="filled-in datotabla" value="Abono" onchange="construirarraydatostabla(this);" />'+
+                                    '<label for="idAbono">Abono</label>'+
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="MotivoBaja" id="idMotivoBaja" class="filled-in datotabla" value="MotivoBaja" onchange="construirarraydatostabla(this);" />'+
+                                    '<label for="idMotivoBaja">MotivoBaja</label>'+
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="Periodo" id="idPeriodo" class="filled-in datotabla" value="Periodo" onchange="construirarraydatostabla(this);" />'+
+                                    '<label for="idPeriodo">Periodo</label>'+
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="Folio" id="idFolio" class="filled-in datotabla" value="Folio" onchange="construirarraydatostabla(this);" />'+
+                                    '<label for="idFolio">Folio</label>'+
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+    
+                                    '<input type="checkbox" name="Serie" id="idSerie" class="filled-in datotabla" value="Serie" onchange="construirarraydatostabla(this);" />'+
+                                    '<label for="idSerie">Serie</label>'+
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="Banco" id="idBanco" class="filled-in datotabla" value="Banco" onchange="construirarraydatostabla(this);" />'+
+                                    '<label for="idBanco">Banco</label>'+
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="Cheque" id="idCheque" class="filled-in datotabla" value="Cheque" onchange="construirarraydatostabla(this);" />'+
+                                    '<label for="idCheque">Cheque</label>'+
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="Beneficiario" id="idBeneficiario" class="filled-in datotabla" value="Beneficiario" onchange="construirarraydatostabla(this);" />'+
+                                    '<label for="idBeneficiario">Beneficiario</label>'+
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="CuentaDeposito" id="idCuentaDeposito" class="filled-in datotabla" value="CuentaDeposito" onchange="construirarraydatostabla(this);" />'+
+                                    '<label for="idCuentaDeposito">CuentaDeposito</label>'+
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="Anotacion" id="idAnotacion" class="filled-in datotabla" value="Anotacion" onchange="construirarraydatostabla(this);" />'+
+                                    '<label for="idAnotacion">Anotacion</label>'+
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="Equipo" id="idEquipo" class="filled-in datotabla" value="Equipo" onchange="construirarraydatostabla(this);" />'+
+                                    '<label for="idEquipo">Equipo</label>'+
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="Usuario" id="idUsuario" class="filled-in datotabla" value="Usuario" onchange="construirarraydatostabla(this);" />'+
+                                    '<label for="idUsuario">Usuario</label>'+
+                                '</div>'+
+                                '<input type="hidden" class="form-control" name="string_datos_tabla_true" id="string_datos_tabla_true" required>'+
+                                '<input type="hidden" class="form-control" name="string_datos_tabla_false" id="string_datos_tabla_false" required>'+
+                            '</div>'+
+                            '<div class="col-md-6">'+
+                                '<div class="col-md-12 form-check">'+
+                                    '<label>DATOS BANCO</label>'+
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="NumeroBanco" id="idNumeroBanco" class="filled-in datotabla" value="NumeroBanco"  onchange="construirarraydatostabla(this);"/>'+
+                                    '<label for="idNumeroBanco">NumeroBanco</label>'+  
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+  
+                                    '<input type="checkbox" name="NombreBanco" id="idNombreBanco" class="filled-in datotabla" value="NombreBanco"  onchange="construirarraydatostabla(this);"/>'+
+                                    '<label for="idNombreBanco">NombreBanco</label>'+ 
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="CuentaBanco" id="idCuentaBanco" class="filled-in datotabla" value="CuentaBanco"  onchange="construirarraydatostabla(this);"/>'+
+                                    '<label for="idCuentaBanco">CuentaBanco</label>'+ 
+                                '</div>'+
+                                '<div class="col-md-12 form-check">'+
+                                    '<label>DATOS PROVEEDOR</label>'+
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="NumeroProveedor" id="idNumeroProveedor" class="filled-in datotabla" value="NumeroProveedor"  onchange="construirarraydatostabla(this);"/>'+
+                                    '<label for="idNumeroProveedor">NumeroProveedor</label>'+  
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+  
+                                    '<input type="checkbox" name="NombreProveedor" id="idNombreProveedor" class="filled-in datotabla" value="NombreProveedor"  onchange="construirarraydatostabla(this);"/>'+
+                                    '<label for="idNombreProveedor">NombreProveedor</label>'+ 
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="RfcProveedor" id="idRfcProveedor" class="filled-in datotabla" value="RfcProveedor"  onchange="construirarraydatostabla(this);"/>'+
+                                    '<label for="idRfcProveedor">RfcProveedor</label>'+ 
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="CodigoPostalProveedor" id="idCodigoPostalProveedor" class="filled-in datotabla" value="CodigoPostalProveedor"  onchange="construirarraydatostabla(this);"/>'+
+                                    '<label for="idCodigoPostalProveedor">CodigoPostalProveedor</label>'+  
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+  
+                                    '<input type="checkbox" name="PlazoProveedor" id="idPlazoProveedor" class="filled-in datotabla" value="PlazoProveedor"  onchange="construirarraydatostabla(this);"/>'+
+                                    '<label for="idPlazoProveedor">PlazoProveedor</label>'+ 
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="TelefonosProveedor" id="idTelefonosProveedor" class="filled-in datotabla" value="TelefonosProveedor"  onchange="construirarraydatostabla(this);"/>'+
+                                    '<label for="idTelefonosProveedor">TelefonosProveedor</label>'+ 
+                                '</div>'+
+                                '<div class="col-md-4 form-check">'+
+                                    '<input type="checkbox" name="Email1Proveedor" id="idEmail1Proveedor" class="filled-in datotabla" value="Email1Proveedor"  onchange="construirarraydatostabla(this);"/>'+
+                                    '<label for="idEmail1Proveedor">Email1Proveedor</label>'+  
+                                '</div>'+                                
+                            '</div>'+
+                        '</div>'+
+                    '</div>'+ 
+                    '<div role="tabpanel" class="tab-pane fade" id="tabordenarcolumnas">'+
+                        '<div class="row">'+
+                            '<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">'+
+                                '<div class="card">'+
+                                    '<div class="header">'+
+                                        '<h2>'+
+                                            'Ordenar Columnas'+
+                                            '<small>Ordena las columnas arrastrándolas hacia arriba o hacia abajo. </small>'+
+                                        '</h2>'+
+                                    '</div>'+
+                                    '<div class="body">'+
+                                        '<div class="clearfix m-b-20">'+
+                                            '<div class="dd" onchange="ordenarcolumnas()">'+
+                                                '<ol class="dd-list" id="columnasnestable">'+
+                                                '</ol>'+
+                                            '</div>'+
+                                        '</div>'+
+                                        '<input type="hidden" id="string_datos_ordenamiento_columnas" name="string_datos_ordenamiento_columnas" class="form-control" required>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+      
+                    '</div>'+
+                '</div>';
+    $("#tabsconfigurartabla").html(tabs);
+    $("#string_datos_ordenamiento_columnas").val(columnas_ordenadas);
+    $("#string_datos_tabla_true").val(campos_activados);
+    $("#string_datos_tabla_false").val(campos_desactivados);
+    $("#modalconfigurartabla").modal('show');
+    $("#titulomodalconfiguraciontabla").html("Configuración de la tabla");
+    $('.dd').nestable();
+    //campos activados
+    var campos = campos_activados.split(",");
+    for (var i = 0; i < campos.length; i++) {
+        $("input[name='"+campos[i]+"']").prop('checked', true);
+    }
+    //crear lista para ordenar columnas
+    var campos_ordenados = columnas_ordenadas.split(",");
+    $("#columnasnestable").empty();
+    for (var i = 0; i < campos_ordenados.length; i++) {
+        var columna =   '<li class="dd-item nestable'+campos_ordenados[i]+'">'+
+                            '<div class="dd-handle">'+campos_ordenados[i]+'</div>'+
+                            '<input type="hidden" class="inputnestable" value="'+campos_ordenados[i]+'">'+
+                        '</li>';
+        $("#columnasnestable").append(columna);
+    }
   }
 init();

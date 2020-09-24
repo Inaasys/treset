@@ -3,14 +3,7 @@
   Almacenes
 @endsection
 @section('additionals_css')
-    <link href="css/parsley/parsley.css" rel="stylesheet">
-    <link href="css/toastr/toastr.min.css" rel="stylesheet">
-    <!-- Wait Me Css -->
-    <link href="plugins/waitme/waitMe.css" rel="stylesheet" />
-    <!-- JQuery DataTable Css -->
-    <link href="plugins/jquery-datatable/skin/bootstrap/css/dataTables.bootstrap.css" rel="stylesheet">
-    <!--Select 2-->
-    <link href="js/select2/css/select2.min.css" rel="stylesheet" /> 
+    @include('secciones.libreriascss')  
 @endsection
 @section('content')
 <section class="content">
@@ -20,7 +13,7 @@
             <div class="row clearfix">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="card" id="listadoregistros">
-                        <div class="header bg-red">
+                        <div class="header bg-red table-responsive button-demo">
                         	<table>
                         		<tr>
                         			<td>
@@ -31,6 +24,11 @@
                                     		Altas
                                 		</div>
                         			</td>
+                                    <td >
+                                        <a class="btn bg-blue btn-xs waves-effect" href="{{route('almacenes_exportar_excel')}}" target="_blank">
+                                            Excel
+                                        </a>
+                                    </td>
                         		</tr>
                         	</table>
                         </div>

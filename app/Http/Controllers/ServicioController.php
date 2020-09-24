@@ -9,6 +9,8 @@ use Carbon\Carbon;
 use DB;
 use Helpers;
 use DataTables;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ServiciosExport;
 use App\Servicio;
 use App\Familia;
 use App\ClaveProdServ;
@@ -170,4 +172,8 @@ class ServicioController extends ConfiguracionSistemaController{
 		$Servicio->save();
     	return response()->json($Servicio); 
     }    
+    //exportar a excel
+    public function servicios_exportar_excel(){
+        return Excel::download(new ServiciosExport, 'servicios.xlsx');
+    }
 }

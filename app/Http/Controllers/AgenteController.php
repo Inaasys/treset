@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Helpers;
 use DataTables;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\AgentesExport;
 use App\Agente;
 use App\Almacen;
 
@@ -146,5 +148,9 @@ class AgenteController extends ConfiguracionSistemaController{
 		    $Agente->save();
       	}
     	return response()->json($Agente); 
-    }                   
+    }  
+    //exportar a excel
+    public function agentes_exportar_excel(){
+        return Excel::download(new AgentesExport, 'agentes.xlsx');
+    }                 
 }

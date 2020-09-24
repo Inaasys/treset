@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Helpers;
 use DataTables;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\LineasExport;
 use App\Linea;
 
 class LineaController extends ConfiguracionSistemaController{
@@ -90,5 +92,9 @@ class LineaController extends ConfiguracionSistemaController{
         Log::channel('linea')->info('Se modifico una linea, Linea Anterior: '.$LineaAnterior.' Linea Actualizada: '.$Linea.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
 		$Linea->save();
     	return response()->json($Linea); 
+    }
+    //exportar a excel
+    public function lineas_exportar_excel(){
+        return Excel::download(new LineasExport, 'lineas.xlsx');
     }
 }

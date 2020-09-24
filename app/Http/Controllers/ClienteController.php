@@ -9,6 +9,8 @@ use Carbon\Carbon;
 use Helpers;
 use DataTables;
 use DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ClientesExport;
 use App\Cliente;
 use App\Pais; 
 use App\CodigoPostal;
@@ -22,20 +24,31 @@ use App\Empresa;
 use App\Marca;
 use App\ProductoPrecio;
 use App\Producto;
+use App\Configuracion_Tabla;
+use App\VistaCliente;
 
 class ClienteController extends ConfiguracionSistemaController{
 
     public function __construct(){
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
+        //CONFIGURACIONES DE LA TABLA DEL CATALOGO O MODULO//
+        $this->configuracion_tabla = Configuracion_Tabla::where('tabla', 'Clientes')->first();
+        $this->campos_consulta = [];
+        foreach (explode(",", $this->configuracion_tabla->columnas_ordenadas) as $campo){
+            array_push($this->campos_consulta, $campo);
+        }
+        //FIN CONFIGURACIONES DE LA TABLA//
     }
 
     public function clientes(){
-        return view('catalogos.clientes.clientes');
+        $configuracion_tabla = $this->configuracion_tabla;
+        $rutaconfiguraciontabla = route('clientes_guardar_configuracion_tabla');
+        return view('catalogos.clientes.clientes', compact('configuracion_tabla','rutaconfiguraciontabla'));
     }
     //obtener todos los registros
     public function clientes_obtener(Request $request){
         if($request->ajax()){
-            $data = Cliente::orderBy("Numero", "DESC")->get();
+            $data = VistaCliente::select($this->campos_consulta)->orderBy('Numero', 'DESC')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
                         if($data->Status == 'ALTA'){
@@ -47,18 +60,13 @@ class ClienteController extends ConfiguracionSistemaController{
                         } 
                         return $boton;
                     })
-                    ->addColumn('Credito', function($data){
-                        $credito = Helpers::convertirvalorcorrecto($data->Credito);
-                        return $credito;
-                    })
-                    ->addColumn('Saldo', function($data){
-                        $saldo = Helpers::convertirvalorcorrecto($data->Saldo);
-                        return $saldo;
-                    })
+                    ->addColumn('Credito', function($data){ return $data->Credito; })
+                    ->addColumn('Saldo', function($data){ return $data->Saldo; })
+                    ->addColumn('ComisionAgente', function($data){ return $data->ComisionAgente; })
                     ->setRowClass(function ($data) {
                         return $data->Status == 'ALTA' ? '' : 'bg-orange';
                     })
-                    ->rawColumns(['operaciones','Credito', 'Saldo'])
+                    ->rawColumns(['operaciones'])
                     ->make(true);
         } 
     }
@@ -411,5 +419,26 @@ class ClienteController extends ConfiguracionSistemaController{
             } 
       	}
     	return response()->json($Cliente); 
+    }
+    //exportar a excel
+    public function clientes_exportar_excel(){
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        return Excel::download(new ClientesExport($this->campos_consulta), "clientes.xlsx");        
+    }
+    //guardar configuracion tabla
+    public function clientes_guardar_configuracion_tabla(Request $request){
+        if($request->string_datos_tabla_false == null){
+            $string_datos_tabla_false = "todos los campos fueron seleccionados";
+        }else{
+            $string_datos_tabla_false = $request->string_datos_tabla_false;
+        }
+        $Configuracion_Tabla = Configuracion_Tabla::where('tabla', 'Clientes')->first();
+        $Configuracion_Tabla->campos_activados = $request->string_datos_tabla_true;
+        $Configuracion_Tabla->campos_desactivados = $string_datos_tabla_false;
+        $Configuracion_Tabla->columnas_ordenadas = $request->string_datos_ordenamiento_columnas;
+        $Configuracion_Tabla->usuario = Auth::user()->user;
+        $Configuracion_Tabla->save();
+        return redirect()->route('clientes');
     }
 }

@@ -181,6 +181,7 @@ return [
         //Barryvdh\DomPDF\ServiceProvider::class,
         Barryvdh\Snappy\ServiceProvider::class,
         Jenssegers\Date\DateServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -250,6 +251,7 @@ return [
         'PDF' => Barryvdh\Snappy\Facades\SnappyPdf::class,
         'SnappyImage' => Barryvdh\Snappy\Facades\SnappyImage::class,
         'Date' => Jenssegers\Date\Date::class,
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
 
     ],
 

@@ -8,22 +8,35 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Helpers;
 use DataTables;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ProveedoresExport;
 use App\Proveedor;
 use App\CodigoPostal;
+use App\Configuracion_Tabla;
+use App\VistaProveedor;
 
 class ProveedorController extends ConfiguracionSistemaController{
 
     public function __construct(){
         parent::__construct(); //carga las configuraciones en el controlador ConfiguracionSistemaController
+        //CONFIGURACIONES DE LA TABLA DEL CATALOGO O MODULO//
+        $this->configuracion_tabla = Configuracion_Tabla::where('tabla', 'Proveedores')->first();
+        $this->campos_consulta = [];
+        foreach (explode(",", $this->configuracion_tabla->columnas_ordenadas) as $campo){
+            array_push($this->campos_consulta, $campo);
+        }
+        //FIN CONFIGURACIONES DE LA TABLA//
     }
 
     public function proveedores(){
-        return view('catalogos.proveedores.proveedores');
+        $configuracion_tabla = $this->configuracion_tabla;
+        $rutaconfiguraciontabla = route('proveedores_guardar_configuracion_tabla');
+        return view('catalogos.proveedores.proveedores', compact('configuracion_tabla','rutaconfiguraciontabla'));
     }
     //obtener todos los registros
     public function proveedores_obtener(Request $request){
         if($request->ajax()){
-            $data = Proveedor::orderBy("Numero", "DESC")->get();
+            $data = VistaProveedor::select($this->campos_consulta)->orderBy('Numero', 'DESC')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
                         if($data->Status == 'ALTA'){
@@ -125,5 +138,26 @@ class ProveedorController extends ConfiguracionSistemaController{
 		    $Proveedor->save();
       	}
     	return response()->json($Proveedor); 
-    }     
+    } 
+    //exportar a excel
+    public function proveedores_exportar_excel(){
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        return Excel::download(new ProveedoresExport($this->campos_consulta), "proveedores.xlsx");  
+    }  
+    //guardar configuracion tabla
+    public function proveedores_guardar_configuracion_tabla(Request $request){
+        if($request->string_datos_tabla_false == null){
+            $string_datos_tabla_false = "todos los campos fueron seleccionados";
+        }else{
+            $string_datos_tabla_false = $request->string_datos_tabla_false;
+        }
+        $Configuracion_Tabla = Configuracion_Tabla::where('tabla', 'Proveedores')->first();
+        $Configuracion_Tabla->campos_activados = $request->string_datos_tabla_true;
+        $Configuracion_Tabla->campos_desactivados = $string_datos_tabla_false;
+        $Configuracion_Tabla->columnas_ordenadas = $request->string_datos_ordenamiento_columnas;
+        $Configuracion_Tabla->usuario = Auth::user()->user;
+        $Configuracion_Tabla->save();
+        return redirect()->route('proveedores');
+    }  
 }

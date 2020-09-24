@@ -196,7 +196,6 @@ class Helpers{
         return $porcentajeiva;
     }
 
-
     public static function obtener_valor_dolar_por_fecha_diario_oficial_federacion($fecha){
         $fecha_explode = explode("-", $fecha);
         $ano = $fecha_explode[0];

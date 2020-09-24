@@ -3,14 +3,7 @@
   Proveedores
 @endsection
 @section('additionals_css')
-    <link href="css/parsley/parsley.css" rel="stylesheet">
-    <link href="css/toastr/toastr.min.css" rel="stylesheet">
-    <!-- Wait Me Css -->
-    <link href="plugins/waitme/waitMe.css" rel="stylesheet" />
-    <!-- JQuery DataTable Css -->
-    <link href="plugins/jquery-datatable/skin/bootstrap/css/dataTables.bootstrap.css" rel="stylesheet">
-    <!--Select 2-->
-    <link href="js/select2/css/select2.min.css" rel="stylesheet" /> 
+    @include('secciones.libreriascss')
 @endsection
 @section('content')
 <section class="content">
@@ -20,17 +13,27 @@
             <div class="row clearfix">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="card" id="listadoregistros">
-                        <div class="header bg-red">
+                        <div class="header bg-red table-responsive button-demo">
                         	<table>
                         		<tr>
-                        			<td>
-                        				<h5>&nbsp;&nbsp;&nbsp;&nbsp;Proveedores&nbsp;&nbsp;&nbsp;</h5>
+                        			<td >
+                        				<h5>&nbsp;&nbsp;&nbsp;Proveedores&nbsp;&nbsp;&nbsp;</h5>
                         			</td>
                         			<td >
                             			<div class="btn bg-blue btn-xs waves-effect" onclick="alta()">
                                     		Altas
                                 		</div>
                         			</td>
+                                    <td >
+                                        <a class="btn bg-blue btn-xs waves-effect" href="{{route('proveedores_exportar_excel')}}" target="_blank">
+                                            Excel
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
+                                            Configurar Tabla
+                                        </div>
+                                    </td>
                         		</tr>
                         	</table>
                         </div>
@@ -40,14 +43,9 @@
                                     <thead class="customercolor">
                                         <tr>
                                             <th><div style="width:80px !important;">Operaciones</div></th>
-                                            <th>Número</th>
-                    						<th>Razon Social</th>
-                                            <th>RFC</th>
-                                            <th>Código Postal</th>
-                                            <th>Email1</th>
-                                            <th>Plazo (Días)</th>
-                                            <th>Telefonos</th>
-                                            <th>Status</th>
+                                            @foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                                            <th>{{$co}}</th>
+                                            @endforeach
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
@@ -118,7 +116,10 @@
 	      	</div>
     	</div>
   	</div>
-</div> 
+</div>
+<!-- modal para configuraciones de tablas-->
+@include('secciones.modalconfiguraciontablas')
+<!-- fin modal para configuraciones de tablas-->
 @endsection
 @section('additionals_js')
     <script>
@@ -127,6 +128,9 @@
         var numerodecimales = '{{$numerodecimales}}';
         var numerocerosconfigurados = '{{$numerocerosconfigurados}}';
         var numerocerosconfiguradosinputnumberstep = '{{$numerocerosconfiguradosinputnumberstep}}';
+        var campos_activados = '{{$configuracion_tabla->campos_activados}}';
+        var campos_desactivados = '{{$configuracion_tabla->campos_desactivados}}';
+        var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
         var proveedores_obtener = '{!!URL::to('proveedores_obtener')!!}';
         var proveedores_obtener_ultimo_numero = '{!!URL::to('proveedores_obtener_ultimo_numero')!!}';
         var proveedores_obtener_codigos_postales = '{!!URL::to('proveedores_obtener_codigos_postales')!!}';

@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Helpers;
 use DataTables;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\TecnicosExport;
 use App\Tecnico;
 
 class TecnicoController extends ConfiguracionSistemaController{
@@ -100,5 +102,9 @@ class TecnicoController extends ConfiguracionSistemaController{
         Log::channel('tecnico')->info('Se modifico el tecnico: '.$Tecnico.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
 		$Tecnico->save();
     	return response()->json($Tecnico); 
+    }
+    //exportar a excel
+    public function tecnicos_exportar_excel(){
+        return Excel::download(new TecnicosExport, 'tecnicos.xlsx');
     }
 }

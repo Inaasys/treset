@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Helpers;
 use DataTables;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\AlmacenesExport;
 use App\Almacen;
 
 class AlmacenController extends ConfiguracionSistemaController{
@@ -90,4 +92,8 @@ class AlmacenController extends ConfiguracionSistemaController{
 		$Almacen->save();
     	return response()->json($Almacen); 
     }  
+    //exportar a excel
+    public function almacenes_exportar_excel(){
+        return Excel::download(new AlmacenesExport, 'almacenes.xlsx');
+    }
 }

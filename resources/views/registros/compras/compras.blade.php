@@ -3,14 +3,7 @@
   Compras
 @endsection
 @section('additionals_css')
-    <link href="css/parsley/parsley.css" rel="stylesheet">
-    <link href="css/toastr/toastr.min.css" rel="stylesheet">
-    <!-- Wait Me Css -->
-    <link href="plugins/waitme/waitMe.css" rel="stylesheet" />
-    <!-- JQuery DataTable Css -->
-    <link href="plugins/jquery-datatable/skin/bootstrap/css/dataTables.bootstrap.css" rel="stylesheet">
-    <!--Select 2-->
-    <link href="js/select2/css/select2.min.css" rel="stylesheet" /> 
+    @include('secciones.libreriascss')
 @endsection
 @section('content')
 <section class="content">
@@ -22,7 +15,7 @@
                     <div class="card" id="listadoregistros">
                         <div class="header bg-red">
                             <div class="row clearfix">
-                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 table-responsive">
+                                <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 table-responsive button-demo">
                                     <table>
                                         <tr>
                                             <td>
@@ -31,28 +24,30 @@
                                             <td >
                                                 <div class="btn bg-blue btn-xs waves-effect" onclick="alta('PROD')">
                                                     Altas Prod
-                                                </div>&nbsp;&nbsp;&nbsp;
+                                                </div>
                                             </td>
                                             <td >
                                                 <div class="btn bg-blue btn-xs waves-effect" onclick="alta('GASTOS')">
                                                     Altas Gastos
-                                                </div>&nbsp;&nbsp;&nbsp;
+                                                </div>
                                             </td>
                                             <td >
                                                 <div class="btn bg-blue btn-xs waves-effect" onclick="mostrarmodalgenerarpdf()">
-                                                    Generar PDF
-                                                </div>&nbsp;&nbsp;&nbsp;
-                                            </td>
-                                            <td hidden>
-                                                <div class="btn bg-blue btn-xs waves-effect" onclick="alta('TOT')">
-                                                    Altas Tot's
+                                                    Generar Documento
                                                 </div>
                                             </td>
-
+                                            <td >
+                                                <a class="btn bg-blue btn-xs waves-effect" href="{{route('compras_exportar_excel')}}" target="_blank">
+                                                    Excel
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
+                                                    Configurar Tabla
+                                                </div>
+                                            </td>
                         		        </tr>
                         	        </table>
-                                </div>
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">     
                                 </div>
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
                                     <div class="row">
@@ -74,31 +69,9 @@
                                     <thead class="customercolor">
                                         <tr>
                                             <th><div style="width:80px !important;">Operaciones</div></th>
-                    						<th>Compra</th>
-                                            <th>Proveedor</th>
-                    						<th><div style="width:200px !important;">Nombre</div></th>
-                                            <th>Plazo</th>
-                                            <th>Fecha</th>
-                                            <th>FechaEmitida</th>
-                                            <th>Remision</th>
-                                            <th>Factura</th>
-                                            <th>Tipo</th>
-                                            <th>Almacen</th>
-                                            <th>Movimiento</th>
-                                            <th><div style="width:200px !important;">UUID</div></th>
-                                            <th>Orden</th>
-                                            <th>SubTotal</th>
-                                            <th>Iva</th>
-                                            <th>Total</th>
-                                            <th>Abonos</th>
-                                            <th>Descuentos</th>
-                                            <th>Saldo</th>
-                                            <th>TipoCambio</th>
-                                            <th><div style="width:200px !important;">Obs</div></th>
-                                            <th>Equipo</th>
-                                            <th>Usuario</th>
-                                            <th>Status</th>
-                                            <th>Periodo</th>
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                                            <th>{{$co}}</th>
+                                            @endforeach
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
@@ -239,71 +212,12 @@
     	</div>
   	</div>
 </div> 
-<!-- Modal Generar PDF-->
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalgenerarpdf" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  	<div class="modal-dialog" role="document">
-    	<div class="modal-content">
-      		<div class="modal-header bg-red">
-        		<h5 class="modal-title" id="exampleModalLabel">Generación de PDF's</h5>
-      		</div>
-      		<div class="modal-body">
-                  <form id="formgenerarpdf" action='{{ url("/compras_generar_pdfs") }}' method="POST" data-parsley-validate="" target="_blank">
-                    @csrf
-		        	<h5 id="textomodalgenerarpdf"> </h5>
-                    <div class="row">
-                        <label>Generar PDF's por:</label>
-                        <div class="col-md-12 form-check">
-                            <input type="radio" name="tipogeneracionpdf" id="tipogeneracionpdf" value="0" onchange="mostrartipogeneracionpdf()" required>
-                            <label for="tipogeneracionpdf">Selección de Folios</label>
-                            <input type="radio" name="tipogeneracionpdf" id="tipogeneracionpdf1" value="1" onchange="mostrartipogeneracionpdf()" required>
-                            <label for="tipogeneracionpdf1">Filtrado de Fechas</label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div id="tiposeleccionfolios" hidden>
-                            <div class="col-md-12">
-                                <input type="text" name="buscarfolio" id="buscarfolio" class="form-control" placeholder="Teclea el folio..." autocomplete="off" onkeyup="buscarstringlike(this.value)">
-                            </div>    
-                            <div class="col-md-12 table-responsive">
-                                <table id="tablafoliosencontrados" class="tablafoliosencontrados table table-bordered table-striped table-hover" style="width:100% !important;"> 
-                                        <thead class="customercolor">
-                                            <tr>
-                                                <th><div style="width:80px !important;">Generar PDF</div></th>
-                                                <th>Compra</th>
-                                                <th>UUID</th>
-                                                <th>Proveedor</th>
-                                                <th>Total</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody></tbody>
-                                </table>
-                            </div>
-                            <div class="col-md-12">
-                                <select  name="arraypdf[]" id="arraypdf" class="form-control select2" multiple="multiple" style="width:100% !important;" >
-                                </select>
-                            </div>
-                        </div>
-                        <div id="tipofiltracionfechas" hidden>
-                            <div class="col-md-12">
-                                <label >Fecha Inicio</label>
-                                <input type="date"  name="fechainiciopdf" id="fechainiciopdf" class="form-control"  >
-                            </div>
-                            <div class="col-md-12">
-                                <label >Fecha Terminación</label>
-                                <input type="date"  name="fechaterminacionpdf" id="fechaterminacionpdf" class="form-control"  >
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-	        	        <div class="btn btn-danger btn-sm" data-dismiss="modal">Salir</div>
-	        	        <button type="submit" class="btn btn-success btn-sm" >Generar PDF's</button>
-	      	        </div>
-		        </form>	
-      		</div>
-    	</div>
-  	</div>
-</div> 
+<!-- modal para crear documento en PDF-->
+@include('secciones.modalcreardocumento')
+<!-- fin modal para crear documento en PDF-->
+<!-- modal para configuraciones de tablas-->
+@include('secciones.modalconfiguraciontablas')
+<!-- fin modal para configuraciones de tablas-->
 @endsection
 @section('additionals_js')
     <script>
@@ -312,10 +226,13 @@
         var numerodecimales = '{{$numerodecimales}}';
         var numerocerosconfigurados = '{{$numerocerosconfigurados}}';
         var numerocerosconfiguradosinputnumberstep = '{{$numerocerosconfiguradosinputnumberstep}}';
-        var compras_obtener = '{!!URL::to('compras_obtener')!!}';
         var serieusuario = '{{$serieusuario}}';
         var periodohoy = '{{$periodohoy}}';
         var meshoy = '{{$meshoy}}';
+        var campos_activados = '{{$configuracion_tabla->campos_activados}}';
+        var campos_desactivados = '{{$configuracion_tabla->campos_desactivados}}';
+        var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
+        var compras_obtener = '{!!URL::to('compras_obtener')!!}';
         var compras_obtener_ultimo_folio = '{!!URL::to('compras_obtener_ultimo_folio')!!}';
         var compras_obtener_tipos_ordenes_compra = '{!!URL::to('compras_obtener_tipos_ordenes_compra')!!}';
         var compras_cargar_xml_alta = '{!!URL::to('compras_cargar_xml_alta')!!}';
