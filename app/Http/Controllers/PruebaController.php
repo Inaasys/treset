@@ -12,11 +12,38 @@ use Helpers;
 use DataTables;
 use DB;
 use PDF;
+use Goutte\Client;
+use GuzzleHttp\Client as GuzzleClient;
 
 class PruebaController extends ConfiguracionSistemaController{
 
     public function __construct(){
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
+    }
+
+    public function pruebaswebscraping(){
+        $fecha = "2020-09-24";
+
+        $client = new Client();
+
+        $crawler = $client->request('GET', 'https://www.dof.gob.mx/indicadores_detalle.php?cod_tipo_indicador=158&dfecha=24%2F09%2F2020&hfecha=24%2F09%2F2020');
+        /*$arraydolar = array();
+        $crawler->filter('.Celda .txt')->each(function ($node) {
+
+            if(is_numeric($node->text())) {
+                array_push($arraydolar, $node->text());
+                print $node->text()."<br>";
+            } 
+
+        });*/
+
+        $arraydolar = $crawler->filter('.Celda .txt')->last()->text();
+        /*foreach ($arraydolar as $domElement) {
+            //var_dump($domElement->nodeName);
+            print $domElement->nodeName."<br>";
+        }*/
+        dd($arraydolar);
+
     }
 
     public function enviar_msj_whatsapp(Request $request){

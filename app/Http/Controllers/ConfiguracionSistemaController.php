@@ -40,12 +40,7 @@ class ConfiguracionSistemaController extends Controller
         }
         $tipodecambio = TipoDeCambio::whereDate('Fecha', $fecha)->first();
         if($tipodecambio == null){
-            $obtener_valor_dolar_dof = Helpers::obtener_valor_dolar_por_fecha_diario_oficial_federacion($fecha);
-            if(is_numeric($obtener_valor_dolar_dof)){
-                $valor_dolar_dof = $obtener_valor_dolar_dof;
-            }else{
-                $valor_dolar_dof = 0;
-            }
+            $valor_dolar_dof = Helpers::obtener_valor_dolar_por_fecha_diario_oficial_federacion($fecha);
             $id = Helpers::ultimoidtabla('App\TipoDeCambio');
             $TipoDeCambio = new TipoDeCambio;
             $TipoDeCambio->Numero = $id;

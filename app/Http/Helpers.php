@@ -3,6 +3,8 @@ use Carbon\Carbon;
 use App\Empresa;
 use App\Serie;
 use Jenssegers\Date\Date;
+use Goutte\Client;
+use GuzzleHttp\Client as GuzzleClient;
 
 class Helpers{
     
@@ -201,10 +203,19 @@ class Helpers{
         $ano = $fecha_explode[0];
         $mes = $fecha_explode[1];
         $dia = $fecha_explode[2];
+        $precio_dolar = 0;
+        $client = new Client();
+        $resultado_scraping = $client->request('GET', 'https://www.dof.gob.mx/indicadores_detalle.php?cod_tipo_indicador=158&dfecha='.$dia.'%2F'.$mes.'%2F'.$ano.'&hfecha='.$dia.'%2F'.$mes.'%2F'.$ano);
+        $precio_dolar = $resultado_scraping->filter('.Celda .txt')->last()->text();
+        return $precio_dolar;
+        /*$fecha_explode = explode("-", $fecha);
+        $ano = $fecha_explode[0];
+        $mes = $fecha_explode[1];
+        $dia = $fecha_explode[2];
         $pagina_inicio = file_get_contents('https://www.dof.gob.mx/indicadores_detalle.php?cod_tipo_indicador=158&dfecha='.$dia.'%2F'.$mes.'%2F'.$ano.'&hfecha='.$dia.'%2F'.$mes.'%2F'.$ano);
         $explode_pagina = explode('<td width="52%" align="center" class="txt">', $pagina_inicio);
         $ultimo_explode = explode('</td>', $explode_pagina[1]);
-        return $ultimo_explode[0];
+        return $ultimo_explode[0];*/
     }
 
     //quitar acentos
