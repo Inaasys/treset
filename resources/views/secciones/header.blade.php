@@ -183,10 +183,10 @@
                     <li><a href="#">Tipos de Cambio</a></li>
                 </ul>
               </li>-->
-              <!--<li class="dropdown">
+              <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Reportes <span class="caret"></span></a>
                 <ul class="dropdown-menu">
-                    <li class="dropdown-submenu">
+                    <!--<li class="dropdown-submenu">
                         <a class="test"  href="#">Ordenes de Compra <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                           <li><a  href="#">Relación de Ordenes de Compra</a></li>
@@ -225,11 +225,12 @@
                           <li><a  href="#">Relación de Remisiones por Clientes</a></li>
                           <li><a  href="#">Relación de Remisiones por Agentes</a></li>
                         </ul>
-                    </li>
+                    </li>-->
                     <li class="dropdown-submenu">
                         <a class="test"  href="#">Facturas <span class="caret"></span></a>
                         <ul class="dropdown-menu">
-                          <li><a  href="#">Relación de Ventas por Clientes</a></li>
+                          <li><a  href="{{route('reporte_diario_ventas')}}">Ventas Diarias</a></li>
+                          <!--<li><a  href="#">Relación de Ventas por Clientes</a></li>
                           <li><a  href="#">Relación de Ventas por Agentes</a></li>
                           <li><a  href="#">Relación de Ventas por Marcas</a></li>                         
                           <li><a  href="#">Proyección de Cobranza a Clientes</a></li>
@@ -239,10 +240,10 @@
                           <li><a  href="#">Ventas Perdidas</a></li>                       
                           <li><a  href="#">Antiguedad de Saldos</a></li>                     
                           <li><a  href="#">Estado de Cuenta de Clientes</a></li>                   
-                          <li><a  href="#">Facturas Liquidadas para Comisiones</a></li>
+                          <li><a  href="#">Facturas Liquidadas para Comisiones</a></li>-->
                         </ul>
                     </li>            
-                    <li class="dropdown-submenu">
+                    <!--<li class="dropdown-submenu">
                         <a class="test"  href="#">Producción <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                           <li><a  href="#">Relación de Producción</a></li>
@@ -263,6 +264,7 @@
                     <li class="dropdown-submenu">
                         <a class="test"  href="#">Ordenes de Trabajo <span class="caret"></span></a>
                         <ul class="dropdown-menu">
+                          <li><a  href="#">Avance Unidades en Reparación</a></li>
                           <li><a  href="#">Horas Técnico</a></li>
                           <li><a  href="#">Unidades Servicio</a></li>
                           <li><a  href="#">Relación de Encuestas</a></li>
@@ -340,9 +342,9 @@
                         <ul class="dropdown-menu">
                           <li><a href="#">Permisos de Usuarios  </a></li>
                         </ul>
-                    </li>
+                    </li>-->
                 </ul>
-              </li>-->
+              </li>
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Utilerias <span class="caret"></span></a>
                 <ul class="dropdown-menu">

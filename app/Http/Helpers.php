@@ -218,6 +218,17 @@ class Helpers{
         return $ultimo_explode[0];*/
     }
 
+    public static function comprobar_conexion_internet(){
+        $conexion = @fsockopen("www.google.com", 80); 
+        if ($conexion){
+            $estado_conexion_internet = true; //action when connected
+            fclose($conexion);
+        }else{
+            $estado_conexion_internet = false; //action in connection failure
+        }
+        return $estado_conexion_internet;
+    }
+    
     //quitar acentos
     public static function quitaracentos($string){
         $string = trim($string);

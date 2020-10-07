@@ -289,9 +289,18 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/notas_credito_proveedores_exportar_excel', 'NotasCreditoProveedoresController@notas_credito_proveedores_exportar_excel')->name('notas_credito_proveedores_exportar_excel')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     Route::post('/notas_credito_proveedor_guardar_configuracion_tabla', 'NotasCreditoProveedoresController@notas_credito_proveedor_guardar_configuracion_tabla')->name('notas_credito_proveedor_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     
-   
+
    
     /* -----------------------------------||||||||||||||||||||FIN REGISTROS||||||||||||||||||||||-------------------------------------*/
+
+
+    /* -----------------------------------||||||||||||||||||||REPORTES||||||||||||||||||||||-------------------------------------*/
+    Route::get('/reporte_diario_ventas', 'ReporteFacturaController@reporte_diario_ventas')->name('reporte_diario_ventas');
+    Route::get('/generar_reporte_diario_ventas', 'ReporteFacturaController@generar_reporte_diario_ventas')->name('generar_reporte_diario_ventas');
+    Route::get('/reporte_ventas_diarias_obtener_clientes', 'ReporteFacturaController@reporte_ventas_diarias_obtener_clientes')->name('reporte_ventas_diarias_obtener_clientes');
+    Route::post('/generar_excel_reporte_diario_ventas', 'ReporteFacturaController@generar_excel_reporte_diario_ventas')->name('generar_excel_reporte_diario_ventas');
+    /* -----------------------------------||||||||||||||||||||FIN REPORTES||||||||||||||||||||||-------------------------------------*/
+
 
     /* -----------------------------------||||||||||||||||||||EMPRESA||||||||||||||||||||||-------------------------------------*/
     Route::post('/utilerias_empresa_guardar_modificacion', 'EmpresaController@utilerias_empresa_guardar_modificacion')->name('utilerias_empresa_guardar_modificacion');

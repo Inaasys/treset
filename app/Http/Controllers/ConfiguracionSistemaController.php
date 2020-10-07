@@ -40,14 +40,20 @@ class ConfiguracionSistemaController extends Controller
         }
         $tipodecambio = TipoDeCambio::whereDate('Fecha', $fecha)->first();
         if($tipodecambio == null){
-            $valor_dolar_dof = Helpers::obtener_valor_dolar_por_fecha_diario_oficial_federacion($fecha);
-            $id = Helpers::ultimoidtabla('App\TipoDeCambio');
-            $TipoDeCambio = new TipoDeCambio;
-            $TipoDeCambio->Numero = $id;
-            $TipoDeCambio->Moneda = 'USD';
-            $TipoDeCambio->Fecha = Helpers::fecha_exacta_accion_datetimestring();
-            $TipoDeCambio->TipoCambioDOF = $valor_dolar_dof;
-            $TipoDeCambio->save();
+            $estado_conexion_internet = Helpers::comprobar_conexion_internet();
+            if($estado_conexion_internet == true){
+                $valor_dolar_dof = Helpers::obtener_valor_dolar_por_fecha_diario_oficial_federacion($fecha);
+                $id = Helpers::ultimoidtabla('App\TipoDeCambio');
+                $TipoDeCambio = new TipoDeCambio;
+                $TipoDeCambio->Numero = $id;
+                $TipoDeCambio->Moneda = 'USD';
+                $TipoDeCambio->Fecha = Helpers::fecha_exacta_accion_datetimestring();
+                $TipoDeCambio->TipoCambioDOF = $valor_dolar_dof;
+                $TipoDeCambio->save();
+            }else{
+                $tipodecambio = TipoDeCambio::orderBy('Numero', 'DESC')->first();
+                $valor_dolar_dof = $tipodecambio->TipoCambioDOF;
+            }
         }else{
             $valor_dolar_dof = $tipodecambio->TipoCambioDOF;
         }
