@@ -61,9 +61,9 @@ class ReportesDiariosVentasExport implements FromView
             $dia = Date::parse($fecha)->format('l');//obtener el nombre del dia de la fecha iterada actualmente
             if($dia != "domingo"){
                 if($this->numerocliente == 0){
-                    $facturas = Factura::whereDate('Fecha', $fechafacturas)->where('Status', '<>', 'BAJA')->orderBy('Folio', 'ASC')->get();//obtener todas las facturas de la fecha iterada actualmente
+                    $facturas = Factura::whereDate('Fecha', $fechafacturas)->where('Status', '<>', 'BAJA')->where('UUID', '<>', '')->orderBy('Folio', 'ASC')->get();//obtener todas las facturas de la fecha iterada actualmente
                 }else{
-                    $facturas = Factura::whereDate('Fecha', $fechafacturas)->where('Cliente', $this->numerocliente)->where('Status', '<>', 'BAJA')->orderBy('Folio', 'ASC')->get();//obtener todas las facturas de la fecha iterada actualmente
+                    $facturas = Factura::whereDate('Fecha', $fechafacturas)->where('Cliente', $this->numerocliente)->where('Status', '<>', 'BAJA')->where('UUID', '<>', '')->orderBy('Folio', 'ASC')->get();//obtener todas las facturas de la fecha iterada actualmente
                 }
                 $acumuladoesperadomes = $acumuladoesperadomes + $importeesperadofacturadopordia;//sumar acumulado esperado en la fecha iterada actualmente
                 $importediatotalsiniva = 0;//declaracion  de variable importe total del dia sin iva

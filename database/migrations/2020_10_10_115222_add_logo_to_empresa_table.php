@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddPermisos extends Migration
+class AddLogoToEmpresaTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,9 @@ class AddPermisos extends Migration
      */
     public function up()
     {
-        DB::table('permisos')->insert(array(
-            'name' => 'registros.ordenescompra.autorizar',
-            'created_at' => date('Y-m-d H:m:s'),
-            'updated_at' => date('Y-m-d H:m:s')
-        ));
+        Schema::table('Empresa', function (Blueprint $table) {
+            $table->string('Logo', 255)->default('default_logo.png')->nullable();
+        });
     }
 
     /**
@@ -27,6 +25,8 @@ class AddPermisos extends Migration
      */
     public function down()
     {
-        //
+        Schema::table('Empresa', function (Blueprint $table) {
+            //
+        });
     }
 }

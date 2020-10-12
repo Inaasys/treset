@@ -42,7 +42,7 @@
                                     </div>  
                                     <div class="col-md-2">
                                         <label>Objetivo Mensual en Pesos</label>
-                                        <input type="number" step="0.{{$numerocerosconfiguradosinputnumberstep}}" class="form-control" name="objetivofinalpesos" id="objetivofinalpesos" value="3000000.{{$numerocerosconfigurados}}" data-parsley-min="1" onchange="formatocorrectoinputcantidades(this);" required>
+                                        <input type="number" step="0.{{$numerocerosconfiguradosinputnumberstep}}" class="form-control" name="objetivofinalpesos" id="objetivofinalpesos" value="3000000.{{$numerocerosconfigurados}}" data-parsley-min="1" onchange="formatocorrectoinputcantidades(this);" onkeypress="return pulsar(event)" required>
                                     </div> 
                                     <div class="col-md-4">
                                         <input type="checkbox" name="porcliente" id="idporcliente" class="filled-in" onchange="filtrocliente();" />
@@ -63,7 +63,7 @@
                                         </div>
                                     </div>
                                     <div class="col-md-2" hidden>
-                                        <button  class="btn btn-success btn-sm" id="btngenerarexcel">Generar Excel</button>
+                                        <button  class="btn btn-success btn-sm" id="btngenerarexcel" onclick="document.forms[0].submit();">Generar Excel</button>
                                     </div>  
                                 </div>
                             </form>

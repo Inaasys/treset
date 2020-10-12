@@ -5,6 +5,7 @@ var form;
 function init(){
   asignarfechaactual(); 
   listar();
+  activarrelistarreporteenter();
 }
 //mostrar modal formulario
 function mostrarmodalformulario(){
@@ -32,6 +33,18 @@ function asignarfechaactual(){
   var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia) ;
   $('#fechafinalreporte').val(hoy);
 }
+//detectar cuando en el input de objetivo mensual cambie y se presione enter para actualizar la busqueda
+function activarrelistarreporteenter(){
+  var objetivofinalpesos = $('#objetivofinalpesos');
+  objetivofinalpesos.unbind();
+  objetivofinalpesos.bind('keyup change', function(e) {
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        realizar_reporte();
+      }
+  });
+}
+//actualizar reporte
 function realizar_reporte(){
   var form = $("#formventasdiarias");
   if (form.parsley().isValid()){
@@ -41,16 +54,21 @@ function realizar_reporte(){
     form.parsley().validate();
   }
 }
+//detectar si se presiono la tecla enter
+function pulsar(e) {
+  var tecla = (document.all) ? e.keyCode :e.which;
+  return (tecla!=13);
+}
+//realizar en reporte en excel
 function realizar_excel_reporte(){
   var form = $("#formventasdiarias");
   if (form.parsley().isValid()){
-    
-   $("#btngenerarexcel").click();
-
+    $("#btngenerarexcel").click();
   }else{
     form.parsley().validate();
   }
 }
+//listar tabla reporte
 function listar(){
   tabla=$('#tbllistado').DataTable({
     "sScrollX": "110%",
@@ -86,7 +104,6 @@ function listar(){
       }else{
         $('td', row).eq(7).addClass('bg-green');
       }
-
       if (parseFloat(data.porcentajeobjetivofinal) >= 100) {
         $('td', row).eq(8).addClass('bg-green');
       }
@@ -113,6 +130,7 @@ function listar(){
     }
   });
 }
+//identificar si el reporte se hara por cliente o no
 function filtrocliente(){
   if($('#idporcliente').prop('checked')){
     seleccionarcliente(1,1,1);
