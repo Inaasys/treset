@@ -178,8 +178,16 @@ Route::group(['middleware' => ['auth']], function () {
     //Route::post('/bancos_alta_o_baja', 'FolioComprobanteFacturaController@bancos_alta_o_baja')->name('bancos_alta_o_baja');
     //Route::get('/bancos_obtener_banco', 'FolioComprobanteFacturaController@bancos_obtener_banco')->name('bancos_obtener_banco');
     //Route::post('/bancos_guardar_modificacion', 'FolioComprobanteFacturaController@bancos_guardar_modificacion')->name('bancos_guardar_modificacion');  
-    
-    
+    //Personal
+    Route::get('/personal', 'PersonalController@personal')->name('personal')->middleware('revisaraccesomenu:menucatalogopersonal');
+    Route::get('/personal_obtener', 'PersonalController@personal_obtener')->name('personal_obtener')->middleware('revisaraccesomenu:menucatalogopersonal');
+    Route::get('/personal_obtener_usuarios_y_tecnicos', 'PersonalController@personal_obtener_usuarios_y_tecnicos')->name('personal_obtener_usuarios_y_tecnicos')->middleware('revisaraccesomenu:menucatalogopersonal');
+    Route::post('/personal_guardar_usuarios_y_tecnicos', 'PersonalController@personal_guardar_usuarios_y_tecnicos')->name('personal_guardar_usuarios_y_tecnicos')->middleware('revisarpermisos:catalogos.personal.altas');
+    Route::get('/personal_exportar_excel', 'PersonalController@personal_exportar_excel')->name('personal_exportar_excel')->middleware('revisaraccesomenu:menucatalogopersonal');
+    Route::post('/personal_alta_o_baja', 'PersonalController@personal_alta_o_baja')->name('personal_alta_o_baja')->middleware('revisarpermisos:catalogos.personal.bajas');
+    Route::get('/personal_obtener_personal', 'PersonalController@personal_obtener_personal')->name('personal_obtener_personal')->middleware('revisaraccesomenu:menucatalogopersonal');
+    Route::post('/personal_guardar_modificacion', 'PersonalController@personal_guardar_modificacion')->name('personal_guardar_modificacion')->middleware('revisarpermisos:catalogos.personal.cambios');
+
     Route::get('usuarios', 'UserController@usuarios')->name('usuarios');    
     Route::get('usuarios_obtener', 'UserController@usuarios_obtener')->name('usuarios_obtener');
     Route::get('/usuarios_obtener_ultimo_numero', 'UserController@usuarios_obtener_ultimo_numero')->name('usuarios_obtener_ultimo_numero'); 
@@ -283,14 +291,26 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/notas_credito_proveedor_cargar_xml_alta', 'NotasCreditoProveedoresController@notas_credito_proveedor_cargar_xml_alta')->name('notas_credito_proveedor_cargar_xml_alta')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     Route::get('/notas_credito_proveedor_obtener_existencias_partida', 'NotasCreditoProveedoresController@notas_credito_proveedor_obtener_existencias_partida')->name('notas_credito_proveedor_obtener_existencias_partida')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     Route::post('/notas_credito_proveedor_guardar', 'NotasCreditoProveedoresController@notas_credito_proveedor_guardar')->name('notas_credito_proveedor_guardar')->middleware('revisarpermisos:registros.notas.credito.proveedores.altas');
-    
     Route::get('/notas_credito_proveedores_buscar_folio_string_like', 'NotasCreditoProveedoresController@notas_credito_proveedores_buscar_folio_string_like')->name('notas_credito_proveedores_buscar_folio_string_like')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     Route::post('/notas_credito_proveedores_generar_pdfs', 'NotasCreditoProveedoresController@notas_credito_proveedores_generar_pdfs')->name('notas_credito_proveedores_generar_pdfs')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     Route::get('/notas_credito_proveedores_exportar_excel', 'NotasCreditoProveedoresController@notas_credito_proveedores_exportar_excel')->name('notas_credito_proveedores_exportar_excel')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     Route::post('/notas_credito_proveedor_guardar_configuracion_tabla', 'NotasCreditoProveedoresController@notas_credito_proveedor_guardar_configuracion_tabla')->name('notas_credito_proveedor_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
-    
-
-   
+    //Asignación de herramienta
+    Route::get('/asignacionherramienta', 'AsignacionHerramientaController@asignacionherramienta')->name('asignacionherramienta')->middleware('revisaraccesomenu:menuregistrosasignacionherramienta');
+    Route::get('/asignacion_herramienta_obtener', 'AsignacionHerramientaController@asignacion_herramienta_obtener')->name('asignacion_herramienta_obtener')->middleware('revisaraccesomenu:menuregistrosasignacionherramienta');
+    Route::get('/asignacion_herramienta_obtener_ultimo_id', 'AsignacionHerramientaController@asignacion_herramienta_obtener_ultimo_id')->name('asignacion_herramienta_obtener_ultimo_id')->middleware('revisaraccesomenu:menuregistrosasignacionherramienta');
+    Route::get('/asignacion_herramienta_obtener_personal_recibe', 'AsignacionHerramientaController@asignacion_herramienta_obtener_personal_recibe')->name('asignacion_herramienta_obtener_personal_recibe')->middleware('revisaraccesomenu:menuregistrosasignacionherramienta');
+    Route::get('/asignacion_herramienta_obtener_personal_entrega', 'AsignacionHerramientaController@asignacion_herramienta_obtener_personal_entrega')->name('asignacion_herramienta_obtener_personal_entrega')->middleware('revisaraccesomenu:menuregistrosasignacionherramienta');
+    Route::get('/asignacion_herramienta_obtener_herramienta', 'AsignacionHerramientaController@asignacion_herramienta_obtener_herramienta')->name('asignacion_herramienta_obtener_herramienta')->middleware('revisaraccesomenu:menuregistrosasignacionherramienta');
+    Route::post('/asignacion_herramienta_guardar', 'AsignacionHerramientaController@asignacion_herramienta_guardar')->name('asignacion_herramienta_guardar')->middleware('revisarpermisos:registros.asignacion.herramienta.altas');
+    Route::post('/asignacion_herramienta_autorizar', 'AsignacionHerramientaController@asignacion_herramienta_autorizar')->name('asignacion_herramienta_autorizar')->middleware('revisarpermisos:registros.asignacion.herramienta.autorizar');
+    Route::get('/asignacion_herramienta_obtener_asignacion_herramienta', 'AsignacionHerramientaController@asignacion_herramienta_obtener_asignacion_herramienta')->name('asignacion_herramienta_obtener_asignacion_herramienta')->middleware('revisaraccesomenu:menuregistrosasignacionherramienta');
+    Route::post('/asignacion_herramienta_guardar_modificacion', 'AsignacionHerramientaController@asignacion_herramienta_guardar_modificacion')->name('asignacion_herramienta_guardar_modificacion')->middleware('revisarpermisos:registros.asignacion.herramienta.cambios');
+    Route::post('/asignacion_herramienta_alta_o_baja', 'AsignacionHerramientaController@asignacion_herramienta_alta_o_baja')->name('asignacion_herramienta_alta_o_baja')->middleware('revisarpermisos:registros.asignacion.herramienta.bajas');
+    Route::get('/asignacion_herramienta_buscar_id_string_like', 'AsignacionHerramientaController@asignacion_herramienta_buscar_id_string_like')->name('asignacion_herramienta_buscar_id_string_like')->middleware('revisaraccesomenu:menuregistrosasignacionherramienta');
+    Route::post('/asignacion_herramienta_generar_pdfs', 'AsignacionHerramientaController@asignacion_herramienta_generar_pdfs')->name('asignacion_herramienta_generar_pdfs')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores')->middleware('revisaraccesomenu:menuregistrosasignacionherramienta');
+    Route::get('/asignacion_herramienta_exportar_excel', 'AsignacionHerramientaController@asignacion_herramienta_exportar_excel')->name('asignacion_herramienta_exportar_excel')->middleware('revisaraccesomenu:menuregistrosasignacionherramienta');
+    Route::post('/asignacion_herramienta_guardar_configuracion_tabla', 'AsignacionHerramientaController@asignacion_herramienta_guardar_configuracion_tabla')->name('asignacion_herramienta_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrosasignacionherramienta');
     /* -----------------------------------||||||||||||||||||||FIN REGISTROS||||||||||||||||||||||-------------------------------------*/
 
 

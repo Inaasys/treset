@@ -359,10 +359,8 @@ function permisos(id){
                                         '<label for="idregistros.ordenescompra.bajas">Bajas</label>'+
                                         '&nbsp;&nbsp;<input type="checkbox" name="registros.ordenescompra.cambios" id="idregistros.ordenescompra.cambios" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
                                         '<label for="idregistros.ordenescompra.cambios">Cambios</label>'+
-
                                         '&nbsp;&nbsp;<input type="checkbox" name="registros.ordenescompra.autorizar" id="idregistros.ordenescompra.autorizar" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
                                         '<label for="idregistros.ordenescompra.autorizar">Autorizar</label>'+
-
                                         '<input type="hidden" name="string_submenus" id="string_submenus">'+
                                         '<input type="hidden" name="string_permisos_crud" id="string_permisos_crud">'+
                                         '<input type="hidden" name="id_usuario_permisos" id="id_usuario_permisos">'+
@@ -620,6 +618,21 @@ function permisos(id){
                                         '<label for="idregistros.ajustes.inventario.cambios">Cambios</label>'+ 
                                     '</div>'+
                                 '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label>Asignación de Herramienta</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="menuregistrosasignacionherramienta" id="idmenuregistrosasignacionherramienta" class="filled-in submenu accesoregistros" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenuregistrosasignacionherramienta">Acceso</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="registros.asignacion.herramienta.altas" id="idregistros.asignacion.herramienta.altas" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
+                                        '<label for="idregistros.asignacion.herramienta.altas">Altas</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="registros.asignacion.herramienta.bajas" id="idregistros.asignacion.herramienta.bajas" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
+                                        '<label for="idregistros.asignacion.herramienta.bajas">Bajas</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="registros.asignacion.herramienta.cambios" id="idregistros.asignacion.herramienta.cambios" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
+                                        '<label for="idregistros.asignacion.herramienta.cambios">Cambios</label>'+ 
+                                        '&nbsp;&nbsp;<input type="checkbox" name="registros.asignacion.herramienta.autorizar" id="idregistros.asignacion.herramienta.autorizar" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
+                                        '<label for="idregistros.asignacion.herramienta.autorizar">Autorizar</label>'+
+                                    '</div>'+
+                                '</div>'+
                             '</div>'+
                             '<div class="row">'+
                                 '<div class="col-md-6">'+
@@ -819,6 +832,19 @@ function permisos(id){
                                         '<label for="idcatalogos.folios.fiscales.folios.facturas.bajas">Bajas</label>'+
                                         '&nbsp;&nbsp;<input type="checkbox" name="catalogos.folios.fiscales.folios.facturas.cambios" id="idcatalogos.folios.fiscales.folios.facturas.cambios" class="filled-in crudcatalogos permisoscrud" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
                                         '<label for="idcatalogos.folios.fiscales.folios.facturas.cambios">Cambios</label>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                '<label>Personal</label>'+
+                                    '<div class="col-md-12 form-check">'+ 
+                                        '<input type="checkbox" name="menucatalogopersonal" id="idmenucatalogopersonal" class="filled-in submenu accesocatalogos" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenucatalogopersonal">Acceso</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="catalogos.personal.altas" id="idcatalogos.personal.altas" class="filled-in crudcatalogos permisoscrud" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idcatalogos.personal.altas">Altas</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="catalogos.personal.bajas" id="idcatalogos.personal.bajas" class="filled-in crudcatalogos permisoscrud" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idcatalogos.personal.bajas">Bajas</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="catalogos.personal.cambios" id="idcatalogos.personal.cambios" class="filled-in crudcatalogos permisoscrud" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idcatalogos.personal.cambios">Cambios</label>'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'+

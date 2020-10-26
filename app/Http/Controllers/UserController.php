@@ -19,6 +19,7 @@ use App\Permiso;
 use App\User_Rel_Permiso;
 use App\User_Rel_Menu;
 use Mail;
+use App\Personal;
 
 class UserController extends ConfiguracionSistemaController
 {
@@ -91,7 +92,17 @@ class UserController extends ConfiguracionSistemaController
             if (App::environment('local')) {
                 DB::unprepared('SET IDENTITY_INSERT users OFF');
             }
-
+            //dar de alta en tabla personal
+            DB::unprepared('SET IDENTITY_INSERT personal ON');
+            $id = Helpers::ultimoidregistrotabla('App\Personal');
+            $Personal = new Personal;
+            $Personal->id=$id;
+            $Personal->nombre = $request->name;
+            $Personal->fecha_ingreso = Carbon::now()->toDateTimeString();
+            $Personal->tipo_personal = "Administrativo";
+            $Personal->status = 'ALTA';
+            $Personal->save();
+            DB::unprepared('SET IDENTITY_INSERT personal OFF');
             //enviar correo electrónico	
             $nombre = 'Receptor envio de correos';
             $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';

@@ -11,6 +11,8 @@ use DataTables;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\TecnicosExport;
 use App\Tecnico;
+use App\Personal;
+use DB;
 
 class TecnicoController extends ConfiguracionSistemaController{
 
@@ -65,6 +67,17 @@ class TecnicoController extends ConfiguracionSistemaController{
         $Tecnico->Status='ALTA';
         Log::channel('tecnico')->info('Se registro un nuevo tecnico: '.$Tecnico.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
         $Tecnico->save();
+        //dar de alta en tabla personal
+        DB::unprepared('SET IDENTITY_INSERT personal ON');
+        $id = Helpers::ultimoidregistrotabla('App\Personal');
+        $Personal = new Personal;
+        $Personal->id=$id;
+        $Personal->nombre = $request->nombre;
+        $Personal->fecha_ingreso = Carbon::now()->toDateTimeString();
+        $Personal->tipo_personal = "Técnico";
+        $Personal->status = 'ALTA';
+        $Personal->save();
+        DB::unprepared('SET IDENTITY_INSERT personal OFF');
         return response()->json($Tecnico); 
     } 
     //dar de baja o alta en catalogo
@@ -78,7 +91,7 @@ class TecnicoController extends ConfiguracionSistemaController{
 	       $Tecnico->Status = 'ALTA';
            Log::channel('tecnico')->info('El tecnico fue dado de alta: '.$Tecnico.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
         }
-	    $Tecnico->save();
+        $Tecnico->save();
 	    return response()->json($Tecnico);
     } 
     //obtener datos del catalogo

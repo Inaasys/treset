@@ -58,6 +58,7 @@
                     <!--
                     <li><a href="#" id="menuregistrosciclicos">Cíclicos</a></li>
                     <li><a href="#" id="menuregistrosajusteinventario">Ajustes de Inventario</a></li>-->
+                    <li><a href="{{ route('asignacionherramienta') }}" id="menuregistrosasignacionherramienta">Asignación Herramienta</a></li>
                 </ul>
               </li>
               <li class="dropdown">
@@ -98,6 +99,7 @@
                           <li><a href="#">Folios Pagos</a></li>-->
                         </ul>
                     </li>
+                    <li><a href="{{ route('personal') }}" id="menucatalogopersonal">Personal</a></li>
                     <!--
                     <li><a href="#">Impresoras</a></li>
                     <li><a href="#">Diseño de Formatos</a></li>-->
