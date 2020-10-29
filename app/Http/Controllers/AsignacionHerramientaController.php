@@ -393,4 +393,111 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
         }
         return response()->json($Asignacion_Herramienta);
     }
+    //obtener personal para crear excel
+    public function asignacion_herramienta_generar_excel_obtener_personal(){
+        $personal = Personal::where('status', 'ALTA')->get();
+        return response()->json($personal);
+    }
+    //obtener toda la herramienta asignada al personal seleccionado
+    public function asignacion_herramienta_obtener_herramienta_personal(Request $request){
+        $Asignacion_Herramienta = Asignacion_Herramienta::where('recibe_herramienta', $request->idpersonal)->where('status', 'ALTA')->where('autorizado_por', '<>', '')->get();
+        $filasdetallesasignacion = '';
+        $contadorfilas = 0;
+        foreach($Asignacion_Herramienta as $ah){
+            $Asignacion_Herramienta_Detalle = Asignacion_Herramienta_Detalle::where('asignacion', $ah->asignacion)->get();
+            foreach($Asignacion_Herramienta_Detalle as $ahd){    
+                if($ahd->estado_auditoria == 'FALTANTE'){
+                    $opciones = '<option value="FALTANTE" selected>FALTANTE</option>'.
+                                '<option value="OK">OK</option>';
+                }elseif($ahd->estado_auditoria == 'OK'){
+                    $opciones = '<option value="FALTANTE">FALTANTE</option>'.
+                                '<option value="OK" selected>OK</option>';
+                }else{
+                    $opciones = '<option value="FALTANTE">FALTANTE</option>'.
+                                '<option value="OK">OK</option>';
+                }
+                $filasdetallesasignacion= $filasdetallesasignacion.
+                '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
+                    '<td class="tdmod"><input type="hidden" class="form-control asignacionpartida" name="asignacionpartida[]" id="asignacsionpartida[]" value="'.$ahd->id.'" readonly>'.$ahd->asignacion.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'.$ahd->herramienta.'" readonly>'.$ahd->herramienta.'</td>'.
+                    '<td class="tdmod"><div class="divorinputmodl"><input type="hidden" class="form-control nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'.$ahd->descripcion.'" readonly>'.$ahd->descripcion.'</div></td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'.$ahd->unidad.'" readonly>'.$ahd->unidad.'</td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($ahd->cantidad).'" onchange="formatocorrectoinputcantidades(this)" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" id="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($ahd->precio).'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" id="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto($ahd->total).'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                    '<td class="tdmod">'.
+                        '<select name="estadoauditoria[]" class="form-control" style="width:100% !important;height: 28px !important;" required>'.
+                            '<option selected disabled hidden>Selecciona</option>'.
+                            $opciones.
+                        '</select>'.
+                    '</td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadauditoriapartida" name="cantidadauditoriapartida[]" id="cantidadauditoriapartida[]" value="'.Helpers::convertirvalorcorrecto($ahd->cantidad_auditoria).'" data-parsley-max="'.Helpers::convertirvalorcorrecto($ahd->cantidad).'" onchange="formatocorrectoinputcantidades(this)" required></td>'.
+                '</tr>';
+                $contadorfilas++;
+            }
+        }
+        //url para generar reporte de auditoria
+        $urlgenerarreporteauditoria  = route('asignacion_herramienta_generar_reporte_auditoria', $request->idpersonal);
+        $data = array(
+            "filasdetallesasignacion" => $filasdetallesasignacion,
+            "contadorfilas" => $contadorfilas,
+            "urlgenerarreporteauditoria" => $urlgenerarreporteauditoria
+        );
+        return response()->json($data);
+    }
+    //guardar auditoria
+    public function asignacion_herramienta_guardar_auditoria(Request $request){
+        foreach ($request->asignacionpartida as $key => $iddetalleasignacion){   
+            $Asignacion_Herramienta_Detalle = Asignacion_Herramienta_Detalle::where('id', $iddetalleasignacion)->first();
+            $Asignacion_Herramienta_Detalle->estado_auditoria =  $request->estadoauditoria  [$key];
+            $Asignacion_Herramienta_Detalle->cantidad_auditoria =  $request->cantidadauditoriapartida [$key];
+            $Asignacion_Herramienta_Detalle->save();
+        }
+    	return response()->json($Asignacion_Herramienta_Detalle);
+    }
+    //generar reporte de auditoria
+    public function asignacion_herramienta_generar_reporte_auditoria($id){
+        $Asignacion_Herramienta = Asignacion_Herramienta::where('recibe_herramienta', $id)->where('status', 'ALTA')->where('autorizado_por', '<>', '')->get();
+        $Personal_Recibe_Herramienta = Personal::where('id', $id)->first();
+        $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $totalasignacion = 0;
+        $data=array();
+        $datadetalle=array();
+
+        foreach ($Asignacion_Herramienta as $ah){
+            $Asignacion_Herramienta_Detalle = Asignacion_Herramienta_Detalle::where('asignacion', $ah->asignacion)->get();
+            foreach($Asignacion_Herramienta_Detalle as $ahd){
+                if($ahd->estado_auditoria == 'FALTANTE'){
+                    $producto = Producto::where('Codigo', $ahd->herramienta)->first();
+                    $totaldetalle = $ahd->cantidad_auditoria * $ahd->precio;
+                    $datadetalle[]=array(
+                        "cantidadauditoriadetalle"=> Helpers::convertirvalorcorrecto($ahd->cantidad_auditoria),
+                        "herramientadetalle"=>$ahd->herramienta,
+                        "descripciondetalle"=>$ahd->descripcion,
+                        "preciodetalle" => Helpers::convertirvalorcorrecto($ahd->precio),
+                        "totaldetalle" => Helpers::convertirvalorcorrecto($totaldetalle),
+                        "estadoauditoriadetalle" => $ahd->estado_auditoria,
+                        "asignaciondetalle" => $ahd->asignacion
+                    );
+                    $totalasignacion = $totalasignacion + $totaldetalle;
+                }
+            } 
+
+        }
+        $data[]=array(
+            "asignacion"=>$ah,
+            "totalasignacion"=>Helpers::convertirvalorcorrecto($totalasignacion),
+            "fechaformato"=> $fechaformato,
+            "datadetalle" => $datadetalle,
+            "Personal_Recibe_Herramienta" => $Personal_Recibe_Herramienta
+        );
+        $pdf = PDF::loadView('registros.asignacionherramienta.formato_pdf_asignacion_herramienta_auditoria', compact('data'))
+        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-right', ''.$fechaformato.'')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-bottom', 10);
+        //return $pdf->download('contrarecibos.pdf');
+        return $pdf->stream();
+    }
 }

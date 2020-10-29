@@ -24,13 +24,15 @@ function obtenultimonumero(){
 //cerrar modales
 function limpiarmodales(){
   $("#tabsform").empty();
+  $("#tabsformauditarherramientas").empty();
 }
 //limpiar todos los inputs del formulario alta
 function limpiar(){
   $("#formparsley")[0].reset();
+  $("#formauditarherramienta")[0].reset();
   //Resetear las validaciones del formulario alta
-  form = $("#formparsley");
-  form.parsley().reset();
+  $("#formparsley").parsley().reset();
+  $("#formauditarherramienta").parsley().reset();
   //volver a aplicar configuracion a datatable principal para que realize la busqueda con la tecla enter
   regresarbusquedadatatableprincipal();
   //reiniciar los contadores de la tabla de detalle de la orden de compra
@@ -396,7 +398,7 @@ function agregarfilaherramienta(Codigo, Producto, Unidad, Costo, Existencias){
                         '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'+Codigo+'" readonly>'+Codigo+'</td>'+
                         '<td class="tdmod"><div class="divorinputmodl"><input type="hidden" class="form-control nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'+Producto+'" readonly>'+Producto+'</div></td>'+
                         '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'+Unidad+'" readonly>'+Unidad+'</td>'+
-                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-max="'+Existencias+'" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('+contadorfilas+');"></td>'+
+                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-max="'+Existencias+'" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('+contadorfilas+');" required></td>'+
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" id="preciopartida[]" value="'+Costo+'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" id="totalpesospartida[]" value="'+Costo+'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                         '<td class="tdmod">'+
@@ -903,4 +905,111 @@ function configurar_tabla(){
       $("#columnasnestable").append(columna);
   }
 }
+//generar excel personal para auditoria
+function mostrarmodalgenerarexcelpersonal(){
+  $.get(asignacion_herramienta_generar_excel_obtener_personal, function(data){
+    $("#personalexcel").empty();
+    $("#personalexcel").append("<option selected disabled hidden>Selecciona el personal</option>");
+    $.each(data,function(key, registro) {
+      $("#personalexcel").append('<option value='+registro.id+'>'+registro.nombre+' - '+registro.tipo_personal+'</option>');
+    });
+    //formulario auditar herramienta a personal
+    var tabs =    '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                      '<li role="presentation" class="active">'+
+                          '<a href="#herramientasasignadastab" data-toggle="tab">Herramientas Asignadas</a>'+
+                      '</li>'+
+                  '</ul>'+
+                  '<div class="tab-content">'+
+                      '<div role="tabpanel" class="tab-pane fade in active" id="herramientasasignadastab">'+
+                          '<div class="row">'+
+                              '<div class="col-md-12 table-responsive">'+
+                                  '<table id="tablaherramientasasignadas" class="table table-bordered tablaherramientasasignadas">'+
+                                      '<thead class="customercolor">'+
+                                          '<tr>'+
+                                              '<th>Asignación</th>'+
+                                              '<th>Herramienta</th>'+
+                                              '<th><div style="width:200px !important;">Descripción</div></th>'+
+                                              '<th >Unidad</th>'+
+                                              '<th >Cantidad</th>'+
+                                              '<th >Precio $</th>'+
+                                              '<th>Total $</th>'+
+                                              '<th class="customercolortheadth">Estado Auditoria</th>'+
+                                              '<th class="customercolortheadth">Cantidad Auditoria</th>'+
+                                          '</tr>'+
+                                      '</thead>'+
+                                      '<tbody>'+           
+                                      '</tbody>'+
+                                  '</table>'+
+                              '</div>'+
+                              '<div class="col-md-12">'+
+                                '<input type="hidden" name="numerofilasherramientaasignada" id="numerofilasherramientaasignada" class="form-control" required>'+
+                              '</div>'+
+                          '</div>'+   
+                      '</div>'+ 
+                  '</div>';
+    $("#tabsformauditarherramientas").html(tabs);
+    $("#modalgenerarexcelpersonal").modal('show');
+  }) 
+}
+//cargar toda la herramienta asignada al personal
+function herramientaasignadapersonal(){
+  var idpersonal = $("#personalexcel").val();
+  $.get(asignacion_herramienta_obtener_herramienta_personal, {idpersonal:idpersonal}, function(data){
+    if(parseInt(data.contadorfilas) > 0){
+      //tabs asignacion herramientas
+      $("#tablaherramientasasignadas tbody").html(data.filasdetallesasignacion);
+      //se deben asignar los valores a los contadores para que las sumas resulten correctas
+      contadorfilas = data.contadorfilas;
+      $("#numerofilasherramientaasignada").val(data.contadorfilas);
+      $("#btnGuardarAuditoria").show();
+      $("#btnGenerarReporteAuditoria").show();
+      $("#btnGenerarReporteAuditoria").attr("href", data.urlgenerarreporteauditoria);
+
+    }else{
+      msj_errorpersonalsinherramientaasignada();
+      $("#tablaherramientasasignadas tbody").html("");
+      $("#btnGuardarAuditoria").hide();
+      $("#btnGenerarReporteAuditoria").hide();
+      $("#btnGenerarReporteAuditoria").attr("href", "");
+    }
+
+  })  
+}
+//guardar la auditoria del personal
+$("#btnGuardarAuditoria").on('click', function (e) {
+  e.preventDefault();
+  var formData = new FormData($("#formauditarherramienta")[0]);
+  var form = $("#formauditarherramienta");
+  if (form.parsley().isValid()){
+    $('.page-loader-wrapper').css('display', 'block');
+    $.ajax({
+      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+      url:asignacion_herramienta_guardar_auditoria,
+      type: "post",
+      dataType: "html",
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false,
+      success:function(data){
+        msj_datosguardadoscorrectamente();
+        limpiar();
+        limpiarmodales();
+        $("#modalgenerarexcelpersonal").modal('hide');
+        $('.page-loader-wrapper').css('display', 'none');
+      },
+      error:function(data){
+        if(data.status == 403){
+          msj_errorenpermisos();
+        }else{
+          msj_errorajax();
+        }
+        $('.page-loader-wrapper').css('display', 'none');
+      }
+    })
+  }else{
+    form.parsley().validate();
+  }
+});
+
 init();

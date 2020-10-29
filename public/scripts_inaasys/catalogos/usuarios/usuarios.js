@@ -631,6 +631,8 @@ function permisos(id){
                                         '<label for="idregistros.asignacion.herramienta.cambios">Cambios</label>'+ 
                                         '&nbsp;&nbsp;<input type="checkbox" name="registros.asignacion.herramienta.autorizar" id="idregistros.asignacion.herramienta.autorizar" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
                                         '<label for="idregistros.asignacion.herramienta.autorizar">Autorizar</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="registros.asignacion.herramienta.auditoria.altas" id="idregistros.asignacion.herramienta.auditoria.altas" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
+                                        '<label for="idregistros.asignacion.herramienta.auditoria.altas">Auditoria</label>'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'+

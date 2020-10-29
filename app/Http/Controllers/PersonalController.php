@@ -13,6 +13,7 @@ use App\Exports\PersonalExport;
 use App\Personal;
 use App\Tecnico;
 use App\User;
+use App\Usuario;
 use DB;
 
 class PersonalController extends ConfiguracionSistemaController{
@@ -50,7 +51,7 @@ class PersonalController extends ConfiguracionSistemaController{
     //obtener todos los usuarios y tecnicos del sistema
     public function personal_obtener_usuarios_y_tecnicos(){
         $tecnicos = Tecnico::where('Status', '<>', 'BAJA')->orderBy('Numero', 'ASC')->get();
-        $usuarios = User::where('status', '<>', 'BAJA')->orderBy('id', 'ASC')->get();
+        $usuarios = Usuario::all();
         $filaspersonal = '';
         $contadorfilas = 0;
         foreach($tecnicos as $t){
@@ -70,11 +71,12 @@ class PersonalController extends ConfiguracionSistemaController{
                 $contadorfilas++;
         }
         foreach($usuarios as $u){
+            $fechaingresousuario = Carbon::now();
             $filaspersonal= $filaspersonal.
                 '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapersonal('.$contadorfilas.')">X</div></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control nombrepersonal" name="nombrepersonal[]" value="'.$u->name.'" readonly>'.$u->name.'</td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm fechaingresopersonal"  name="fechaingresopersonal[]" value="'.$u->created_at->toDateString().'">'.$u->created_at.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control nombrepersonal" name="nombrepersonal[]" value="'.$u->Usuario.'" readonly>'.$u->Usuario.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm fechaingresopersonal"  name="fechaingresopersonal[]" value="'.$fechaingresousuario->toDateString().'">'.$fechaingresousuario->toDateTimeString().'</td>'.
                     '<td class="tdmod">'.
                         '<select name="tipopersonal[]" class="form-control" style="width:100% !important;">'.
                             '<option value="Técnico">Técnico</option>'.

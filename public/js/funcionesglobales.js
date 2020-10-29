@@ -316,6 +316,14 @@ function msj_errorentradacontrarecibo(){
             "extendedTImeout": "5000"
     });
 }
+//mensaje error el personal no cuenta con herramienta asignada para auditar
+function msj_errorpersonalsinherramientaasignada(){
+	toastr.error( "El personal seleccionado no tiene herramienta asignada que auditar", "Mensaje", {
+            "timeOut": "5000",
+            "progressBar": true,
+            "extendedTImeout": "5000"
+    });
+}
 ///////////////////////////////////FIN MENSAJES TOASTR.JS INAASYS///////////////////////////////////////
 //////////////////////////////FUNCIONES PARA CONFIGURACION DE COLUMNAS DE TABLAS/////////////////////////////////////////
 //ordenar las columnas para vista de tabla

@@ -32,6 +32,11 @@
                                                 </div>
                                             </td>
                                             <td >
+                                                <div class="btn bg-blue btn-xs waves-effect" onclick="mostrarmodalgenerarexcelpersonal()">
+                                                    Auditar Herramienta
+                                                </div>
+                                            </td>
+                                            <td >
                                                 <a class="btn bg-blue btn-xs waves-effect" href="{{route('asignacion_herramienta_exportar_excel')}}" target="_blank">
                                                     Excel
                                                 </a>
@@ -208,6 +213,36 @@
 <!-- modal para configuraciones de tablas-->
 @include('secciones.modalconfiguraciontablas')
 <!-- fin modal para configuraciones de tablas-->
+<!-- modal para crear excel personal para auditoria -->
+<!-- Modal Generar PDF-->
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalgenerarexcelpersonal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  	<div class="modal-dialog modal-lg" role="document">
+    	<div class="modal-content">
+      		<div class="modal-header bg-red">
+        		<h5 class="modal-title" id="exampleModalLabel">Auditoria de Herramienta por Personal</h5>
+      		</div>
+      		<div class="modal-body">
+                  <form id="formauditarherramienta">
+                    <div class="row">
+                        <label>Selecciona el personal que se auditara:</label>
+                        <div class="col-md-12 form-check">
+                            <select name="personalexcel" id="personalexcel" class="form-control select2" onchange="herramientaasignadapersonal()" style="width:100% !important;" required>
+                            </select>
+                        </div>
+                        <div class="col-md-12" id="tabsformauditarherramientas">
+                            <!-- aqui van el formulario para auditar herramienta al personal -->
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
+                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarAuditoria" style="display:none">Guardar Auditoria</button>
+                        <a class="btn btn-primary btn-sm" id="btnGenerarReporteAuditoria" style="display:none" target="_blank">Imprimir</a>
+	      	        </div>
+		        </form>	
+      		</div>
+    	</div>
+  	</div>
+</div> 
 @endsection
 @section('additionals_js')
     <script>
@@ -232,6 +267,9 @@
         var asignacion_herramienta_guardar_modificacion = '{!!URL::to('asignacion_herramienta_guardar_modificacion')!!}';
         var asignacion_herramienta_alta_o_baja = '{!!URL::to('asignacion_herramienta_alta_o_baja')!!}'; 
         var asignacion_herramienta_buscar_id_string_like = '{!!URL::to('asignacion_herramienta_buscar_id_string_like')!!}';
+        var asignacion_herramienta_generar_excel_obtener_personal = '{!!URL::to('asignacion_herramienta_generar_excel_obtener_personal')!!}';
+        var asignacion_herramienta_obtener_herramienta_personal = '{!!URL::to('asignacion_herramienta_obtener_herramienta_personal')!!}';
+        var asignacion_herramienta_guardar_auditoria = '{!!URL::to('asignacion_herramienta_guardar_auditoria')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="scripts_inaasys/registros/asignacionherramienta/asignacionherramienta.js"></script>
