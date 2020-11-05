@@ -13,7 +13,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        'App\Console\Commands\GetValueDolar'
+        //'App\Console\Commands\GetValueDolar',
+        'App\Console\Commands\VerificarPrestamoHerramienta'
     ];
 
     /**
@@ -24,10 +25,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
-        $schedule->command('get:valuedolar')
-                  ->daily();
+        // $schedule->command('inspire')->hourly();
+        // $schedule->command('get:valuedolar')->daily();
+        $schedule->command('verificar:prestamo')->everyThirtyMinutes();
     }
 
     /**

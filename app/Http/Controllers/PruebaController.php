@@ -14,6 +14,10 @@ use DB;
 use PDF;
 use Goutte\Client;
 use GuzzleHttp\Client as GuzzleClient;
+use App\Prestamo_Herramienta;
+use App\Prestamo_Herramienta_Detalle;
+use App\Personal;
+use Mail;
 
 class PruebaController extends ConfiguracionSistemaController{
 
@@ -70,5 +74,5 @@ class PruebaController extends ConfiguracionSistemaController{
         $enviarmensaje = file_get_contents($url, false, $opciones);
         dd($enviarmensaje);
     }
-    //
+
 }

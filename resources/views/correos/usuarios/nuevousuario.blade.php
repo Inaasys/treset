@@ -167,7 +167,7 @@
                   </tr>
                   <tr>
                     <td style="color:#bbbbbb; font-size:12px;">
-                       © 2020 Todos los derechos reservados
+                       © 2020 Inaasys Todos los derechos reservados
                        <br>
                        <br>
                     </td>

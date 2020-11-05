@@ -15,6 +15,7 @@ use App\Exports\AsignacionHerramientaExport;
 use App\Configuracion_Tabla;
 use App\Asignacion_Herramienta;
 use App\Asignacion_Herramienta_Detalle;
+use App\Prestamo_Herramienta_Detalle;
 use App\Personal;
 use App\BitacoraDocumento;
 use App\VistaAsignacionHerramienta;
@@ -377,6 +378,21 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
             $Asignacion_Herramienta_Detalle->save();
         }
     	return response()->json($Asignacion_Herramienta);
+    }
+    //verificar si la asignacion no se esta usando el algun modulo (Prestamos Herramientas)
+    public function asignacion_herramienta_verificar_uso_en_modulos(Request $request){
+        $Asignacion_Herramienta_Detalle = Asignacion_Herramienta_Detalle::where('asignacion', $request->asignaciondesactivar)->get();
+        $numero_prestamos = 0;
+        foreach($Asignacion_Herramienta_Detalle as $ahd){
+            $Prestamo_Herramienta_Detalle = Prestamo_Herramienta_Detalle::where('id_detalle_asignacion_herramienta', $ahd->id)->where('status_prestamo', 'PRESTADO')->count();
+            if($Prestamo_Herramienta_Detalle > 0){
+                $numero_prestamos = $numero_prestamos + $Prestamo_Herramienta_Detalle;
+            }
+        }
+        $data = array (
+            'numero_prestamos' => $numero_prestamos,
+        );
+        return response()->json($data);
     }
     //dar de baja asignacion de herramienta
     public function asignacion_herramienta_alta_o_baja(Request $request){

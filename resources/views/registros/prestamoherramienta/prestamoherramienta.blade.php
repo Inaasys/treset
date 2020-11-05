@@ -1,6 +1,6 @@
 @extends('plantilla_maestra')
 @section('titulo')
-  Asignación de Herramienta
+  Prestamo de Herramienta
 @endsection
 @section('additionals_css')
     @include('secciones.libreriascss')
@@ -19,7 +19,7 @@
                                     <table>
                                         <tr>
                                             <td>
-                                                <h5>&nbsp;&nbsp;&nbsp;Asignación de Herramienta&nbsp;&nbsp;&nbsp;</h5>
+                                                <h5>&nbsp;&nbsp;&nbsp;Prestamo de Herramienta&nbsp;&nbsp;&nbsp;</h5>
                                             </td>
                                             <td >
                                                 <div class="btn bg-blue btn-xs waves-effect" onclick="alta()">
@@ -27,17 +27,7 @@
                                                 </div>
                                             </td>
                                             <td >
-                                                <div class="btn bg-blue btn-xs waves-effect" onclick="mostrarmodalgenerarpdf()">
-                                                    Generar Documento
-                                                </div>
-                                            </td>
-                                            <td >
-                                                <div class="btn bg-blue btn-xs waves-effect" onclick="mostrarmodalgenerarexcelpersonal()">
-                                                    Auditar Herramienta
-                                                </div>
-                                            </td>
-                                            <td >
-                                                <a class="btn bg-blue btn-xs waves-effect" href="{{route('asignacion_herramienta_exportar_excel')}}" target="_blank">
+                                                <a class="btn bg-blue btn-xs waves-effect" href="{{route('prestamo_herramienta_exportar_excel')}}" target="_blank">
                                                     Excel
                                                 </a>
                                             </td>
@@ -103,11 +93,20 @@
                                 <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" required readonly>
                             </div>   
                             <div class="col-md-4">
+                                <label>Selecciona el personal que entrega:</label>
+                                <div class="col-md-12 form-check">
+                                    <select name="personalherramientacomun" id="personalherramientacomun" class="form-control select2" onchange="herramientaasignadapersonal()" style="width:100% !important;" required>
+                                    </select>
+                                    <input type="hidden" class="form-control" name="numeropersonalentrega" id="numeropersonalentrega" required readonly onkeyup="tipoLetra(this)">
+                                    <input type="hidden" class="form-control" name="personalentrega" id="personalentrega" required readonly>
+                                </div>
+                            </div>  
+                            <div class="col-md-4">
                                 <label>Personal que recibe</label>
                                 <table class="col-md-12">
                                     <tr>
                                         <td>
-                                            <div class="btn bg-blue waves-effect" onclick="obtenerpersonalrecibe()">Seleccionar</div>
+                                            <div class="btn bg-blue waves-effect" onclick="obtenerpersonalrecibe()" id="btnobtenerpersonalrecibe" style="display:none">Seleccionar</div>
                                         </td>
                                         <td>
                                             <div class="form-line">
@@ -118,22 +117,6 @@
                                     </tr>    
                                 </table>
                             </div>
-                            <div class="col-md-4">
-                                <label>Personal que entrega</label>
-                                <table class="col-md-12">
-                                    <tr>
-                                        <td>
-                                            <div class="btn bg-blue waves-effect" onclick="obtenerpersonalentrega()" id="btnbuscarpersonalqueentrega" style="display:none">Seleccionar</div>
-                                        </td>
-                                        <td>    
-                                            <div class="form-line">
-                                                <input type="hidden" class="form-control" name="numeropersonalentrega" id="numeropersonalentrega" required readonly onkeyup="tipoLetra(this)">
-                                                <input type="text" class="form-control" name="personalentrega" id="personalentrega" required readonly>
-                                            </div>
-                                        </td>    
-                                    </tr>    
-                                </table>
-                            </div>   
                             <div class="col-md-2">
                                 <label>Fecha</label>
                                 <input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" onkeyup="tipoLetra(this);">
@@ -141,9 +124,17 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4" id="divbuscarcodigoproducto">
-                                <label>Buscar herramienta por código</label>
-                                <input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código de la herramienta">
+                            <div class="col-md-3">
+                                <label>Inicio Prestamo</label>
+                                <input type="datetime-local" class="form-control inicioprestamo" name="inicioprestamo" id="inicioprestamo" onchange="compararterminoprestamo()" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Termino Prestamo</label>
+                                <input type="datetime-local" class="form-control terminoprestamo" name="terminoprestamo" id="terminoprestamo" onchange="compararterminoprestamo()" required >
+                            </div>
+                            <div class="col-md-4">
+                                <label >correo notificaciones</label>
+                                <input type="email" class="form-control" name="correo" id="correo" data-parsley-type="email" required>
                             </div>
                         </div>
                         <div class="col-md-12" id="tabsform">
@@ -193,7 +184,7 @@
       		<div class="modal-body">
 		      	<form id="formdesactivar" action="#">
 		        	<h5 id="textomodaldesactivar"> </h5>
-                    <input type="hidden" id="asignaciondesactivar" name="asignaciondesactivar">
+                    <input type="hidden" id="prestamodesactivar" name="prestamodesactivar">
                     <div id="divmotivobaja">
                         <label>Motivo Baja</label>
                         <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)"></textarea>
@@ -206,43 +197,31 @@
 	      	</div>
     	</div>
   	</div>
-</div> 
-<!-- modal para crear documento en PDF-->
-@include('secciones.modalcreardocumento')
-<!-- fin modal para crear documento en PDF-->
-<!-- modal para configuraciones de tablas-->
-@include('secciones.modalconfiguraciontablas')
-<!-- fin modal para configuraciones de tablas-->
-<!-- modal para crear excel personal para auditoria -->
-<!-- Modal Generar PDF-->
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalgenerarexcelpersonal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  	<div class="modal-dialog modal-lg" role="document">
+</div>
+<!-- Modal Terminar Prestamo-->
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalterminarprestamo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  	<div class="modal-dialog" role="document">
     	<div class="modal-content">
       		<div class="modal-header bg-red">
-        		<h5 class="modal-title" id="exampleModalLabel">Auditoria de Herramienta por Personal</h5>
+        		<h5 class="modal-title" >Aviso</h5>
       		</div>
       		<div class="modal-body">
-                  <form id="formauditarherramienta">
-                    <div class="row">
-                        <label>Selecciona el personal que se auditara:</label>
-                        <div class="col-md-12 form-check">
-                            <select name="personalexcel" id="personalexcel" class="form-control select2" onchange="herramientaasignadapersonal()" style="width:100% !important;" required>
-                            </select>
-                        </div>
-                        <div class="col-md-12" id="tabsformauditarherramientas">
-                            <!-- aqui van el formulario para auditar herramienta al personal -->
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
-                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarAuditoria" style="display:none">Guardar Auditoria</button>
-                        <a class="btn btn-primary btn-sm" id="btnGenerarReporteAuditoria" style="display:none" target="_blank">Imprimir</a>
-	      	        </div>
+		      	<form id="formterminarprestamo" action="#">
+		        	<h5 id="textomodalterminarprestamo"> </h5>
+                    <input type="hidden" id="prestamoterminarprestamo" name="prestamoterminarprestamo">
 		        </form>	
       		</div>
+	      	<div class="modal-footer">
+	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
+	        	<button type="button" class="btn btn-success btn-sm" id="btnterminarprestamo">Guardar</button>
+	      	</div>
     	</div>
   	</div>
 </div> 
+<!-- modal para configuraciones de tablas-->
+@include('secciones.modalconfiguraciontablas')
+<!-- fin modal para configuraciones de tablas-->
+
 @endsection
 @section('additionals_js')
     <script>
@@ -256,24 +235,21 @@
         var campos_activados = '{{$configuracion_tabla->campos_activados}}';
         var campos_desactivados = '{{$configuracion_tabla->campos_desactivados}}';
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
-        var asignacion_herramienta_obtener = '{!!URL::to('asignacion_herramienta_obtener')!!}';
-        var asignacion_herramienta_obtener_ultimo_id = '{!!URL::to('asignacion_herramienta_obtener_ultimo_id')!!}';
-        var asignacion_herramienta_obtener_personal_recibe = '{!!URL::to('asignacion_herramienta_obtener_personal_recibe')!!}';
-        var asignacion_herramienta_obtener_personal_entrega = '{!!URL::to('asignacion_herramienta_obtener_personal_entrega')!!}';
-        var asignacion_herramienta_obtener_herramienta = '{!!URL::to('asignacion_herramienta_obtener_herramienta')!!}';
-        var asignacion_herramienta_guardar = '{!!URL::to('asignacion_herramienta_guardar')!!}';
-        var asignacion_herramienta_autorizar = '{!!URL::to('asignacion_herramienta_autorizar')!!}'; 
-        var asignacion_herramienta_obtener_asignacion_herramienta = '{!!URL::to('asignacion_herramienta_obtener_asignacion_herramienta')!!}'; 
-        var asignacion_herramienta_guardar_modificacion = '{!!URL::to('asignacion_herramienta_guardar_modificacion')!!}';
-        var asignacion_herramienta_alta_o_baja = '{!!URL::to('asignacion_herramienta_alta_o_baja')!!}'; 
-        var asignacion_herramienta_buscar_id_string_like = '{!!URL::to('asignacion_herramienta_buscar_id_string_like')!!}';
-        var asignacion_herramienta_generar_excel_obtener_personal = '{!!URL::to('asignacion_herramienta_generar_excel_obtener_personal')!!}';
-        var asignacion_herramienta_obtener_herramienta_personal = '{!!URL::to('asignacion_herramienta_obtener_herramienta_personal')!!}';
-        var asignacion_herramienta_guardar_auditoria = '{!!URL::to('asignacion_herramienta_guardar_auditoria')!!}';
-        var asignacion_herramienta_verificar_uso_en_modulos = '{!!URL::to('asignacion_herramienta_verificar_uso_en_modulos')!!}';
+        var prestamo_herramienta_obtener = '{!!URL::to('prestamo_herramienta_obtener')!!}';
+        var prestamo_herramienta_obtener_ultimo_id = '{!!URL::to('prestamo_herramienta_obtener_ultimo_id')!!}';
+        var prestamo_herramienta_obtener_detalle_asignacion_seleccionada = '{!!URL::to('prestamo_herramienta_obtener_detalle_asignacion_seleccionada')!!}';
+        var prestamo_herramienta_obtener_fecha_datetimelocal = '{!!URL::to('prestamo_herramienta_obtener_fecha_datetimelocal')!!}';
+        var prestamo_herramienta_obtener_personal = '{!!URL::to('prestamo_herramienta_obtener_personal')!!}';
+        var prestamo_herramienta_obtener_herramienta_personal = '{!!URL::to('prestamo_herramienta_obtener_herramienta_personal')!!}';
+        var prestamo_herramienta_obtener_personal_recibe = '{!!URL::to('prestamo_herramienta_obtener_personal_recibe')!!}';
+        var prestamo_herramienta_guardar = '{!!URL::to('prestamo_herramienta_guardar')!!}';
+        var prestamo_herramienta_terminar_prestamo = '{!!URL::to('prestamo_herramienta_terminar_prestamo')!!}';
+        var prestamo_herramienta_alta_o_baja = '{!!URL::to('prestamo_herramienta_alta_o_baja')!!}'; 
+        var prestamo_herramienta_obtener_prestamo_herramienta = '{!!URL::to('prestamo_herramienta_obtener_prestamo_herramienta')!!}'; 
+        var prestamo_herramienta_guardar_modificacion = '{!!URL::to('prestamo_herramienta_guardar_modificacion')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
-    <script src="scripts_inaasys/registros/asignacionherramienta/asignacionherramienta.js"></script>
+    <script src="scripts_inaasys/registros/prestamoherramienta/prestamoherramienta.js"></script>
 @endsection
 
 

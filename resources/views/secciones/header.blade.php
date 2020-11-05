@@ -59,6 +59,7 @@
                     <li><a href="#" id="menuregistrosciclicos">Cíclicos</a></li>
                     <li><a href="#" id="menuregistrosajusteinventario">Ajustes de Inventario</a></li>-->
                     <li><a href="{{ route('asignacionherramienta') }}" id="menuregistrosasignacionherramienta">Asignación Herramienta</a></li>
+                    <li><a href="{{ route('prestamoherramienta') }}" id="menuregistrosprestamoherramienta">Prestamo Herramienta</a></li>
                 </ul>
               </li>
               <li class="dropdown">

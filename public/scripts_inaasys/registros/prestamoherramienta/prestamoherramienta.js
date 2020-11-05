@@ -1,6 +1,8 @@
 'use strict'
 var tabla;
 var form;
+var contadorproductos=0;
+var contadorfilas = 0;
 //funcion que se ejecuta al inicio
 function init(){
    listar();
@@ -9,15 +11,28 @@ function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1000));
 }
 function asignarfechaactual(){
+  $.get(prestamo_herramienta_obtener_fecha_datetimelocal, function(data){
     var fechahoy = new Date();
     var dia = ("0" + fechahoy.getDate()).slice(-2);
     var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
     var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia) ;
     $('#fecha').val(hoy);
+    $("#inicioprestamo").val(data);
+    $("#terminoprestamo").val(data);
+  });
+}
+//comparar si la fecha de termino del prestamo es menor a la fecha de inicio
+function compararterminoprestamo(){
+  var inicioprestamo = $("#inicioprestamo").val();
+  var terminoprestamo = $("#terminoprestamo").val();
+  if(inicioprestamo > terminoprestamo){
+    msjterminoprestamomenor();
+    $("#terminoprestamo").val("");
+  }
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
-  $.get(asignacion_herramienta_obtener_ultimo_id, function(id){
+  $.get(prestamo_herramienta_obtener_ultimo_id, function(id){
     $("#id").val(id);
   })  
 }
@@ -29,10 +44,8 @@ function limpiarmodales(){
 //limpiar todos los inputs del formulario alta
 function limpiar(){
   $("#formparsley")[0].reset();
-  $("#formauditarherramienta")[0].reset();
   //Resetear las validaciones del formulario alta
   $("#formparsley").parsley().reset();
-  $("#formauditarherramienta").parsley().reset();
   //volver a aplicar configuracion a datatable principal para que realize la busqueda con la tecla enter
   regresarbusquedadatatableprincipal();
   //reiniciar los contadores de la tabla de detalle de la orden de compra
@@ -98,13 +111,14 @@ function listar(){
     },
     serverSide: true,
     ajax: {
-        url: asignacion_herramienta_obtener,
+        url: prestamo_herramienta_obtener,
         data: function (d) {
             d.periodo = $("#periodo").val();
         }
     },
     "createdRow": function( row, data, dataIndex){
-        if( data.status ==  `BAJA`){ $(row).addClass('bg-orange');}
+        if( data.status ==  `BAJA`){$(row).addClass('bg-orange');}
+        else if( data.status ==  `ENTREGADO`){$(row).addClass('bg-green');}
     },
     columns: campos_tabla,
     "initComplete": function() {
@@ -160,7 +174,10 @@ function obtenerpersonalrecibe(){
         },
         serverSide: true,
         ajax: {
-            url: asignacion_herramienta_obtener_personal_recibe,
+            url: prestamo_herramienta_obtener_personal_recibe,
+            data: function (d) {
+              d.personalherramientacomun = $("#personalherramientacomun").val();
+            }
         },
         columns: [
             { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
@@ -182,82 +199,10 @@ function obtenerpersonalrecibe(){
         "iDisplayLength": 8,
     }); 
 } 
-//obtener registros de almacenes
-function obtenerpersonalentrega(){
-    ocultarformulario();
-    var tablapersonalentrega = '<div class="modal-header bg-red">'+
-                            '<h4 class="modal-title">Personal que entrega</h4>'+
-                        '</div>'+
-                        '<div class="modal-body">'+
-                            '<div class="row">'+
-                                '<div class="col-md-12">'+
-                                    '<div class="table-responsive ">'+
-                                        '<table id="tbllistadopersonalentrega" class="tbllistadopersonalentrega table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                            '<thead class="customercolor">'+
-                                                '<tr>'+
-                                                    '<th>Operaciones</th>'+
-                                                    '<th>Numero</th>'+
-                                                    '<th>Nombre</th>'+
-                                                    '<th>Fecha Ingreso</th>'+
-                                                    '<th>Tipo Personal</th>'+
-                                                    '<th>Status</th>'+
-                                                '</tr>'+
-                                            '</thead>'+
-                                            '<tbody></tbody>'+
-                                        '</table>'+
-                                    '</div>'+
-                                '</div>'+   
-                            '</div>'+
-                        '</div>'+
-                        '<div class="modal-footer">'+
-                            '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                        '</div>';
-      $("#contenidomodaltablas").html(tablapersonalentrega);
-      $('#tbllistadopersonalentrega').DataTable({
-          "sScrollX": "110%",
-          "sScrollY": "300px",
-          "bScrollCollapse": true,
-          processing: true,
-          'language': {
-              'loadingRecords': '&nbsp;',
-              'processing': '<div class="spinner"></div>'
-          },
-          serverSide: true,
-          ajax: {
-            url: asignacion_herramienta_obtener_personal_entrega,
-            data: function (d) {
-              d.numeropersonalrecibe = $("#numeropersonalrecibe").val();
-            }
-          },
-          columns: [
-            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
-            { data: 'id', name: 'id' },
-            { data: 'nombre', name: 'nombre' },
-            { data: 'fecha_ingreso', name: 'fecha_ingreso' },
-            { data: 'tipo_personal', name: 'tipo_personal' },
-            { data: 'status', name: 'status', orderable: false, searchable: false }
-          ],
-          "initComplete": function() {
-              var $buscar = $('div.dataTables_filter input');
-              $buscar.unbind();
-              $buscar.bind('keyup change', function(e) {
-                  if(e.keyCode == 13 || this.value == "") {
-                  $('#tbllistadopersonalentrega').DataTable().search( this.value ).draw();
-                  }
-              });
-          },
-          "iDisplayLength": 8,
-      }); 
-  } 
 function seleccionarpersonalrecibe(id, nombre){
     $("#numeropersonalrecibe").val(id);
     $("#personalrecibe").val(nombre);
     $("#btnbuscarpersonalqueentrega").show();
-    mostrarformulario();
-}
-function seleccionarpersonalentrega(id, nombre){
-    $("#numeropersonalentrega").val(id);
-    $("#personalentrega").val(nombre);
     mostrarformulario();
 }
 //detectar cuando en el input de buscar por codigo de producto el usuario presione la tecla enter, si es asi se realizara la busqueda con el codigo escrito
@@ -270,73 +215,6 @@ $(document).ready(function(){
       }
   });
 });
-//listar productos para tab consumos
-function listarherramientas(){
-  ocultarformulario();
-  var tablaherramientas = '<div class="modal-header bg-red">'+
-                          '<h4 class="modal-title">Productos</h4>'+
-                        '</div>'+
-                        '<div class="modal-body">'+
-                          '<div class="row">'+
-                            '<div class="col-md-12">'+
-                              '<div class="table-responsive">'+
-                                '<table id="tbllistadoherramienta" class="tbllistadoherramienta table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                  '<thead class="customercolor">'+
-                                    '<tr>'+
-                                      '<th>Operaciones</th>'+
-                                      '<th>Código</th>'+
-                                      '<th>Producto</th>'+
-                                      '<th>Unidad</th>'+
-                                      '<th>Existencias</th>'+
-                                      '<th>Costo</th>'+
-                                    '</tr>'+
-                                  '</thead>'+
-                                  '<tbody></tbody>'+
-                                '</table>'+
-                              '</div>'+
-                            '</div>'+  
-                          '</div>'+
-                        '</div>'+
-                        '<div class="modal-footer">'+
-                          '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                        '</div>';   
-  $("#contenidomodaltablas").html(tablaherramientas);
-  $('#tbllistadoherramienta').DataTable({
-    "sScrollX": "110%",
-    "sScrollY": "300px",
-    "bScrollCollapse": true,
-    processing: true,
-      'language': {
-        'loadingRecords': '&nbsp;',
-        'processing': '<div class="spinner"></div>'
-      },
-    serverSide: true,
-    ajax: {
-      url: asignacion_herramienta_obtener_herramienta,
-      data: function (d) {
-        d.codigoabuscar = $("#codigoabuscar").val();
-      }
-    },
-    columns: [
-      { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false  },
-      { data: 'Codigo', name: 'Codigo' },
-      { data: 'Producto', name: 'Producto' },
-      { data: 'Unidad', name: 'Unidad', orderable: false, searchable: false },
-      { data: 'Existencias', name: 'Existencias', orderable: false, searchable: false  },
-      { data: 'Costo', name: 'Costo', orderable: false, searchable: false  }
-    ],
-    "initComplete": function() {
-      var $buscar = $('div.dataTables_filter input');
-      $buscar.unbind();
-      $buscar.bind('keyup change', function(e) {
-        if(e.keyCode == 13 || this.value == "") {
-          $('#tbllistadoherramienta').DataTable().search( this.value ).draw();
-        }
-      });
-    },
-    "iDisplayLength": 8,
-  });
-}
 //función que evalua si la partida que quieren ingresar ya existe o no en el detalle de la orden de compra
 function evaluarproductoexistente(Codigo){
   var sumaiguales=0;
@@ -373,57 +251,158 @@ function calculartotalesfilasordencompra(fila){
       //total de la partida
       totalpesospartida =  new Decimal(cantidadpartida).times(preciopartida);
       $('.totalpesospartida', this).val(number_format(round(totalpesospartida, numerodecimales), numerodecimales, '.', ''));
-      calculartotalordencompra();
+      calculartotal();
     }  
     cuentaFilas++;
   });
 } 
 //calcular totales de orden de compra
-function calculartotalordencompra(){
+function calculartotal(){
   var total = 0;
   $("tr.filasproductos").each(function(){
-    total = new Decimal(total).plus($(".totalpesospartida", this).val());
+    total = new Decimal(total).plus($(".totalpartida", this).val());
   }); 
   $("#total").val(number_format(round(total, numerodecimales), numerodecimales, '.', ''));
 }
-//agregar una fila en la tabla de precios productos
-var contadorproductos=0;
-var contadorfilas = 0;
-function agregarfilaherramienta(Codigo, Producto, Unidad, Costo, Existencias){
-  var result = evaluarproductoexistente(Codigo);
-  if(result == false){
-    var tipo = "alta";
-    var fila=   '<tr class="filasproductos" id="filaproducto'+contadorproductos+'">'+
-                        '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('+contadorproductos+')">X</div></td>'+
-                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'+Codigo+'" readonly>'+Codigo+'</td>'+
-                        '<td class="tdmod"><div class="divorinputmodl"><input type="hidden" class="form-control nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'+Producto+'" readonly>'+Producto+'</div></td>'+
-                        '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'+Unidad+'" readonly>'+Unidad+'</td>'+
-                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-max="'+Existencias+'" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('+contadorfilas+');" required></td>'+
-                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" id="preciopartida[]" value="'+Costo+'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" id="totalpesospartida[]" value="'+Costo+'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                        '<td class="tdmod">'+
-                          '<select name="estadopartida[]" class="form-control" style="width:100% !important;height: 28px !important;" required>'+
-                              '<option selected disabled hidden>Selecciona</option>'+
-                              '<option value="Nuevo">Nuevo</option>'+
-                              '<option value="Usado">Usado</option>'+
-                          '</select>'+
-                        '</td>'+    
-                '</tr>';
-    contadorproductos++;
-    contadorfilas++;
-    $("#tablaherramientasasignadas").append(fila);
-    mostrarformulario();
-    calculartotalordencompra();
+//obtener personal
+function obtenerpersonal(){
+  $.get(prestamo_herramienta_obtener_personal, function(data){
+      $("#personalherramientacomun").empty();
+      $("#personalherramientacomun").append("<option selected disabled hidden>Selecciona el personal</option>");
+      $.each(data,function(key, registro) {
+        $("#personalherramientacomun").append('<option value='+registro.id+'>'+registro.nombre+' - '+registro.tipo_personal+'</option>');
+      });
+  });
+}
+//cargar toda la herramienta asignada al personal
+function herramientaasignadapersonal(){
+  ocultarformulario();
+  $("#tablaherramientasprestadas tbody").html("");
+  contadorproductos=0;
+  contadorfilas = 0;
+  var tablaherramientasasignadaspersonalseleccionado =    '<div class="modal-header bg-red">'+
+                                                              '<h4 class="modal-title">Herramienta Asignada a Personal Seleccionado</h4>'+
+                                                          '</div>'+
+                                                          '<div class="modal-body">'+
+                                                              '<div class="row">'+
+                                                                  '<div class="col-md-12">'+
+                                                                      '<div class="table-responsive ">'+
+                                                                          '<table id="tablaherramientasasignadaspersonalseleccionado" class="table table-bordered tablaherramientasasignadaspersonalseleccionado" style="width:100% !important;">'+
+                                                                              '<thead class="customercolor">'+
+                                                                                  '<tr>'+
+                                                                                      '<th>Operaciones</th>'+    
+                                                                                      '<th>Asignación</th>'+
+                                                                                      '<th>Herramienta</th>'+
+                                                                                      '<th><div style="width:200px !important;">Descripción</div></th>'+
+                                                                                      '<th >Unidad</th>'+
+                                                                                      '<th >Cantidad</th>'+
+                                                                                      '<th >Precio $</th>'+
+                                                                                      '<th>Total $</th>'+
+                                                                                  '</tr>'+
+                                                                              '</thead>'+
+                                                                              '<tbody>'+           
+                                                                              '</tbody>'+
+                                                                          '</table>'+
+                                                                      '</div>'+
+                                                                  '</div>'+   
+                                                              '</div>'+
+                                                          '</div>'+
+                                                          '<div class="modal-footer">'+
+                                                              '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                                                          '</div>';
+                                                          '<div class="modal-footer">'+
+                                                              '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                                                          '</div>';
+  $("#contenidomodaltablas").html(tablaherramientasasignadaspersonalseleccionado);
+  $('#tablaherramientasasignadaspersonalseleccionado').DataTable({
+      "sScrollX": "110%",
+      "sScrollY": "300px",
+      "bScrollCollapse": true,
+      processing: true,
+      'language': {
+          'loadingRecords': '&nbsp;',
+          'processing': '<div class="spinner"></div>'
+      },
+      serverSide: true,
+      ajax: {
+        url: prestamo_herramienta_obtener_herramienta_personal,
+        data: function (d) {
+          d.personalherramientacomun = $("#personalherramientacomun").val();
+        }
+      },
+      columns: [
+        { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+        { data: 'asignacion', name: 'asignacion' },
+        { data: 'herramienta', name: 'herramienta' },
+        { data: 'descripcion', name: 'descripcion', orderable: false, searchable: false },
+        { data: 'unidad', name: 'unidad', orderable: false, searchable: false },
+        { data: 'cantidad', name: 'cantidad', orderable: false, searchable: false },
+        { data: 'precio', name: 'precio', orderable: false, searchable: false },
+        { data: 'total', name: 'total', orderable: false, searchable: false }
+      ],
+      "initComplete": function() {
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+              $('#tablaherramientasasignadaspersonalseleccionado').DataTable().search( this.value ).draw();
+              }
+          });
+      },
+      "iDisplayLength": 8,
+  });   
+}
+//evaluar nunmero de filas
+function evaluarnumerofilas(){
+  if(contadorfilas > 0){
+    $("#btnobtenerpersonalrecibe").show();
   }else{
-    msj_errorproductoyaagregado();
-  }  
+    $("#btnobtenerpersonalrecibe").hide();
+    $("#numeropersonalrecibe").val("");
+    $("#personalrecibe").val("");
+  }
+}
+//agregar una fila en la tabla de prestamos
+function seleccionarherramientaasignada(iddetalleasignacionherramienta){
+  $.get(prestamo_herramienta_obtener_detalle_asignacion_seleccionada, {iddetalleasignacionherramienta:iddetalleasignacionherramienta}, function(data){
+    var result = evaluarproductoexistente(data.herramienta);
+    if(result == false){
+      if(parseFloat(data.cantidad) > 0){
+        var fila=   '<tr class="filasproductos" id="filaproducto'+contadorproductos+'">'+
+                            '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('+contadorproductos+')">X</div></td>'+
+                            '<td class="tdmod"><input type="hidden" class="form-control iddetalleasignacionherramienta" name="iddetalleasignacionherramienta[]" id="iddetalleasignacionherramienta[]" value="'+iddetalleasignacionherramienta+'" readonly><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'+data.herramienta+'" readonly>'+data.herramienta+'</td>'+
+                            '<td class="tdmod"><div class="divorinputmodl"><input type="hidden" class="form-control descripcionpartida" name="descripcionpartida[]" id="descripcionpartida[]" value="'+data.descripcion+'" readonly>'+data.descripcion+'</div></td>'+
+                            '<td class="tdmod"><input type="hidden" class="form-control unidadpartida" name="unidadpartida[]" id="unidadpartida[]" value="'+data.unidad+'" readonly>'+data.unidad+'</td>'+
+                            '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-max="'+data.cantidad+'" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('+contadorfilas+');" required></td>'+
+                            '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" id="preciopartida[]" value="'+data.precio+'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                            '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm totalpartida" name="totalpartida[]" id="totalpartida[]" value="'+data.precio+'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                            '<td class="tdmod">'+
+                              '<select name="estadopartida[]" class="form-control" style="width:100% !important;height: 28px !important;" required readonly>'+
+                                  data.estado_herramienta+
+                              '</select>'+
+                            '</td>'+    
+                    '</tr>';
+        contadorproductos++;
+        contadorfilas++;
+        $("#tablaherramientasprestadas").append(fila);
+        calculartotal();
+        evaluarnumerofilas();
+        msj_herramientagregadocorrectamente();
+      }else{
+        msj_errorherramientasinexistenciasparaprestamo();
+      }
+    }else{
+      msj_errorherramientayaagregado();
+    } 
+  });
 }
 //eliminar una fila en la tabla de precios clientes
 function eliminarfilapreciosproductos(numerofila){
   $("#filaproducto"+numerofila).remove();
   contadorfilas--; //importante para todos los calculo en el modulo de orden de compra se debe restar al contadorfilas la fila que se acaba de eliminar
   renumerarfilasordencompra();//importante para todos los calculo en el modulo de orden de compra 
-  calculartotalordencompra();
+  calculartotal();
+  evaluarnumerofilas();
 }
 //renumerar las filas de la orden de compra
 function renumerarfilasordencompra(){
@@ -436,7 +415,7 @@ function renumerarfilasordencompra(){
 }  
 //alta clientes
 function alta(){
-  $("#titulomodal").html('Alta Asignación Herramienta');
+  $("#titulomodal").html('Alta Prestamo Herramienta');
   mostrarmodalformulario('ALTA', 1);
   mostrarformulario();
   //formulario alta
@@ -449,7 +428,7 @@ function alta(){
                     '<div role="tabpanel" class="tab-pane fade in active" id="herramientastab">'+
                         '<div class="row">'+
                             '<div class="col-md-12 table-responsive">'+
-                                '<table id="tablaherramientasasignadas" class="table table-bordered tablaherramientasasignadas">'+
+                                '<table id="tablaherramientasprestadas" class="table table-bordered tablaherramientasprestadas">'+
                                     '<thead class="customercolor">'+
                                         '<tr>'+
                                             '<th>#</th>'+
@@ -486,6 +465,7 @@ function alta(){
   $("#tabsform").html(tabs);
   obtenultimonumero();
   asignarfechaactual();
+  obtenerpersonal();
   //se debe motrar el input para buscar los productos
   $("#divbuscarcodigoproducto").show();
   $("#ModalAlta").modal('show');
@@ -499,7 +479,7 @@ $("#btnGuardar").on('click', function (e) {
     $('.page-loader-wrapper').css('display', 'block');
     $.ajax({
       headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-      url:asignacion_herramienta_guardar,
+      url:prestamo_herramienta_guardar,
       type: "post",
       dataType: "html",
       data: formData,
@@ -526,64 +506,14 @@ $("#btnGuardar").on('click', function (e) {
     form.parsley().validate();
   }
 });
-//autorizar orden de compra
-function autorizarasignacion(asignacion){
-  $("#asignacionautorizar").val(asignacion);
-  $('#autorizarasignacion').modal('show');
-}
-$("#btnautorizar").on('click', function(e){
-  e.preventDefault();
-  var formData = new FormData($("#formautorizar")[0]);
-  var form = $("#formautorizar");
-  if (form.parsley().isValid()){
-    $('.page-loader-wrapper').css('display', 'block');
-    $.ajax({
-      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-      url:asignacion_herramienta_autorizar,
-      type: "post",
-      dataType: "html",
-      data: formData,
-      cache: false,
-      contentType: false,
-      processData: false,
-      success:function(data){
-        $('#autorizarasignacion').modal('hide');
-        msj_datosguardadoscorrectamente();
-        $('.page-loader-wrapper').css('display', 'none');
-      },
-      error:function(data){
-        if(data.status == 403){
-          msj_errorenpermisos();
-        }else{
-          msj_errorajax();
-        }
-        $('#autorizarasignacion').modal('hide');
-        $('.page-loader-wrapper').css('display', 'none');
-      }
-    })
-  }else{
-    form.parsley().validate();
-  }
-});
-//verificar si la asignacion se esta utilizando en algun prestamo de herramienta
-function desactivar(asignaciondesactivar){
-  $.get(asignacion_herramienta_verificar_uso_en_modulos,{asignaciondesactivar:asignaciondesactivar}, function(data){
-    if(data.numero_prestamos > 0){
+//desactivar prestamo
+function desactivar(prestamodesactivar){
       $("#motivobaja").val("");
-      $("#asignaciondesactivar").val(0);
-      $("#textomodaldesactivar").html('Error esta asignación tiene herramienta prestada');
-      $("#divmotivobaja").hide();
-      $("#btnbaja").hide();
-      $('#estatusregistro').modal('show');
-    }else{
-      $("#motivobaja").val("");
-      $("#asignaciondesactivar").val(asignaciondesactivar);
+      $("#prestamodesactivar").val(prestamodesactivar);
       $("#textomodaldesactivar").html('Estas seguro de dar de baja el registro?');
       $("#divmotivobaja").show();
       $("#btnbaja").show();
       $('#estatusregistro').modal('show');
-    }
-  }) 
 }
 $("#btnbaja").on('click', function(e){
   e.preventDefault();
@@ -593,7 +523,7 @@ $("#btnbaja").on('click', function(e){
     $('.page-loader-wrapper').css('display', 'block');
     $.ajax({
       headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-      url:asignacion_herramienta_alta_o_baja,
+      url:prestamo_herramienta_alta_o_baja,
       type: "post",
       dataType: "html",
       data: formData,
@@ -620,11 +550,54 @@ $("#btnbaja").on('click', function(e){
     form.parsley().validate();
   }
 });
-function obtenerdatos(asignacionmodificar){
-  $("#titulomodal").html('Modificación Asignación Herramienta');
+//terminar prestamo
+function terminarprestamo(prestamo){
+  $("#prestamoterminarprestamo").val(prestamo);
+  $("#textomodalterminarprestamo").html('Estas seguro de terminar el prestamo?');
+  $("#btnterminarprestamo").show();
+  $('#modalterminarprestamo').modal('show');
+}
+$("#btnterminarprestamo").on('click', function(e){
+  e.preventDefault();
+  var formData = new FormData($("#formterminarprestamo")[0]);
+  var form = $("#formterminarprestamo");
+  if (form.parsley().isValid()){
+    $('.page-loader-wrapper').css('display', 'block');
+    $.ajax({
+      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+      url:prestamo_herramienta_terminar_prestamo,
+      type: "post",
+      dataType: "html",
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false,
+      success:function(data){
+        $('#modalterminarprestamo').modal('hide');
+        msj_datosguardadoscorrectamente();
+        $('.page-loader-wrapper').css('display', 'none');
+      },
+      error:function(data){
+        if(data.status == 403){
+          msj_errorenpermisos();
+        }else{
+          msj_errorajax();
+        }
+        $('#modalterminarprestamo').modal('hide');
+        $('.page-loader-wrapper').css('display', 'none');
+      }
+    })
+  }else{
+    form.parsley().validate();
+  }
+});
+
+//obtener datos para modificacion
+function obtenerdatos(prestamomodificar){
+  $("#titulomodal").html('Modificación Prestamo Herramienta');
   $('.page-loader-wrapper').css('display', 'block');
-  $.get(asignacion_herramienta_obtener_asignacion_herramienta,{asignacionmodificar:asignacionmodificar },function(data){
-    //formulario modificacion
+  $.get(prestamo_herramienta_obtener_prestamo_herramienta,{prestamomodificar:prestamomodificar },function(data){
+    //formulario alta
     var tabs =    '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
                       '<li role="presentation" class="active">'+
                           '<a href="#herramientastab" data-toggle="tab">Herramientas</a>'+
@@ -634,7 +607,7 @@ function obtenerdatos(asignacionmodificar){
                       '<div role="tabpanel" class="tab-pane fade in active" id="herramientastab">'+
                           '<div class="row">'+
                               '<div class="col-md-12 table-responsive">'+
-                                  '<table id="tablaherramientasasignadas" class="table table-bordered tablaherramientasasignadas">'+
+                                  '<table id="tablaherramientasprestadas" class="table table-bordered tablaherramientasprestadas">'+
                                       '<thead class="customercolor">'+
                                           '<tr>'+
                                               '<th>#</th>'+
@@ -669,24 +642,34 @@ function obtenerdatos(asignacionmodificar){
                       '</div>'+ 
                   '</div>';
     $("#tabsform").html(tabs);
-    $("#id").val(data.Asignacion_Herramienta.id);
+
+    $("#id").val(data.Prestamo_Herramienta.id);
     $("#numeropersonalrecibe").val(data.personalrecibe.id);
     $("#personalrecibe").val(data.personalrecibe.nombre);
-    $("#numeropersonalentrega").val(data.personalentrega.id);
-    $("#personalentrega").val(data.personalentrega.nombre);
     $("#fecha").val(data.fecha);
-    $("#observaciones").val(data.Asignacion_Herramienta.observaciones)
+    $("#fecha").attr('readonly', 'readonly');
+    $("#inicioprestamo").val(data.Prestamo_Herramienta.inicio_prestamo);
+    $("#inicioprestamo").attr('readonly', 'readonly');
+    $("#terminoprestamo").val(data.Prestamo_Herramienta.termino_prestamo);
+    $("#correo").val(data.Prestamo_Herramienta.correo);
+    $("#observaciones").val(data.Prestamo_Herramienta.observaciones);
     $("#total").val(data.total);
-    //tabs precios productos
-    $("#tablaherramientasasignadas").append(data.filasdetallesasignacion);
+    //tabs herramientas
+    $("#tablaherramientasprestadas").append(data.filasdetallesprestamo);
     //se deben asignar los valores a los contadores para que las sumas resulten correctas
     contadorproductos = data.contadorproductos;
     contadorfilas = data.contadorfilas;
     //se debe esconder el input para buscar los productos porque en la modificacion no se permiten agregar productos
     $("#divbuscarcodigoproducto").hide();
-    mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
-    $('.page-loader-wrapper').css('display', 'none');
+    seleccionarpersonalentrega(data);
   })
+}
+async function seleccionarpersonalentrega(data){
+  await retraso();
+  $("#personalherramientacomun").html(data.selectpersonal);
+  $("#personalherramientacomun").attr('disabled', 'disabled');
+  mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
+  $('.page-loader-wrapper').css('display', 'none');
 }
 //guardar modificación
 $("#btnGuardarModificacion").on('click', function (e) {
@@ -697,7 +680,7 @@ $("#btnGuardarModificacion").on('click', function (e) {
     $('.page-loader-wrapper').css('display', 'block');
     $.ajax({
       headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-      url:asignacion_herramienta_guardar_modificacion,
+      url:prestamo_herramienta_guardar_modificacion,
       type: "post",
       dataType: "html",
       data: formData,
@@ -724,43 +707,6 @@ $("#btnGuardarModificacion").on('click', function (e) {
     form.parsley().validate();
   }
 });
-//hacer busqueda de folio para exportacion en pdf
-function relistarbuscarstringlike(){
-  var tabla = $('#tablafoliosencontrados').DataTable();
-  tabla.ajax.reload();
-}
-function buscarstringlike(){
-  var columnastablafoliosencontrados =  '<tr>'+
-                                          '<th><div style="width:80px !important;">Generar Documento en PDF</div></th>'+
-                                          '<th>Asignación</th>'+
-                                          '<th>Recibe</th>'+
-                                          '<th>Entrega</th>'+
-                                          '<th>Total</th>'+
-                                        '</tr>';
-  $("#columnastablafoliosencontrados").html(columnastablafoliosencontrados);
-  tabla=$('#tablafoliosencontrados').DataTable({
-      "paging":   false,
-      "ordering": false,
-      "info":     false,
-      "searching": false,
-      order: [1, 'asc'],
-      processing: true,
-      serverSide: true,
-      ajax: {
-          url: asignacion_herramienta_buscar_id_string_like,
-          data: function (d) {
-              d.string = $("#buscarfolio").val();
-          },
-      },
-      columns: [
-          { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
-          { data: 'asignacion', name: 'Orden' },
-          { data: 'nombre_recibe_herramienta', name: 'nombre_recibe_herramienta', orderable: false, searchable: false },
-          { data: 'nombre_entrega_herramienta', name: 'nombre_entrega_herramienta', orderable: false, searchable: false  },
-          { data: 'total', name: 'total', orderable: false, searchable: false  },
-      ],
-  });
-}
 //configurar tabla
 function configurar_tabla(){
   //formulario modificacion
@@ -784,8 +730,8 @@ function configurar_tabla(){
                                   '<label for="idid">id</label>'+
                               '</div>'+
                               '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="asignacion" id="idasignacion" class="filled-in datotabla" value="asignacion" readonly onchange="construirarraydatostabla(this);" onclick="javascript: return false;"/>'+
-                                  '<label for="idasignacion">asignacion</label>'+
+                                  '<input type="checkbox" name="prestamo" id="idprestamo" class="filled-in datotabla" value="prestamo" readonly onchange="construirarraydatostabla(this);" onclick="javascript: return false;"/>'+
+                                  '<label for="idprestamo">prestamo</label>'+
                               '</div>'+
                               '<div class="col-md-4 form-check">'+
                                   '<input type="checkbox" name="serie" id="idserie" class="filled-in datotabla" value="serie" onchange="construirarraydatostabla(this);" />'+
@@ -812,17 +758,28 @@ function configurar_tabla(){
                                   '<label for="idobservaciones">observaciones</label>'+
                               '</div>'+
                               '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="autorizado_por" id="idautorizado_por" class="filled-in datotabla" value="autorizado_por" onchange="construirarraydatostabla(this);" onclick="javascript: return false;"/>'+
-                                  '<label for="idautorizado_por">autorizado_por</label>'+
+                                  '<input type="checkbox" name="correo" id="idcorreo" class="filled-in datotabla" value="correo" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idcorreo">correo</label>'+
                               '</div>'+
                               '<div class="col-md-4 form-check">'+    
-                                  '<input type="checkbox" name="fecha_autorizacion" id="idfecha_autorizacion" class="filled-in datotabla" value="fecha_autorizacion" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idfecha_autorizacion">fecha_autorizacion</label>'+
+                                  '<input type="checkbox" name="correo_enviado" id="idcorreo_enviado" class="filled-in datotabla" value="correo_enviado" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idcorreo_enviado">correo_enviado</label>'+
                               '</div>'+
                               '<div class="col-md-4 form-check">'+
                                   '<input type="checkbox" name="status" id="idstatus" class="filled-in datotabla" value="status" onchange="construirarraydatostabla(this);" onclick="javascript: return false;"/>'+
                                   '<label for="idstatus">status</label>'+
                               '</div>'+
+
+
+                              '<div class="col-md-4 form-check">'+
+                                '<input type="checkbox" name="inicio_prestamo" id="idinicio_prestamo" class="filled-in datotabla" value="inicio_prestamo" onchange="construirarraydatostabla(this);"/>'+
+                                '<label for="idinicio_prestamo">inicio_prestamo</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="termino_prestamo" id="idtermino_prestamo" class="filled-in datotabla" value="termino_prestamo" onchange="construirarraydatostabla(this);"/>'+
+                                  '<label for="idtermino_prestamo">termino_prestamo</label>'+
+                              '</div>'+
+
                               '<div class="col-md-4 form-check">'+
                                   '<input type="checkbox" name="motivo_baja" id="idmotivo_baja" class="filled-in datotabla" value="motivo_baja" onchange="construirarraydatostabla(this);" />'+
                                   '<label for="idmotivo_baja">motivo_baja</label>'+
@@ -915,111 +872,4 @@ function configurar_tabla(){
       $("#columnasnestable").append(columna);
   }
 }
-//generar excel personal para auditoria
-function mostrarmodalgenerarexcelpersonal(){
-  $.get(asignacion_herramienta_generar_excel_obtener_personal, function(data){
-    $("#personalexcel").empty();
-    $("#personalexcel").append("<option selected disabled hidden>Selecciona el personal</option>");
-    $.each(data,function(key, registro) {
-      $("#personalexcel").append('<option value='+registro.id+'>'+registro.nombre+' - '+registro.tipo_personal+'</option>');
-    });
-    //formulario auditar herramienta a personal
-    var tabs =    '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
-                      '<li role="presentation" class="active">'+
-                          '<a href="#herramientasasignadastab" data-toggle="tab">Herramientas Asignadas</a>'+
-                      '</li>'+
-                  '</ul>'+
-                  '<div class="tab-content">'+
-                      '<div role="tabpanel" class="tab-pane fade in active" id="herramientasasignadastab">'+
-                          '<div class="row">'+
-                              '<div class="col-md-12 table-responsive">'+
-                                  '<table id="tablaherramientasasignadas" class="table table-bordered tablaherramientasasignadas">'+
-                                      '<thead class="customercolor">'+
-                                          '<tr>'+
-                                              '<th>Asignación</th>'+
-                                              '<th>Herramienta</th>'+
-                                              '<th><div style="width:200px !important;">Descripción</div></th>'+
-                                              '<th >Unidad</th>'+
-                                              '<th >Cantidad</th>'+
-                                              '<th >Precio $</th>'+
-                                              '<th>Total $</th>'+
-                                              '<th class="customercolortheadth">Estado Auditoria</th>'+
-                                              '<th class="customercolortheadth">Cantidad Auditoria</th>'+
-                                          '</tr>'+
-                                      '</thead>'+
-                                      '<tbody>'+           
-                                      '</tbody>'+
-                                  '</table>'+
-                              '</div>'+
-                              '<div class="col-md-12">'+
-                                '<input type="hidden" name="numerofilasherramientaasignada" id="numerofilasherramientaasignada" class="form-control" required>'+
-                              '</div>'+
-                          '</div>'+   
-                      '</div>'+ 
-                  '</div>';
-    $("#tabsformauditarherramientas").html(tabs);
-    $("#modalgenerarexcelpersonal").modal('show');
-  }) 
-}
-//cargar toda la herramienta asignada al personal
-function herramientaasignadapersonal(){
-  var idpersonal = $("#personalexcel").val();
-  $.get(asignacion_herramienta_obtener_herramienta_personal, {idpersonal:idpersonal}, function(data){
-    if(parseInt(data.contadorfilas) > 0){
-      //tabs asignacion herramientas
-      $("#tablaherramientasasignadas tbody").html(data.filasdetallesasignacion);
-      //se deben asignar los valores a los contadores para que las sumas resulten correctas
-      contadorfilas = data.contadorfilas;
-      $("#numerofilasherramientaasignada").val(data.contadorfilas);
-      $("#btnGuardarAuditoria").show();
-      $("#btnGenerarReporteAuditoria").show();
-      $("#btnGenerarReporteAuditoria").attr("href", data.urlgenerarreporteauditoria);
-
-    }else{
-      msj_errorpersonalsinherramientaasignada();
-      $("#tablaherramientasasignadas tbody").html("");
-      $("#btnGuardarAuditoria").hide();
-      $("#btnGenerarReporteAuditoria").hide();
-      $("#btnGenerarReporteAuditoria").attr("href", "");
-    }
-
-  })  
-}
-//guardar la auditoria del personal
-$("#btnGuardarAuditoria").on('click', function (e) {
-  e.preventDefault();
-  var formData = new FormData($("#formauditarherramienta")[0]);
-  var form = $("#formauditarherramienta");
-  if (form.parsley().isValid()){
-    $('.page-loader-wrapper').css('display', 'block');
-    $.ajax({
-      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-      url:asignacion_herramienta_guardar_auditoria,
-      type: "post",
-      dataType: "html",
-      data: formData,
-      cache: false,
-      contentType: false,
-      processData: false,
-      success:function(data){
-        msj_datosguardadoscorrectamente();
-        limpiar();
-        limpiarmodales();
-        $("#modalgenerarexcelpersonal").modal('hide');
-        $('.page-loader-wrapper').css('display', 'none');
-      },
-      error:function(data){
-        if(data.status == 403){
-          msj_errorenpermisos();
-        }else{
-          msj_errorajax();
-        }
-        $('.page-loader-wrapper').css('display', 'none');
-      }
-    })
-  }else{
-    form.parsley().validate();
-  }
-});
-
 init();

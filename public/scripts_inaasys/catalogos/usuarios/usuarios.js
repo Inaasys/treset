@@ -638,6 +638,24 @@ function permisos(id){
                             '</div>'+
                             '<div class="row">'+
                                 '<div class="col-md-6">'+
+                                    '<label>Prestamo de Herramienta</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="menuregistrosprestamoherramienta" id="idmenuregistrosprestamoherramienta" class="filled-in submenu accesoregistros" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenuregistrosprestamoherramienta">Acceso</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="registros.prestamo.herramienta.altas" id="idregistros.prestamo.herramienta.altas" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
+                                        '<label for="idregistros.prestamo.herramienta.altas">Altas</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="registros.prestamo.herramienta.bajas" id="idregistros.prestamo.herramienta.bajas" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
+                                        '<label for="idregistros.prestamo.herramienta.bajas">Bajas</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="registros.prestamo.herramienta.cambios" id="idregistros.prestamo.herramienta.cambios" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
+                                        '<label for="idregistros.prestamo.herramienta.cambios">Cambios</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="registros.prestamo.herramienta.terminar" id="idregistros.prestamo.herramienta.terminar" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
+                                        '<label for="idregistros.prestamo.herramienta.terminar">Terminar</label>'+ 
+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                            '<div class="row">'+
+                                '<div class="col-md-6">'+
                                     '<label>Acceso a todos los registros en menu</label>'+
                                     '<div class="col-md-12 form-check">'+ 
                                         '<input type="checkbox" name="accesotodoslosregistrosenmenu" id="idaccesotodoslosregistrosenmenu" class="filled-in" value="1" onchange="marcaraccesosentodoslosregistros()"/>'+

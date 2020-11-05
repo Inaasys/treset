@@ -324,6 +324,38 @@ function msj_errorpersonalsinherramientaasignada(){
             "extendedTImeout": "5000"
     });
 }
+//mensaje termino prestamo menor a inicio prestamo
+function msjterminoprestamomenor(){
+    toastr.error( "La fecha de termino no puede ser menor a la fecha de inicio", "Mensaje", {
+        "timeOut": "5000",
+        "progressBar": true,
+        "extendedTImeout": "5000"
+    });
+}
+//mensaje herramienta agregada correctamente
+function msj_herramientagregadocorrectamente(){
+    toastr.success( "La herramienta se agrego correctamente", "Mensaje", {
+        "timeOut": "5000",
+        "progressBar": true,
+        "extendedTImeout": "5000"
+    });
+}
+//mensaje herramient ya agregada
+function msj_errorherramientayaagregado(){
+    toastr.error( "La herramienta solo se puede agregar una vez", "Mensaje", {
+        "timeOut": "5000",
+        "progressBar": true,
+        "extendedTImeout": "5000"
+    });
+}
+//mensaje error herramienta sin existencias para prestamo
+function msj_errorherramientasinexistenciasparaprestamo(){
+    toastr.error( "Error todas las existencias de la herramienta seleccionada ya estan prestadas", "Mensaje", {
+        "timeOut": "5000",
+        "progressBar": true,
+        "extendedTImeout": "5000"
+    });
+}
 ///////////////////////////////////FIN MENSAJES TOASTR.JS INAASYS///////////////////////////////////////
 //////////////////////////////FUNCIONES PARA CONFIGURACION DE COLUMNAS DE TABLAS/////////////////////////////////////////
 //ordenar las columnas para vista de tabla

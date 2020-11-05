@@ -92,34 +92,45 @@ class UserController extends ConfiguracionSistemaController
             if (App::environment('local')) {
                 DB::unprepared('SET IDENTITY_INSERT users OFF');
             }
-            //dar de alta en tabla personal
-            DB::unprepared('SET IDENTITY_INSERT personal ON');
-            $id = Helpers::ultimoidregistrotabla('App\Personal');
-            $Personal = new Personal;
-            $Personal->id=$id;
-            $Personal->nombre = $request->name;
-            $Personal->fecha_ingreso = Carbon::now()->toDateTimeString();
-            $Personal->tipo_personal = "Administrativo";
-            $Personal->status = 'ALTA';
-            $Personal->save();
-            DB::unprepared('SET IDENTITY_INSERT personal OFF');
-            //enviar correo electrónico	
-            $nombre = 'Receptor envio de correos';
-            $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
-            $correos = ['al221410832@gmail.com','marco.baltazar@utpcamiones.com.mx'];
-            $name = "Receptor envio de correos";
-            $body = "Se dio de alta un nuevo usuario";
-            $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
-            $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
-            $nombre = $request->name;
-            $correo = $request->email;
-            $usuario = $request->user;
-            $rol = $request->rol;
-            Mail::send('correos.usuarios.nuevousuario', compact('nombre', 'correo', 'usuario', 'rol', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos) {
-                $message->to($receptor, $nombre)
-                        ->cc($correos)
-                        ->subject('Nuevo Usuario');
-            });
+                //dar de alta en tabla personal
+                DB::unprepared('SET IDENTITY_INSERT personal ON');
+                $id = Helpers::ultimoidregistrotabla('App\Personal');
+                $Personal = new Personal;
+                $Personal->id=$id;
+                $Personal->nombre = $request->name;
+                $Personal->fecha_ingreso = Carbon::now()->toDateTimeString();
+                $Personal->tipo_personal = "Administrativo";
+                $Personal->status = 'ALTA';
+                $Personal->save();
+                DB::unprepared('SET IDENTITY_INSERT personal OFF');
+            try{
+                //enviar correo electrónico	
+                $nombre = 'Receptor envio de correos';
+                $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
+                $correos = ['osbaldo.anzaldo@utpcamiones.com.mx','marco.baltazar@utpcamiones.com.mx'];
+                $name = "Receptor envio de correos";
+                $body = "Se dio de alta un nuevo usuario";
+                $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
+                $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
+                $nombre = $request->name;
+                $correo = $request->email;
+                $usuario = $request->user;
+                $rol = $request->rol;
+                Mail::send('correos.usuarios.nuevousuario', compact('nombre', 'correo', 'usuario', 'rol', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos) {
+                    $message->to($receptor, $nombre)
+                            ->cc($correos)
+                            ->subject('Nuevo Usuario');
+                });
+            } catch(\Exception $e) {
+                $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
+                $correos = ['osbaldo.anzaldo@utpcamiones.com.mx'];
+                $msj = 'Error al enviar correo nuevo usuario'.$request->name.', '.$request->email;
+                Mail::send('correos.errorenvio.error', compact('e','msj'), function($message) use ($receptor, $correos) {
+                    $message->to($receptor)
+                            ->cc($correos)
+                            ->subject('Error al enviar correo nuevo usuario');
+                });
+            }
 
       	}
     	return response()->json($Usuario); 

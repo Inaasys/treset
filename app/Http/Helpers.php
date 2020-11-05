@@ -52,12 +52,34 @@ class Helpers{
         return $fecha;
     }
 
+    //se coloca la fecha enviada en español
+    public static function fecha_espanol_datetime($fechaenviada){
+        /*Carbon::setLocale(config('app.locale'));
+        Carbon::setUTF8(true);
+        setlocale(LC_TIME, 'es_Es');
+        $fecha = Carbon::parse($fechaenviada)->formatLocalized('%A %d %B %Y');*/
+        Date::setLocale(config('app.locale'));
+        Date::setUTF8(true);
+        setlocale(LC_TIME, 'es_Es');
+        $fecha = Date::parse($fechaenviada)->format('l j F Y H:i:s');
+        return $fecha;
+    }
+
     //se obtiene la fecha excacta en la que se realizo una accion con formato DateTimeString
     public static function fecha_exacta_accion_datetimestring(){
         Carbon::setLocale(config('app.locale'));
         Carbon::setUTF8(true);
         setlocale(LC_TIME, 'es_Es');
         $fecha = Carbon::now()->toDateTimeString();
+        return $fecha;
+    }
+
+    //se obtiene la fecha excacta para input date-timelocal
+    public static function fecha_exacta_accion_datetimelocal(){
+        Carbon::setLocale(config('app.locale'));
+        Carbon::setUTF8(true);
+        setlocale(LC_TIME, 'es_Es');
+        $fecha = Carbon::now()->format('Y-m-d')."T".Carbon::now()->format('H:i');
         return $fecha;
     }
 
@@ -205,8 +227,12 @@ class Helpers{
         $dia = $fecha_explode[2];
         $precio_dolar = 0;
         $client = new Client();
-        $resultado_scraping = $client->request('GET', 'https://www.dof.gob.mx/indicadores_detalle.php?cod_tipo_indicador=158&dfecha='.$dia.'%2F'.$mes.'%2F'.$ano.'&hfecha='.$dia.'%2F'.$mes.'%2F'.$ano);
-        $precio_dolar = $resultado_scraping->filter('.Celda .txt')->last()->text();
+        try{
+            $resultado_scraping = $client->request('GET', 'https://www.dof.gob.mx/indicadores_detalle.php?cod_tipo_indicador=158&dfecha='.$dia.'%2F'.$mes.'%2F'.$ano.'&hfecha='.$dia.'%2F'.$mes.'%2F'.$ano);
+            $precio_dolar = $resultado_scraping->filter('.Celda .txt')->last()->text();
+        } catch(Exception $e) {
+            $precio_dolar = "sinactualizacion";
+        }
         return $precio_dolar;
         /*$fecha_explode = explode("-", $fecha);
         $ano = $fecha_explode[0];
