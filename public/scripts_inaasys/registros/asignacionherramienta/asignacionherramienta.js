@@ -389,7 +389,7 @@ function calculartotalordencompra(){
 //agregar una fila en la tabla de precios productos
 var contadorproductos=0;
 var contadorfilas = 0;
-function agregarfilaherramienta(Codigo, Producto, Unidad, Costo, Existencias){
+function agregarfilaherramienta(Codigo, Producto, Unidad, Costo, Existencias, selectalmacenes){
   var result = evaluarproductoexistente(Codigo);
   if(result == false){
     var tipo = "alta";
@@ -398,11 +398,17 @@ function agregarfilaherramienta(Codigo, Producto, Unidad, Costo, Existencias){
                         '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'+Codigo+'" readonly>'+Codigo+'</td>'+
                         '<td class="tdmod"><div class="divorinputmodl"><input type="hidden" class="form-control nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'+Producto+'" readonly>'+Producto+'</div></td>'+
                         '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'+Unidad+'" readonly>'+Unidad+'</td>'+
+                        '<td class="tdmod">'+
+                          '<select name="almacenpartida[]" class="form-control divorinputmodxl almacenpartida" style="width:100% !important;height: 28px !important;" onchange="obtenerexistenciasalmacen('+contadorproductos+')" required>'+
+                            selectalmacenes+
+                          '</select>'+
+                        '</td>'+ 
+                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm existenciasalmacenpartida" name="existenciasalmacenpartida[]" id="existenciasalmacenpartida[]" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-max="'+Existencias+'" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('+contadorfilas+');" required></td>'+
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" id="preciopartida[]" value="'+Costo+'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" id="totalpesospartida[]" value="'+Costo+'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                         '<td class="tdmod">'+
-                          '<select name="estadopartida[]" class="form-control" style="width:100% !important;height: 28px !important;" required>'+
+                          '<select name="estadopartida[]" class="form-control divorinputmodmd" style="width:100% !important;height: 28px !important;" required>'+
                               '<option selected disabled hidden>Selecciona</option>'+
                               '<option value="Nuevo">Nuevo</option>'+
                               '<option value="Usado">Usado</option>'+
@@ -417,6 +423,41 @@ function agregarfilaherramienta(Codigo, Producto, Unidad, Costo, Existencias){
   }else{
     msj_errorproductoyaagregado();
   }  
+}
+//obtener las existencias actuales del almacen seleccionado
+function obtenerexistenciasalmacen(fila){
+  // for each por cada fila:
+  var cuentaFilas = 0;
+  $("tr.filasproductos").each(function () { 
+    if(fila === cuentaFilas){
+      // obtener los datos de la fila:
+      var almacenpartida = $(".almacenpartida", this).val();
+      var codigoproductopartida = $(".codigoproductopartida", this).val();
+      comprobarexistenciasalmacenpartida(almacenpartida, codigoproductopartida).then(existencias=>{
+        if(parseFloat(existencias) > 0){
+          $(".existenciasalmacenpartida", this).val(existencias);
+          $(".cantidadpartida", this).removeAttr('readonly');
+          $(".cantidadpartida", this).attr('data-parsley-max', existencias);
+        }else{
+          $(".existenciasalmacenpartida", this).val(existencias);
+          $(".cantidadpartida", this).val("0."+numerocerosconfigurados);
+          $(".cantidadpartida", this).attr('readonly', 'readonly');
+          $(".cantidadpartida", this).attr('data-parsley-max', "0."+numerocerosconfigurados);
+        }
+      }) 
+    }  
+    cuentaFilas++;
+  });
+}
+//funcion asincrona para buscar existencias de la partida
+function comprobarexistenciasalmacenpartida(almacenpartida, codigoproductopartida){
+  return new Promise((ejecuta)=>{
+    setTimeout(function(){ 
+      $.get(asignacion_herramienta_obtener_existencias_almacen,{'almacenpartida':almacenpartida,'codigoproductopartida':codigoproductopartida},existencias=>{
+        return ejecuta(existencias);
+      })
+    },500);
+  })
 }
 //eliminar una fila en la tabla de precios clientes
 function eliminarfilapreciosproductos(numerofila){
@@ -456,6 +497,8 @@ function alta(){
                                             '<th>Herramienta</th>'+
                                             '<th><div style="width:200px !important;">Descripción</div></th>'+
                                             '<th class="customercolortheadth">Unidad</th>'+
+                                            '<th class="customercolortheadth">Almacén</th>'+
+                                            '<th class="customercolortheadth">Existencias Almacén</th>'+
                                             '<th class="customercolortheadth">Cantidad</th>'+
                                             '<th class="customercolortheadth">Precio $</th>'+
                                             '<th>Total $</th>'+
@@ -547,6 +590,7 @@ $("#btnautorizar").on('click', function(e){
       contentType: false,
       processData: false,
       success:function(data){
+        console.log(data);
         $('#autorizarasignacion').modal('hide');
         msj_datosguardadoscorrectamente();
         $('.page-loader-wrapper').css('display', 'none');
@@ -641,6 +685,8 @@ function obtenerdatos(asignacionmodificar){
                                               '<th>Herramienta</th>'+
                                               '<th><div style="width:200px !important;">Descripción</div></th>'+
                                               '<th class="customercolortheadth">Unidad</th>'+
+                                              '<th class="customercolortheadth">Almacén</th>'+
+                                              '<th class="customercolortheadth">Existencias Almacén</th>'+
                                               '<th class="customercolortheadth">Cantidad</th>'+
                                               '<th class="customercolortheadth">Precio $</th>'+
                                               '<th>Total $</th>'+
@@ -940,11 +986,11 @@ function mostrarmodalgenerarexcelpersonal(){
                                               '<th>Herramienta</th>'+
                                               '<th><div style="width:200px !important;">Descripción</div></th>'+
                                               '<th >Unidad</th>'+
-                                              '<th >Cantidad</th>'+
+                                              '<th >Cantidad Asignada</th>'+
                                               '<th >Precio $</th>'+
                                               '<th>Total $</th>'+
                                               '<th class="customercolortheadth">Estado Auditoria</th>'+
-                                              '<th class="customercolortheadth">Cantidad Auditoria</th>'+
+                                              '<th class="customercolortheadth">Cantidad Actual Auditoria</th>'+
                                           '</tr>'+
                                       '</thead>'+
                                       '<tbody>'+           
@@ -974,16 +1020,50 @@ function herramientaasignadapersonal(){
       $("#btnGuardarAuditoria").show();
       $("#btnGenerarReporteAuditoria").show();
       $("#btnGenerarReporteAuditoria").attr("href", data.urlgenerarreporteauditoria);
-
+      $("#btnGenerarReporteGeneral").show();
+      $("#btnGenerarReporteGeneral").attr("href", data.urlgenerarreportegeneral);
+      if(parseInt(data.contadorasignacionessinautorizar) > 0){
+        msj_infopersonalconasignacionesporautorizar(); 
+        $("#btnGuardarAuditoria").hide();
+        $("#btnGenerarReporteAuditoria").hide();
+        $("#btnGenerarReporteAuditoria").attr("href", "");   
+        $("#btnGenerarReporteGeneral").hide();
+        $("#btnGenerarReporteGeneral").attr("href", "");   
+      }
+    }else if(parseInt(data.contadorasignacionessinautorizar) > 0){
+      msj_infopersonalconasignacionesporautorizar();
     }else{
       msj_errorpersonalsinherramientaasignada();
       $("#tablaherramientasasignadas tbody").html("");
       $("#btnGuardarAuditoria").hide();
       $("#btnGenerarReporteAuditoria").hide();
       $("#btnGenerarReporteAuditoria").attr("href", "");
+      $("#btnGenerarReporteGeneral").hide();
+      $("#btnGenerarReporteGeneral").attr("href", "");
     }
-
   })  
+}
+//compara el estado de la auditoria
+function compararestadoauditoria(fila){
+  // for each por cada fila:
+  var cuentaFilas = 0;
+  $("tr.filasproductos").each(function () { 
+     if(fila === cuentaFilas){
+       // obtener los datos de la fila:
+       var estadoauditoria = $(".estadoauditoria", this).val();
+       var cantidadpartida = $(".cantidadpartida", this).val();
+       if(estadoauditoria == "FALTANTE"){
+          $(".cantidadauditoriapartida", this).val("0."+numerocerosconfigurados);
+          $(".cantidadauditoriapartida",this).removeAttr('readonly');
+          $(".cantidadauditoriapartida",this).attr('data-parsley-min', "0."+numerocerosconfiguradosinputnumberstep);
+       }else{
+          $(".cantidadauditoriapartida",this).attr('readonly', 'readonly');
+          $(".cantidadauditoriapartida", this).val(cantidadpartida);
+          $(".cantidadauditoriapartida",this).removeAttr('data-parsley-min');
+       }
+     }  
+     cuentaFilas++;
+  });
 }
 //guardar la auditoria del personal
 $("#btnGuardarAuditoria").on('click', function (e) {
@@ -1003,9 +1083,6 @@ $("#btnGuardarAuditoria").on('click', function (e) {
       processData: false,
       success:function(data){
         msj_datosguardadoscorrectamente();
-        limpiar();
-        limpiarmodales();
-        $("#modalgenerarexcelpersonal").modal('hide');
         $('.page-loader-wrapper').css('display', 'none');
       },
       error:function(data){

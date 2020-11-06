@@ -285,8 +285,8 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
             $personal_recibe = Personal::where('id', $Prestamo_Herramienta->recibe_herramienta)->first();
             $nombre_personal_entrega = $personal_entrega->nombre;
             $nombre_personal_recibe = $personal_recibe->nombre;
-            $inicio_prestamo = Helpers::fecha_espanol_datetime($ph->inicio_prestamo);
-            $termino_prestamo = Helpers::fecha_espanol_datetime($ph->termino_prestamo);
+            $inicio_prestamo = Helpers::fecha_espanol_datetime($Prestamo_Herramienta->inicio_prestamo);
+            $termino_prestamo = Helpers::fecha_espanol_datetime($Prestamo_Herramienta->termino_prestamo);
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             $filascorreo = Prestamo_Herramienta_Detalle::where('prestamo', $request->prestamoterminarprestamo)->get();
@@ -353,9 +353,9 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
         $selectpersonal = "<option selected disabled hidden>Selecciona el personal</option>";
         foreach($personal as $p){
             if($p->id == $Prestamo_Herramienta->entrega_herramienta){
-                $selectpersonal = $selectpersonal.'<option selected value='.$p->id.'>'.$p->nombre.' - '.$p->tipo_personal;
+                $selectpersonal = $selectpersonal.'<option selected value='.$p->id.'>'.$p->nombre.' - '.$p->tipo_personal.'</option>';
             }else{
-                $selectpersonal = $selectpersonal.'<option value='.$p->id.'>'.$p->nombre.' - '.$p->tipo_personal;
+                $selectpersonal = $selectpersonal.'<option value='.$p->id.'>'.$p->nombre.' - '.$p->tipo_personal.'</option>';
             }
         }     
         $data = array(

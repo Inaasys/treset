@@ -236,8 +236,9 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardarAuditoria" style="display:none">Guardar Auditoria</button>
-                        <a class="btn btn-primary btn-sm" id="btnGenerarReporteAuditoria" style="display:none" target="_blank">Imprimir</a>
-	      	        </div>
+                        <a class="btn btn-primary btn-sm" id="btnGenerarReporteAuditoria" style="display:none" target="_blank">Generar Reporte Auditoría</a>
+                        <a class="btn btn-primary btn-sm" id="btnGenerarReporteGeneral" style="display:none" target="_blank">Generar Reporte General</a>
+                    </div>
 		        </form>	
       		</div>
     	</div>
@@ -261,6 +262,7 @@
         var asignacion_herramienta_obtener_personal_recibe = '{!!URL::to('asignacion_herramienta_obtener_personal_recibe')!!}';
         var asignacion_herramienta_obtener_personal_entrega = '{!!URL::to('asignacion_herramienta_obtener_personal_entrega')!!}';
         var asignacion_herramienta_obtener_herramienta = '{!!URL::to('asignacion_herramienta_obtener_herramienta')!!}';
+        var asignacion_herramienta_obtener_existencias_almacen = '{!!URL::to('asignacion_herramienta_obtener_existencias_almacen')!!}';
         var asignacion_herramienta_guardar = '{!!URL::to('asignacion_herramienta_guardar')!!}';
         var asignacion_herramienta_autorizar = '{!!URL::to('asignacion_herramienta_autorizar')!!}'; 
         var asignacion_herramienta_obtener_asignacion_herramienta = '{!!URL::to('asignacion_herramienta_obtener_asignacion_herramienta')!!}'; 
