@@ -83,17 +83,13 @@
         </div>
     </div>
 </div>
-
-
-
-
 <!-- Modal Permisos-->
 <div class="modal fade" data-backdrop="static" data-keyboard="false" id="ModalPermisos" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div id="formulariopermisos">
                 <div class="modal-header bg-red">
-                    <h4 class="modal-title" id="titulomodal"></h4>
+                    <h4 class="modal-title" >Permisos</h4>
                 </div>
                 <form id="formpermisos" action="#">
                     <div class="modal-body">
@@ -113,10 +109,6 @@
         </div>
     </div>
 </div>
-
-
-
-
 <!-- Modal Baja o Alta-->
 <div class="modal fade" data-backdrop="static" data-keyboard="false" id="estatusregistro" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   	<div class="modal-dialog" role="document">

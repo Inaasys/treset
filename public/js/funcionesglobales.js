@@ -364,6 +364,30 @@ function msj_infopersonalconasignacionesporautorizar(){
         "extendedTImeout": "5000"
     });
 }
+//la fecha final es mayor al dia de hoy
+function msjfechafinalmayorahoy(){
+    toastr.error( "Error la fecha final del reporte no puede ser mayor a la fecha actual", "Mensaje", {
+        "timeOut": "9500",
+        "progressBar": true,
+        "extendedTImeout": "5000"
+    });
+}
+//la fecha incial es mayor a la fecha final
+function msjfechainicialmayorafechafinal(){
+    toastr.error( "Error la fecha inicial no puede ser mayor a la fecha final del reporte", "Mensaje", {
+        "timeOut": "9500",
+        "progressBar": true,
+        "extendedTImeout": "5000"
+    });
+}
+//msj debe seleccionar al menos una compra para generar el formato en excel
+function msjseleccionaunacompra(){
+    toastr.info( "Aviso, debe seleccionar al menos una compra para poder realizar el formato de la caja chica en excel", "Mensaje", {
+        "timeOut": "9500",
+        "progressBar": true,
+        "extendedTImeout": "5000"
+    });
+}
 ///////////////////////////////////FIN MENSAJES TOASTR.JS INAASYS///////////////////////////////////////
 //////////////////////////////FUNCIONES PARA CONFIGURACION DE COLUMNAS DE TABLAS/////////////////////////////////////////
 //ordenar las columnas para vista de tabla

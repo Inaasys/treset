@@ -194,17 +194,18 @@
                         <ul class="dropdown-menu">
                           <li><a  href="#">Relación de Ordenes de Compra</a></li>
                         </ul>
-                    </li>
+                    </li>-->
                     <li class="dropdown-submenu">
                         <a class="test"  href="#">Compras <span class="caret"></span></a>
                         <ul class="dropdown-menu">
-                          <li><a  href="#">Relación de Compras por Proveedor</a></li>                        
+                          <li><a  href="{{route('reporte_caja_chica')}}" id="menureportescomprascajachica">Caja Chica</a></li>   
+                          <!--<li><a  href="#">Relación de Compras por Proveedor</a></li>                        
                           <li><a  href="#">Proyección de Pagos a Proveedores</a></li>
                           <li><a  href="#">Cartera Vencida a Proveedores</a></li>                      
-                          <li><a  href="#">Productos + Comprados</a></li>
+                          <li><a  href="#">Productos + Comprados</a></li>-->
                         </ul>
                     </li>
-                    <li class="dropdown-submenu">
+                    <!--<li class="dropdown-submenu">
                         <a class="test"  href="#">ContraRecibos <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                           <li><a  href="#">Relación de ContraRecibos</a></li>
@@ -232,7 +233,7 @@
                     <li class="dropdown-submenu">
                         <a class="test"  href="#">Facturas <span class="caret"></span></a>
                         <ul class="dropdown-menu">
-                          <li><a  href="{{route('reporte_diario_ventas')}}">Ventas Diarias</a></li>
+                          <li><a  href="{{route('reporte_diario_ventas')}}" id="menureportesfacturasventasdiarias">Ventas Diarias</a></li>
                           <!--<li><a  href="#">Relación de Ventas por Clientes</a></li>
                           <li><a  href="#">Relación de Ventas por Agentes</a></li>
                           <li><a  href="#">Relación de Ventas por Marcas</a></li>                         

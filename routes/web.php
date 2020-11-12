@@ -338,10 +338,15 @@ Route::group(['middleware' => ['auth']], function () {
 
 
     /* -----------------------------------||||||||||||||||||||REPORTES||||||||||||||||||||||-------------------------------------*/
-    Route::get('/reporte_diario_ventas', 'ReporteFacturaController@reporte_diario_ventas')->name('reporte_diario_ventas');
-    Route::get('/generar_reporte_diario_ventas', 'ReporteFacturaController@generar_reporte_diario_ventas')->name('generar_reporte_diario_ventas');
-    Route::get('/reporte_ventas_diarias_obtener_clientes', 'ReporteFacturaController@reporte_ventas_diarias_obtener_clientes')->name('reporte_ventas_diarias_obtener_clientes');
-    Route::post('/generar_excel_reporte_diario_ventas', 'ReporteFacturaController@generar_excel_reporte_diario_ventas')->name('generar_excel_reporte_diario_ventas');
+    //reporte diario de ventas
+    Route::get('/reporte_diario_ventas', 'ReporteFacturaController@reporte_diario_ventas')->name('reporte_diario_ventas')->middleware('revisaraccesomenu:menureportesfacturasventasdiarias');
+    Route::get('/generar_reporte_diario_ventas', 'ReporteFacturaController@generar_reporte_diario_ventas')->name('generar_reporte_diario_ventas')->middleware('revisaraccesomenu:menureportesfacturasventasdiarias');
+    Route::get('/reporte_ventas_diarias_obtener_clientes', 'ReporteFacturaController@reporte_ventas_diarias_obtener_clientes')->name('reporte_ventas_diarias_obtener_clientes')->middleware('revisaraccesomenu:menureportesfacturasventasdiarias');
+    Route::post('/generar_excel_reporte_diario_ventas', 'ReporteFacturaController@generar_excel_reporte_diario_ventas')->name('generar_excel_reporte_diario_ventas')->middleware('revisaraccesomenu:menureportesfacturasventasdiarias');
+    //reporte caja chica
+    Route::get('/reporte_caja_chica', 'ReporteCajaChicaController@reporte_caja_chica')->name('reporte_caja_chica')->middleware('revisaraccesomenu:menureportescomprascajachica');
+    Route::get('/generar_reporte_caja_chica', 'ReporteCajaChicaController@generar_reporte_caja_chica')->name('generar_reporte_caja_chica')->middleware('revisaraccesomenu:menureportescomprascajachica');
+    Route::get('/reporte_caja_chica_generar_formato_excel', 'ReporteCajaChicaController@reporte_caja_chica_generar_formato_excel')->name('reporte_caja_chica_generar_formato_excel')->middleware('revisaraccesomenu:menureportescomprascajachica');
     /* -----------------------------------||||||||||||||||||||FIN REPORTES||||||||||||||||||||||-------------------------------------*/
 
 

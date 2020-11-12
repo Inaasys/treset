@@ -23,6 +23,9 @@ class LoginController extends Controller
      *
      * @var string
      */
+    protected $maxAttempts = 10; // Numero de intentos permitidos para loguearse a la aplicacion
+    protected $decayMinutes = 10; // Tiempo en minutos que no podra loguearse al fallar el numero de intentos permitidos para loguarse en la aplicacion
+
     protected $redirectTo = '/inicio';
     /**
      * Create a new controller instance.

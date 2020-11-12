@@ -333,6 +333,9 @@ function permisos(id){
                             '<a href="#tabcatalogos" data-toggle="tab">Catálogos</a>'+
                         '</li>'+
                         '<li role="presentation">'+
+                            '<a href="#tabreportes" data-toggle="tab">Reportes</a>'+
+                        '</li>'+
+                        '<li role="presentation">'+
                             '<a href="#tabliberar" data-toggle="tab">Liberar</a>'+
                         '</li>'+
                         '<li role="presentation">'+
@@ -885,6 +888,33 @@ function permisos(id){
                                 '</div>'+
                             '</div>'+
                         '</div>'+ 
+                        '<div role="tabpanel" class="tab-pane fade" id="tabreportes">'+
+                            '<div class="row">'+
+                                '<div class="col-md-6">'+
+                                    '<label>Compras</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="menureportescomprascajachica" id="idmenureportescomprascajachica" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureportescomprascajachica">Caja Chica</label>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label>Facturas</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="menureportesfacturasventasdiarias" id="idmenureportesfacturasventasdiarias" class="filled-in submenu accesoreportes" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureportesfacturasventasdiarias">Ventas Diarias</label>'+                                     
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                            '<div class="row">'+
+                                '<div class="col-md-6">'+
+                                    '<label>Acceso a todos los reportes en menu</label>'+
+                                    '<div class="col-md-12 form-check">'+ 
+                                        '<input type="checkbox" name="accesotodoslosreportesenmenu" id="idaccesotodoslosreportesenmenu" class="filled-in" value="1" onchange="marcaraccesosentodoslosreportes()"/>'+
+                                        '<label for="idaccesotodoslosreportesenmenu">Marcar</label>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+ 
                         '<div role="tabpanel" class="tab-pane fade" id="tabliberar">'+
                             '<div class="row">'+
                                 '<div class="col-md-12">'+
@@ -972,6 +1002,20 @@ function marcarcrudentodosloscatalogos(){
     construirarraysubmenus();
     construirarraypermisoscrud();
 }
+
+
+//marcador todos los accesos de los reportes
+function marcaraccesosentodoslosreportes(){
+    if( $('#idaccesotodoslosreportesenmenu').prop('checked') ) {
+        $(".accesoreportes").prop('checked', true);
+    }else{
+        $(".accesoreportes").prop('checked', false);
+    }
+    construirarraysubmenus();
+    construirarraypermisoscrud();
+}
+
+
 //permitir o reestringir acceso al menu
 function construirarraysubmenus(){
     var string_submenus = "";
