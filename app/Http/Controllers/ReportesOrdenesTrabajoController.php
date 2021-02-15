@@ -124,19 +124,23 @@ class ReportesOrdenesTrabajoController extends ConfiguracionSistemaController{
                     foreach($detalles as $d){
                         if($d->Tecnico1 == $tecnico->Numero){
                             $totalhorasdetalles = $totalhorasdetalles + $d->Horas1;
-                            $totalpesoshorasdetalle = $totalpesoshorasdetalle + $d->SubTotal;
+                            $subtotaltecnico = $d->Precio * $d->Horas1;
+                            $totalpesoshorasdetalle = $totalpesoshorasdetalle + $subtotaltecnico;
                         }
                         if($d->Tecnico2 == $tecnico->Numero){
                             $totalhorasdetalles = $totalhorasdetalles + $d->Horas2;
-                            $totalpesoshorasdetalle = $totalpesoshorasdetalle + $d->SubTotal;
+                            $subtotaltecnico = $d->Precio * $d->Horas2;
+                            $totalpesoshorasdetalle = $totalpesoshorasdetalle + $subtotaltecnico;
                         }
                         if($d->Tecnico3 == $tecnico->Numero){
                             $totalhorasdetalles = $totalhorasdetalles + $d->Horas3;
-                            $totalpesoshorasdetalle = $totalpesoshorasdetalle + $d->SubTotal;
+                            $subtotaltecnico = $d->Precio * $d->Horas3;
+                            $totalpesoshorasdetalle = $totalpesoshorasdetalle + $subtotaltecnico;
                         }
                         if($d->Tecnico4 == $tecnico->Numero){
                             $totalhorasdetalles = $totalhorasdetalles + $d->Horas4;
-                            $totalpesoshorasdetalle = $totalpesoshorasdetalle + $d->SubTotal;
+                            $subtotaltecnico = $d->Precio * $d->Horas4;
+                            $totalpesoshorasdetalle = $totalpesoshorasdetalle + $subtotaltecnico;
                         }
                     }
                 }
