@@ -19,6 +19,16 @@
                         			<td >
                         				<h5>&nbsp;&nbsp;&nbsp;Reporte Caja Chica&nbsp;&nbsp;&nbsp;</h5>
                         			</td>
+                                    <td >
+                                        <div class="btn bg-blue btn-xs waves-effect" onclick="generar_reporte()">
+                                            Ver Reporte
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="" >
+                                            <a class="btn bg-blue btn-xs waves-effect" id="btnGenerarFormatoExcelCajaChica" onclick="generar_formato_excel()">Generar Reporte en Excel</a>
+                                        </div>  
+                                    </td>
                         		</tr>
                         	</table>
                         </div>
@@ -29,22 +39,21 @@
                                         <label>Fecha Inicial Reporte</label>
                                         <input type="date" class="form-control" name="fechainicialreporte" id="fechainicialreporte" onchange="generar_reporte()" required>
                                     </div>  
-                                    <div class="col-md-2">
+                                    <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
                                         <label>Fecha Final Reporte</label>
                                         <input type="date" class="form-control" name="fechafinalreporte" id="fechafinalreporte" onchange="generar_reporte()" required>
                                     </div> 
+                                    <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+                                        <label>Status Compra</label>
+                                        <select class="form-control select2" name="statuscompra" id="statuscompra" onchange="generar_reporte()"  required>
+                                            <option value="LIQUIDADA">LIQUIDADA</option>
+                                            <option value="POR PAGAR">POR PAGAR</option>
+                                        </select>
+                                    </div>
                                     <div class="col-md-2" hidden>
                                         <label>String Compras</label>
                                         <input type="text" class="form-control" name="string_compras" id="string_compras" value="0" required>
                                     </div> 
-                                    <div class="col-md-2" >
-                                        <label for=""></label>
-                                        <div  class="btn btn-success btn-block btn-sm" onclick="generar_reporte()">Ver Reporte</div>
-                                    </div> 
-                                    <div class="col-md-2" >
-                                        <label for=""></label>
-                                        <a class="btn btn-success btn-block btn-sm" id="btnGenerarFormatoExcelCajaChica" onclick="generar_formato_excel_caja_chica()" style="display:none;">Generar Formato Caja Chica</a>
-                                    </div>  
                                 </div>
                             </form>
                             <div class="table-responsive">

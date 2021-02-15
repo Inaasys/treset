@@ -32,8 +32,9 @@
                         </ul>
                     </li>
                     <li><a href="#" id="menuregistrospedidos">Pedidos</a></li>
-                    <li><a href="#" id="menuregistrosremisiones">Remisiones</a></li>
-                    <li><a href="#" id="menuregistrosfacturas">Facturas</a></li>                   
+                    <li><a href="#" id="menuregistrosremisiones">Remisiones</a></li>-->
+                    <li><a href="{{ route('cotizaciones') }}" id="menuregistroscotizaciones">Cotizaciones</a></li>
+                    <!--<li><a href="#" id="menuregistrosfacturas">Facturas</a></li>                   
                     <li class="dropdown-submenu">
                         <a class="test"  href="#" id="menuregistrosproduccion">Producción <span class="caret"></span></a>
                         <ul class="dropdown-menu">
@@ -60,6 +61,8 @@
                     <li><a href="#" id="menuregistrosajusteinventario">Ajustes de Inventario</a></li>-->
                     <li><a href="{{ route('asignacionherramienta') }}" id="menuregistrosasignacionherramienta">Asignación Herramienta</a></li>
                     <li><a href="{{ route('prestamoherramienta') }}" id="menuregistrosprestamoherramienta">Prestamo Herramienta</a></li>
+                    <li><a href="{{ route('ajustesinventario') }}" id="menuregistrosajusteinventario">Ajustes de Inventario</a></li>
+
                 </ul>
               </li>
               <li class="dropdown">
@@ -264,21 +267,21 @@
                         <ul class="dropdown-menu">
                           <li><a  href="#">Relación de Requisiciones</a></li>
                         </ul>
-                    </li>
+                    </li>-->
                     <li class="dropdown-submenu">
                         <a class="test"  href="#">Ordenes de Trabajo <span class="caret"></span></a>
                         <ul class="dropdown-menu">
-                          <li><a  href="#">Avance Unidades en Reparación</a></li>
-                          <li><a  href="#">Horas Técnico</a></li>
-                          <li><a  href="#">Unidades Servicio</a></li>
+                          <!--<li><a  href="#">Avance Unidades en Reparación</a></li>-->
+                          <li><a  href="{{route('reporte_ordenes_trabajo_horas_tecnico')}}" id="menureportesordenestrabajohorastecnico">Horas Técnico</a></li>
+                          <!--<li><a  href="#">Unidades Servicio</a></li>
                           <li><a  href="#">Relación de Encuestas</a></li>
                           <li><a  href="#">Precios Mano de Obra</a></li>
                           <li><a  href="#">Planeación del Taller Entradas y Salidas</a></li>
                           <li><a  href="#">Planeación del Taller Bahías Disponibles</a></li>
-                          <li><a  href="#">Planeación del Taller Técnicos Disponibles</a></li>
+                          <li><a  href="#">Planeación del Taller Técnicos Disponibles</a></li>-->
                         </ul>
                     </li>
-                    <li class="dropdown-submenu">
+                    <!--<li class="dropdown-submenu">
                         <a class="test"  href="#">Estado Financiero CABS <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                           <li><a  href="#">Antiguedad del Inventario</a></li>

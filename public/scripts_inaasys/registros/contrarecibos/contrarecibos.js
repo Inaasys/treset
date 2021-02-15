@@ -76,7 +76,7 @@ function listar(){
             'data'    : campos[i],
             'name'  : campos[i],
             'orderable': true,
-            'searchable': false
+            'searchable': true
         });
     }
     tabla=$('#tbllistado').DataTable({

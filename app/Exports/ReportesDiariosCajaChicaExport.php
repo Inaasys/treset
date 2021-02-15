@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
+use Maatwebsite\Excel\Concerns\WithTitle;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Jenssegers\Date\Date;
@@ -11,23 +12,30 @@ use Helpers;
 use App\Compra;
 use App\Proveedor;
 
-class ReportesDiariosCajaChicaExport implements FromView
+class ReportesDiariosCajaChicaExport implements FromView,WithTitle
 {
     /**
     * @return \Illuminate\Support\Collection
     */
     private $fechainicialreporte;
     private $fechafinalreporte;
+    private $statuscompra;
     private $string_compras;
     private $numerodecimales;
     private $empresa;
 
-    public function __construct($fechainicialreporte, $fechafinalreporte, $string_compras, $numerodecimales, $empresa){
+    public function __construct($fechainicialreporte, $fechafinalreporte, $statuscompra, $string_compras, $numerodecimales, $empresa){
         $this->fechainicialreporte = $fechainicialreporte;
         $this->fechafinalreporte = $fechafinalreporte;
+        $this->statuscompra = $statuscompra;
         $this->string_compras = $string_compras;
         $this->numerodecimales = $numerodecimales;
         $this->empresa = $empresa;
+    }
+
+    //titulo de la hoja de excel
+    public function title(): string{
+        return 'Caja Chica';
     }
 
     public function view(): View{
@@ -36,7 +44,7 @@ class ReportesDiariosCajaChicaExport implements FromView
             array_push($compras, $compra);
         }
         $fechahoy = Carbon::parse($this->fechafinalreporte);//fecha de la que se realizar el reporte
-        $compras = Compra::whereBetween('Fecha', [$this->fechainicialreporte, $this->fechafinalreporte])->whereIn('Compra', $compras)->where('Tipo', 'CAJA CHICA')->where('Status', 'LIQUIDADA')->get();
+        $compras = Compra::whereBetween('Fecha', [$this->fechainicialreporte, $this->fechafinalreporte])->whereIn('Compra', $compras)->where('Tipo', 'CAJA CHICA')->where('Status', $this->statuscompra)->get();
         $data=array();
         $sumasubtotal = 0;
         $sumaiva = 0;

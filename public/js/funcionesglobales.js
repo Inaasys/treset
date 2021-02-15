@@ -252,6 +252,14 @@ function msj_errorcodigoexistente(){
         "extendedTImeout": "5000"
     });
 }
+//mensaje error la orden ya existe
+function msj_errorordenexistente(){
+    toastr.error( "Error el número de orden ya existe", "Mensaje", {
+        "timeOut": "9500",
+        "progressBar": true,
+        "extendedTImeout": "5000"
+    });
+}
 //mensaje error el UUID ya existe
 function msj_erroruuidexistente(){
             toastr.error( "Error el uuid de la factura ya fue ingresado en el sistema", "Mensaje", {
@@ -276,6 +284,15 @@ function msj_errorproductoyaagregado(){
         "extendedTImeout": "5000"
     });
 }
+//mensaje error el servicio ya fue agregado
+function msj_errorservicioyaagregado(){
+    toastr.error( "El servicio ya fue agregado", "Mensaje", {
+        "timeOut": "9500",
+        "progressBar": true,
+        "extendedTImeout": "5000"
+    });
+}
+
 //mensaje error la compra ya fue agregada
 function msj_errorcomprayaagregada(){
     toastr.error( "El código de la compra ya fue agregado", "Mensaje", {
@@ -386,6 +403,72 @@ function msjseleccionaunacompra(){
         "timeOut": "9500",
         "progressBar": true,
         "extendedTImeout": "5000"
+    });
+}
+//msj faltan datos por capturar OT
+function msjfaltandatosporcapturar(){
+    toastr.error( "Error faltan datos por capturar, revisa todas las pestañas del formulario", "Mensaje", {
+        "timeOut": "9500",
+        "progressBar": true,
+        "extendedTImeout": "5000"
+    });   
+}
+//msj tecnico ya agregado OT
+function msj_errortecnicoyaagregado(){
+    toastr.error( "Error el técnico ya esta agregado", "Mensaje", {
+        "timeOut": "9500",
+        "progressBar": true,
+        "extendedTImeout": "5000"
+    }); 
+}
+//msj solo se puedne agregar 4 tecnicos OT
+function msjsolo4tecnicospermitidos(){
+    toastr.error( "Error solo se permiten agregar 4 técnicos", "Mensaje", {
+        "timeOut": "9500",
+        "progressBar": true,
+        "extendedTImeout": "5000"
+    }); 
+}
+//msj El total de horas trabajadas por los técnicos es distinto al total de horas facturadas OT
+function msjtotalhorasnocorresponden(){
+    toastr.error( "El total de horas trabajadas por los técnicos es distinto al total de horas facturadas", "Mensaje", {
+        "timeOut": "9500",
+        "progressBar": true,
+        "extendedTImeout": "5000"
+    });     
+}
+//msj para quitar refaccion cancela su traspaso
+function msjerrorcancelartraspaso(){
+    toastr.error( "Error, para quitar la refacción cancela el traspaso al que corresponde", "Mensaje", {
+        "timeOut": "9500",
+        "progressBar": true,
+        "extendedTImeout": "5000"
+    });   
+}
+//msj orden terminada correctamente
+function msj_ordenterminada(){
+    toastr.success( "La orden de trabajo se termino correctamente", "Mensaje", {
+        "timeOut": "9500",
+        "progressBar": true,
+        "extendedTImeout": "5000"
+    });
+    var tabla = $('.tbllistado').DataTable();
+    tabla.ajax.reload();
+}
+//msj la remision ya ha sido utilizada en una cotizacion
+function msjremisionyautilizada(){
+    toastr.error( "Error, la remisión ya fue utilizada en una cotización", "Mensaje", {
+        "timeOut": "9500",
+        "progressBar": true,
+        "extendedTImeout": "5000"
+    });       
+}
+//mensaje error se require al menos una entrada de una partida
+function msj_erroralmenosunaentrada(){
+	toastr.error( "Se requiere la entrada de al menos una partida", "Mensaje", {
+            "timeOut": "9500",
+            "progressBar": true,
+            "extendedTImeout": "5000"
     });
 }
 ///////////////////////////////////FIN MENSAJES TOASTR.JS INAASYS///////////////////////////////////////

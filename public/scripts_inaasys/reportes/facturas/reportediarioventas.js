@@ -60,7 +60,7 @@ function pulsar(e) {
   return (tecla!=13);
 }
 //realizar en reporte en excel
-function realizar_excel_reporte(){
+function generar_formato_excel(){
   var form = $("#formventasdiarias");
   if (form.parsley().isValid()){
     $("#btngenerarexcel").click();

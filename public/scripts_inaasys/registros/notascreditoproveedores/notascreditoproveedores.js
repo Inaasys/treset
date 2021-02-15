@@ -83,7 +83,7 @@ function listar(){
           'data'    : campos[i],
           'name'  : campos[i],
           'orderable': true,
-          'searchable': false
+          'searchable': true
       });
   }
   tabla=$('#tbllistado').DataTable({
@@ -782,10 +782,13 @@ function calculartotalnotaproveedor(){
 }
 //eliminar una fila en la tabla
 function eliminarfilanotaproveedor(fila){
-  $("#filaproducto"+fila).remove();
-  contadorfilas--; //importante para todos los calculo en el modulo de orden de compra se debe restar al contadorfilas la fila que se acaba de eliminar
-  renumerarfilasnotaproveedor();//importante para todos los calculo en el modulo de orden de compra 
-  calculartotalnotaproveedor();
+  var confirmacion = confirm("Esta seguro de eliminar la fila?"); 
+  if (confirmacion == true) { 
+    $("#filaproducto"+fila).remove();
+    contadorfilas--; //importante para todos los calculo en el modulo de orden de compra se debe restar al contadorfilas la fila que se acaba de eliminar
+    renumerarfilasnotaproveedor();//importante para todos los calculo en el modulo de orden de compra 
+    calculartotalnotaproveedor();
+  }
 }
 //renumerar las filas de la orden de compra
 function renumerarfilasnotaproveedor(){

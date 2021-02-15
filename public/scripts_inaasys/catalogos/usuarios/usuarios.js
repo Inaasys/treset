@@ -520,6 +520,8 @@ function permisos(id){
                                         '<label for="idregistros.ordenes.trabajo.bajas">Bajas</label>'+
                                         '&nbsp;&nbsp;<input type="checkbox" name="registros.ordenes.trabajo.cambios" id="idregistros.ordenes.trabajo.cambios" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
                                         '<label for="idregistros.ordenes.trabajo.cambios">Cambios</label>'+ 
+                                        '&nbsp;&nbsp;<input type="checkbox" name="registros.ordenes.trabajo.terminar" id="idregistros.ordenes.trabajo.terminar" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
+                                        '<label for="idregistros.ordenes.trabajo.terminar">Terminar</label>'+ 
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
@@ -902,6 +904,13 @@ function permisos(id){
                                     '<div class="col-md-12 form-check">'+
                                         '<input type="checkbox" name="menureportesfacturasventasdiarias" id="idmenureportesfacturasventasdiarias" class="filled-in submenu accesoreportes" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
                                         '<label for="idmenureportesfacturasventasdiarias">Ventas Diarias</label>'+                                     
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label>Ordenes Trabajo</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="menureportesordenestrabajohorastecnico" id="idmenureportesordenestrabajohorastecnico" class="filled-in submenu accesoreportes" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureportesordenestrabajohorastecnico">Horas Técnico</label>'+                                     
                                     '</div>'+
                                 '</div>'+
                             '</div>'+

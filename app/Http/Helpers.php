@@ -85,7 +85,7 @@ class Helpers{
 
     //dar formato correcto a la fecha para input type date en vista
     public static function formatoinputdate($fecha){
-        if($fecha == null){
+        if($fecha == null || $fecha == ''){
             $fechacorrecta = null;
         }else{
             $fechacorrecta = Carbon::parse($fecha)->format('Y-m-d');

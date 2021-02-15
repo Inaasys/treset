@@ -38,13 +38,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/enviar_msj_whatsapp', 'PruebaController@enviar_msj_whatsapp')->name('enviar_msj_whatsapp');
     Route::get('/artisan', function () { 
         //return Artisan::call('config:cache');
-
     });
 
-
-
     Route::get('/obtener_valor_dolar_dof', 'MonedaController@obtener_valor_dolar_dof')->name('obtener_valor_dolar_dof');
-
 
     /* -----------------------------------||||||||||||||||||||CATALOGOS||||||||||||||||||||||-------------------------------------*/
     //Clientes
@@ -187,7 +183,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/personal_alta_o_baja', 'PersonalController@personal_alta_o_baja')->name('personal_alta_o_baja')->middleware('revisarpermisos:catalogos.personal.bajas');
     Route::get('/personal_obtener_personal', 'PersonalController@personal_obtener_personal')->name('personal_obtener_personal')->middleware('revisaraccesomenu:menucatalogopersonal');
     Route::post('/personal_guardar_modificacion', 'PersonalController@personal_guardar_modificacion')->name('personal_guardar_modificacion')->middleware('revisarpermisos:catalogos.personal.cambios');
-
+    //Usuarios
     Route::get('usuarios', 'UserController@usuarios')->name('usuarios');    
     Route::get('usuarios_obtener', 'UserController@usuarios_obtener')->name('usuarios_obtener');
     Route::get('/usuarios_obtener_ultimo_numero', 'UserController@usuarios_obtener_ultimo_numero')->name('usuarios_obtener_ultimo_numero'); 
@@ -248,6 +244,23 @@ Route::group(['middleware' => ['auth']], function () {
     //Ordenes de Trabajo
     Route::get('/ordenes_trabajo', 'OrdenTrabajoController@ordenes_trabajo')->name('ordenes_trabajo')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
     Route::get('/ordenes_trabajo_obtener', 'OrdenTrabajoController@ordenes_trabajo_obtener')->name('ordenes_trabajo_obtener')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+    Route::get('/ordenes_trabajo_obtener_ultimo_folio', 'OrdenTrabajoController@ordenes_trabajo_obtener_ultimo_folio')->name('ordenes_trabajo_obtener_ultimo_folio')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+    Route::get('/ordenes_trabajo_obtener_tipos_ordenes_trabajo', 'OrdenTrabajoController@ordenes_trabajo_obtener_tipos_ordenes_trabajo')->name('ordenes_trabajo_obtener_tipos_ordenes_trabajo')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+    Route::get('/ordenes_trabajo_obtener_tipos_unidades', 'OrdenTrabajoController@ordenes_trabajo_obtener_tipos_unidades')->name('ordenes_trabajo_obtener_tipos_unidades')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+    Route::get('/ordenes_trabajo_obtener_fecha_actual_datetimelocal', 'OrdenTrabajoController@ordenes_trabajo_obtener_fecha_actual_datetimelocal')->name('ordenes_trabajo_obtener_fecha_actual_datetimelocal')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+    Route::get('/ordenes_trabajo_obtener_clientes_facturaa', 'OrdenTrabajoController@ordenes_trabajo_obtener_clientes_facturaa')->name('ordenes_trabajo_obtener_clientes_facturaa')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+    Route::get('/ordenes_trabajo_obtener_clientes_delcliente', 'OrdenTrabajoController@ordenes_trabajo_obtener_clientes_delcliente')->name('ordenes_trabajo_obtener_clientes_delcliente')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+    Route::get('/ordenes_trabajo_obtener_agentes', 'OrdenTrabajoController@ordenes_trabajo_obtener_agentes')->name('ordenes_trabajo_obtener_agentes')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+    Route::get('/ordenes_trabajo_obtener_vines', 'OrdenTrabajoController@ordenes_trabajo_obtener_vines')->name('ordenes_trabajo_obtener_vines')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+    Route::get('/ordenes_trabajo_obtener_servicios', 'OrdenTrabajoController@ordenes_trabajo_obtener_servicios')->name('ordenes_trabajo_obtener_servicios')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+    Route::get('/ordenes_trabajo_obtener_tecnicos', 'OrdenTrabajoController@ordenes_trabajo_obtener_tecnicos')->name('ordenes_trabajo_obtener_tecnicos')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+    Route::post('/ordenes_trabajo_guardar', 'OrdenTrabajoController@ordenes_trabajo_guardar')->name('ordenes_trabajo_guardar')->middleware('revisarpermisos:registros.ordenes.trabajo.altas');
+    Route::get('/ordenes_trabajo_obtener_orden_trabajo', 'OrdenTrabajoController@ordenes_trabajo_obtener_orden_trabajo')->name('ordenes_trabajo_obtener_orden_trabajo')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+    Route::post('/ordenes_trabajo_guardar_modificacion', 'OrdenTrabajoController@ordenes_trabajo_guardar_modificacion')->name('ordenes_trabajo_guardar_modificacion')->middleware('revisarpermisos:registros.ordenes.trabajo.cambios');
+    Route::get('/ordenes_trabajo_verificar_uso_en_modulos', 'OrdenTrabajoController@ordenes_trabajo_verificar_uso_en_modulos')->name('ordenes_trabajo_verificar_uso_en_modulos')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+    Route::post('/ordenes_trabajo_alta_o_baja', 'OrdenTrabajoController@ordenes_trabajo_alta_o_baja')->name('ordenes_trabajo_alta_o_baja')->middleware('revisarpermisos:registros.ordenes.trabajo.bajas');
+    Route::get('/ordenes_trabajo_verificar_status_orden', 'OrdenTrabajoController@ordenes_trabajo_verificar_status_orden')->name('ordenes_trabajo_verificar_status_orden')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+    Route::post('/ordenes_trabajo_terminar_orden', 'OrdenTrabajoController@ordenes_trabajo_terminar_orden')->name('ordenes_trabajo_terminar_orden')->middleware('revisarpermisos:registros.ordenes.trabajo.terminar');
     Route::get('/ordenes_trabajo_buscar_folio_string_like', 'OrdenTrabajoController@ordenes_trabajo_buscar_folio_string_like')->name('ordenes_trabajo_buscar_folio_string_like')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
     Route::post('/ordenes_trabajo_generar_pdfs', 'OrdenTrabajoController@ordenes_trabajo_generar_pdfs')->name('ordenes_trabajo_generar_pdfs')->middleware('revisaraccesomenu:menuregistroscuentasxpagar');
     Route::get('/ordenes_trabajo_exportar_excel', 'OrdenTrabajoController@ordenes_trabajo_exportar_excel')->name('ordenes_trabajo_exportar_excel')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
@@ -334,8 +347,34 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/prestamo_herramienta_guardar_modificacion', 'PrestamoHerramientaController@prestamo_herramienta_guardar_modificacion')->name('prestamo_herramienta_guardar_modificacion')->middleware('revisarpermisos:registros.prestamo.herramienta.cambios');
     Route::post('/prestamo_herramienta_guardar_configuracion_tabla', 'PrestamoHerramientaController@prestamo_herramienta_guardar_configuracion_tabla')->name('prestamo_herramienta_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrosprestamoherramienta');
     Route::get('/prestamo_herramienta_exportar_excel', 'PrestamoHerramientaController@prestamo_herramienta_exportar_excel')->name('prestamo_herramienta_exportar_excel')->middleware('revisaraccesomenu:menuregistrosprestamoherramienta');
+    //Cotizaciones
+    Route::get('/cotizaciones', 'CotizacionController@cotizaciones')->name('cotizaciones')->middleware('revisaraccesomenu:menuregistroscotizaciones');
+    Route::get('/cotizaciones_obtener', 'CotizacionController@cotizaciones_obtener')->name('cotizaciones_obtener')->middleware('revisaraccesomenu:menuregistroscotizaciones');
+    Route::get('/cotizaciones_obtener_ultimo_id', 'CotizacionController@cotizaciones_obtener_ultimo_id')->name('cotizaciones_obtener_ultimo_id')->middleware('revisaraccesomenu:menuregistroscotizaciones');
+    Route::get('/cotizaciones_obtener_remisiones', 'CotizacionController@cotizaciones_obtener_remisiones')->name('cotizaciones_obtener_remisiones')->middleware('revisaraccesomenu:menuregistroscotizaciones');
+    Route::get('/cotizaciones_obtener_remision', 'CotizacionController@cotizaciones_obtener_remision')->name('cotizaciones_obtener_remision')->middleware('revisaraccesomenu:menuregistroscotizaciones');
+    Route::post('/cotizaciones_guardar', 'CotizacionController@cotizaciones_guardar')->name('cotizaciones_guardar')->middleware('revisarpermisos:registros.cotizaciones.altas');
+    Route::post('/cotizaciones_alta_o_baja', 'CotizacionController@cotizaciones_alta_o_baja')->name('cotizaciones_alta_o_baja')->middleware('revisarpermisos:registros.cotizaciones.bajas');
+    Route::get('/cotizaciones_obtener_cotizacion', 'CotizacionController@cotizaciones_obtener_cotizacion')->name('cotizaciones_obtener_cotizacion')->middleware('revisaraccesomenu:menuregistroscotizaciones');
+    Route::post('/cotizaciones_guardar_modificacion', 'CotizacionController@cotizaciones_guardar_modificacion')->name('cotizaciones_guardar_modificacion')->middleware('revisarpermisos:registros.cotizaciones.cambios');
+    Route::get('/cotizaciones_exportar_excel', 'CotizacionController@cotizaciones_exportar_excel')->name('cotizaciones_exportar_excel')->middleware('revisaraccesomenu:menuregistroscotizaciones');
+    Route::get('/cotizaciones_crear_formato_excel/{cotizacion}', 'CotizacionController@cotizaciones_crear_formato_excel')->name('cotizaciones_crear_formato_excel')->middleware('revisaraccesomenu:menuregistroscotizaciones');
+    Route::post('/cotizaciones_guardar_configuracion_tabla', 'CotizacionController@cotizaciones_guardar_configuracion_tabla')->name('cotizaciones_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistroscotizaciones');
+    //Ajuste Inventario
+    Route::get('/ajustesinventario', 'AjusteInventarioController@ajustesinventario')->name('ajustesinventario')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
+    Route::get('/ajustesinventario_obtener', 'AjusteInventarioController@ajustesinventario_obtener')->name('ajustesinventario_obtener')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
+    Route::get('/ajustesinventario_obtener_ultimo_id', 'AjusteInventarioController@ajustesinventario_obtener_ultimo_id')->name('ajustesinventario_obtener_ultimo_id')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
+    Route::get('/ajustesinventario_obtener_almacenes', 'AjusteInventarioController@ajustesinventario_obtener_almacenes')->name('ajustesinventario_obtener_almacenes')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
+    Route::get('/ajustesinventario_obtener_productos', 'AjusteInventarioController@ajustesinventario_obtener_productos')->name('ajustesinventario_obtener_productos')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
+    Route::get('/ajustesinventario_obtener_existencias_por_codigo_y_almacen', 'AjusteInventarioController@ajustesinventario_obtener_existencias_por_codigo_y_almacen')->name('ajustesinventario_obtener_existencias_por_codigo_y_almacen')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
+    Route::post('/ajustesinventario_guardar', 'AjusteInventarioController@ajustesinventario_guardar')->name('ajustesinventario_guardar')->middleware('revisarpermisos:registros.ajustes.inventario.altas');
+    Route::get('/ajustesinventario_verificar_baja', 'AjusteInventarioController@ajustesinventario_verificar_baja')->name('ajustesinventario_verificar_baja')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
+    Route::post('/ajustesinventario_alta_o_baja', 'AjusteInventarioController@ajustesinventario_alta_o_baja')->name('ajustesinventario_alta_o_baja')->middleware('revisarpermisos:registros.ajustes.inventario.bajas');
+    Route::get('/ajustesinventario_obtener_ajuste', 'AjusteInventarioController@ajustesinventario_obtener_ajuste')->name('ajustesinventario_obtener_ajuste')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
+    Route::post('/ajustesinventario_guardar_modificacion', 'AjusteInventarioController@ajustesinventario_guardar_modificacion')->name('ajustesinventario_guardar_modificacion')->middleware('revisarpermisos:registros.ajustes.inventario.cambios');
+    Route::get('/ajustesinventario_exportar_excel', 'AjusteInventarioController@ajustesinventario_exportar_excel')->name('ajustesinventario_exportar_excel')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
+    Route::post('/ajustesinventario_guardar_configuracion_tabla', 'AjusteInventarioController@ajustesinventario_guardar_configuracion_tabla')->name('ajustesinventario_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
     /* -----------------------------------||||||||||||||||||||FIN REGISTROS||||||||||||||||||||||-------------------------------------*/
-
 
     /* -----------------------------------||||||||||||||||||||REPORTES||||||||||||||||||||||-------------------------------------*/
     //reporte diario de ventas
@@ -347,8 +386,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/reporte_caja_chica', 'ReporteCajaChicaController@reporte_caja_chica')->name('reporte_caja_chica')->middleware('revisaraccesomenu:menureportescomprascajachica');
     Route::get('/generar_reporte_caja_chica', 'ReporteCajaChicaController@generar_reporte_caja_chica')->name('generar_reporte_caja_chica')->middleware('revisaraccesomenu:menureportescomprascajachica');
     Route::get('/reporte_caja_chica_generar_formato_excel', 'ReporteCajaChicaController@reporte_caja_chica_generar_formato_excel')->name('reporte_caja_chica_generar_formato_excel')->middleware('revisaraccesomenu:menureportescomprascajachica');
+    //reporte horas tecnico
+    Route::get('/reporte_ordenes_trabajo_horas_tecnico', 'ReportesOrdenesTrabajoController@reporte_ordenes_trabajo_horas_tecnico')->name('reporte_ordenes_trabajo_horas_tecnico')->middleware('revisaraccesomenu:menureportesordenestrabajohorastecnico');
+    Route::get('/generar_reporte_horas_tecnico', 'ReportesOrdenesTrabajoController@generar_reporte_horas_tecnico')->name('generar_reporte_horas_tecnico')->middleware('revisaraccesomenu:menureportesordenestrabajohorastecnico');
+    Route::get('/reporte_horas_tecnico_obtener_tecnicos', 'ReportesOrdenesTrabajoController@reporte_horas_tecnico_obtener_tecnicos')->name('reporte_horas_tecnico_obtener_tecnicos')->middleware('revisaraccesomenu:menureportesordenestrabajohorastecnico');
+    Route::get('/reporte_horas_tecnico_generar_formato_excel', 'ReportesOrdenesTrabajoController@reporte_horas_tecnico_generar_formato_excel')->name('reporte_horas_tecnico_generar_formato_excel')->middleware('revisaraccesomenu:menureportesordenestrabajohorastecnico');
     /* -----------------------------------||||||||||||||||||||FIN REPORTES||||||||||||||||||||||-------------------------------------*/
-
 
     /* -----------------------------------||||||||||||||||||||EMPRESA||||||||||||||||||||||-------------------------------------*/
     Route::post('/utilerias_empresa_guardar_modificacion', 'EmpresaController@utilerias_empresa_guardar_modificacion')->name('utilerias_empresa_guardar_modificacion');

@@ -82,7 +82,7 @@ function listar(){
           'data'    : campos[i],
           'name'  : campos[i],
           'orderable': true,
-          'searchable': false
+          'searchable': true
       });
   }
   tabla=$('#tbllistado').DataTable({
@@ -521,11 +521,14 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto){
 }
 //eliminar una fila en la tabla de precios clientes
 function eliminarfilapreciosproductos(numerofila){
-  $("#filaproducto"+numerofila).remove();
-  contadorfilas--; //importante para todos los calculo en el modulo de orden de compra se debe restar al contadorfilas la fila que se acaba de eliminar
-  comprobarfilaspreciosproductos();
-  renumerarfilasordencompra();//importante para todos los calculo en el modulo de orden de compra 
-  calculartotalordencompra();
+  var confirmacion = confirm("Esta seguro de eliminar el producto?"); 
+  if (confirmacion == true) { 
+    $("#filaproducto"+numerofila).remove();
+    contadorfilas--; //importante para todos los calculo en el modulo de orden de compra se debe restar al contadorfilas la fila que se acaba de eliminar
+    comprobarfilaspreciosproductos();
+    renumerarfilasordencompra();//importante para todos los calculo en el modulo de orden de compra 
+    calculartotalordencompra();
+  }
 }
 //comprobar numero filas de la tabla precios clientes
 function comprobarfilaspreciosproductos(){

@@ -78,13 +78,14 @@ function generar_reporte(){
     }
 }
 //realizar en reporte en excel
-function generar_formato_excel_caja_chica(){
+function generar_formato_excel(){
     var form = $("#formcajachica");
     if (form.parsley().isValid()){
         var fechainicialreporte = $("#fechainicialreporte").val();
         var fechafinalreporte = $("#fechafinalreporte").val();
+        var statuscompra = $("#statuscompra").val();
         var string_compras = $("#string_compras").val();
-        $("#btnGenerarFormatoExcelCajaChica").attr("href", urlgenerarformatoexcelcajachica+'?fechainicialreporte='+fechainicialreporte+'&fechafinalreporte='+fechafinalreporte+'&string_compras='+string_compras);
+        $("#btnGenerarFormatoExcelCajaChica").attr("href", urlgenerarformatoexcelcajachica+'?fechainicialreporte='+fechainicialreporte+'&fechafinalreporte='+fechafinalreporte+'&statuscompra='+statuscompra+'&string_compras='+string_compras);
         $("#btnGenerarFormatoExcelCajaChica").click();
     }else{
         form.parsley().validate();
@@ -112,6 +113,7 @@ function listar(){
             data: function (d) {
                 d.fechainicialreporte = $("#fechainicialreporte").val();
                 d.fechafinalreporte = $("#fechafinalreporte").val();
+                d.statuscompra = $("#statuscompra").val();
             }
         },
         columns: [

@@ -13,4 +13,5 @@ class TipoOrdenCompra extends Model
         'Numero', 
         'Nombre',
         'Status'
-    ];}
+    ];
+}

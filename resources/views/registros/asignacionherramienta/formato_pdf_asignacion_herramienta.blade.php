@@ -30,7 +30,7 @@
                     </div>
                     <div style="float:left;width:60%;text-align: center;">
                         <b style="font-size:12px;color:#122b40;">{{$empresa->Empresa}}</b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$empresa->Calle}} {{$empresa->NoExterior}}    </b>
+                        <b style="font-size:12px;color:#122b40;">{{$empresa->Calle}} {{$empresa->NoExterior}} </b><br>
                         <b style="font-size:12px;color:#122b40;">  {{$empresa->Municipio}} {{$empresa->Estado}}, {{$empresa->Pais}} CP: {{$empresa->LugarExpedicion}}</b>
                     </div>
                     <div style="float:right;width:20%;text-align: right;">

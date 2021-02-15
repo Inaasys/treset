@@ -8,7 +8,8 @@ class Servicio extends Model
 {
     public $timestamps = false;
     protected $table = 'Servicios';
-    protected $primaryKey = 'Codigo';
+    protected $primaryKey = null;
+    public $incrementing = false;
     protected $fillable = [
         'Codigo', 
         'Servicio', 

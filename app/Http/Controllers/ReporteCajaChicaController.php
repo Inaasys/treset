@@ -28,7 +28,6 @@ class ReporteCajaChicaController extends ConfiguracionSistemaController{
         }
         //FIN CONFIGURACIONES DE LA TABLA//
     }
-
     public function reporte_caja_chica(){
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('proveedores_guardar_configuracion_tabla');
@@ -53,7 +52,7 @@ class ReporteCajaChicaController extends ConfiguracionSistemaController{
     //generar reporte caja chica
     public function generar_reporte_caja_chica(Request $request){
         $fechahoy = Carbon::parse($request->fechafinalreporte);//fecha de la que se realizar el reporte
-        $compras = Compra::whereBetween('Fecha', [$request->fechainicialreporte, $request->fechafinalreporte])->where('Tipo', 'CAJA CHICA')->where('Status', 'LIQUIDADA')->get();
+        $compras = Compra::whereBetween('Fecha', [$request->fechainicialreporte, $request->fechafinalreporte])->where('Tipo', 'CAJA CHICA')->where('Status', $request->statuscompra)->get();
         $data=array();
         $sumasubtotal = 0;
         $sumaiva = 0;
@@ -89,9 +88,7 @@ class ReporteCajaChicaController extends ConfiguracionSistemaController{
         $fechahoy = Carbon::now()->toDateString();
         return DataTables::of($data)
         ->addColumn('operaciones', function($data){
-           
             $checkbox = '<input type="checkbox" name="checkcompra'.$data['movimientocompra'].'" id="idcheckcompra'.$data['movimientocompra'].'" class="filled-in checkcompra" value="'.$data['movimientocompra'].'" onchange="construirarraycheckscompras()" checked/><label for="idcheckcompra'.$data['movimientocompra'].'">Seleccionar</label>'; 
-
             return $checkbox;
         })
         ->rawColumns(['operaciones'])
@@ -99,6 +96,6 @@ class ReporteCajaChicaController extends ConfiguracionSistemaController{
     }
     //generar formato en excel de la caja chica
     public function reporte_caja_chica_generar_formato_excel(Request $request){
-        return Excel::download(new ReportesDiariosCajaChicaExport($request->fechainicialreporte, $request->fechafinalreporte, $request->string_compras, $this->numerodecimales, $this->empresa), "formatocajachica.xlsx"); 
+        return Excel::download(new ReportesDiariosCajaChicaExport($request->fechainicialreporte, $request->fechafinalreporte, $request->statuscompra, $request->string_compras, $this->numerodecimales, $this->empresa), "formatocajachica.xlsx"); 
     }
 }

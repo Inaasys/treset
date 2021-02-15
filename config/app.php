@@ -136,7 +136,7 @@ return [
     'endpointapicurrencylayer' => 'live',
     'keyapicurrencylayer' => '6e2993559ed8ce04ef56d47f792e5a52',
     'periodoincialmodulos' => '2014', //aqui se asigna el periodo inicial de los select de los modulos
-    'numerodedecimales' => '2', //aqui se asignan el numero de decimales que se utilizaran en todas las cantidades utilizadas en el sistema
+    'numerodedecimales' => '6', //aqui se asignan el numero de decimales que se utilizaran en todas las cantidades utilizadas en el sistema
     'mayusculas_sistema' => 'S', //aqui se aisgna si el sistema utilizara solo mayusculas o no
 
     /*

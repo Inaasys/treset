@@ -21,12 +21,12 @@
                         			</td>
                         			<td >
                             			<div class="btn bg-blue btn-xs waves-effect" onclick="realizar_reporte()">
-                                    		Actualizar Reporte
+                                    		Ver Reporte
                                 		</div>
                         			</td>
                                     <td >
-                                        <a class="btn bg-blue btn-xs waves-effect" onclick="realizar_excel_reporte()">
-                                            Generar Excel
+                                        <a class="btn bg-blue btn-xs waves-effect" onclick="generar_formato_excel()">
+                                            Generar Reporte en Excel
                                         </a>
                                     </td>
                         		</tr>
@@ -38,11 +38,11 @@
                                 <div class="row">
                                     <div class="col-md-2">
                                         <label>Fecha Final Reporte</label>
-                                        <input type="date" class="form-control" name="fechafinalreporte" id="fechafinalreporte" required>
+                                        <input type="date" class="form-control" name="fechafinalreporte" id="fechafinalreporte" onchange="realizar_reporte()" required>
                                     </div>  
                                     <div class="col-md-2">
                                         <label>Objetivo Mensual en Pesos</label>
-                                        <input type="number" step="0.{{$numerocerosconfiguradosinputnumberstep}}" class="form-control" name="objetivofinalpesos" id="objetivofinalpesos" value="3000000.{{$numerocerosconfigurados}}" data-parsley-min="1" onchange="formatocorrectoinputcantidades(this);" onkeypress="return pulsar(event)" required>
+                                        <input type="number" step="0.{{$numerocerosconfiguradosinputnumberstep}}" class="form-control" name="objetivofinalpesos" id="objetivofinalpesos" value="3000000.{{$numerocerosconfigurados}}" data-parsley-min="1" onchange="formatocorrectoinputcantidades(this);realizar_reporte();" onkeypress="return pulsar(event)" required>
                                     </div> 
                                     <div class="col-md-4">
                                         <input type="checkbox" name="porcliente" id="idporcliente" class="filled-in" onchange="filtrocliente();" />

@@ -4,13 +4,14 @@ namespace App\Exports;
 
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
+use Maatwebsite\Excel\Concerns\WithTitle;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Jenssegers\Date\Date;
 use Helpers;
 use App\Factura;
 
-class ReportesDiariosVentasExport implements FromView
+class ReportesDiariosVentasExport implements FromView,WithTitle
 {
     /**
     * @return \Illuminate\Support\Collection
@@ -28,6 +29,11 @@ class ReportesDiariosVentasExport implements FromView
         $this->numerocliente = $numerocliente;
         $this->cliente = $cliente;
         $this->numerodecimales = $numerodecimales;
+    }
+
+    //titulo de la hoja de excel
+    public function title(): string{
+        return 'Ventas Diarias';
     }
 
     public function view(): View{
