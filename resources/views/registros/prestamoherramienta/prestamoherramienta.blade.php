@@ -27,7 +27,7 @@
                                                 </div>
                                             </td>
                                             <td >
-                                                <a class="btn bg-blue btn-xs waves-effect" href="{{route('prestamo_herramienta_exportar_excel')}}" target="_blank">
+                                                <a class="btn bg-blue btn-xs waves-effect" id="btnGenerarFormatoExcel" href="{{route('prestamo_herramienta_exportar_excel')}}" target="_blank">
                                                     Excel
                                                 </a>
                                             </td>
@@ -94,7 +94,7 @@
                             </div>   
                             <div class="col-md-4">
                                 <label>Selecciona el personal que entrega:</label>
-                                <div class="col-md-12 form-check">
+                                <div class="col-md-12">
                                     <select name="personalherramientacomun" id="personalherramientacomun" class="form-control select2" onchange="herramientaasignadapersonal()" style="width:100% !important;" required>
                                     </select>
                                     <input type="hidden" class="form-control" name="numeropersonalentrega" id="numeropersonalentrega" required readonly onkeyup="tipoLetra(this)">
@@ -235,6 +235,7 @@
         var campos_activados = '{{$configuracion_tabla->campos_activados}}';
         var campos_desactivados = '{{$configuracion_tabla->campos_desactivados}}';
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
+        var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var prestamo_herramienta_obtener = '{!!URL::to('prestamo_herramienta_obtener')!!}';
         var prestamo_herramienta_obtener_ultimo_id = '{!!URL::to('prestamo_herramienta_obtener_ultimo_id')!!}';
         var prestamo_herramienta_obtener_detalle_asignacion_seleccionada = '{!!URL::to('prestamo_herramienta_obtener_detalle_asignacion_seleccionada')!!}';

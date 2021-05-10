@@ -33,9 +33,6 @@ function limpiar(){
   form.parsley().reset();
   //volver a aplicar configuracion a datatable principal para que realize la busqueda con la tecla enter
   regresarbusquedadatatableprincipal();
-  //reiniciar los contadores de la tabla de detalle de la orden de compra
-  contadorproductos=0;
-  contadorfilas = 0;
 }
 //mostrar modal formulario
 function mostrarmodalformulario(tipo, modificacionpermitida){
@@ -67,12 +64,20 @@ function ocultarformulario(){
   $("#formulario").hide();
   $("#contenidomodaltablas").show();
 }
+//cambiar url para exportar excel
+function cambiarurlexportarexcel(){
+  //colocar el periodo seleccionado como parametro para exportar a excel
+  var periodo = $("#periodo").val();
+  $("#btnGenerarFormatoExcel").attr("href", urlgenerarformatoexcel+'?periodo='+periodo);
+}
 function relistar(){
+  cambiarurlexportarexcel();
     var tabla = $('.tbllistado').DataTable();
     tabla.ajax.reload();
 }
 //listar todos los registros de la tabla
 function listar(){
+  cambiarurlexportarexcel();
   //Campos ordenados a mostras
   var campos = columnas_ordenadas.split(",");
   var campos_tabla  = [];
@@ -86,6 +91,8 @@ function listar(){
       });
   }
   tabla=$('#tbllistado').DataTable({
+    "lengthMenu": [ 10, 50, 100, 250, 500 ],
+    "pageLength": 250,
     "sScrollX": "110%",
     "sScrollY": "350px",
     "bScrollCollapse": true,
@@ -158,7 +165,7 @@ function obtenerproveedores(){
     $("#contenidomodaltablas").html(tablaproveedores);
     $('#tbllistadoproveedor').DataTable({
         "sScrollX": "110%",
-        "sScrollY": "300px",
+        "sScrollY": "370px",
         "bScrollCollapse": true,
         processing: true,
         'language': {
@@ -220,7 +227,7 @@ function obteneralmacenes(){
       $("#contenidomodaltablas").html(tablaalmacenes);
       $('#tbllistadoalmacen').DataTable({
           "sScrollX": "110%",
-          "sScrollY": "300px",
+          "sScrollY": "370px",
           "bScrollCollapse": true,
           processing: true,
           'language': {
@@ -306,7 +313,7 @@ function listarproductos(){
   $("#contenidomodaltablas").html(tablaproductos);
   $('#tbllistadoproducto').DataTable({
     "sScrollX": "110%",
-    "sScrollY": "300px",
+    "sScrollY": "370px",
     "bScrollCollapse": true,
     processing: true,
       'language': {
@@ -318,6 +325,7 @@ function listarproductos(){
       url: ordenes_compra_obtener_productos,
       data: function (d) {
         d.codigoabuscar = $("#codigoabuscar").val();
+        d.tipooperacion = $("#tipooperacion").val();
       }
     },
     columns: [
@@ -486,7 +494,7 @@ function calculartotalordencompra(){
 //agregar una fila en la tabla de precios productos
 var contadorproductos=0;
 var contadorfilas = 0;
-function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto){
+function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, tipooperacion){
   var result = evaluarproductoexistente(Codigo);
   if(result == false){
     var multiplicacioncostoimpuesto =  new Decimal(Costo).times(Impuesto);      
@@ -494,13 +502,13 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto){
     var total = new Decimal(Costo).plus(ivapesos);
     var tipo = "alta";
     var fila=   '<tr class="filasproductos" id="filaproducto'+contadorproductos+'">'+
-                        '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('+contadorproductos+')">X</div></td>'+
-                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'+Codigo+'" readonly>'+Codigo+'</td>'+
-                        '<td class="tdmod"><div class="divorinputmodl"><input type="hidden" class="form-control nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'+Producto+'" readonly>'+Producto+'</div></td>'+
-                        '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'+Unidad+'" readonly>'+Unidad+'</td>'+
+                        '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('+contadorproductos+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
+                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+
+                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'+
+                        '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'+Unidad+'" readonly data-parsley-length="[1, 5]">'+Unidad+'</td>'+
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm porsurtirpartida" name="porsurtirpartida[]" id="porsurtirpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
-                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('+contadorfilas+');cambiodecantidadopreciopartida('+contadorfilas+',\''+tipo +'\');"></td>'+
-                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" id="preciopartida[]" value="'+Costo+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('+contadorfilas+');cambiodecantidadopreciopartida('+contadorfilas+',\''+tipo +'\');"></td>'+
+                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.'+numerocerosconfiguradosinputnumberstep+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('+contadorfilas+');cambiodecantidadopreciopartida('+contadorfilas+',\''+tipo +'\');"></td>'+
+                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" id="preciopartida[]" value="'+Costo+'" data-parsley-min="0.'+numerocerosconfiguradosinputnumberstep+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('+contadorfilas+');cambiodecantidadopreciopartida('+contadorfilas+',\''+tipo +'\');"></td>'+
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm importepartida" name="importepartida[]" id="importepartida[]" value="'+Costo+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" id="descuentoporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('+contadorfilas+');"></td>'+
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" id="descuentopesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentoporcentajepartida('+contadorfilas+');"></td>'+
@@ -533,7 +541,7 @@ function eliminarfilapreciosproductos(numerofila){
 //comprobar numero filas de la tabla precios clientes
 function comprobarfilaspreciosproductos(){
   var numerofilas = $("#tablaproductodordencompra tbody tr").length;
-  $("#numerofilasproducto").val(numerofilas);
+  $("#numerofilas").val(numerofilas);
 }
 //renumerar las filas de la orden de compra
 function renumerarfilasordencompra(){
@@ -542,27 +550,27 @@ function renumerarfilasordencompra(){
   //renumerar la cantidad de la partida
   lista = document.getElementsByClassName("cantidadpartida");
   for (var i = 0; i < lista.length; i++) {
-    lista[i].setAttribute("onchange", "calculartotalesfilasordencompra("+i+');cambiodecantidadopreciopartida('+i+',\''+tipo +'\')');
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilasordencompra("+i+');cambiodecantidadopreciopartida('+i+',\''+tipo +'\')');
   }
   //renumero el precio de la partida
   lista = document.getElementsByClassName("preciopartida");
   for (var i = 0; i < lista.length; i++) {
-    lista[i].setAttribute("onchange", "calculartotalesfilasordencompra("+i+');cambiodecantidadopreciopartida('+i+',\''+tipo +'\')');
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilasordencompra("+i+');cambiodecantidadopreciopartida('+i+',\''+tipo +'\')');
   }
   //renumerar descuento en pesos
   lista = document.getElementsByClassName("descuentoporcentajepartida");
   for (var i = 0; i < lista.length; i++) {
-    lista[i].setAttribute("onchange", "calculardescuentopesospartida("+i+')');
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculardescuentopesospartida("+i+')');
   }
   //renumerar porcentaje de descuento
   lista = document.getElementsByClassName("descuentopesospartida");
   for (var i = 0; i < lista.length; i++) {
-    lista[i].setAttribute("onchange", "calculardescuentoporcentajepartida("+i+')');
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculardescuentoporcentajepartida("+i+')');
   }
   //renumerar porcentaje de iva
   lista = document.getElementsByClassName("ivaporcentajepartida");
   for (var i = 0; i < lista.length; i++) {
-    lista[i].setAttribute("onchange", "calculartotalesfilasordencompra("+i+')');
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilasordencompra("+i+')');
   }
 }  
 //alta clientes
@@ -579,24 +587,24 @@ function alta(){
                 '<div class="tab-content">'+
                     '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
                         '<div class="row">'+
-                            '<div class="col-md-12 table-responsive">'+
+                            '<div class="col-md-12 table-responsive cabecerafija" style="height: 175px;overflow-y: scroll;padding: 0px 0px;">'+
                                 '<table id="tablaproductodordencompra" class="table table-bordered tablaproductodordencompra">'+
                                     '<thead class="customercolor">'+
                                         '<tr>'+
-                                          '<th>#</th>'+
+                                          '<th class="customercolor">#</th>'+
                                           '<th class="customercolortheadth">Código</th>'+
                                           '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
                                           '<th class="customercolortheadth">Unidad</th>'+
-                                          '<th>Por Surtir</th>'+
+                                          '<th class="customercolor">Por Surtir</th>'+
                                           '<th class="customercolortheadth">Cantidad</th>'+
                                           '<th class="customercolortheadth">Precio $</th>'+
-                                          '<th>Importe $</th>'+
+                                          '<th class="customercolor">Importe $</th>'+
                                           '<th class="customercolortheadth">Dcto %</th>'+
                                           '<th class="customercolortheadth">Dcto $</th>'+
-                                          '<th>SubTotal $</th>'+
+                                          '<th class="customercolor">SubTotal $</th>'+
                                           '<th class="customercolortheadth">Iva %</th>'+
-                                          '<th>Iva $</th>'+
-                                          '<th>Total $</th>'+
+                                          '<th class="customercolor">Iva $</th>'+
+                                          '<th class="customercolor">Total $</th>'+
                                         '</tr>'+
                                     '</thead>'+
                                     '<tbody>'+           
@@ -607,7 +615,7 @@ function alta(){
                         '<div class="row">'+
                           '<div class="col-md-6">'+   
                             '<label>Observaciones</label>'+
-                            '<textarea class="form-control" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required></textarea>'+
+                            '<textarea class="form-control" name="observaciones" id="observaciones" rows="5" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" required></textarea>'+
                           '</div>'+ 
                           '<div class="col-md-3 col-md-offset-3">'+
                                 '<table class="table table-striped table-hover">'+
@@ -637,9 +645,16 @@ function alta(){
                     '</div>'+ 
                 '</div>';
   $("#tabsform").html(tabs);
+  $("#serie").val(serieusuario);
+  $("#serietexto").html("Serie: "+serieusuario);
   obtenultimonumero();
-  obtenertiposordenescompra()
+  obtenertiposordenescompra();
   asignarfechaactual();
+  //asignar el tipo de operacion que se realizara
+  $("#tipooperacion").val("alta");
+  //reiniciar los contadores
+  contadorproductos=0;
+  contadorfilas = 0;
   //se debe motrar el input para buscar los productos
   $("#divbuscarcodigoproducto").show();
   $("#ModalAlta").modal('show');
@@ -647,37 +662,42 @@ function alta(){
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
   e.preventDefault();
-  var formData = new FormData($("#formparsley")[0]);
-  var form = $("#formparsley");
-  if (form.parsley().isValid()){
-    $('.page-loader-wrapper').css('display', 'block');
-    $.ajax({
-      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-      url:ordenes_compra_guardar,
-      type: "post",
-      dataType: "html",
-      data: formData,
-      cache: false,
-      contentType: false,
-      processData: false,
-      success:function(data){
-        msj_datosguardadoscorrectamente();
-        limpiar();
-        ocultarmodalformulario();
-        limpiarmodales();
-        $('.page-loader-wrapper').css('display', 'none');
-      },
-      error:function(data){
-        if(data.status == 403){
-          msj_errorenpermisos();
-        }else{
-          msj_errorajax();
+  var numerofilas = $("#numerofilas").val();
+  if(parseInt(numerofilas) > 0){
+    var formData = new FormData($("#formparsley")[0]);
+    var form = $("#formparsley");
+    if (form.parsley().isValid()){
+      $('.page-loader-wrapper').css('display', 'block');
+      $.ajax({
+        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+        url:ordenes_compra_guardar,
+        type: "post",
+        dataType: "html",
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success:function(data){
+          msj_datosguardadoscorrectamente();
+          limpiar();
+          ocultarmodalformulario();
+          limpiarmodales();
+          $('.page-loader-wrapper').css('display', 'none');
+        },
+        error:function(data){
+          if(data.status == 403){
+            msj_errorenpermisos();
+          }else{
+            msj_errorajax();
+          }
+          $('.page-loader-wrapper').css('display', 'none');
         }
-        $('.page-loader-wrapper').css('display', 'none');
-      }
-    })
+      })
+    }else{
+      form.parsley().validate();
+    }
   }else{
-    form.parsley().validate();
+    msj_erroralmenosunaentrada();
   }
 });
 //autorizar orden de compra
@@ -722,18 +742,34 @@ $("#btnautorizar").on('click', function(e){
 //verificar si la orden de compra se esta utilzando en alguna orden de compra
 function desactivar(ordendesactivar){
   $.get(ordenes_compra_verificar_uso_en_modulos,{ordendesactivar:ordendesactivar}, function(data){
-    if(data.resultado > 0){
+    if(data.Status == 'BAJA'){
       $("#ordendesactivar").val(0);
-      $("#textomodaldesactivar").html('Error esta orden de compra se esta utilizando en la compra : ' + data.numerocompra);
+      $("#textomodaldesactivar").html('Error, esta orden de compra ya fue dada de baja ');
       $("#divmotivobaja").hide();
       $("#btnbaja").hide();
       $('#estatusregistro').modal('show');
     }else{
-      $("#ordendesactivar").val(ordendesactivar);
-      $("#textomodaldesactivar").html('Estas seguro de cambiar el estado el registro?');
-      $("#divmotivobaja").show();
-      $("#btnbaja").show();
-      $('#estatusregistro').modal('show');
+      if(data.resultadofechas != ''){
+        $("#ordendesactivar").val(0);
+        $("#textomodaldesactivar").html('Error solo se pueden dar de baja las ordenes de compra del mes actual, fecha de la orden de compra: ' + data.resultadofechas);
+        $("#divmotivobaja").hide();
+        $("#btnbaja").hide();
+        $('#estatusregistro').modal('show');
+      }else{
+        if(data.resultado > 0){
+          $("#ordendesactivar").val(0);
+          $("#textomodaldesactivar").html('Error esta orden de compra se esta utilizando en la compra : ' + data.numerocompra);
+          $("#divmotivobaja").hide();
+          $("#btnbaja").hide();
+          $('#estatusregistro').modal('show');
+        }else{
+          $("#ordendesactivar").val(ordendesactivar);
+          $("#textomodaldesactivar").html('Estas seguro de cambiar el estado el registro?');
+          $("#divmotivobaja").show();
+          $("#btnbaja").show();
+          $('#estatusregistro').modal('show');
+        }
+      }
     }
   }) 
 }
@@ -785,24 +821,24 @@ function obtenerdatos(ordenmodificar){
               '<div class="tab-content">'+
                   '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
                       '<div class="row">'+
-                          '<div class="col-md-12 table-responsive">'+
+                          '<div class="col-md-12 table-responsive cabecerafija" style="height: 175px;overflow-y: scroll;padding: 0px 0px;">'+
                               '<table id="tablaproductodordencompra" class="table table-bordered tablaproductodordencompra">'+
                                   '<thead class="customercolor">'+
                                       '<tr>'+
-                                          '<th>#</th>'+
+                                          '<th class="customercolor">#</th>'+
                                           '<th class="customercolortheadth">Código</th>'+
                                           '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
                                           '<th class="customercolortheadth">Unidad</th>'+
-                                          '<th>Por Surtir</th>'+
+                                          '<th class="customercolor">Por Surtir</th>'+
                                           '<th class="customercolortheadth">Cantidad</th>'+
                                           '<th class="customercolortheadth">Precio $</th>'+
-                                          '<th>Importe $</th>'+
+                                          '<th class="customercolor">Importe $</th>'+
                                           '<th class="customercolortheadth">Dcto %</th>'+
                                           '<th class="customercolortheadth">Dcto $</th>'+
-                                          '<th>SubTotal $</th>'+
+                                          '<th class="customercolor">SubTotal $</th>'+
                                           '<th class="customercolortheadth">Iva %</th>'+
-                                          '<th>Iva $</th>'+
-                                          '<th>Total $</th>'+
+                                          '<th class="customercolor">Iva $</th>'+
+                                          '<th class="customercolor">Total $</th>'+
                                       '</tr>'+
                                   '</thead>'+
                                   '<tbody>'+           
@@ -813,7 +849,7 @@ function obtenerdatos(ordenmodificar){
                       '<div class="row">'+
                         '<div class="col-md-6">'+   
                           '<label>Observaciones</label>'+
-                          '<textarea class="form-control" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required></textarea>'+
+                          '<textarea class="form-control" name="observaciones" id="observaciones" rows="5" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" required></textarea>'+
                         '</div>'+ 
                         '<div class="col-md-3 col-md-offset-3">'+
                               '<table class="table table-striped table-hover">'+
@@ -849,6 +885,8 @@ function obtenerdatos(ordenmodificar){
               '</div>';
     $("#tabsform").html(tabs);
     $("#folio").val(data.ordencompra.Folio);
+    $("#serie").val(data.ordencompra.Serie);
+    $("#serietexto").html("Serie: "+data.ordencompra.Serie);
     $("#plazo").val(data.ordencompra.Plazo);
     $("#referencia").val(data.ordencompra.Referencia);
     $("#fecha").val(data.fecha);
@@ -862,6 +900,8 @@ function obtenerdatos(ordenmodificar){
     $("#subtotal").val(data.subtotal);
     $("#iva").val(data.iva);
     $("#total").val(data.total);
+    //asignar el tipo de operacion que se realizara
+    $("#tipooperacion").val("modificacion");
     //tabs precios productos
     $("#tablaproductodordencompra").append(data.filasdetallesordencompra);
     //se deben asignar los valores a los contadores para que las sumas resulten correctas
@@ -869,13 +909,16 @@ function obtenerdatos(ordenmodificar){
     contadorfilas = data.contadorfilas;
     obtenertiposordenescompra();
     seleccionartipoordencompra(data);
-  })
+  }).fail( function() {
+    msj_errorajax();
+    $('.page-loader-wrapper').css('display', 'none');
+  }) 
 }
 async function seleccionartipoordencompra(data){
   await retraso();
   $("#tipo").val(data.ordencompra.Tipo).change();
   //se debe esconder el input para buscar los productos porque en la modificacion no se permiten agregar productos
-  $("#divbuscarcodigoproducto").hide();
+  $("#divbuscarcodigoproducto").show();
   mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
   $('.page-loader-wrapper').css('display', 'none');
 }

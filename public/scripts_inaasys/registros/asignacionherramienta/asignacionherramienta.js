@@ -35,9 +35,6 @@ function limpiar(){
   $("#formauditarherramienta").parsley().reset();
   //volver a aplicar configuracion a datatable principal para que realize la busqueda con la tecla enter
   regresarbusquedadatatableprincipal();
-  //reiniciar los contadores de la tabla de detalle de la orden de compra
-  contadorproductos=0;
-  contadorfilas = 0;
 }
 //mostrar modal formulario
 function mostrarmodalformulario(tipo, modificacionpermitida){
@@ -69,12 +66,20 @@ function ocultarformulario(){
   $("#formulario").hide();
   $("#contenidomodaltablas").show();
 }
+//cambiar url para exportar excel
+function cambiarurlexportarexcel(){
+  //colocar el periodo seleccionado como parametro para exportar a excel
+  var periodo = $("#periodo").val();
+  $("#btnGenerarFormatoExcel").attr("href", urlgenerarformatoexcel+'?periodo='+periodo);
+}
 function relistar(){
+  cambiarurlexportarexcel();
     var tabla = $('.tbllistado').DataTable();
     tabla.ajax.reload();
 }
 //listar todos los registros de la tabla
 function listar(){
+  cambiarurlexportarexcel();
   //Campos ordenados a mostras
   var campos = columnas_ordenadas.split(",");
   var campos_tabla  = [];
@@ -88,6 +93,8 @@ function listar(){
       });
   }
   tabla=$('#tbllistado').DataTable({
+    "lengthMenu": [ 10, 50, 100, 250, 500 ],
+    "pageLength": 250,
     "sScrollX": "110%",
     "sScrollY": "350px",
     "bScrollCollapse": true,
@@ -151,7 +158,7 @@ function obtenerpersonalrecibe(){
     $("#contenidomodaltablas").html(tablapersonalrecibe);
     $('#tbllistadopersonalrecibe').DataTable({
         "sScrollX": "110%",
-        "sScrollY": "300px",
+        "sScrollY": "370px",
         "bScrollCollapse": true,
         processing: true,
         'language': {
@@ -215,7 +222,7 @@ function obtenerpersonalentrega(){
       $("#contenidomodaltablas").html(tablapersonalentrega);
       $('#tbllistadopersonalentrega').DataTable({
           "sScrollX": "110%",
-          "sScrollY": "300px",
+          "sScrollY": "370px",
           "bScrollCollapse": true,
           processing: true,
           'language': {
@@ -303,7 +310,7 @@ function listarherramientas(){
   $("#contenidomodaltablas").html(tablaherramientas);
   $('#tbllistadoherramienta').DataTable({
     "sScrollX": "110%",
-    "sScrollY": "300px",
+    "sScrollY": "370px",
     "bScrollCollapse": true,
     processing: true,
       'language': {
@@ -315,6 +322,7 @@ function listarherramientas(){
       url: asignacion_herramienta_obtener_herramienta,
       data: function (d) {
         d.codigoabuscar = $("#codigoabuscar").val();
+        d.tipooperacion = $("#tipooperacion").val();
       }
     },
     columns: [
@@ -361,7 +369,7 @@ function evaluarproductoexistente(Codigo){
   return result;
 }
 //calcular total de la orden de compra
-function calculartotalesfilasordencompra(fila){
+function calculartotalesfilas(fila){
   // for each por cada fila:
   var cuentaFilas = 0;
   $("tr.filasproductos").each(function () { 
@@ -389,23 +397,23 @@ function calculartotalordencompra(){
 //agregar una fila en la tabla de precios productos
 var contadorproductos=0;
 var contadorfilas = 0;
-function agregarfilaherramienta(Codigo, Producto, Unidad, Costo, Existencias, selectalmacenes){
+function agregarfilaherramienta(Codigo, Producto, Unidad, Costo, Existencias, selectalmacenes, tipooperacion){
   var result = evaluarproductoexistente(Codigo);
   if(result == false){
     var tipo = "alta";
     var fila=   '<tr class="filasproductos" id="filaproducto'+contadorproductos+'">'+
-                        '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('+contadorproductos+')">X</div></td>'+
-                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'+Codigo+'" readonly>'+Codigo+'</td>'+
-                        '<td class="tdmod"><div class="divorinputmodl"><input type="hidden" class="form-control nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'+Producto+'" readonly>'+Producto+'</div></td>'+
-                        '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'+Unidad+'" readonly>'+Unidad+'</td>'+
+                        '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('+contadorproductos+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
+                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+
+                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'+
+                        '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'+Unidad+'" readonly data-parsley-length="[1, 5]">'+Unidad+'</td>'+
                         '<td class="tdmod">'+
                           '<select name="almacenpartida[]" class="form-control divorinputmodxl almacenpartida" style="width:100% !important;height: 28px !important;" onchange="obtenerexistenciasalmacen('+contadorproductos+')" required>'+
                             selectalmacenes+
                           '</select>'+
                         '</td>'+ 
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm existenciasalmacenpartida" name="existenciasalmacenpartida[]" id="existenciasalmacenpartida[]" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-max="'+Existencias+'" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('+contadorfilas+');" required></td>'+
-                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" id="preciopartida[]" value="'+Costo+'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-max="'+Existencias+'" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" required></td>'+
+                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" id="preciopartida[]" value="'+Costo+'" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');"></td>'+
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" id="totalpesospartida[]" value="'+Costo+'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                         '<td class="tdmod">'+
                           '<select name="estadopartida[]" class="form-control divorinputmodmd" style="width:100% !important;height: 28px !important;" required>'+
@@ -433,16 +441,19 @@ function obtenerexistenciasalmacen(fila){
       // obtener los datos de la fila:
       var almacenpartida = $(".almacenpartida", this).val();
       var codigoproductopartida = $(".codigoproductopartida", this).val();
+      var cantidadpartida = $(".cantidadpartida", this).val();
       comprobarexistenciasalmacenpartida(almacenpartida, codigoproductopartida).then(existencias=>{
         if(parseFloat(existencias) > 0){
-          $(".existenciasalmacenpartida", this).val(existencias);
+          var nuevaexistencia = new Decimal(existencias).plus(cantidadpartida);
+          $(".existenciasalmacenpartida", this).val(number_format(round(existencias, numerodecimales), numerodecimales, '.', ''));
           $(".cantidadpartida", this).removeAttr('readonly');
-          $(".cantidadpartida", this).attr('data-parsley-max', existencias);
+          $(".cantidadpartida", this).attr('data-parsley-max', number_format(round(nuevaexistencia, numerodecimales), numerodecimales, '.', ''));
         }else{
-          $(".existenciasalmacenpartida", this).val(existencias);
+          var nuevaexistencia = new Decimal(0).plus(cantidadpartida);
+          $(".existenciasalmacenpartida", this).val(number_format(round(existencias, numerodecimales), numerodecimales, '.', ''));
           $(".cantidadpartida", this).val("0."+numerocerosconfigurados);
           $(".cantidadpartida", this).attr('readonly', 'readonly');
-          $(".cantidadpartida", this).attr('data-parsley-max', "0."+numerocerosconfigurados);
+          $(".cantidadpartida", this).attr('data-parsley-max', number_format(round(nuevaexistencia, numerodecimales), numerodecimales, '.', ''));
         }
       }) 
     }  
@@ -475,7 +486,12 @@ function renumerarfilasordencompra(){
   //renumerar la cantidad de la partida
   lista = document.getElementsByClassName("cantidadpartida");
   for (var i = 0; i < lista.length; i++) {
-    lista[i].setAttribute("onchange", "calculartotalesfilasordencompra("+i+')');
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+')');
+  }
+  //renumerar la precio de la partida
+  lista = document.getElementsByClassName("preciopartida");
+  for (var i = 0; i < lista.length; i++) {
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+')');
   }
 }  
 //alta clientes
@@ -492,20 +508,20 @@ function alta(){
                 '<div class="tab-content">'+
                     '<div role="tabpanel" class="tab-pane fade in active" id="herramientastab">'+
                         '<div class="row">'+
-                            '<div class="col-md-12 table-responsive">'+
+                            '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
                                 '<table id="tablaherramientasasignadas" class="table table-bordered tablaherramientasasignadas">'+
                                     '<thead class="customercolor">'+
                                         '<tr>'+
-                                            '<th>#</th>'+
-                                            '<th>Herramienta</th>'+
-                                            '<th><div style="width:200px !important;">Descripción</div></th>'+
+                                            '<th class="customercolor">#</th>'+
+                                            '<th class="customercolor">Herramienta</th>'+
+                                            '<th class="customercolor"><div style="width:200px !important;">Descripción</div></th>'+
                                             '<th class="customercolortheadth">Unidad</th>'+
                                             '<th class="customercolortheadth">Almacén</th>'+
                                             '<th class="customercolortheadth">Existencias Almacén</th>'+
                                             '<th class="customercolortheadth">Cantidad</th>'+
                                             '<th class="customercolortheadth">Precio $</th>'+
-                                            '<th>Total $</th>'+
-                                            '<th>Estado Herramienta</th>'+
+                                            '<th class="customercolor">Total $</th>'+
+                                            '<th class="customercolor">Estado Herramienta</th>'+
                                         '</tr>'+
                                     '</thead>'+
                                     '<tbody>'+           
@@ -516,7 +532,7 @@ function alta(){
                         '<div class="row">'+
                             '<div class="col-md-6">'+   
                             '<label>Observaciones</label>'+
-                            '<textarea class="form-control" name="observaciones" id="observaciones" rows="2" onkeyup="tipoLetra(this);" required></textarea>'+
+                            '<textarea class="form-control" name="observaciones" id="observaciones" rows="2" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
                             '</div>'+ 
                             '<div class="col-md-3 col-md-offset-3">'+
                                 '<table class="table table-striped table-hover">'+
@@ -530,8 +546,15 @@ function alta(){
                     '</div>'+ 
                 '</div>';
   $("#tabsform").html(tabs);
+  $("#serie").val(serieusuario);
+  $("#serietexto").html("Serie: "+serieusuario);
   obtenultimonumero();
   asignarfechaactual();
+  //asignar el tipo de operacion que se realizara
+  $("#tipooperacion").val("alta");
+  //reiniciar contadores  
+  contadorproductos=0;
+  contadorfilas = 0;
   //se debe motrar el input para buscar los productos
   $("#divbuscarcodigoproducto").show();
   $("#ModalAlta").modal('show');
@@ -574,8 +597,12 @@ $("#btnGuardar").on('click', function (e) {
 });
 //autorizar orden de compra
 function autorizarasignacion(asignacion){
-  $("#asignacionautorizar").val(asignacion);
-  $('#autorizarasignacion').modal('show');
+  $.get(asignacion_herramienta_obtener_asignacion_herramienta_a_autorizar, {asignacion:asignacion}, function(filasdetallesasignacion){
+    $("#asignacionautorizar").val(asignacion);
+    $("#tablaautorizacionasignacionherramienta tbody").html(filasdetallesasignacion)
+    $('#autorizarasignacion').modal('show');
+  })  
+
 }
 $("#btnautorizar").on('click', function(e){
   e.preventDefault();
@@ -593,7 +620,6 @@ $("#btnautorizar").on('click', function(e){
       contentType: false,
       processData: false,
       success:function(data){
-        console.log(data);
         $('#autorizarasignacion').modal('hide');
         msj_datosguardadoscorrectamente();
         $('.page-loader-wrapper').css('display', 'none');
@@ -615,20 +641,29 @@ $("#btnautorizar").on('click', function(e){
 //verificar si la asignacion se esta utilizando en algun prestamo de herramienta
 function desactivar(asignaciondesactivar){
   $.get(asignacion_herramienta_verificar_uso_en_modulos,{asignaciondesactivar:asignaciondesactivar}, function(data){
-    if(data.numero_prestamos > 0){
+    if(data.status == 'BAJA'){
       $("#motivobaja").val("");
       $("#asignaciondesactivar").val(0);
-      $("#textomodaldesactivar").html('Error esta asignación tiene herramienta prestada');
+      $("#textomodaldesactivar").html('Error, esta asignación ya fue dado de baja');
       $("#divmotivobaja").hide();
       $("#btnbaja").hide();
       $('#estatusregistro').modal('show');
-    }else{
-      $("#motivobaja").val("");
-      $("#asignaciondesactivar").val(asignaciondesactivar);
-      $("#textomodaldesactivar").html('Estas seguro de dar de baja el registro?');
-      $("#divmotivobaja").show();
-      $("#btnbaja").show();
-      $('#estatusregistro').modal('show');
+    }else{ 
+      if(data.numero_prestamos > 0){
+        $("#motivobaja").val("");
+        $("#asignaciondesactivar").val(0);
+        $("#textomodaldesactivar").html('Error esta asignación tiene herramienta prestada');
+        $("#divmotivobaja").hide();
+        $("#btnbaja").hide();
+        $('#estatusregistro').modal('show');
+      }else{
+        $("#motivobaja").val("");
+        $("#asignaciondesactivar").val(asignaciondesactivar);
+        $("#textomodaldesactivar").html('Estas seguro de dar de baja el registro?');
+        $("#divmotivobaja").show();
+        $("#btnbaja").show();
+        $('#estatusregistro').modal('show');
+      }
     }
   }) 
 }
@@ -680,20 +715,20 @@ function obtenerdatos(asignacionmodificar){
                   '<div class="tab-content">'+
                       '<div role="tabpanel" class="tab-pane fade in active" id="herramientastab">'+
                           '<div class="row">'+
-                              '<div class="col-md-12 table-responsive">'+
+                              '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
                                   '<table id="tablaherramientasasignadas" class="table table-bordered tablaherramientasasignadas">'+
                                       '<thead class="customercolor">'+
                                           '<tr>'+
-                                              '<th>#</th>'+
-                                              '<th>Herramienta</th>'+
-                                              '<th><div style="width:200px !important;">Descripción</div></th>'+
+                                              '<th class="customercolor">#</th>'+
+                                              '<th class="customercolor">Herramienta</th>'+
+                                              '<th class="customercolor"><div style="width:200px !important;">Descripción</div></th>'+
                                               '<th class="customercolortheadth">Unidad</th>'+
                                               '<th class="customercolortheadth">Almacén</th>'+
                                               '<th class="customercolortheadth">Existencias Almacén</th>'+
                                               '<th class="customercolortheadth">Cantidad</th>'+
                                               '<th class="customercolortheadth">Precio $</th>'+
-                                              '<th>Total $</th>'+
-                                              '<th>Estado Herramienta</th>'+
+                                              '<th class="customercolor">Total $</th>'+
+                                              '<th class="customercolor">Estado Herramienta</th>'+
                                           '</tr>'+
                                       '</thead>'+
                                       '<tbody>'+           
@@ -704,7 +739,7 @@ function obtenerdatos(asignacionmodificar){
                           '<div class="row">'+
                               '<div class="col-md-6">'+   
                               '<label>Observaciones</label>'+
-                              '<textarea class="form-control" name="observaciones" id="observaciones" rows="2" onkeyup="tipoLetra(this);" required></textarea>'+
+                              '<textarea class="form-control" name="observaciones" id="observaciones" rows="2" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
                               '</div>'+ 
                               '<div class="col-md-3 col-md-offset-3">'+
                                   '<table class="table table-striped table-hover">'+
@@ -719,21 +754,26 @@ function obtenerdatos(asignacionmodificar){
                   '</div>';
     $("#tabsform").html(tabs);
     $("#id").val(data.Asignacion_Herramienta.id);
+    $("#serie").val(data.Asignacion_Herramienta.serie);
+    $("#serietexto").html("Serie: "+data.Asignacion_Herramienta.serie);
     $("#numeropersonalrecibe").val(data.personalrecibe.id);
     $("#personalrecibe").val(data.personalrecibe.nombre);
     $("#numeropersonalentrega").val(data.personalentrega.id);
     $("#personalentrega").val(data.personalentrega.nombre);
     $("#fecha").val(data.fecha);
-    $("#observaciones").val(data.Asignacion_Herramienta.observaciones)
+    $("#observaciones").val(data.Asignacion_Herramienta.observaciones);
     $("#total").val(data.total);
     //tabs precios productos
     $("#tablaherramientasasignadas").append(data.filasdetallesasignacion);
+    //asignar el tipo de operacion que se realizara
+    $("#tipooperacion").val("modificacion");
     //se deben asignar los valores a los contadores para que las sumas resulten correctas
     contadorproductos = data.contadorproductos;
     contadorfilas = data.contadorfilas;
-    //se debe esconder el input para buscar los productos porque en la modificacion no se permiten agregar productos
-    $("#divbuscarcodigoproducto").hide();
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
+    $('.page-loader-wrapper').css('display', 'none');
+  }).fail( function() {
+    msj_errorajax();
     $('.page-loader-wrapper').css('display', 'none');
   })
 }
@@ -985,13 +1025,13 @@ function mostrarmodalgenerarexcelpersonal(){
                                   '<table id="tablaherramientasasignadas" class="table table-bordered tablaherramientasasignadas">'+
                                       '<thead class="customercolor">'+
                                           '<tr>'+
-                                              '<th>Asignación</th>'+
-                                              '<th>Herramienta</th>'+
-                                              '<th><div style="width:200px !important;">Descripción</div></th>'+
-                                              '<th >Unidad</th>'+
-                                              '<th >Cantidad Asignada</th>'+
-                                              '<th >Precio $</th>'+
-                                              '<th>Total $</th>'+
+                                              '<th class="customercolor">Asignación</th>'+
+                                              '<th class="customercolor">Herramienta</th>'+
+                                              '<th class="customercolor"><div style="width:200px !important;">Descripción</div></th>'+
+                                              '<th class="customercolor" >Unidad</th>'+
+                                              '<th class="customercolor" >Cantidad Asignada</th>'+
+                                              '<th class="customercolor" >Precio $</th>'+
+                                              '<th class="customercolor">Total $</th>'+
                                               '<th class="customercolortheadth">Estado Auditoria</th>'+
                                               '<th class="customercolortheadth">Cantidad Actual Auditoria</th>'+
                                           '</tr>'+

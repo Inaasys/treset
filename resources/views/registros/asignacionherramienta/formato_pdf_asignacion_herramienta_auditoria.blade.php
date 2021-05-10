@@ -16,11 +16,19 @@
             page-break-after: auto
         }
         body {
-            letter-spacing: 2px;
+            letter-spacing: 1px;
 	        font-family: 'Roboto', Arial, Tahoma, sans-serif;
         }
+        .wrap,
+        .wrap2{ 
+            width:750px;
+            white-space: pre-wrap;      /* CSS3 */   
+            white-space: -moz-pre-wrap; /* Firefox */    
+            white-space: -pre-wrap;     /* Opera <7 */   
+            white-space: -o-pre-wrap;   /* Opera 7 */    
+            word-wrap: break-word;      /* IE */
+        }
     </style>
-    
     <body>
         <div class="saltopagina">
             <section style="height:1200px">
@@ -30,8 +38,10 @@
                     </div>
                     <div style="float:left;width:60%;text-align: center;">
                         <b style="font-size:12px;color:#122b40;">{{$empresa->Empresa}}</b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$empresa->Calle}} {{$empresa->NoExterior}} </b><br>
-                        <b style="font-size:12px;color:#122b40;">  {{$empresa->Municipio}} {{$empresa->Estado}}, {{$empresa->Pais}} CP: {{$empresa->LugarExpedicion}}</b>
+                        <b style="font-size:12px;color:#122b40;">{{$empresa->Calle}} No. {{$empresa->NoExterior}} </b><br>
+                        <b style="font-size:12px;color:#122b40;">{{$empresa->Colonia}} CP: {{$empresa->LugarExpedicion}}</b><br>
+                        <b style="font-size:12px;color:#122b40;">{{$empresa->Municipio}}, {{$empresa->Estado}}</b><br>
+                        <b style="font-size:12px;color:#122b40;">RFC {{$empresa->Rfc}} Telefonos {{$empresa->Telefonos}}</b>
                     </div>
                     <div style="float:right;width:20%;text-align: right;">
                         <p style="font-size:10px;"></p>

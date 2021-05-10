@@ -52,6 +52,8 @@ function ocultarformulario(){
 //listar todos los registros de la tabla
 function listar(){
   tabla=$('#tbllistado').DataTable({
+    "lengthMenu": [ 10, 50, 100, 250, 500 ],
+    "pageLength": 250,
     "sScrollX": "110%",
     "sScrollY": "350px",
     "bScrollCollapse": true,  
@@ -156,43 +158,43 @@ function alta(){
                   '<div class="row">'+
                       '<div class="col-md-4">'+
                           '<label>Dirección</label>'+
-                          '<input type="text" class="form-control" name="direccion" id="direccion"  onkeyup="tipoLetra(this);">'+
+                          '<input type="text" class="form-control" name="direccion" id="direccion"  data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                       '<div class="col-md-4">'+
                           '<label>Colonia</label>'+
-                          '<input type="text" class="form-control" name="colonia" id="colonia"  onkeyup="tipoLetra(this);">'+
+                          '<input type="text" class="form-control" name="colonia" id="colonia"  data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                       '<div class="col-md-4">'+
                           '<label>Ciudad</label>'+
-                          '<input type="text" class="form-control" name="ciudad" id="ciudad"  onkeyup="tipoLetra(this);">'+
+                          '<input type="text" class="form-control" name="ciudad" id="ciudad"  data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                     '</div>'+
                     '<div class="row">'+
                       '<div class="col-md-4">'+
                           '<label>Codigo Postal</label>'+
-                          '<input type="text" class="form-control" name="codigopostal" id="codigopostal"  onkeyup="tipoLetra(this);">'+
+                          '<input type="text" class="form-control" name="codigopostal" id="codigopostal"  data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                       '<div class="col-md-4">'+
                           '<label>RFC</label>'+
-                          '<input type="text" class="form-control" name="rfc" id="rfc" required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                          '<input type="text" class="form-control" name="rfc" id="rfc" required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                       '</div>'+
                       '<div class="col-md-4">'+
                           '<label>Contacto</label>'+
-                          '<input type="text" class="form-control" name="contacto" id="contacto" onkeyup="tipoLetra(this);">'+
+                          '<input type="text" class="form-control" name="contacto" id="contacto" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                     '</div>'+
                     '<div class="row">'+    
                       '<div class="col-md-4">'+
                           '<label>Teléfonos</label>'+
-                          '<input type="text" class="form-control" name="telefonos" id="telefonos" onkeyup="tipoLetra(this);">'+
+                          '<input type="text" class="form-control" name="telefonos" id="telefonos" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                       '<div class="col-md-4">'+
                           '<label>Email</label>'+
-                          '<input type="text" class="form-control" name="email" id="email" data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/">'+
+                          '<input type="text" class="form-control" name="email" id="email" data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 60]">'+
                       '</div>'+
                       '<div class="col-md-4">'+
                           '<label>Cuenta</label>'+
-                          '<input type="text" class="form-control" name="cuenta" id="cuenta" onkeyup="tipoLetra(this);">'+
+                          '<input type="text" class="form-control" name="cuenta" id="cuenta" data-parsley-length="[1, 25]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                     '</div>'+
                     '<div class="row">'+ 
@@ -218,7 +220,7 @@ function alta(){
                       '</div>'+
                       '<div class="col-md-4">'+
                             '<label>Anotaciones</label>'+
-                            '<textarea class="form-control" name="anotaciones" id="anotaciones"  onkeyup="tipoLetra(this);"></textarea>'+
+                            '<textarea class="form-control" name="anotaciones" id="anotaciones" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
                       '</div>'+
                     '</div>'+   
                 '</div>'+
@@ -226,7 +228,6 @@ function alta(){
   $("#tabsform").html(tabs);
   obtenultimonumero();
 }
-
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
   e.preventDefault();
@@ -321,43 +322,43 @@ function obtenerdatos(numeroagente){
                     '<div class="row">'+
                         '<div class="col-md-4">'+
                             '<label>Dirección</label>'+
-                            '<input type="text" class="form-control" name="direccion" id="direccion"  onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control" name="direccion" id="direccion" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Colonia</label>'+
-                            '<input type="text" class="form-control" name="colonia" id="colonia"  onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control" name="colonia" id="colonia" data-parsley-length="[1, 60]"  onkeyup="tipoLetra(this);">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Ciudad</label>'+
-                            '<input type="text" class="form-control" name="ciudad" id="ciudad"  onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control" name="ciudad" id="ciudad" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
                         '</div>'+
                         '<div class="row">'+
                         '<div class="col-md-4">'+
                             '<label>Codigo Postal</label>'+
-                            '<input type="text" class="form-control" name="codigopostal" id="codigopostal"  onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control" name="codigopostal" id="codigopostal" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>RFC</label>'+
-                            '<input type="text" class="form-control" name="rfc" id="rfc" required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                            '<input type="text" class="form-control" name="rfc" id="rfc" required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Contacto</label>'+
-                            '<input type="text" class="form-control" name="contacto" id="contacto" onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control" name="contacto" id="contacto" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
                         '</div>'+
                         '<div class="row">'+    
                         '<div class="col-md-4">'+
                             '<label>Teléfonos</label>'+
-                            '<input type="text" class="form-control" name="telefonos" id="telefonos" onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control" name="telefonos" id="telefonos" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Email</label>'+
-                            '<input type="text" class="form-control" name="email" id="email" data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/">'+
+                            '<input type="text" class="form-control" name="email" id="email" data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 60]">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Cuenta</label>'+
-                            '<input type="text" class="form-control" name="cuenta" id="cuenta" onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control" name="cuenta" id="cuenta" data-parsley-length="[1, 25]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
                         '</div>'+
                         '<div class="row">'+ 
@@ -383,7 +384,7 @@ function obtenerdatos(numeroagente){
                           '</div>'+
                           '<div class="col-md-4">'+
                                   '<label>Anotaciones</label>'+
-                                  '<textarea class="form-control" name="anotaciones" id="anotaciones"  onkeyup="tipoLetra(this);"></textarea>'+
+                                  '<textarea class="form-control" name="anotaciones" id="anotaciones" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
                           '</div>'+
                         '</div>'+   
                     '</div>'+
@@ -408,6 +409,9 @@ function obtenerdatos(numeroagente){
     $("#nombrealmacen").val(data.almacen.Nombre);
     $("#nombrealmacen").keyup(); 
     mostrarmodalformulario('MODIFICACION');
+    $('.page-loader-wrapper').css('display', 'none');
+  }).fail( function() {
+    msj_errorajax();
     $('.page-loader-wrapper').css('display', 'none');
   })
 }

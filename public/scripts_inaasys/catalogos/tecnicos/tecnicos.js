@@ -52,6 +52,8 @@ function ocultarformulario(){
 //listar todos los registros de la tabla
 function listar(){
     tabla=$('#tbllistado').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "350px",
         "bScrollCollapse": true,  
@@ -97,17 +99,17 @@ function alta(){
                   '<div class="row">'+
                     '<div class="col-md-12">'+
                       '<label>Nombre</label>'+
-                      '<input type="text" class="form-control" name="nombre" id="nombre" required data-parsley-length="[0, 30]" onkeyup="tipoLetra(this);">'+
+                      '<input type="text" class="form-control" name="nombre" id="nombre" required data-parsley-length="[1, 30]" onkeyup="tipoLetra(this);">'+
                     '</div>'+
                   '</div>'+
                   '<div class="row">'+
                     '<div class="col-md-6">'+
                       '<label>Objetivo (Horas X Mes)</label>'+
-                      '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="objetivo" id="objetivo" required value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                      '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="objetivo" id="objetivo" required value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                     '</div>'+
                     '<div class="col-md-6">'+
                       '<label>Planeación</label>'+
-                      '<input type="text" class="form-control" name="planeacion" id="planeacion" value="N" required onkeyup="tipoLetra(this);">'+
+                      '<input type="text" class="form-control" name="planeacion" id="planeacion" value="N" required data-parsley-length="[1, 1]" onkeyup="tipoLetra(this);">'+
                     '</div>'+
                   '</div>'+
                 '</div>'+
@@ -205,17 +207,17 @@ function obtenerdatos(numerotecnico){
                     '<div class="row">'+
                       '<div class="col-md-12">'+
                         '<label>Nombre</label>'+
-                        '<input type="text" class="form-control" name="nombre" id="nombre" required data-parsley-length="[0, 30]" onkeyup="tipoLetra(this);">'+
+                        '<input type="text" class="form-control" name="nombre" id="nombre" required data-parsley-length="[1, 30]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                     '</div>'+
                     '<div class="row">'+
                       '<div class="col-md-6">'+
                         '<label>Objetivo (Horas X Mes)</label>'+
-                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="objetivo" id="objetivo" value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="objetivo" id="objetivo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                       '</div>'+
                       '<div class="col-md-6">'+
                         '<label>Planeación</label>'+
-                        '<input type="text" class="form-control" name="planeacion" id="planeacion" value="N" required onkeyup="tipoLetra(this);">'+
+                        '<input type="text" class="form-control" name="planeacion" id="planeacion" value="N" required data-parsley-length="[1, 1]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                     '</div>'+
                   '</div>'+
@@ -227,6 +229,9 @@ function obtenerdatos(numerotecnico){
     $("#objetivo").val(data.objetivo);
     $("#planeacion").val(data.tecnico.Planeacion);
     mostrarmodalformulario('MODIFICACION');
+    $('.page-loader-wrapper').css('display', 'none');
+  }).fail( function() {
+    msj_errorajax();
     $('.page-loader-wrapper').css('display', 'none');
   })
 }

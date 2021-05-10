@@ -31,11 +31,13 @@
                                                     Excel
                                                 </a>
                                             </td>
+                                            @if(Auth::user()->role_id == 1)
                                             <td>
                                                 <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
                                                     Configurar Tabla
                                                 </div>
                                             </td>
+                                            @endif
                         		        </tr>
                         	        </table>
                                 </div>
@@ -88,16 +90,16 @@
                             <div class="col-md-3">
                                 <label>Cotización <b style="color:#F44336 !important;" id="serietexto"> Serie: {{$serieusuario}}</b></label>
                                 <input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">
-                                <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" required readonly>
+                                <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" required readonly data-parsley-length="[1, 10]">
                                 <input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>
                             </div>   
                             <div class="col-md-3">
                                 <label>OT Tecnodiesel</label>
-                                <input type="text" class="form-control" name="ottecnodiesel" id="ottecnodiesel"  required  onkeyup="tipoLetra(this);">
+                                <input type="text" class="form-control" name="ottecnodiesel" id="ottecnodiesel"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">
                             </div>
                             <div class="col-md-3">
                                 <label>OT TyT</label>
-                                <input type="text" class="form-control" name="ottyt" id="ottyt" required data-parsley-length="[0, 20]" onkeyup="tipoLetra(this);">
+                                <input type="text" class="form-control" name="ottyt" id="ottyt" required data-parsley-length="[0, 50]" onkeyup="tipoLetra(this);">
                             </div>   
                             <div class="col-md-3">
                                 <label>Fecha </label>
@@ -124,11 +126,11 @@
                             </div>
                             <div class="col-md-3">
                                 <label>Equipo</label>
-                                <input type="text" class="form-control" name="equipo" id="equipo" required onkeyup="tipoLetra(this);">
+                                <input type="text" class="form-control" name="equipo" id="equipo" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">
                             </div>  
                             <div class="col-md-3">
                                 <label>Requisición</label>
-                                <input type="text" class="form-control" name="requisicion" id="requisicion" required onkeyup="tipoLetra(this);">
+                                <input type="text" class="form-control" name="requisicion" id="requisicion" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">
                             </div>  
                         </div>
                         <div class="col-md-12" id="tabsform">
@@ -161,7 +163,7 @@
                     <input type="hidden" id="cotizaciondesactivar" name="cotizaciondesactivar">
                     <div id="divmotivobaja">
                         <label>Motivo Baja</label>
-                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required></textarea>
+                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required data-parsley-length="[1, 255]"></textarea>
                     </div>
 		        </form>	
       		</div>
@@ -183,6 +185,7 @@
         var numerodecimales = '{{$numerodecimales}}';
         var numerocerosconfigurados = '{{$numerocerosconfigurados}}';
         var numerocerosconfiguradosinputnumberstep = '{{$numerocerosconfiguradosinputnumberstep}}';
+        var serieusuario = '{{$serieusuario}}';
         var meshoy = '{{$meshoy}}';
         var periodohoy = '{{$periodohoy}}';
         var campos_activados = '{{$configuracion_tabla->campos_activados}}';
@@ -193,6 +196,7 @@
         var cotizaciones_obtener_remisiones = '{!!URL::to('cotizaciones_obtener_remisiones')!!}';
         var cotizaciones_obtener_remision = '{!!URL::to('cotizaciones_obtener_remision')!!}';
         var cotizaciones_guardar = '{!!URL::to('cotizaciones_guardar')!!}';
+        var cotizaciones_verificar_uso_en_modulos = '{!!URL::to('cotizaciones_verificar_uso_en_modulos')!!}';
         var cotizaciones_alta_o_baja = '{!!URL::to('cotizaciones_alta_o_baja')!!}'; 
         var cotizaciones_obtener_cotizacion = '{!!URL::to('cotizaciones_obtener_cotizacion')!!}'; 
         var cotizaciones_guardar_modificacion = '{!!URL::to('cotizaciones_guardar_modificacion')!!}';

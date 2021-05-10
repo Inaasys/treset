@@ -1,4 +1,5 @@
 <?php
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Empresa;
 use App\Serie;
@@ -74,6 +75,17 @@ class Helpers{
         return $fecha;
     }
 
+    //se obtiene la hora exacta y se contatena con la fecha recibida
+    public static function fecha_mas_hora_exacta_accion_datetimestring($fechaenviada){
+        Carbon::setLocale(config('app.locale'));
+        Carbon::setUTF8(true);
+        setlocale(LC_TIME, 'es_Es');
+        $hora = Carbon::now()->toTimeString();
+        $fechaenviada = Carbon::parse($fechaenviada)->toDateString();
+        $fecha = Carbon::parse($fechaenviada." ".$hora)->toDateTimeString();
+        return $fecha;
+    }
+
     //se obtiene la fecha excacta para input date-timelocal
     public static function fecha_exacta_accion_datetimelocal(){
         Carbon::setLocale(config('app.locale'));
@@ -103,9 +115,37 @@ class Helpers{
         return $fechacorrecta;
     }
 
+    //comparar año y mes de dos fecha
+    public static function compararanoymesfechas($fechadocumento){
+        Date::setLocale(config('app.locale'));
+        Date::setUTF8(true);
+        setlocale(LC_TIME, 'es_Es');
+        $fecha = "";
+        $fechaalta = Date::parse($fechadocumento);
+        $fechaactual = Date::now();
+        //$fechaactual = Date::parse('2000-01-31');
+        if( Auth::user()->role_id != 1){
+            if( ($fechaalta->year != $fechaactual->year) || ($fechaalta->month != $fechaactual->month)){
+                $fecha = Date::parse($fechadocumento)->format('l j F Y');
+            }
+        }
+        return $fecha;
+    }
+
     //se obtiene el ultimo folio del modulo que se requiere
     public static function ultimofoliotablamodulos($tabla){
         $ultimoFolioTabla = $tabla::select("Folio")->orderBy("Folio", "DESC")->take(1)->get();
+        if(sizeof($ultimoFolioTabla) == 0 || sizeof($ultimoFolioTabla) == "" || sizeof($ultimoFolioTabla) == null){
+            $folio = 1;
+        }else{
+            $folio = $ultimoFolioTabla[0]->Folio+1;   
+        }
+        return $folio;
+    }
+
+    //se obtiene el ultimo folio por serie del modulo que se requiere
+    public static function ultimofolioserietablamodulos($tabla, $serie){
+        $ultimoFolioTabla = $tabla::select("Folio")->where('Serie', $serie)->orderBy("Folio", "DESC")->take(1)->get();
         if(sizeof($ultimoFolioTabla) == 0 || sizeof($ultimoFolioTabla) == "" || sizeof($ultimoFolioTabla) == null){
             $folio = 1;
         }else{

@@ -52,6 +52,8 @@ function ocultarformulario(){
 //listar todos los registros de la tabla
 function listar(){
     tabla=$('#tbllistado').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "350px",
         "bScrollCollapse": true,  
@@ -95,7 +97,7 @@ function alta(){
                   '<div class="row">'+
                     '<div class="col-md-12">'+
                       '<label>Nombre</label>'+
-                      '<input type="text" class="form-control" name="nombre" id="nombre" required onkeyup="tipoLetra(this);">'+
+                      '<input type="text" class="form-control" name="nombre" id="nombre" required data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                     '</div>'+
                   '</div>'+                
                 '</div>'+
@@ -193,7 +195,7 @@ function obtenerdatos(numerolinea){
                     '<div class="row">'+
                       '<div class="col-md-12">'+
                         '<label>Nombre</label>'+
-                        '<input type="text" class="form-control" name="nombre" id="nombre" required onkeyup="tipoLetra(this);">'+
+                        '<input type="text" class="form-control" name="nombre" id="nombre" required data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                     '</div>'+                
                   '</div>'+
@@ -203,6 +205,9 @@ function obtenerdatos(numerolinea){
     $("#numero").val(numerolinea);
     $("#nombre").val(data.linea.Nombre);
     mostrarmodalformulario('MODIFICACION');
+    $('.page-loader-wrapper').css('display', 'none');
+  }).fail( function() {
+    msj_errorajax();
     $('.page-loader-wrapper').css('display', 'none');
   })
 }

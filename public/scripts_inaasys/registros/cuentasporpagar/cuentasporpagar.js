@@ -35,14 +35,19 @@ function limpiar(){
   regresarbusquedadatatableprincipal();
 }
 //mostrar modal formulario
-function mostrarmodalformulario(tipo){
+function mostrarmodalformulario(tipo, modificacionpermitida){
     $("#ModalFormulario").modal('show');
     if(tipo == 'ALTA'){
         $("#btnGuardar").show();
         $("#btnGuardarModificacion").hide();
     }else if(tipo == 'MODIFICACION'){
-          $("#btnGuardar").hide();
-          $("#btnGuardarModificacion").hide();
+        if(modificacionpermitida == 0){
+            $("#btnGuardar").hide();
+            $("#btnGuardarModificacion").hide();
+        }else{
+            $("#btnGuardar").hide();
+            $("#btnGuardarModificacion").show();
+        }
     }   
 }
 //ocultar modal formulario
@@ -59,12 +64,20 @@ function ocultarformulario(){
   $("#formulario").hide();
   $("#contenidomodaltablas").show();
 }
+//cambiar url para exportar excel
+function cambiarurlexportarexcel(){
+    //colocar el periodo seleccionado como parametro para exportar a excel
+    var periodo = $("#periodo").val();
+    $("#btnGenerarFormatoExcel").attr("href", urlgenerarformatoexcel+'?periodo='+periodo);
+}
 function relistar(){
+    cambiarurlexportarexcel();
     var tabla = $('.tbllistado').DataTable();
     tabla.ajax.reload();
 }
 //listar todos los registros de la tabla
 function listar(){
+    cambiarurlexportarexcel();
     //Campos ordenados a mostras
     var campos = columnas_ordenadas.split(",");
     var campos_tabla  = [];
@@ -78,6 +91,8 @@ function listar(){
         });
     }
     tabla=$('#tbllistado').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "350px",
         "bScrollCollapse": true,
@@ -118,7 +133,7 @@ function obtenerproveedores(){
                     '<div class="modal-body">'+
                       '<div class="row">'+
                           '<div class="col-md-12">'+
-                              '<div class="table-responsive">'+
+                              '<div class="table-responsive" >'+
                                   '<table id="tbllistadoproveedor" class="tbllistadoproveedor table table-bordered table-striped table-hover" style="width:100% !important">'+
                                       '<thead class="customercolor">'+
                                           '<tr>'+
@@ -143,7 +158,7 @@ function obtenerproveedores(){
     $("#contenidomodaltablas").html(tablaproveedores);
     $('#tbllistadoproveedor').DataTable({
         "sScrollX": "110%",
-        "sScrollY": "300px",
+        "sScrollY": "370px",
         "bScrollCollapse": true,
         processing: true,
         'language': {
@@ -205,7 +220,7 @@ function obtenerbancos(){
       $("#contenidomodaltablas").html(tablabancos);
       $('#tbllistadobanco').DataTable({
             "sScrollX": "110%",
-            "sScrollY": "300px",
+            "sScrollY": "370px",
             "bScrollCollapse": true,
           processing: true,
           'language': {
@@ -261,22 +276,22 @@ function alta(){
                 '<div class="tab-content">'+
                     '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
                         '<div class="row">'+
-                            '<div class="col-md-12 table-responsive">'+
-                                '<table class="table table-bordered">'+
+                            '<div class="col-md-12 table-responsive cabecerafija" style="height: 225px; overflow-y: scroll;padding: 0px 0px;">'+
+                                '<table class="table  table-bordered">'+
                                     '<thead class="customercolor">'+
                                         '<tr>'+
-                                          '<th>#</th>'+
-                                          '<th>Compra</th>'+
-                                          '<th>Factura</th>'+
-                                          '<th>Fecha</th>'+
-                                          '<th>Plazo</th>'+
-                                          '<th>Vence</th>'+
-                                          '<th>Total $</th>'+
-                                          '<th>Abonos $</th>'+
-                                          '<th>Notas Crédito $</th>'+
+                                          '<th class="customercolor">#</th>'+
+                                          '<th class="customercolor">Compra</th>'+
+                                          '<th class="customercolor">Factura</th>'+
+                                          '<th class="customercolor">Fecha</th>'+
+                                          '<th class="customercolor">Plazo</th>'+
+                                          '<th class="customercolor">Vence</th>'+
+                                          '<th class="customercolor">Total $</th>'+
+                                          '<th class="customercolor">Abonos $</th>'+
+                                          '<th class="customercolor">Notas Crédito $</th>'+
                                           '<th class="customercolortheadth">Abono</th>'+
-                                          '<th>Saldo $</th>'+
-                                          '<th>Contrarecibo</th>'+
+                                          '<th class="customercolor">Saldo $</th>'+
+                                          '<th class="customercolor">Contrarecibo</th>'+
                                         '</tr>'+
                                     '</thead>'+
                                     '<tbody id="tabladetallecuentasporpagar">'+           
@@ -301,6 +316,8 @@ function alta(){
                     '</div>'+ 
                 '</div>';
   $("#tabsform").html(tabs);
+  $("#serie").val(serieusuario);
+  $("#serietexto").html("Serie: "+serieusuario);
   $("#btnobtenerproveedores").show();
   obtenultimonumero();
   asignarfechaactual();
@@ -369,10 +386,28 @@ $("#btnGuardar").on('click', function (e) {
 });
 //verificar si la orden de compra se esta utilzando en alguna orden de compra
 function desactivar(cxpdesactivar){
-      $("#cxpdesactivar").val(cxpdesactivar);
-      $("#divmotivobaja").show();
-      $("#textomodaldesactivar").html('Estas seguro de dar de baja el registro?');
-      $('#estatusregistro').modal('show');
+    $.get(cuentas_por_pagar_comprobar_baja,{cxpdesactivar:cxpdesactivar}, function(data){
+        if(data.Status == 'BAJA'){
+            $("#cxpdesactivar").val(0);
+            $("#textomodaldesactivar").html('Error, esta cuenta por pagar ya fue dado de baja');
+            $("#divmotivobaja").hide();
+            $("#btnbaja").hide();
+            $('#estatusregistro').modal('show');
+        }else{ 
+            if(data.resultadofechas != ''){
+                $("#cxpdesactivar").val(0);
+                $("#textomodaldesactivar").html('Error solo se pueden dar de baja las cuentas por pagar del mes actual, fecha de la cuenta por pagar: ' + data.resultadofechas);
+                $("#divmotivobaja").hide();
+                $("#btnbaja").hide();
+                $('#estatusregistro').modal('show');
+            }else{
+                $("#cxpdesactivar").val(cxpdesactivar);
+                $("#divmotivobaja").show();
+                $("#textomodaldesactivar").html('Estas seguro de dar de baja el registro?');
+                $('#estatusregistro').modal('show');
+            }
+        }
+    }) 
 }
 $("#btnbaja").on('click', function(e){
   e.preventDefault();
@@ -421,22 +456,21 @@ function obtenerdatos(cxpmodificar){
                 '<div class="tab-content">'+
                     '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
                         '<div class="row">'+
-                            '<div class="col-md-12 table-responsive">'+
+                            '<div class="col-md-12 table-responsive cabecerafija" style="height: 225px;overflow-y: scroll;padding: 0px 0px;">'+
                                 '<table class="table table-bordered">'+
                                     '<thead class="customercolor">'+
                                         '<tr>'+
-                                        '<th>#</th>'+
-                                        '<th>Compra</th>'+
-                                        '<th>Factura</th>'+
-                                        '<th>Fecha</th>'+
-                                        '<th>Plazo</th>'+
-                                        '<th>Vence</th>'+
-                                        '<th>Total $</th>'+
-                                        '<th>Abonos $</th>'+
-                                        '<th>Notas Crédito $</th>'+
-                                        '<th class="customercolortheadth">Abono</th>'+
-                                        '<th>Saldo $</th>'+
-                                        '<th>Contrarecibo</th>'+
+                                          '<th class="customercolor">#</th>'+
+                                          '<th class="customercolor">Compra</th>'+
+                                          '<th class="customercolor">Factura</th>'+
+                                          '<th class="customercolor">Fecha</th>'+
+                                          '<th class="customercolor">Plazo</th>'+
+                                          '<th class="customercolor">Vence</th>'+
+                                          '<th class="customercolor">Total $</th>'+
+                                          '<th class="customercolor">Abonos $</th>'+
+                                          '<th class="customercolor">Notas Crédito $</th>'+
+                                          '<th class="customercolortheadth">Abono</th>'+
+                                          '<th class="customercolor">Saldo $</th>'+
                                         '</tr>'+
                                     '</thead>'+
                                     '<tbody id="tabladetallecuentasporpagar">'+           
@@ -462,6 +496,8 @@ function obtenerdatos(cxpmodificar){
                 '</div>';
                 $("#tabsform").html(tabs);        
     $("#folio").val(data.CuentaXPagar.Folio);
+    $("#serie").val(data.CuentaXPagar.Serie);
+    $("#serietexto").html("Serie: "+data.CuentaXPagar.Serie);
     $("#numeroproveedor").val(data.proveedor.Numero);
     $("#proveedor").val(data.proveedor.Nombre);
     $("#btnobtenerproveedores").hide();
@@ -476,11 +512,13 @@ function obtenerdatos(cxpmodificar){
     $("#total").val(data.abonototal);
     //tabs precios productos
     $("#tabladetallecuentasporpagar").html(data.filasdetallecuentasporpagar);
-    mostrarmodalformulario('MODIFICACION');
+    mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
+    $('.page-loader-wrapper').css('display', 'none');
+  }).fail( function() {
+    msj_mantenimientoajax();    
     $('.page-loader-wrapper').css('display', 'none');
   })
 }
-
 //guardar modificación
 $("#btnGuardarModificacion").on('click', function (e) {
     e.preventDefault();
@@ -573,11 +611,11 @@ function configurar_tabla(){
                                     '<label>DATOS CUENTA POR PAGAR</label>'+
                                 '</div>'+
                                 '<div class="col-md-4 form-check">'+
-                                    '<input type="checkbox" name="Pago" id="idPago" class="filled-in datotabla" value="Pago" readonly onchange="construirarraydatostabla(this);" />'+
+                                    '<input type="checkbox" name="Pago" id="idPago" class="filled-in datotabla" value="Pago" readonly onchange="construirarraydatostabla(this);" onclick="javascript: return false;"/>'+
                                     '<label for="idPago">Pago</label>'+
                                 '</div>'+
                                 '<div class="col-md-4 form-check">'+
-                                    '<input type="checkbox" name="Status" id="idStatus" class="filled-in datotabla" value="Status" onchange="construirarraydatostabla(this);" />'+
+                                    '<input type="checkbox" name="Status" id="idStatus" class="filled-in datotabla" value="Status" onchange="construirarraydatostabla(this);" onclick="javascript: return false;"/>'+
                                     '<label for="idStatus">Status</label>'+
                                 '</div>'+
                                 '<div class="col-md-4 form-check">'+

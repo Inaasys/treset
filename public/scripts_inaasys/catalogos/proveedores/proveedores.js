@@ -64,6 +64,8 @@ function listar(){
       });
   }
     tabla=$('#tbllistado').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "350px",
         "bScrollCollapse": true,  
@@ -163,7 +165,7 @@ function alta(){
                   '<div class="row">'+
                       '<div class="col-md-4">'+
                           '<label>RFC</label>'+
-                          '<input type="text" class="form-control" name="rfc" id="rfc" required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                          '<input type="text" class="form-control" name="rfc" id="rfc" required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Código Postal</label>'+
@@ -182,11 +184,11 @@ function alta(){
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Teléfonos</label>'+
-                            '<input type="text" class="form-control" name="telefonos" id="telefonos" onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control" name="telefonos" id="telefonos" data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>E-mail 1</label>'+
-                            '<input type="text" class="form-control" name="email1" id="email1"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/">'+
+                            '<input type="text" class="form-control" name="email1" id="email1"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 100]">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Plazo</label>'+
@@ -293,7 +295,7 @@ function obtenerdatos(numeroproveedor){
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>RFC</label>'+
-                                '<input type="text" class="form-control" name="rfc" id="rfc" required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                '<input type="text" class="form-control" name="rfc" id="rfc" required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Código Postal</label>'+
@@ -312,11 +314,11 @@ function obtenerdatos(numeroproveedor){
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Teléfonos</label>'+
-                                '<input type="text" class="form-control" name="telefonos" id="telefonos" onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="telefonos" id="telefonos" onkeyup="tipoLetra(this);" data-parsley-length="[1, 100]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>E-mail 1</label>'+
-                                '<input type="text" class="form-control" name="email1" id="email1"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/">'+
+                                '<input type="text" class="form-control" name="email1" id="email1"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 100]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                               '<label>Plazo</label>'+
@@ -335,6 +337,9 @@ function obtenerdatos(numeroproveedor){
     $("#plazo").val(data.proveedor.Plazo);
     $("#telefonos").val(data.proveedor.Telefonos);
     mostrarmodalformulario('MODIFICACION');
+    $('.page-loader-wrapper').css('display', 'none');
+  }).fail( function() {
+    msj_errorajax();
     $('.page-loader-wrapper').css('display', 'none');
   })
 }

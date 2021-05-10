@@ -26,9 +26,11 @@ class FolioComprobanteFacturaController extends ConfiguracionSistemaController{
             $data = FolioComprobanteFactura::orderBy('Numero', 'DESC')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
+                        $botoncambios =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos('.$data->Numero.')"><i class="material-icons">mode_edit</i></div> '; 
+                        $botonbajas =      '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar('.$data->Numero.')"><i class="material-icons">cancel</i></div> ';
+                        $botonpredeterminar = '<div class="btn bg-green btn-xs waves-effect" data-toggle="tooltip" title="Predeterminar Folio" onclick="predeterminarfolio('.$data->Numero.')"><i class="material-icons">check</i></div> ';
                         if($data->Status == 'ALTA'){
-                            $boton =    '<div class="btn bg-amber btn-xs waves-effect" onclick="obtenerdatos(\''.$data->Numero .'\')">Cambios</div> '. 
-                                        '<div class="btn bg-red btn-xs waves-effect" onclick="desactivar(\''.$data->Numero .'\')">Bajas</div>';
+                            $boton =    $botonpredeterminar.$botoncambios.$botonbajas;
                         }else{
                             $boton = '';
                             //$boton =    '<div class="btn bg-green btn-xs waves-effect" onclick="desactivar(\''.$data->Numero .'\')">Altas</div>';
@@ -42,4 +44,62 @@ class FolioComprobanteFacturaController extends ConfiguracionSistemaController{
                     ->make(true);
         } 
     }
+
+    //obtener ultimo numero
+    public function folios_comprobantes_facturas_obtener_ultimo_numero(Request $request){
+        $id = Helpers::ultimoidtabla('App\FolioComprobanteFactura');
+        return response()->json($id);
+    }
+
+    //predeterminar folio
+    public function folios_comprobantes_facturas_predeterminar(Request $request){
+        //predeterminar folio
+        FolioComprobanteFactura::where('Numero', $request->numerofolio)
+        ->update([
+            'Predeterminar' => '+'
+        ]);
+        //vaciar predeterminar de folio anterior
+        FolioComprobanteFactura::where('Numero', '<>', $request->numerofolio)
+        ->update([
+            'Predeterminar' => ''
+        ]);        
+    }
+
+    //altas
+    public function folios_comprobantes_facturas_guardar(Request $request){
+
+    }
+
+    //bajas
+    public function folios_comprobantes_facturas_alta_o_baja(Requesr $request){
+        $numerofolio=$request->numerofolio;
+	    $FolioComprobanteFactura = FolioComprobanteFactura::where('Numero', $numerofolio )->first();
+	    if($FolioComprobanteFactura->Status == 'ALTA'){
+            FolioComprobanteFactura::where('Numero', $numerofolio)
+            ->update([
+                'Status' => 'BAJA'
+            ]);  
+	    }else{
+            FolioComprobanteFactura::where('Numero', $numerofolio)
+            ->update([
+                'Status' => 'ALTA'
+            ]);
+        }
+	    return response()->json($FolioComprobanteFactura);
+    }
+
+    //obtener folio
+    public function folios_comprobantes_facturas_obtener_folio(Request $request){
+        $FolioComprobanteFactura = FolioComprobanteFactura::where('Numero', $request->numerofolio)->first();
+        $data = array(
+            'FolioComprobanteFactura' => $FolioComprobanteFactura
+        );
+        return response()->json($data);
+    }
+
+    //cambios
+    public function folios_comprobantes_facturas_guardar_modificacion(Request $request){
+
+    }
+
 }

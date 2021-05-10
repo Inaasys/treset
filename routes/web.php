@@ -1,5 +1,4 @@
 <?php
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -11,7 +10,6 @@
 |
 */
 //pruebas
-
 //Si no hay usuario logueado
 Route::group(['middleware' => 'guest'], function () {
     Route::get('/', function () { 
@@ -29,19 +27,18 @@ Auth::routes();
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/inicio', 'HomeController@inicio')->name('inicio');
 });
-
 //si el usuario esta logueado
 Route::group(['middleware' => ['auth']], function () {
-
     Route::get('/pruebas', 'ProductoController@pruebas')->name('pruebas');
     Route::get('/pruebaswebscraping', 'PruebaController@pruebaswebscraping')->name('pruebaswebscraping');
     Route::post('/enviar_msj_whatsapp', 'PruebaController@enviar_msj_whatsapp')->name('enviar_msj_whatsapp');
+    Route::get('/pruebas_vocales', 'PruebaController@pruebas_vocales')->name('pruebas_vocales');
+    Route::get('/prueba_diferencias_arrays', 'PruebaController@prueba_diferencias_arrays')->name('prueba_diferencias_arrays');
+    Route::get('/matchar_compras', 'PruebaController@matchar_compras')->name('matchar_compras');
     Route::get('/artisan', function () { 
         //return Artisan::call('config:cache');
     });
-
     Route::get('/obtener_valor_dolar_dof', 'MonedaController@obtener_valor_dolar_dof')->name('obtener_valor_dolar_dof');
-
     /* -----------------------------------||||||||||||||||||||CATALOGOS||||||||||||||||||||||-------------------------------------*/
     //Clientes
     Route::get('/clientes', 'ClienteController@clientes')->name('clientes')->middleware('revisaraccesomenu:menucatalogoclientes');
@@ -169,11 +166,30 @@ Route::group(['middleware' => ['auth']], function () {
     //Folio Comprobante Facturas
     Route::get('/folios_comprobantes_facturas', 'FolioComprobanteFacturaController@folios_comprobantes_facturas')->name('folios_comprobantes_facturas')->middleware('revisaraccesomenu:menucatalogofoliosfiscalesfoliosfacturas');
     Route::get('/folios_comprobantes_facturas_obtener', 'FolioComprobanteFacturaController@folios_comprobantes_facturas_obtener')->name('folios_comprobantes_facturas_obtener')->middleware('revisaraccesomenu:menucatalogofoliosfiscalesfoliosfacturas');
-    //Route::get('/bancos_obtener_ultimo_numero', 'FolioComprobanteFacturaController@bancos_obtener_ultimo_numero')->name('bancos_obtener_ultimo_numero');
-    //Route::post('/bancos_guardar', 'FolioComprobanteFacturaController@bancos_guardar')->name('bancos_guardar');
-    //Route::post('/bancos_alta_o_baja', 'FolioComprobanteFacturaController@bancos_alta_o_baja')->name('bancos_alta_o_baja');
-    //Route::get('/bancos_obtener_banco', 'FolioComprobanteFacturaController@bancos_obtener_banco')->name('bancos_obtener_banco');
-    //Route::post('/bancos_guardar_modificacion', 'FolioComprobanteFacturaController@bancos_guardar_modificacion')->name('bancos_guardar_modificacion');  
+    Route::post('/folios_comprobantes_facturas_predeterminar', 'FolioComprobanteFacturaController@folios_comprobantes_facturas_predeterminar')->name('folios_comprobantes_facturas_predeterminar')->middleware('revisaraccesomenu:menucatalogofoliosfiscalesfoliosfacturas');
+    Route::get('/folios_comprobantes_facturas_obtener_ultimo_numero', 'FolioComprobanteFacturaController@folios_comprobantes_facturas_obtener_ultimo_numero')->name('folios_comprobantes_facturas_obtener_ultimo_numero')->middleware('revisaraccesomenu:menucatalogofoliosfiscalesfoliosfacturas');
+    Route::post('/folios_comprobantes_facturas_guardar', 'FolioComprobanteFacturaController@folios_comprobantes_facturas_guardar')->name('folios_comprobantes_facturas_guardar')->middleware('revisarpermisos:catalogos.folios.fiscales.folios.facturas.altas');
+    Route::post('/folios_comprobantes_facturas_alta_o_baja', 'FolioComprobanteFacturaController@folios_comprobantes_facturas_alta_o_baja')->name('folios_comprobantes_facturas_alta_o_baja')->middleware('revisarpermisos:catalogos.folios.fiscales.folios.facturas.bajas');
+    Route::get('/folios_comprobantes_facturas_obtener_folio', 'FolioComprobanteFacturaController@folios_comprobantes_facturas_obtener_folio')->name('folios_comprobantes_facturas_obtener_folio')->middleware('revisaraccesomenu:menucatalogofoliosfiscalesfoliosfacturas');
+    Route::post('/folios_comprobantes_facturas_guardar_modificacion', 'FolioComprobanteFacturaController@folios_comprobantes_facturas_guardar_modificacion')->name('folios_comprobantes_facturas_guardar_modificacion')->middleware('revisarpermisos:catalogos.folios.fiscales.folios.facturas.cambios');
+    //Folio Comprobante Notas
+    Route::get('/folios_comprobantes_notas', 'FolioComprobanteNotaController@folios_comprobantes_notas')->name('folios_comprobantes_notas')->middleware('revisaraccesomenu:menucatalogofoliosfiscalesfoliosnotas');
+    Route::get('/folios_comprobantes_notas_obtener', 'FolioComprobanteNotaController@folios_comprobantes_notas_obtener')->name('folios_comprobantes_notas_obtener')->middleware('revisaraccesomenu:menucatalogofoliosfiscalesfoliosnotas');
+    Route::post('/folios_comprobantes_notas_predeterminar', 'FolioComprobanteNotaController@folios_comprobantes_notas_predeterminar')->name('folios_comprobantes_notas_predeterminar')->middleware('revisaraccesomenu:menucatalogofoliosfiscalesfoliosnotas');
+    Route::get('/folios_comprobantes_notas_obtener_ultimo_numero', 'FolioComprobanteNotaController@folios_comprobantes_notas_obtener_ultimo_numero')->name('folios_comprobantes_notas_obtener_ultimo_numero')->middleware('revisaraccesomenu:menucatalogofoliosfiscalesfoliosnotas');
+    Route::post('/folios_comprobantes_notas_guardar', 'FolioComprobanteNotaController@folios_comprobantes_notas_guardar')->name('folios_comprobantes_notas_guardar')->middleware('revisarpermisos:catalogos.folios.fiscales.folios.notas.altas');
+    Route::post('/folios_comprobantes_notas_alta_o_baja', 'FolioComprobanteNotaController@folios_comprobantes_notas_alta_o_baja')->name('folios_comprobantes_notas_alta_o_baja')->middleware('revisarpermisos:catalogos.folios.fiscales.folios.notas.bajas');
+    Route::get('/folios_comprobantes_notas_obtener_folio', 'FolioComprobanteNotaController@folios_comprobantes_notas_obtener_folio')->name('folios_comprobantes_notas_obtener_folio')->middleware('revisaraccesomenu:menucatalogofoliosfiscalesfoliosnotas');
+    Route::post('/folios_comprobantes_notas_guardar_modificacion', 'FolioComprobanteNotaController@folios_comprobantes_notas_guardar_modificacion')->name('folios_comprobantes_notas_guardar_modificacion')->middleware('revisarpermisos:catalogos.folios.fiscales.folios.notas.cambios');
+    //Folio Comprobante Pagos
+    Route::get('/folios_comprobantes_pagos', 'FolioComprobantePagoController@folios_comprobantes_pagos')->name('folios_comprobantes_pagos')->middleware('revisaraccesomenu:menucatalogofoliosfiscalesfoliospagos');
+    Route::get('/folios_comprobantes_pagos_obtener', 'FolioComprobantePagoController@folios_comprobantes_pagos_obtener')->name('folios_comprobantes_pagos_obtener')->middleware('revisaraccesomenu:menucatalogofoliosfiscalesfoliospagos');
+    Route::post('/folios_comprobantes_pagos_predeterminar', 'FolioComprobantePagoController@folios_comprobantes_pagos_predeterminar')->name('folios_comprobantes_pagos_predeterminar')->middleware('revisaraccesomenu:menucatalogofoliosfiscalesfoliospagos');
+    Route::get('/folios_comprobantes_pagos_obtener_ultimo_numero', 'FolioComprobantePagoController@folios_comprobantes_pagos_obtener_ultimo_numero')->name('folios_comprobantes_pagos_obtener_ultimo_numero')->middleware('revisaraccesomenu:menucatalogofoliosfiscalesfoliospagos');
+    Route::post('/folios_comprobantes_pagos_guardar', 'FolioComprobantePagoController@folios_comprobantes_pagos_guardar')->name('folios_comprobantes_pagos_guardar')->middleware('revisarpermisos:catalogos.folios.fiscales.folios.pagos.altas');
+    Route::post('/folios_comprobantes_pagos_alta_o_baja', 'FolioComprobantePagoController@folios_comprobantes_pagos_alta_o_baja')->name('folios_comprobantes_pagos_alta_o_baja')->middleware('revisarpermisos:catalogos.folios.fiscales.folios.pagos.bajas');
+    Route::get('/folios_comprobantes_pagos_obtener_folio', 'FolioComprobantePagoController@folios_comprobantes_pagos_obtener_folio')->name('folios_comprobantes_pagos_obtener_folio')->middleware('revisaraccesomenu:menucatalogofoliosfiscalesfoliospagos');
+    Route::post('/folios_comprobantes_pagos_guardar_modificacion', 'FolioComprobantePagoController@folios_comprobantes_pagos_guardar_modificacion')->name('folios_comprobantes_pagos_guardar_modificacion')->middleware('revisarpermisos:catalogos.folios.fiscales.folios.pagos.cambios');
     //Personal
     Route::get('/personal', 'PersonalController@personal')->name('personal')->middleware('revisaraccesomenu:menucatalogopersonal');
     Route::get('/personal_obtener', 'PersonalController@personal_obtener')->name('personal_obtener')->middleware('revisaraccesomenu:menucatalogopersonal');
@@ -196,6 +212,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/usuarios_obtener_permisos', 'UserController@usuarios_obtener_permisos')->name('usuarios_obtener_permisos'); 
     Route::post('/usuarios_guardar_permisos', 'UserController@usuarios_guardar_permisos')->name('usuarios_guardar_permisos');
     Route::get('/usuarios_obtener_submenus_activos', 'UserController@usuarios_obtener_submenus_activos')->name('usuarios_obtener_submenus_activos');
+    //Existencias
+    Route::get('/existencias', 'ExistenciaController@existencias')->name('existencias')->middleware('revisaraccesomenu:menucatalogoexistencias');
+    Route::get('/existencias_obtener', 'ExistenciaController@existencias_obtener')->name('existencias_obtener')->middleware('revisaraccesomenu:menucatalogoexistencias');
+    Route::get('/existencias_exportar_excel', 'ExistenciaController@existencias_exportar_excel')->name('existencias_exportar_excel')->middleware('revisaraccesomenu:menucatalogoexistencias');
+    Route::post('/existencias_guardar_configuracion_tabla', 'ExistenciaController@existencias_guardar_configuracion_tabla')->name('existencias_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menucatalogoexistencias');
     /* -----------------------------------||||||||||||||||||||FIN CATALOGOS||||||||||||||||||||||-------------------------------------*/
 
     /* -----------------------------------||||||||||||||||||||REGISTROS||||||||||||||||||||||-------------------------------------*/
@@ -226,6 +247,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/compras_obtener_ordenes_compra', 'CompraController@compras_obtener_ordenes_compra')->name('compras_obtener_ordenes_compra')->middleware('revisaraccesomenu:menuregistroscompras');
     Route::get('/compras_obtener_proveedores', 'CompraController@compras_obtener_proveedores')->name('compras_obtener_proveedores')->middleware('revisaraccesomenu:menuregistroscompras');
     Route::get('/compras_obtener_almacenes', 'CompraController@compras_obtener_almacenes')->name('compras_obtener_almacenes')->middleware('revisaraccesomenu:menuregistroscompras');
+    Route::get('/compras_obtener_productos', 'CompraController@compras_obtener_productos')->name('compras_obtener_productos')->middleware('revisaraccesomenu:menuregistroscompras');
     Route::get('/compras_obtener_orden_compra', 'CompraController@compras_obtener_orden_compra')->name('compras_obtener_orden_compra')->middleware('revisaraccesomenu:menuregistroscompras');
     Route::get('/compras_obtener_departamentos', 'CompraController@compras_obtener_departamentos')->name('compras_obtener_departamentos')->middleware('revisaraccesomenu:menuregistroscompras');
     Route::get('/compras_obtener_claves_productos', 'CompraController@compras_obtener_claves_productos')->name('compras_obtener_claves_productos')->middleware('revisaraccesomenu:menuregistroscompras');
@@ -234,6 +256,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/compras_obtener_movimientos_compra', 'CompraController@compras_obtener_movimientos_compra')->name('compras_obtener_movimientos_compra')->middleware('revisaraccesomenu:menuregistroscompras');
     Route::get('/compras_obtener_compra', 'CompraController@compras_obtener_compra')->name('compras_obtener_compra')->middleware('revisaraccesomenu:menuregistroscompras');
     Route::get('/compras_obtener_existencias_partida', 'CompraController@compras_obtener_existencias_partida')->name('compras_obtener_existencias_partida')->middleware('revisaraccesomenu:menuregistroscompras');
+    Route::get('/compras_obtener_existencias_almacen', 'CompraController@compras_obtener_existencias_almacen')->name('compras_obtener_existencias_almacen')->middleware('revisaraccesomenu:menuregistroscompras');
     Route::post('/compras_guardar_modificacion', 'CompraController@compras_guardar_modificacion')->name('compras_guardar_modificacion')->middleware('revisarpermisos:registros.compras.cambios');
     Route::get('/compras_verificar_uso_en_modulos', 'CompraController@compras_verificar_uso_en_modulos')->name('compras_verificar_uso_en_modulos')->middleware('revisaraccesomenu:menuregistroscompras');
     Route::post('/compras_alta_o_baja', 'CompraController@compras_alta_o_baja')->name('compras_alta_o_baja')->middleware('revisarpermisos:registros.compras.bajas');
@@ -273,12 +296,33 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/cuentas_por_pagar_obtener_bancos', 'CuentasPorPagarController@cuentas_por_pagar_obtener_bancos')->name('cuentas_por_pagar_obtener_bancos')->middleware('revisaraccesomenu:menuregistroscuentasxpagar');
     Route::get('/cuentas_por_pagar_obtener_compras_proveedor', 'CuentasPorPagarController@cuentas_por_pagar_obtener_compras_proveedor')->name('cuentas_por_pagar_obtener_compras_proveedor')->middleware('revisaraccesomenu:menuregistroscuentasxpagar');
     Route::post('/cuentas_por_pagar_guardar', 'CuentasPorPagarController@cuentas_por_pagar_guardar')->name('cuentas_por_pagar_guardar')->middleware('revisarpermisos:registros.cuentas.x.pagar.altas');
+    Route::get('/cuentas_por_pagar_comprobar_baja', 'CuentasPorPagarController@cuentas_por_pagar_comprobar_baja')->name('cuentas_por_pagar_comprobar_baja')->middleware('revisaraccesomenu:menuregistroscuentasxpagar');
     Route::post('/cuentas_por_pagar_baja', 'CuentasPorPagarController@cuentas_por_pagar_baja')->name('cuentas_por_pagar_baja')->middleware('revisarpermisos:registros.cuentas.x.pagar.bajas');
     Route::get('/cuentas_por_pagar_obtener_cuenta_por_pagar', 'CuentasPorPagarController@cuentas_por_pagar_obtener_cuenta_por_pagar')->name('cuentas_por_pagar_obtener_cuenta_por_pagar')->middleware('revisaraccesomenu:menuregistroscuentasxpagar');
     Route::get('/cuentas_por_pagar_buscar_folio_string_like', 'CuentasPorPagarController@cuentas_por_pagar_buscar_folio_string_like')->name('cuentas_por_pagar_buscar_folio_string_like')->middleware('revisaraccesomenu:menuregistroscuentasxpagar');
     Route::post('/cuentas_por_pagar_generar_pdfs', 'CuentasPorPagarController@cuentas_por_pagar_generar_pdfs')->name('cuentas_por_pagar_generar_pdfs')->middleware('revisaraccesomenu:menuregistroscuentasxpagar');
     Route::get('/cuentas_por_pagar_exportar_excel', 'CuentasPorPagarController@cuentas_por_pagar_exportar_excel')->name('cuentas_por_pagar_exportar_excel')->middleware('revisaraccesomenu:menuregistroscuentasxpagar');
     Route::post('/cuentas_por_pagar_guardar_configuracion_tabla', 'CuentasPorPagarController@cuentas_por_pagar_guardar_configuracion_tabla')->name('cuentas_por_pagar_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistroscuentasxpagar');
+    //Cuentas por Cobrar
+    Route::get('/cuentas_por_cobrar', 'CuentasPorCobrarController@cuentas_por_cobrar')->name('cuentas_por_cobrar')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::get('/cuentas_por_cobrar_obtener', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener')->name('cuentas_por_cobrar_obtener')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::get('/cuentas_por_cobrar_obtener_ultimo_folio', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_ultimo_folio')->name('cuentas_por_cobrar_obtener_ultimo_folio')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::get('/cuentas_por_cobrar_obtener_fecha_datetime', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_fecha_datetime')->name('cuentas_por_cobrar_obtener_fecha_datetime')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::get('/cuentas_por_cobrar_obtener_clientes', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_clientes')->name('cuentas_por_cobrar_obtener_clientes')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::get('/cuentas_por_cobrar_obtener_bancos', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_bancos')->name('cuentas_por_cobrar_obtener_bancos')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::get('/cuentas_por_cobrar_obtener_metodos_pago', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_metodos_pago')->name('cuentas_por_cobrar_obtener_metodos_pago')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::get('/cuentas_por_cobrar_obtener_facturas', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_facturas')->name('cuentas_por_cobrar_obtener_facturas')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::get('/cuentas_por_cobrar_obtener_factura', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_factura')->name('cuentas_por_cobrar_obtener_factura')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::get('/cuentas_por_cobrar_obtener_folios_fiscales', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_folios_fiscales')->name('cuentas_por_cobrar_obtener_folios_fiscales')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::get('/cuentas_por_cobrar_obtener_ultimo_folio_serie_seleccionada', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_ultimo_folio_serie_seleccionada')->name('cuentas_por_cobrar_obtener_ultimo_folio_serie_seleccionada')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::post('/cuentas_por_cobrar_guardar', 'CuentasPorCobrarController@cuentas_por_cobrar_guardar')->name('cuentas_por_cobrar_guardar')->middleware('revisarpermisos:registros.cuentas.x.cobrar.altas');
+    Route::get('/cuentas_por_cobrar_comprobar_baja', 'CuentasPorCobrarController@cuentas_por_cobrar_comprobar_baja')->name('cuentas_por_cobrar_comprobar_baja')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::post('/cuentas_por_cobrar_baja', 'CuentasPorCobrarController@cuentas_por_cobrar_baja')->name('cuentas_por_cobrar_baja')->middleware('revisarpermisos:registros.cuentas.x.cobrar.bajas');
+    Route::get('/cuentas_por_cobrar_obtener_cuenta_por_cobrar', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_cuenta_por_cobrar')->name('cuentas_por_cobrar_obtener_cuenta_por_cobrar')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::get('/cuentas_por_cobrar_buscar_folio_string_like', 'CuentasPorCobrarController@cuentas_por_cobrar_buscar_folio_string_like')->name('cuentas_por_cobrar_buscar_folio_string_like')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::post('/cuentas_por_cobrar_generar_pdfs', 'CuentasPorCobrarController@cuentas_por_cobrar_generar_pdfs')->name('cuentas_por_cobrar_generar_pdfs')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::get('/cuentas_por_cobrar_exportar_excel', 'CuentasPorCobrarController@cuentas_por_cobrar_exportar_excel')->name('cuentas_por_cobrar_exportar_excel')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::post('/cuentas_por_cobrar_guardar_configuracion_tabla', 'CuentasPorCobrarController@cuentas_por_cobrar_guardar_configuracion_tabla')->name('cuentas_por_cobrar_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
     //Contrarecibos
     Route::get('/contrarecibos', 'ContraRecibosController@contrarecibos')->name('contrarecibos')->middleware('revisaraccesomenu:menuregistroscontrarecibos');
     Route::get('/contrarecibos_obtener', 'ContraRecibosController@contrarecibos_obtener')->name('contrarecibos_obtener')->middleware('revisaraccesomenu:menuregistroscontrarecibos');
@@ -286,6 +330,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/contrarecibos_obtener_proveedores', 'ContraRecibosController@contrarecibos_obtener_proveedores')->name('contrarecibos_obtener_proveedores')->middleware('revisaraccesomenu:menuregistroscontrarecibos');
     Route::get('/contrarecibos_obtener_compras_proveedor', 'ContraRecibosController@contrarecibos_obtener_compras_proveedor')->name('contrarecibos_obtener_compras_proveedor')->middleware('revisaraccesomenu:menuregistroscontrarecibos');
     Route::post('/contrarecibos_guardar', 'ContraRecibosController@contrarecibos_guardar')->name('contrarecibos_guardar')->middleware('revisarpermisos:registros.contrarecibos.altas');
+    Route::get('/contrarecibos_verificar_si_continua_baja', 'ContraRecibosController@contrarecibos_verificar_si_continua_baja')->name('contrarecibos_verificar_si_continua_baja')->middleware('revisaraccesomenu:menuregistroscontrarecibos');
     Route::post('/contrarecibos_baja', 'ContraRecibosController@contrarecibos_baja')->name('contrarecibos_baja')->middleware('revisarpermisos:registros.contrarecibos.bajas');
     Route::get('/contrarecibos_obtener_contrarecibo', 'ContraRecibosController@contrarecibos_obtener_contrarecibo')->name('contrarecibos_obtener_contrarecibo')->middleware('revisaraccesomenu:menuregistroscontrarecibos');
     Route::get('/contrarecibos_buscar_folio_string_like', 'ContraRecibosController@contrarecibos_buscar_folio_string_like')->name('contrarecibos_buscar_folio_string_like')->middleware('revisaraccesomenu:menuregistroscontrarecibos');
@@ -296,18 +341,54 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/notas_credito_proveedores', 'NotasCreditoProveedoresController@notas_credito_proveedores')->name('notas_credito_proveedores')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     Route::get('/notas_credito_proveedores_obtener', 'NotasCreditoProveedoresController@notas_credito_proveedores_obtener')->name('notas_credito_proveedores_obtener')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     Route::get('/notas_credito_proveedores_obtener_ultimo_folio', 'NotasCreditoProveedoresController@notas_credito_proveedores_obtener_ultimo_folio')->name('notas_credito_proveedores_obtener_ultimo_folio')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
+    Route::get('/notas_credito_proveedor_obtener_tipos_ordenes_compra', 'NotasCreditoProveedoresController@notas_credito_proveedor_obtener_tipos_ordenes_compra')->name('notas_credito_proveedor_obtener_tipos_ordenes_compra')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
+    Route::get('/notas_credito_proveedores_obtener_productos', 'NotasCreditoProveedoresController@notas_credito_proveedores_obtener_productos')->name('notas_credito_proveedores_obtener_productos')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     Route::get('/notas_credito_proveedores_obtener_proveedores', 'NotasCreditoProveedoresController@notas_credito_proveedores_obtener_proveedores')->name('notas_credito_proveedores_obtener_proveedores')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     Route::get('/notas_credito_proveedores_obtener_almacenes', 'NotasCreditoProveedoresController@notas_credito_proveedores_obtener_almacenes')->name('notas_credito_proveedores_obtener_almacenes')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     Route::get('/notas_credito_proveedores_obtener_compras', 'NotasCreditoProveedoresController@notas_credito_proveedores_obtener_compras')->name('notas_credito_proveedores_obtener_compras')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     Route::get('/notas_credito_proveedores_obtener_compra', 'NotasCreditoProveedoresController@notas_credito_proveedores_obtener_compra')->name('notas_credito_proveedores_obtener_compra')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     Route::get('/notas_credito_proveedor_obtener_codigos_compra', 'NotasCreditoProveedoresController@notas_credito_proveedor_obtener_codigos_compra')->name('notas_credito_proveedor_obtener_codigos_compra')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
+    Route::get('/notas_credito_proveedores_obtener_datos_almacen', 'NotasCreditoProveedoresController@notas_credito_proveedores_obtener_datos_almacen')->name('notas_credito_proveedores_obtener_datos_almacen')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     Route::post('/notas_credito_proveedor_cargar_xml_alta', 'NotasCreditoProveedoresController@notas_credito_proveedor_cargar_xml_alta')->name('notas_credito_proveedor_cargar_xml_alta')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     Route::get('/notas_credito_proveedor_obtener_existencias_partida', 'NotasCreditoProveedoresController@notas_credito_proveedor_obtener_existencias_partida')->name('notas_credito_proveedor_obtener_existencias_partida')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     Route::post('/notas_credito_proveedor_guardar', 'NotasCreditoProveedoresController@notas_credito_proveedor_guardar')->name('notas_credito_proveedor_guardar')->middleware('revisarpermisos:registros.notas.credito.proveedores.altas');
+    Route::get('/notas_credito_proveedores_verificar_uso_en_modulos', 'NotasCreditoProveedoresController@notas_credito_proveedores_verificar_uso_en_modulos')->name('notas_credito_proveedores_verificar_uso_en_modulos')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
+    Route::post('/notas_credito_proveedores_alta_o_baja', 'NotasCreditoProveedoresController@notas_credito_proveedores_alta_o_baja')->name('notas_credito_proveedores_alta_o_baja')->middleware('revisarpermisos:registros.notas.credito.proveedores.bajas');
+    Route::get('/notas_credito_proveedores_obtener_nota_proveedor', 'NotasCreditoProveedoresController@notas_credito_proveedores_obtener_nota_proveedor')->name('notas_credito_proveedores_obtener_nota_proveedor')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
+    Route::post('/notas_credito_proveedores_guardar_modificacion', 'NotasCreditoProveedoresController@notas_credito_proveedores_guardar_modificacion')->name('notas_credito_proveedores_guardar_modificacion')->middleware('revisarpermisos:registros.notas.credito.proveedores.cambios');
     Route::get('/notas_credito_proveedores_buscar_folio_string_like', 'NotasCreditoProveedoresController@notas_credito_proveedores_buscar_folio_string_like')->name('notas_credito_proveedores_buscar_folio_string_like')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     Route::post('/notas_credito_proveedores_generar_pdfs', 'NotasCreditoProveedoresController@notas_credito_proveedores_generar_pdfs')->name('notas_credito_proveedores_generar_pdfs')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     Route::get('/notas_credito_proveedores_exportar_excel', 'NotasCreditoProveedoresController@notas_credito_proveedores_exportar_excel')->name('notas_credito_proveedores_exportar_excel')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
     Route::post('/notas_credito_proveedor_guardar_configuracion_tabla', 'NotasCreditoProveedoresController@notas_credito_proveedor_guardar_configuracion_tabla')->name('notas_credito_proveedor_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrosnotascreditoproveedores');
+    //Notas de Crédito Clientes
+    Route::get('/notas_credito_clientes', 'NotasCreditoClientesController@notas_credito_clientes')->name('notas_credito_clientes')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::get('/notas_credito_clientes_obtener', 'NotasCreditoClientesController@notas_credito_clientes_obtener')->name('notas_credito_clientes_obtener')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::get('/notas_credito_clientes_obtener_ultimo_folio', 'NotasCreditoClientesController@notas_credito_clientes_obtener_ultimo_folio')->name('notas_credito_clientes_obtener_ultimo_folio')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::get('/notas_credito_clientes_obtener_clientes', 'NotasCreditoClientesController@notas_credito_clientes_obtener_clientes')->name('notas_credito_clientes_obtener_clientes')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::get('/notas_credito_clientes_obtener_almacenes', 'NotasCreditoClientesController@notas_credito_clientes_obtener_almacenes')->name('notas_credito_clientes_obtener_almacenes')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::get('/notas_credito_clientes_obtener_codigos_postales', 'NotasCreditoClientesController@notas_credito_clientes_obtener_codigos_postales')->name('notas_credito_clientes_obtener_codigos_postales')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::get('/notas_credito_clientes_obtener_regimenes_fiscales', 'NotasCreditoClientesController@notas_credito_clientes_obtener_regimenes_fiscales')->name('notas_credito_clientes_obtener_regimenes_fiscales')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::get('/notas_credito_clientes_obtener_tipos_relacion', 'NotasCreditoClientesController@notas_credito_clientes_obtener_tipos_relacion')->name('notas_credito_clientes_obtener_tipos_relacion')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::get('/notas_credito_clientes_obtener_formas_pago', 'NotasCreditoClientesController@notas_credito_clientes_obtener_formas_pago')->name('notas_credito_clientes_obtener_formas_pago')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::get('/notas_credito_clientes_obtener_metodos_pago', 'NotasCreditoClientesController@notas_credito_clientes_obtener_metodos_pago')->name('notas_credito_clientes_obtener_metodos_pago')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::get('/notas_credito_clientes_obtener_usos_cfdi', 'NotasCreditoClientesController@notas_credito_clientes_obtener_usos_cfdi')->name('notas_credito_clientes_obtener_usos_cfdi')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::get('/notas_credito_clientes_obtener_residencias_fiscales', 'NotasCreditoClientesController@notas_credito_clientes_obtener_residencias_fiscales')->name('notas_credito_clientes_obtener_residencias_fiscales')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::get('/notas_credito_cliente_comprobar_cantidad_nota_vs_cantidad_factura', 'NotasCreditoClientesController@notas_credito_cliente_comprobar_cantidad_nota_vs_cantidad_factura')->name('notas_credito_cliente_comprobar_cantidad_nota_vs_cantidad_factura')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::get('/notas_credito_clientes_obtener_facturas', 'NotasCreditoClientesController@notas_credito_clientes_obtener_facturas')->name('notas_credito_clientes_obtener_facturas')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::get('/notas_credito_clientes_obtener_factura', 'NotasCreditoClientesController@notas_credito_clientes_obtener_factura')->name('notas_credito_clientes_obtener_factura')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::get('/notas_credito_clientes_obtener_datos_almacen', 'NotasCreditoClientesController@notas_credito_clientes_obtener_datos_almacen')->name('notas_credito_clientes_obtener_datos_almacen')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::get('/notas_credito_clientes_obtener_productos', 'NotasCreditoClientesController@notas_credito_clientes_obtener_productos')->name('notas_credito_clientes_obtener_productos')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::get('/notas_credito_clientes_obtener_folios_fiscales', 'NotasCreditoClientesController@notas_credito_clientes_obtener_folios_fiscales')->name('notas_credito_clientes_obtener_folios_fiscales')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::get('/notas_credito_clientes_obtener_ultimo_folio_serie_seleccionada', 'NotasCreditoClientesController@notas_credito_clientes_obtener_ultimo_folio_serie_seleccionada')->name('notas_credito_clientes_obtener_ultimo_folio_serie_seleccionada')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::post('/notas_credito_clientes_guardar', 'NotasCreditoClientesController@notas_credito_clientes_guardar')->name('notas_credito_clientes_guardar')->middleware('revisarpermisos:registros.notas.credito.clientes.altas');
+    Route::get('/notas_credito_clientes_verificar_si_continua_baja', 'NotasCreditoClientesController@notas_credito_clientes_verificar_si_continua_baja')->name('notas_credito_clientes_verificar_si_continua_baja')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::post('/notas_credito_clientes_alta_o_baja', 'NotasCreditoClientesController@notas_credito_clientes_alta_o_baja')->name('notas_credito_clientes_alta_o_baja')->middleware('revisarpermisos:registros.notas.credito.clientes.bajas');
+    Route::get('/notas_credito_clientes_obtener_nota_cliente', 'NotasCreditoClientesController@notas_credito_clientes_obtener_nota_cliente')->name('notas_credito_clientes_obtener_nota_cliente')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::post('/notas_credito_clientes_guardar_modificacion', 'NotasCreditoClientesController@notas_credito_clientes_guardar_modificacion')->name('notas_credito_clientes_guardar_modificacion')->middleware('revisarpermisos:registros.notas.credito.clientes.cambios');
+    Route::get('/notas_credito_clientes_buscar_folio_string_like', 'NotasCreditoClientesController@notas_credito_clientes_buscar_folio_string_like')->name('notas_credito_clientes_buscar_folio_string_like')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::post('/notas_credito_clientes_generar_pdfs', 'NotasCreditoClientesController@notas_credito_clientes_generar_pdfs')->name('notas_credito_clientes_generar_pdfs')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::get('/notas_credito_clientes_exportar_excel', 'NotasCreditoClientesController@notas_credito_clientes_exportar_excel')->name('notas_credito_clientes_exportar_excel')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::post('/notas_credito_clientes_guardar_configuracion_tabla', 'NotasCreditoClientesController@notas_credito_clientes_guardar_configuracion_tabla')->name('notas_credito_clientes_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
     //Asignación de herramienta
     Route::get('/asignacionherramienta', 'AsignacionHerramientaController@asignacionherramienta')->name('asignacionherramienta')->middleware('revisaraccesomenu:menuregistrosasignacionherramienta');
     Route::get('/asignacion_herramienta_obtener', 'AsignacionHerramientaController@asignacion_herramienta_obtener')->name('asignacion_herramienta_obtener')->middleware('revisaraccesomenu:menuregistrosasignacionherramienta');
@@ -317,6 +398,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/asignacion_herramienta_obtener_herramienta', 'AsignacionHerramientaController@asignacion_herramienta_obtener_herramienta')->name('asignacion_herramienta_obtener_herramienta')->middleware('revisaraccesomenu:menuregistrosasignacionherramienta');
     Route::get('/asignacion_herramienta_obtener_existencias_almacen', 'AsignacionHerramientaController@asignacion_herramienta_obtener_existencias_almacen')->name('asignacion_herramienta_obtener_existencias_almacen')->middleware('revisaraccesomenu:menuregistrosasignacionherramienta');
     Route::post('/asignacion_herramienta_guardar', 'AsignacionHerramientaController@asignacion_herramienta_guardar')->name('asignacion_herramienta_guardar')->middleware('revisarpermisos:registros.asignacion.herramienta.altas');
+    Route::get('/asignacion_herramienta_obtener_asignacion_herramienta_a_autorizar', 'AsignacionHerramientaController@asignacion_herramienta_obtener_asignacion_herramienta_a_autorizar')->name('asignacion_herramienta_obtener_asignacion_herramienta_a_autorizar')->middleware('revisaraccesomenu:menuregistrosasignacionherramienta');
     Route::post('/asignacion_herramienta_autorizar', 'AsignacionHerramientaController@asignacion_herramienta_autorizar')->name('asignacion_herramienta_autorizar')->middleware('revisarpermisos:registros.asignacion.herramienta.autorizar');
     Route::get('/asignacion_herramienta_obtener_asignacion_herramienta', 'AsignacionHerramientaController@asignacion_herramienta_obtener_asignacion_herramienta')->name('asignacion_herramienta_obtener_asignacion_herramienta')->middleware('revisaraccesomenu:menuregistrosasignacionherramienta');
     Route::post('/asignacion_herramienta_guardar_modificacion', 'AsignacionHerramientaController@asignacion_herramienta_guardar_modificacion')->name('asignacion_herramienta_guardar_modificacion')->middleware('revisarpermisos:registros.asignacion.herramienta.cambios');
@@ -354,6 +436,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/cotizaciones_obtener_remisiones', 'CotizacionController@cotizaciones_obtener_remisiones')->name('cotizaciones_obtener_remisiones')->middleware('revisaraccesomenu:menuregistroscotizaciones');
     Route::get('/cotizaciones_obtener_remision', 'CotizacionController@cotizaciones_obtener_remision')->name('cotizaciones_obtener_remision')->middleware('revisaraccesomenu:menuregistroscotizaciones');
     Route::post('/cotizaciones_guardar', 'CotizacionController@cotizaciones_guardar')->name('cotizaciones_guardar')->middleware('revisarpermisos:registros.cotizaciones.altas');
+    Route::get('/cotizaciones_verificar_uso_en_modulos', 'CotizacionController@cotizaciones_verificar_uso_en_modulos')->name('cotizaciones_verificar_uso_en_modulos')->middleware('revisaraccesomenu:menuregistroscotizaciones');
     Route::post('/cotizaciones_alta_o_baja', 'CotizacionController@cotizaciones_alta_o_baja')->name('cotizaciones_alta_o_baja')->middleware('revisarpermisos:registros.cotizaciones.bajas');
     Route::get('/cotizaciones_obtener_cotizacion', 'CotizacionController@cotizaciones_obtener_cotizacion')->name('cotizaciones_obtener_cotizacion')->middleware('revisaraccesomenu:menuregistroscotizaciones');
     Route::post('/cotizaciones_guardar_modificacion', 'CotizacionController@cotizaciones_guardar_modificacion')->name('cotizaciones_guardar_modificacion')->middleware('revisarpermisos:registros.cotizaciones.cambios');
@@ -366,16 +449,90 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/ajustesinventario_obtener_ultimo_id', 'AjusteInventarioController@ajustesinventario_obtener_ultimo_id')->name('ajustesinventario_obtener_ultimo_id')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
     Route::get('/ajustesinventario_obtener_almacenes', 'AjusteInventarioController@ajustesinventario_obtener_almacenes')->name('ajustesinventario_obtener_almacenes')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
     Route::get('/ajustesinventario_obtener_productos', 'AjusteInventarioController@ajustesinventario_obtener_productos')->name('ajustesinventario_obtener_productos')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
-    Route::get('/ajustesinventario_obtener_existencias_por_codigo_y_almacen', 'AjusteInventarioController@ajustesinventario_obtener_existencias_por_codigo_y_almacen')->name('ajustesinventario_obtener_existencias_por_codigo_y_almacen')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
+    Route::get('/ajustesinventario_obtener_existencias_partida', 'AjusteInventarioController@ajustesinventario_obtener_existencias_partida')->name('ajustesinventario_obtener_existencias_partida')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
     Route::post('/ajustesinventario_guardar', 'AjusteInventarioController@ajustesinventario_guardar')->name('ajustesinventario_guardar')->middleware('revisarpermisos:registros.ajustes.inventario.altas');
     Route::get('/ajustesinventario_verificar_baja', 'AjusteInventarioController@ajustesinventario_verificar_baja')->name('ajustesinventario_verificar_baja')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
     Route::post('/ajustesinventario_alta_o_baja', 'AjusteInventarioController@ajustesinventario_alta_o_baja')->name('ajustesinventario_alta_o_baja')->middleware('revisarpermisos:registros.ajustes.inventario.bajas');
+    Route::get('/ajustesinventario_obtener_nuevos_datos_fila', 'AjusteInventarioController@ajustesinventario_obtener_nuevos_datos_fila')->name('ajustesinventario_obtener_nuevos_datos_fila')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
     Route::get('/ajustesinventario_obtener_ajuste', 'AjusteInventarioController@ajustesinventario_obtener_ajuste')->name('ajustesinventario_obtener_ajuste')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
     Route::post('/ajustesinventario_guardar_modificacion', 'AjusteInventarioController@ajustesinventario_guardar_modificacion')->name('ajustesinventario_guardar_modificacion')->middleware('revisarpermisos:registros.ajustes.inventario.cambios');
+    Route::get('/ajustesinventario_buscar_folio_string_like', 'AjusteInventarioController@ajustesinventario_buscar_folio_string_like')->name('ajustesinventario_buscar_folio_string_like')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
+    Route::post('/ajustesinventario_generar_pdfs', 'AjusteInventarioController@ajustesinventario_generar_pdfs')->name('ajustesinventario_generar_pdfs')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
     Route::get('/ajustesinventario_exportar_excel', 'AjusteInventarioController@ajustesinventario_exportar_excel')->name('ajustesinventario_exportar_excel')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
     Route::post('/ajustesinventario_guardar_configuracion_tabla', 'AjusteInventarioController@ajustesinventario_guardar_configuracion_tabla')->name('ajustesinventario_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
+    //traspasos
+    Route::get('/traspasos', 'TraspasoController@traspasos')->name('traspasos')->middleware('revisaraccesomenu:menuregistrostraspasos');
+    Route::get('/traspasos_obtener', 'TraspasoController@traspasos_obtener')->name('traspasos_obtener')->middleware('revisaraccesomenu:menuregistrostraspasos');
+    Route::get('/traspasos_obtener_ultimo_folio', 'TraspasoController@traspasos_obtener_ultimo_folio')->name('traspasos_obtener_ultimo_folio')->middleware('revisaraccesomenu:menuregistrostraspasos');
+    Route::get('/traspasos_obtener_almacenes', 'TraspasoController@traspasos_obtener_almacenes')->name('traspasos_obtener_almacenes')->middleware('revisaraccesomenu:menuregistrostraspasos');
+    Route::get('/traspasos_obtener_almacenes_foraneos', 'TraspasoController@traspasos_obtener_almacenes_foraneos')->name('traspasos_obtener_almacenes_foraneos')->middleware('revisaraccesomenu:menuregistrostraspasos');
+    Route::get('/traspasos_obtener_ordenes_trabajo', 'TraspasoController@traspasos_obtener_ordenes_trabajo')->name('traspasos_obtener_ordenes_trabajo')->middleware('revisaraccesomenu:menuregistrostraspasos');
+    Route::get('/traspasos_obtener_productos', 'TraspasoController@traspasos_obtener_productos')->name('traspasos_obtener_productos')->middleware('revisaraccesomenu:menuregistrostraspasos');
+    Route::get('/traspasos_obtener_existencias_partida', 'TraspasoController@traspasos_obtener_existencias_partida')->name('traspasos_obtener_existencias_partida')->middleware('revisaraccesomenu:menuregistrostraspasos');
+    Route::post('/traspasos_guardar', 'TraspasoController@traspasos_guardar')->name('traspasos_guardar')->middleware('revisarpermisos:registros.traspasos.altas');
+    Route::get('/traspasos_verificar_baja', 'TraspasoController@traspasos_verificar_baja')->name('traspasos_verificar_baja')->middleware('revisaraccesomenu:menuregistrostraspasos');
+    Route::post('/traspasos_alta_o_baja', 'TraspasoController@traspasos_alta_o_baja')->name('traspasos_alta_o_baja')->middleware('revisarpermisos:registros.traspasos.bajas');
+    Route::get('/traspasos_obtener_traspaso', 'TraspasoController@traspasos_obtener_traspaso')->name('traspasos_obtener_traspaso')->middleware('revisaraccesomenu:menuregistrostraspasos');
+    Route::get('/traspasos_obtener_existencias_almacen_foraneo', 'TraspasoController@traspasos_obtener_existencias_almacen_foraneo')->name('traspasos_obtener_existencias_almacen_foraneo')->middleware('revisaraccesomenu:menuregistrostraspasos');
+    Route::post('/traspasos_guardar_modificacion', 'TraspasoController@traspasos_guardar_modificacion')->name('traspasos_guardar_modificacion')->middleware('revisarpermisos:registros.traspasos.cambios');
+    Route::get('/traspasos_buscar_folio_string_like', 'TraspasoController@traspasos_buscar_folio_string_like')->name('traspasos_buscar_folio_string_like')->middleware('revisaraccesomenu:menuregistrostraspasos');
+    Route::post('/traspasos_generar_pdfs', 'TraspasoController@traspasos_generar_pdfs')->name('traspasos_generar_pdfs')->middleware('revisaraccesomenu:menuregistrostraspasos');
+    Route::get('/traspasos_exportar_excel', 'TraspasoController@traspasos_exportar_excel')->name('traspasos_exportar_excel')->middleware('revisaraccesomenu:menuregistrostraspasos');
+    Route::post('/traspasos_guardar_configuracion_tabla', 'TraspasoController@traspasos_guardar_configuracion_tabla')->name('traspasos_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrostraspasos');
+    //Remisiones
+    Route::get('/remisiones', 'RemisionController@remisiones')->name('remisiones')->middleware('revisaraccesomenu:menuregistrosremisiones');
+    Route::get('/remisiones_obtener', 'RemisionController@remisiones_obtener')->name('remisiones_obtener')->middleware('revisaraccesomenu:menuregistrosremisiones');
+    Route::get('/remisiones_obtener_ultimo_folio', 'RemisionController@remisiones_obtener_ultimo_folio')->name('remisiones_obtener_ultimo_folio')->middleware('revisaraccesomenu:menuregistrosremisiones');
+    Route::get('/remisiones_obtener_clientes', 'RemisionController@remisiones_obtener_clientes')->name('remisiones_obtener_clientes')->middleware('revisaraccesomenu:menuregistrosremisiones');
+    Route::get('/remisiones_obtener_agentes', 'RemisionController@remisiones_obtener_agentes')->name('remisiones_obtener_agentes')->middleware('revisaraccesomenu:menuregistrosremisiones');
+    Route::get('/remisiones_obtener_almacenes', 'RemisionController@remisiones_obtener_almacenes')->name('remisiones_obtener_almacenes')->middleware('revisaraccesomenu:menuregistrosremisiones');
+    Route::get('/remisiones_obtener_tipos_cliente', 'RemisionController@remisiones_obtener_tipos_cliente')->name('remisiones_obtener_tipos_cliente')->middleware('revisaraccesomenu:menuregistrosremisiones');
+    Route::get('/remisiones_obtener_tipos_unidad', 'RemisionController@remisiones_obtener_tipos_unidad')->name('remisiones_obtener_tipos_unidad')->middleware('revisaraccesomenu:menuregistrosremisiones');
+    Route::get('/remisiones_obtener_productos', 'RemisionController@remisiones_obtener_productos')->name('remisiones_obtener_productos')->middleware('revisaraccesomenu:menuregistrosremisiones');
+    Route::get('/remisiones_obtener_existencias_almacen', 'RemisionController@remisiones_obtener_existencias_almacen')->name('remisiones_obtener_existencias_almacen')->middleware('revisaraccesomenu:menuregistrosremisiones');
+    Route::post('/remisiones_guardar', 'RemisionController@remisiones_guardar')->name('remisiones_guardar')->middleware('revisarpermisos:registros.remisiones.altas');
+    Route::get('/remisiones_verificar_baja', 'RemisionController@remisiones_verificar_baja')->name('remisiones_verificar_baja')->middleware('revisaraccesomenu:menuregistrosremisiones');
+    Route::post('/remisiones_alta_o_baja', 'RemisionController@remisiones_alta_o_baja')->name('remisiones_alta_o_baja')->middleware('revisarpermisos:registros.remisiones.bajas');
+    Route::get('/remisiones_obtener_remision', 'RemisionController@remisiones_obtener_remision')->name('remisiones_obtener_remision')->middleware('revisaraccesomenu:menuregistrosremisiones');
+    Route::post('/remisiones_guardar_modificacion', 'RemisionController@remisiones_guardar_modificacion')->name('remisiones_guardar_modificacion')->middleware('revisarpermisos:registros.remisiones.cambios');
+    Route::get('/remisiones_buscar_folio_string_like', 'RemisionController@remisiones_buscar_folio_string_like')->name('remisiones_buscar_folio_string_like')->middleware('revisaraccesomenu:menuregistrosremisiones');
+    Route::post('/remisiones_generar_pdfs', 'RemisionController@remisiones_generar_pdfs')->name('remisiones_generar_pdfs')->middleware('revisaraccesomenu:menuregistrosremisiones');
+    Route::get('/remisiones_exportar_excel', 'RemisionController@remisiones_exportar_excel')->name('remisiones_exportar_excel')->middleware('revisaraccesomenu:menuregistrosremisiones');
+    Route::post('/remisiones_guardar_configuracion_tabla', 'RemisionController@remisiones_guardar_configuracion_tabla')->name('remisiones_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrosremisiones');
+    //Facturas
+    Route::get('/facturas', 'FacturaController@facturas')->name('facturas')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener', 'FacturaController@facturas_obtener')->name('facturas_obtener')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_ultimo_folio', 'FacturaController@facturas_obtener_ultimo_folio')->name('facturas_obtener_ultimo_folio')->middleware('revisaraccesomenu:menuregistrosfacturas');    
+    Route::get('/facturas_obtener_tipos', 'FacturaController@facturas_obtener_tipos')->name('facturas_obtener_tipos')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_tipos_unidades', 'FacturaController@facturas_obtener_tipos_unidades')->name('facturas_obtener_tipos_unidades')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_clientes', 'FacturaController@facturas_obtener_clientes')->name('facturas_obtener_clientes')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_agentes', 'FacturaController@facturas_obtener_agentes')->name('facturas_obtener_agentes')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_codigos_postales', 'FacturaController@facturas_obtener_codigos_postales')->name('facturas_obtener_codigos_postales')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_regimenes_fiscales', 'FacturaController@facturas_obtener_regimenes_fiscales')->name('facturas_obtener_regimenes_fiscales')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_tipos_relacion', 'FacturaController@facturas_obtener_tipos_relacion')->name('facturas_obtener_tipos_relacion')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_formas_pago', 'FacturaController@facturas_obtener_formas_pago')->name('facturas_obtener_formas_pago')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_metodos_pago', 'FacturaController@facturas_obtener_metodos_pago')->name('facturas_obtener_metodos_pago')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_usos_cfdi', 'FacturaController@facturas_obtener_usos_cfdi')->name('facturas_obtener_usos_cfdi')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_residencias_fiscales', 'FacturaController@facturas_obtener_residencias_fiscales')->name('facturas_obtener_residencias_fiscales')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_folios_fiscales', 'FacturaController@facturas_obtener_folios_fiscales')->name('facturas_obtener_folios_fiscales')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_ultimo_folio_serie_seleccionada', 'FacturaController@facturas_obtener_ultimo_folio_serie_seleccionada')->name('facturas_obtener_ultimo_folio_serie_seleccionada')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_datos_agente', 'FacturaController@facturas_obtener_datos_agente')->name('facturas_obtener_datos_agente')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_remisiones', 'FacturaController@facturas_obtener_remisiones')->name('facturas_obtener_remisiones')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_remision', 'FacturaController@facturas_obtener_remision')->name('facturas_obtener_remision')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_ordenes', 'FacturaController@facturas_obtener_ordenes')->name('facturas_obtener_ordenes')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_orden', 'FacturaController@facturas_obtener_orden')->name('facturas_obtener_orden')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_productos', 'FacturaController@facturas_obtener_productos')->name('facturas_obtener_productos')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::post('/facturas_cargar_xml_uuid_relacionado', 'FacturaController@facturas_cargar_xml_uuid_relacionado')->name('facturas_cargar_xml_uuid_relacionado')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::post('/facturas_guardar', 'FacturaController@facturas_guardar')->name('facturas_guardar')->middleware('revisarpermisos:registros.facturas.altas');
+    Route::get('/facturas_obtener_factura', 'FacturaController@facturas_obtener_factura')->name('facturas_obtener_factura')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::post('/facturas_guardar_modificacion', 'FacturaController@facturas_guardar_modificacion')->name('facturas_guardar_modificacion')->middleware('revisarpermisos:registros.facturas.cambios');
+    Route::get('/facturas_verificar_si_continua_baja', 'FacturaController@facturas_verificar_si_continua_baja')->name('facturas_verificar_si_continua_baja')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::post('/facturas_alta_o_baja', 'FacturaController@facturas_alta_o_baja')->name('facturas_alta_o_baja')->middleware('revisarpermisos:registros.facturas.bajas');
+    Route::get('/facturas_buscar_folio_string_like', 'FacturaController@facturas_buscar_folio_string_like')->name('facturas_buscar_folio_string_like')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::post('/facturas_generar_pdfs', 'FacturaController@facturas_generar_pdfs')->name('facturas_generar_pdfs')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_exportar_excel', 'FacturaController@facturas_exportar_excel')->name('facturas_exportar_excel')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::post('/facturas_guardar_configuracion_tabla', 'FacturaController@facturas_guardar_configuracion_tabla')->name('facturas_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrosfacturas');
     /* -----------------------------------||||||||||||||||||||FIN REGISTROS||||||||||||||||||||||-------------------------------------*/
-
     /* -----------------------------------||||||||||||||||||||REPORTES||||||||||||||||||||||-------------------------------------*/
     //reporte diario de ventas
     Route::get('/reporte_diario_ventas', 'ReporteFacturaController@reporte_diario_ventas')->name('reporte_diario_ventas')->middleware('revisaraccesomenu:menureportesfacturasventasdiarias');
@@ -392,13 +549,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/reporte_horas_tecnico_obtener_tecnicos', 'ReportesOrdenesTrabajoController@reporte_horas_tecnico_obtener_tecnicos')->name('reporte_horas_tecnico_obtener_tecnicos')->middleware('revisaraccesomenu:menureportesordenestrabajohorastecnico');
     Route::get('/reporte_horas_tecnico_generar_formato_excel', 'ReportesOrdenesTrabajoController@reporte_horas_tecnico_generar_formato_excel')->name('reporte_horas_tecnico_generar_formato_excel')->middleware('revisaraccesomenu:menureportesordenestrabajohorastecnico');
     /* -----------------------------------||||||||||||||||||||FIN REPORTES||||||||||||||||||||||-------------------------------------*/
-
     /* -----------------------------------||||||||||||||||||||EMPRESA||||||||||||||||||||||-------------------------------------*/
     Route::post('/utilerias_empresa_guardar_modificacion', 'EmpresaController@utilerias_empresa_guardar_modificacion')->name('utilerias_empresa_guardar_modificacion');
     /* -----------------------------------||||||||||||||||||||FIN EMPRESA||||||||||||||||||||||-------------------------------------*/
-
-
-
 });
 
 

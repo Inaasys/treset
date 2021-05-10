@@ -6,7 +6,7 @@ function init(){
    listar();
 }
 function retraso(){
-  return new Promise(resolve => setTimeout(resolve, 1000));
+  return new Promise(resolve => setTimeout(resolve, 1500));
 }
 function asignarfechaactual(){
     var fechahoy = new Date();
@@ -35,7 +35,16 @@ function limpiar(){
   form.parsley().reset();
   //volver a aplicar configuracion a datatable principal para que realize la busqueda con la tecla enter
   regresarbusquedadatatableprincipal();
-
+}
+//validar si se debe mostrar o no el buscador de productos
+function mostrarbuscadorcodigoproducto(){
+  var orden = $("#orden").val();
+  var proveedor = $("#proveedor").val();
+  if(orden != "" && proveedor != ""){
+    $("#divbuscarcodigoproducto").show();
+  }else{
+    $("#divbuscarcodigoproducto").hide();
+  }
 }
 //mostrar modal formulario
 function mostrarmodalformulario(tipo, modificacionpermitida){
@@ -67,12 +76,20 @@ function ocultarformulario(){
   $("#formulario").hide();
   $("#contenidomodaltablas").show();
 }
+//cambiar url para exportar excel
+function cambiarurlexportarexcel(){
+  //colocar el periodo seleccionado como parametro para exportar a excel
+  var periodo = $("#periodo").val();
+  $("#btnGenerarFormatoExcel").attr("href", urlgenerarformatoexcel+'?periodo='+periodo);
+}
 function relistar(){
+  cambiarurlexportarexcel();
     var tabla = $('.tbllistado').DataTable();
     tabla.ajax.reload();
 }
 //listar todos los registros de la tabla
 function listar(){
+  cambiarurlexportarexcel();
   //Campos ordenados a mostras
   var campos = columnas_ordenadas.split(",");
   var campos_tabla  = [];
@@ -86,6 +103,8 @@ function listar(){
       });
   }
   tabla=$('#tbllistado').DataTable({
+    "lengthMenu": [ 10, 50, 100, 250, 500 ],
+    "pageLength": 250,
     "sScrollX": "110%",
     "sScrollY": "350px",
     "bScrollCollapse": true,  
@@ -102,7 +121,7 @@ function listar(){
         }
     },
     "createdRow": function( row, data, dataIndex){
-        if( data.Status ==  `BAJA`){ $(row).addClass('bg-red');}
+        if( data.Status ==  `BAJA`){ $(row).addClass('bg-orange');}
     },
     columns: campos_tabla,
     "initComplete": function() {
@@ -156,7 +175,7 @@ function obtenerproveedores(){
     $("#contenidomodaltablas").html(tablaproveedores);
     $('#tbllistadoproveedor').DataTable({
         "sScrollX": "110%",
-        "sScrollY": "300px",
+        "sScrollY": "370px",
         "bScrollCollapse": true,  
         processing: true,
         'language': {
@@ -188,6 +207,17 @@ function obtenerproveedores(){
         "iDisplayLength": 8,
     }); 
 } 
+//obtener datos del proveedor
+function seleccionarproveedor(Numero, Nombre, Plazo, Rfc){
+  $("#numeroproveedor").val(Numero);
+  $("#proveedor").val(Nombre);
+  $("#emisornombredb").val(Nombre);
+  $("#emisorrfcdb").val(Rfc);
+  $("#plazo").val(Plazo);
+  //mostrar boton de buscar ordenes de compra
+  $("#btnlistarordenesdecompra").show();
+  mostrarformulario();
+}
 //obtener registros de almacenes
 function obteneralmacenes(){
     ocultarformulario();
@@ -218,7 +248,7 @@ function obteneralmacenes(){
       $("#contenidomodaltablas").html(tablaalmacenes);
       $('#tbllistadoalmacen').DataTable({
           "sScrollX": "110%",
-          "sScrollY": "300px",
+          "sScrollY": "370px",
           "bScrollCollapse": true,  
           processing: true,
           'language': {
@@ -246,14 +276,6 @@ function obteneralmacenes(){
           "iDisplayLength": 8,
       }); 
 } 
-//obtener datos del proveedor
-function seleccionarproveedor(Numero, Nombre){
-    $("#numeroproveedor").val(Numero);
-    $("#proveedor").val(Nombre);
-    //mostrar boton de buscar ordenes de compra
-    $("#btnlistarordenesdecompra").show();
-    mostrarformulario();
-}
 //obtener datos del almacen
 function seleccionaralmacen(Numero, Nombre){
     $("#numeroalmacen").val(Numero);
@@ -290,7 +312,7 @@ function listardepartamentos(fila){
   $("#contenidomodaltablas").html(tabladepartamentos);
   $('#tbllistadodepartamento').DataTable({
       "sScrollX": "110%",
-      "sScrollY": "300px",
+      "sScrollY": "370px",
       "bScrollCollapse": true,  
       processing: true,
       'language': {
@@ -333,336 +355,6 @@ function seleccionardepartamento(numerodepartamento, departamento, fila){
   });   
   mostrarformulario();
 }
-
-//alta clientes
-function alta(){
-  $("#titulomodal").html('Alta Compra Prod');
-  mostrarmodalformulario('ALTA', 1);
-  mostrarformulario();
-  //formulario alta
-  var tabs =    '<div class="row">'+
-                    '<div class="col-md-12">'+
-                        '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
-                            '<li role="presentation" class="active">'+
-                                '<a href="#compratab" data-toggle="tab">Compra</a>'+
-                            '</li>'+
-                            '<li role="presentation">'+
-                                '<a href="#emisorreceptortab" data-toggle="tab">Emisor, Receptor</a>'+
-                            '</li>'+
-                        '</ul>'+
-                        '<div class="tab-content">'+
-                            '<div role="tabpanel" class="tab-pane fade in active" id="compratab">'+
-                                '<div class="row">'+
-                                    '<div class="col-md-3">'+
-                                        '<label>Compra <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
-                                        '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
-                                        '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly>'+
-                                        '<input type="hidden" class="form-control" name="uuid" id="uuid" readonly required>'+
-                                        '<input type="hidden" class="form-control" name="diferenciatotales" id="diferenciatotales" readonly required>'+
-                                    '</div>'+   
-                                    '<div class="col-md-3">'+
-                                        '<label>Plazo Días (proveedor)</label>'+
-                                        '<input type="text" class="form-control" name="plazo" id="plazo"  required readonly onkeyup="tipoLetra(this);">'+
-                                    '</div>'+
-                                    '<div class="col-md-3">'+
-                                        '<label>Fecha</label>'+
-                                        '<input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();validarmescompra();">'+
-                                        '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
-                                        '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
-                                    '</div>'+   
-                                    '<div class="col-md-3">'+
-                                        '<label>Emitida</label>'+
-                                        '<input type="datetime-local" class="form-control" name="fechaemitida" id="fechaemitida"  required readonly>'+
-                                        '<input type="hidden" class="form-control" name="fechatimbrado" id="fechatimbrado" >'+
-                                    '</div>'+
-                                '</div>'+
-                                '<div class="row">'+
-                                    '<div class="col-md-3">'+
-                                        '<label>Proveedor</label>'+
-                                        '<table class="col-md-12">'+
-                                            '<tr>'+
-                                                '<td>'+
-                                                    '<div class="btn bg-blue waves-effect" id="btnobtenerproveedores" onclick="obtenerproveedores()" style="display:none">Seleccionar</div>'+
-                                                '</td>'+
-                                                '<td>'+
-                                                    '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="numeroproveedor" id="numeroproveedor" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="proveedor" id="proveedor" required readonly>'+
-                                                    '</div>'+
-                                                '</td>'+    
-                                            '</tr>'+    
-                                        '</table>'+
-                                    '</div>'+
-                                    '<div class="col-md-3">'+
-                                        '<label>Almacen</label>'+
-                                        '<table class="col-md-12">'+
-                                            '<tr>'+
-                                                '<td hidden>'+
-                                                    '<div class="btn bg-blue waves-effect" onclick="obteneralmacenes()">Seleccionar</div>'+
-                                                '</td>'+
-                                                '<td>'+
-                                                    '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="numeroalmacen" id="numeroalmacen" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="almacen" id="almacen" required readonly>'+
-                                                    '</div>'+
-                                                '</td>'+
-                                            '</tr>'+    
-                                        '</table>'+
-                                    '</div>'+
-                                    '<div class="col-md-3">'+
-                                        '<label>Remisión</label>'+
-                                        '<input type="text" class="form-control" name="remision" id="remision" onkeyup="tipoLetra(this)">'+
-                                    '</div>'+
-                                    '<div class="col-md-3">'+
-                                        '<label>Factura</label>'+
-                                        '<input type="text" class="form-control" name="factura" id="factura" required onkeyup="tipoLetra(this)">'+
-                                    '</div>'+
-                                '</div>'+
-                                '<div class="row">'+    
-                                    '<div class="col-md-3">'+
-                                        '<label>Tipo</label>'+
-                                        '<select name="tipo" id="tipo" class="form-control select2" style="width:100% !important;" required readonly>'+
-                                        '</select>'+
-                                    '</div>'+
-                                    '<div class="col-md-6" id="divbuscarcodigoproducto">'+
-                                        '<table class="col-md-12">'+
-                                            '<tr>'+
-                                                '<td>'+
-                                                    '<label>Moneda</label>'+
-                                                    '<select name="moneda" id="moneda" class="form-control select2" style="width:100% !important;" required>'+
-                                                        '<option value="MXN">MXN</option>'+
-                                                        '<option value="USD">USD</option>'+
-                                                        '<option value="EUR">EUR</option>'+
-                                                    '</select>'+
-                                                '</td>'+
-                                                '<td>'+
-                                                    '<label>Pesos</label>'+
-                                                    '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="pesosmoneda" id="pesosmoneda" value="1.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
-                                                '</td>'+
-                                            '</tr>'+
-                                        '</table>'+
-                                    '</div>'+
-                                    '<div class="col-md-3">'+
-                                        '<label>Cargar Ordenes de Compra</label>'+
-                                        '<div class="btn btn-block bg-blue waves-effect" id="btnlistarordenesdecompra" onclick="listarordenesdecompra()" style="display:none">VER ORDENES DE COMPRA</div>'+
-                                        '<input type="hidden" class="form-control" name="orden" id="orden" required readonly>'+
-                                    '</div>'+
-                                '</div>'+
-                            '</div>'+   
-                            '<div role="tabpanel" class="tab-pane fade" id="emisorreceptortab">'+
-                                '<div class="row">'+
-                                    '<div class="col-md-6">'+
-                                        '<label>Emisor R.F.C.</label>'+
-                                        '<input type="text" class="form-control" name="emisorrfc" id="emisorrfc"  required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" onkeyup="tipoLetra(this);mayusculas(this);">'+
-                                    '</div>'+
-                                    '<div class="col-md-6">'+
-                                        '<label>Emisor Nombre</label>'+
-                                        '<input type="text" class="form-control" name="emisornombre" id="emisornombre" required onkeyup="tipoLetra(this);">'+
-                                    '</div>'+
-                                    '<div class="col-md-6">'+
-                                        '<label>Receptor R.F.C.</label>'+
-                                        '<input type="text" class="form-control" name="receptorrfc" id="receptorrfc"  required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" onkeyup="tipoLetra(this);mayusculas(this);">'+
-                                    '</div>'+
-                                    '<div class="col-md-6">'+
-                                        '<label>Receptor Nombre</label>'+
-                                        '<input type="text" class="form-control" name="receptornombre" id="receptornombre" required onkeyup="tipoLetra(this);">'+
-                                    '</div>'+
-                                '</div>'+
-                            '</div>'+   
-                        '</div>'+
-                    '</div>'+
-                '</div>'+
-                '<div class="row">'+
-                    '<div class="col-md-12">'+
-                        '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
-                            '<li role="presentation" class="active">'+
-                                '<a href="#productostab" data-toggle="tab">Productos</a>'+
-                            '</li>'+
-                        '</ul>'+
-                        '<div class="tab-content">'+
-                            '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
-                                '<div class="row">'+
-                                    '<div class="col-md-12 table-responsive">'+
-                                        '<table id="tablaproductodordencompra" class="table table-bordered tablaproductodordencompra">'+
-                                            '<thead class="customercolor">'+
-                                                '<tr>'+
-                                                '<th>#</th>'+
-                                                '<th class="customercolortheadth">Código</th>'+
-                                                '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
-                                                '<th class="customercolortheadth">Unidad</th>'+
-                                                '<th>Por Surtir</th>'+
-                                                '<th class="customercolortheadth">Cantidad</th>'+
-                                                '<th class="customercolortheadth">Precio $</th>'+
-                                                '<th>Importe $</th>'+
-                                                '<th class="customercolortheadth">Dcto %</th>'+
-                                                '<th class="customercolortheadth">Dcto $</th>'+
-                                                '<th>Importe Descuento $</th>'+
-                                                '<th class="customercolortheadth">Ieps %</th>'+
-                                                '<th>Traslado Ieps $</th>'+
-                                                '<th>SubTotal $</th>'+
-                                                '<th class="customercolortheadth">Iva %</th>'+
-                                                '<th>Traslado Iva $</th>'+
-                                                '<th class="customercolortheadth">Retención Iva %</th>'+
-                                                '<th>Retención Iva $</th>'+
-                                                '<th class="customercolortheadth">Retención Isr %</th>'+
-                                                '<th>Retención Isr $</th>'+
-                                                '<th class="customercolortheadth">Retención Ieps %</th>'+
-                                                '<th>Retención Ieps $</th>'+
-                                                '<th>Total $</th>'+
-                                                '<th class="customercolortheadth">Orden</th>'+
-                                                '<th class="customercolortheadth">Depto</th>'+
-                                                '<th class="customercolortheadth" hidden>Precio Moneda $</th>'+
-                                                '<th class="customercolortheadth" hidden>Descuento $</th>'+
-                                                '<th>ClaveProducto</th>'+
-                                                '<th>Nombre ClaveProducto</th>'+
-                                                '<th>ClaveUnidad</th>'+
-                                                '<th>Nombre ClaveUnidad</th>'+
-                                                '<th>Costo Catálogo</th>'+
-                                                '<th>Costo Ingresado</th>'+
-                                                '</tr>'+
-                                            '</thead>'+
-                                            '<tbody>'+           
-                                            '</tbody>'+
-                                        '</table>'+
-                                    '</div>'+
-                                '</div>'+ 
-                                '<div class="row">'+
-                                  '<div class="col-md-6">'+   
-                                      '<label>Observaciones</label>'+
-                                      '<textarea class="form-control" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required readonly></textarea>'+
-                                  '</div>'+ 
-                                  '<div class="col-md-3 col-md-offset-3">'+
-                                        '<table class="table table-striped table-hover">'+
-                                            '<tr>'+
-                                                '<td class="tdmod">Importe</td>'+
-                                                '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="importe" id="importe" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                                '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="importexml" id="importexml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                            '</tr>'+
-                                            '<tr>'+
-                                                '<td class="tdmod">Descuento</td>'+
-                                                '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="descuento" id="descuento" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                                '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="descuentoxml" id="descuentoxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                            '</tr>'+
-                                            '<tr id="trieps">'+
-                                              '<td class="tdmod">Ieps</td>'+
-                                              '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="ieps" id="ieps" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                              '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="iepsxml" id="iepsxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                            '</tr>'+
-                                            '<tr>'+
-                                                '<td class="tdmod">SubTotal</td>'+
-                                                '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="subtotal" id="subtotal" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                                '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="subtotalxml" id="subtotalxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                            '</tr>'+
-                                            '<tr>'+
-                                                '<td class="tdmod">Iva</td>'+
-                                                '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="iva" id="iva" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                                '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="ivaxml" id="ivaxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                            '</tr>'+
-                                            '<tr id="trretencioniva">'+
-                                              '<td class="tdmod">Retención Iva</td>'+
-                                              '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencioniva" id="retencioniva" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                              '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionivaxml" id="retencionivaxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                            '</tr>'+
-                                            '<tr id="trretencionisr">'+
-                                              '<td class="tdmod">Retención Isr</td>'+
-                                              '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionisr" id="retencionisr" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                              '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionisrxml" id="retencionisrxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                            '</tr>'+
-                                            '<tr id="trretencionieps">'+
-                                              '<td class="tdmod">Retención Ieps</td>'+
-                                              '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionieps" id="retencionieps" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                              '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencioniepsxml" id="retencioniepsxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                            '</tr>'+
-                                            '<tr>'+
-                                                '<td class="tdmod">Total</td>'+
-                                                '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                                '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="totalxml" id="totalxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                            '</tr>'+
-                                        '</table>'+
-                                  '</div>'+
-                                '</div>'+
-                                '<div class="row">'+
-                                  '<div class="col-md-12">'+   
-                                    '<h5 id="mensajecalculoscompra"></h5>'+  
-                                  '</div>'+
-                                '</div>'+
-                            '</div>'+ 
-                        '</div>'+
-                    '</div>'+
-                '</div>';
-  $("#tabsform").html(tabs);
-  obtenultimonumero();
-  obtenertiposordenescompra()
-  asignarfechaactual();
-  //se debe motrar el input para buscar los productos
-  $("#divbuscarcodigoproducto").show();
-  //activar los input select
-  $("#tipo").select2({disabled: true});
-  $("#moneda").select2();
-  $("#ModalAlta").modal('show');
-}
-//Cada que se elija un archivo
-function cambiodexml(e) {
-  $("#btnenviarxml").click();
-}
-//Agregar respuesta a la datatable
-$("#btnenviarxml").on('click', function(e){
-  e.preventDefault();
-  var xml = $('#xml')[0].files[0];
-  var form_data = new FormData();
-  form_data.append('xml', xml);  
-      $.ajax({
-          headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-          url:compras_cargar_xml_alta,
-          data: form_data,
-          type: 'POST',
-          contentType: false,
-          processData: false,
-          success: function (data) {
-            if(data.array_comprobante.Descuento == null){
-              var importexml = data.array_comprobante.SubTotal[0];
-              var descuentoxml = '0.'+numerocerosconfigurados;
-              var subtotalxml = data.array_comprobante.SubTotal[0];
-              var ivaxml = data.TotalImpuestosTrasladados[0];
-              var totalxml = data.array_comprobante.Total[0];
-            }else{
-              var importexml = data.array_comprobante.SubTotal[0];
-              var descuentoxml = data.array_comprobante.Descuento[0]
-              var subtotalxml = new Decimal(importexml).minus(descuentoxml);
-              var ivaxml = data.TotalImpuestosTrasladados[0];
-              var totalxml = new Decimal(subtotalxml).plus(ivaxml);
-            }
-              $("#uuidxml").val(data.uuid[0]);
-              $("#uuid").val(data.uuid[0]);
-              $("#fechatimbrado").val(data.fechatimbrado[0]);
-              $("#emisorrfc").val(data.array_emisor.Rfc[0]);
-              $("#emisornombre").val(data.array_emisor.Nombre[0]);
-              $("#receptorrfc").val(data.array_receptor.Rfc[0]);
-              $("#receptornombre").val(data.array_receptor.Nombre[0]);
-              $("#factura").val(data.array_comprobante.Serie[0]+data.array_comprobante.Folio[0]);
-              $("#importexml").val(number_format(round(importexml, numerodecimales), numerodecimales, '.', ''));
-              $("#descuentoxml").val(number_format(round(descuentoxml, numerodecimales), numerodecimales, '.', ''));
-              $("#subtotalxml").val(number_format(round(subtotalxml, numerodecimales), numerodecimales, '.', ''));
-              $("#ivaxml").val(number_format(round(ivaxml, numerodecimales), numerodecimales, '.', ''));
-              $("#totalxml").val(number_format(round(totalxml, numerodecimales), numerodecimales, '.', ''));
-              $("#fechaemitida").val(data.array_comprobante.Fecha[0]);
-              //mostrar el total de la factura del proveedor
-              //$("#totalfacturaproveedor").html("Total factura proveedor : "+ truncar(totalxml.toFixed(parseInt(numerodecimales)), numerodecimales));
-              $("#totalfacturaproveedor").html("Total factura proveedor :"+ number_format(round(totalxml, numerodecimales), numerodecimales, '.', ''))
-              //mostrar boton de buscar proveedores
-              $("#btnobtenerproveedores").show();
-              //vaciar la fecha de la compra
-              $("#fecha").val("");
-              if($("#total").val() > 0){
-                calculartotalordencompra();
-              }
-          },
-          error: function (data) {
-              console.log(data);
-          }
-      });                      
-});
-
 //listar todas las ordenes de compra
 function listarordenesdecompra (){
   ocultarformulario();
@@ -698,7 +390,7 @@ function listarordenesdecompra (){
     $("#contenidomodaltablas").html(tablaordenescompra);
     $('#tbllistadoordencompra').DataTable({
         "sScrollX": "110%",
-        "sScrollY": "300px",
+        "sScrollY": "370px",
         "bScrollCollapse": true,  
         processing: true,
         'language': {
@@ -743,25 +435,214 @@ function seleccionarordencompra(Folio, Orden){
     $("#numeroalmacen").val(data.almacen.Numero);
     $("#observaciones").val(data.ordencompra.Obs);
     $("#plazo").val(data.ordencompra.Plazo);
-    $("#tablaproductodordencompra tbody").html(data.filasdetallesordencompra);
+    $("#tablaproductoscompras tbody").html(data.filasdetallesordencompra);
     $("#importe").val(data.importe);
     $("#descuento").val(data.descuento);
     $("#subtotal").val(data.subtotal);
     $("#iva").val(data.iva);
     $("#total").val(data.total);
+    //detalles
+    $("#arraycodigosdetallesordencompra").val(data.arraycodigosdetallesordencompra);
+    //colocar valores a contadores
+    contadorproductos = data.contadorproductos;
+    contadorfilas = data.contadorfilas;
     seleccionartipoordencompra(data);
   })  
 }
 async function seleccionartipoordencompra(data){
   await retraso();
   $("#tipo").val(data.ordencompra.Tipo).change();
-  calculartotalordencompra();
+  calculartotal();
+  mostrarbuscadorcodigoproducto();
   mostrarformulario();
   $('.page-loader-wrapper').css('display', 'none');
 } 
-
+//Cada que se elija un archivo
+function cambiodexml(e) {
+  $("#btnenviarxml").click();
+}
+//Agregar respuesta a la datatable
+$("#btnenviarxml").on('click', function(e){
+  e.preventDefault();
+  var xml = $('#xml')[0].files[0];
+  var form_data = new FormData();
+  form_data.append('xml', xml);  
+      $.ajax({
+          headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+          url:compras_cargar_xml_alta,
+          data: form_data,
+          type: 'POST',
+          contentType: false,
+          processData: false,
+          success: function (data) {
+            console.log(data);
+            if(data.array_comprobante.Descuento == null){
+              var importexml = data.array_comprobante.SubTotal[0];
+              var descuentoxml = '0.'+numerocerosconfigurados;
+              var subtotalxml = data.array_comprobante.SubTotal[0];
+              var ivaxml = data.TotalImpuestosTrasladados[0];
+              var totalxml = data.array_comprobante.Total[0];
+            }else{
+              var importexml = data.array_comprobante.SubTotal[0];
+              var descuentoxml = data.array_comprobante.Descuento[0]
+              var subtotalxml = new Decimal(importexml).minus(descuentoxml);
+              var ivaxml = data.TotalImpuestosTrasladados[0];
+              var totalxml = new Decimal(subtotalxml).plus(ivaxml);
+            }
+              $("#uuidxml").val(data.uuid[0]);
+              $("#uuid").val(data.uuid[0]);
+              $("#fechatimbrado").val(data.fechatimbrado[0]);
+              $("#emisorrfc").val(data.array_emisor.Rfc[0]);
+              $("#emisornombre").val(data.array_emisor.Nombre[0]);
+              $("#receptorrfcxml").val(data.array_receptor.Rfc[0]);
+              $("#receptornombrexml").val(data.array_receptor.Nombre[0]);
+              $("#factura").val(data.array_comprobante.Serie[0]+data.array_comprobante.Folio[0]);
+              $("#importexml").val(number_format(round(importexml, numerodecimales), numerodecimales, '.', ''));
+              $("#descuentoxml").val(number_format(round(descuentoxml, numerodecimales), numerodecimales, '.', ''));
+              $("#subtotalxml").val(number_format(round(subtotalxml, numerodecimales), numerodecimales, '.', ''));
+              $("#ivaxml").val(number_format(round(ivaxml, numerodecimales), numerodecimales, '.', ''));
+              $("#totalxml").val(number_format(round(totalxml, numerodecimales), numerodecimales, '.', ''));
+              $("#fechaemitida").val(data.array_comprobante.Fecha[0]);
+              //mostrar el total de la factura del proveedor
+              //$("#totalfacturaproveedor").html("Total factura proveedor : "+ truncar(totalxml.toFixed(parseInt(numerodecimales)), numerodecimales));
+              $("#totalfacturaproveedor").html("Total factura proveedor :"+ number_format(round(totalxml, numerodecimales), numerodecimales, '.', ''))
+              //detalles xml
+              /*$("#tablaproductoscompras tbody").html(data.filasdetallesxml);
+              calculartotal();*/
+              //validar si la fecha de la compra es igual a la fecha de la factura del proveedor
+              validarmescompra();
+              //mostrar boton de buscar proveedores
+              $("#btnobtenerproveedores").show();
+              //vaciar la fecha de la compra
+              $("#fecha").val("");
+              if($("#total").val() > 0){
+                calculartotal();
+              }
+          },
+          error: function (data) {
+              console.log(data);
+          }
+      });                      
+});
+//detectar cuando en el input de buscar por codigo de producto el usuario presione la tecla enter, si es asi se realizara la busqueda con el codigo escrito
+$(document).ready(function(){
+  $("#codigoabuscar").keypress(function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        listarproductos();
+      }
+  });
+});
+//listar productos para tab consumos
+function listarproductos(){
+  ocultarformulario();
+  var tablaproductos = '<div class="modal-header bg-red">'+
+                          '<h4 class="modal-title">Productos</h4>'+
+                        '</div>'+
+                        '<div class="modal-body">'+
+                          '<div class="row">'+
+                            '<div class="col-md-12">'+
+                              '<div class="table-responsive">'+
+                                '<table id="tbllistadoproducto" class="tbllistadoproducto table table-bordered table-striped table-hover" style="width:100% !important">'+
+                                  '<thead class="customercolor">'+
+                                    '<tr>'+
+                                      '<th>Operaciones</th>'+
+                                      '<th>Código</th>'+
+                                      '<th>Marca</th>'+
+                                      '<th>Producto</th>'+
+                                      '<th>Ubicación</th>'+
+                                      '<th>Existencias Totales</th>'+
+                                      '<th>Costo $</th>'+
+                                      '<th>Sub Total $</th>'+
+                                    '</tr>'+
+                                  '</thead>'+
+                                  '<tbody></tbody>'+
+                                '</table>'+
+                              '</div>'+
+                            '</div>'+  
+                          '</div>'+
+                        '</div>'+
+                        '<div class="modal-footer">'+
+                          '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                        '</div>';   
+  $("#contenidomodaltablas").html(tablaproductos);
+  $('#tbllistadoproducto').DataTable({
+    "sScrollX": "110%",
+    "sScrollY": "370px",
+    "bScrollCollapse": true,
+    processing: true,
+      'language': {
+        'loadingRecords': '&nbsp;',
+        'processing': '<div class="spinner"></div>'
+      },
+    serverSide: true,
+    ajax: {
+      url: compras_obtener_productos,
+      data: function (d) {
+        d.codigoabuscar = $("#codigoabuscar").val();
+        d.numeroalmacen = $("#numeroalmacen").val();
+        d.tipooperacion = $("#tipooperacion").val();
+      }
+    },
+    columns: [
+      { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false  },
+      { data: 'Codigo', name: 'Codigo' },
+      { data: 'Marca', name: 'Marca', orderable: false, searchable: false  },
+      { data: 'Producto', name: 'Producto', orderable: false, searchable: false  },
+      { data: 'Ubicacion', name: 'Ubicacion', orderable: false, searchable: false  },
+      { data: 'Existencias', name: 'Existencias', orderable: false, searchable: false  },
+      { data: 'Costo', name: 'Costo', orderable: false, searchable: false  },
+      { data: 'SubTotal', name: 'SubTotal', orderable: false, searchable: false  } 
+    ],
+    "initComplete": function() {
+      var $buscar = $('div.dataTables_filter input');
+      $buscar.unbind();
+      $buscar.bind('keyup change', function(e) {
+        if(e.keyCode == 13 || this.value == "") {
+          $('#tbllistadoproducto').DataTable().search( this.value ).draw();
+        }
+      });
+    },
+    "iDisplayLength": 8,
+  });
+}
+//funcion que evalua si el codigo agregado existe en la orden de compra
+function evaluarcodigoenordencompra(Codigo){
+  var arraycodigosdetallesordencompra = $("#arraycodigosdetallesordencompra").val();
+  var codigoencontrado = arraycodigosdetallesordencompra.search(Codigo);
+  if(codigoencontrado == -1){
+    var codigocorrecto = false;
+  }else{
+    var codigocorrecto = true;
+  }
+  return codigocorrecto;
+}
+//función que evalua si la partida que quieren ingresar ya existe o no en el detalle de la orden de compra
+function evaluarproductoexistente(Codigo){
+  var sumaiguales=0;
+  var sumadiferentes=0;
+  var sumatotal=0;
+  $("tr.filasproductos").each(function () {
+      var codigoproducto = $('.codigoproductopartida', this).val();
+      if(Codigo === codigoproducto){
+          sumaiguales++;
+      }else{
+          sumadiferentes++;
+      }
+      sumatotal++;
+  });
+  var resta = parseInt(sumadiferentes) - parseInt(sumaiguales);
+  var total = sumatotal;
+  if(resta != total){
+      var result = true;
+  }else{
+      var result = false;
+  }
+  return result;
+}
 //calcular total de la orden de compra
-function calculartotalesfilasordencompra(fila){
+function calculartotalesfilas(fila){
   // for each por cada fila:
   var cuentaFilas = 0;
   $("tr.filasproductos").each(function () { 
@@ -826,7 +707,7 @@ function calculartotalesfilasordencompra(fila){
       var menosretencioniepspesospartida = new Decimal(menosretencionisrpesospartida).minus(retencioniepspesospartida);
       totalpesospartida = new Decimal(menosretencioniepspesospartida);
       $('.totalpesospartida', this).val(truncar(totalpesospartida, numerodecimales).toFixed(parseInt(numerodecimales)));
-      calculartotalordencompra();
+      calculartotal();
       //asignar el traslado traslado iva partida
       $(".trasladoivapartida", this).val(ivaporcentajepartida+',Tasa');
     }  
@@ -841,8 +722,8 @@ function cambiodecantidadopreciopartida(fila){
       //$('.descuentopesospartida', this).val('0.'+numerocerosconfigurados); 
       //$('.descuentoporcentajepartida',this).val('0.'+numerocerosconfigurados);
       calculardescuentoporcentajepartida(fila);
-      calculartotalesfilasordencompra(fila);
-      calculartotalordencompra();
+      calculartotalesfilas(fila);
+      calculartotal();
     }  
     cuentaFilas++;
   });  
@@ -859,8 +740,8 @@ function calculardescuentoporcentajepartida(fila){
       if(multiplicaciondescuentoporcentajepartida.d[0] > parseInt(0)){
         var descuentoporcentajepartida = new Decimal(multiplicaciondescuentoporcentajepartida/importepartida);
         $('.descuentoporcentajepartida', this).val(number_format(round(descuentoporcentajepartida, numerodecimales), numerodecimales, '.', ''));
-        calculartotalesfilasordencompra(fila);
-        calculartotalordencompra();
+        calculartotalesfilas(fila);
+        calculartotal();
       }
     }  
     cuentaFilas++;
@@ -878,15 +759,15 @@ function calculardescuentopesospartida(fila){
       if(multiplicaciondescuentopesospartida.d[0] > parseInt(0)){
         var descuentopesospartida = new Decimal(multiplicaciondescuentopesospartida/100);
         $('.descuentopesospartida', this).val(number_format(round(descuentopesospartida, numerodecimales), numerodecimales, '.', ''));
-        calculartotalesfilasordencompra(fila);
-        calculartotalordencompra();
+        calculartotalesfilas(fila);
+        calculartotal();
       }
     }  
     cuentaFilas++;
   }); 
 }      
 //calcular totales de orden de compra
-function calculartotalordencompra(){
+function calculartotal(){
   var importe = 0;
   var descuento = 0;
   var subtotal= 0;
@@ -962,60 +843,151 @@ function validarmescompra(){
     msj_errorfechaigualafechafactura();
   }
 }
-//guardar el registro
-$("#btnGuardar").on('click', function (e) {
-  e.preventDefault();
-  var diferenciatotales = $("#diferenciatotales").val();
-  if(diferenciatotales <= 0.01){
-    $("#tipo").prop("disabled", false);
-    var formData = new FormData($("#formparsley")[0]);
-    var form = $("#formparsley");
-    if (form.parsley().isValid()){
-      $('.page-loader-wrapper').css('display', 'block');
-      $.ajax({
-        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-        url:compras_guardar,
-        type: "post",
-        dataType: "html",
-        data: formData,
-        cache: false,
-        contentType: false,
-        processData: false,
-        success:function(data){
-          if(data == 1){
-            msj_erroruuidexistente();
-            $('.page-loader-wrapper').css('display', 'none');
-          }else{
-            msj_datosguardadoscorrectamente();
-            limpiar();
-            ocultarmodalformulario();
-            limpiarmodales();
-            $('.page-loader-wrapper').css('display', 'none');
-          }
-        },
-        error:function(data){
-          if(data.status == 403){
-            msj_errorenpermisos();
-          }else{
-            msj_errorajax();
-          }
-          $('.page-loader-wrapper').css('display', 'none');
-        }
-      })
-    }else{
-      form.parsley().validate();
-    }
-  }else{
-    msj_errortotalpartidasnocoincide();
-  }
-});
-//modificacion compra
-function obtenerdatos(compramodificar){
-  $("#titulomodal").html('Modificación Compra');
+//agregar una fila en la tabla de precios productos
+var contadorproductos=0;
+var contadorfilas = 0;
+function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal, Existencias, tipooperacion, Insumo, ClaveProducto, ClaveUnidad, NombreClaveProducto, NombreClaveUnidad, CostoDeLista){
   $('.page-loader-wrapper').css('display', 'block');
-  $.get(compras_obtener_compra,{compramodificar:compramodificar },function(data){
-    //formulario modificacion
-    var tabs =    '<div class="row">'+
+  var codigocorrecto = evaluarcodigoenordencompra(Codigo);
+  if(codigocorrecto == true){
+    var result = evaluarproductoexistente(Codigo);
+    if(result == false){
+        var multiplicacioncostoimpuesto =  new Decimal(SubTotal).times(Impuesto);      
+        var ivapesos = new Decimal(multiplicacioncostoimpuesto/100);
+        var total = new Decimal(SubTotal).plus(ivapesos);
+        var preciopartida = Costo;
+        var orden = $("#orden").val();
+        var tipo = "alta";
+        var fila=   
+                  '<tr class="filasproductos" id="filaproducto'+contadorproductos+'">'+
+                    '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('+contadorproductos+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
+                    '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'+
+                    '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'+Unidad+'" readonly data-parsley-length="[1, 5]">'+Unidad+'</td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm porsurtirpartida"  name="porsurtirpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');"></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" value="'+preciopartida+'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');"></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" ></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm importedescuentopesospartida" name="importedescuentopesospartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm iepsporcentajepartida" name="iepsporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" readonly></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm trasladoiepspesospartida" name="trasladoiepspesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'+Impuesto+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" readonly></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm trasladoivapesospartida" name="trasladoivapesospartida[]" value="'+ivapesos+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencionivaporcentajepartida" name="retencionivaporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" readonly></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencionivapesospartida" name="retencionivapesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencionisrporcentajepartida" name="retencionisrporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" readonly></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencionisrpesospartida" name="retencionisrpesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencioniepsporcentajepartida" name="retencioniepsporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" readonly></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencioniepspesospartida" name="retencioniepspesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'+total+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm ordenpartida" name="ordenpartida[]" value="'+orden+'" readonly data-parsley-length="[1, 20]"></td>'+
+                    '<td class="tdmod">'+
+                        '<div class="row divorinputmodxl">'+
+                            '<div class="col-md-2">'+
+                                '<div class="btn bg-blue btn-xs waves-effect" data-toggle="tooltip" title="Ver Departamentos" onclick="listardepartamentos('+contadorfilas+');" ><i class="material-icons">remove_red_eye</i></div>'+
+                            '</div>'+
+                            '<div class="col-md-10">'+    
+                                '<input type="hidden" class="form-control divorinputmodsm numerodepartamentopartida" name="numerodepartamentopartida[]" readonly><input type="text" class="form-control divorinputmodmd departamentopartida" name="departamentopartida[]" readonly>'+   
+                            '</div>'+
+                        '</div>'+
+                    '</td>'+
+                    '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm preciomonedapartida" name="preciomonedapartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" ></td>'+
+                    '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm descuentopartida" name="descuentopartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" ></td>'+
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'+ClaveProducto+'" readonly data-parsley-length="[1, 20]"></td>'+
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'+NombreClaveProducto+'" readonly></td>'+
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'+ClaveUnidad+'" readonly data-parsley-length="[1, 5]"></td>'+
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'+NombreClaveUnidad+'" readonly></td>'+
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm costocatalogopartida" name="costocatalogopartida[]" value="'+Costo+'"  readonly></td>'+
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm costoingresadopartida" name="costoingresadopartida[]" readonly></td>'+
+                  '</tr>';
+        contadorproductos++;
+        contadorfilas++;
+        $("#tablaproductoscompras").append(fila);
+        mostrarformulario();      
+        comprobarfilas();
+        calculartotal();
+        $('.page-loader-wrapper').css('display', 'none');
+    }else{
+        msj_errorproductoyaagregado();
+        $('.page-loader-wrapper').css('display', 'none');
+    }  
+  }else{
+    msj_errorcodigonoexisteenorden();
+    $('.page-loader-wrapper').css('display', 'none');
+  }
+}
+//eliminar una fila en la tabla de precios clientes
+function eliminarfila(numerofila){
+  var confirmacion = confirm("Esta seguro de eliminar la fila?"); 
+  if (confirmacion == true) { 
+    $("#filaproducto"+numerofila).remove();
+    contadorfilas--;
+    contadorproductos--;
+    comprobarfilas();
+    renumerarfilas();//importante para todos los calculo en el modulo de orden de compra 
+    calculartotal();  
+  }
+}
+//comprobar numero filas de la tabla precios clientes
+function comprobarfilas(){
+  var numerofilas = $("#tablaproductoscompras tbody tr").length;
+  $("#numerofilas").val(numerofilas);
+}
+//renumerar las filas de la orden de compra
+function renumerarfilas(){
+  var lista;
+  var tipo = "alta";
+  //renumerar cantidadpartida
+  lista = document.getElementsByClassName("cantidadpartida");
+  for (var i = 0; i < lista.length; i++) {
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+')');
+  }
+  //renumerar preciopartida
+  lista = document.getElementsByClassName("preciopartida");
+  for (var i = 0; i < lista.length; i++) {
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+')');
+  }
+  //renumerar descuentopesospartida
+  lista = document.getElementsByClassName("descuentopesospartida");
+  for (var i = 0; i < lista.length; i++) {
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+')');
+  }
+  //renumerar iepsporcentajepartida
+  lista = document.getElementsByClassName("iepsporcentajepartida");
+  for (var i = 0; i < lista.length; i++) {
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+')');
+  }
+  //renumerar ivaporcentajepartida
+  lista = document.getElementsByClassName("ivaporcentajepartida");
+  for (var i = 0; i < lista.length; i++) {
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+')');
+  }
+  // renumerar retencionivaporcentajepartida
+  lista = document.getElementsByClassName("retencionivaporcentajepartida");
+  for (var i = 0; i < lista.length; i++){
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+')');
+  }
+  // renumerar retencionisrporcentajepartida
+  lista = document.getElementsByClassName("retencionisrporcentajepartida");
+  for (var i = 0; i < lista.length; i++){
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+')');
+  }
+  // renumerar retencioniepsporcentajepartida
+  lista = document.getElementsByClassName("retencioniepsporcentajepartida");
+  for (var i = 0; i < lista.length; i++){
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+')');
+  }
+}  
+//alta clientes
+function alta(){
+  $("#titulomodal").html('Alta Compra Prod');
+  mostrarmodalformulario('ALTA', 1);
+  mostrarformulario();
+  //formulario alta
+  var tabs =    '<div class="row">'+
                     '<div class="col-md-12">'+
                         '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
                             '<li role="presentation" class="active">'+
@@ -1031,14 +1003,16 @@ function obtenerdatos(compramodificar){
                                     '<div class="col-md-3">'+
                                         '<label>Compra <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
                                         '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
-                                        '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly>'+
-                                        '<input type="hidden" class="form-control" name="compra" id="compra" required readonly>'+
-                                        '<input type="hidden" class="form-control" name="uuid" id="uuid" readonly required>'+
+                                        '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'"  required readonly data-parsley-length="[1, 10]">'+
+                                        '<input type="hidden" class="form-control" name="uuid" id="uuid" readonly required data-parsley-length="[1, 50]">'+
                                         '<input type="hidden" class="form-control" name="diferenciatotales" id="diferenciatotales" readonly required>'+
+                                        '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
+                                        '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
+                                        '<input type="hidden" class="form-control" name="arraycodigosdetallesordencompra" id="arraycodigosdetallesordencompra" readonly>'+
                                     '</div>'+   
                                     '<div class="col-md-3">'+
                                         '<label>Plazo Días (proveedor)</label>'+
-                                        '<input type="text" class="form-control" name="plazo" id="plazo"  required readonly onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control" name="plazo" id="plazo"  required onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Fecha</label>'+
@@ -1087,11 +1061,11 @@ function obtenerdatos(compramodificar){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Remisión</label>'+
-                                        '<input type="text" class="form-control" name="remision" id="remision" onkeyup="tipoLetra(this)">'+
+                                        '<input type="text" class="form-control" name="remision" id="remision" onkeyup="tipoLetra(this)" data-parsley-length="[1, 20]">'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Factura</label>'+
-                                        '<input type="text" class="form-control" name="factura" id="factura" required onkeyup="tipoLetra(this)">'+
+                                        '<input type="text" class="form-control" name="factura" id="factura" required onkeyup="tipoLetra(this)" data-parsley-length="[1, 20]">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+    
@@ -1100,12 +1074,12 @@ function obtenerdatos(compramodificar){
                                         '<select name="tipo" id="tipo" class="form-control select2" style="width:100% !important;" required readonly>'+
                                         '</select>'+
                                     '</div>'+
-                                    '<div class="col-md-6" id="divbuscarcodigoproducto">'+
+                                    '<div class="col-md-3">'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td>'+
                                                     '<label>Moneda</label>'+
-                                                    '<select name="moneda" id="moneda" class="form-control select2" style="width:100% !important;" required>'+
+                                                    '<select name="moneda" id="moneda" class="form-control select2" style="width:100% !important;" required data-parsley-length="[1, 5]">'+
                                                         '<option value="MXN">MXN</option>'+
                                                         '<option value="USD">USD</option>'+
                                                         '<option value="EUR">EUR</option>'+
@@ -1118,9 +1092,14 @@ function obtenerdatos(compramodificar){
                                             '</tr>'+
                                         '</table>'+
                                     '</div>'+
-                                    '<div class="col-md-3" id="divbtnlistarordenes">'+
+                                    '<div class="col-md-3">'+
                                         '<label>Cargar Ordenes de Compra</label>'+
-                                        '<div class="btn bg-blue waves-effect" id="btnlistarordenesdecompra" onclick="listarordenesdecompra()" style="display:none">Ver Ordenes de Compra</div>'+
+                                        '<div class="btn btn-block bg-blue waves-effect" id="btnlistarordenesdecompra" onclick="listarordenesdecompra()" style="display:none">VER ORDENES DE COMPRA</div>'+
+                                        '<input type="hidden" class="form-control" name="orden" id="orden" required readonly>'+
+                                    '</div>'+
+                                    '<div class="col-md-3" id="divbuscarcodigoproducto" hidden>'+
+                                        '<label>Buscar producto por código</label>'+
+                                        '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'+   
@@ -1128,19 +1107,23 @@ function obtenerdatos(compramodificar){
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Emisor R.F.C.</label>'+
-                                        '<input type="text" class="form-control" name="emisorrfc" id="emisorrfc"  required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                        '<input type="text" class="form-control" name="emisorrfc" id="emisorrfc"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                        '<input type="hidden" class="form-control" name="emisorrfcdb" id="emisorrfcdb"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Emisor Nombre</label>'+
-                                        '<input type="text" class="form-control" name="emisornombre" id="emisornombre" required onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control" name="emisornombre" id="emisornombre" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="hidden" class="form-control" name="emisornombredb" id="emisornombredb" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Receptor R.F.C.</label>'+
-                                        '<input type="text" class="form-control" name="receptorrfc" id="receptorrfc"  required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                        '<input type="text" class="form-control" name="receptorrfc" id="receptorrfc"  value="'+rfcreceptor+'" required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                        '<input type="hidden" class="form-control" name="receptorrfcxml" id="receptorrfcxml" required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Receptor Nombre</label>'+
-                                        '<input type="text" class="form-control" name="receptornombre" id="receptornombre" required onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control" name="receptornombre" id="receptornombre" value="'+nombrereceptor+'" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="hidden" class="form-control" name="receptornombrexml" id="receptornombrexml" value="'+nombrereceptor+'" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'+   
@@ -1157,43 +1140,43 @@ function obtenerdatos(compramodificar){
                         '<div class="tab-content">'+
                             '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
                                 '<div class="row">'+
-                                    '<div class="col-md-12 table-responsive">'+
-                                        '<table id="tablaproductodordencompra" class="table table-bordered tablaproductodordencompra">'+
+                                    '<div class="col-md-12 table-responsive cabecerafija" style="height: 200px;overflow-y: scroll;padding: 0px 0px;">'+
+                                        '<table id="tablaproductoscompras" class="table table-bordered tablaproductoscompras">'+
                                             '<thead class="customercolor">'+
                                                 '<tr>'+
-                                                '<th>#</th>'+
+                                                '<th class="customercolor">#</th>'+
                                                 '<th class="customercolortheadth">Código</th>'+
                                                 '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
                                                 '<th class="customercolortheadth">Unidad</th>'+
-                                                '<th hidden>Por Surtir</th>'+
+                                                '<th class="customercolor">Por Surtir</th>'+
                                                 '<th class="customercolortheadth">Cantidad</th>'+
                                                 '<th class="customercolortheadth">Precio $</th>'+
-                                                '<th>Importe $</th>'+
+                                                '<th class="customercolor">Importe $</th>'+
                                                 '<th class="customercolortheadth">Dcto %</th>'+
                                                 '<th class="customercolortheadth">Dcto $</th>'+
-                                                '<th>Importe Descuento $</th>'+
+                                                '<th class="customercolor">Importe Descuento $</th>'+
                                                 '<th class="customercolortheadth">Ieps %</th>'+
-                                                '<th>Traslado Ieps $</th>'+
-                                                '<th>SubTotal $</th>'+
+                                                '<th class="customercolor">Traslado Ieps $</th>'+
+                                                '<th class="customercolor">SubTotal $</th>'+
                                                 '<th class="customercolortheadth">Iva %</th>'+
-                                                '<th>Traslado Iva $</th>'+
+                                                '<th class="customercolor">Traslado Iva $</th>'+
                                                 '<th class="customercolortheadth">Retención Iva %</th>'+
-                                                '<th>Retención Iva $</th>'+
+                                                '<th class="customercolor">Retención Iva $</th>'+
                                                 '<th class="customercolortheadth">Retención Isr %</th>'+
-                                                '<th>Retención Isr $</th>'+
+                                                '<th class="customercolor">Retención Isr $</th>'+
                                                 '<th class="customercolortheadth">Retención Ieps %</th>'+
-                                                '<th>Retención Ieps $</th>'+
-                                                '<th>Total $</th>'+
+                                                '<th class="customercolor">Retención Ieps $</th>'+
+                                                '<th class="customercolor">Total $</th>'+
                                                 '<th class="customercolortheadth">Orden</th>'+
                                                 '<th class="customercolortheadth">Depto</th>'+
                                                 '<th class="customercolortheadth" hidden>Precio Moneda $</th>'+
                                                 '<th class="customercolortheadth" hidden>Descuento $</th>'+
-                                                '<th>ClaveProducto</th>'+
-                                                '<th>Nombre ClaveProducto</th>'+
-                                                '<th>ClaveUnidad</th>'+
-                                                '<th>Nombre ClaveUnidad</th>'+
-                                                '<th>Costo Catálogo</th>'+
-                                                '<th>Costo Ingresado</th>'+
+                                                '<th class="customercolor">ClaveProducto</th>'+
+                                                '<th class="customercolor">Nombre ClaveProducto</th>'+
+                                                '<th class="customercolor">ClaveUnidad</th>'+
+                                                '<th class="customercolor">Nombre ClaveUnidad</th>'+
+                                                '<th class="customercolor">Costo Catálogo</th>'+
+                                                '<th class="customercolor">Costo Ingresado</th>'+
                                                 '</tr>'+
                                             '</thead>'+
                                             '<tbody>'+           
@@ -1204,7 +1187,7 @@ function obtenerdatos(compramodificar){
                                 '<div class="row">'+
                                   '<div class="col-md-6">'+   
                                       '<label>Observaciones</label>'+
-                                      '<textarea class="form-control" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required readonly></textarea>'+
+                                      '<textarea class="form-control" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
                                   '</div>'+ 
                                   '<div class="col-md-3 col-md-offset-3">'+
                                         '<table class="table table-striped table-hover">'+
@@ -1218,7 +1201,7 @@ function obtenerdatos(compramodificar){
                                                 '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="descuento" id="descuento" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
                                                 '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="descuentoxml" id="descuentoxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
                                             '</tr>'+
-                                            '<tr id="trieps">'+
+                                            '<tr id="trieps" hidden>'+
                                               '<td class="tdmod">Ieps</td>'+
                                               '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="ieps" id="ieps" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
                                               '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="iepsxml" id="iepsxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
@@ -1233,17 +1216,369 @@ function obtenerdatos(compramodificar){
                                                 '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="iva" id="iva" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
                                                 '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="ivaxml" id="ivaxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
                                             '</tr>'+
-                                            '<tr id="trretencioniva">'+
+                                            '<tr id="trretencioniva" hidden>'+
                                               '<td class="tdmod">Retención Iva</td>'+
                                               '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencioniva" id="retencioniva" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
                                               '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionivaxml" id="retencionivaxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
                                             '</tr>'+
-                                            '<tr id="trretencionisr">'+
+                                            '<tr id="trretencionisr" hidden>'+
                                               '<td class="tdmod">Retención Isr</td>'+
                                               '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionisr" id="retencionisr" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
                                               '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionisrxml" id="retencionisrxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
                                             '</tr>'+
-                                            '<tr id="trretencionieps">'+
+                                            '<tr id="trretencionieps" hidden>'+
+                                              '<td class="tdmod">Retención Ieps</td>'+
+                                              '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionieps" id="retencionieps" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                              '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencioniepsxml" id="retencioniepsxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                            '</tr>'+
+                                            '<tr>'+
+                                                '<td class="tdmod">Total</td>'+
+                                                '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                                '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="totalxml" id="totalxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                            '</tr>'+
+                                        '</table>'+
+                                  '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                  '<div class="col-md-12">'+   
+                                    '<h5 id="mensajecalculoscompra"></h5>'+  
+                                  '</div>'+
+                                '</div>'+
+                            '</div>'+ 
+                        '</div>'+
+                    '</div>'+
+                '</div>';
+  $("#tabsform").html(tabs);
+  obtenultimonumero();
+  obtenertiposordenescompra()
+  asignarfechaactual();
+  //ocultar buscador de productos
+  mostrarbuscadorcodigoproducto();
+  //asignar el tipo de operacion que se realizara
+  $("#tipooperacion").val("alta");
+  //activar los input select
+  $("#tipo").select2({disabled: true});
+  $("#moneda").select2();
+  //reiniciar contadores
+  contadorproductos=0;
+  contadorfilas = 0;
+  //activar busqueda de codigos
+  $("#codigoabuscar").keypress(function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      listarproductos();
+    }
+  });
+  $("#ModalAlta").modal('show');
+}
+//guardar el registro
+$("#btnGuardar").on('click', function (e) {
+  e.preventDefault();
+  var diferenciatotales = $("#diferenciatotales").val();
+  if(diferenciatotales <= 0.01){
+    var emisorrfc = $("#emisorrfc").val();
+    var emisorrfcdb = $("#emisorrfcdb").val();
+    if(emisorrfc == emisorrfcdb){
+      var receptorrfc = $("#receptorrfc").val();
+      var receptorrfcxml = $("#receptorrfcxml").val();
+      if(receptorrfc == receptorrfcxml){
+        $("#tipo").prop("disabled", false);
+        var formData = new FormData($("#formparsley")[0]);
+        var form = $("#formparsley");
+        if (form.parsley().isValid()){
+          $('.page-loader-wrapper').css('display', 'block');
+          $.ajax({
+            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+            url:compras_guardar,
+            type: "post",
+            dataType: "html",
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success:function(data){
+              if(data == 1){
+                msj_erroruuidexistente();
+                $('.page-loader-wrapper').css('display', 'none');
+              }else{
+                msj_datosguardadoscorrectamente();
+                limpiar();
+                ocultarmodalformulario();
+                limpiarmodales();
+                $('.page-loader-wrapper').css('display', 'none');
+              }
+            },
+            error:function(data){
+              if(data.status == 403){
+                msj_errorenpermisos();
+              }else{
+                msj_errorajax();
+              }
+              $('.page-loader-wrapper').css('display', 'none');
+            }
+          })    
+        }else{
+          form.parsley().validate();
+        }
+      }else{
+        msj_errorrfcreceptordistinto();
+      }
+    }else{
+      msj_errorrfcdistinto();
+    }
+  }else{
+    msj_errortotalpartidasnocoincide();
+  }
+});
+//modificacion compra
+function obtenerdatos(compramodificar){
+  $("#titulomodal").html('Modificación Compra');
+  $('.page-loader-wrapper').css('display', 'block');
+  $.get(compras_obtener_compra,{compramodificar:compramodificar },function(data){
+    console.log(data);
+    //formulario modificacion
+    var tabs =    '<div class="row">'+
+                    '<div class="col-md-12">'+
+                        '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                            '<li role="presentation" class="active">'+
+                                '<a href="#compratab" data-toggle="tab">Compra</a>'+
+                            '</li>'+
+                            '<li role="presentation">'+
+                                '<a href="#emisorreceptortab" data-toggle="tab">Emisor, Receptor</a>'+
+                            '</li>'+
+                        '</ul>'+
+                        '<div class="tab-content">'+
+                            '<div role="tabpanel" class="tab-pane fade in active" id="compratab">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Compra <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
+                                        '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                                        '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
+                                        '<input type="hidden" class="form-control" name="compra" id="compra" required readonly>'+
+                                        '<input type="hidden" class="form-control" name="uuid" id="uuid" readonly required data-parsley-length="[1, 50]">'+
+                                        '<input type="hidden" class="form-control" name="diferenciatotales" id="diferenciatotales" readonly required>'+
+                                        '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
+                                        '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
+                                        '<input type="hidden" class="form-control" name="arraycodigosdetallesordencompra" id="arraycodigosdetallesordencompra" readonly>'+
+                                    '</div>'+   
+                                    '<div class="col-md-3">'+
+                                        '<label>Plazo Días (proveedor)</label>'+
+                                        '<input type="text" class="form-control" name="plazo" id="plazo"  required onkeyup="tipoLetra(this);">'+
+                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Fecha</label>'+
+                                        '<input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();validarmescompra();">'+
+                                        '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
+                                        '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
+                                    '</div>'+   
+                                    '<div class="col-md-3">'+
+                                        '<label>Emitida</label>'+
+                                        '<input type="datetime-local" class="form-control" name="fechaemitida" id="fechaemitida"  required readonly>'+
+                                        '<input type="hidden" class="form-control" name="fechatimbrado" id="fechatimbrado" >'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Proveedor</label>'+
+                                        '<table class="col-md-12">'+
+                                            '<tr>'+
+                                                '<td>'+
+                                                    '<div class="btn bg-blue waves-effect" id="btnobtenerproveedores" onclick="obtenerproveedores()" style="display:none">Seleccionar</div>'+
+                                                '</td>'+
+                                                '<td>'+
+                                                    '<div class="form-line">'+
+                                                        '<input type="hidden" class="form-control" name="numeroproveedor" id="numeroproveedor" required readonly onkeyup="tipoLetra(this)">'+
+                                                        '<input type="text" class="form-control" name="proveedor" id="proveedor" required readonly>'+
+                                                    '</div>'+
+                                                '</td>'+    
+                                            '</tr>'+    
+                                        '</table>'+
+                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Almacen</label>'+
+                                        '<table class="col-md-12">'+
+                                            '<tr>'+
+                                                '<td hidden>'+
+                                                    '<div class="btn bg-blue waves-effect" onclick="obteneralmacenes()">Seleccionar</div>'+
+                                                '</td>'+
+                                                '<td>'+
+                                                    '<div class="form-line">'+
+                                                        '<input type="hidden" class="form-control" name="numeroalmacen" id="numeroalmacen" required readonly onkeyup="tipoLetra(this)">'+
+                                                        '<input type="text" class="form-control" name="almacen" id="almacen" required readonly>'+
+                                                    '</div>'+
+                                                '</td>'+
+                                            '</tr>'+    
+                                        '</table>'+
+                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Remisión</label>'+
+                                        '<input type="text" class="form-control" name="remision" id="remision" onkeyup="tipoLetra(this)" data-parsley-length="[1, 20]">'+
+                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Factura</label>'+
+                                        '<input type="text" class="form-control" name="factura" id="factura" required onkeyup="tipoLetra(this)" data-parsley-length="[1, 20]">'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="row">'+    
+                                    '<div class="col-md-3">'+
+                                        '<label>Tipo</label>'+
+                                        '<select name="tipo" id="tipo" class="form-control select2" style="width:100% !important;" required readonly>'+
+                                        '</select>'+
+                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                        '<table class="col-md-12">'+
+                                            '<tr>'+
+                                                '<td>'+
+                                                    '<label>Moneda</label>'+
+                                                    '<select name="moneda" id="moneda" class="form-control select2" style="width:100% !important;" required data-parsley-length="[1, 5]">'+
+                                                        '<option value="MXN">MXN</option>'+
+                                                        '<option value="USD">USD</option>'+
+                                                        '<option value="EUR">EUR</option>'+
+                                                    '</select>'+
+                                                '</td>'+
+                                                '<td>'+
+                                                    '<label>Pesos</label>'+
+                                                    '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="pesosmoneda" id="pesosmoneda" value="1.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                                '</td>'+
+                                            '</tr>'+
+                                        '</table>'+
+                                    '</div>'+
+                                    '<div class="col-md-3" id="divbtnlistarordenes">'+
+                                        '<label>Cargar Ordenes de Compra</label>'+
+                                        '<div class="btn bg-blue waves-effect" id="btnlistarordenesdecompra" onclick="listarordenesdecompra()" style="display:none">Ver Ordenes de Compra</div>'+
+                                        '<input type="hidden" class="form-control" name="orden" id="orden" required readonly>'+
+                                    '</div>'+
+                                    '<div class="col-md-3" id="divbuscarcodigoproducto" hidden>'+
+                                        '<label>Buscar producto por código</label>'+
+                                        '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+   
+                            '<div role="tabpanel" class="tab-pane fade" id="emisorreceptortab">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-6">'+
+                                        '<label>Emisor R.F.C.</label>'+
+                                        '<input type="text" class="form-control" name="emisorrfc" id="emisorrfc"  required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                        '<input type="hidden" class="form-control" name="emisorrfcdb" id="emisorrfcdb"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                      '</div>'+
+                                    '<div class="col-md-6">'+
+                                        '<label>Emisor Nombre</label>'+
+                                        '<input type="text" class="form-control" name="emisornombre" id="emisornombre" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="hidden" class="form-control" name="emisornombredb" id="emisornombredb" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '</div>'+
+                                    '<div class="col-md-6">'+
+                                        '<label>Receptor R.F.C.</label>'+
+                                        '<input type="text" class="form-control" name="receptorrfc" id="receptorrfc"  required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                        '<input type="hidden" class="form-control" name="receptorrfcxml" id="receptorrfcxml" required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                    '</div>'+
+                                    '<div class="col-md-6">'+
+                                        '<label>Receptor Nombre</label>'+
+                                        '<input type="text" class="form-control" name="receptornombre" id="receptornombre" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="hidden" class="form-control" name="receptornombrexml" id="receptornombrexml" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+   
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+                '<div class="row">'+
+                    '<div class="col-md-12">'+
+                        '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                            '<li role="presentation" class="active">'+
+                                '<a href="#productostab" data-toggle="tab">Productos</a>'+
+                            '</li>'+
+                        '</ul>'+
+                        '<div class="tab-content">'+
+                            '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-12 table-responsive cabecerafija" style="height: 200px;overflow-y: scroll;padding: 0px 0px;">'+
+                                        '<table id="tablaproductoscompras" class="table table-bordered tablaproductoscompras">'+
+                                            '<thead class="customercolor">'+
+                                                '<tr>'+
+                                                '<th class="customercolor">#</th>'+
+                                                '<th class="customercolortheadth">Código</th>'+
+                                                '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
+                                                '<th class="customercolortheadth">Unidad</th>'+
+                                                '<th class="customercolor" hidden>Por Surtir</th>'+
+                                                '<th class="customercolortheadth">Cantidad</th>'+
+                                                '<th class="customercolortheadth">Precio $</th>'+
+                                                '<th class="customercolor">Importe $</th>'+
+                                                '<th class="customercolortheadth">Dcto %</th>'+
+                                                '<th class="customercolortheadth">Dcto $</th>'+
+                                                '<th class="customercolor">Importe Descuento $</th>'+
+                                                '<th class="customercolortheadth">Ieps %</th>'+
+                                                '<th class="customercolor">Traslado Ieps $</th>'+
+                                                '<th class="customercolor">SubTotal $</th>'+
+                                                '<th class="customercolortheadth">Iva %</th>'+
+                                                '<th class="customercolor">Traslado Iva $</th>'+
+                                                '<th class="customercolortheadth">Retención Iva %</th>'+
+                                                '<th class="customercolor">Retención Iva $</th>'+
+                                                '<th class="customercolortheadth">Retención Isr %</th>'+
+                                                '<th class="customercolor">Retención Isr $</th>'+
+                                                '<th class="customercolortheadth">Retención Ieps %</th>'+
+                                                '<th class="customercolor">Retención Ieps $</th>'+
+                                                '<th class="customercolor">Total $</th>'+
+                                                '<th class="customercolortheadth">Orden</th>'+
+                                                '<th class="customercolortheadth">Depto</th>'+
+                                                '<th class="customercolortheadth" hidden>Precio Moneda $</th>'+
+                                                '<th class="customercolortheadth" hidden>Descuento $</th>'+
+                                                '<th class="customercolor">ClaveProducto</th>'+
+                                                '<th class="customercolor">Nombre ClaveProducto</th>'+
+                                                '<th class="customercolor">ClaveUnidad</th>'+
+                                                '<th class="customercolor">Nombre ClaveUnidad</th>'+
+                                                '<th class="customercolor">Costo Catálogo</th>'+
+                                                '<th class="customercolor">Costo Ingresado</th>'+
+                                                '</tr>'+
+                                            '</thead>'+
+                                            '<tbody>'+           
+                                            '</tbody>'+
+                                        '</table>'+
+                                    '</div>'+
+                                '</div>'+ 
+                                '<div class="row">'+
+                                  '<div class="col-md-6">'+   
+                                      '<label>Observaciones</label>'+
+                                      '<textarea class="form-control" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
+                                  '</div>'+ 
+                                  '<div class="col-md-3 col-md-offset-3">'+
+                                        '<table class="table table-striped table-hover">'+
+                                            '<tr>'+
+                                                '<td class="tdmod">Importe</td>'+
+                                                '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="importe" id="importe" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                                '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="importexml" id="importexml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                            '</tr>'+
+                                            '<tr>'+
+                                                '<td class="tdmod">Descuento</td>'+
+                                                '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="descuento" id="descuento" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                                '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="descuentoxml" id="descuentoxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                            '</tr>'+
+                                            '<tr id="trieps" hidden>'+
+                                              '<td class="tdmod">Ieps</td>'+
+                                              '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="ieps" id="ieps" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                              '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="iepsxml" id="iepsxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                            '</tr>'+
+                                            '<tr>'+
+                                                '<td class="tdmod">SubTotal</td>'+
+                                                '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="subtotal" id="subtotal" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                                '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="subtotalxml" id="subtotalxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                            '</tr>'+
+                                            '<tr>'+
+                                                '<td class="tdmod">Iva</td>'+
+                                                '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="iva" id="iva" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                                '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="ivaxml" id="ivaxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                            '</tr>'+
+                                            '<tr id="trretencioniva" hidden>'+
+                                              '<td class="tdmod">Retención Iva</td>'+
+                                              '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencioniva" id="retencioniva" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                              '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionivaxml" id="retencionivaxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                            '</tr>'+
+                                            '<tr id="trretencionisr" hidden>'+
+                                              '<td class="tdmod">Retención Isr</td>'+
+                                              '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionisr" id="retencionisr" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                              '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionisrxml" id="retencionisrxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                            '</tr>'+
+                                            '<tr id="trretencionieps" hidden>'+
                                               '<td class="tdmod">Retención Ieps</td>'+
                                               '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionieps" id="retencionieps" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
                                               '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencioniepsxml" id="retencioniepsxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
@@ -1269,13 +1604,16 @@ function obtenerdatos(compramodificar){
     //esconder el div del boton listar ordenes
     $("#divbtnlistarordenes").hide();
     $("#folio").val(data.compra.Folio);
+    $("#serie").val(data.compra.Serie);
+    $("#serietexto").html("Serie: "+data.compra.Serie);
     $("#compra").val(data.compra.Compra);
     $("#uuidxml").val(data.compra.UUID);
     $("#uuid").val(data.compra.UUID);
     $("#plazo").val(data.compra.Plazo);
     $("#fecha").val(data.fecha);
-    $("#fechaemitida").val(data.fechaemitida)
-    $("#proveedor").val(data.proveedor.Nombre)
+    $("#fechaemitida").val(data.fechaemitida);
+    $("#fechatimbrado").val(data.fechatimbrado);
+    $("#proveedor").val(data.proveedor.Nombre);
     $("#numeroproveedor").val(data.proveedor.Numero);
     $("#almacen").val(data.almacen.Nombre);
     $("#numeroalmacen").val(data.almacen.Numero);
@@ -1284,8 +1622,14 @@ function obtenerdatos(compramodificar){
     $("#moneda").val(data.compra.Moneda).change();
     $("#pesosmoneda").val(data.tipocambio);
     $("#observaciones").val(data.compra.Obs);
-    //cargar todos los detalles
-    $("#tablaproductodordencompra tbody").html(data.filasdetallescompra);
+    $("#emisorrfc").val(data.compra.EmisorRfc);
+    $("#emisornombre").val(data.compra.EmisorNombre);
+    $("#receptorrfc").val(data.compra.ReceptorRfc);
+    $("#receptornombre").val(data.compra.ReceptorNombre);
+    $("#emisorrfcdb").val(data.compra.EmisorRfc);
+    $("#emisornombredb").val(data.compra.EmisorNombre);
+    $("#receptorrfcxml").val(data.compra.ReceptorRfc);
+    $("#receptornombrexml").val(data.compra.ReceptorNombre);
     //totales compra
     $("#importe").val(data.importe);
     $("#descuento").val(data.descuento);
@@ -1305,16 +1649,38 @@ function obtenerdatos(compramodificar){
     $("#retencionivaxml").val(data.ivaretencion);
     $("#retencionisrxml").val(data.isrretencion);
     $("#retencioniepsxml").val(data.iepsretencion);
-    $("#totalxml").val(data.total);    
+    $("#totalxml").val(data.total);  
+    //detalles
+    $("#tablaproductoscompras tbody").html(data.filasdetallescompra);
+    $("#numerofilas").val(data.numerodetallescompra);
+    $("#arraycodigosdetallesordencompra").val(data.arraycodigosdetallesordencompra);
+    //colocar valores a contadores
+    contadorproductos = data.contadorproductos;
+    contadorfilas = data.contadorfilas;
+    //mostrar el buscador de productos
+    mostrarbuscadorcodigoproducto();
+    //activar busqueda de codigos
+    $("#codigoabuscar").keypress(function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+          listarproductos();
+        }
+    });
+    //asignar el tipo de operacion que se realizara
+    $("#tipooperacion").val("modificacion");
     //se deben asignar los valores a los contadores para que las sumas resulten correctas
     obtenertiposordenescompra();
     seleccionartipocompra(data);
+  }).fail( function() {
+    msj_errorajax();
+    $('.page-loader-wrapper').css('display', 'none');
   })
 }
 async function seleccionartipocompra(data){
   await retraso();
   $("#tipo").val(data.compra.Tipo).change();
-  calculartotalordencompra();
+  calculartotal();
   $("#tipo").select2({disabled: true});
   $("#moneda").select2();
   mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
@@ -1324,12 +1690,13 @@ async function seleccionartipocompra(data){
 function revisarexistenciasalmacen(fila){
   var cuentaFilas = 0;
   var cantidadoperacionaritmetica = 0;
-  var cantidadoperacionaritmetica = 0;
   $("tr.filasproductos").each(function () {
-    if(fila === cuentaFilas){ 
+    if(fila === cuentaFilas){  
+      var folio = $("#folio").val();
+      var serie = $("#serie").val();
       var cantidadinicialpartida = $(".cantidadinicialpartida", this).val();
       var cantidadpartida = $(".cantidadpartida", this).val();
-      if(cantidadpartida > cantidadinicialpartida){
+      if(parseFloat(cantidadpartida) > parseFloat(cantidadinicialpartida)){
         $(".operacionaritmetica", this).val("suma");
         cantidadoperacionaritmetica = new Decimal(cantidadpartida).minus(cantidadinicialpartida);
         $(".cantidadoperacionaritmetica", this).val(number_format(round(cantidadoperacionaritmetica, numerodecimales), numerodecimales, '.', ''));
@@ -1337,18 +1704,17 @@ function revisarexistenciasalmacen(fila){
         $(".cantidaderrorexistencias", this).css('display','none');
         $(".cantidaderrorexistencias", this).html("");
         $(".cantidadincorrecta", this).val(0);
-      }else if(cantidadpartida < cantidadinicialpartida){
+      }else if(parseFloat(cantidadpartida) < parseFloat(cantidadinicialpartida)){
         $(".operacionaritmetica", this).val("resta");
         cantidadoperacionaritmetica = new Decimal(cantidadinicialpartida).minus(cantidadpartida);
         $(".cantidadoperacionaritmetica", this).val(number_format(round(cantidadoperacionaritmetica, numerodecimales), numerodecimales, '.', ''));
         var almacen = $("#numeroalmacen").val();
         var codigopartida = $(".codigoproductopartida", this).val();
-        comprobarexistenciaspartida(almacen, codigopartida).then(existencias=>{
-          if(cantidadoperacionaritmetica > existencias){
+        comprobarexistenciaspartida(almacen, codigopartida, folio, serie).then(nuevaexistencia=>{
+          if(parseFloat(cantidadoperacionaritmetica) > parseFloat(nuevaexistencia)){
             //mostrar error en existencias
             $(".cantidaderrorexistencias", this).css('display','block');
             $(".cantidaderrorexistencias", this).html("Error el almacen no cuenta con existencias suficientes");
-            
             $(".cantidadincorrecta", this).val(1);
           }else{
             //esconder error en existencias
@@ -1369,10 +1735,11 @@ function revisarexistenciasalmacen(fila){
     cuentaFilas++;
   }); 
   //revisar si se mostrara o ocultara el boton de guardar
-  cantidadesinsuficientesalmacen();
+  var tipooperacion = $("#tipooperacion").val();
+  cantidadesinsuficientesalmacen(tipooperacion);
 }
 //funcion que revisa si se mostrara o ocultara el boton de guardar
-async function cantidadesinsuficientesalmacen(){
+async function cantidadesinsuficientesalmacen(tipooperacion){
   await retraso();
   var cantidadincorrecta = 0;
   $("tr.filasproductos").each(function () {
@@ -1380,17 +1747,32 @@ async function cantidadesinsuficientesalmacen(){
       cantidadincorrecta++;
     }
   });
-  if(cantidadincorrecta > 0){
+  if(cantidadincorrecta == 0 && tipooperacion == 'alta'){
+    $("#btnGuardar").show();
     $("#btnGuardarModificacion").hide();
-  } else{
+  }else if(cantidadincorrecta == 0 && tipooperacion == 'modificacion'){
+    $("#btnGuardar").hide();
     $("#btnGuardarModificacion").show();
+  }else{
+    $("#btnGuardar").hide();
+    $("#btnGuardarModificacion").hide();
   }
 }
 //funcion asincrona para buscar existencias de la partida
 function comprobarexistenciaspartida(almacen, codigopartida){
   return new Promise((ejecuta)=>{
     setTimeout(function(){ 
-      $.get(compras_obtener_existencias_partida,{'almacen':almacen,'codigopartida':codigopartida},existencias=>{
+      $.get(compras_obtener_existencias_partida,{'almacen':almacen,'codigopartida':codigopartida,'folio':folio,'serie':serie},nuevaexistencia=>{
+        return ejecuta(nuevaexistencia);
+      })
+    },500);
+  })
+}
+//funcion asincrona para buscar existencias de la partida
+function comprobarexistenciasenbd(fila, tipo, numeroalmacen, codigo){
+  return new Promise((ejecuta)=>{
+    setTimeout(function(){ 
+      $.get(compras_obtener_existencias_almacen,{'numeroalmacen':numeroalmacen,'codigo':codigo},existencias=>{
         return ejecuta(existencias);
       })
     },500);
@@ -1399,65 +1781,105 @@ function comprobarexistenciaspartida(almacen, codigopartida){
 //guardar modificación
 $("#btnGuardarModificacion").on('click', function (e) {
   e.preventDefault();
-  var formData = new FormData($("#formparsley")[0]);
-  var form = $("#formparsley");
-  if (form.parsley().isValid()){
-    $('.page-loader-wrapper').css('display', 'block');
-    $.ajax({
-      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-      url:compras_guardar_modificacion,
-      type: "post",
-      dataType: "html",
-      data: formData,
-      cache: false,
-      contentType: false,
-      processData: false,
-      success:function(data){
-        if(data == 1){
-          msj_erroruuidexistente();
-          $('.page-loader-wrapper').css('display', 'none');
+  var diferenciatotales = $("#diferenciatotales").val();
+  if(diferenciatotales <= 0.01){
+    var emisorrfc = $("#emisorrfc").val();
+    var emisorrfcdb = $("#emisorrfcdb").val();
+    if(emisorrfc == emisorrfcdb){
+      var receptorrfc = $("#receptorrfc").val();
+      var receptorrfcxml = $("#receptorrfcxml").val();
+      if(receptorrfc == receptorrfcxml){
+        $("#tipo").prop("disabled", false);
+        var formData = new FormData($("#formparsley")[0]);
+        var form = $("#formparsley");
+        if (form.parsley().isValid()){
+          $('.page-loader-wrapper').css('display', 'block');
+          $.ajax({
+            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+            url:compras_guardar_modificacion,
+            type: "post",
+            dataType: "html",
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success:function(data){
+              if(data == 1){
+                msj_erroruuidexistente();
+                $('.page-loader-wrapper').css('display', 'none');
+              }else{
+                msj_datosguardadoscorrectamente();
+                limpiar();
+                ocultarmodalformulario();
+                limpiarmodales();
+                $('.page-loader-wrapper').css('display', 'none');
+              }
+            },
+            error:function(data){
+              if(data.status == 403){
+                msj_errorenpermisos();
+              }else{
+                msj_errorajax();
+              }
+              $('.page-loader-wrapper').css('display', 'none');
+            }
+          })   
         }else{
-          msj_datosguardadoscorrectamente();
-          limpiar();
-          ocultarmodalformulario();
-          limpiarmodales();
-          $('.page-loader-wrapper').css('display', 'none');
+          form.parsley().validate();
         }
-      },
-      error:function(data){
-        if(data.status == 403){
-          msj_errorenpermisos();
-        }else{
-          msj_errorajax();
-        }
-        $('.page-loader-wrapper').css('display', 'none');
+      }else{
+        msj_errorrfcreceptordistinto();
       }
-    })
+    }else{
+      msj_errorrfcdistinto();
+    }
   }else{
-    form.parsley().validate();
+    msj_errortotalpartidasnocoincide();
   }
 });
 //verificar si la orden de compra se esta utilzando en alguna orden de compra
 function desactivar(compradesactivar){
   $.get(compras_verificar_uso_en_modulos,{compradesactivar:compradesactivar}, function(data){
-    if(data.resultado > 0 && data.numerodetallesconexistenciasinsuficientes == 0){
+    if(data.Status == 'BAJA'){
       $("#compradesactivar").val(0);
-      $("#textomodaldesactivar").html('Error esta compra tiene registros de cuentas por pagar con el pago: ' + data.numerocuentaxpagar);
-      $("#divmotivobaja").hide();
-      $("#btnbaja").hide();
-      $('#estatusregistro').modal('show');
-    }else if(data.numerodetallesconexistenciasinsuficientes > 0){
-      $("#compradesactivar").val(0);
-      $("#textomodaldesactivar").html('Error el Almacen con cuenta con existencias suficientes para cancelar la compra: ' + compradesactivar);
+      $("#textomodaldesactivar").html('Error, esta compra ya fue dada de baja');
       $("#divmotivobaja").hide();
       $("#btnbaja").hide();
       $('#estatusregistro').modal('show');
     }else{
-      $("#compradesactivar").val(compradesactivar);
-      $("#textomodaldesactivar").html('Estas seguro de cambiar el estado el registro?');
-      $("#divmotivobaja").show();
-      $("#btnbaja").show();
-      $('#estatusregistro').modal('show');
+      if(data.resultadofechas != ''){
+        $("#compradesactivar").val(0);
+        $("#textomodaldesactivar").html('Error solo se pueden dar de baja las compras del mes actual, fecha de la compra: ' + data.resultadofechas);
+        $("#divmotivobaja").hide();
+        $("#btnbaja").hide();
+        $('#estatusregistro').modal('show');
+      }else{
+        if(data.numerocuentasporpagar > 0){
+          $("#compradesactivar").val(0);
+          $("#textomodaldesactivar").html('Error esta compra tiene registros de cuentas por pagar con el pago: ' + data.numerocuentaxpagar);
+          $("#divmotivobaja").hide();
+          $("#btnbaja").hide();
+          $('#estatusregistro').modal('show');
+        }else if(data.numerocontrareciboscompra > 0){
+          $("#compradesactivar").val(0);
+          $("#textomodaldesactivar").html('Error esta compra tiene registros de contrarecibos con el contrarecibo: ' + data.numerocontrarecibo);
+          $("#divmotivobaja").hide();
+          $("#btnbaja").hide();
+          $('#estatusregistro').modal('show');
+        }else if(data.numerodetallesconexistenciasinsuficientes > 0){
+          $("#compradesactivar").val(0);
+          $("#textomodaldesactivar").html('Error el Almacen no cuenta con existencias suficientes para cancelar la compra: ' + compradesactivar);
+          $("#divmotivobaja").hide();
+          $("#btnbaja").hide();
+          $('#estatusregistro').modal('show');
+        }else{
+          $("#compradesactivar").val(compradesactivar);
+          $("#textomodaldesactivar").html('Estas seguro de cambiar el estado el registro?');
+          $("#divmotivobaja").show();
+          $("#btnbaja").show();
+          $('#estatusregistro').modal('show');
+        }
+      }
     }
   }) 
 }
@@ -1496,7 +1918,6 @@ $("#btnbaja").on('click', function(e){
     form.parsley().validate();
   }
 });
-
 //obtener movimiento compra
 function movimientoscompra(compra){
   $.get(compras_obtener_movimientos_compra, {compra:compra}, function(data){
@@ -1504,7 +1925,6 @@ function movimientoscompra(compra){
     $("#filasmovimientos").html(data.filasmovimientos);
   });
 }
-
 //hacer busqueda de folio para exportacion en pdf
 function relistarbuscarstringlike(){
   var tabla = $('#tablafoliosencontrados').DataTable();

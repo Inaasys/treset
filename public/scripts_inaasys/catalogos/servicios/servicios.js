@@ -46,6 +46,8 @@ function ocultarformulario(){
 //listar todos los registros de la tabla
 function listar(){
     tabla=$('#tbllistado').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "350px",
         "bScrollCollapse": true,  
@@ -312,7 +314,7 @@ function alta(){
                                     '</div>'+  
                                     '<div class="col-md-9">'+  
                                         '<div class="form-line">'+
-                                            '<input type="hidden" class="form-control" name="claveproducto" id="claveproducto" required onkeyup="tipoLetra(this);">'+
+                                            '<input type="hidden" class="form-control" name="claveproducto" id="claveproducto" required data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+
                                             '<input type="text" class="form-control" name="nombreclaveproducto" id="nombreclaveproducto" required onkeyup="tipoLetra(this);">'+
                                         '</div>'+
                                     '</div>'+     
@@ -330,7 +332,7 @@ function alta(){
                                     '</div>'+  
                                     '<div class="col-md-9">'+  
                                         '<div class="form-line">'+
-                                            '<input type="hidden" class="form-control" name="claveunidad" id="claveunidad" required onkeyup="tipoLetra(this);">'+
+                                            '<input type="hidden" class="form-control" name="claveunidad" id="claveunidad" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this);">'+
                                             '<input type="text" class="form-control" name="nombreclaveunidad" id="nombreclaveunidad" required onkeyup="tipoLetra(this);">'+
                                         '</div>'+
                                     '</div>'+     
@@ -338,25 +340,25 @@ function alta(){
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Servicio<b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="text" class="form-control" name="servicio" id="servicio" required onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="servicio" id="servicio" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Unidad<b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="text" class="form-control" name="unidad" id="unidad" required data-parsley-length="[0, 5]" onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="unidad" id="unidad" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this);">'+
                             '</div>'+
                         '</div>'+  
                         '<div class="row">'+   
                             '<div class="col-md-4">'+
                                 '<label>Cantidad</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="cantidad" id="cantidad" value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="cantidad" id="cantidad" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Costo</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="costo" id="costo" value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="costo" id="costo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+  
                             '<div class="col-md-4">'+
                                 '<label>Venta</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="venta" id="venta" value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="venta" id="venta" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+
                         '</div>'+  
                     '</div>'+
@@ -481,7 +483,7 @@ function obtenerdatos(codigoservicio){
                                     '</div>'+  
                                     '<div class="col-md-9">'+  
                                         '<div class="form-line">'+
-                                            '<input type="hidden" class="form-control" name="claveproducto" id="claveproducto" required onkeyup="tipoLetra(this);">'+
+                                            '<input type="hidden" class="form-control" name="claveproducto" id="claveproducto" required data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+
                                             '<input type="text" class="form-control" name="nombreclaveproducto" id="nombreclaveproducto" required onkeyup="tipoLetra(this);">'+
                                         '</div>'+
                                     '</div>'+     
@@ -499,7 +501,7 @@ function obtenerdatos(codigoservicio){
                                     '</div>'+  
                                     '<div class="col-md-9">'+  
                                         '<div class="form-line">'+
-                                            '<input type="hidden" class="form-control" name="claveunidad" id="claveunidad" required onkeyup="tipoLetra(this);">'+
+                                            '<input type="hidden" class="form-control" name="claveunidad" id="claveunidad" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this);">'+
                                             '<input type="text" class="form-control" name="nombreclaveunidad" id="nombreclaveunidad" required onkeyup="tipoLetra(this);">'+
                                         '</div>'+
                                     '</div>'+     
@@ -507,25 +509,25 @@ function obtenerdatos(codigoservicio){
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Servicio<b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="text" class="form-control" name="servicio" id="servicio" required onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="servicio" id="servicio" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Unidad<b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="text" class="form-control" name="unidad" id="unidad" required data-parsley-length="[0, 5]" onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="unidad" id="unidad" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this);">'+
                             '</div>'+
                         '</div>'+  
                         '<div class="row">'+   
                             '<div class="col-md-4">'+
                                 '<label>Cantidad</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="cantidad" id="cantidad" value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="cantidad" id="cantidad" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Costo</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="costo" id="costo" value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="costo" id="costo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+  
                             '<div class="col-md-4">'+
                                 '<label>Venta</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="venta" id="venta" value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="venta" id="venta" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+
                         '</div>'+  
                     '</div>'+
@@ -548,6 +550,9 @@ function obtenerdatos(codigoservicio){
     $("#nombreclaveunidad").val(data.claveunidad.Nombre);
     $("#nombreclaveunidad").keyup();
     mostrarmodalformulario('MODIFICACION');
+    $('.page-loader-wrapper').css('display', 'none');
+  }).fail( function() {
+    msj_errorajax();
     $('.page-loader-wrapper').css('display', 'none');
   })
 }

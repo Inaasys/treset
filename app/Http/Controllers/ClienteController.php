@@ -99,7 +99,7 @@ class ClienteController extends ConfiguracionSistemaController{
             }
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarestado('.$data->Numero.',\''.$data->Nombre .'\')">Seleccionar</div>';
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarestado(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->rawColumns(['operaciones'])
@@ -109,9 +109,8 @@ class ClienteController extends ConfiguracionSistemaController{
     //obtener codigos postales
     public function clientes_obtener_codigos_postales(Request $request){
         if($request->ajax()){
-            if ($request->numeroestado != '') {
-                $estado = Estado::where('Numero', $request->numeroestado)->first();
-                $data = CodigoPostal::where('Estado', $estado->Clave )->get();
+            if ($request->claveestado != '') {
+                $data = CodigoPostal::where('Estado', $request->claveestado )->get();
             }else{
                 $data = CodigoPostal::query();
             }
@@ -127,9 +126,8 @@ class ClienteController extends ConfiguracionSistemaController{
     //obtener municipios
     public function clientes_obtener_municipios(Request $request){
         if($request->ajax()){
-            if ($request->numeroestado != '') {
-                $estado = Estado::where('Numero', $request->numeroestado)->first();
-                $data = Municipio::where('Estado', $estado->Clave )->orderBy("Numero", "ASC")->get();
+            if ($request->claveestado != '') {
+                $data = Municipio::where('Estado', $request->claveestado )->orderBy("Numero", "ASC")->get();
             }else{
                 $data = Municipio::query();
             }
@@ -248,7 +246,7 @@ class ClienteController extends ConfiguracionSistemaController{
 		    $Cliente->Localidad=$request->localidad;
 		    $Cliente->Referencia=$request->referencia;
             $Cliente->Pais=$request->clavepais;
-            $Cliente->Estado=$request->nombreestado;
+            $Cliente->Estado=$request->estado;
             $Cliente->Municipio=$request->municipio;  
             $Cliente->CodigoPostal=$request->codigopostal;
             $Cliente->Plazo=$request->plazo;
@@ -291,9 +289,9 @@ class ClienteController extends ConfiguracionSistemaController{
         $clavepais = $cliente->Pais;
         $pais = Pais::select('Numero', 'Clave')->where('Clave', $clavepais)->first();
         $nombreestado = $cliente->Estado;
-        $estado = Estado::select('Numero', 'Nombre')->where('Nombre', mb_strtolower($nombreestado))->first(); 
+        $estado = Estado::select('Numero', 'Nombre')->where('Clave', mb_strtolower($nombreestado))->first(); 
         $nombremunicipio = $cliente->Municipio;
-        $municipio = Municipio::select('Nombre')->where('Nombre', mb_strtolower($nombremunicipio))->first(); 
+        $municipio = Municipio::select('Nombre')->where('Estado', mb_strtolower($nombreestado))->where('Nombre', 'like', '%' . mb_strtolower($nombremunicipio) . '%')->first(); 
         $clavecodigopostal = $cliente->CodigoPostal;
         $codigopostal = CodigoPostal::select('Clave')->where('Clave', $clavecodigopostal)->first();
         $claveformadepago = $cliente->FormaPago;
@@ -383,7 +381,7 @@ class ClienteController extends ConfiguracionSistemaController{
 		    $Cliente->Localidad=$request->localidad;
 		    $Cliente->Referencia=$request->referencia;
             $Cliente->Pais=$request->clavepais;
-            $Cliente->Estado=$request->nombreestado;
+            $Cliente->Estado=$request->estado;
             $Cliente->Municipio=$request->municipio;  
             $Cliente->CodigoPostal=$request->codigopostal;
             $Cliente->Plazo=$request->plazo;

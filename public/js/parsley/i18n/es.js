@@ -26,6 +26,7 @@ Parsley.addMessages('es', {
   
   min:                "Este valor no debe ser menor que %s.",
   max:                "Este valor no debe ser mayor que %s.",
+  existencias:        "Error el almacen no cuenta con existencias suficientes, Existencias actuales :%s.",
   range:              "Este valor debe estar entre %s y %s.",
   minlength:          "Este valor es muy corto. La longitud mínima es de %s caracteres.",
   maxlength:          "Este valor es muy largo. La longitud máxima es de %s caracteres.",

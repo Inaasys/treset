@@ -52,6 +52,8 @@ function ocultarformulario(){
 //listar todos los registros de la tabla
 function listar(){
     tabla=$('#tbllistado').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "350px",
         "bScrollCollapse": true,  
@@ -85,26 +87,39 @@ function listar(){
     });
 }
 //validacion de utilidades
-function validautilidad1(tipoformulario){
+function validautilidad1(){
   var utilidad1 = $("#utilidad1").val();
-  $("#utilidad2").removeAttr('data-parsley-max');  
-  $("#utilidad2").attr('data-parsley-max', utilidad1);  
+  if(parseFloat(utilidad1) > 0){
+    $("#utilidad2").removeAttr('data-parsley-max');  
+    $("#utilidad2").attr('data-parsley-max', utilidad1);  
+    $("#utilidad2").removeAttr('readonly');
+  }
 }
 //validacion de utilidades
 function validautilidad2(){
   var utilidad2 = $("#utilidad2").val();
-  $("#utilidad3").removeAttr('data-parsley-max');  
-  $("#utilidad3").attr('data-parsley-max', utilidad2);  
+  if(parseFloat(utilidad2) > 0){
+    $("#utilidad3").removeAttr('data-parsley-max');  
+    $("#utilidad3").attr('data-parsley-max', utilidad2);  
+    $("#utilidad3").removeAttr('readonly');
+  }
 }
 function validautilidad3(){
   var utilidad3 = $("#utilidad3").val();
-  $("#utilidad4").removeAttr('data-parsley-max');  
-  $("#utilidad4").attr('data-parsley-max', utilidad3);  
+  if(parseFloat(utilidad3) > 0){
+    $("#utilidad4").removeAttr('data-parsley-max');  
+    $("#utilidad4").attr('data-parsley-max', utilidad3);
+    $("#utilidad4").removeAttr('readonly');
+  }
+    
 }
 function validautilidad4(){
   var utilidad4 = $("#utilidad4").val();
-  $("#utilidad5").removeAttr('data-parsley-max');  
-  $("#utilidad5").attr('data-parsley-max', utilidad4);  
+  if(parseFloat(utilidad4) > 0){
+    $("#utilidad5").removeAttr('data-parsley-max');  
+    $("#utilidad5").attr('data-parsley-max', utilidad4); 
+    $("#utilidad5").removeAttr('readonly');
+  } 
 }
 //alta clientes
 function alta(){
@@ -122,32 +137,32 @@ function alta(){
                         '<div class="row">'+
                             '<div class="col-md-2">'+
                                 '<label>Utilidad 1 %</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="utilidad1" id="utilidad1" value="0.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onkeyup="tipoLetra(this);validautilidad1();" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="utilidad1" id="utilidad1" value="0.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);validautilidad1();">'+
                             '</div>'+
                             '<div class="col-md-2">'+
                                 '<label>Utilidad 2 %</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="utilidad2" id="utilidad2" value="0.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onkeyup="tipoLetra(this);validautilidad2();" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="utilidad2" id="utilidad2" value="0.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);validautilidad2();" readonly>'+
                                 '<ul id="utilidad2labelerror" style="display:none">'+
                                     '<li>la utilidad2 no debe ser mayor a la utilidad1</li>'+
                                 '</ul>'+
                             '</div>'+
                             '<div class="col-md-2">'+
                                 '<label>Utilidad 3 %</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="utilidad3" id="utilidad3" value="0.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onkeyup="tipoLetra(this);validautilidad3();" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="utilidad3" id="utilidad3" value="0.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);validautilidad3();" readonly>'+
                                 '<ul id="utilidad3labelerror" style="display:none">'+
                                     '<li>la utilidad3 no debe ser mayor a la utilidad2</li>'+
                                 '</ul>'+
                             '</div>'+
                             '<div class="col-md-2">'+
                                 '<label>Utilidad 4 %</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="utilidad4" id="utilidad4" value="0.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onkeyup="tipoLetra(this);validautilidad4();" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="utilidad4" id="utilidad4" value="0.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/"  onchange="formatocorrectoinputcantidades(this);validautilidad4();" readonly>'+
                                 '<ul id="utilidad4labelerror" style="display:none">'+
                                     '<li>la utilidad4 no debe ser mayor a la utilidad3</li>'+
                                 '</ul>'+
                             '</div>'+
                             '<div class="col-md-2">'+
                                 '<label>Utilidad 5 %</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="utilidad5" id="utilidad5" value="0.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onkeyup="tipoLetra(this);" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="utilidad5" id="utilidad5" value="0.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly>'+
                                 '<ul id="utilidad5labelerror" style="display:none">'+
                                     '<li>la utilidad5 no debe ser mayor a la utilidad4</li>'+
                                 '</ul>'+
@@ -248,32 +263,32 @@ function obtenerdatos(numeromarca){
                         '<div class="row">'+
                             '<div class="col-md-2">'+
                                 '<label>Utilidad 1 %</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="utilidad1" id="utilidad1" value="0.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onkeyup="tipoLetra(this);validautilidad1();" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="utilidad1" id="utilidad1" value="0.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);validautilidad1();">'+
                             '</div>'+
                             '<div class="col-md-2">'+
                                 '<label>Utilidad 2 %</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="utilidad2" id="utilidad2" value="0.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onkeyup="tipoLetra(this);validautilidad2()" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="utilidad2" id="utilidad2" value="0.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);validautilidad2();" >'+
                                 '<ul id="utilidad2labelerror" style="display:none">'+
                                     '<li>la utilidad2 no debe ser mayor a la utilidad1</li>'+
                                 '</ul>'+
                             '</div>'+
                             '<div class="col-md-2">'+
                                 '<label>Utilidad 3 %</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="utilidad3" id="utilidad3" value="0.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onkeyup="tipoLetra(this);validautilidad3();" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="utilidad3" id="utilidad3" value="0.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);validautilidad3();" >'+
                                 '<ul id="utilidad3labelerror" style="display:none">'+
                                     '<li>la utilidad3 no debe ser mayor a la utilidad2</li>'+
                                 '</ul>'+
                             '</div>'+
                             '<div class="col-md-2">'+
                                 '<label>Utilidad 4 %</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="utilidad4" id="utilidad4" value="0.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onkeyup="tipoLetra(this);validautilidad4();" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="utilidad4" id="utilidad4" value="0.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);validautilidad4();" >'+
                                 '<ul id="utilidad4labelerror" style="display:none">'+
                                     '<li>la utilidad4 no debe ser mayor a la utilidad3</li>'+
                                 '</ul>'+
                             '</div>'+
                             '<div class="col-md-2">'+
                                 '<label>Utilidad 5 %</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="utilidad5" id="utilidad5" value="0.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onkeyup="tipoLetra(this);" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="utilidad5" id="utilidad5" value="0.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" >'+
                                 '<ul id="utilidad5labelerror" style="display:none">'+
                                     '<li>la utilidad5 no debe ser mayor a la utilidad4</li>'+
                                 '</ul>'+
@@ -295,6 +310,9 @@ function obtenerdatos(numeromarca){
     $("#utilidad5").val(data.utilidad5);
     $("#utilidad5").attr('data-parsley-max', data.utilidad4);
     mostrarmodalformulario('MODIFICACION');
+    $('.page-loader-wrapper').css('display', 'none');
+  }).fail( function() {
+    msj_errorajax();
     $('.page-loader-wrapper').css('display', 'none');
   })
 }

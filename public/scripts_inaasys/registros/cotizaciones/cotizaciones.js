@@ -11,7 +11,7 @@ function retraso(){
 function asignarfechaactual(){
     var fechahoy = new Date();
     var dia = ("0" + fechahoy.getDate()).slice(-2);
-    var mes = ("0" + (fechahoy.etMonth() + 1)).slice(-2);
+    var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
     var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia);
     $('#fecha').val(hoy);
 }
@@ -83,6 +83,8 @@ function listar(){
       });
   }
   tabla=$('#tbllistado').DataTable({
+    "lengthMenu": [ 10, 50, 100, 250, 500 ],
+    "pageLength": 250,
     "sScrollX": "110%",
     "sScrollY": "350px",
     "bScrollCollapse": true,
@@ -148,7 +150,7 @@ function obtenerremisiones(){
     $("#contenidomodaltablas").html(tablaremisiones);
     $('#tbllistadoremision').DataTable({
         "sScrollX": "110%",
-        "sScrollY": "300px",
+        "sScrollY": "370px",
         "bScrollCollapse": true,
         processing: true,
         'language': {
@@ -283,19 +285,19 @@ function alta(){
                 '<div class="tab-content">'+
                     '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
                         '<div class="row">'+
-                            '<div class="col-md-12 table-responsive">'+
+                            '<div class="col-md-12 table-responsive cabecerafija" style="height: 275px;overflow-y: scroll;padding: 0px 0px;">'+
                                 '<table id="tablaproductocotizacion" class="table table-bordered tablaproductocotizacion">'+
                                     '<thead class="customercolor">'+
                                         '<tr>'+
-                                          '<th>#</th>'+
+                                          '<th class="customercolor">#</th>'+
                                           '<th class="customercolortheadth">numero_parte</th>'+
                                           '<th class="customercolortheadth"><div style="width:200px !important;">descripcion</div></th>'+
                                           '<th class="customercolortheadth">unidad</th>'+
-                                          '<th>insumo</th>'+
+                                          '<th class="customercolor">insumo</th>'+
                                           '<th class="customercolortheadth">status_refaccion</th>'+
                                           '<th class="customercolortheadth">precio $</th>'+
                                           '<th class="customercolortheadth">cantidad</th>'+
-                                          '<th>importe $</th>'+
+                                          '<th class="customercolor">importe $</th>'+
                                         '</tr>'+
                                     '</thead>'+
                                     '<tbody>'+           
@@ -326,6 +328,8 @@ function alta(){
                     '</div>'+ 
                 '</div>';
   $("#tabsform").html(tabs);
+  $("#serie").val(serieusuario);
+  $("#serietexto").html("Serie: "+serieusuario);
   obtenultimonumero();
   asignarfechaactual();
   $("#ModalAlta").modal('show');
@@ -373,11 +377,29 @@ $("#btnGuardar").on('click', function (e) {
 });
 //bajas
 function desactivar(cotizaciondesactivar){
-  $("#cotizaciondesactivar").val(cotizaciondesactivar);
-  $("#textomodaldesactivar").html('Estas seguro de cambiar el estado el registro?');
-  $("#divmotivobaja").show();
-  $("#btnbaja").show();
-  $('#estatusregistro').modal('show');
+  $.get(cotizaciones_verificar_uso_en_modulos,{cotizaciondesactivar:cotizaciondesactivar}, function(data){
+    if(data.status == 'BAJA'){
+      $("#cotizaciondesactivar").val(0);
+      $("#textomodaldesactivar").html('Error, esta Cotización ya fue dado de baja');
+      $("#divmotivobaja").hide();
+      $("#btnbaja").hide();
+      $('#estatusregistro').modal('show');
+    }else{   
+      if(data.resultadofechas != ''){
+        $("#cotizaciondesactivar").val(0);
+        $("#textomodaldesactivar").html('Error solo se pueden dar de baja las cotizaciones del mes actual, fecha de la cotización: ' + data.resultadofechas);
+        $("#divmotivobaja").hide();
+        $("#btnbaja").hide();
+        $('#estatusregistro').modal('show');
+      }else{
+        $("#cotizaciondesactivar").val(cotizaciondesactivar);
+        $("#textomodaldesactivar").html('Estas seguro de cambiar el estado el registro?');
+        $("#divmotivobaja").show();
+        $("#btnbaja").show();
+        $('#estatusregistro').modal('show');
+      }
+    }
+  }) 
 }
 $("#btnbaja").on('click', function(e){
   e.preventDefault();
@@ -427,19 +449,19 @@ function obtenerdatos(cotizacionmodificar){
                 '<div class="tab-content">'+
                     '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
                         '<div class="row">'+
-                            '<div class="col-md-12 table-responsive">'+
+                            '<div class="col-md-12 table-responsive cabecerafija" style="height: 275px;overflow-y: scroll;padding: 0px 0px;">'+
                                 '<table id="tablaproductocotizacion" class="table table-bordered tablaproductocotizacion">'+
                                     '<thead class="customercolor">'+
                                         '<tr>'+
-                                          '<th>#</th>'+
+                                          '<th class="customercolor">#</th>'+
                                           '<th class="customercolortheadth">numero_parte</th>'+
                                           '<th class="customercolortheadth"><div style="width:200px !important;">descripcion</div></th>'+
                                           '<th class="customercolortheadth">unidad</th>'+
-                                          '<th>insumo</th>'+
+                                          '<th class="customercolor">insumo</th>'+
                                           '<th class="customercolortheadth">status_refaccion</th>'+
                                           '<th class="customercolortheadth">precio $</th>'+
                                           '<th class="customercolortheadth">cantidad</th>'+
-                                          '<th>importe $</th>'+
+                                          '<th class="customercolor">importe $</th>'+
                                         '</tr>'+
                                     '</thead>'+
                                     '<tbody>'+           
@@ -471,6 +493,8 @@ function obtenerdatos(cotizacionmodificar){
                 '</div>';
     $("#tabsform").html(tabs);
     $("#folio").val(data.cotizacion.id);
+    $("#serie").val(data.cotizacion.Serie);
+    $("#serietexto").html("Serie: "+data.cotizacion.Serie);
     $("#ottecnodiesel").val(data.cotizacion.ot_tecnodiesel);
     $("#ottyt").val(data.cotizacion.ot_tyt);
     $("#fecha").val(data.fecha);
@@ -484,6 +508,9 @@ function obtenerdatos(cotizacionmodificar){
     $("#tablaproductocotizacion tbody").html(data.filasdetallescotizacion);
     $("#numerofilas").val(data.numerodetallescotizacion);
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
+    $('.page-loader-wrapper').css('display', 'none');
+  }).fail( function() {
+    msj_errorajax();
     $('.page-loader-wrapper').css('display', 'none');
   })
 }

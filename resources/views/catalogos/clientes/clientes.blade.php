@@ -29,11 +29,13 @@
                                             Excel
                                         </a>
                                     </td>
+                                    @if(Auth::user()->role_id == 1)
                                     <td>
                                         <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
                                             Configurar Tabla
                                         </div>
                                     </td>
+                                    @endif
                         		</tr>
                         	</table>
                         </div>
@@ -77,7 +79,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <label>Nombre</label>
-                                <input type="text" class="form-control" name="nombre" id="nombre" placeholder="1er Apellido, 2do Apellido, Nombre(s)" required onkeyup="tipoLetra(this);">
+                                <input type="text" class="form-control" name="nombre" id="nombre" placeholder="1er Apellido, 2do Apellido, Nombre(s)" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">
                             </div>
                         </div>
                         <div class="col-md-12" id="tabsform">

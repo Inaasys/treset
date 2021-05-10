@@ -179,6 +179,9 @@ function obtenerdatos(numeropersonal){
     $("#tipopersonal").html(data.tipopersonal);
     mostrarmodalformulario('MODIFICACION');
     $('.page-loader-wrapper').css('display', 'none');
+  }).fail( function() {
+    msj_errorajax();
+    $('.page-loader-wrapper').css('display', 'none');
   })
 }
 //guardar el registro

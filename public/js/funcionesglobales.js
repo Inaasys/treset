@@ -174,30 +174,66 @@ function agregararraypdf(foliomodulo){
         $("#arraypdf").append('<option value="'+foliomodulo+'" selected>'+foliomodulo+'</option>');
     }
 }
+//validar que el rango de las fecha de inicio y fin para la creacion de documentos sea maximos 2 meses y validar que la fecha final sea mayor a la fecha inicial en la creacion de documentos
+function validarrangofechascreaciondocumentos(){
+    var fechainiciopdf = $("#fechainiciopdf").val();
+    var fechaterminacionpdf = $("#fechaterminacionpdf").val();
+    if(Date.parse(fechaterminacionpdf) < Date.parse(fechainiciopdf)) {
+        toastr.error( "Error, la fecha de terminación debe ser mayor a la fecha de inicio", "Mensaje", {
+            "timeOut": "5000",
+            "progressBar": true,
+            "extendedTImeout": "5000" 
+        });
+        $("#btngenerardocumentospdf").hide();
+    }else{
+        var fechadesde = new Date(fechainiciopdf);
+        var fechahasta = new Date(fechaterminacionpdf);    
+        var milisegundostranscurridos = fechahasta - fechadesde;// diferencia en milisegundos
+        var diastranscurridos = milisegundostranscurridos / (1000 * 60 * 60 * 24) // diferencia en dias
+        if(parseInt(diastranscurridos) > 60){
+            toastr.error( "Error, el rango entre ambas fechas no debe ser mayor a 60 días", "Mensaje", {
+                "timeOut": "5000",
+                "progressBar": true,
+                "extendedTImeout": "5000" 
+            });
+            $("#btngenerardocumentospdf").hide();
+        }else{
+            $("#btngenerardocumentospdf").show();
+        }
+    }
+}
 //FIN FUNCIONES EXPORTACION DE PDF EN MODULOS
 ////////////////////////////////////////MENSAJES TOASTR.JS INAASYS//////////////////////////////////////////
 //error en permisos del usuario
 function msj_errorenpermisos(){
     toastr.error( "No tiene permisos para realizar esta acción, contacta al administrador del sistema", "Mensaje", {
-        "timeOut": "9500",
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000" 
+        "extendedTImeout": "6000" 
+    });
+}
+//error en peticion ajax
+function msj_mantenimientoajax(){
+    toastr.info( "Aviso, estamos en esta función, pronto podras hacer uso de ella", "Mensaje", {
+        "timeOut": "6000",
+        "progressBar": true,
+        "extendedTImeout": "6000"
     });
 }
 //error en peticion ajax
 function msj_errorajax(){
-    toastr.error( "Ocurrio un error", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, estamos experimentando problemas, contacta al administrador del sistema", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });
 }
 //mensaje correcto alta
 function msj_datosguardadoscorrectamente(){
     toastr.success( "Datos guardados correctamente", "Mensaje", {
-        "timeOut": "9500",
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });
     var tabla = $('.tbllistado').DataTable();
     tabla.ajax.reload();
@@ -205,272 +241,372 @@ function msj_datosguardadoscorrectamente(){
 //mensaje correcto bajas
 function msj_statuscambiado(){
     toastr.success( "Estatus Cambiado", "Mensaje", {
-        "timeOut": "9500",
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });
     var tabla = $('.tbllistado').DataTable();
     tabla.ajax.reload();
 }
 //mensaje error el vin ya existe
 function msj_errorcorreoexistente(){
-    toastr.error( "Error el Correo Electrónico ya existe", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, el Correo Electrónico ya existe", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });
 }
 //mensaje error el vin ya existe
 function msj_errorvinexistente(){
-    toastr.error( "Error el Vin ya existe", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, el Vin ya existe", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });
 }
 //mensaje verifique que todos los datos sean correctos
 function msj_verificartodoslosdatos(){
-	toastr.error( "Verifique que todos los datos sean correctos", "Mensaje", {
-            "timeOut": "9500",
+	toastr.error( "Aviso, verifique que todos los datos sean correctos", "Mensaje", {
+            "timeOut": "6000",
             "progressBar": true,
-            "extendedTImeout": "5000"
+            "extendedTImeout": "6000"
     });
 }
 //mensaje error el rfc ya existe
 function msj_errorrfcexistente(){
-    toastr.error( "Error el RFC ya existe", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, el RFC ya existe", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });
 }
 //mensaje error el codigo ya existe
 function msj_errorcodigoexistente(){
-    toastr.error( "Error el código ya existe", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, el código ya existe", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });
 }
 //mensaje error la orden ya existe
 function msj_errorordenexistente(){
-    toastr.error( "Error el número de orden ya existe", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, el número de orden ya existe", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });
 }
 //mensaje error el UUID ya existe
 function msj_erroruuidexistente(){
-            toastr.error( "Error el uuid de la factura ya fue ingresado en el sistema", "Mensaje", {
-        "timeOut": "9500",
+            toastr.error( "Aviso, el uuid de la factura ya fue ingresado en el sistema", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });
 }
 //mensaje error comprobar el total de orden compra
 function msj_errortotalordencompra(){
-    toastr.error( "Debes revisar que el total de la orden de compra coincida con la suma del/los total/totales de la(s) factura(s) de/los proveedor/proveedores", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, debes revisar que el total de la orden de compra coincida con la suma del/los total/totales de la(s) factura(s) de/los proveedor/proveedores", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });
 }
 //mensaje error el producto ya fue agregado
 function msj_errorproductoyaagregado(){
-    toastr.error( "El producto ya fue agregado", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, este producto ya esta agregado", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
+    });
+}
+//mensaje error el codigo no existe en la orden
+function msj_errorcodigonoexisteenorden(){
+    toastr.error( "Aviso, el código no existe en la orden de compra", "Mensaje", {
+        "timeOut": "6000",
+        "progressBar": true,
+        "extendedTImeout": "6000"
     });
 }
 //mensaje error el servicio ya fue agregado
 function msj_errorservicioyaagregado(){
-    toastr.error( "El servicio ya fue agregado", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, el servicio ya fue agregado", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });
 }
 
 //mensaje error la compra ya fue agregada
 function msj_errorcomprayaagregada(){
-    toastr.error( "El código de la compra ya fue agregado", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, el código de la compra ya fue agregado", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     }); 
 }
 //mensaje error la fecha debe ser del año y mes en curso
 function msj_errorfechaanoymesactual(){
-    toastr.error( "Error la fecha debe ser del mes y año en curso", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, la fecha debe ser del mes y año en curso", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });
 }
 //mensaje error la fecha debe ser igual a la fecha de factura del proveedor
 function msj_errorfechaigualafechafactura(){
-    toastr.error( "Error la fecha debe ser igual a la fecha de la factura del proveedor", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, la fecha debe ser igual a la fecha de la factura del proveedor", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });
 }
 //mensaje error el total de las pertidas no coincide con el total de factura del proveedor
 function msj_errortotalpartidasnocoincide(){
-    toastr.error( "El total de las partidas no coincide con el total de la factura del proveedor", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, el total de las partidas no coincide con el total de la factura del proveedor", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
+    });
+}
+//mensaje error el RFC del proveedor no es igual al RFC del xml
+function msj_errorrfcdistinto(){
+    toastr.error( "Aviso, el RFC del proveedor no es igual al RFC del xml", "Mensaje", {
+        "timeOut": "6000",
+        "progressBar": true,
+        "extendedTImeout": "6000"
+    });
+}
+//mensaje error esta factura no corresponde al RFC de la empresa
+function msj_errorrfcreceptordistinto(){
+    toastr.error( "Aviso, esta factura no corresponde al RFC de la empresa", "Mensaje", {
+        "timeOut": "6000",
+        "progressBar": true,
+        "extendedTImeout": "6000"
     });
 }
 //mensaje error se require al menos una entrada de un contrarecibo
 function msj_errorentradacontrarecibo(){
-	toastr.error( "Se requiere la entrada de al menos un contrarecibo ", "Mensaje", {
-            "timeOut": "9500",
+	toastr.error( "Aviso, se requiere la entrada de al menos un contrarecibo ", "Mensaje", {
+            "timeOut": "6000",
             "progressBar": true,
-            "extendedTImeout": "5000"
+            "extendedTImeout": "6000"
     });
 }
 //mensaje error el personal no cuenta con herramienta asignada para auditar
 function msj_errorpersonalsinherramientaasignada(){
-	toastr.error( "El personal seleccionado no tiene herramienta asignada que auditar", "Mensaje", {
-            "timeOut": "9500",
+	toastr.error( "Aviso, el personal seleccionado no tiene herramienta asignada que auditar", "Mensaje", {
+            "timeOut": "6000",
             "progressBar": true,
-            "extendedTImeout": "5000"
+            "extendedTImeout": "6000"
     });
 }
 //mensaje termino prestamo menor a inicio prestamo
 function msjterminoprestamomenor(){
-    toastr.error( "La fecha de termino no puede ser menor a la fecha de inicio", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, la fecha de termino no puede ser menor a la fecha de inicio", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });
 }
 //mensaje herramienta agregada correctamente
 function msj_herramientagregadocorrectamente(){
-    toastr.success( "La herramienta se agrego correctamente", "Mensaje", {
-        "timeOut": "9500",
+    toastr.success( "Aviso, la herramienta se agrego correctamente", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });
 }
 //mensaje herramient ya agregada
 function msj_errorherramientayaagregado(){
-    toastr.error( "La herramienta solo se puede agregar una vez", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, la herramienta solo se puede agregar una vez", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });
 }
 //mensaje error herramienta sin existencias para prestamo
 function msj_errorherramientasinexistenciasparaprestamo(){
-    toastr.error( "Error todas las existencias de la herramienta seleccionada ya estan prestadas", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, todas las existencias de la herramienta seleccionada ya estan prestadas", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });
 }
 //mensaje info el persona tiene asignaciones sin autorizar
 function msj_infopersonalconasignacionesporautorizar(){
     toastr.info( "Recomendación, el personal seleccionado tiene asignaciones sin autorizar, antes de auditar al personal se recomienda tener autorizadas todas sus asignaciones de herramienta", "Mensaje", {
-        "timeOut": "9500",
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });
 }
 //la fecha final es mayor al dia de hoy
 function msjfechafinalmayorahoy(){
-    toastr.error( "Error la fecha final del reporte no puede ser mayor a la fecha actual", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, la fecha final del reporte no puede ser mayor a la fecha actual", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });
 }
 //la fecha incial es mayor a la fecha final
 function msjfechainicialmayorafechafinal(){
-    toastr.error( "Error la fecha inicial no puede ser mayor a la fecha final del reporte", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, la fecha inicial no puede ser mayor a la fecha final del reporte", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });
 }
 //msj debe seleccionar al menos una compra para generar el formato en excel
 function msjseleccionaunacompra(){
     toastr.info( "Aviso, debe seleccionar al menos una compra para poder realizar el formato de la caja chica en excel", "Mensaje", {
-        "timeOut": "9500",
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });
 }
 //msj faltan datos por capturar OT
 function msjfaltandatosporcapturar(){
-    toastr.error( "Error faltan datos por capturar, revisa todas las pestañas del formulario", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, faltan datos por capturar, revisa todas las pestañas del formulario", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });   
 }
 //msj tecnico ya agregado OT
 function msj_errortecnicoyaagregado(){
-    toastr.error( "Error el técnico ya esta agregado", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, el técnico ya esta agregado", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     }); 
 }
 //msj solo se puedne agregar 4 tecnicos OT
 function msjsolo4tecnicospermitidos(){
-    toastr.error( "Error solo se permiten agregar 4 técnicos", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, solo se permiten agregar 4 técnicos", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     }); 
 }
 //msj El total de horas trabajadas por los técnicos es distinto al total de horas facturadas OT
 function msjtotalhorasnocorresponden(){
-    toastr.error( "El total de horas trabajadas por los técnicos es distinto al total de horas facturadas", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, el total de horas trabajadas por los técnicos es distinto al total de horas facturadas", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });     
 }
 //msj para quitar refaccion cancela su traspaso
 function msjerrorcancelartraspaso(){
-    toastr.error( "Error, para quitar la refacción cancela el traspaso al que corresponde", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, para quitar la refacción cancela el traspaso al que corresponde", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });   
 }
 //msj orden terminada correctamente
 function msj_ordenterminada(){
-    toastr.success( "La orden de trabajo se termino correctamente", "Mensaje", {
-        "timeOut": "9500",
+    toastr.success( "Aviso, la orden de trabajo se termino correctamente", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });
     var tabla = $('.tbllistado').DataTable();
     tabla.ajax.reload();
 }
 //msj la remision ya ha sido utilizada en una cotizacion
 function msjremisionyautilizada(){
-    toastr.error( "Error, la remisión ya fue utilizada en una cotización", "Mensaje", {
-        "timeOut": "9500",
+    toastr.error( "Aviso, la remisión ya fue utilizada en una cotización", "Mensaje", {
+        "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "5000"
+        "extendedTImeout": "6000"
     });       
 }
 //mensaje error se require al menos una entrada de una partida
 function msj_erroralmenosunaentrada(){
-	toastr.error( "Se requiere la entrada de al menos una partida", "Mensaje", {
-            "timeOut": "9500",
+	toastr.error( "Aviso, se requiere la entrada de al menos una partida", "Mensaje", {
+            "timeOut": "6000",
             "progressBar": true,
-            "extendedTImeout": "5000"
+            "extendedTImeout": "6000"
     });
 }
+//mensaje solo se admite 1 compra para devolución de producto
+function msj_errorsolo1compraparadevoluciones(){
+	toastr.error( "Aviso, solo se admite 1 compra para devolución de producto", "Mensaje", {
+            "timeOut": "6000",
+            "progressBar": true,
+            "extendedTImeout": "6000"
+    });
+}
+//mensaje error el total de la nota debe ser igual al total de los descuentos
+function msj_errorendiferenciatotalnotatotaldescuentos(){
+    toastr.error( "Aviso, el total de la nota debe ser igual al total de los descuentos", "Mensaje", {
+        "timeOut": "6000",
+        "progressBar": true,
+        "extendedTImeout": "6000"
+    }); 
+}
+//mensaje solo se admite 1 factura
+function msj_errorsolo1factura(){
+	toastr.error( "Aviso, solo se admite 1 factura para selección de códigos, para 2 o mas facturas se aplican DPPP", "Mensaje", {
+            "timeOut": "6000",
+            "progressBar": true,
+            "extendedTImeout": "6000"
+    });
+}
+//mensaje error al menos debe haber una partida agregada por tabla
+function msj_erroralmenosunapartidaagregada(){
+    toastr.error( "Aviso, al menos debe haber una partida agregada por tabla", "Mensaje", {
+        "timeOut": "6000",
+        "progressBar": true,
+        "extendedTImeout": "6000"
+    });
+}
+//mensaje error elige al menos un almacén
+function msj_erroreligeunalmacen(){
+    toastr.error( "Aviso, elige al menos un almacén", "Mensaje", {
+        "timeOut": "6000",
+        "progressBar": true,
+        "extendedTImeout": "6000"
+    });
+}
+//mensaje remision agregada correctamente
+function remisionagregadacorrectamente(){
+    toastr.success( "Aviso, la remisión se agrego correctamente a las partidas", "Mensaje", {
+        "timeOut": "6000",
+        "positionClass": "toast-top-left",
+        "progressBar": true,
+        "extendedTImeout": "6000"
+    });
+} 
+//mensaje remision eliminada correctamente
+function remisioneliminadacorrectamente(){
+    toastr.success( "Aviso, la remisión se elimino correctamente de las partidas", "Mensaje", {
+        "timeOut": "6000",
+        "positionClass": "toast-top-left",
+        "progressBar": true,
+        "extendedTImeout": "6000"
+    });
+} 
+//mensaje orden agregada correctamente
+function ordenagregadacorrectamente(){
+    toastr.success( "Aviso, la orden se agrego correctamente a las partidas", "Mensaje", {
+        "timeOut": "6000",
+        "positionClass": "toast-top-left",
+        "progressBar": true,
+        "extendedTImeout": "6000"
+    });
+} 
+//mensaje orden eliminada correctamente
+function ordeneliminadacorrectamente(){
+    toastr.success( "Correcto, la orden se elimino correctamente de las partidas", "Mensaje", {
+        "timeOut": "6000",
+        "positionClass": "toast-top-left",
+        "progressBar": true,
+        "extendedTImeout": "6000"
+    });
+} 
 ///////////////////////////////////FIN MENSAJES TOASTR.JS INAASYS///////////////////////////////////////
 //////////////////////////////FUNCIONES PARA CONFIGURACION DE COLUMNAS DE TABLAS/////////////////////////////////////////
 //ordenar las columnas para vista de tabla

@@ -74,7 +74,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <label>Código<b style="color:#F44336 !important;">*</b></label>
-                                <input type="text" class="form-control" name="codigo" id="codigo" required onkeyup="tipoLetra(this);">
+                                <input type="text" class="form-control" name="codigo" id="codigo" required data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">
                             </div>
                         </div>
                         <div class="col-md-12" id="tabsform">

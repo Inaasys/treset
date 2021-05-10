@@ -23,7 +23,8 @@
         "luecano/numero-a-letras": "^2.0",
         "maatwebsite/excel": "^3.1",
         "wemersonjanuario/wkhtmltopdf-windows": "0.12.2.3",
-        "yajra/laravel-datatables-oracle": "~9.0"
+        "yajra/laravel-datatables-oracle": "~9.0",
+        "simplesoftwareio/simple-qrcode": "~2"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",

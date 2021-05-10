@@ -48,9 +48,6 @@ function limpiar(){
   $("#formparsley").parsley().reset();
   //volver a aplicar configuracion a datatable principal para que realize la busqueda con la tecla enter
   regresarbusquedadatatableprincipal();
-  //reiniciar los contadores de la tabla de detalle de la orden de compra
-  contadorproductos=0;
-  contadorfilas = 0;
 }
 //mostrar modal formulario
 function mostrarmodalformulario(tipo, modificacionpermitida){
@@ -82,12 +79,20 @@ function ocultarformulario(){
   $("#formulario").hide();
   $("#contenidomodaltablas").show();
 }
+//cambiar url para exportar excel
+function cambiarurlexportarexcel(){
+  //colocar el periodo seleccionado como parametro para exportar a excel
+  var periodo = $("#periodo").val();
+  $("#btnGenerarFormatoExcel").attr("href", urlgenerarformatoexcel+'?periodo='+periodo);
+}
 function relistar(){
+  cambiarurlexportarexcel();
     var tabla = $('.tbllistado').DataTable();
     tabla.ajax.reload();
 }
 //listar todos los registros de la tabla
 function listar(){
+  cambiarurlexportarexcel();
   //Campos ordenados a mostras
   var campos = columnas_ordenadas.split(",");
   var campos_tabla  = [];
@@ -101,6 +106,8 @@ function listar(){
       });
   }
   tabla=$('#tbllistado').DataTable({
+    "lengthMenu": [ 10, 50, 100, 250, 500 ],
+    "pageLength": 250,
     "sScrollX": "110%",
     "sScrollY": "350px",
     "bScrollCollapse": true,
@@ -132,7 +139,7 @@ function listar(){
     }
   });
 }
-//obtener registros de proveedores
+//obtener registros
 function obtenerpersonalrecibe(){
   ocultarformulario();
   var tablapersonalrecibe = '<div class="modal-header bg-red">'+
@@ -165,7 +172,7 @@ function obtenerpersonalrecibe(){
     $("#contenidomodaltablas").html(tablapersonalrecibe);
     $('#tbllistadopersonalrecibe').DataTable({
         "sScrollX": "110%",
-        "sScrollY": "300px",
+        "sScrollY": "370px",
         "bScrollCollapse": true,
         processing: true,
         'language': {
@@ -310,13 +317,10 @@ function herramientaasignadapersonal(){
                                                           '<div class="modal-footer">'+
                                                               '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                                                           '</div>';
-                                                          '<div class="modal-footer">'+
-                                                              '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                                                          '</div>';
   $("#contenidomodaltablas").html(tablaherramientasasignadaspersonalseleccionado);
   $('#tablaherramientasasignadaspersonalseleccionado').DataTable({
       "sScrollX": "110%",
-      "sScrollY": "300px",
+      "sScrollY": "370px",
       "bScrollCollapse": true,
       processing: true,
       'language': {
@@ -430,18 +434,18 @@ function alta(){
                 '<div class="tab-content">'+
                     '<div role="tabpanel" class="tab-pane fade in active" id="herramientastab">'+
                         '<div class="row">'+
-                            '<div class="col-md-12 table-responsive">'+
+                            '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
                                 '<table id="tablaherramientasprestadas" class="table table-bordered tablaherramientasprestadas">'+
                                     '<thead class="customercolor">'+
                                         '<tr>'+
-                                            '<th>#</th>'+
-                                            '<th>Herramienta</th>'+
-                                            '<th><div style="width:200px !important;">Descripción</div></th>'+
+                                            '<th class="customercolor">#</th>'+
+                                            '<th class="customercolor">Herramienta</th>'+
+                                            '<th class="customercolor"><div style="width:200px !important;">Descripción</div></th>'+
                                             '<th class="customercolortheadth">Unidad</th>'+
                                             '<th class="customercolortheadth">Cantidad</th>'+
                                             '<th class="customercolortheadth">Precio $</th>'+
-                                            '<th>Total $</th>'+
-                                            '<th>Estado Herramienta</th>'+
+                                            '<th class="customercolor">Total $</th>'+
+                                            '<th class="customercolor">Estado Herramienta</th>'+
                                         '</tr>'+
                                     '</thead>'+
                                     '<tbody>'+           
@@ -469,6 +473,9 @@ function alta(){
   obtenultimonumero();
   asignarfechaactual();
   obtenerpersonal();
+  //reiniciar los contadores
+  contadorproductos=0;
+  contadorfilas = 0;
   //se debe motrar el input para buscar los productos
   $("#divbuscarcodigoproducto").show();
   $("#ModalAlta").modal('show');
@@ -594,7 +601,6 @@ $("#btnterminarprestamo").on('click', function(e){
     form.parsley().validate();
   }
 });
-
 //obtener datos para modificacion
 function obtenerdatos(prestamomodificar){
   $("#titulomodal").html('Modificación Prestamo Herramienta');
@@ -609,18 +615,18 @@ function obtenerdatos(prestamomodificar){
                   '<div class="tab-content">'+
                       '<div role="tabpanel" class="tab-pane fade in active" id="herramientastab">'+
                           '<div class="row">'+
-                              '<div class="col-md-12 table-responsive">'+
+                              '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
                                   '<table id="tablaherramientasprestadas" class="table table-bordered tablaherramientasprestadas">'+
                                       '<thead class="customercolor">'+
                                           '<tr>'+
-                                              '<th>#</th>'+
-                                              '<th>Herramienta</th>'+
-                                              '<th><div style="width:200px !important;">Descripción</div></th>'+
+                                              '<th class="customercolor">#</th>'+
+                                              '<th class="customercolor">Herramienta</th>'+
+                                              '<th class="customercolor"><div style="width:200px !important;">Descripción</div></th>'+
                                               '<th class="customercolortheadth">Unidad</th>'+
                                               '<th class="customercolortheadth">Cantidad</th>'+
                                               '<th class="customercolortheadth">Precio $</th>'+
-                                              '<th>Total $</th>'+
-                                              '<th>Estado Herramienta</th>'+
+                                              '<th class="customercolor">Total $</th>'+
+                                              '<th class="customercolor">Estado Herramienta</th>'+
                                           '</tr>'+
                                       '</thead>'+
                                       '<tbody>'+           
@@ -645,7 +651,6 @@ function obtenerdatos(prestamomodificar){
                       '</div>'+ 
                   '</div>';
     $("#tabsform").html(tabs);
-
     $("#id").val(data.Prestamo_Herramienta.id);
     $("#numeropersonalrecibe").val(data.personalrecibe.id);
     $("#personalrecibe").val(data.personalrecibe.nombre);
@@ -665,6 +670,9 @@ function obtenerdatos(prestamomodificar){
     //se debe esconder el input para buscar los productos porque en la modificacion no se permiten agregar productos
     $("#divbuscarcodigoproducto").hide();
     seleccionarpersonalentrega(data);
+  }).fail( function() {
+    msj_errorajax();
+    $('.page-loader-wrapper').css('display', 'none');
   })
 }
 async function seleccionarpersonalentrega(data){

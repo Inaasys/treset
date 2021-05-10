@@ -14,8 +14,17 @@
             page-break-after: auto
         }
         body {
-            letter-spacing: 2px;
+            letter-spacing: 1px;
 	        font-family: 'Roboto', Arial, Tahoma, sans-serif;
+        }
+        .wrap,
+        .wrap2{ 
+            width:750px;
+            white-space: pre-wrap;      /* CSS3 */   
+            white-space: -moz-pre-wrap; /* Firefox */    
+            white-space: -pre-wrap;     /* Opera <7 */   
+            white-space: -o-pre-wrap;   /* Opera 7 */    
+            word-wrap: break-word;      /* IE */
         }
     </style>
     @foreach($data as $d)
@@ -28,8 +37,10 @@
                     </div>
                     <div style="float:left;width:60%;text-align: center;">
                         <b style="font-size:12px;color:#122b40;">{{$empresa->Empresa}}</b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$empresa->Calle}} {{$empresa->NoExterior}} </b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$empresa->Municipio}} {{$empresa->Estado}}, {{$empresa->Pais}} CP: {{$empresa->LugarExpedicion}}</b>
+                        <b style="font-size:12px;color:#122b40;">{{$empresa->Calle}} No. {{$empresa->NoExterior}} </b><br>
+                        <b style="font-size:12px;color:#122b40;">{{$empresa->Colonia}} CP: {{$empresa->LugarExpedicion}}</b><br>
+                        <b style="font-size:12px;color:#122b40;">{{$empresa->Municipio}}, {{$empresa->Estado}}</b><br>
+                        <b style="font-size:12px;color:#122b40;">RFC {{$empresa->Rfc}} Telefonos {{$empresa->Telefonos}}</b>
                     </div>
                     <div style="float:right;width:20%;text-align: right;">
                         <p style="font-size:10px;"></p>
@@ -38,78 +49,71 @@
                 <div>
                     <hr></hr>
                 </div>
-                <div id ="contenedor">
-                    <div style="width:100%; float:right; text-align: right;">
-                        <p style="font-size:15px;">NOTA PROVEEDOR</p>
-                        <b style="font-size:10px;"></b>
-                    </div>
-                </div>
-                <div id ="contenedor" style="margin-top:50px;">
-                    <div style="width:68%; height:125px; float:left; text-align: left; border-style: groove;">
-                        <p style="font-size:11px; margin-left: 5px;"> Proveedor: <b>{{$d['proveedor']->Nombre}}</b></p>
-                        <p style="font-size:11px; margin-left: 5px;"> Calle: <b>{{$d['proveedor']->Calle}}</b></p>
-                        <p style="font-size:11px; margin-left: 5px;"> Colonia: <b>{{$d['proveedor']->Colonia}}</b></p>
-                        <p style="font-size:11px; margin-left: 5px;"> Municipio: <b>{{$d['proveedor']->Municipio}}</b></p>
-                        <p style="font-size:11px; margin-left: 5px;"></p>
+                <div id ="contenedor" style="margin-top:10px;">
+                    <div style="width:53%; height:110px; float:left; text-align: left; border-style: groove;">
+                        <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
+                            <li style="font-size:9px; margin-left: 5px;"> Proveedor: {{$d['proveedor']->Nombre}}</li>
+                            <li style="font-size:9px; margin-left: 5px;"> Calle: {{$d['proveedor']->Calle}}</li>
+                            <li style="font-size:9px; margin-left: 5px;"> Colonia: {{$d['proveedor']->Colonia}}</li>
+                            <li style="font-size:9px; margin-left: 5px;"> Municipio: {{$d['proveedor']->Municipio}}</li>
+                        </ul>
                     </div>
                     <div style="width:1%; float:left;">
                     </div>
-                    <div style="width:30%; height:125px; float:left; text-align: left; border-style: groove;">
-                        <p style="font-size:11px; margin-left: 5px;">Nota: <b>{{$d['notacreditoproveedor']->Nota}}</b></p>
-                        <p style="font-size:11px; margin-left: 5px;">Fecha: <b>{{$d['notacreditoproveedor']->Fecha}}</b></p>
-                        <p style="font-size:11px; margin-left: 5px;">Status: <b>{{$d['notacreditoproveedor']->Status}}</b></p>
+                    <div style="width:45%; height:110px; float:left; text-align: left; border-style: groove;">
+                        <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
+                            <li style="font-size:12px; margin-left: 5px;"><b>Nota Proveedor: </b><b style="color:red">{{$d['notacreditoproveedor']->Nota}}</b></li>
+                            <li style="font-size:9px; margin-left: 5px;">Fecha: {{$d['notacreditoproveedor']->Fecha}}</li>
+                            <li style="font-size:9px; margin-left: 5px;">Status: {{$d['notacreditoproveedor']->Status}}</li>
+                        </ul>
                     </div>
                 </div>
-                <div id ="contenedor" style="margin-top:200px;">
+                <div id ="contenedor" style="margin-top:13px;">
                     <table style="width: 100%;max-width: 100%;border: 1px solid #ddd;">
-                        <thead style="background-color:#a6a6b3; font-size:11px;">
-                            <tr>
+                        <tbody style="font-size:9px; text-align: justify;">
+                            <tr style="background-color:#a6a6b3;font-size:10px;">
                                 <th>Cantidad</th>
                                 <th>Código</th>
                                 <th>Descripción</th>
                                 <th>Compra</th>
                                 <th>Remision</th>
                                 <th>Factura</th>
-                                <th>Precio</th>
-                                <th>SubTotal</th>
+                                <th>Precio $</th>
+                                <th>SubTotal $</th>
                             </tr>
-                        </thead>
-                        <tbody style="background-color:#ddd; font-size:11px; text-align: center;">
                             @foreach($d['datadetalle'] as $ncpd)
                             <tr>
-                                <td>{{$ncpd['cantidaddetalle']}}</td>
+                                <td>{{ number_format($ncpd['cantidaddetalle'], $d['numerodecimalesdocumento']) }}</td>
                                 <td>{{$ncpd['codigodetalle']}}</td>
                                 <td>{{$ncpd['descripciondetalle']}}</td>
                                 <td>{{$ncpd['compradetalle']}}</td>
                                 <td>{{$ncpd['remisiondetalle']}}</td>
                                 <td>{{$ncpd['facturadetalle']}}</td>
-                                <td>{{$ncpd['preciodetalle']}}</td>
-                                <td>{{$ncpd['subtotaldetalle']}}</td>
+                                <td>{{ number_format($ncpd['preciodetalle'], $d['numerodecimalesdocumento']) }}</td>
+                                <td>{{ number_format($ncpd['subtotaldetalle'], $d['numerodecimalesdocumento']) }}</td>
                             </tr>
                             @endforeach
+                            <tr>
+                                <td colspan="6" style="font-size:11px"></td>
+                                <td style="font-size:11px;text-align: right;">Descuento $ : </td>
+                                <td style="font-size:11px;text-align: right;"><b>{{ number_format($d['descuentonotacreditoproveedor'], $d['numerodecimalesdocumento']) }}</b></td>
+                            </tr>
+                            <tr>
+                                <td colspan="6" style="font-size:11px"></td>
+                                <td style="font-size:11px;text-align: right;">SubTotal $ : </td>
+                                <td style="font-size:11px;text-align: right;"><b>{{ number_format($d['subtotalnotacreditoproveedor'], $d['numerodecimalesdocumento']) }}</b></td>
+                            </tr>
+                            <tr>
+                                <td colspan="6" style="font-size:11px"></td>
+                                <td style="font-size:11px;text-align: right;">IVA $ : </td>
+                                <td style="font-size:11px;text-align: right;"><b>{{ number_format($d['ivanotacreditoproveedor'], $d['numerodecimalesdocumento']) }}</b></td>
+                            </tr>
+                            <tr>
+                                <td colspan="6" style="font-size:11px"></td>
+                                <td style="font-size:11px;text-align: right;">Total $ : </td>
+                                <td style="font-size:11px;text-align: right;"><b>{{ number_format($d['totalnotacreditoproveedor'], $d['numerodecimalesdocumento']) }}</b></td>
+                            </tr>
                         </tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="6" style="font-size:12px"></td>
-                                <td style="font-size:12px;text-align: right;">Descuento $ : </td>
-                                <td style="font-size:12px;text-align: right;"><b>{{$d['descuentonotacreditoproveedor']}}</b></td>
-                            </tr>
-                            <tr>
-                                <td colspan="6" style="font-size:12px"></td>
-                                <td style="font-size:12px;text-align: right;">SubTotal $ : </td>
-                                <td style="font-size:12px;text-align: right;"><b>{{$d['subtotalnotacreditoproveedor']}}</b></td>
-                            </tr>
-                            <tr>
-                                <td colspan="6" style="font-size:12px"></td>
-                                <td style="font-size:12px;text-align: right;">IVA $ : </td>
-                                <td style="font-size:12px;text-align: right;"><b>{{$d['ivanotacreditoproveedor']}}</b></td>
-                            </tr>
-                            <tr>
-                                <td colspan="6" style="font-size:12px"></td>
-                                <td style="font-size:12px;text-align: right;">Total $ : </td>
-                                <td style="font-size:12px;text-align: right;"><b>{{$d['totalnotacreditoproveedor']}}</b></td>
-                            </tr>
-                        </tfoot>
                     </table>
                 </div>
                 <div id ="contenedor" style="margin-top:150px;">

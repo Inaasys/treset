@@ -278,6 +278,9 @@ function obtenerdatos(id){
     $("#roles").html(data.roles);
     mostrarmodalformulario('MODIFICACION');
     $('.page-loader-wrapper').css('display', 'none');
+  }).fail( function() {
+    msj_errorajax();
+    $('.page-loader-wrapper').css('display', 'none');
   })
 }
 //guardar el registro
@@ -860,7 +863,35 @@ function permisos(id){
                                     '</div>'+
                                 '</div>'+
                                 '<div class="col-md-6">'+
-                                '<label>Personal</label>'+
+                                    '<label>Folios Notas</label>'+
+                                    '<div class="col-md-12 form-check">'+ 
+                                        '<input type="checkbox" name="menucatalogofoliosfiscalesfoliosnotas" id="idmenucatalogofoliosfiscalesfoliosnotas" class="filled-in submenu accesocatalogos" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenucatalogofoliosfiscalesfoliosnotas">Acceso</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="catalogos.folios.fiscales.folios.notas.altas" id="idcatalogos.folios.fiscales.folios.notas.altas" class="filled-in crudcatalogos permisoscrud" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idcatalogos.folios.fiscales.folios.notas.altas">Altas</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="catalogos.folios.fiscales.folios.notas.bajas" id="idcatalogos.folios.fiscales.folios.notas.bajas" class="filled-in crudcatalogos permisoscrud" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idcatalogos.folios.fiscales.folios.notas.bajas">Bajas</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="catalogos.folios.fiscales.folios.notas.cambios" id="idcatalogos.folios.fiscales.folios.notas.cambios" class="filled-in crudcatalogos permisoscrud" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idcatalogos.folios.fiscales.folios.notas.cambios">Cambios</label>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                            '<div class="row">'+
+                                '<div class="col-md-6">'+
+                                    '<label>Folios Pagos</label>'+
+                                    '<div class="col-md-12 form-check">'+ 
+                                        '<input type="checkbox" name="menucatalogofoliosfiscalesfoliospagos" id="idmenucatalogofoliosfiscalesfoliospagos" class="filled-in submenu accesocatalogos" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenucatalogofoliosfiscalesfoliospagos">Acceso</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="catalogos.folios.fiscales.folios.pagos.altas" id="idcatalogos.folios.fiscales.folios.pagos.altas" class="filled-in crudcatalogos permisoscrud" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idcatalogos.folios.fiscales.folios.pagos.altas">Altas</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="catalogos.folios.fiscales.folios.pagos.bajas" id="idcatalogos.folios.fiscales.folios.pagos.bajas" class="filled-in crudcatalogos permisoscrud" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idcatalogos.folios.fiscales.folios.pagos.bajas">Bajas</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="catalogos.folios.fiscales.folios.pagos.cambios" id="idcatalogos.folios.fiscales.folios.pagos.cambios" class="filled-in crudcatalogos permisoscrud" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idcatalogos.folios.fiscales.folios.pagos.cambios">Cambios</label>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label>Personal</label>'+
                                     '<div class="col-md-12 form-check">'+ 
                                         '<input type="checkbox" name="menucatalogopersonal" id="idmenucatalogopersonal" class="filled-in submenu accesocatalogos" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
                                         '<label for="idmenucatalogopersonal">Acceso</label>'+
@@ -871,6 +902,18 @@ function permisos(id){
                                         '&nbsp;&nbsp;<input type="checkbox" name="catalogos.personal.cambios" id="idcatalogos.personal.cambios" class="filled-in crudcatalogos permisoscrud" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
                                         '<label for="idcatalogos.personal.cambios">Cambios</label>'+
                                     '</div>'+
+                                '</div>'+
+                            '</div>'+
+                            '<div class="row">'+
+                                '<div class="col-md-6">'+
+                                    '<label>Existencias</label>'+
+                                    '<div class="col-md-12 form-check">'+ 
+                                        '<input type="checkbox" name="menucatalogoexistencias" id="idmenucatalogoexistencias" class="filled-in submenu accesocatalogos" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenucatalogoexistencias">Acceso</label>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                   
                                 '</div>'+
                             '</div>'+
                             '<div class="row">'+
@@ -969,6 +1012,9 @@ function permisos(id){
                $("input[name='"+registro[0]+"']").prop('checked', true);
             } 
         });
+    }).fail( function() {
+        msj_errorajax();
+        $('.page-loader-wrapper').css('display', 'none');
     })
 }
 //marcar todos los aceesos de los registros

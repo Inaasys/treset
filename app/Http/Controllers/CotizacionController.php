@@ -43,7 +43,7 @@ class CotizacionController extends ConfiguracionSistemaController{
     }
 
     public function cotizaciones(){
-        $serieusuario = Helpers::obtenerserieusuario(Auth::user()->email, 'Cotizaciones');
+        $serieusuario = Helpers::obtenerserieusuario(Auth::user()->user, 'Cotizaciones');
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('cotizaciones_guardar_configuracion_tabla');
         return view('registros.cotizaciones.cotizaciones', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla'));
@@ -59,11 +59,7 @@ class CotizacionController extends ConfiguracionSistemaController{
                         $botoncambios =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->cotizacion .'\')"><i class="material-icons">mode_edit</i></div> '; 
                         $botonbajas =      '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->cotizacion .'\')"><i class="material-icons">cancel</i></div> ';
                         $botonexcel =      '<a href="'.route('cotizaciones_crear_formato_excel',$data->cotizacion).'"><div class="btn bg-green btn-xs waves-effect" data-toggle="tooltip" title="Crear formato excel"><i class="material-icons">format_indent_increase</i></div></a> ';
-                        if($data->status == 'BAJA'){
-                            $operaciones = '';
-                        }else{
-                            $operaciones =  $botoncambios.$botonbajas.$botonexcel;
-                        }
+                        $operaciones =  $botoncambios.$botonbajas.$botonexcel;
                         return $operaciones;
                     })
                     ->addColumn('total', function($data){ return $data->total; })
@@ -79,7 +75,7 @@ class CotizacionController extends ConfiguracionSistemaController{
 
     public function cotizaciones_obtener_remisiones(Request $request){
         if($request->ajax()){
-            $data = Remision::orderBy("Folio", "DESC")->get();
+            $data = Remision::where('Status', 'POR FACTURAR')->orderBy("Folio", "DESC")->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarremision('.$data->Folio.',\''.$data->Remision .'\')">Seleccionar</div>';
@@ -106,9 +102,9 @@ class CotizacionController extends ConfiguracionSistemaController{
                     $filasdetallesremision= $filasdetallesremision.
                     '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                         '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.');">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dr->Item.'" readonly></td>'.
-                        '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dr->Codigo.'" readonly>'.$dr->Codigo.'</td>'.
-                        '<td class="tdmod"><div class="divorinputmodl"><input type="hidden" class="form-control descripcionpartida" name="descripcionpartida[]" value="'.$dr->Descripcion.'" readonly>'.$dr->Descripcion.'</div></td>'.
-                        '<td class="tdmod"><input type="hidden" class="form-control unidadpartida" name="unidadpartida[]" value="'.$dr->Unidad.'" readonly>'.$dr->Unidad.'</td>'.
+                        '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dr->Codigo.'" readonly data-parsley-length="[1, 50]">'.$dr->Codigo.'</td>'.
+                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.$dr->Descripcion.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                        '<td class="tdmod"><input type="hidden" class="form-control unidadpartida" name="unidadpartida[]" value="'.$dr->Unidad.'" readonly data-parsley-length="[1, 50]">'.$dr->Unidad.'</td>'.
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'.$producto->Insumo.'" readonly required></td>'.
                         '<td class="tdmod">'.
                             '<select name="estadopartida[]" class="form-control divorinputmodmd" style="width:100% !important;height: 28px !important;" required>'.
@@ -147,6 +143,7 @@ class CotizacionController extends ConfiguracionSistemaController{
 
     //guardar registro
     public function cotizaciones_guardar(Request $request){
+        ini_set('max_input_vars','10000' );
         //obtener el ultimo id de la tabla
         DB::unprepared('SET IDENTITY_INSERT cotizaciones_t ON');
         $id = Helpers::ultimoidregistrotabla('App\Cotizacion');
@@ -205,12 +202,42 @@ class CotizacionController extends ConfiguracionSistemaController{
     	return response()->json($Cotizacion); 
     }
 
+    //veririfcar baja
+    public function cotizaciones_verificar_uso_en_modulos(Request $request){
+        $Cotizacion = Cotizacion::where('cotizacion', $request->cotizaciondesactivar)->first();
+        $resultadofechas = Helpers::compararanoymesfechas($Cotizacion->fecha);
+        $data = array (
+            'resultadofechas' => $resultadofechas,
+            'status' => $Cotizacion->status
+        );
+        return response()->json($data);
+    }
+
     //bajas
     public function cotizaciones_alta_o_baja(Request $request){
         $Cotizacion = Cotizacion::where('cotizacion', $request->cotizaciondesactivar)->first();
-        $Cotizacion->motivo_baja = $request->motivobaja.', '.Helpers::fecha_exacta_accion_datetimestring().', '.Auth::user()->user;
-        $Cotizacion->status = 'BAJA';
-        $Cotizacion->save();
+        //cambiar status y colocar valores en 0
+        $MotivoBaja = $request->motivobaja.', '.Helpers::fecha_exacta_accion_datetimestring().', '.Auth::user()->user;
+        Cotizacion::where('cotizacion', $request->cotizaciondesactivar)
+                ->update([
+                    'motivo_baja' => $MotivoBaja,
+                    'status' => 'BAJA',
+                    'num_remision' => '',
+                    'num_equipo' => '',
+                    'subtotal' => '0.000000',
+                    'iva' => '0.000000',
+                    'total' => '0.000000'
+                ]);
+        $detalles = CotizacionDetalle::where('cotizacion', $request->cotizaciondesactivar)->get();
+        foreach($detalles as $detalle){
+            //colocar en ceros cantidades
+            CotizacionDetalle::where('cotizacion', $request->cotizaciondesactivar)
+                            ->where('Item', $detalle->item)
+                            ->update([
+                                'cantidad' => '0.000000',
+                                'importe' => '0.000000'
+                            ]);
+        }        
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
         $BitacoraDocumento->Documento = "COTIZACIONES";
@@ -253,9 +280,9 @@ class CotizacionController extends ConfiguracionSistemaController{
                 $filasdetallescotizacion= $filasdetallescotizacion.
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" >X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dc->item.'" readonly></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dc->numero_parte.'" readonly>'.$dc->numero_parte.'</td>'.
-                    '<td class="tdmod"><div class="divorinputmodl"><input type="hidden" class="form-control descripcionpartida" name="descripcionpartida[]" value="'.$dc->descripcion.'" readonly>'.$dc->descripcion.'</div></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control unidadpartida" name="unidadpartida[]" value="'.$dc->unidad.'" readonly>'.$dc->unidad.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dc->numero_parte.'" readonly data-parsley-length="[1, 50]">'.$dc->numero_parte.'</td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.$dc->descripcion.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control unidadpartida" name="unidadpartida[]" value="'.$dc->unidad.'" readonly data-parsley-length="[1, 50]">'.$dc->unidad.'</td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'.$dc->insumo.'" readonly required></td>'.
                     '<td class="tdmod">'.
                         '<select name="estadopartida[]" class="form-control divorinputmodmd" style="width:100% !important;height: 28px !important;" required>'.
@@ -271,7 +298,27 @@ class CotizacionController extends ConfiguracionSistemaController{
             }
         }else{
             $filasdetallescotizacion = '';
-        }        
+        }   
+        //permitir o no modificar registro
+        if(Auth::user()->role_id == 1){
+            if($cotizacion->status == 'BAJA'){
+                $modificacionpermitida = 0;
+            }else{
+                $modificacionpermitida = 1;
+            }
+        }
+        if(Auth::user()->role_id != 1){
+            if($cotizacion->status == 'BAJA'){
+                $modificacionpermitida = 0;
+            }else{
+                $resultadofechas = Helpers::compararanoymesfechas($cotizacion->fecha);
+                if($resultadofechas != ''){
+                    $modificacionpermitida = 0;
+                }else{
+                    $modificacionpermitida = 1;
+                }
+            }
+        }      
         $data = array(
             "cotizacion" => $cotizacion,
             "remision" => $remision,
@@ -283,24 +330,50 @@ class CotizacionController extends ConfiguracionSistemaController{
             "subtotal" => Helpers::convertirvalorcorrecto($cotizacion->subtotal),
             "iva" => Helpers::convertirvalorcorrecto($cotizacion->iva),
             "total" => Helpers::convertirvalorcorrecto($cotizacion->total),
-            "modificacionpermitida" => 1
+            "modificacionpermitida" => $modificacionpermitida
         );
         return response()->json($data);        
     }
 
     //modificar
     public function cotizaciones_guardar_modificacion(Request $request){
+        ini_set('max_input_vars','10000' );
         $cotizacion = $request->folio.'-'.$request->serie;
         $Cotizacion = Cotizacion::where('cotizacion', $cotizacion)->first();
-		$Cotizacion->fecha=Carbon::parse($request->fecha)->toDateTimeString();
-		$Cotizacion->num_remision=$request->remision;
-        $Cotizacion->num_equipo=$request->equipo;
-		$Cotizacion->subtotal=$request->subtotal;
-		$Cotizacion->iva=$request->iva;
-		$Cotizacion->total=$request->total;
-        $Cotizacion->ot_tecnodiesel=$request->ottecnodiesel;
-        $Cotizacion->ot_tyt=$request->ottyt;
-        $Cotizacion->save();
+        //validar si las partidas en las modiifcacion son las mismas que los detalles
+        // si no son las mismas comparar y eliminar las partidas que corresponden en la tabla detalles
+        //array partidas antes de modificacion
+        $ArrayDetallesCotizacionAnterior = Array();
+        $DetallesCotizacionAnterior = CotizacionDetalle::where('cotizacion', $cotizacion)->get();
+        foreach($DetallesCotizacionAnterior as $detalle){
+            array_push($ArrayDetallesCotizacionAnterior, $detalle->numero_parte);
+        }
+        //array partida despues de modificacion
+        $ArrayDetallesCotizacionNuevo = Array();
+        foreach ($request->codigopartida as $key => $nuevocodigo){ 
+            array_push($ArrayDetallesCotizacionNuevo, $nuevocodigo);
+        }  
+        //diferencias entre arreglos
+        $diferencias_arreglos = array_diff($ArrayDetallesCotizacionAnterior, $ArrayDetallesCotizacionNuevo);
+        //iteramos las diferencias entre arreglos
+        if(count($diferencias_arreglos) > 0){
+            foreach($diferencias_arreglos as $eliminapartida){
+                //eliminar detalle de la remision eliminado
+                $eliminardetallecotizacion = CotizacionDetalle::where('cotizacion', $cotizacion)->where('Codigo', $eliminapartida)->forceDelete();
+            }
+        }
+        //modificar remision
+        Cotizacion::where('cotizacion', $cotizacion)
+        ->update([
+            'fecha'=>Carbon::parse($request->fecha)->toDateTimeString(),
+            'num_remision'=>$request->remision,
+            'num_equipo'=>$request->equipo,
+            'subtotal'=>$request->subtotal,
+            'iva'=>$request->iva,
+            'total'=>$request->total,
+            'ot_tecnodiesel'=>$request->ottecnodiesel,
+            'ot_tyt'=>$request->ottyt
+        ]);
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
         $BitacoraDocumento->Documento = "COTIZACIONES";
@@ -311,16 +384,46 @@ class CotizacionController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Usuario = Auth::user()->user;
         $BitacoraDocumento->Periodo = $request->periodohoy;
         $BitacoraDocumento->save();
-        foreach ($request->codigopartida as $key => $codigopartida){  
-            CotizacionDetalle::where('cotizacion', $cotizacion)
-            ->where('item', $request->itempartida [$key])
-            ->update([
-                'fecha' => Carbon::parse($request->fecha)->toDateTimeString(),
-                'status_refaccion' => $request->estadopartida [$key],
-                'precio' => $request->preciopartida [$key],
-                'cantidad' => $request->cantidadpartida  [$key],
-                'importe' => $request->importepartida [$key]
-            ]);
+        //INGRESAR DATOS A TABLA DETALLES
+        foreach ($request->codigopartida as $key => $codigopartida){   
+            //if la partida se agrego en la modificacion se agrega en los detalles de traspaso y de orden de trabajo si asi lo requiere
+            if($request->agregadoen [$key] == 'modificacion'){
+                $item = CotizacionDetalle::select('item')->where('cotizacion', $cotizacion)->orderBy('item', 'DESC')->take(1)->get();
+                $ultimoitem = $item[0]->Item+1;                
+                DB::unprepared('SET IDENTITY_INSERT cotizaciones_t_detalles ON');       
+                $iddetalle = Helpers::ultimoidregistrotabla('App\CotizacionDetalle');       
+                $CotizacionDetalle=new CotizacionDetalle;
+                $CotizacionDetalle->id = $iddetalle;
+                $CotizacionDetalle->id_cotizacion = $id;
+                $CotizacionDetalle->cotizacion = $cotizacion;
+                $CotizacionDetalle->fecha = Carbon::parse($request->fecha)->toDateTimeString();
+                $CotizacionDetalle->numero_parte = $codigopartida;
+                $CotizacionDetalle->descripcion = $request->descripcionpartida [$key];
+                $CotizacionDetalle->unidad = $request->unidadpartida [$key];
+                $CotizacionDetalle->status_refaccion = $request->estadopartida [$key];
+                $CotizacionDetalle->insumo = $request->insumopartida [$key];
+                $CotizacionDetalle->precio =  $request->preciopartida [$key];
+                $CotizacionDetalle->cantidad =  $request->cantidadpartida  [$key];
+                $CotizacionDetalle->importe = $request->importepartida [$key];
+                $CotizacionDetalle->item = $ultimoitem;
+                $CotizacionDetalle->save();
+                $item++;
+                DB::unprepared('SET IDENTITY_INSERT cotizaciones_t_detalles OFF');
+                $ultimoitem++;
+            }else{
+                //si la partida no se agrego en la modificacion solo se modifican los datos
+                //modificar detalle
+                CotizacionDetalle::where('cotizacion', $cotizacion)
+                ->where('item', $request->itempartida [$key])
+                ->update([
+                    'fecha' => Carbon::parse($request->fecha)->toDateTimeString(),
+                    'descripcion' => $request->descripcionpartida [$key],
+                    'status_refaccion' => $request->estadopartida [$key],
+                    'precio' => $request->preciopartida [$key],
+                    'cantidad' => $request->cantidadpartida  [$key],
+                    'importe' => $request->importepartida [$key]
+                ]);
+            }
         }
     	return response()->json($Cotizacion);
     }

@@ -32,15 +32,17 @@
                                                 </div>
                                             </td>
                                             <td >
-                                                <a class="btn bg-blue btn-xs waves-effect" href="{{route('ordenes_trabajo_exportar_excel')}}" target="_blank">
+                                                <a class="btn bg-blue btn-xs waves-effect" id="btnGenerarFormatoExcel" href="{{route('ordenes_trabajo_exportar_excel')}}" target="_blank">
                                                     Excel
                                                 </a>
                                             </td>
+                                            @if(Auth::user()->role_id == 1)
                                             <td>
                                                 <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
                                                     Configurar Tabla
                                                 </div>
                                             </td>
+                                            @endif
                         		        </tr>
                         	        </table>
                                 </div>
@@ -106,8 +108,10 @@
                                     <div class="col-md-2">
                                         <label>Orden <b style="color:#F44336 !important;" id="serietexto"> Serie: {{$serieusuario}}</b></label>
                                         <input type="text" class="form-control" name="folio" id="folio" required onkeyup="tipoLetra(this);">
-                                        <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" required readonly>
-                                        <input type="hidden" class="form-control" name="numerofilastablaservicios" id="numerofilastablaservicios" required readonly>
+                                        <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" required readonly data-parsley-length="[1, 10]">
+                                        <input type="hidden" class="form-control" name="numerofilastablaservicios" id="numerofilastablaservicios" value="0" required readonly>
+                                        <input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>
+                                        <input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>
                                     </div>   
                                     <div class="col-md-2">
                                         <label>Tipo de Orden</label>
@@ -180,7 +184,7 @@
                                     </div>
                                     <div class="col-md-3" id="divcaso">
                                         <label>Caso</label>
-                                        <input type="text" class="form-control" name="caso" id="caso"   onkeyup="tipoLetra(this);">
+                                        <input type="text" class="form-control" name="caso" id="caso"   onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">
                                     </div>
                                 </div>
                                 <div class="row">
@@ -210,7 +214,7 @@
                                                 </td>
                                                 <td>    
                                                     <div class="form-line">
-                                                        <input type="text" class="form-control" name="vin" id="vin" required>
+                                                        <input type="text" class="form-control" name="vin" id="vin" required data-parsley-length="[1, 30]">
                                                     </div>
                                                 </td>    
                                             </tr>    
@@ -218,15 +222,15 @@
                                     </div>
                                     <div class="col-md-2">
                                         <label>Motor / Serie</label>
-                                        <input type="text" class="form-control" name="motor" id="motor"  required  onkeyup="tipoLetra(this);">
+                                        <input type="text" class="form-control" name="motor" id="motor"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]">
                                     </div>
                                     <div class="col-md-2">
                                         <label>Marca</label>
-                                        <input type="text" class="form-control" name="marca" id="marca"  required  onkeyup="tipoLetra(this);">
+                                        <input type="text" class="form-control" name="marca" id="marca"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]">
                                     </div>
                                     <div class="col-md-2">
                                         <label>Modelo</label>
-                                        <input type="text" class="form-control" name="modelo" id="modelo"  required  onkeyup="tipoLetra(this);">
+                                        <input type="text" class="form-control" name="modelo" id="modelo"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]">
                                     </div>
                                     <div class="col-md-1">
                                         <label>Año</label>
@@ -240,15 +244,15 @@
                                     </div>
                                     <div class="col-md-2">
                                         <label>Placas</label>
-                                        <input type="text" class="form-control" name="placas" id="placas"  required  onkeyup="tipoLetra(this);">
+                                        <input type="text" class="form-control" name="placas" id="placas"  required data-parsley-length="[1, 10]" onkeyup="tipoLetra(this);">
                                     </div>
                                     <div class="col-md-2">
                                         <label># Económico</label>
-                                        <input type="text" class="form-control" name="economico" id="economico"  required  onkeyup="tipoLetra(this);">
+                                        <input type="text" class="form-control" name="economico" id="economico"  required  data-parsley-length="[1, 30]" onkeyup="tipoLetra(this);">
                                     </div>
                                     <div class="col-md-2">
                                         <label>Color</label>
-                                        <input type="text" class="form-control" name="color" id="color"  required data-parsley-minlength="3" onkeyup="tipoLetra(this);">
+                                        <input type="text" class="form-control" name="color" id="color"  required data-parsley-length="[3, 30]" onkeyup="tipoLetra(this);">
                                     </div>
                                     <div class="col-md-2">
                                         <label>Km Próx Servicio</label>
@@ -264,7 +268,7 @@
                                 <div class="row">
                                     <div class="col-md-2">
                                         <label>Reclamo</label>
-                                        <input type="text" class="form-control" name="reclamo" id="reclamo"   onkeyup="tipoLetra(this);">
+                                        <input type="text" class="form-control" name="reclamo" id="reclamo"  data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">
                                     </div>
                                     <div class="col-md-2">
                                         <label>Orden Cliente</label>
@@ -272,7 +276,7 @@
                                     </div>
                                     <div class="col-md-2">
                                         <label>Campaña No</label>
-                                        <input type="text" class="form-control" name="campana" id="campana"  onkeyup="tipoLetra(this);">
+                                        <input type="text" class="form-control" name="campana" id="campana" data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);">
                                     </div>
                                     <div class="col-md-2" >
                                         <label>Promoción</label>
@@ -284,11 +288,13 @@
                                     </div>
                                     <div class="col-md-2" >
                                         <label>Horas Reales</label>
-                                        <input type="text" class="form-control" name="horasreales" id="horasreales"   onkeyup="tipoLetra(this);">
+                                        <input type="number" step="0.{{$numerocerosconfiguradosinputnumberstep}}" class="form-control" name="horasreales" id="horasreales" value="0.{{$numerocerosconfigurados}}" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{<?php echo $numerodecimales; ?>}$/" onchange="formatocorrectoinputcantidades(this)">
                                     </div>
+                                </div>
+                                <div class="row">
                                     <div class="col-md-2" >
                                         <label>Rodar</label>
-                                        <input type="text" class="form-control" name="rodar" id="rodar"   onkeyup="tipoLetra(this);">
+                                        <input type="text" class="form-control" name="rodar" id="rodar"  data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">
                                     </div>
                                     <div class="col-md-2">
                                         <label>Plazo Días</label>
@@ -341,7 +347,7 @@
                     <input type="hidden" id="ordendesactivar" name="ordendesactivar">
                     <div id="divmotivobaja">
                         <label>Motivo Baja</label>
-                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required></textarea>
+                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required data-parsley-length="[1, 255]"></textarea>
                     </div>
 		        </form>	
       		</div>
@@ -405,6 +411,7 @@
         var campos_desactivados = '{{$configuracion_tabla->campos_desactivados}}';
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
         var usuario = '{!!Auth::user()->user!!}';
+        var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var ordenes_trabajo_obtener = '{!!URL::to('ordenes_trabajo_obtener')!!}';
         var ordenes_trabajo_obtener_ultimo_folio = '{!!URL::to('ordenes_trabajo_obtener_ultimo_folio')!!}';
         var ordenes_trabajo_obtener_tipos_ordenes_trabajo = '{!!URL::to('ordenes_trabajo_obtener_tipos_ordenes_trabajo')!!}';

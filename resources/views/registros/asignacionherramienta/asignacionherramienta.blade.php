@@ -37,7 +37,7 @@
                                                 </div>
                                             </td>
                                             <td >
-                                                <a class="btn bg-blue btn-xs waves-effect" href="{{route('asignacion_herramienta_exportar_excel')}}" target="_blank">
+                                                <a class="btn bg-blue btn-xs waves-effect" id="btnGenerarFormatoExcel" href="{{route('asignacion_herramienta_exportar_excel')}}" target="_blank">
                                                     Excel
                                                 </a>
                                             </td>
@@ -100,7 +100,9 @@
                             <div class="col-md-2">
                                 <label>Asignación <b style="color:#F44336 !important;" id="serietexto"> Serie: {{$serieusuario}}</b></label>
                                 <input type="text" class="form-control" name="id" id="id" required readonly onkeyup="tipoLetra(this);">
-                                <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" required readonly>
+                                <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" required readonly data-parsley-length="[1, 10]">
+                                <input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>
+                                <input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>
                             </div>   
                             <div class="col-md-4">
                                 <label>Personal que recibe</label>
@@ -172,7 +174,19 @@
       		</div>
       		<div class="modal-body">
 		      	<form id="formautorizar" action="#">
-		        	Estas seguro de autorizar la asignación de herramienta?
+                    <h5 >Estas seguro de autorizar la asignación de herramienta? </h5>
+                    <div class="table-responsive">
+                        <table id="tablaautorizacionasignacionherramienta" class="tablaautorizacionasignacionherramienta table table-bordered table-striped table-hover">
+                            <thead class="customercolor">
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Cantidad</th>
+                                    <th>Almacen</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
 		        	<input type="hidden" id="asignacionautorizar" name="asignacionautorizar">
 		        </form>	
       		</div>
@@ -196,7 +210,7 @@
                     <input type="hidden" id="asignaciondesactivar" name="asignaciondesactivar">
                     <div id="divmotivobaja">
                         <label>Motivo Baja</label>
-                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)"></textarea>
+                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required data-parsley-length="[1, 255]"></textarea>
                     </div>
 		        </form>	
       		</div>
@@ -225,10 +239,13 @@
                   <form id="formauditarherramienta">
                     <div class="row">
                         <label>Selecciona el personal que se auditara:</label>
-                        <div class="col-md-12 form-check">
+                        <div class="col-md-12">
                             <select name="personalexcel" id="personalexcel" class="form-control select2" onchange="herramientaasignadapersonal()" style="width:100% !important;" required>
                             </select>
                         </div>
+                    </div>
+                    <div class="row">
+
                         <div class="col-md-12" id="tabsformauditarherramientas">
                             <!-- aqui van el formulario para auditar herramienta al personal -->
                         </div>
@@ -252,11 +269,13 @@
         var numerodecimales = '{{$numerodecimales}}';
         var numerocerosconfigurados = '{{$numerocerosconfigurados}}';
         var numerocerosconfiguradosinputnumberstep = '{{$numerocerosconfiguradosinputnumberstep}}';
+        var serieusuario = '{{$serieusuario}}';
         var meshoy = '{{$meshoy}}';
         var periodohoy = '{{$periodohoy}}';
         var campos_activados = '{{$configuracion_tabla->campos_activados}}';
         var campos_desactivados = '{{$configuracion_tabla->campos_desactivados}}';
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
+        var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var asignacion_herramienta_obtener = '{!!URL::to('asignacion_herramienta_obtener')!!}';
         var asignacion_herramienta_obtener_ultimo_id = '{!!URL::to('asignacion_herramienta_obtener_ultimo_id')!!}';
         var asignacion_herramienta_obtener_personal_recibe = '{!!URL::to('asignacion_herramienta_obtener_personal_recibe')!!}';
@@ -264,6 +283,7 @@
         var asignacion_herramienta_obtener_herramienta = '{!!URL::to('asignacion_herramienta_obtener_herramienta')!!}';
         var asignacion_herramienta_obtener_existencias_almacen = '{!!URL::to('asignacion_herramienta_obtener_existencias_almacen')!!}';
         var asignacion_herramienta_guardar = '{!!URL::to('asignacion_herramienta_guardar')!!}';
+        var asignacion_herramienta_obtener_asignacion_herramienta_a_autorizar = '{!!URL::to('asignacion_herramienta_obtener_asignacion_herramienta_a_autorizar')!!}'; 
         var asignacion_herramienta_autorizar = '{!!URL::to('asignacion_herramienta_autorizar')!!}'; 
         var asignacion_herramienta_obtener_asignacion_herramienta = '{!!URL::to('asignacion_herramienta_obtener_asignacion_herramienta')!!}'; 
         var asignacion_herramienta_guardar_modificacion = '{!!URL::to('asignacion_herramienta_guardar_modificacion')!!}';

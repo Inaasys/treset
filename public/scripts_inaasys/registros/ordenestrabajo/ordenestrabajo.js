@@ -16,7 +16,8 @@ function asignarfechaactual(){
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
-  $.get(ordenes_trabajo_obtener_ultimo_folio, function(folio){
+  var serie = $("#serie").val();
+  $.get(ordenes_trabajo_obtener_ultimo_folio, {serie:serie}, function(folio){
     $("#folio").val(folio);
   })  
 }
@@ -32,9 +33,6 @@ function limpiar(){
   form.parsley().reset();
   //volver a aplicar configuracion a datatable principal para que realize la busqueda con la tecla enter
   regresarbusquedadatatableprincipal();
-  //reiniciar los contadores de la tabla de detalle de la orden de compra
-  contadorservicios=0;
-  contadorfilas = 0;
 }
 //mostrar modal formulario
 function mostrarmodalformulario(tipo, modificacionpermitida){
@@ -66,6 +64,12 @@ function ocultarformulario(){
   $("#formulario").hide();
   $("#contenidomodaltablas").show();
 }
+//cambiar url para exportar excel
+function cambiarurlexportarexcel(){
+  //colocar el periodo seleccionado como parametro para exportar a excel
+  var periodo = $("#periodo").val();
+  $("#btnGenerarFormatoExcel").attr("href", urlgenerarformatoexcel+'?periodo='+periodo);
+}
 //mostrar formulario en modal y ocultar tabla de seleccion
 function asignaciontecnicosmostrarformulario(){
   $("#asignaciontecnicosformulario").show();
@@ -91,9 +95,11 @@ function ocultarmodalasignaciontecnicos(){
 function relistar(){
     var tabla = $('.tbllistado').DataTable();
     tabla.ajax.reload();
+    cambiarurlexportarexcel();
 }
 //listar todos los registros de la tabla
 function listar(){
+  cambiarurlexportarexcel();
   //Campos ordenados a mostras
   var campos = columnas_ordenadas.split(",");
   var campos_tabla  = [];
@@ -107,6 +113,8 @@ function listar(){
       });
   }
     tabla=$('#tbllistado').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "350px",
         "bScrollCollapse": true,
@@ -162,7 +170,7 @@ function listarclientesfacturaa(){
                                 '<div class="row">'+
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
-                                            '<table id="tbllistadoclientesfacturaa" class="tbllistadoclientesfacturaa table table-bordered table-striped table-hover">'+
+                                            '<table id="tbllistadoclientesfacturaa" class="tbllistadoclientesfacturaa table table-bordered table-striped table-hover" style="width:100% !important">'+
                                                 '<thead class="customercolor">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
@@ -186,6 +194,9 @@ function listarclientesfacturaa(){
                               '</div>';
     $("#contenidomodaltablas").html(tablaclientesfacturaa);
     $('#tbllistadoclientesfacturaa').DataTable({
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -217,9 +228,13 @@ function listarclientesfacturaa(){
         "iDisplayLength": 8,
     }); 
 } 
-function seleccionarclientefacturaa(Numero, Nombre, Plazo){
+function seleccionarclientefacturaa(Numero, Nombre, Plazo, NumeroAgente, Agente){
     $("#numeroclientefacturaa").val(Numero);
     $("#clientefacturaa").val(Nombre);
+    $("#plazodias").val(Plazo);
+    //datos agente
+    $("#numeroagente").val(NumeroAgente);
+    $("#agente").val(Agente);
     mostrarformulario();
 }
 //obtener registros de clientes
@@ -232,7 +247,7 @@ function listarclientesdelcliente(){
                                 '<div class="row">'+
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
-                                            '<table id="tbllistadoclientesdelcliente" class="tbllistadoclientesdelcliente table table-bordered table-striped table-hover">'+
+                                            '<table id="tbllistadoclientesdelcliente" class="tbllistadoclientesdelcliente table table-bordered table-striped table-hover" style="width:100% !important">'+
                                                 '<thead class="customercolor">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
@@ -256,6 +271,9 @@ function listarclientesdelcliente(){
                               '</div>';
     $("#contenidomodaltablas").html(tablaclientesdelcliente);
     $('#tbllistadoclientesdelcliente').DataTable({
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -301,8 +319,8 @@ function listaragentes(){
                               '<div class="modal-body">'+
                                 '<div class="row">'+
                                     '<div class="col-md-12">'+
-                                        '<div class="table-responsive">'+
-                                            '<table id="tbllistadoagentes" class="tbllistadoagentes table table-bordered table-striped table-hover">'+
+                                        '<div class="table-responsive" >'+
+                                            '<table id="tbllistadoagentes" class="tbllistadoagentes table table-bordered table-striped table-hover" style="width:100% !important">'+
                                                 '<thead class="customercolor">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
@@ -322,6 +340,9 @@ function listaragentes(){
                               '</div>';
     $("#contenidomodaltablas").html(tablaagentes);
     $('#tbllistadoagentes').DataTable({
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -365,7 +386,7 @@ function listartecnicos(){
                                 '<div class="row">'+
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
-                                            '<table id="tbllistadotecnicos" class="tbllistadotecnicos table table-bordered table-striped table-hover">'+
+                                            '<table id="tbllistadotecnicos" class="tbllistadotecnicos table table-bordered table-striped table-hover" style="width:100% !important">'+
                                                 '<thead class="customercolor">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
@@ -384,6 +405,9 @@ function listartecnicos(){
                               '</div>';
     $("#asignaciontecnicoscontenidomodaltablas").html(tablatecnicos);
     $('#tbllistadotecnicos').DataTable({
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -423,7 +447,7 @@ function listarvines(){
                                 '<div class="row">'+
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
-                                            '<table id="tbllistadovines" class="tbllistadovines table table-bordered table-striped table-hover">'+
+                                            '<table id="tbllistadovines" class="tbllistadovines table table-bordered table-striped table-hover" style="width:100% !important">'+
                                                 '<thead class="customercolor">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
@@ -445,7 +469,10 @@ function listarvines(){
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                               '</div>';
     $("#contenidomodaltablas").html(tablavines);
-    $('#tbllistadovines').DataTable({
+    $('#tbllistadovines').DataTable({ 
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -510,7 +537,7 @@ function listarservicios(){
                           '<div class="row">'+
                             '<div class="col-md-12">'+
                               '<div class="table-responsive">'+
-                                '<table id="tbllistadoservicio" class="tbllistadoservicio table table-bordered table-striped table-hover">'+
+                                '<table id="tbllistadoservicio" class="tbllistadoservicio table table-bordered table-striped table-hover" style="width:100% !important">'+
                                   '<thead class="customercolor">'+
                                     '<tr>'+
                                       '<th>Operaciones</th>'+
@@ -531,6 +558,9 @@ function listarservicios(){
                         '</div>';   
   $("#contenidomodaltablas").html(tablaservicios);
   $('#tbllistadoservicio').DataTable({
+    "sScrollX": "110%",
+    "sScrollY": "370px",
+    "bScrollCollapse": true,
     processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -541,6 +571,7 @@ function listarservicios(){
       url: ordenes_trabajo_obtener_servicios,
       data: function (d) {
         d.codigoabuscar = $("#codigoabuscar").val();
+        d.tipooperacion = $("#tipooperacion").val();
       }
     },
     columns: [
@@ -669,7 +700,7 @@ function calculartotalordentrabajo(){
 var contadorservicios=0;
 var contadorfilas = 0;
 var item = 1;
-function agregarfilaservicio(Codigo, Servicio, Unidad, Costo, Venta, Cantidad, ClaveProducto, ClaveUnidad){
+function agregarfilaservicio(Codigo, Servicio, Unidad, Costo, Venta, Cantidad, ClaveProducto, ClaveUnidad, tipooperacion){
     var impuesto = "16."+numerocerosconfigurados;
     var importepartida = new Decimal(Cantidad).times(Venta);
     var multiplicacioncostoimpuesto =  new Decimal(importepartida).times(impuesto);      
@@ -682,12 +713,12 @@ function agregarfilaservicio(Codigo, Servicio, Unidad, Costo, Venta, Cantidad, C
     var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia) ;
     var fila=   '<tr class="filasservicios" id="filaservicio'+contadorservicios+'">'+
                         '<td class="tdmod"><div class="divorinputmodmd">'+
-                          '<div class="btn bg-red btn-xs" data-toggle="tooltip" title="Eliminar Fila" onclick="eliminarfila('+contadorservicios+')">X</div> '+
+                          '<div class="btn bg-red btn-xs" data-toggle="tooltip" title="Eliminar Fila" onclick="eliminarfila('+contadorservicios+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly> '+
                           '<div class="btn bg-blue btn-xs" data-toggle="tooltip" title="Asignar Técnicos" onclick="asignaciontecnicos('+contadorservicios+')">Asignar técnicos</div>'+
                         '</div></td>'+
-                        '<td class="tdmod"><input type="hidden" class="form-control tipofila" name="tipofila[]" value="agregado" readonly><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'+Codigo+'" readonly>'+Codigo+'</td>'+
-                        '<td class="tdmod"><div class="divorinputmodl"><input type="hidden" class="form-control descripcionpartida" name="descripcionpartida[]" value="'+Servicio+'" readonly>'+Servicio+'</div></td>'+
-                        '<td class="tdmod"><input type="hidden" class="form-control unidadpartidad" name="unidadpartidad[]" value="'+Unidad+'" readonly>'+Unidad+'</td>'+
+                        '<td class="tdmod"><input type="hidden" class="form-control tipofila" name="tipofila[]" value="agregado" readonly><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+
+                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'+Servicio+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'+
+                        '<td class="tdmod"><input type="hidden" class="form-control unidadpartidad" name="unidadpartidad[]" value="'+Unidad+'" readonly data-parsley-length="[1, 5]">'+Unidad+'</td>'+
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'+Cantidad+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordentrabajo('+contadorfilas+');cambiodecantidadopreciopartida('+contadorfilas+',\''+tipo +'\');"></td>'+
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" value="'+Venta+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordentrabajo('+contadorfilas+');cambiodecantidadopreciopartida('+contadorfilas+',\''+tipo +'\');"></td>'+
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'+number_format(round(importepartida, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
@@ -702,13 +733,13 @@ function agregarfilaservicio(Codigo, Servicio, Unidad, Costo, Venta, Cantidad, C
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm comisionporcentajepartida" name="comisionporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)" readonly></td>'+
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm comisionpesospartida" name="comisionpesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)" readonly></td>'+
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'+number_format(round(importepartida, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)" readonly></td>'+
-                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxs departamentopartida" name="departamentopartida[]" value="SERVICIO" readonly></td>'+
-                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxs cargopartida" name="cargopartida[]" value="SERVICIO" readonly></td>'+
+                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxs departamentopartida" name="departamentopartida[]" value="SERVICIO" readonly data-parsley-length="[1, 20]"></td>'+
+                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxs cargopartida" name="cargopartida[]" value="SERVICIO" readonly data-parsley-length="[1, 20]"></td>'+
                         '<td class="tdmod"><input type="date" class="form-control divorinputmodmd fechapartida" name="fechapartida[]" value="'+hoy+'" readonly></td>'+
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxs traspasopartida" name="traspasopartida[]" readonly></td>'+
-                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxs comprapartida" name="comprapartida[]" readonly></td>'+
+                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxs comprapartida" name="comprapartida[]" readonly data-parsley-length="[1, 20]"></td>'+
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxs usuariopartida" name="usuariopartida[]" value="'+usuario+'" readonly></td>'+
-                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxl anotacionespartida" name="anotacionespartida[]"></td>'+
+                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxl anotacionespartida" name="anotacionespartida[]" data-parsley-length="[1, 255]"></td>'+
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxs statuspartida" name="statuspartida[]" readonly></td>'+
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxs itempartida" name="itempartida[]" value="'+item+'" readonly></td>'+
                         '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida1" name="numerotecnicopartida1[]" value="0" readonly><input type="text" class="form-control divorinputmodl tecnicopartida1" name="tecnicopartida1[]" value="0" readonly></td>'+
@@ -722,13 +753,14 @@ function agregarfilaservicio(Codigo, Servicio, Unidad, Costo, Venta, Cantidad, C
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxs promocionpartida" name="promocionpartida[]" readonly></td>'+
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxs partidapartida" name="partidapartida[]" value="'+item+'" readonly></td>'+
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxs almacenpartida" name="almacenpartida[]" value="0" readonly></td>'+
-                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxs cotizacionpartida" name="cotizacionpartida[]" readonly></td>'+
+                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxs cotizacionpartida" name="cotizacionpartida[]" readonly data-parsley-length="[1, 20]"></td>'+
                 '</tr>';
     contadorservicios++;
     contadorfilas++;
     item++;
     $("#tablaserviciosordentrabajo").append(fila);
     $("#numerofilastablaservicios").val(contadorservicios);
+    $("#numerofilas").val(contadorservicios);
     mostrarformulario();
     calculartotalordentrabajo(); 
 }
@@ -829,7 +861,7 @@ function asignaciontecnicos(fila){
                                           '</div>'+
                                           '<div class="col-md-12">'+
                                               '<label>Anotaciones</label>'+
-                                              '<textarea class="form-control" name="asignaciontecnicosanotaciones" id="asignaciontecnicosanotaciones" placeholder="Escribe las anotaciones" required onkeyup="tipoLetra(this);" rowspan="1">'+anotaciones+'</textarea>'+
+                                              '<textarea class="form-control" name="asignaciontecnicosanotaciones" id="asignaciontecnicosanotaciones" placeholder="Escribe las anotaciones" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rowspan="1">'+anotaciones+'</textarea>'+
                                           '</div>'+
                                           '<div class="col-md-12">'+
                                             '<label><br>Técnicos</label>&nbsp;&nbsp;'+
@@ -997,6 +1029,19 @@ function asignartecnicos(fila){
   }else{
     var form = $("#formasignaciontecnicos");
     if (form.parsley().isValid()){
+      //borrar tecnicos primero
+      $("#filaservicio"+fila+" .numerotecnicopartida1").val("0");
+      $("#filaservicio"+fila+" .tecnicopartida1").val("0");
+      $("#filaservicio"+fila+" .horaspartida1").val("0").change();
+      $("#filaservicio"+fila+" .numerotecnicopartida2").val("0");
+      $("#filaservicio"+fila+" .tecnicopartida2").val("0");
+      $("#filaservicio"+fila+" .horaspartida2").val("0").change();
+      $("#filaservicio"+fila+" .numerotecnicopartida3").val("0");
+      $("#filaservicio"+fila+" .tecnicopartida3").val("0");
+      $("#filaservicio"+fila+" .horaspartida3").val("0").change();
+      $("#filaservicio"+fila+" .numerotecnicopartida4").val("0");
+      $("#filaservicio"+fila+" .tecnicopartida4").val("0");
+      $("#filaservicio"+fila+" .horaspartida4").val("0").change();
       var asignaciontecnicosanotaciones = $("#asignaciontecnicosanotaciones").val();
       $("#filaservicio"+fila+" .anotacionespartida").val(asignaciontecnicosanotaciones);
       $("tr.filastecnicos").each(function () {
@@ -1025,49 +1070,49 @@ function alta(){
                 '<div class="tab-content">'+
                     '<div role="tabpanel" class="tab-pane fade in active" id="serviciostab">'+
                         '<div class="row">'+
-                            '<div class="col-md-12 table-responsive">'+
+                            '<div class="col-md-12 table-responsive cabecerafija" style="height: 150px;overflow-y: scroll;padding: 0px 0px;">'+
                                 '<table id="tablaserviciosordentrabajo" class="table table-bordered tablaserviciosordentrabajo">'+
                                     '<thead class="customercolor">'+
                                         '<tr>'+
-                                          '<th>#</th>'+
-                                          '<th>Código</th>'+
-                                          '<th><div style="width:200px !important;">Descripción</div></th>'+
-                                          '<th>Unidad</th>'+
+                                          '<th class="customercolor">#</th>'+
+                                          '<th class="customercolor">Código</th>'+
+                                          '<th class="customercolor"><div style="width:200px !important;">Descripción</div></th>'+
+                                          '<th class="customercolor">Unidad</th>'+
                                           '<th class="customercolortheadth">Cantidad</th>'+
                                           '<th class="customercolortheadth">Precio $</th>'+
-                                          '<th>Importe $</th>'+
+                                          '<th class="customercolor">Importe $</th>'+
                                           '<th class="customercolortheadth">Dcto %</th>'+
                                           '<th class="customercolortheadth">Dcto $</th>'+
-                                          '<th>SubTotal $</th>'+
+                                          '<th class="customercolor">SubTotal $</th>'+
                                           '<th class="customercolortheadth">Iva %</th>'+
-                                          '<th>Iva $</th>'+
-                                          '<th>Total $</th>'+
-                                          '<th>Costo $</th>'+
-                                          '<th>Costo Total $</th>'+
+                                          '<th class="customercolor">Iva $</th>'+
+                                          '<th class="customercolor">Total $</th>'+
+                                          '<th class="customercolor">Costo $</th>'+
+                                          '<th class="customercolor">Costo Total $</th>'+
                                           '<th class="customercolortheadth">Comisión %</th>'+
-                                          '<th>Comisión $</th>'+
+                                          '<th class="customercolor">Comisión $</th>'+
                                           '<th class="bg-amber">Utilidad $</th>'+
-                                          '<th>Departamento</th>'+
-                                          '<th>Cargo</th>'+
-                                          '<th>Fecha</th>'+
-                                          '<th>Traspaso</th>'+
-                                          '<th>Compra</th>'+
-                                          '<th>Usuario</th>'+
+                                          '<th class="customercolor">Departamento</th>'+
+                                          '<th class="customercolor">Cargo</th>'+
+                                          '<th class="customercolor">Fecha</th>'+
+                                          '<th class="customercolor">Traspaso</th>'+
+                                          '<th class="customercolor">Compra</th>'+
+                                          '<th class="customercolor">Usuario</th>'+
                                           '<th class="customercolortheadth">Anotaciones</th>'+
-                                          '<th>Status</th>'+
-                                          '<th>Item</th>'+
-                                          '<th>Técnico 1</th>'+
-                                          '<th>Técnico 2</th>'+
-                                          '<th>Técnico 3</th>'+
-                                          '<th>Técnico 4</th>'+
-                                          '<th>Horas 1</th>'+
-                                          '<th>Horas 2</th>'+
-                                          '<th>Horas 3</th>'+
-                                          '<th>Horas 4</th>'+
+                                          '<th class="customercolor">Status</th>'+
+                                          '<th class="customercolor">Item</th>'+
+                                          '<th class="customercolor">Técnico 1</th>'+
+                                          '<th class="customercolor">Técnico 2</th>'+
+                                          '<th class="customercolor">Técnico 3</th>'+
+                                          '<th class="customercolor">Técnico 4</th>'+
+                                          '<th class="customercolor">Horas 1</th>'+
+                                          '<th class="customercolor">Horas 2</th>'+
+                                          '<th class="customercolor">Horas 3</th>'+
+                                          '<th class="customercolor">Horas 4</th>'+
                                           '<th class="customercolortheadth">Promoción</th>'+
-                                          '<th>Partida</th>'+
-                                          '<th>Almacén</th>'+
-                                          '<th>Cotización</th>'+
+                                          '<th class="customercolor">Partida</th>'+
+                                          '<th class="customercolor">Almacén</th>'+
+                                          '<th class="customercolor">Cotización</th>'+
                                         '</tr>'+
                                     '</thead>'+
                                     '<tbody>'+           
@@ -1080,19 +1125,19 @@ function alta(){
                             '<div class="row">'+ 
                               '<div class="col-md-3">'+
                                 '<label>Falla</label>'+
-                                '<textarea class="form-control" name="falla" id="falla"  required  onkeyup="tipoLetra(this);" rowspan="3"></textarea>'+
+                                '<textarea class="form-control" name="falla" id="falla"  required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"  rowspan="3"></textarea>'+
                               '</div>'+
                               '<div class="col-md-3">'+
                                 '<label>Observaciones</label>'+
-                                '<textarea class="form-control" name="observaciones" id="observaciones"  required  onkeyup="tipoLetra(this);" rowspan="3"></textarea>'+
+                                '<textarea class="form-control" name="observaciones" id="observaciones"  required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rowspan="3"></textarea>'+
                               '</div>'+
                               '<div class="col-md-3">'+
                                 '<label>Causa</label>'+
-                                '<textarea class="form-control" name="causa" id="causa"  onkeyup="tipoLetra(this);" rowspan="3"></textarea>'+
+                                '<textarea class="form-control" name="causa" id="causa" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rowspan="3"></textarea>'+
                               '</div>'+
                               '<div class="col-md-3">'+
                                 '<label>Corrección</label>'+
-                                '<textarea class="form-control" name="correccion" id="correccion"   onkeyup="tipoLetra(this);" rowspan="3"></textarea>'+
+                                '<textarea class="form-control" name="correccion" id="correccion"  data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rowspan="3"></textarea>'+
                               '</div>'+
                             '</div>'+  
                           '</div>'+ 
@@ -1124,10 +1169,20 @@ function alta(){
                     '</div>'+ 
                 '</div>';
   $("#tabsform").html(tabs);
+  $("#serie").val(serieusuario);
+  $("#serietexto").html("Serie: "+serieusuario);
+  $("#numerofilastablaservicios").val(0);
+  $("#numerofilas").val(0);
+  //asignar el tipo de operacion que se realizara
+  $("#tipooperacion").val("alta");
   obtenultimonumero();
   obtenertiposordenestrabajo()
   obtenertiposunidades();
   asignarfechaactual();
+  //reiniciar contadores  
+  contadorservicios=0;
+  contadorfilas = 0;
+  item = 1;
   //se debe motrar el input para buscar los productos
   $("#divbuscarcodigoservicio").show();
   $("#ModalAlta").modal('show');
@@ -1148,6 +1203,7 @@ function eliminarfila(numerofila){
       renumerarfilasordentrabajo();//importante para todos los calculo en el modulo
       calculartotalordentrabajo();
       $("#numerofilastablaservicios").val(contadorservicios);
+      $("#numerofilas").val(contadorservicios);
     }
   } 
 }
@@ -1235,18 +1291,34 @@ $("#btnGuardar").on('click', function (e) {
 //verificar si la orden de compra se esta utilzando en alguna orden de compra
 function desactivar(ordendesactivar){
   $.get(ordenes_trabajo_verificar_uso_en_modulos,{ordendesactivar:ordendesactivar}, function(data){
-    if(data.condetalles == true){
+    if(data.Status == 'BAJA'){
       $("#ordendesactivar").val(0);
-      $("#textomodaldesactivar").html('Error no deben existir partidas en las ordenes de trabajo');
+      $("#textomodaldesactivar").html('Error, esta Orden ya fue dado de baja');
       $("#divmotivobaja").hide();
       $("#btnbaja").hide();
       $('#estatusregistro').modal('show');
-    }else{
-      $("#ordendesactivar").val(ordendesactivar);
-      $("#textomodaldesactivar").html('Estas seguro de cambiar el estado el registro?');
-      $("#divmotivobaja").show();
-      $("#btnbaja").show();
-      $('#estatusregistro').modal('show');
+    }else{ 
+      if(data.resultadofechas != ''){
+        $("#ordendesactivar").val(0);
+        $("#textomodaldesactivar").html('Error solo se pueden dar de baja las ordenes de trabajo del mes actual, fecha de la orden de trabajo: ' + data.resultadofechas);
+        $("#divmotivobaja").hide();
+        $("#btnbaja").hide();
+        $('#estatusregistro').modal('show');
+      }else{
+        if(data.condetalles == true){
+          $("#ordendesactivar").val(0);
+          $("#textomodaldesactivar").html('Error no deben existir partidas en las ordenes de trabajo');
+          $("#divmotivobaja").hide();
+          $("#btnbaja").hide();
+          $('#estatusregistro').modal('show');
+        }else{
+          $("#ordendesactivar").val(ordendesactivar);
+          $("#textomodaldesactivar").html('Estas seguro de cambiar el estado el registro?');
+          $("#divmotivobaja").show();
+          $("#btnbaja").show();
+          $('#estatusregistro').modal('show');
+        }
+      }
     }
   }) 
 }
@@ -1298,49 +1370,49 @@ function obtenerdatos(ordenmodificar){
               '<div class="tab-content">'+
                   '<div role="tabpanel" class="tab-pane fade in active" id="serviciostab">'+
                       '<div class="row">'+
-                          '<div class="col-md-12 table-responsive">'+
+                          '<div class="col-md-12 table-responsive cabecerafija" style="height: 150px;overflow-y: scroll;padding: 0px 0px;">'+
                               '<table id="tablaserviciosordentrabajo" class="table table-bordered tablaserviciosordentrabajo">'+
                                   '<thead class="customercolor">'+
                                       '<tr>'+
-                                        '<th>#</th>'+
-                                        '<th>Código</th>'+
-                                        '<th><div style="width:200px !important;">Descripción</div></th>'+
-                                        '<th>Unidad</th>'+
+                                        '<th class="customercolor">#</th>'+
+                                        '<th class="customercolor">Código</th>'+
+                                        '<th class="customercolor"><div style="width:200px !important;">Descripción</div></th>'+
+                                        '<th class="customercolor">Unidad</th>'+
                                         '<th class="customercolortheadth">Cantidad</th>'+
                                         '<th class="customercolortheadth">Precio $</th>'+
-                                        '<th>Importe $</th>'+
+                                        '<th class="customercolor">Importe $</th>'+
                                         '<th class="customercolortheadth">Dcto %</th>'+
                                         '<th class="customercolortheadth">Dcto $</th>'+
-                                        '<th>SubTotal $</th>'+
+                                        '<th class="customercolor">SubTotal $</th>'+
                                         '<th class="customercolortheadth">Iva %</th>'+
-                                        '<th>Iva $</th>'+
-                                        '<th>Total $</th>'+
-                                        '<th>Costo $</th>'+
-                                        '<th>Costo Total $</th>'+
+                                        '<th class="customercolor">Iva $</th>'+
+                                        '<th class="customercolor">Total $</th>'+
+                                        '<th class="customercolor">Costo $</th>'+
+                                        '<th class="customercolor">Costo Total $</th>'+
                                         '<th class="customercolortheadth">Comisión %</th>'+
-                                        '<th>Comisión $</th>'+
+                                        '<th class="customercolor">Comisión $</th>'+
                                         '<th class="bg-amber">Utilidad $</th>'+
-                                        '<th>Departamento</th>'+
-                                        '<th>Cargo</th>'+
-                                        '<th>Fecha</th>'+
-                                        '<th>Traspaso</th>'+
-                                        '<th>Compra</th>'+
-                                        '<th>Usuario</th>'+
+                                        '<th class="customercolor">Departamento</th>'+
+                                        '<th class="customercolor">Cargo</th>'+
+                                        '<th class="customercolor">Fecha</th>'+
+                                        '<th class="customercolor">Traspaso</th>'+
+                                        '<th class="customercolor">Compra</th>'+
+                                        '<th class="customercolor">Usuario</th>'+
                                         '<th class="customercolortheadth">Anotaciones</th>'+
-                                        '<th>Status</th>'+
-                                        '<th>Item</th>'+
-                                        '<th>Técnico 1</th>'+
-                                        '<th>Técnico 2</th>'+
-                                        '<th>Técnico 3</th>'+
-                                        '<th>Técnico 4</th>'+
-                                        '<th>Horas 1</th>'+
-                                        '<th>Horas 2</th>'+
-                                        '<th>Horas 3</th>'+
-                                        '<th>Horas 4</th>'+
+                                        '<th class="customercolor">Status</th>'+
+                                        '<th class="customercolor">Item</th>'+
+                                        '<th class="customercolor">Técnico 1</th>'+
+                                        '<th class="customercolor">Técnico 2</th>'+
+                                        '<th class="customercolor">Técnico 3</th>'+
+                                        '<th class="customercolor">Técnico 4</th>'+
+                                        '<th class="customercolor">Horas 1</th>'+
+                                        '<th class="customercolor">Horas 2</th>'+
+                                        '<th class="customercolor">Horas 3</th>'+
+                                        '<th class="customercolor">Horas 4</th>'+
                                         '<th class="customercolortheadth">Promoción</th>'+
-                                        '<th>Partida</th>'+
-                                        '<th>Almacén</th>'+
-                                        '<th>Cotización</th>'+
+                                        '<th class="customercolor">Partida</th>'+
+                                        '<th class="customercolor">Almacén</th>'+
+                                        '<th class="customercolor">Cotización</th>'+
                                       '</tr>'+
                                   '</thead>'+
                                   '<tbody>'+           
@@ -1353,19 +1425,19 @@ function obtenerdatos(ordenmodificar){
                           '<div class="row">'+ 
                             '<div class="col-md-3">'+
                               '<label>Falla</label>'+
-                              '<textarea class="form-control" name="falla" id="falla"  required  onkeyup="tipoLetra(this);" rowspan="3"></textarea>'+
+                              '<textarea class="form-control" name="falla" id="falla"  required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rowspan="3"></textarea>'+
                             '</div>'+
                             '<div class="col-md-3">'+
                               '<label>Observaciones</label>'+
-                              '<textarea class="form-control" name="observaciones" id="observaciones"  required  onkeyup="tipoLetra(this);" rowspan="3"></textarea>'+
+                              '<textarea class="form-control" name="observaciones" id="observaciones"  required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rowspan="3"></textarea>'+
                             '</div>'+
                             '<div class="col-md-3">'+
                               '<label>Causa</label>'+
-                              '<textarea class="form-control" name="causa" id="causa"   onkeyup="tipoLetra(this);" rowspan="3"></textarea>'+
+                              '<textarea class="form-control" name="causa" id="causa" data-parsley-length="[1, 255]"  onkeyup="tipoLetra(this);" rowspan="3"></textarea>'+
                             '</div>'+
                             '<div class="col-md-3">'+
                               '<label>Corrección</label>'+
-                              '<textarea class="form-control" name="correccion" id="correccion"   onkeyup="tipoLetra(this);" rowspan="3"></textarea>'+
+                              '<textarea class="form-control" name="correccion" id="correccion"  data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rowspan="3"></textarea>'+
                             '</div>'+
                           '</div>'+
                         '</div>'+ 
@@ -1398,7 +1470,10 @@ function obtenerdatos(ordenmodificar){
               '</div>';
     $("#tabsform").html(tabs);
     $("#folio").val(data.ordentrabajo.Folio);
+    $("#serie").val(data.ordentrabajo.Serie);
+    $("#serietexto").html("Serie: "+data.ordentrabajo.Serie);
     $("#numerofilastablaservicios").val(data.numerodetallesordentrabajo);
+    $("#numerofilas").val(data.numerodetallesordentrabajo);
     $("#fecha").val(data.fecha);
     $("#fechaentregapromesa").val(data.fechaentrega);
     $("#numeroclientefacturaa").val(data.cliente.Numero);
@@ -1442,7 +1517,12 @@ function obtenerdatos(ordenmodificar){
     contadorservicios = data.contadorservicios;
     contadorfilas = data.contadorfilas;
     item = data.item;
+    //asignar el tipo de operacion que se realizara
+    $("#tipooperacion").val("modificacion");
     selectsordentrabajo(data);
+  }).fail( function() {
+    msj_errorajax();
+    $('.page-loader-wrapper').css('display', 'none');
   })
 }
 async function selectsordentrabajo(data){

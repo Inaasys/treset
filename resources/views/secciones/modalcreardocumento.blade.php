@@ -10,12 +10,26 @@
                     @csrf
 		        	<h5 id="textomodalgenerarpdf"> </h5>
                     <div class="row">
-                        <label>Generar Documento en PDF por:</label>
-                        <div class="col-md-12 form-check">
-                            <input type="radio" name="tipogeneracionpdf" id="tipogeneracionpdf" value="0" onchange="mostrartipogeneracionpdf()" required>
-                            <label for="tipogeneracionpdf">Selección de Folios</label>
-                            <input type="radio" name="tipogeneracionpdf" id="tipogeneracionpdf1" value="1" onchange="mostrartipogeneracionpdf()" required>
-                            <label for="tipogeneracionpdf1">Filtrado de Fechas</label>
+                        <div class="col-md-6">
+                            <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Generar Documento en PDF por:</label>
+                            <div class="col-md-12 form-check">
+                                <input type="radio" name="tipogeneracionpdf" id="tipogeneracionpdf" value="0" onchange="mostrartipogeneracionpdf()" required>
+                                <label for="tipogeneracionpdf">Selección de Folios</label>
+                                <input type="radio" name="tipogeneracionpdf" id="tipogeneracionpdf1" value="1" onchange="mostrartipogeneracionpdf()" required>
+                                <label for="tipogeneracionpdf1">Filtrado de Fechas</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label > Número Decimales en Documento:</label>
+                            <select name="numerodecimalesdocumento" id="numerodecimalesdocumento" class="form-control select2" required>
+                                <option selected disabled hidden>Selecciona...</option>
+                                <option value="1">1</option>
+                                <option value="2" selected>2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                            </select>
                         </div>
                     </div>
                     <div class="row">
@@ -39,20 +53,19 @@
                             </div>
                         </div>
                         <div id="tipofiltracionfechas" hidden>
-
                             <div class="col-md-12">
                                 <label >Fecha Inicio</label>
-                                <input type="date"  name="fechainiciopdf" id="fechainiciopdf" class="form-control"  >
+                                <input type="date"  name="fechainiciopdf" id="fechainiciopdf" onchange="validarrangofechascreaciondocumentos();" class="form-control"  >
                             </div>
                             <div class="col-md-12">
                             <label >Fecha Terminación</label>
-                                <input type="date"  name="fechaterminacionpdf" id="fechaterminacionpdf" class="form-control"  >
+                                <input type="date"  name="fechaterminacionpdf" id="fechaterminacionpdf" onchange="validarrangofechascreaciondocumentos();" class="form-control"  >
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
 	        	        <div class="btn btn-danger btn-sm" data-dismiss="modal" onclick="destruirtablafoliosexportacion()">Salir</div>
-	        	        <button type="submit" class="btn btn-success btn-sm" >Generar Documento en PDF</button>
+	        	        <button type="submit" class="btn btn-success btn-sm" id="btngenerardocumentospdf">Generar Documento en PDF</button>
 	      	        </div>
 		        </form>	
       		</div>

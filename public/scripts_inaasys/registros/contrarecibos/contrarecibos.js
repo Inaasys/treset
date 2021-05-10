@@ -36,14 +36,19 @@ function limpiar(){
   regresarbusquedadatatableprincipal();
 }
 //mostrar modal formulario
-function mostrarmodalformulario(tipo){
+function mostrarmodalformulario(tipo, modificacionpermitida){
     $("#ModalFormulario").modal('show');
     if(tipo == 'ALTA'){
         $("#btnGuardar").show();
         $("#btnGuardarModificacion").hide();
     }else if(tipo == 'MODIFICACION'){
-          $("#btnGuardar").hide();
-          $("#btnGuardarModificacion").hide();
+        if(modificacionpermitida == 0){
+            $("#btnGuardar").hide();
+            $("#btnGuardarModificacion").hide();
+        }else{
+            $("#btnGuardar").hide();
+            $("#btnGuardarModificacion").show();
+        }
     }   
 }
 //ocultar modal formulario
@@ -60,13 +65,21 @@ function ocultarformulario(){
   $("#formulario").hide();
   $("#contenidomodaltablas").show();
 }
+//cambiar url para exportar excel
+function cambiarurlexportarexcel(){
+    //colocar el periodo seleccionado como parametro para exportar a excel
+    var periodo = $("#periodo").val();
+    $("#btnGenerarFormatoExcel").attr("href", urlgenerarformatoexcel+'?periodo='+periodo);
+}
 //relistar tabla al cambiar el periodo
 function relistar(){
+    cambiarurlexportarexcel();
     var tabla = $('.tbllistado').DataTable();
     tabla.ajax.reload();
 }
 //listar todos los registros de la tabla
 function listar(){
+    cambiarurlexportarexcel();
     //Campos ordenados a mostras
     var campos = columnas_ordenadas.split(",");
     var campos_tabla  = [];
@@ -80,6 +93,8 @@ function listar(){
         });
     }
     tabla=$('#tbllistado').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "350px",
         "bScrollCollapse": true,
@@ -145,7 +160,7 @@ function obtenerproveedores(){
     $("#contenidomodaltablas").html(tablaproveedores);
     $('#tbllistadoproveedor').DataTable({
         "sScrollX": "110%",
-        "sScrollY": "300px",
+        "sScrollY": "370px",
         "bScrollCollapse": true,
         processing: true,
         'language': {
@@ -200,18 +215,18 @@ function alta(){
                 '<div class="tab-content">'+
                     '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
                         '<div class="row">'+
-                            '<div class="col-md-12 table-responsive">'+
+                            '<div class="col-md-12 table-responsive cabecerafija" style="height: 350px;overflow-y: scroll;padding: 0px 0px;">'+
                                 '<table class="table table-bordered">'+
                                     '<thead class="customercolor">'+
                                         '<tr>'+
-                                          '<th>#</th>'+
-                                          '<th>Compra</th>'+
-                                          '<th>Factura</th>'+
-                                          '<th>Remisión</th>'+
-                                          '<th>Fecha Factura</th>'+
-                                          '<th>Plazo</th>'+
-                                          '<th>Fecha a Pagar</th>'+
-                                          '<th>Total $</th>'+
+                                          '<th class="customercolor">#</th>'+
+                                          '<th class="customercolor">Compra</th>'+
+                                          '<th class="customercolor">Factura</th>'+
+                                          '<th class="customercolor">Remisión</th>'+
+                                          '<th class="customercolor">Fecha Factura</th>'+
+                                          '<th class="customercolor">Plazo</th>'+
+                                          '<th class="customercolor">Fecha a Pagar</th>'+
+                                          '<th class="customercolor">Total $</th>'+
                                           '<th class="customercolortheadth">ContraRecibo </th>'+
                                         '</tr>'+
                                     '</thead>'+
@@ -223,7 +238,7 @@ function alta(){
                         '<div class="row">'+
                           '<div class="col-md-6">'+   
                             '<label>Observaciones</label>'+
-                            '<textarea class="form-control" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" rows="2" required></textarea>'+
+                            '<textarea class="form-control" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" rows="2" required data-parsley-length="[1, 255]"></textarea>'+
                           '</div>'+ 
                           '<div class="col-md-3 col-md-offset-3">'+
                                 '<table class="table table-striped table-hover">'+
@@ -237,6 +252,8 @@ function alta(){
                     '</div>'+ 
                 '</div>';
   $("#tabsform").html(tabs);
+  $("#serie").val(serieusuario);
+  $("#serietexto").html("Serie: "+serieusuario);
   $("#btnobtenerproveedores").show();
   obtenultimonumero();
   asignarfechaactual();
@@ -317,10 +334,29 @@ $("#btnGuardar").on('click', function (e) {
 });
 //verificar si la orden de compra se esta utilzando en alguna orden de compra
 function desactivar(contrarecibodesactivar){
-      $("#contrarecibodesactivar").val(contrarecibodesactivar);
-      $("#divmotivobaja").show();
-      $("#textomodaldesactivar").html('Estas seguro de dar de baja el registro?');
-      $('#estatusregistro').modal('show');
+    $.get(contrarecibos_verificar_si_continua_baja,{contrarecibodesactivar:contrarecibodesactivar}, function(data){
+        if(data.Status == 'BAJA'){
+            $("#contrarecibodesactivar").val(0);
+            $("#textomodaldesactivar").html('Error, este contrarecibo ya fue dado de baja');
+            $("#divmotivobaja").hide();
+            $("#btnbaja").hide();
+            $('#estatusregistro').modal('show');
+        }else{    
+            if(data.resultadofechas != ''){
+                $("#contrarecibodesactivar").val(0);
+                $("#textomodaldesactivar").html('Error solo se pueden dar de baja los contrarecibos del mes actual, fecha del contrarecibo: ' + data.resultadofechas);
+                $("#divmotivobaja").hide();
+                $("#btnbaja").hide();
+                $('#estatusregistro').modal('show');
+            }else{
+                $("#contrarecibodesactivar").val(contrarecibodesactivar);
+                $("#textomodaldesactivar").html('Estas seguro de cambiar el estado el registro?');
+                $("#divmotivobaja").show();
+                $("#btnbaja").show();
+                $('#estatusregistro').modal('show');
+            }
+        }
+    }) 
 }
 $("#btnbaja").on('click', function(e){
     e.preventDefault();
@@ -369,18 +405,18 @@ function obtenerdatos(contrarecibomodificar){
                 '<div class="tab-content">'+
                     '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
                         '<div class="row">'+
-                            '<div class="col-md-12 table-responsive">'+
+                            '<div class="col-md-12 table-responsive cabecerafija" style="height: 350px;overflow-y: scroll;padding: 0px 0px;">'+
                                 '<table class="table table-bordered">'+
                                     '<thead class="customercolor">'+
                                         '<tr>'+
-                                          '<th>#</th>'+
-                                          '<th>Compra</th>'+
-                                          '<th>Factura</th>'+
-                                          '<th>Remisión</th>'+
-                                          '<th>Fecha Factura</th>'+
-                                          '<th>Plazo</th>'+
-                                          '<th>Fecha a Pagar</th>'+
-                                          '<th>Total $</th>'+
+                                          '<th class="customercolor">#</th>'+
+                                          '<th class="customercolor">Compra</th>'+
+                                          '<th class="customercolor">Factura</th>'+
+                                          '<th class="customercolor">Remisión</th>'+
+                                          '<th class="customercolor">Fecha Factura</th>'+
+                                          '<th class="customercolor">Plazo</th>'+
+                                          '<th class="customercolor">Fecha a Pagar</th>'+
+                                          '<th class="customercolor">Total $</th>'+
                                           '<th class="customercolortheadth">ContraRecibo </th>'+
                                         '</tr>'+
                                     '</thead>'+
@@ -392,7 +428,7 @@ function obtenerdatos(contrarecibomodificar){
                         '<div class="row">'+
                           '<div class="col-md-6">'+   
                             '<label>Observaciones</label>'+
-                            '<textarea class="form-control" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" rows="2" required></textarea>'+
+                            '<textarea class="form-control" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" rows="2" required data-parsley-length="[1, 255]"></textarea>'+
                           '</div>'+ 
                           '<div class="col-md-3 col-md-offset-3">'+
                                 '<table class="table table-striped table-hover">'+
@@ -407,6 +443,8 @@ function obtenerdatos(contrarecibomodificar){
                 '</div>';
     $("#tabsform").html(tabs);        
     $("#folio").val(data.contrarecibo.Folio);
+    $("#serie").val(data.contrarecibo.Serie);
+    $("#serietexto").html("Serie: "+data.contrarecibo.Serie);
     $("#numeroproveedor").val(data.proveedor.Numero);
     $("#proveedor").val(data.proveedor.Nombre);
     $("#btnobtenerproveedores").hide();
@@ -416,8 +454,11 @@ function obtenerdatos(contrarecibomodificar){
     $("#totalcontrarecibos").val(data.total);
     //tabs detalles
     $("#tabladetallecontrarecibos").html(data.filasdetallescontrarecibo);
-    mostrarmodalformulario('MODIFICACION');
+    mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
     mostrarformulario();
+    $('.page-loader-wrapper').css('display', 'none');
+  }).fail( function() {
+    msj_mantenimientoajax();    
     $('.page-loader-wrapper').css('display', 'none');
   })
 }

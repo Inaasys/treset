@@ -77,7 +77,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <label>Nombre</label>
-                                <input type="text" class="form-control" name="nombre" id="nombre" required onkeyup="tipoLetra(this);">
+                                <input type="text" class="form-control" name="nombre" id="nombre" required data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">
                             </div>
                         </div>
                         <div class="col-md-12" id="tabsform">

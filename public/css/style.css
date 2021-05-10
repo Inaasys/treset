@@ -4163,7 +4163,7 @@ section.content {
       -webkit-transform: scaleX(1);
       transform: scaleX(1); }
   .nav-tabs + .tab-content {
-    padding: 15px 0; }
+    padding: 3px 0; }
 
 .nav-tabs.tab-col-red > li > a:before {
   border-bottom: 2px solid #F44336; }
@@ -4258,7 +4258,7 @@ section.content {
   border: none; }
   .modal .modal-content .modal-body {
     color: #777;
-    padding: 15px 25px; 
+    padding: 5px 5px; 
     font-size: 11px;}
 
 .modal .modal-footer {
@@ -8215,3 +8215,14 @@ html.ie11 .bs-searchbox .form-control {
   height: 25px !important;
 }
 /*|||||||||FIN IMPORTANTE ESTILOS PARA INPUTS DE LOS DETALLES EN MODULOS||||||||*/
+
+
+
+
+
+
+
+/*||||||ESTILOS PARA QUE LAS TABLAS DE DETALLES TENGAN LA CABECERA FIJA|||||||*/
+.cabecerafija          { overflow-y: auto; height: 100px; }
+.cabecerafija thead th { position: sticky; top: 0; }
+/*|||||||||||||||||||||||||||||||||||||||||||||||*/

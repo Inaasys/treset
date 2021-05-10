@@ -24,7 +24,7 @@ use App\BitacoraDocumento;
 use Luecano\NumeroALetras\NumeroALetras;
 use App\Configuracion_Tabla;
 use App\VistaCuentaPorPagar;
-
+use App\ContraReciboDetalle;
 
 class CuentasPorPagarController extends ConfiguracionSistemaController{
 
@@ -40,11 +40,12 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
     }
 
     public function cuentas_por_pagar(){
-        $serieusuario = Helpers::obtenerserieusuario(Auth::user()->email, 'Ordenes de Trabajo');
+        $serieusuario = Helpers::obtenerserieusuario(Auth::user()->user, 'CuentasPorPagar');
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('cuentas_por_pagar_guardar_configuracion_tabla');
+        $urlgenerarformatoexcel = route('cuentas_por_pagar_exportar_excel');
         $rutacreardocumento = route('cuentas_por_pagar_generar_pdfs');
-        return view('registros.cuentasporpagar.cuentasporpagar', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','rutacreardocumento'));
+        return view('registros.cuentasporpagar.cuentasporpagar', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','rutacreardocumento'));
     }
     //obtener registro tabla
     public function cuentas_por_pagar_obtener(Request $request){
@@ -54,13 +55,10 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
             $data = VistaCuentaPorPagar::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Folio', 'DESC')->get();
             return DataTables::of($data)
                 ->addColumn('operaciones', function($data){
-                    if($data->Status != 'BAJA'){
-                        $boton =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Pago .'\')"><i class="material-icons">mode_edit</i></div> '. 
-                        '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Pago .'\')"><i class="material-icons">cancel</i></div>  ';
-                    }else{
-                        $boton =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Pago .'\')"><i class="material-icons">mode_edit</i></div> ';
-                    }
-                    return $boton;
+                    $botoncambios   =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Pago .'\')"><i class="material-icons">mode_edit</i></div> '; 
+                    $botonbajas     =    '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Pago .'\')"><i class="material-icons">cancel</i></div>  ';
+                    $operaciones =  $botoncambios.$botonbajas;
+                    return $operaciones;
                 })
                 ->addColumn('Abono', function($data){ return $data->Abono; })
                 ->rawColumns(['operaciones'])
@@ -100,7 +98,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
     }
     //obtener compras por proveedor
     public function cuentas_por_pagar_obtener_compras_proveedor(Request $request){
-        $compras = Compra::where('Proveedor', $request->Numero)->where('Status', 'POR PAGAR')->get();
+        $compras = Compra::where('Proveedor', $request->Numero)->where('Status', 'POR PAGAR')->orderBy('Fecha', 'ASC')->get();
         $numerocompras = Compra::where('Proveedor', $request->Numero)->where('Status', 'POR PAGAR')->count();
         $filascompras = '';
         $contadorfilas = 0;
@@ -116,6 +114,12 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                         $detallenotacredito = $detallenotacreditoproveedor->Total;
                     }
                 }
+                $contrarecibo = '';
+                $numerocontrarecibos = ContraReciboDetalle::where('Compra', $c->Compra)->count();
+                if($numerocontrarecibos > 0){
+                    $contrarecibodetalle = ContraReciboDetalle::where('Compra', $c->Compra)->first();
+                    $contrarecibo = $contrarecibodetalle->ContraRecibo;
+                }
                 $filascompras= $filascompras.
                     '<tr class="filascompras" id="filacompra'.$contadorfilas.'">'.
                         '<td class="tdmod"></td>'.
@@ -128,22 +132,23 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                         '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm abonoscompra" name="abonoscompra[]" value="'.Helpers::convertirvalorcorrecto($c->Abonos).'" readonly>'.Helpers::convertirvalorcorrecto($c->Abonos).'</td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm notascreditocompra" name="notascreditocompra[]" value="'.Helpers::convertirvalorcorrecto($detallenotacredito).'" readonly>'.Helpers::convertirvalorcorrecto($detallenotacredito).'</td>'.
                         '<td class="tdmod">'.
-                            '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm abonocompra"  name="abonocompra[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calcularnuevosaldo('.$contadorfilas.');formatocorrectoinputcantidades(this);" >'.
+                            '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm abonocompra"  name="abonocompra[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularnuevosaldo('.$contadorfilas.');" >'.
                         '</td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm saldocomprainicial" name="saldocomprainicial[]" value="'.Helpers::convertirvalorcorrecto($c->Saldo).'" readonly><input type="text" class="form-control divorinputmodsm saldocompra" name="saldocompra[]" value="'.Helpers::convertirvalorcorrecto($c->Saldo).'" readonly></td>'.
-                        '<td class="tdmod"><input type="hidden" class="form-control contrarecibocompra" name="contrarecibocompra[]" readonly></td>'.
-
+                        '<td class="tdmod"><input type="hidden" class="form-control contrarecibocompra" name="contrarecibocompra[]" value="'.$contrarecibo.'" readonly>'.$contrarecibo.'</td>'.
                     '</tr>';
                     $contadorfilas++;
             }
         }       
         $data = array(
-            "filascompras" => $filascompras
+            "filascompras" => $filascompras,
+            "numerocontrarecibos" => $numerocontrarecibos
         );
         return response()->json($data);
     }
     //guardar cuenta por pagar
     public function cuentas_por_pagar_guardar(Request $request){
+        ini_set('max_input_vars','10000' );
         //obtener el ultimo id de la tabla
         $folio = Helpers::ultimofoliotablamodulos('App\CuentaXPagar');
         //INGRESAR DATOS A TABLA ORDEN COMPRA
@@ -177,35 +182,78 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
         $item = 1;
-        foreach ($request->compra as $key => $c){             
-            $CuentaXPagarDetalle=new CuentaXPagarDetalle;
-            $CuentaXPagarDetalle->Pago = $pago;
-            $CuentaXPagarDetalle->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
-            $CuentaXPagarDetalle->Proveedor = $request->numeroproveedor;
-            $CuentaXPagarDetalle->Compra = $c;
-            $CuentaXPagarDetalle->Abono = $request->abonocompra [$key];
-            $CuentaXPagarDetalle->Item = $item;
-            $CuentaXPagarDetalle->save();
-            $item++;
-            //modificar abonos y saldo en compra
-            $Compra = Compra::where('Compra', $c)->first();
-            $Compra->Abonos = $Compra->Abonos + $request->abonocompra [$key];
-            $Compra->Saldo = $request->saldocompra [$key];
-            if($Compra->Saldo == 0){
-                $Compra->Status = "LIQUIDADA";
+        foreach ($request->compra as $key => $c){     
+            if($request->abonocompra [$key] > Helpers::convertirvalorcorrecto(0)){        
+                $CuentaXPagarDetalle=new CuentaXPagarDetalle;
+                $CuentaXPagarDetalle->Pago = $pago;
+                $CuentaXPagarDetalle->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
+                $CuentaXPagarDetalle->Proveedor = $request->numeroproveedor;
+                $CuentaXPagarDetalle->Compra = $c;
+                $CuentaXPagarDetalle->Abono = $request->abonocompra [$key];
+                $CuentaXPagarDetalle->Item = $item;
+                $CuentaXPagarDetalle->save();
+                $item++;
+                //modificar abonos y saldo en compra
+                $Compra = Compra::where('Compra', $c)->first();
+                $NuevoAbono = $Compra->Abonos + $request->abonocompra [$key];
+                $NuevoSaldo = $request->saldocompra [$key];
+                if($request->saldocompra [$key] == 0){
+                    $Status = "LIQUIDADA";
+                }else{
+                    $Status = "POR PAGAR"; 
+                }
+                Compra::where('Compra', $c)
+                            ->update([
+                                'Abonos' => Helpers::convertirvalorcorrecto($NuevoAbono),
+                                'Saldo' => Helpers::convertirvalorcorrecto($NuevoSaldo),
+                                'Status' => $Status
+                            ]);
             }
-            $Compra->save();
         }
     	return response()->json($CuentaXPagar); 
     }
+
+    //comprobar baja de documento
+    public function cuentas_por_pagar_comprobar_baja(Request $request){
+        $CuentaXPagar = CuentaXPagar::where('Pago', $request->cxpdesactivar)->first();
+        $resultadofechas = Helpers::compararanoymesfechas($CuentaXPagar->Fecha);
+        $data = array (
+            'resultadofechas' => $resultadofechas,
+            'Status' => $CuentaXPagar->Status
+        );
+        return response()->json($data);
+    }
+
     //bajas cuentas por pagar
     public function cuentas_por_pagar_baja(Request $request){
-        //tabla cuenta x pagar
         $CuentaXPagar = CuentaXPagar::where('Pago', $request->cxpdesactivar)->first();
-        $CuentaXPagar->Abono = '0';
-        $CuentaXPagar->MotivoBaja = $request->motivobaja.', '.Helpers::fecha_exacta_accion_datetimestring().', '.Auth::user()->user;
-        $CuentaXPagar->Status = 'BAJA';
-        $CuentaXPagar->save();
+        //cambiar status y colocar valores en 0
+        $MotivoBaja = $request->motivobaja.', '.Helpers::fecha_exacta_accion_datetimestring().', '.Auth::user()->user;
+        CuentaXPagar::where('Pago', $request->cxpdesactivar)
+                ->update([
+                    'MotivoBaja' => $MotivoBaja,
+                    'Status' => 'BAJA',
+                    'Abono' => '0.000000'
+                ]);
+        $detalles = CuentaXPagarDetalle::where('Pago', $request->cxpdesactivar)->get();
+        foreach($detalles as $detalle){
+            //restar abono de la compra
+            $Compra = Compra::where('Compra', $detalle->Compra)->first();
+            $NuevoAbono = $Compra->Abonos - $detalle->Abono;
+            $NuevoSaldo = $Compra->Saldo + $detalle->Abono;
+            Compra::where('Compra', $detalle->Compra)
+                        ->update([
+                            'Abonos' => Helpers::convertirvalorcorrecto($NuevoAbono),
+                            'Saldo' => Helpers::convertirvalorcorrecto($NuevoSaldo),
+                            'Status' => "POR PAGAR"
+                        ]);
+            //tabla cuenta x pgar detalle
+            CuentaXPagarDetalle::where('Pago', $detalle->Pago)
+                            ->where('Compra', $detalle->Compra)
+                            ->update([
+                                'Abono' => '0.000000'
+                            ]);
+        }
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
         $BitacoraDocumento->Documento = "CXP";
@@ -216,20 +264,6 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Usuario = Auth::user()->user;
         $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
-        //obtener detalle cuenta por pagar
-        $CuentaXPagarDetalle = CuentaXPagarDetalle::where('Pago', $request->cxpdesactivar)->get();
-        foreach($CuentaXPagarDetalle as $cxpd){
-            //tabla compras
-            $Compra = Compra::where('Compra', $cxpd->Compra)->first();
-            $Compra->Abonos = $Compra->Abonos - $cxpd->Abono;
-            $Compra->Saldo = $Compra->Saldo + $cxpd->Abono;
-            $Compra->Status = "POR PAGAR";
-            $Compra->save();
-            //tabla cuenta x pgar detalle
-            $CuentaXPagarDetalleBaja = CuentaXPagarDetalle::where('Pago', $cxpd->Pago)->where('Compra', $cxpd->Compra)->first();
-            $CuentaXPagarDetalleBaja->Abono = '0';
-            $CuentaXPagarDetalleBaja->save();
-        }
         return response()->json($CuentaXPagar);
     }
     //obtener cuentas por pagar
@@ -263,11 +297,30 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm totalcompra" name="totalcompra[]" value="'.Helpers::convertirvalorcorrecto($c->Total).'" readonly>'.Helpers::convertirvalorcorrecto($c->Total).'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm abonoscompra" name="abonoscompra[]" value="'.Helpers::convertirvalorcorrecto($c->Abonos).'" readonly>'.Helpers::convertirvalorcorrecto($c->Abonos).'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm notascreditocompra" name="notascreditocompra[]" value="'.Helpers::convertirvalorcorrecto($detallenotacredito).'" readonly>'.Helpers::convertirvalorcorrecto($detallenotacredito).'</td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm abonocompra"  name="abonocompra[]" value="'.Helpers::convertirvalorcorrecto($cxpd->Abono).'" readonly>'.Helpers::convertirvalorcorrecto($cxpd->Abono).'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm abonocompra"  name="abonocompra[]" value="'.Helpers::convertirvalorcorrecto($cxpd->Abono).'" onchange="formatocorrectoinputcantidades(this);" readonly>'.Helpers::convertirvalorcorrecto($cxpd->Abono).'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm saldocomprainicial" name="saldocomprainicial[]" value="'.Helpers::convertirvalorcorrecto($c->Saldo).'" readonly><input type="hidden" class="form-control divorinputmodsm saldocompra" name="saldocompra[]" value="'.Helpers::convertirvalorcorrecto($c->Saldo).'" readonly>'.Helpers::convertirvalorcorrecto($c->Saldo).'</td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control contrarecibocompra" name="contrarecibocompra[]" readonly></td>'.
                 '</tr>';
                 $contadorfilas++;
+        }
+        //permitir o no modificar registro
+        if(Auth::user()->role_id == 1){
+            if($CuentaXPagar->Status == 'BAJA'){
+                $modificacionpermitida = 0;
+            }else{
+                $modificacionpermitida = 1;
+            }
+        }
+        if(Auth::user()->role_id != 1){
+            if($CuentaXPagar->Status == 'BAJA'){
+                $modificacionpermitida = 0;
+            }else{
+                $resultadofechas = Helpers::compararanoymesfechas($CuentaXPagar->Fecha);
+                if($resultadofechas != ''){
+                    $modificacionpermitida = 0;
+                }else{
+                    $modificacionpermitida = 1;
+                }
+            }
         }
         $data = array(
             'CuentaXPagar' => $CuentaXPagar,
@@ -276,9 +329,10 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
             'proveedor' => $Proveedor,
             'banco' => $Banco,
             'filasdetallecuentasporpagar' => $filasdetallecuentasporpagar,
-            'abonototal' => $CuentaXPagar->Abono
+            'abonototal' => Helpers::convertirvalorcorrecto($CuentaXPagar->Abono),
+            "modificacionpermitida" => $modificacionpermitida
         );
-        return response()->json($data);
+        return response()->json($datas);
     }
 
 
@@ -304,12 +358,11 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
     public function cuentas_por_pagar_generar_pdfs(Request $request){
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
-            $cuentasporpagar = CuentaXPagar::whereIn('Pago', $request->arraypdf)->orderBy('Folio', 'ASC')->take(500)->get(); 
+            $cuentasporpagar = CuentaXPagar::whereIn('Pago', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
         }else{
-            //$contrarecibos = ContraRecibo::where('Fecha', $request->anopdf)->get(); 
             $fechainiciopdf = date($request->fechainiciopdf);
             $fechaterminacionpdf = date($request->fechaterminacionpdf);
-            $cuentasporpagar = CuentaXPagar::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(500)->get();
+            $cuentasporpagar = CuentaXPagar::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
@@ -345,25 +398,29 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                       "abonoletras"=>$abonoletras,
                       "proveedor" => $proveedor,
                       "banco"=> $banco,
-                      "datadetalle" => $datadetalle
+                      "datadetalle" => $datadetalle,
+                      "numerodecimalesdocumento"=> $request->numerodecimalesdocumento
             );
         }
-        //$footerHtml = view()->make('seccionespdf.footer', compact('fechaformato'))->render();
+        //dd($data);
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.cuentasporpagar.formato_pdf_cuentasporpagar', compact('data'))
-        //->setOption('footer-html', $footerHtml, 'Página [page]')
         ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
         ->setOption('footer-center', 'Página [page] de [toPage]')
         ->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 5)
+        ->setOption('margin-right', 5)
         ->setOption('margin-bottom', 10);
-        //return $pdf->download('contrarecibos.pdf');
         return $pdf->stream();
     }
     //exportar a excel
-    public function cuentas_por_pagar_exportar_excel(){
+    public function cuentas_por_pagar_exportar_excel(Request $request){
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
-        return Excel::download(new CuentasPorPagarExport($this->campos_consulta), "cuentasporpagar.xlsx");      
+        return Excel::download(new CuentasPorPagarExport($this->campos_consulta,$request->periodo), "cuentasporpagar-".$request->periodo.".xlsx");   
+    
     }
     //configuracion de la tabla
     public function cuentas_por_pagar_guardar_configuracion_tabla(Request $request){

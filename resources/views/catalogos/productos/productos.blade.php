@@ -29,11 +29,13 @@
                                             Excel
                                         </a>
                                     </td>
+                                    @if(Auth::user()->role_id == 1)
                                     <td>
                                         <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
                                             Configurar Tabla
                                         </div>
                                     </td>
+                                    @endif
                         		</tr>
                         	</table>
                         </div>
@@ -71,7 +73,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <label>Código<b style="color:#F44336 !important;">*</b></label>
-                                    <input type="text" class="form-control" name="codigo" id="codigo" required onkeyup="tipoLetra(this);">
+                                    <input type="text" class="form-control" name="codigo" id="codigo" required data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">
                                 </div>   
                                 <div class="col-md-4">
                                     <label>Clave Producto<b style="color:#F44336 !important;">*</b></label>
@@ -83,7 +85,7 @@
                                         </div>  
                                         <div class="col-md-8"> 
                                             <div class="form-line">
-                                                <input type="text" class="form-control" name="claveproducto" id="claveproducto" required readonly>
+                                                <input type="text" class="form-control" name="claveproducto" id="claveproducto" required readonly data-parsley-length="[1, 20]">
                                             </div>
                                         </div>    
                                     </div>
@@ -98,7 +100,7 @@
                                         </div>  
                                         <div class="col-md-8"> 
                                             <div class="form-line">
-                                                <input type="text" class="form-control" name="claveunidad" id="claveunidad" required readonly>
+                                                <input type="text" class="form-control" name="claveunidad" id="claveunidad" required readonly data-parsley-length="[1, 5]">
                                             </div>
                                         </div>    
                                     </div>
@@ -107,11 +109,11 @@
                             <div class="row">
                                 <div class="col-md-8">
                                     <label>Producto<b style="color:#F44336 !important;">*</b></label>
-                                    <input type="text" class="form-control" name="producto" id="producto" required onkeyup="tipoLetra(this);">
+                                    <input type="text" class="form-control" name="producto" id="producto" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);">
                                 </div>
                                 <div class="col-md-4">
                                     <label>Unidad<b style="color:#F44336 !important;">*</b></label>
-                                    <input type="text" class="form-control" name="unidad" id="unidad" required onkeyup="tipoLetra(this);">
+                                    <input type="text" class="form-control" name="unidad" id="unidad" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this);">
                                 </div>
                             </div>
                             <div class="col-md-12" id="tabsform">

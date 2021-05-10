@@ -78,7 +78,7 @@ class ServicioController extends ConfiguracionSistemaController{
     //obtener claves productos
     public function servicios_obtener_claves_productos(Request $request){
         if($request->ajax()){
-            $data = ClaveProdServ::where('Usual', 'S')->get();
+            $data = ClaveProdServ::query();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarclaveproducto(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';
@@ -91,7 +91,7 @@ class ServicioController extends ConfiguracionSistemaController{
     //obtener claves unidades
     public function servicios_obtener_claves_unidades(Request $request){
         if($request->ajax()){
-            $data = ClaveUnidad::where('Usual', 'S')->get();
+            $data = ClaveUnidad::query();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarclaveunidad(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';

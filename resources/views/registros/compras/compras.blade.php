@@ -26,7 +26,7 @@
                                                     Altas Prod
                                                 </div>
                                             </td>
-                                            <td >
+                                            <td hidden>
                                                 <div class="btn bg-blue btn-xs waves-effect" onclick="alta('GASTOS')">
                                                     Altas Gastos
                                                 </div>
@@ -37,15 +37,17 @@
                                                 </div>
                                             </td>
                                             <td >
-                                                <a class="btn bg-blue btn-xs waves-effect" href="{{route('compras_exportar_excel')}}" target="_blank">
+                                                <a class="btn bg-blue btn-xs waves-effect" id="btnGenerarFormatoExcel" href="{{route('compras_exportar_excel')}}" target="_blank">
                                                     Excel
                                                 </a>
                                             </td>
+                                            @if(Auth::user()->role_id == 1)
                                             <td>
                                                 <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
                                                     Configurar Tabla
                                                 </div>
                                             </td>
+                                            @endif
                         		        </tr>
                         	        </table>
                                 </div>
@@ -95,7 +97,6 @@
                 <div class="modal-body">
                     <form id="formxml" action="#" enctype="multipart/form-data">
                         <div class="col-md-12">
-                            
                             <table class="col-md-12">
                                 <tr>
                                     <td>
@@ -130,8 +131,7 @@
                         <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Guardar</button>
-                    </div>
-                        
+                    </div> 
                 </div>
             </div>
             <div id="contenidomodaltablas">
@@ -173,7 +173,7 @@
                     <input type="hidden" id="compradesactivar" name="compradesactivar">
                     <div id="divmotivobaja">
                         <label>Motivo Baja</label>
-                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)"></textarea>
+                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required data-parsley-length="[1, 255]"></textarea>
                     </div>
 		        </form>	
       		</div>
@@ -232,12 +232,16 @@
         var campos_activados = '{{$configuracion_tabla->campos_activados}}';
         var campos_desactivados = '{{$configuracion_tabla->campos_desactivados}}';
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
+        var rfcreceptor = '{{$empresa->Rfc}}';
+        var nombrereceptor = '{{$empresa->Nombre}}';
+        var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var compras_obtener = '{!!URL::to('compras_obtener')!!}';
         var compras_obtener_ultimo_folio = '{!!URL::to('compras_obtener_ultimo_folio')!!}';
         var compras_obtener_tipos_ordenes_compra = '{!!URL::to('compras_obtener_tipos_ordenes_compra')!!}';
         var compras_cargar_xml_alta = '{!!URL::to('compras_cargar_xml_alta')!!}';
         var compras_obtener_proveedores = '{!!URL::to('compras_obtener_proveedores')!!}';
         var compras_obtener_almacenes = '{!!URL::to('compras_obtener_almacenes')!!}';
+        var compras_obtener_productos = '{!!URL::to('compras_obtener_productos')!!}';
         var compras_obtener_ordenes_compra = '{!!URL::to('compras_obtener_ordenes_compra')!!}';
         var compras_obtener_orden_compra = '{!!URL::to('compras_obtener_orden_compra')!!}'; 
         var compras_obtener_departamentos = '{!!URL::to('compras_obtener_departamentos')!!}'; 
@@ -247,6 +251,7 @@
         var compras_obtener_movimientos_compra = '{!!URL::to('compras_obtener_movimientos_compra')!!}';
         var compras_obtener_compra = '{!!URL::to('compras_obtener_compra')!!}';
         var compras_obtener_existencias_partida = '{!!URL::to('compras_obtener_existencias_partida')!!}';
+        var compras_obtener_existencias_almacen = '{!!URL::to('compras_obtener_existencias_almacen')!!}';
         var compras_guardar_modificacion = '{!!URL::to('compras_guardar_modificacion')!!}';
         var compras_verificar_uso_en_modulos =  '{!!URL::to('compras_verificar_uso_en_modulos')!!}';
         var compras_alta_o_baja = '{!!URL::to('compras_alta_o_baja')!!}'; 

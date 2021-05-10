@@ -54,6 +54,8 @@ function ocultarformulario(){
 //listar todos los registros de la tabla
 function listar(){
     tabla=$('#tbllistado').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "350px",
         "bScrollCollapse": true,  
@@ -98,13 +100,13 @@ function alta(){
                   '<div class="row">'+
                     '<div class="col-md-12">'+
                       '<label>Banco</label>'+
-                      '<input type="text" class="form-control" name="nombre" id="nombre" required onkeyup="tipoLetra(this);">'+
+                      '<input type="text" class="form-control" name="nombre" id="nombre" required data-parsley-length="[1, 30]" onkeyup="tipoLetra(this);">'+
                     '</div>'+
                   '</div>'+
                   '<div class="row">'+
                     '<div class="col-md-12">'+
                       '<label>Cuenta Contable</label>'+
-                      '<input type="text" class="form-control" name="cuenta" id="cuenta" required onkeyup="tipoLetra(this);">'+
+                      '<input type="text" class="form-control" name="cuenta" id="cuenta" required data-parsley-length="[1, 25]" onkeyup="tipoLetra(this);">'+
                     '</div>'+
                   '</div>'+   
                 '</div>'+
@@ -202,13 +204,13 @@ function obtenerdatos(numerobanco){
                     '<div class="row">'+
                       '<div class="col-md-12">'+
                         '<label>Banco</label>'+
-                        '<input type="text" class="form-control" name="nombre" id="nombre" required onkeyup="tipoLetra(this);">'+
+                        '<input type="text" class="form-control" name="nombre" id="nombre" required data-parsley-length="[1, 30]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                     '</div>'+
                     '<div class="row">'+
                       '<div class="col-md-12">'+
                         '<label>Cuenta Contable</label>'+
-                        '<input type="text" class="form-control" name="cuenta" id="cuenta" required onkeyup="tipoLetra(this);">'+
+                        '<input type="text" class="form-control" name="cuenta" id="cuenta" required data-parsley-length="[1, 25]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                     '</div>'+   
                   '</div>'+
@@ -219,6 +221,9 @@ function obtenerdatos(numerobanco){
     $("#nombre").val(data.banco.Nombre);
     $("#cuenta").val(data.banco.Cuenta);
     mostrarmodalformulario('MODIFICACION');
+    $('.page-loader-wrapper').css('display', 'none');
+  }).fail( function() {
+    msj_errorajax();
     $('.page-loader-wrapper').css('display', 'none');
   })
 }

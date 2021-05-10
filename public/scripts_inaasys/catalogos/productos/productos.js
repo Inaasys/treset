@@ -58,6 +58,8 @@ function listar(){
         });
     }
     tabla=$('#tbllistado').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "350px",
         "bScrollCollapse": true,  
@@ -698,7 +700,7 @@ function alta(){
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Ubicación</label>'+
-                                '<input type="text" class="form-control " name="ubicacion" id="ubicacion" onkeyup="tipoLetra(this)">'+
+                                '<input type="text" class="form-control " name="ubicacion" id="ubicacion" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this)">'+
                             '</div>'+
                         '</div>'+ 
                     '</div>'+
@@ -706,30 +708,31 @@ function alta(){
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Código 1</label>'+
-                                '<input type="text" class="form-control" name="codigo1" id="codigo1" onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="codigo1" id="codigo1" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Código 2</label>'+
-                                '<input type="text" class="form-control" name="codigo2" id="codigo2" onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="codigo2" id="codigo2" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Código 3</label>'+
-                                '<input type="text" class="form-control" name="codigo3" id="codigo3" onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="codigo3" id="codigo3" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Código 4</label>'+
-                                '<input type="text" class="form-control" name="codigo4" id="codigo4" onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="codigo4" id="codigo4" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Código 5</label>'+
-                                '<input type="text" class="form-control" name="codigo5" id="codigo5" onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="codigo5" id="codigo5" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                         '</div>'+
                     '</div>'+
                 '</div>';
   $("#tabsform").html(tabs);
+  $("#codigo").removeAttr('readonly');
   seleccionarclaveunidad('H87','Pieza');
 }
 //guardar el registro
@@ -883,7 +886,7 @@ function obtenerdatos(codigoproducto){
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Ubicación</label>'+
-                                '<input type="text" class="form-control " name="ubicacion" id="ubicacion" onkeyup="tipoLetra(this)">'+
+                                '<input type="text" class="form-control " name="ubicacion" id="ubicacion" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this)">'+
                             '</div>'+
                         '</div>'+ 
                         '<div class="row">'+
@@ -901,7 +904,7 @@ function obtenerdatos(codigoproducto){
                                     '</div>'+  
                                     '<div class="col-md-8">'+  
                                         '<div class="form-line">'+
-                                            '<input type="text" class="form-control" name="moneda" id="moneda" readonly>'+
+                                            '<input type="text" class="form-control" name="moneda" id="moneda" readonly data-parsley-length="[1, 5]">'+
                                         '</div>'+
                                     '</div>'+     
                                 '</div>'+
@@ -1018,25 +1021,25 @@ function obtenerdatos(codigoproducto){
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Código 1</label>'+
-                                '<input type="text" class="form-control" name="codigo1" id="codigo1" onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="codigo1" id="codigo1" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Código 2</label>'+
-                                '<input type="text" class="form-control" name="codigo2" id="codigo2" onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="codigo2" id="codigo2" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Código 3</label>'+
-                                '<input type="text" class="form-control" name="codigo3" id="codigo3" onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="codigo3" id="codigo3" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Código 4</label>'+
-                                '<input type="text" class="form-control" name="codigo4" id="codigo4" onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="codigo4" id="codigo4" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Código 5</label>'+
-                                '<input type="text" class="form-control" name="codigo5" id="codigo5" onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="codigo5" id="codigo5" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                         '</div>'+
                     '</div>'+
@@ -1094,27 +1097,27 @@ function obtenerdatos(codigoproducto){
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Zona de impresión </label>'+
-                                        '<input type="text" class="form-control" name="fechaszonadeimpresion" id="fechaszonadeimpresion" value="ZONA00" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control" name="fechaszonadeimpresion" id="fechaszonadeimpresion" value="ZONA00" data-parsley-length="[1, 8]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Producto PELIGROSO </label>'+
-                                        '<input type="text" class="form-control" name="fechasproductopeligroso" id="fechasproductopeligroso" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control" name="fechasproductopeligroso" id="fechasproductopeligroso" data-parsley-length="[1, 1]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Supercedido </label>'+
-                                        '<input type="text" class="form-control" name="fechassupercedido" id="fechassupercedido" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control" name="fechassupercedido" id="fechassupercedido" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" >'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Insumo </label>'+
-                                        '<input type="text" class="form-control" name="fechasinsumo" id="fechasinsumo" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control" name="fechasinsumo" id="fechasinsumo" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-md-12">'+
                                         '<label>Descripción </label>'+
-                                        '<textarea class="form-control" name="fechasdescripcion" id="fechasdescripcion" rows="4" onkeyup="tipoLetra(this);"></textarea>'+
+                                        '<textarea class="form-control" name="fechasdescripcion" id="fechasdescripcion" rows="4" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
@@ -1152,13 +1155,13 @@ function obtenerdatos(codigoproducto){
                                     '</div>'+
                                     '<div class="col-md-4">'+
                                         '<label>Identificación</label>'+
-                                        '<input type="text" class="form-control" name="lpaidentificacion" id="lpaidentificacion" >'+
+                                        '<input type="text" class="form-control" name="lpaidentificacion" id="lpaidentificacion" data-parsley-length="[1, 5]">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+    
                                     '<div class="col-md-4">'+
                                         '<label>Ubicación</label>'+
-                                        '<input type="text" class="form-control" name="lpaubicacion" id="lpaubicacion" >'+
+                                        '<input type="text" class="form-control" name="lpaubicacion" id="lpaubicacion" data-parsley-length="[1, 60]">'+
                                     '</div>'+
                                     '<div class="col-md-8">'+
                                         '<label>Código de Compra (0=surtir en automatico 6=bloqueado)</label>'+
@@ -1172,6 +1175,7 @@ function obtenerdatos(codigoproducto){
     $("#tabsform").html(tabs);
     //datos principales
     $("#codigo").val(codigoproducto);
+    $("#codigo").attr('readonly', 'readonly');
     $("#claveproducto").val(data.producto.ClaveProducto);
     $("#claveunidad").val(data.producto.ClaveUnidad);
     $("#producto").val(data.producto.Producto);
@@ -1240,6 +1244,9 @@ function obtenerdatos(codigoproducto){
     $('.page-loader-wrapper').css('display', 'none');
     activarbusquedaproducto();//importante activa la busqueda de productos por su codigo
     activarbusquedacliente();//importante activa la busqueda de clientes por su numero
+  }).fail( function() {
+    msj_errorajax();
+    $('.page-loader-wrapper').css('display', 'none');
   })
 }
 //guardar el registro

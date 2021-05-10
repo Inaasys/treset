@@ -33,15 +33,17 @@
                                                 </div>
                                             </td>
                                             <td >
-                                                <a class="btn bg-blue btn-xs waves-effect" href="{{route('contrarecibos_exportar_excel')}}" target="_blank">
+                                                <a class="btn bg-blue btn-xs waves-effect" id="btnGenerarFormatoExcel" href="{{route('contrarecibos_exportar_excel')}}" target="_blank">
                                                     Excel
                                                 </a>
                                             </td>
+                                            @if(Auth::user()->role_id == 1)
                                             <td>
                                                 <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
                                                     Configurar Tabla
                                                 </div>
                                             </td>
+                                            @endif
                         		        </tr>
                         	        </table>
                                 </div>
@@ -94,7 +96,7 @@
                             <div class="col-md-2">
                                 <label>Contrarecibo <b style="color:#F44336 !important;" id="serietexto"> Serie: {{$serieusuario}}</b></label>
                                 <input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">
-                                <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" required readonly>
+                                <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" required readonly data-parsley-length="[1, 10]">
                                 <input type="hidden" class="form-control" name="numerofacturas" id="numerofacturas" value="0" required readonly>
                             </div>   
                             <div class="col-md-4">
@@ -153,7 +155,7 @@
                     <input type="hidden" id="contrarecibodesactivar" name="contrarecibodesactivar">
                     <div id="divmotivobaja">
                         <label>Motivo Baja</label>
-                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required></textarea>
+                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required data-parsley-length="[1, 255]"></textarea>
                     </div>
 		        </form>	
       		</div>
@@ -178,16 +180,19 @@
         var numerodecimales = '{{$numerodecimales}}';
         var numerocerosconfigurados = '{{$numerocerosconfigurados}}';
         var numerocerosconfiguradosinputnumberstep = '{{$numerocerosconfiguradosinputnumberstep}}';
+        var serieusuario = '{{$serieusuario}}';
         var meshoy = '{{$meshoy}}';
         var periodohoy = '{{$periodohoy}}';
         var campos_activados = '{{$configuracion_tabla->campos_activados}}';
         var campos_desactivados = '{{$configuracion_tabla->campos_desactivados}}';
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
+        var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var contrarecibos_obtener = '{!!URL::to('contrarecibos_obtener')!!}';
         var contrarecibos_obtener_ultimo_folio = '{!!URL::to('contrarecibos_obtener_ultimo_folio')!!}';
         var contrarecibos_obtener_proveedores = '{!!URL::to('contrarecibos_obtener_proveedores')!!}';
         var contrarecibos_obtener_compras_proveedor = '{!!URL::to('contrarecibos_obtener_compras_proveedor')!!}';
         var contrarecibos_guardar = '{!!URL::to('contrarecibos_guardar')!!}';
+        var contrarecibos_verificar_si_continua_baja = '{!!URL::to('contrarecibos_verificar_si_continua_baja')!!}';
         var contrarecibos_baja  = '{!!URL::to('contrarecibos_baja')!!}';
         var contrarecibos_obtener_contrarecibo =  '{!!URL::to('contrarecibos_obtener_contrarecibo')!!}';
         var contrarecibos_buscar_folio_string_like = '{!!URL::to('contrarecibos_buscar_folio_string_like')!!}';

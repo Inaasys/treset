@@ -36,11 +36,12 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
         //FIN CONFIGURACIONES DE LA TABLA//
     }
     public function asignacionherramienta(){
-        $serieusuario = Helpers::obtenerserieusuario(Auth::user()->email, 'AsignacionHerramienta');
+        $serieusuario = Helpers::obtenerserieusuario(Auth::user()->user, 'AsignacionHerramienta');
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('asignacion_herramienta_guardar_configuracion_tabla');
+        $urlgenerarformatoexcel = route('asignacion_herramienta_exportar_excel');
         $rutacreardocumento = route('asignacion_herramienta_generar_pdfs');
-        return view('registros.asignacionherramienta.asignacionherramienta', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','rutacreardocumento'));
+        return view('registros.asignacionherramienta.asignacionherramienta', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','rutacreardocumento'));
     }
     //obtener las asignaciones de herramienta
     public function asignacion_herramienta_obtener(Request $request){
@@ -51,17 +52,9 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($tipousuariologueado){
                         $botoncambios =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->asignacion .'\')"><i class="material-icons">mode_edit</i></div> '; 
-                        $botonautorizar =  '<div class="btn bg-green btn-xs waves-effect" data-toggle="tooltip" title="Autorizar" onclick="autorizarasignacion(\''.$data->asignacion .'\')"><i class="material-icons">check</i></div> ';
+                        //$botonautorizar =  '<div class="btn bg-green btn-xs waves-effect" data-toggle="tooltip" title="Autorizar" onclick="autorizarasignacion(\''.$data->asignacion .'\')"><i class="material-icons">check</i></div> ';
                         $botonbajas =      '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->asignacion .'\')"><i class="material-icons">cancel</i></div> ';
-                        if($data->status == 'BAJA'){
-                            $operaciones = '';
-                        }else{
-                            if($data->autorizado_por == ''){
-                                $operaciones =  $botoncambios.$botonautorizar.$botonbajas;
-                            }else{
-                                $operaciones =  $botonbajas;
-                            }
-                        }
+                        $operaciones =  $botoncambios.$botonbajas;
                         return $operaciones;
                     })
                     ->addColumn('total', function($data){ return $data->total; })
@@ -104,6 +97,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
     public function asignacion_herramienta_obtener_herramienta(Request $request){
         if($request->ajax()){
             $codigoabuscar = $request->codigoabuscar;
+            $tipooperacion = $request->tipooperacion;
             $data = DB::table('Productos as t')
             ->leftJoin('Marcas as m', 'm.Numero', '=', 't.Marca')
             ->leftJoin(DB::raw("(select codigo, sum(existencias) as existencias from Existencias group by codigo) as e"),
@@ -119,10 +113,10 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                     $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.'>'.$a->Nombre;
             }
             return DataTables::of($data)
-                    ->addColumn('operaciones', function($data) use ($selectalmacenes){
+                    ->addColumn('operaciones', function($data) use ($selectalmacenes, $tipooperacion){
                         $boton = '';
                         if($data->Existencias > 0){
-                            $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaherramienta(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$selectalmacenes.'\')">Seleccionar</div>';
+                            $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaherramienta(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$selectalmacenes.'\',\''.$tipooperacion.'\')">Seleccionar</div>';
                         }
                         return $boton;
                     })
@@ -147,6 +141,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
     }
     //guardar regustro
     public function asignacion_herramienta_guardar(Request $request){
+        ini_set('max_input_vars','10000' );
         //obtener el ultimo id de la tabla
         DB::unprepared('SET IDENTITY_INSERT asignacion_herramientas ON');
         $id = Helpers::ultimoidregistrotabla('App\Asignacion_Herramienta');
@@ -200,6 +195,15 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
             $Asignacion_Herramienta_Detalle->save();
             $item++;
             DB::unprepared('SET IDENTITY_INSERT asignacion_herramientas_detalles OFF');
+            //restar existencias a almacen principal
+            $RestarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->almacenpartida [$key])->first();
+            $RestarExistenciaNuevaAlmacen = $RestarExistenciaAlmacen->Existencias - $request->cantidadpartida  [$key];
+            Existencia::where('Codigo', $codigoproductopartida)
+                        ->where('Almacen', $request->almacenpartida [$key])
+                        ->update([
+                            'Existencias' => Helpers::convertirvalorcorrecto($RestarExistenciaNuevaAlmacen)
+                        ]);
+
         }
     	return response()->json($Asignacion_Herramienta);
     }
@@ -250,16 +254,21 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                       "asignacion"=>$ah,
                       "totalasignacion"=>Helpers::convertirvalorcorrecto($ah->total),
                       "fechaformato"=> $fechaformato,
-                      "datadetalle" => $datadetalle
+                      "datadetalle" => $datadetalle,
+                      "numerodecimalesdocumento"=> $request->numerodecimalesdocumento
             );
         }
+        //dd($data);
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.asignacionherramienta.formato_pdf_asignacion_herramienta', compact('data'))
         ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
         ->setOption('footer-center', 'Página [page] de [toPage]')
         ->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 5)
+        ->setOption('margin-right', 5)
         ->setOption('margin-bottom', 10);
-        //return $pdf->download('contrarecibos.pdf');
         return $pdf->stream();
     }
     //guardar configuracion tabla
@@ -278,10 +287,25 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
         return redirect()->route('asignacionherramienta');
     }
     //exportar excel
-    public function asignacion_herramienta_exportar_excel(){
+    public function asignacion_herramienta_exportar_excel(Request $request){
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
-        return Excel::download(new AsignacionHerramientaExport($this->campos_consulta), "asignacionherramienta.xlsx"); 
+        return Excel::download(new AsignacionHerramientaExport($this->campos_consulta,$request->periodo), "asignacionherramienta-".$request->periodo.".xlsx");   
+
+    }
+    //obtener asignacion a autorizar
+    public function asignacion_herramienta_obtener_asignacion_herramienta_a_autorizar(Request $request){
+        $Asignacion_Herramienta_Detalle = Asignacion_Herramienta_Detalle::where('asignacion', $request->asignacion)->get();
+        $filasdetallesasignacion='';
+        foreach($Asignacion_Herramienta_Detalle as $ahd){
+            $filasdetallesasignacion= $filasdetallesasignacion.
+            '<tr>'.
+                '<td class="tdmod">'.$ahd->herramienta.'</td>'.
+                '<td class="tdmod">'.$ahd->cantidad.'</td>'.
+                '<td class="tdmod">'.$ahd->id_almacen.'</td>'.
+            '</tr>';
+        }
+        return response()->json($filasdetallesasignacion);
     }
     //autorizar asignacion herramienta
     public function asignacion_herramienta_autorizar(Request $request){
@@ -323,11 +347,10 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                 $almacenes = Almacen::where('status', 'ALTA')->get();
                 $selectalmacenes = "<option selected disabled hidden>Selecciona el almacén</option>";
                 foreach($almacenes as $a){
-
                     if($a->Numero == $ahd->id_almacen){
                         $selectalmacenes = $selectalmacenes.'<option selected value='.$a->Numero.'>'.$a->Nombre.'</option>';
                     }else{
-                        $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.'>'.$a->Nombre.'</option>';
+                        //$selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.'>'.$a->Nombre.'</option>';
                     }    
                 }
                 //existencias del almacen seleccionado
@@ -338,19 +361,18 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                 }
                 $filasdetallesasignacion= $filasdetallesasignacion.
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
-                    '<td class="tdmod"></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'.$ahd->herramienta.'" readonly>'.$ahd->herramienta.'</td>'.
-                    '<td class="tdmod"><div class="divorinputmodl"><input type="hidden" class="form-control nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'.$ahd->descripcion.'" readonly>'.$ahd->descripcion.'</div></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'.$ahd->unidad.'" readonly>'.$ahd->unidad.'</td>'.
-                    
+                    '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$ahd->item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'.$ahd->herramienta.'" readonly data-parsley-length="[1, 20]">'.$ahd->herramienta.'</td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'.$ahd->descripcion.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'.$ahd->unidad.'" readonly data-parsley-length="[1, 5]">'.$ahd->unidad.'</td>'.
                     '<td class="tdmod">'.
                         '<select name="almacenpartida[]" class="form-control divorinputmodxl almacenpartida" style="width:100% !important;height: 28px !important;" onchange="obtenerexistenciasalmacen('.$contadorproductos.')" required>'.
                         $selectalmacenes.
                         '</select>'.
                     '</td>'. 
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm existenciasalmacenpartida" name="existenciasalmacenpartida[]" id="existenciasalmacenpartida[]" value="'.Helpers::convertirvalorcorrecto($existenciasactuales).'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($ahd->cantidad).'" data-parsley-min="0.1" data-parsley-max="'.Helpers::convertirvalorcorrecto($existenciasactuales).'" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('.$contadorfilas.');"></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" id="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($ahd->precio).'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                    '<td class="tdmod"><input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" id="cantidadpartidadb[]" value="'.Helpers::convertirvalorcorrecto($ahd->cantidad).'" ><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($ahd->cantidad).'" data-parsley-min="0.1" data-parsley-max="'.Helpers::convertirvalorcorrecto($existenciasactuales+$ahd->cantidad).'" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');"></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" id="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($ahd->precio).'" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" ></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" id="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto($ahd->total).'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
                     '<td class="tdmod">'.
                     '<select name="estadopartida[]" class="form-control" style="width:100% !important;height: 28px !important;" required>'.
@@ -365,13 +387,37 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
         }else{
             $filasdetallesasignacion = '';
         }        
+        //permitir o no modificar registro
+        if(Auth::user()->role_id == 1){
+            if($Asignacion_Herramienta->status == 'BAJA'){
+                $modificacionpermitida = 0;
+            }else{
+                $modificacionpermitida = 1;
+            }
+        }
+        if(Auth::user()->role_id != 1){
+            if($Asignacion_Herramienta->status == 'BAJA'){
+                $modificacionpermitida = 0;
+            }else{
+                $resultadofechas = Helpers::compararanoymesfechas($Asignacion_Herramienta->fecha);
+                if($resultadofechas != ''){
+                    $modificacionpermitida = 0;
+                }else{
+                    if($Asignacion_Herramienta->autorizado_por == ''){
+                        $modificacionpermitida = 1;
+                    }else{
+                        $modificacionpermitida = 0;
+                    }
+                }
+            }
+        }  
         $data = array(
             "Asignacion_Herramienta" => $Asignacion_Herramienta,
             "filasdetallesasignacion" => $filasdetallesasignacion,
             "Numero_Asignacion_Herramienta_Detalle" => $Numero_Asignacion_Herramienta_Detalle,
             "contadorproductos" => $contadorproductos,
             "contadorfilas" => $contadorfilas,
-            "modificacionpermitida" => 1,
+            "modificacionpermitida" => $modificacionpermitida,
             "fecha" => Helpers::formatoinputdate($Asignacion_Herramienta->fecha),
             "total" => Helpers::convertirvalorcorrecto($Asignacion_Herramienta->total),
             "personalrecibe" => $personalrecibe,
@@ -381,15 +427,50 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
     }
     //guardar cambios de la asignacion
     public function asignacion_herramienta_guardar_modificacion(Request $request){
-        //INGRESAR DATOS A TABLA ORDEN COMPRA
+        //INGRESAR DATOS A TABLA
         $asignacion = $request->id.'-'.$request->serie;
         $Asignacion_Herramienta = Asignacion_Herramienta::where('id', $request->id)->first();
-        $Asignacion_Herramienta->fecha=Carbon::parse($request->fecha)->toDateTimeString();
-		$Asignacion_Herramienta->recibe_herramienta=$request->numeropersonalrecibe;
-		$Asignacion_Herramienta->entrega_herramienta=$request->numeropersonalentrega;
-		$Asignacion_Herramienta->total=$request->total;
-        $Asignacion_Herramienta->observaciones=$request->observaciones;
-        $Asignacion_Herramienta->save();
+        //array detalles antes de modificacion
+        $ArrayDetallesAsignacionAnterior = Array();
+        $DetallesAsignacionAnterior = Asignacion_Herramienta_Detalle::where('asignacion', $asignacion)->get();
+        foreach($DetallesAsignacionAnterior as $detalle){
+            array_push($ArrayDetallesAsignacionAnterior, $detalle->asignacion.'#'.$detalle->herramienta.'#'.$detalle->item.'#'.$detalle->id_almacen);
+        }
+        //array detalles despues de modificacion
+        $ArrayDetallesAsignacionNuevo = Array();
+        foreach ($request->codigoproductopartida as $key => $nuevocodigo){
+            if($request->agregadoen [$key] == 'NA'){
+                array_push($ArrayDetallesAsignacionNuevo, $asignacion.'#'.$nuevocodigo.'#'.$request->itempartida [$key].'#'.$request->almacenpartida [$key]);
+            } 
+        }  
+        //diferencias entre arreglos
+        $diferencias_arreglos = array_diff($ArrayDetallesAsignacionAnterior, $ArrayDetallesAsignacionNuevo);
+        //iteramos las diferencias entre arreglos
+        if(count($diferencias_arreglos) > 0){
+            foreach($diferencias_arreglos as $eliminapartida){
+                $explode_d = explode("#",$eliminapartida);
+                $detalleasignacion = Asignacion_Herramienta_Detalle::where('asignacion', $explode_d[0])->where('herramienta', $explode_d[1])->where('item', $explode_d[2])->first();
+                //sumar existencias a almacen principal
+                $SumarExistenciaAlmacen = Existencia::where('Codigo', $explode_d[1])->where('Almacen', $explode_d[3])->first();
+                $SumarExistenciaNuevaAlmacen = $SumarExistenciaAlmacen->Existencias + $detalleasignacion->cantidad;
+                Existencia::where('Codigo', $explode_d[1])
+                            ->where('Almacen', $explode_d[3])
+                            ->update([
+                                'Existencias' => Helpers::convertirvalorcorrecto($SumarExistenciaNuevaAlmacen)
+                            ]);
+                //eliminar detalle
+                $eliminardetalle= Asignacion_Herramienta_Detalle::where('asignacion', $explode_d[0])->where('herramienta', $explode_d[1])->where('item', $explode_d[2])->forceDelete();
+            }
+        }
+        //modificar tabla general
+        Asignacion_Herramienta::where('id', $request->id)
+                                ->update([
+                                    'fecha' => Carbon::parse($request->fecha)->toDateTimeString(),
+                                    'recibe_herramienta' => $request->numeropersonalrecibe,
+                                    'entrega_herramienta' => $request->numeropersonalentrega,
+                                    'total' => $request->total,
+                                    'observaciones' => $request->observaciones
+                                ]);
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
         $BitacoraDocumento->Documento = "ASIGNACION DE HERRAMIENTA";
@@ -400,19 +481,78 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Usuario = Auth::user()->user;
         $BitacoraDocumento->Periodo = $request->periodohoy;
         $BitacoraDocumento->save();
-        //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
-        foreach ($request->codigoproductopartida as $key => $codigoproductopartida){   
-            $Asignacion_Herramienta_Detalle = Asignacion_Herramienta_Detalle::where('id_asignacion_herramienta', $request->id)->first();
-            $Asignacion_Herramienta_Detalle->cantidad =  $request->cantidadpartida  [$key];
-            $Asignacion_Herramienta_Detalle->precio =  $request->preciopartida [$key];
-            $Asignacion_Herramienta_Detalle->total = $request->totalpesospartida [$key];
-            $Asignacion_Herramienta_Detalle->estado_herramienta = $request->estadopartida  [$key];
-            $Asignacion_Herramienta_Detalle->save();
+        //INGRESAR DATOS A TABLA  DETALLES
+        foreach ($request->codigoproductopartida as $key => $codigoproductopartida){  
+            //if la partida se agrego en la modificacion se realiza un insert
+            if($request->agregadoen [$key] == 'modificacion'){ 
+                DB::unprepared('SET IDENTITY_INSERT asignacion_herramientas_detalles ON');
+                $iddetalle = Helpers::ultimoidregistrotabla('App\Asignacion_Herramienta_Detalle'); 
+                $contardetalles = Asignacion_Herramienta_Detalle::where('asignacion', $asignacion)->count();
+                if($contardetalles > 0){
+                    $item = Asignacion_Herramienta_Detalle::select('item')->where('asignacion', $asignacion)->orderBy('item', 'DESC')->take(1)->get();
+                    $ultimoitem = $item[0]->item+1; 
+                }else{
+                    $ultimoitem = 1;
+                }        
+                $Asignacion_Herramienta_Detalle=new Asignacion_Herramienta_Detalle;
+                $Asignacion_Herramienta_Detalle->id = $iddetalle;
+                $Asignacion_Herramienta_Detalle->id_asignacion_herramienta = $request->id;
+                $Asignacion_Herramienta_Detalle->asignacion = $asignacion;
+                $Asignacion_Herramienta_Detalle->fecha = Carbon::parse($request->fecha)->toDateTimeString();
+                $Asignacion_Herramienta_Detalle->herramienta = $codigoproductopartida;
+                $Asignacion_Herramienta_Detalle->descripcion = $request->nombreproductopartida [$key];
+                $Asignacion_Herramienta_Detalle->unidad = $request->unidadproductopartida [$key];
+                $Asignacion_Herramienta_Detalle->cantidad =  $request->cantidadpartida  [$key];
+                $Asignacion_Herramienta_Detalle->precio =  $request->preciopartida [$key];
+                $Asignacion_Herramienta_Detalle->total = $request->totalpesospartida [$key];
+                $Asignacion_Herramienta_Detalle->estado_herramienta = $request->estadopartida  [$key];
+                $Asignacion_Herramienta_Detalle->item = $item;
+                $Asignacion_Herramienta_Detalle->id_almacen = $request->almacenpartida [$key];
+                $Asignacion_Herramienta_Detalle->save();
+                $item++;
+                DB::unprepared('SET IDENTITY_INSERT asignacion_herramientas_detalles OFF');
+                //restar existencias a almacen principal
+                $RestarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->almacenpartida [$key])->first();
+                $RestarExistenciaNuevaAlmacen = $RestarExistenciaAlmacen->Existencias - $request->cantidadpartida  [$key];
+                Existencia::where('Codigo', $codigoproductopartida)
+                            ->where('Almacen', $request->almacenpartida [$key])
+                            ->update([
+                                'Existencias' => Helpers::convertirvalorcorrecto($RestarExistenciaNuevaAlmacen)
+                            ]);
+
+            }else{
+                $Asignacion_Herramienta_Detalle = Asignacion_Herramienta_Detalle::where('id_asignacion_herramienta', $request->id)->first();
+                Asignacion_Herramienta_Detalle::where('id_asignacion_herramienta', $request->id)
+                                                ->update([
+                                                    'descripcion' => $request->nombreproductopartida [$key],
+                                                    'cantidad' =>  $request->cantidadpartida  [$key],
+                                                    'precio' =>  $request->preciopartida [$key],
+                                                    'total' => $request->totalpesospartida [$key],
+                                                    'estado_herramienta' => $request->estadopartida  [$key]
+                                                ]);
+                //sumar existencias a almacen principal
+                $SumarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->almacenpartida [$key])->first();
+                $SumarExistenciaNuevaAlmacen = $SumarExistenciaAlmacen->Existencias + $request->cantidadpartidadb  [$key];
+                Existencia::where('Codigo', $codigoproductopartida)
+                            ->where('Almacen', $request->almacenpartida [$key])
+                            ->update([
+                                'Existencias' => Helpers::convertirvalorcorrecto($SumarExistenciaNuevaAlmacen)
+                            ]);
+                //restar existencias a almacen principal
+                $RestarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->almacenpartida [$key])->first();
+                $RestarExistenciaNuevaAlmacen = $RestarExistenciaAlmacen->Existencias - $request->cantidadpartida  [$key];
+                Existencia::where('Codigo', $codigoproductopartida)
+                            ->where('Almacen', $request->almacenpartida [$key])
+                            ->update([
+                                'Existencias' => Helpers::convertirvalorcorrecto($RestarExistenciaNuevaAlmacen)
+                            ]);                                
+            }
         }
     	return response()->json($Asignacion_Herramienta);
     }
     //verificar si la asignacion no se esta usando el algun modulo (Prestamos Herramientas)
     public function asignacion_herramienta_verificar_uso_en_modulos(Request $request){
+        $Asignacion_Herramienta = Asignacion_Herramienta::where('asignacion', $request->asignaciondesactivar)->first();
         $Asignacion_Herramienta_Detalle = Asignacion_Herramienta_Detalle::where('asignacion', $request->asignaciondesactivar)->get();
         $numero_prestamos = 0;
         foreach($Asignacion_Herramienta_Detalle as $ahd){
@@ -423,24 +563,41 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
         }
         $data = array (
             'numero_prestamos' => $numero_prestamos,
+            'status' => $Asignacion_Herramienta->status
         );
         return response()->json($data);
     }
     //dar de baja asignacion de herramienta
     public function asignacion_herramienta_alta_o_baja(Request $request){
         $Asignacion_Herramienta = Asignacion_Herramienta::where('asignacion', $request->asignaciondesactivar)->first();
-        $Asignacion_Herramienta->motivo_baja = $request->motivobaja.', '.Helpers::fecha_exacta_accion_datetimestring().', '.Auth::user()->user;
-        $Asignacion_Herramienta->status = 'BAJA';
-        $Asignacion_Herramienta->save();
+        //cambiar status y colocar valores en 0
+        $MotivoBaja = $request->motivobaja.', '.Helpers::fecha_exacta_accion_datetimestring().', '.Auth::user()->user;
+        Asignacion_Herramienta::where('asignacion', $request->asignaciondesactivar)
+                                ->update([
+                                    'motivo_baja' => $MotivoBaja,
+                                    'status' => 'BAJA',
+                                    'total' => '0.000000'
+                                ]);
         //regresar cantidad asignada al codigo en la tabla existencias
-        if($Asignacion_Herramienta->autorizado_por != ''){
             $Asignacion_Herramienta_Detalle = Asignacion_Herramienta_Detalle::where('asignacion', $request->asignaciondesactivar)->get();
             foreach($Asignacion_Herramienta_Detalle as $detalle){
-                $Existencia = Existencia::where('Codigo', $detalle->herramienta)->where('Almacen', $detalle->id_almacen)->first();
-                $existenciasactuales = $Existencia->Existencias + $detalle->cantidad;
-                Existencia::where('Almacen', $detalle->id_almacen)->where('Codigo', $detalle->herramienta)->update(['Existencias' => $existenciasactuales]);
+                //sumar existencias a almacen principal
+                $SumarExistenciaAlmacen = Existencia::where('Codigo', $detalle->herramienta)->where('Almacen', $detalle->id_almacen)->first();
+                $SumarExistenciaNuevaAlmacen = $SumarExistenciaAlmacen->Existencias + $detalle->cantidad;
+                Existencia::where('Codigo', $detalle->herramienta)
+                            ->where('Almacen', $detalle->id_almacen)
+                            ->update([
+                                'Existencias' => Helpers::convertirvalorcorrecto($SumarExistenciaNuevaAlmacen)
+                            ]);
+                //colocar en ceros cantidades detalles
+                Asignacion_Herramienta_Detalle::where('id', $detalle->id)
+                ->update([
+                    'cantidad' => '0.000000',
+                    'total' => '0.000000',
+                    'estado_auditoria' => 'BAJA',
+                    'cantidad_auditoria' => '0.000000'
+                ]);
             }
-        }
         return response()->json($Asignacion_Herramienta);
     }
     //obtener personal para crear excel
@@ -452,7 +609,6 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
     public function asignacion_herramienta_obtener_herramienta_personal(Request $request){
         //$Asignacion_Herramienta = Asignacion_Herramienta::where('recibe_herramienta', $request->idpersonal)->where('status', 'ALTA')->where('autorizado_por', '<>', '')->get();
         $Asignacion_Herramienta = Asignacion_Herramienta::where('recibe_herramienta', $request->idpersonal)->where('status', 'ALTA')->get();
-
         $filasdetallesasignacion = '';
         $contadorfilas = 0;
         $contadorasignacionessinautorizar = 0;
@@ -615,15 +771,19 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
             "fechaformato"=> $fechaformato,
             "datadetalle" => $datadetalle,
             "datadetallefaltante" => $datadetallefaltante,
-            "Personal_Recibe_Herramienta" => $Personal_Recibe_Herramienta
+            "Personal_Recibe_Herramienta" => $Personal_Recibe_Herramienta,
         );
+        //dd($data);
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.asignacionherramienta.formato_pdf_reporte_general_herramienta_asignada', compact('data'))
         ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
         ->setOption('footer-center', 'Página [page] de [toPage]')
         ->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 5)
+        ->setOption('margin-right', 5)
         ->setOption('margin-bottom', 10);
-        //return $pdf->download('contrarecibos.pdf');
         return $pdf->stream();
     }
 }

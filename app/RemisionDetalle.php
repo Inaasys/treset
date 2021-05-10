@@ -37,6 +37,10 @@ class RemisionDetalle extends Model
         'Pedido',
         'Cotizacion',
         'Insumo',
-        'Item'
+        'Item',
+        'InteresMeses',
+        'InteresTasa',
+        'InteresMonto',
+        'PrecioNeto'
     ];
 }

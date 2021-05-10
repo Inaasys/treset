@@ -14,8 +14,17 @@
             page-break-after: auto
         }
         body {
-            letter-spacing: 2px;
+            letter-spacing: 1px;
 	        font-family: 'Roboto', Arial, Tahoma, sans-serif;
+        }
+        .wrap,
+        .wrap2{ 
+            width:750px;
+            white-space: pre-wrap;      /* CSS3 */   
+            white-space: -moz-pre-wrap; /* Firefox */    
+            white-space: -pre-wrap;     /* Opera <7 */   
+            white-space: -o-pre-wrap;   /* Opera 7 */    
+            word-wrap: break-word;      /* IE */
         }
     </style>
     @foreach($data as $d)
@@ -28,8 +37,10 @@
                     </div>
                     <div style="float:left;width:60%;text-align: center;">
                         <b style="font-size:12px;color:#122b40;">{{$empresa->Empresa}}</b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$empresa->Calle}} {{$empresa->NoExterior}} </b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$empresa->Municipio}} {{$empresa->Estado}}, {{$empresa->Pais}} CP: {{$empresa->LugarExpedicion}}</b>
+                        <b style="font-size:12px;color:#122b40;">{{$empresa->Calle}} No. {{$empresa->NoExterior}} </b><br>
+                        <b style="font-size:12px;color:#122b40;">{{$empresa->Colonia}} CP: {{$empresa->LugarExpedicion}}</b><br>
+                        <b style="font-size:12px;color:#122b40;">{{$empresa->Municipio}}, {{$empresa->Estado}}</b><br>
+                        <b style="font-size:12px;color:#122b40;">RFC {{$empresa->Rfc}} Telefonos {{$empresa->Telefonos}}</b>
                     </div>
                     <div style="float:right;width:20%;text-align: right;">
                         <p style="font-size:10px;"></p>
@@ -38,32 +49,28 @@
                 <div>
                     <hr></hr>
                 </div>
-                <div id ="contenedor">
-                    <div style="width:100%; float:right; text-align: right;">
-                        <p style="font-size:15px;">CONTRA RECIBO</p>
-                        <b style="font-size:10px;"></b>
-                    </div>
-                </div>
-                <div id ="contenedor" style="margin-top:50px;">
-                    <div style="width:68%; height:120px; float:left; text-align: left; border-style: groove;">
-                        <p style="font-size:11px; margin-left: 5px;"> Proveedor: <b>{{$d['proveedor']->Nombre}} ({{$d['contrarecibo']->Proveedor}})</b></p>
-                        <p style="font-size:11px; margin-left: 5px;"> Observaciones: <b>{{$d['contrarecibo']->Obs}}</b></p>
-                        <p style="font-size:11px; margin-left: 5px;"></p>
-                        <p style="font-size:11px; margin-left: 5px;"></p>
+                <div id ="contenedor" style="margin-top:10px;">
+                    <div style="width:53%; height:110px; float:left; text-align: left; border-style: groove;">
+                        <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
+                            <li style="font-size:9px; margin-left: 5px;"> Proveedor: {{$d['proveedor']->Nombre}} ({{$d['contrarecibo']->Proveedor}})</li>
+                            <li style="font-size:9px; margin-left: 5px;"> Observaciones: {{$d['contrarecibo']->Obs}}</li>
+                        </ul>
                     </div>
                     <div style="width:1%; float:left;">
                     </div>
-                    <div style="width:30%; height:120px; float:left; text-align: left; border-style: groove;">
-                        <p style="font-size:11px; margin-left: 5px;">ContraRecibo: <b>{{$d['contrarecibo']->ContraRecibo}}</b></p>
-                        <p style="font-size:11px; margin-left: 5px;">Fecha: <b>{{$d['contrarecibo']->Fecha}}</b></p>
-                        <p style="font-size:11px; margin-left: 5px;">Status: <b>{{$d['contrarecibo']->Status}}</b></p>
-                        <p style="font-size:11px; margin-left: 5px;">Ampara: <b>{{$d['contrarecibo']->Facturas}} Factura(s)</b></p>
+                    <div style="width:45%; height:110px; float:left; text-align: left; border-style: groove;">
+                        <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
+                            <li style="font-size:12px; margin-left: 5px;"><b>ContraRecibo: </b><b style="color:red">{{$d['contrarecibo']->ContraRecibo}}</b></li>
+                            <li style="font-size:9px; margin-left: 5px;">Fecha: {{$d['contrarecibo']->Fecha}}</li>
+                            <li style="font-size:9px; margin-left: 5px;">Status: {{$d['contrarecibo']->Status}}</li>
+                            <li style="font-size:9px; margin-left: 5px;">Ampara: {{$d['contrarecibo']->Facturas}} Factura(s)</li>
+                        </ul>
                     </div>
                 </div>
-                <div id ="contenedor" style="margin-top:185px;">
+                <div id ="contenedor" style="margin-top:130px;">
                     <table style="width: 100%;max-width: 100%;border: 1px solid #ddd;">
-                        <thead style="background-color:#a6a6b3; font-size:11px;">
-                            <tr>
+                        <tbody style="font-size:9px; text-align: justify;">
+                            <tr style="background-color:#a6a6b3;font-size:10px;">
                                 <th>Fecha Factura</th>
                                 <th>Factura</th>
                                 <th>Remision</th>
@@ -71,25 +78,22 @@
                                 <th>Fecha de Pago</th>
                                 <th>Movimiento de Compra</th>
                             </tr>
-                        </thead>
-                        <tbody style="background-color:#ddd; font-size:11px; text-align: center;">
                             @foreach($d['datadetalle'] as $crd)
                             <tr>
                                 <td>{{$crd['fechadetalle']}}</td>
                                 <td>{{$crd['facturadetalle']}}</td>
                                 <td>{{$crd['remisiondetalle']}}</td>
-                                <td>{{$crd['totaldetalle']}}</td>
+                                <td>{{ number_format($crd['totaldetalle'], $d['numerodecimalesdocumento']) }}</td>
                                 <td>{{$crd['fechaapagardetalle']}}</td>
                                 <td>{{$crd['compradetalle']}}</td>
                             </tr>
                             @endforeach
-                        </tbody>
-                        <tfoot>
                             <tr rowspan="5">
-                                <td colspan="5" style="font-size:12px"><b>CERO PESOS 00/100 M.N.</b></td>
-                                <td colspan="2" style="font-size:12px"><b>Total $ : {{$d['totalcontrarecibo']}}</b></td>
+                                <td colspan="4" style="font-size:11px"><b>CERO PESOS 00/100 M.N.</b></td>
+                                <td style="font-size:11px;text-align: right;">Total $:</td>
+                                <td style="font-size:11px;text-align: right;background-color:#ddd;"><b>{{ number_format($d['totalcontrarecibo'], $d['numerodecimalesdocumento']) }}</b></td>
                             </tr>
-                        </tfoot>
+                        </tbody>
                     </table>
                 </div>
                 <div id ="contenedor" style="margin-top:30px;">

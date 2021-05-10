@@ -17,6 +17,9 @@ use GuzzleHttp\Client as GuzzleClient;
 use App\Prestamo_Herramienta;
 use App\Prestamo_Herramienta_Detalle;
 use App\Personal;
+use App\CuentaXPagar;
+use App\CuentaXPagarDetalle;
+use App\OrdenCompraDetalle;
 use Mail;
 
 class PruebaController extends ConfiguracionSistemaController{
@@ -73,6 +76,61 @@ class PruebaController extends ConfiguracionSistemaController{
         // Enviar a peticion a la API
         $enviarmensaje = file_get_contents($url, false, $opciones);
         dd($enviarmensaje);
+    }
+
+    public function pruebas_vocales(){
+        $ArrayVocales = array('A', 'E', 'I', 'O', 'U');
+        $String = "BIENVENIDO";
+        $ArrayVocalesEncontradas = array();
+        $contadorvocales = 0;
+        $vocalesencontradas = "";
+        for($i = 0; $i<strlen($String); $i++){
+            for($j = 0 ; $j<count($ArrayVocales); $j++){
+                $existevocal = in_array($String[$i], $ArrayVocalesEncontradas);
+                //if($existevocal == false){
+                    if($ArrayVocales[$j] == $String[$i]){
+                        array_push($ArrayVocalesEncontradas, $String[$i]);
+                        $vocalesencontradas = $vocalesencontradas.",".$String[$i];
+                        $contadorvocales++;
+                    }
+                //}
+            }
+        }
+        echo "Numero de vocales: ".$contadorvocales;
+        echo "<br>";
+        echo "Vocales encontradas: ";
+        print_r($ArrayVocalesEncontradas);
+        //dd($ArrayVocalesEncontradas);
+    }
+
+    public function prueba_diferencias_arrays(){
+        $ArrayDetallesTraspasoAnterior = Array();
+
+        $ArrayDetallesTraspasoNuevo = Array('20725387');
+
+        //$clave = array_search('verde', $array); // $clave = 2;
+        //echo $clave;
+        $diferencias_arreglos = array_diff($ArrayDetallesTraspasoAnterior, $ArrayDetallesTraspasoNuevo);
+        dd($diferencias_arreglos);
+/*
+        if(count($diferencias_arreglos) > 0){
+            foreach($diferencias_arreglos as $eliminapartida){
+                echo $eliminapartida."<br>";
+            }
+        }*/
+
+    }
+
+    public function matchar_compras(){
+        /*$ArrayCompras = Array('27907-A');
+        foreach($ArrayCompras as $compra){
+            $cuentasporpagar = CuentaXPagarDetalle::where('Compra', $compra)->get();
+            dd($cuentasporpagar);
+        }*/
+        $fecha='2021-03-08';
+
+        dd(Helpers::fecha_mas_hora_exacta_accion_datetimestring($fecha));
+
     }
 
 }

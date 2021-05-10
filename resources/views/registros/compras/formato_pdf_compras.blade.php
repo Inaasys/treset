@@ -14,8 +14,17 @@
             page-break-after: auto
         }
         body {
-            letter-spacing: 2px;
+            letter-spacing: 1px;
 	        font-family: 'Roboto', Arial, Tahoma, sans-serif;
+        }
+        .wrap,
+        .wrap2{ 
+            width:750px;
+            white-space: pre-wrap;      /* CSS3 */   
+            white-space: -moz-pre-wrap; /* Firefox */    
+            white-space: -pre-wrap;     /* Opera <7 */   
+            white-space: -o-pre-wrap;   /* Opera 7 */    
+            word-wrap: break-word;      /* IE */
         }
     </style>
     @foreach($data as $d)
@@ -28,8 +37,10 @@
                     </div>
                     <div style="float:left;width:60%;text-align: center;">
                         <b style="font-size:12px;color:#122b40;">{{$empresa->Empresa}}</b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$empresa->Calle}} {{$empresa->NoExterior}} </b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$empresa->Municipio}} {{$empresa->Estado}}, {{$empresa->Pais}} CP: {{$empresa->LugarExpedicion}}</b>
+                        <b style="font-size:12px;color:#122b40;">{{$empresa->Calle}} No. {{$empresa->NoExterior}} </b><br>
+                        <b style="font-size:12px;color:#122b40;">{{$empresa->Colonia}} CP: {{$empresa->LugarExpedicion}}</b><br>
+                        <b style="font-size:12px;color:#122b40;">{{$empresa->Municipio}}, {{$empresa->Estado}}</b><br>
+                        <b style="font-size:12px;color:#122b40;">RFC {{$empresa->Rfc}} Telefonos {{$empresa->Telefonos}}</b>
                     </div>
                     <div style="float:right;width:20%;text-align: right;">
                         <p style="font-size:10px;"></p>
@@ -38,37 +49,34 @@
                 <div>
                     <hr></hr>
                 </div>
-                <div id ="contenedor">
-                    <div style="width:100%; float:right; text-align: right;">
-                        <p style="font-size:15px;">COMPRA</p>
-                        <b style="font-size:10px;"></b>
-                    </div>
-                </div>
-                <div id ="contenedor" style="margin-top:50px;">
-                    <div style="width:68%; height:175px; float:left; text-align: left; border-style: groove;">
-                        <p style="font-size:11px; margin-left: 5px;"> Factura Número: <b>{{$d['compra']->Factura}}</b></p>
-                        <p style="font-size:11px; margin-left: 5px;"> Remisión Número: <b>{{$d['compra']->Remision}}</b></p>
-                        <p style="font-size:11px; margin-left: 5px;"> UUID: <b>{{$d['compra']->UUID}}</b></p>
-                        <p style="font-size:11px; margin-left: 5px;"> Emisor Rfc: <b>{{$d['compra']->EmisorRfc}}</b></p>
-                        <p style="font-size:11px; margin-left: 5px;"> Receptor Rfc: <b>{{$d['compra']->ReceptorRfc}}</b></p>
-                        <p style="font-size:11px; margin-left: 5px;"> Proveedor: <b>{{$d['proveedor']->Nombre}} ({{$d['compra']->Proveedor}})</b></p>
-                        <p style="font-size:11px; margin-left: 5px;"> Observaciones: <b>{{$d['compra']->Obs}}</b></p>
-                        <p style="font-size:11px; margin-left: 5px;"></p>
+                <div id ="contenedor" style="margin-top:10px;">
+                    <div style="width:53%; height:110px; float:left; text-align: left; border-style: groove;">
+                        <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
+                            <li style="font-size:9px; margin-left: 5px;"> Factura Número: {{$d['compra']->Factura}}</li>
+                            <li style="font-size:9px; margin-left: 5px;"> Remisión Número: {{$d['compra']->Remision}}</li>
+                            <li style="font-size:9px; margin-left: 5px;"> UUID: {{$d['compra']->UUID}}</li>
+                            <li style="font-size:9px; margin-left: 5px;"> Emisor Rfc: {{$d['compra']->EmisorRfc}}</li>
+                            <li style="font-size:9px; margin-left: 5px;"> Receptor Rfc: {{$d['compra']->ReceptorRfc}}</li>
+                            <li style="font-size:9px; margin-left: 5px;"> Proveedor: {{$d['proveedor']->Nombre}} ({{$d['compra']->Proveedor}})</li>
+                            <li style="font-size:9px; margin-left: 5px;"> Observaciones: {{$d['compra']->Obs}}</li>
+                        </ul>
                     </div>
                     <div style="width:1%; float:left;">
                     </div>
-                    <div style="width:30%; height:175px; float:left; text-align: left; border-style: groove;">
-                        <p style="font-size:11px; margin-left: 5px;">Compra: <b>{{$d['compra']->Compra}}</b></p>
-                        <p style="font-size:11px; margin-left: 5px;">Fecha: <b>{{$d['compra']->Fecha}}</b></p>
-                        <p style="font-size:11px; margin-left: 5px;">Status: <b>{{$d['compra']->Status}}</b></p>
-                        <p style="font-size:11px; margin-left: 5px;">Tipo: <b>{{$d['compra']->Tipo}}</b></p>
-                        <p style="font-size:11px; margin-left: 5px;">Movimiento: <b>{{$d['compra']->Movimiento}}</b></p>
+                    <div style="width:45%; height:110px; float:left; text-align: left; border-style: groove;">
+                        <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
+                            <li style="font-size:12px; margin-left: 5px;"><b>Compra: </b> <b style="color:red"> {{$d['compra']->Compra}}</b></li>
+                            <li style="font-size:9px; margin-left: 5px;">Fecha: {{$d['compra']->Fecha}}</li>
+                            <li style="font-size:9px; margin-left: 5px;">Status: {{$d['compra']->Status}}</li>
+                            <li style="font-size:9px; margin-left: 5px;">Tipo: {{$d['compra']->Tipo}}</li>
+                            <li style="font-size:9px; margin-left: 5px;">Movimiento: {{$d['compra']->Movimiento}}</li>
+                        </ul>
                     </div>
                 </div>
-                <div id ="contenedor" style="margin-top:240px;">
+                <div id ="contenedor" style="margin-top:130px;">
                     <table style="width: 100%;max-width: 100%;border: 1px solid #ddd;">
-                        <thead style="background-color:#a6a6b3; font-size:11px;">
-                            <tr>
+                        <tbody style="font-size:9px; text-align: justify;">
+                            <tr style="background-color:#a6a6b3;font-size:10px;">
                                 <th>Cantidad</th>
                                 <th>Código</th>
                                 <th>Descripción</th>
@@ -78,48 +86,44 @@
                                 <th>Dcto %</th>
                                 <th>SubTotal</th>
                             </tr>
-                        </thead>
-                        <tbody style="background-color:#ddd; font-size:11px; text-align: center;">
                             @foreach($d['datadetalle'] as $ocd)
                             <tr>
-                                <td>{{$ocd['cantidaddetalle']}}</td>
+                                <td>{{ number_format($ocd['cantidaddetalle'], $d['numerodecimalesdocumento']) }}</td>
                                 <td>{{$ocd['codigodetalle']}}</td>
                                 <td>{{$ocd['descripciondetalle']}}</td>
                                 <td>{{$ocd['marcadetalle']}}</td>
                                 <td>{{$ocd['ubicaciondetalle']}}</td>
-                                <td>{{$ocd['preciodetalle']}}</td>
-                                <td>{{$ocd['descuentodetalle']}}</td>
-                                <td>{{$ocd['subtotaldetalle']}}</td>
+                                <td>{{ number_format($ocd['preciodetalle'], $d['numerodecimalesdocumento']) }}</td>
+                                <td>{{ number_format($ocd['descuentodetalle'], $d['numerodecimalesdocumento']) }}</td>
+                                <td>{{ number_format($ocd['subtotaldetalle'], $d['numerodecimalesdocumento']) }}</td>
                             </tr>
                             @endforeach
+                            <tr>
+                                <td colspan="5" style="font-size:11px"></td>
+                                <td style="font-size:11px;text-align: right;">Descuento $ : </td>
+                                <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"><b>{{ number_format($d['descuentocompra'], $d['numerodecimalesdocumento']) }}</b></td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" style="font-size:11px"></td>
+                                <td style="font-size:11px;text-align: right;">SubTotal $ : </td>
+                                <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"><b>{{ number_format($d['descuentocompra'], $d['numerodecimalesdocumento']) }}</b></td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" style="font-size:11px"></td>
+                                <td style="font-size:11px;text-align: right;">IVA $ : </td>
+                                <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"><b>{{ number_format($d['descuentocompra'], $d['numerodecimalesdocumento']) }}</b></td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" style="font-size:11px"></td>
+                                <td style="font-size:11px;text-align: right;">Retención $ : </td>
+                                <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"><b></b></td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" style="font-size:11px"></td>
+                                <td style="font-size:11px;text-align: right;">Total $ : </td>
+                                <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"><b>{{ number_format($d['descuentocompra'], $d['numerodecimalesdocumento']) }}</b></td>
+                            </tr>
                         </tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="6" style="font-size:12px"></td>
-                                <td style="font-size:12px;text-align: right;">Descuento $ : </td>
-                                <td style="font-size:12px;text-align: right;"><b>{{$d['descuentocompra']}}</b></td>
-                            </tr>
-                            <tr>
-                                <td colspan="6" style="font-size:12px"></td>
-                                <td style="font-size:12px;text-align: right;">SubTotal $ : </td>
-                                <td style="font-size:12px;text-align: right;"><b>{{$d['subtotalcompra']}}</b></td>
-                            </tr>
-                            <tr>
-                                <td colspan="6" style="font-size:12px"></td>
-                                <td style="font-size:12px;text-align: right;">IVA $ : </td>
-                                <td style="font-size:12px;text-align: right;"><b>{{$d['ivacompra']}}</b></td>
-                            </tr>
-                            <tr>
-                                <td colspan="6" style="font-size:12px"></td>
-                                <td style="font-size:12px;text-align: right;">Retención $ : </td>
-                                <td style="font-size:12px;text-align: right;"><b></b></td>
-                            </tr>
-                            <tr>
-                                <td colspan="6" style="font-size:12px"></td>
-                                <td style="font-size:12px;text-align: right;">Total $ : </td>
-                                <td style="font-size:12px;text-align: right;"><b>{{$d['totalcompra']}}</b></td>
-                            </tr>
-                        </tfoot>
                     </table>
                 </div>
                 <div id ="contenedor" style="margin-top:150px;">

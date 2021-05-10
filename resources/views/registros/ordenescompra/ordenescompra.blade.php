@@ -32,15 +32,17 @@
                                                 </div>
                                             </td>
                                             <td >
-                                                <a class="btn bg-blue btn-xs waves-effect" href="{{route('ordenes_compra_exportar_excel')}}" target="_blank">
+                                                <a class="btn bg-blue btn-xs waves-effect" id="btnGenerarFormatoExcel" href="{{route('ordenes_compra_exportar_excel')}}" target="_blank">
                                                     Excel
                                                 </a>
                                             </td>
+                                            @if(Auth::user()->role_id == 1)
                                             <td>
                                                 <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
                                                     Configurar Tabla
                                                 </div>
                                             </td>
+                                            @endif
                         		        </tr>
                         	        </table>
                                 </div>
@@ -93,19 +95,21 @@
                             <div class="col-md-3">
                                 <label>Orden <b style="color:#F44336 !important;" id="serietexto"> Serie: {{$serieusuario}}</b></label>
                                 <input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">
-                                <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" required readonly>
+                                <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" data-parsley-length="[0, 10]" required readonly>
+                                <input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>
+                                <input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>
                             </div>   
                             <div class="col-md-3">
                                 <label>Plazo Días (proveedor)</label>
-                                <input type="text" class="form-control" name="plazo" id="plazo"  required readonly onkeyup="tipoLetra(this);">
+                                <input type="text" class="form-control" name="plazo" id="plazo"  required>
                             </div>
                             <div class="col-md-3">
                                 <label>Referencia</label>
-                                <input type="text" class="form-control" name="referencia" id="referencia" required data-parsley-length="[0, 20]" onkeyup="tipoLetra(this);">
+                                <input type="text" class="form-control" name="referencia" id="referencia" required data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">
                             </div>   
                             <div class="col-md-3">
                                 <label>Fecha</label>
-                                <input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" onkeyup="tipoLetra(this);">
+                                <input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();">
                                 <input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="{{$periodohoy}}">
                             </div>
                         </div>
@@ -119,8 +123,8 @@
                                         </td>
                                         <td>
                                             <div class="form-line">
-                                                <input type="hidden" class="form-control" name="numeroproveedor" id="numeroproveedor" required readonly onkeyup="tipoLetra(this)">
-                                                <input type="text" class="form-control" name="proveedor" id="proveedor" required readonly>
+                                                <input type="hidden" class="form-control" name="numeroproveedor" id="numeroproveedor" required readonly >
+                                                <input type="text" class="form-control" name="proveedor" id="proveedor" required readonly onkeyup="tipoLetra(this)">
                                             </div>
                                         </td>
                                     </tr>    
@@ -135,8 +139,8 @@
                                         </td>
                                         <td>    
                                             <div class="form-line">
-                                                <input type="hidden" class="form-control" name="numeroalmacen" id="numeroalmacen" required readonly onkeyup="tipoLetra(this)">
-                                                <input type="text" class="form-control" name="almacen" id="almacen" required readonly>
+                                                <input type="hidden" class="form-control" name="numeroalmacen" id="numeroalmacen" required readonly >
+                                                <input type="text" class="form-control" name="almacen" id="almacen" required readonly onkeyup="tipoLetra(this)">
                                             </div>
                                         </td>    
                                     </tr>    
@@ -144,7 +148,7 @@
                             </div>
                             <div class="col-md-4">
                                 <label>Tipo</label>
-                                <select name="tipo" id="tipo" class="form-control select2" style="width:100% !important;">
+                                <select name="tipo" id="tipo" class="form-control select2" style="width:100% !important;" required>
                                     
                                 </select>
                             </div>
@@ -152,7 +156,7 @@
                         <div class="row">
                             <div class="col-md-4" id="divbuscarcodigoproducto">
                                 <label>Buscar producto por código</label>
-                                <input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto">
+                                <input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">
                             </div>
                         </div>
                         <div class="col-md-12" id="tabsform">
@@ -205,7 +209,7 @@
                     <input type="hidden" id="ordendesactivar" name="ordendesactivar">
                     <div id="divmotivobaja">
                         <label>Motivo Baja</label>
-                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)"></textarea>
+                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" required></textarea>
                     </div>
 		        </form>	
       		</div>
@@ -230,11 +234,13 @@
         var numerodecimales = '{{$numerodecimales}}';
         var numerocerosconfigurados = '{{$numerocerosconfigurados}}';
         var numerocerosconfiguradosinputnumberstep = '{{$numerocerosconfiguradosinputnumberstep}}';
+        var serieusuario = '{{$serieusuario}}';
         var meshoy = '{{$meshoy}}';
         var periodohoy = '{{$periodohoy}}';
         var campos_activados = '{{$configuracion_tabla->campos_activados}}';
         var campos_desactivados = '{{$configuracion_tabla->campos_desactivados}}';
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
+        var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var ordenes_compra_obtener = '{!!URL::to('ordenes_compra_obtener')!!}';
         var ordenes_compra_obtener_ultimo_folio = '{!!URL::to('ordenes_compra_obtener_ultimo_folio')!!}';
         var ordenes_compra_obtener_tipos_ordenes_compra = '{!!URL::to('ordenes_compra_obtener_tipos_ordenes_compra')!!}';
@@ -248,7 +254,6 @@
         var ordenes_compra_obtener_orden_compra = '{!!URL::to('ordenes_compra_obtener_orden_compra')!!}'; 
         var ordenes_compra_guardar_modificacion = '{!!URL::to('ordenes_compra_guardar_modificacion')!!}';
         var ordenes_compra_buscar_folio_string_like = '{!!URL::to('ordenes_compra_buscar_folio_string_like')!!}';
-
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="scripts_inaasys/registros/ordenescompra/ordenescompra.js"></script>

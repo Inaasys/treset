@@ -19,7 +19,7 @@ class CreateCotizacionesTable extends Migration
             $table->string('serie', 255)->nullable();
             $table->dateTime('fecha')->nullable();
             $table->string('num_remision', 255)->nullable();
-            $table->integer('num_equipo')->nullable();
+            $table->string('num_equipo')->nullable();
             $table->decimal('subtotal', 30, 6)->nullable();
             $table->decimal('iva', 30, 6)->nullable();
             $table->decimal('total', 30, 6)->nullable();

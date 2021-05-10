@@ -27,15 +27,22 @@
                                                 </div>
                                             </td>
                                             <td >
-                                                <a class="btn bg-blue btn-xs waves-effect" href="{{route('ajustesinventario_exportar_excel')}}" target="_blank">
+                                                <div class="btn bg-blue btn-xs waves-effect" onclick="mostrarmodalgenerarpdf()">
+                                                    Generar Documento
+                                                </div>
+                                            </td>
+                                            <td >
+                                                <a class="btn bg-blue btn-xs waves-effect" id="btnGenerarFormatoExcel" href="{{route('ajustesinventario_exportar_excel')}}" target="_blank">
                                                     Excel
                                                 </a>
                                             </td>
+                                            @if(Auth::user()->role_id == 1)
                                             <td>
                                                 <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
                                                     Configurar Tabla
                                                 </div>
                                             </td>
+                                            @endif
                         		        </tr>
                         	        </table>
                                 </div>
@@ -88,8 +95,9 @@
                             <div class="col-md-2">
                                 <label>Ajuste <b style="color:#F44336 !important;" id="serietexto"> Serie: {{$serieusuario}}</b></label>
                                 <input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">
-                                <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" required readonly>
+                                <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" required readonly data-parsley-length="[1, 10]">
                                 <input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>
+                                <input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>
                             </div>  
                             <div class="col-md-3">
                                 <label>Almacén</label>
@@ -102,6 +110,8 @@
                                             <div class="form-line">
                                                 <input type="hidden" class="form-control" name="numeroalmacen" id="numeroalmacen" required readonly onkeyup="tipoLetra(this)">
                                                 <input type="text" class="form-control" name="almacen" id="almacen" required readonly>
+                                                <input type="hidden" class="form-control" name="almacendb" id="almacendb" required readonly>
+                                                <input type="hidden" class="form-control" name="numeroalmacendb" id="numeroalmacendb" required readonly>
                                             </div>
                                         </td>
                                     </tr>    
@@ -149,7 +159,7 @@
                     <input type="hidden" id="ajustedesactivar" name="ajustedesactivar">
                     <div id="divmotivobaja">
                         <label>Motivo Baja</label>
-                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required></textarea>
+                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required data-parsley-length="[1, 255]"></textarea>
                     </div>
 		        </form>	
       		</div>
@@ -160,6 +170,9 @@
     	</div>
   	</div>
 </div> 
+<!-- modal para crear documento en PDF-->
+@include('secciones.modalcreardocumento')
+<!-- fin modal para crear documento en PDF-->
 <!-- modal para configuraciones de tablas-->
 @include('secciones.modalconfiguraciontablas')
 <!-- fin modal para configuraciones de tablas-->
@@ -171,21 +184,25 @@
         var numerodecimales = '{{$numerodecimales}}';
         var numerocerosconfigurados = '{{$numerocerosconfigurados}}';
         var numerocerosconfiguradosinputnumberstep = '{{$numerocerosconfiguradosinputnumberstep}}';
+        var serieusuario = '{{$serieusuario}}';
         var meshoy = '{{$meshoy}}';
         var periodohoy = '{{$periodohoy}}';
         var campos_activados = '{{$configuracion_tabla->campos_activados}}';
         var campos_desactivados = '{{$configuracion_tabla->campos_desactivados}}';
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
+        var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var ajustesinventario_obtener = '{!!URL::to('ajustesinventario_obtener')!!}';
         var ajustesinventario_obtener_ultimo_id = '{!!URL::to('ajustesinventario_obtener_ultimo_id')!!}';
         var ajustesinventario_obtener_almacenes = '{!!URL::to('ajustesinventario_obtener_almacenes')!!}';
         var ajustesinventario_obtener_productos = '{!!URL::to('ajustesinventario_obtener_productos')!!}';
-        var ajustesinventario_obtener_existencias_por_codigo_y_almacen = '{!!URL::to('ajustesinventario_obtener_existencias_por_codigo_y_almacen')!!}';
+        var ajustesinventario_obtener_existencias_partida = '{!!URL::to('ajustesinventario_obtener_existencias_partida')!!}';
         var ajustesinventario_guardar = '{!!URL::to('ajustesinventario_guardar')!!}';
         var ajustesinventario_verificar_baja = '{!!URL::to('ajustesinventario_verificar_baja')!!}';
         var ajustesinventario_alta_o_baja = '{!!URL::to('ajustesinventario_alta_o_baja')!!}'; 
+        var ajustesinventario_obtener_nuevos_datos_fila = '{!!URL::to('ajustesinventario_obtener_nuevos_datos_fila')!!}'; 
         var ajustesinventario_obtener_ajuste = '{!!URL::to('ajustesinventario_obtener_ajuste')!!}'; 
         var ajustesinventario_guardar_modificacion = '{!!URL::to('ajustesinventario_guardar_modificacion')!!}';
+        var ajustesinventario_buscar_folio_string_like = '{!!URL::to('ajustesinventario_buscar_folio_string_like')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="scripts_inaasys/registros/ajustesinventario/ajustesinventario.js"></script>

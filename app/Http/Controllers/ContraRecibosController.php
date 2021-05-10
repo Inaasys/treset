@@ -35,11 +35,12 @@ class ContraRecibosController extends ConfiguracionSistemaController{
     }
 
     public function contrarecibos(){
-        $serieusuario = Helpers::obtenerserieusuario(Auth::user()->email, 'ContraRecibos');
+        $serieusuario = Helpers::obtenerserieusuario(Auth::user()->user, 'ContraRecibos');
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('contrarecibos_guardar_configuracion_tabla');
+        $urlgenerarformatoexcel = route('contrarecibos_exportar_excel');
         $rutacreardocumento = route('contrarecibos_generar_pdfs');
-        return view('registros.contrarecibos.contrarecibos', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','rutacreardocumento'));
+        return view('registros.contrarecibos.contrarecibos', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','rutacreardocumento'));
     }
     //obtener registro tabla
     public function contrarecibos_obtener(Request $request){
@@ -49,12 +50,9 @@ class ContraRecibosController extends ConfiguracionSistemaController{
             $data = VistaContraRecibo::select($this->campos_consulta)->orderBy('Folio', 'DESC')->where('Periodo', $periodo)->get();
             return DataTables::of($data)
                 ->addColumn('operaciones', function($data){
-                    if($data->Status != 'BAJA'){
-                        $boton =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->ContraRecibo .'\')"><i class="material-icons">mode_edit</i></div> '. 
-                        '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->ContraRecibo .'\')"><i class="material-icons">cancel</i></div>  ';
-                    }else{
-                        $boton =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->ContraRecibo .'\')"><i class="material-icons">mode_edit</i></div> ';
-                    }
+                    $botoncambios   = '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->ContraRecibo .'\')"><i class="material-icons">mode_edit</i></div> ';
+                    $botonbaja      = '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->ContraRecibo .'\')"><i class="material-icons">cancel</i></div>  ';
+                    $boton =  $botoncambios.$botonbaja;
                     return $boton;
                 })
                 ->addColumn('Total', function($data){ return $data->Total; })
@@ -90,13 +88,12 @@ class ContraRecibosController extends ConfiguracionSistemaController{
             foreach($compras as $c){
                 $existedetallecontrarecibo = ContraReciboDetalle::where('Compra', $c->Compra)->count();
                 if($existedetallecontrarecibo == 0){
-
                         $filascompras= $filascompras.
                         '<tr class="filascompras" id="filacompra'.$contadorfilas.'">'.
                             '<td class="tdmod"></td>'.
-                            '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm compra" name="compra[]" value="'.$c->Compra.'" readonly>'.$c->Compra.'</td>'.
-                            '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm facturacompra" name="facturacompra[]" value="'.$c->Factura.'" readonly>'.$c->Factura.'</td>'.
-                            '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm remisioncompra" name="remisioncompra[]" value="'.$c->Remision.'" readonly>'.$c->Remision.'</td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm compra" name="compra[]" value="'.$c->Compra.'" readonly data-parsley-length="[1, 20]">'.$c->Compra.'</td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm facturacompra" name="facturacompra[]" value="'.$c->Factura.'" readonly data-parsley-length="[1, 20]">'.$c->Factura.'</td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm remisioncompra" name="remisioncompra[]" value="'.$c->Remision.'" readonly data-parsley-length="[1, 20]">'.$c->Remision.'</td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm fechafacturacompra" name="fechafacturacompra[]" value="'.$c->Fecha.'" readonly>'.Helpers::fecha_espanol($c->Fecha).'</td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm plazocompra" name="plazocompra[]" value="'.$c->Plazo.'" readonly>'.$c->Plazo.'</td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm fechapagarproveedor" name="fechapagarproveedor[]" value="'.Carbon::parse($c->Fecha)->addDays($c->Plazo)->toDateTimeString().'" readonly>'.Helpers::fecha_espanol(Carbon::parse($c->Fecha)->addDays($c->Plazo)->toDateTimeString()).'</td>'.
@@ -117,6 +114,7 @@ class ContraRecibosController extends ConfiguracionSistemaController{
     }
     //guardar contrarecibo
     public function contrarecibos_guardar(Request $request){
+        ini_set('max_input_vars','10000' );
         //obtener el ultimo id de la tabla
         $folio = Helpers::ultimofoliotablamodulos('App\ContraRecibo');
         //INGRESAR DATOS A TABLA ORDEN COMPRA
@@ -163,35 +161,53 @@ class ContraRecibosController extends ConfiguracionSistemaController{
         }
     	return response()->json($ContraRecibo);
     }
+
+    //verificar baja
+    public function contrarecibos_verificar_si_continua_baja(Request $request){
+        $ContraRecibo = ContraRecibo::where('ContraRecibo', $request->contrarecibodesactivar)->first(); 
+        $resultadofechas = Helpers::compararanoymesfechas($ContraRecibo->Fecha);
+        $data = array (
+            'resultadofechas' => $resultadofechas,
+            'Status' => $ContraRecibo->Status
+        );
+        return response()->json($data);
+    }
+
     //dar de baja contrarecibo
     public function contrarecibos_baja(Request $request){
-        //tabla contrarecibo
         $ContraRecibo = ContraRecibo::where('ContraRecibo', $request->contrarecibodesactivar)->first();
-        $ContraRecibo->Facturas = '0';
-        $ContraRecibo->Total = '0';
-        $ContraRecibo->MotivoBaja = $request->motivobaja.', '.Helpers::fecha_exacta_accion_datetimestring().', '.Auth::user()->user;
-        $ContraRecibo->Status = 'BAJA';
-        $ContraRecibo->save();
+        //cambiar status y colocar valores en 0
+        $MotivoBaja = $request->motivobaja.', '.Helpers::fecha_exacta_accion_datetimestring().', '.Auth::user()->user;
+        ContraRecibo::where('ContraRecibo', $request->contrarecibodesactivar)
+                ->update([
+                    'MotivoBaja' => $MotivoBaja,
+                    'Status' => 'BAJA',
+                    'Facturas' => '0',
+                    'Total' => '0.000000'
+                ]);
+        //obtener detalle cuenta por pagar
+        $ContraReciboDetalle = ContraReciboDetalle::where('ContraRecibo', $request->contrarecibodesactivar)->get();
+        foreach($ContraReciboDetalle as $crd){
+
+            //colocar en ceros cantidades
+            ContraReciboDetalle::where('ContraRecibo', $crd->ContraRecibo)
+            ->where('Compra', $crd->Compra)
+            ->update([
+                'Compra' => 'BAJA',
+                'Factura' => '',
+                'Total' => '0.000000'
+            ]);
+        }
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
         $BitacoraDocumento->Documento = "CONTRARECIBOS";
         $BitacoraDocumento->Movimiento = $request->contrarecibodesactivar;
         $BitacoraDocumento->Aplicacion = "BAJA";
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
-        $BitacoraDocumento->Status = $ContraRecibo->Status;
+        $BitacoraDocumento->Status = 'BAJA';
         $BitacoraDocumento->Usuario = Auth::user()->user;
         $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
-        //obtener detalle cuenta por pagar
-        $ContraReciboDetalle = ContraReciboDetalle::where('ContraRecibo', $request->contrarecibodesactivar)->get();
-        foreach($ContraReciboDetalle as $crd){
-            //tabla cuenta x pgar detalle
-            $ContraReciboDetalleBaja = ContraReciboDetalle::where('ContraRecibo', $crd->ContraRecibo)->where('Compra', $crd->Compra)->first();
-            $ContraReciboDetalleBaja->Compra = 'BAJA';
-            $ContraReciboDetalleBaja->Factura = '';
-            $ContraReciboDetalleBaja->Total = '0';
-            $ContraReciboDetalleBaja->save();
-        }
         return response()->json($ContraRecibo);
     }
     //Obtener contrarecibo
@@ -205,9 +221,9 @@ class ContraRecibosController extends ConfiguracionSistemaController{
             $filasdetallescontrarecibo= $filasdetallescontrarecibo.
             '<tr class="filascompras" id="filacompra'.$contadorfilas.'">'.
                 '<td class="tdmod"></td>'.
-                '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm compra" name="compra[]" value="'.$dcr->Compra.'" readonly>'.$dcr->Compra.'</td>'.
-                '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm facturacompra" name="facturacompra[]" value="'.$dcr->Factura.'" readonly>'.$dcr->Factura.'</td>'.
-                '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm remisioncompra" name="remisioncompra[]" value="'.$dcr->Remision.'" readonly>'.$dcr->Remision.'</td>'.
+                '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm compra" name="compra[]" value="'.$dcr->Compra.'" readonly data-parsley-length="[1, 20]">'.$dcr->Compra.'</td>'.
+                '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm facturacompra" name="facturacompra[]" value="'.$dcr->Factura.'" readonly data-parsley-length="[1, 20]">'.$dcr->Factura.'</td>'.
+                '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm remisioncompra" name="remisioncompra[]" value="'.$dcr->Remision.'" readonly data-parsley-length="[1, 20]">'.$dcr->Remision.'</td>'.
                 '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm fechafacturacompra" name="fechafacturacompra[]" value="'.$dcr->Fecha.'" readonly>'.Helpers::fecha_espanol($dcr->Fecha).'</td>'.
                 '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm plazocompra" name="plazocompra[]" value="'.$dcr->Plazo.'" readonly>'.$dcr->Plazo.'</td>'.
                 '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm fechapagarproveedor" name="fechapagarproveedor[]" value="'.$dcr->FechaAPagar.'" readonly>'.Helpers::fecha_espanol($dcr->FechaAPagar).'</td>'.
@@ -219,15 +235,36 @@ class ContraRecibosController extends ConfiguracionSistemaController{
             '</tr>';
             $contadorfilas++;
         }
+        //permitir o no modificar registro
+        if(Auth::user()->role_id == 1){
+            if($contrarecibo->Status == 'BAJA'){
+                $modificacionpermitida = 0;
+            }else{
+                $modificacionpermitida = 1;
+            }
+        }
+        if(Auth::user()->role_id != 1){
+            if($contrarecibo->Status == 'BAJA'){
+                $modificacionpermitida = 0;
+            }else{
+                $resultadofechas = Helpers::compararanoymesfechas($contrarecibo->Fecha);
+                if($resultadofechas != ''){
+                    $modificacionpermitida = 0;
+                }else{
+                    $modificacionpermitida = 1;
+                }
+            }
+        } 
         $data = array(
             "contrarecibo" => $contrarecibo,
             "detallescontrarecibo" => $detallescontrarecibo,
             "proveedor" => $proveedor,
             "fecha" => Helpers::formatoinputdate($contrarecibo->Fecha),
             "total" => Helpers::convertirvalorcorrecto($contrarecibo->Total),
-            "filasdetallescontrarecibo" => $filasdetallescontrarecibo
+            "filasdetallescontrarecibo" => $filasdetallescontrarecibo,
+            "modificacionpermitida" => $modificacionpermitida
         );
-        return response()->json($data);
+        return response()->json($datas);
     }
     //buscar folio on key up
     public function contrarecibos_buscar_folio_string_like(Request $request){
@@ -251,12 +288,11 @@ class ContraRecibosController extends ConfiguracionSistemaController{
     public function contrarecibos_generar_pdfs(Request $request){
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
-            $contrarecibos = ContraRecibo::whereIn('ContraRecibo', $request->arraypdf)->orderBy('Folio', 'ASC')->take(500)->get(); 
+            $contrarecibos = ContraRecibo::whereIn('ContraRecibo', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
         }else{
-            //$contrarecibos = ContraRecibo::where('Fecha', $request->anopdf)->get(); 
             $fechainiciopdf = date($request->fechainiciopdf);
             $fechaterminacionpdf = date($request->fechaterminacionpdf);
-            $contrarecibos = ContraRecibo::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(500)->get();
+            $contrarecibos = ContraRecibo::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
@@ -280,25 +316,28 @@ class ContraRecibosController extends ConfiguracionSistemaController{
                       "contrarecibodetalle"=>$contrarecibodetalle,
                       "proveedor" => $proveedor,
                       "fechaformato"=> $fechaformato,
-                      "datadetalle" => $datadetalle
+                      "datadetalle" => $datadetalle,
+                      "numerodecimalesdocumento"=> $request->numerodecimalesdocumento
             );
         }
-        //$footerHtml = view()->make('seccionespdf.footer', compact('fechaformato'))->render();
+        //dd($data);
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.contrarecibos.formato_pdf_contrarecibos', compact('data'))
-        //->setOption('footer-html', $footerHtml, 'Página [page]')
         ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
         ->setOption('footer-center', 'Página [page] de [toPage]')
         ->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 5)
+        ->setOption('margin-right', 5)
         ->setOption('margin-bottom', 10);
-        //return $pdf->download('contrarecibos.pdf');
         return $pdf->stream();
     }
     //exportar excel
-    public function contrarecibos_exportar_excel(){
+    public function contrarecibos_exportar_excel(Request $request){
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
-        return Excel::download(new ContraRecibosExport($this->campos_consulta), "contrarecibos.xlsx");     
+        return Excel::download(new ContraRecibosExport($this->campos_consulta,$request->periodo), "contrarecibos-".$request->periodo.".xlsx");      
     }
     //configuracion tabla
     public function contrarecibos_guardar_configuracion_tabla(Request $request){

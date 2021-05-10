@@ -32,15 +32,17 @@
                                                 </div>
                                             </td>
                                             <td >
-                                                <a class="btn bg-blue btn-xs waves-effect" href="{{route('notas_credito_proveedores_exportar_excel')}}" target="_blank">
+                                                <a class="btn bg-blue btn-xs waves-effect" id="btnGenerarFormatoExcel" href="{{route('notas_credito_proveedores_exportar_excel')}}" target="_blank">
                                                     Excel
                                                 </a>
                                             </td>
+                                            @if(Auth::user()->role_id == 1)
                                             <td>
                                                 <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
                                                     Configurar Tabla
                                                 </div>
                                             </td>
+                                            @endif
                         		        </tr>
                         	        </table>
                                 </div>
@@ -165,10 +167,10 @@
       		<div class="modal-body">
 		      	<form id="formdesactivar" action="#">
 		        	<h5 id="textomodaldesactivar"> </h5>
-                    <input type="hidden" id="compradesactivar" name="compradesactivar">
+                    <input type="hidden" id="notadesactivar" name="notadesactivar">
                     <div id="divmotivobaja">
                         <label>Motivo Baja</label>
-                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)"></textarea>
+                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required data-parsley-length="[1, 255]"></textarea>
                     </div>
 		        </form>	
       		</div>
@@ -178,35 +180,7 @@
 	      	</div>
     	</div>
   	</div>
-</div> 
-<!-- Modal Movimientos-->
-<div class="modal fade" data-keyboard="false" id="modalmovimientoscompra" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  	<div class="modal-dialog" role="document">
-    	<div class="modal-content">
-      		<div class="modal-header bg-red">
-        		<h5 class="modal-title" id="exampleModalLabel">Movimientos</h5>
-      		</div>
-      		<div class="modal-body">
-                <div class="row">
-                    <div class="col-md-12">
-                        <table class="table table-bordered table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <td class="customercolortheadth">Movimiento</td>
-                                    <td class="customercolortheadth">Número</td>
-                                    <td class="customercolortheadth">Fecha</td>
-                                    <td class="customercolortheadth">Abono $</td>
-                                    <td class="customercolortheadth">Status</td>
-                                </tr>
-                            </thead>
-                            <tbody id="filasmovimientos"></tbody>
-                        </table> 
-                    </div>
-                </div>    	
-      		</div>
-    	</div>
-  	</div>
-</div> 
+</div>
 <!-- modal para crear documento en PDF-->
 @include('secciones.modalcreardocumento')
 <!-- fin modal para crear documento en PDF-->
@@ -227,6 +201,8 @@
         var campos_activados = '{{$configuracion_tabla->campos_activados}}';
         var campos_desactivados = '{{$configuracion_tabla->campos_desactivados}}';
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
+        var rfcempresa = '{{$empresa->Rfc}}';
+        var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var notas_credito_proveedores_obtener = '{!!URL::to('notas_credito_proveedores_obtener')!!}';
         var notas_credito_proveedores_obtener_ultimo_folio = '{!!URL::to('notas_credito_proveedores_obtener_ultimo_folio')!!}';
         var notas_credito_proveedores_obtener_proveedores = '{!!URL::to('notas_credito_proveedores_obtener_proveedores')!!}';
@@ -234,18 +210,16 @@
         var notas_credito_proveedores_obtener_compras = '{!!URL::to('notas_credito_proveedores_obtener_compras')!!}'; 
         var notas_credito_proveedores_obtener_compra = '{!!URL::to('notas_credito_proveedores_obtener_compra')!!}';
         var notas_credito_proveedor_obtener_codigos_compra = '{!!URL::to('notas_credito_proveedor_obtener_codigos_compra')!!}';
+        var notas_credito_proveedores_obtener_datos_almacen  = '{!!URL::to('notas_credito_proveedores_obtener_datos_almacen')!!}';
         var notas_credito_proveedor_guardar = '{!!URL::to('notas_credito_proveedor_guardar')!!}';
         var notas_credito_proveedor_cargar_xml_alta = '{!!URL::to('notas_credito_proveedor_cargar_xml_alta')!!}';
         var notas_credito_proveedor_obtener_existencias_partida = '{!!URL::to('notas_credito_proveedor_obtener_existencias_partida')!!}';
-
-
-        var compras_obtener_claves_productos = '{!!URL::to('compras_obtener_claves_productos')!!}'; 
-        var compras_obtener_claves_unidades = '{!!URL::to('compras_obtener_claves_unidades')!!}'; 
-        var compras_obtener_movimientos_compra = '{!!URL::to('compras_obtener_movimientos_compra')!!}';
-        var compras_obtener_compra = '{!!URL::to('compras_obtener_compra')!!}';
-        var compras_guardar_modificacion = '{!!URL::to('compras_guardar_modificacion')!!}';
-        var compras_verificar_uso_en_modulos =  '{!!URL::to('compras_verificar_uso_en_modulos')!!}';
-        var compras_alta_o_baja = '{!!URL::to('compras_alta_o_baja')!!}'; 
+        var notas_credito_proveedor_obtener_tipos_ordenes_compra = '{!!URL::to('notas_credito_proveedor_obtener_tipos_ordenes_compra')!!}';
+        var notas_credito_proveedores_obtener_productos = '{!!URL::to('notas_credito_proveedores_obtener_productos')!!}';
+        var notas_credito_proveedores_verificar_uso_en_modulos =  '{!!URL::to('notas_credito_proveedores_verificar_uso_en_modulos')!!}';
+        var notas_credito_proveedores_alta_o_baja = '{!!URL::to('notas_credito_proveedores_alta_o_baja')!!}'; 
+        var notas_credito_proveedores_obtener_nota_proveedor = '{!!URL::to('notas_credito_proveedores_obtener_nota_proveedor')!!}';
+        var notas_credito_proveedores_guardar_modificacion = '{!!URL::to('notas_credito_proveedores_guardar_modificacion')!!}';
         var notas_credito_proveedores_buscar_folio_string_like = '{!!URL::to('notas_credito_proveedores_buscar_folio_string_like')!!}'; 
     </script>
     @include('secciones.libreriasregistrosycatalogos')

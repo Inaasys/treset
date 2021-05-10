@@ -37,10 +37,11 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
     }   
 
     public function prestamoherramienta(){
-        $serieusuario = Helpers::obtenerserieusuario(Auth::user()->email, 'PrestamoHerramienta');
+        $serieusuario = Helpers::obtenerserieusuario(Auth::user()->user, 'PrestamoHerramienta');
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('prestamo_herramienta_guardar_configuracion_tabla');
-        return view('registros.prestamoherramienta.prestamoherramienta', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla'));
+        $urlgenerarformatoexcel = route('prestamo_herramienta_exportar_excel');
+        return view('registros.prestamoherramienta.prestamoherramienta', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel'));
     }
     //obtener prestamos de herramienta
     public function prestamo_herramienta_obtener(Request $request){
@@ -53,13 +54,7 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
                         $botoncambios =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->prestamo .'\')"><i class="material-icons">mode_edit</i></div> '; 
                         $botonterminarprestamo=      '<div class="btn bg-green btn-xs waves-effect" data-toggle="tooltip" title="Terminar Prestamo" onclick="terminarprestamo(\''.$data->prestamo .'\')"><i class="material-icons">check</i></div> ';
                         $botonbajas =      '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->prestamo .'\')"><i class="material-icons">cancel</i></div> ';
-                        if($data->status == 'BAJA'){
-                            $operaciones = '';
-                        }else if($data->status == 'ENTREGADO'){
-                            $operaciones = '';
-                        }else{
-                                $operaciones =  $botonbajas.$botoncambios.$botonterminarprestamo;
-                        }
+                        $operaciones =  $botoncambios.$botonbajas.$botonterminarprestamo;
                         return $operaciones;
                     })
                     ->addColumn('total', function($data){ return $data->total; })
@@ -81,7 +76,7 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
     public function prestamo_herramienta_obtener_herramienta_personal(Request $request){
         if($request->ajax()){
             $data = array();
-            $Asignacion_Herramienta = Asignacion_Herramienta::where('recibe_herramienta', $request->personalherramientacomun)->where('status', 'ALTA')->where('autorizado_por', '<>', '')->get();
+            $Asignacion_Herramienta = Asignacion_Herramienta::where('recibe_herramienta', $request->personalherramientacomun)->where('status', 'ALTA')->get();
             foreach($Asignacion_Herramienta as $ah){
                 $Asignacion_Herramienta_Detalle = Asignacion_Herramienta_Detalle::where('asignacion', $ah->asignacion)->get();
                 foreach($Asignacion_Herramienta_Detalle as $ahd){    
@@ -153,6 +148,7 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
     }
     //guardar prestamo herramienta
     public function prestamo_herramienta_guardar(Request $request){
+        ini_set('max_input_vars','10000' );
         //obtener el ultimo id de la tabla
         DB::unprepared('SET IDENTITY_INSERT prestamo_herramientas ON');
         $id = Helpers::ultimoidregistrotabla('App\Prestamo_Herramienta');
@@ -248,17 +244,25 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
     }
     //dar de baja prestamo
     public function prestamo_herramienta_alta_o_baja(Request $request){
-        //cambiar status del prestamo
         $Prestamo_Herramienta = Prestamo_Herramienta::where('prestamo', $request->prestamodesactivar)->first();
-        $Prestamo_Herramienta->motivo_baja = $request->motivobaja.', '.Helpers::fecha_exacta_accion_datetimestring().', '.Auth::user()->user;
-        $Prestamo_Herramienta->status = 'BAJA';
-        $Prestamo_Herramienta->save();
+        //cambiar status y colocar valores en 0
+        $MotivoBaja = $request->motivobaja.', '.Helpers::fecha_exacta_accion_datetimestring().', '.Auth::user()->user;
+        Prestamo_Herramienta::where('prestamo', $request->prestamodesactivar)
+                                ->update([
+                                    'motivo_baja' => $MotivoBaja,
+                                    'status' => 'BAJA',
+                                    'total' => '0.000000'
+                                ]);
         //cambiar status de los detalles
         $Prestamo_Herramienta_Detalle = Prestamo_Herramienta_Detalle::where('prestamo', $request->prestamodesactivar)->get();
         foreach($Prestamo_Herramienta_Detalle as $phd){
-            $Detalle_Prestamo = Prestamo_Herramienta_Detalle::where('id', $phd->id)->first();
-            $Detalle_Prestamo->status_prestamo = 'BAJA';
-            $Detalle_Prestamo->save();
+            //colocar en ceros cantidades detalles
+            Prestamo_Herramienta_Detalle::where('id', $phd->id)
+            ->update([
+                'cantidad' => '0.000000',
+                'total' => '0.000000',
+                'status_prestamo' => 'BAJA'
+            ]); 
         }
         return response()->json($Prestamo_Herramienta);
     }
@@ -266,14 +270,17 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
     public function prestamo_herramienta_terminar_prestamo(Request $request){
         //cambiar status del prestamo
         $Prestamo_Herramienta = Prestamo_Herramienta::where('prestamo', $request->prestamoterminarprestamo)->first();
-        $Prestamo_Herramienta->status = 'ENTREGADO';
-        $Prestamo_Herramienta->save();
+        Prestamo_Herramienta::where('prestamo', $request->prestamoterminarprestamo)
+        ->update([
+            'status' => 'ENTREGADO',
+        ]);
         //cambiar status de los detalles
         $Prestamo_Herramienta_Detalle = Prestamo_Herramienta_Detalle::where('prestamo', $request->prestamoterminarprestamo)->get();
         foreach($Prestamo_Herramienta_Detalle as $phd){
-            $Detalle_Prestamo = Prestamo_Herramienta_Detalle::where('id', $phd->id)->first();
-            $Detalle_Prestamo->status_prestamo = 'ENTREGADO';
-            $Detalle_Prestamo->save();
+            Prestamo_Herramienta_Detalle::where('id', $phd->id)
+            ->update([
+                'status_prestamo' => 'ENTREGADO'
+            ]); 
         }
         try {
             //enviar correo electrónico	
@@ -357,14 +364,34 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
             }else{
                 $selectpersonal = $selectpersonal.'<option value='.$p->id.'>'.$p->nombre.' - '.$p->tipo_personal.'</option>';
             }
-        }     
+        }    
+        //permitir o no modificar registro
+        if(Auth::user()->role_id == 1){
+            if($Prestamo_Herramienta->status == 'BAJA' || $Prestamo_Herramienta->status == 'ENTREGADO'){
+                $modificacionpermitida = 0;
+            }else{
+                $modificacionpermitida = 1;
+            }
+        }
+        if(Auth::user()->role_id != 1){
+            if($Prestamo_Herramienta->status == 'BAJA' || $Prestamo_Herramienta->status == 'ENTREGADO'){
+                $modificacionpermitida = 0;
+            }else{
+                $resultadofechas = Helpers::compararanoymesfechas($Prestamo_Herramienta->fecha);
+                if($resultadofechas != ''){
+                    $modificacionpermitida = 0;
+                }else{
+                    $modificacionpermitida = 1;
+                }
+            }
+        } 
         $data = array(
             "Prestamo_Herramienta" => $Prestamo_Herramienta,
             "filasdetallesprestamo" => $filasdetallesprestamo,
             "Numero_Prestamo_Herramienta_Detalle" => $Numero_Prestamo_Herramienta_Detalle,
             "contadorproductos" => $contadorproductos,
             "contadorfilas" => $contadorfilas,
-            "modificacionpermitida" => 1,
+            "modificacionpermitida" => $modificacionpermitida,
             "fecha" => Helpers::formatoinputdate($Prestamo_Herramienta->fecha),
             "total" => Helpers::convertirvalorcorrecto($Prestamo_Herramienta->total),
             "personalrecibe" => $personalrecibe,
@@ -375,6 +402,7 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
     }
     //guardar modificacion del prestamo
     public function prestamo_herramienta_guardar_modificacion(Request $request){
+        ini_set('max_input_vars','10000' );
         //Modificar prestamo
         $prestamo = $request->id.'-'.$request->serie;
         $Prestamo_Herramienta = Prestamo_Herramienta::where('id', $request->id)->first();
@@ -398,10 +426,11 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
     	return response()->json($Prestamo_Herramienta);
     }
     //exportar excel
-    public function prestamo_herramienta_exportar_excel(){
+    public function prestamo_herramienta_exportar_excel(Request $request){
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
-        return Excel::download(new PrestamoHerramientaExport($this->campos_consulta), "prestamosherramienta.xlsx"); 
+        return Excel::download(new PrestamoHerramientaExport($this->campos_consulta,$request->periodo), "prestamosherramienta-".$request->periodo.".xlsx");   
+
     }
     //guardar configuracion tabla
     public function prestamo_herramienta_guardar_configuracion_tabla(Request $request){

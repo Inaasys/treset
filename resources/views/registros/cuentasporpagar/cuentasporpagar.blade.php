@@ -33,15 +33,17 @@
                                                 </div>
                                             </td>
                                             <td >
-                                                <a class="btn bg-blue btn-xs waves-effect" href="{{route('cuentas_por_pagar_exportar_excel')}}" target="_blank">
+                                                <a class="btn bg-blue btn-xs waves-effect" id="btnGenerarFormatoExcel" href="{{route('cuentas_por_pagar_exportar_excel')}}" target="_blank">
                                                     Excel
                                                 </a>
                                             </td>
+                                            @if(Auth::user()->role_id == 1)
                                             <td>
                                                 <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
                                                     Configurar Tabla
                                                 </div>
                                             </td>
+                                            @endif
                         		        </tr>
                         	        </table>
                                 </div>
@@ -94,7 +96,7 @@
                             <div class="col-md-2">
                                 <label>Pago <b style="color:#F44336 !important;" id="serietexto"> Serie: {{$serieusuario}}</b></label>
                                 <input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">
-                                <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" required readonly>
+                                <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" required readonly data-parsley-length="[1, 10]">
                             </div>   
                             <div class="col-md-4">
                                 <label>Proveedor</label>
@@ -137,7 +139,7 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <label>Transferencia</label>
-                                <input type="text" class="form-control" name="transferencia" id="transferencia"  required onkeyup="tipoLetra(this);">
+                                <input type="text" class="form-control" name="transferencia" id="transferencia" value="0" required onkeyup="tipoLetra(this);">
                             </div>
                             <div class="col-md-4">
                                 <label>Cheque</label>
@@ -145,17 +147,17 @@
                             </div>
                             <div class="col-md-4">
                                 <label>Beneficiario</label>
-                                <input type="text" class="form-control" name="beneficiario" id="beneficiario"  required onkeyup="tipoLetra(this);">
+                                <input type="text" class="form-control" name="beneficiario" id="beneficiario"  required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <label>Cuenta a la que se Depositó</label>
-                                <input type="text" class="form-control" name="cuentadeposito" id="cuentadeposito" onkeyup="tipoLetra(this);">
+                                <input type="text" class="form-control" name="cuentadeposito" id="cuentadeposito" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">
                             </div>
                             <div class="col-md-6">
                                 <label>Anotación</label>
-                                <textarea class="form-control" name="anotacion" id="anotacion" rows="2" required onkeyup="tipoLetra(this);"></textarea>
+                                <textarea class="form-control" name="anotacion" id="anotacion" rows="2" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>
                             </div>
                         </div>
                         <div class="col-md-12" id="tabsform">
@@ -208,7 +210,7 @@
                     <input type="hidden" id="cxpdesactivar" name="cxpdesactivar">
                     <div id="divmotivobaja">
                         <label>Motivo Baja</label>
-                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required></textarea>
+                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></textarea>
                     </div>
 		        </form>	
       		</div>
@@ -233,17 +235,20 @@
         var numerodecimales = '{{$numerodecimales}}';
         var numerocerosconfigurados = '{{$numerocerosconfigurados}}';
         var numerocerosconfiguradosinputnumberstep = '{{$numerocerosconfiguradosinputnumberstep}}';
+        var serieusuario = '{{$serieusuario}}';
         var meshoy = '{{$meshoy}}';
         var periodohoy = '{{$periodohoy}}';
         var campos_activados = '{{$configuracion_tabla->campos_activados}}';
         var campos_desactivados = '{{$configuracion_tabla->campos_desactivados}}';
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
+        var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var cuentas_por_pagar_obtener = '{!!URL::to('cuentas_por_pagar_obtener')!!}';
         var cuentas_por_pagar_obtener_ultimo_folio = '{!!URL::to('cuentas_por_pagar_obtener_ultimo_folio')!!}';
         var cuentas_por_pagar_obtener_proveedores = '{!!URL::to('cuentas_por_pagar_obtener_proveedores')!!}';
         var cuentas_por_pagar_obtener_bancos = '{!!URL::to('cuentas_por_pagar_obtener_bancos')!!}';
         var cuentas_por_pagar_obtener_compras_proveedor = '{!!URL::to('cuentas_por_pagar_obtener_compras_proveedor')!!}';
         var cuentas_por_pagar_guardar = '{!!URL::to('cuentas_por_pagar_guardar')!!}';
+        var cuentas_por_pagar_comprobar_baja = '{!!URL::to('cuentas_por_pagar_comprobar_baja')!!}';
         var cuentas_por_pagar_baja  = '{!!URL::to('cuentas_por_pagar_baja')!!}';
         var cuentas_por_pagar_obtener_cuenta_por_pagar =  '{!!URL::to('cuentas_por_pagar_obtener_cuenta_por_pagar')!!}';
         var cuentas_por_pagar_buscar_folio_string_like =  '{!!URL::to('cuentas_por_pagar_buscar_folio_string_like')!!}';

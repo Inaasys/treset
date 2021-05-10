@@ -43,8 +43,8 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('ordenes_trabajo_guardar_configuracion_tabla');
         $rutacreardocumento = route('ordenes_trabajo_generar_pdfs');
-        return view('registros.ordenestrabajo.ordenestrabajo', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','rutacreardocumento'));
-
+        $urlgenerarformatoexcel = route('ordenes_trabajo_exportar_excel');
+        return view('registros.ordenestrabajo.ordenestrabajo', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','rutacreardocumento','urlgenerarformatoexcel'));
     }
     //obtener todos los registros del modulo
     public function ordenes_trabajo_obtener(Request $request){
@@ -54,11 +54,11 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             $data = VistaOrdenTrabajo::select($this->campos_consulta)->orderBy('Folio', 'DESC')->where('Periodo', $periodo)->get();
             return DataTables::of($data)
                 ->addColumn('operaciones', function($data){
-                    $boton =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Orden .'\')"><i class="material-icons">mode_edit</i></div> '. 
-                                '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Orden .'\')"><i class="material-icons">cancel</i></div>  '.
-                                '<div class="btn bg-green btn-xs waves-effect" data-toggle="tooltip" title="Terminar" onclick="terminar(\''.$data->Orden .'\')"><i class="material-icons">playlist_add_check</i></div> ';
-
-                    return $boton;
+                    $botoncambios   =   '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Orden .'\')"><i class="material-icons">mode_edit</i></div> '; 
+                    $botonbajas     =   '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Orden .'\')"><i class="material-icons">cancel</i></div>  ';
+                    $botonterminar  =   '<div class="btn bg-green btn-xs waves-effect" data-toggle="tooltip" title="Terminar" onclick="terminar(\''.$data->Orden .'\')"><i class="material-icons">playlist_add_check</i></div> ';
+                    $operaciones = $botoncambios.$botonbajas.$botonterminar;
+                    return $operaciones;
                 })
                 ->addColumn('Total', function($data){ return $data->Total; })
                 ->addColumn('Kilometros', function($data){ return $data->Kilometros; })
@@ -79,7 +79,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
     }
     //obtener ultimo folio de la orden de trabajo
     public function ordenes_trabajo_obtener_ultimo_folio(Request $request){
-        $folio = Helpers::ultimofoliotablamodulos('App\OrdenTrabajo');
+        $folio = Helpers::ultimofolioserietablamodulos('App\OrdenTrabajo', $request->serie);
         return response()->json($folio);
     }
     //obtener tipos de ordenes de trbaajo
@@ -111,7 +111,15 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             $data = Cliente::where('Status', 'ALTA')->orderBy("Numero", "DESC")->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarclientefacturaa('.$data->Numero.',\''.$data->Nombre .'\','.$data->Plazo.')">Seleccionar</div>';
+                        $contaragente = Agente::where('Numero', $data->Agente)->count();
+                        $nombreagente = '';
+                        $numeroagente = '';
+                        if($contaragente > 0){
+                            $agente = Agente::where('Numero', $data->Agente)->first();
+                            $nombreagente = $agente->Nombre;
+                            $numeroagente = $agente->Numero;
+                        }
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarclientefacturaa('.$data->Numero.',\''.$data->Nombre .'\','.$data->Plazo.',\''.$numeroagente.'\',\''.$nombreagente.'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->rawColumns(['operaciones'])
@@ -161,10 +169,11 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
     public function ordenes_trabajo_obtener_servicios(Request $request){
         if($request->ajax()){
             $codigoabuscar = $request->codigoabuscar;
+            $tipooperacion = $request->tipooperacion;
             $data = Servicio::where('Codigo', 'like', '%'.$codigoabuscar.'%')->where('Status', 'ALTA')->get();
             return DataTables::of($data)
-                    ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaservicio(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Servicio, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Venta).'\',\''.Helpers::convertirvalorcorrecto($data->Cantidad).'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\')">Seleccionar</div>';
+                    ->addColumn('operaciones', function($data) use ($tipooperacion){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaservicio(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Servicio, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Venta).'\',\''.Helpers::convertirvalorcorrecto($data->Cantidad).'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$tipooperacion.'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->addColumn('Venta', function($data){ 
@@ -193,7 +202,9 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
 
     //alta/guardar
     public function ordenes_trabajo_guardar(Request $request){
-        $orden = $request->folio.'-'.$request->serie;
+        ini_set('max_input_vars','10000' );
+        $folio = Helpers::ultimofolioserietablamodulos('App\OrdenTrabajo', $request->serie);
+        $orden = $folio.'-'.$request->serie;
         $ExisteOrden = OrdenTrabajo::where('Orden', $orden)->first();
 	    if($ExisteOrden == true){
 	        $OrdenTrabajo = 1;
@@ -334,11 +345,9 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         }
         //modificacion permitida
         if($ordentrabajo->Status == 'ABIERTA'){
-            $modificacionpermitida=1;
-            $readonly = ''; 
+            //$readonly = ''; 
         }else{
-            $modificacionpermitida=0;
-            $readonly = 'readonly="readonly"';
+            //$readonly = 'readonly="readonly"';
         }
         $filasdetallesordentrabajo = '';
         $contadorservicios = 0;
@@ -346,7 +355,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         $item = 1;
         $tipo = "modificacion";
         //detalles orden trabajo
-        $detallesordentrabajo = OrdenTrabajoDetalle::where('Orden', $request->ordenmodificar)->OrderBy('Item', 'ASC')->get();
+        $detallesordentrabajo = OrdenTrabajoDetalle::where('Orden', $request->ordenmodificar)->OrderBy('Partida', 'ASC')->get();
         $numerodetallesordentrabajo = OrdenTrabajoDetalle::where('Orden', $request->ordenmodificar)->count();
         if($numerodetallesordentrabajo > 0){
             foreach($detallesordentrabajo as $dot){
@@ -378,17 +387,38 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                 }else{
                     $tecnico4 = $dot->Tecnico4;
                 }
+                if($dot->Departamento == 'SERVICIO'){
+                    $botonasignartecnicos = '<div class="btn bg-blue btn-xs" data-toggle="tooltip" title="Asignar Técnicos" onclick="asignaciontecnicos('.$contadorservicios.')">Asignar técnicos</div>';
+                    $botoneliminarfila = '<div class="btn bg-red btn-xs" data-toggle="tooltip" title="Eliminar Fila" onclick="eliminarfila('.$contadorservicios.')">X</div> ';
+                    if($ordentrabajo->Status == 'ABIERTA'){
+                        $readonly = '';
+                        $readonlyprecio = '';
+                    }else{
+                        $readonly = 'readonly="readonly"';
+                        $readonlyprecio = 'readonly="readonly"';
+                    }
+                }else{
+                    $botonasignartecnicos = '';
+                    $botoneliminarfila = '';
+                    if($ordentrabajo->Status == 'ABIERTA'){
+                        $readonlyprecio = '';
+                    }else{
+                        $readonlyprecio = 'readonly="readonly"';
+                    }
+                    $readonly = 'readonly="readonly"';
+                }
                 $filasdetallesordentrabajo=$filasdetallesordentrabajo. 
                 '<tr class="filasservicios" id="filaservicio'.$contadorservicios.'">'.
                     '<td class="tdmod"><div class="divorinputmodmd">'.
-                    '<div class="btn bg-red btn-xs" data-toggle="tooltip" title="Eliminar Fila" onclick="eliminarfila('.$contadorservicios.')">X</div> '.
-                    '<div class="btn bg-blue btn-xs" data-toggle="tooltip" title="Asignar Técnicos" onclick="asignaciontecnicos('.$contadorservicios.')">Asignar técnicos</div>'.
+                    $botoneliminarfila.
+                    $botonasignartecnicos.
+                    '<input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dot->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly>'.
                     '</div></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control tipofila" name="tipofila[]" value="consultado" readonly><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dot->Codigo.'" readonly>'.$dot->Codigo.'</td>'.
-                    '<td class="tdmod"><div class="divorinputmodl"><input type="hidden" class="form-control descripcionpartida" name="descripcionpartida[]" value="'.$dot->Descripcion.'" readonly>'.$dot->Descripcion.'</div></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control unidadpartidad" name="unidadpartidad[]" value="'.$dot->Unidad.'" readonly>'.$dot->Unidad.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control tipofila" name="tipofila[]" value="consultado" readonly><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dot->Codigo.'" readonly data-parsley-length="[1, 20]">'.$dot->Codigo.'</td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.$dot->Descripcion.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control unidadpartidad" name="unidadpartidad[]" value="'.$dot->Unidad.'" readonly data-parsley-length="[1, 5]">'.$dot->Unidad.'</td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dot->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordentrabajo('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');" '.$readonly.'></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($dot->Precio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordentrabajo('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');" '.$readonly.'></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($dot->Precio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordentrabajo('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');" '.$readonlyprecio.'></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.Helpers::convertirvalorcorrecto($dot->Importe).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($dot->Dcto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('.$contadorfilas.');" '.$readonly.'></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($dot->Descuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentoporcentajepartida('.$contadorfilas.');" '.$readonly.'></td>'.
@@ -401,13 +431,13 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm comisionporcentajepartida" name="comisionporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($dot->Com).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this)" readonly></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm comisionpesospartida" name="comisionpesospartida[]" value="'.Helpers::convertirvalorcorrecto($dot->Comision).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this)" readonly></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dot->Utilidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this)" readonly></td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxs departamentopartida" name="departamentopartida[]" value="'.$dot->Departamento.'" readonly></td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxs cargopartida" name="cargopartida[]" value="'.$dot->Cargo.'" readonly></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxs departamentopartida" name="departamentopartida[]" value="'.$dot->Departamento.'" readonly data-parsley-length="[1, 20]"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxs cargopartida" name="cargopartida[]" value="'.$dot->Cargo.'" readonly data-parsley-length="[1, 20]"></td>'.
                     '<td class="tdmod"><input type="date" class="form-control divorinputmodmd fechapartida" name="fechapartida[]" value="'.Helpers::formatoinputdate($dot->Fecha).'" readonly></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxs traspasopartida" name="traspasopartida[]" value="'.$dot->Traspaso.'" readonly></td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxs comprapartida" name="comprapartida[]" value="'.$dot->Compra.'" readonly></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxs comprapartida" name="comprapartida[]" value="'.$dot->Compra.'" readonly data-parsley-length="[1, 20]"></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxs usuariopartida" name="usuariopartida[]" value="'.$dot->Usuario.'" readonly></td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl anotacionespartida" name="anotacionespartida[]" value="'.$dot->Anotaciones.'" '.$readonly.'></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl anotacionespartida" name="anotacionespartida[]" value="'.$dot->Anotaciones.'" '.$readonly.'  data-parsley-length="[1, 255]"></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxs statuspartida" name="statuspartida[]" value="'.$dot->Status.'" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodxs itempartidabd" name="itempartidabd[]" value="'.$dot->Item.'" readonly><input type="text" class="form-control divorinputmodxs itempartida" name="itempartida[]" value="'.$dot->Item.'" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida1" name="numerotecnicopartida1[]" value="'.$dot->Tecnico1.'" readonly><input type="text" class="form-control divorinputmodl tecnicopartida1" name="tecnicopartida1[]" value="'.$tecnico1.'" readonly></td>'.
@@ -421,7 +451,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxs promocionpartida" name="promocionpartida[]" value="'.$dot->Promocion.'" readonly></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxs partidapartida" name="partidapartida[]" value="'.$dot->Partida.'" readonly></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxs almacenpartida" name="almacenpartida[]" value="'.$dot->Almacen.'" readonly></td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxs cotizacionpartida" name="cotizacionpartida[]" value="'.$dot->Cotizacion.'" readonly></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxs cotizacionpartida" name="cotizacionpartida[]" value="'.$dot->Cotizacion.'" readonly data-parsley-length="[1, 20]"></td>'.
                 '</tr>';
                 $contadorservicios++;
                 $contadorfilas++;
@@ -429,7 +459,27 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             }
         }else{
             $filasdetallesordentrabajo = '';
-        }        
+        }  
+        //permitir o no modificar registro
+        if(Auth::user()->role_id == 1){
+            if($ordentrabajo->Status != 'ABIERTA'){
+                $modificacionpermitida = 0;
+            }else{
+                $modificacionpermitida = 1;
+            }
+        }
+        if(Auth::user()->role_id != 1){
+            if($ordentrabajo->Status != 'ABIERTA'){
+                $modificacionpermitida = 0;
+            }else{
+                $resultadofechas = Helpers::compararanoymesfechas($ordentrabajo->Fecha);
+                if($resultadofechas != ''){
+                    $modificacionpermitida = 0;
+                }else{
+                    $modificacionpermitida = 1;
+                }
+            }
+        } 
         $data = array(
             "ordentrabajo" => $ordentrabajo,
             "filasdetallesordentrabajo" => $filasdetallesordentrabajo,
@@ -458,47 +508,51 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
     }
     //modificacion
     public function ordenes_trabajo_guardar_modificacion(Request $request){
+        ini_set('max_input_vars','10000' );
         $orden = $request->folio.'-'.$request->serie;
         $OrdenTrabajo = OrdenTrabajo::where('Orden', $orden)->first();
-        $OrdenTrabajo->Tipo=$request->tipoorden;
-        $OrdenTrabajo->Unidad=$request->tipounidad;
-        $OrdenTrabajo->Fecha=Carbon::parse($request->fecha)->toDateTimeString();
-        $OrdenTrabajo->Entrega=Carbon::parse($request->fechaentregapromesa)->toDateTimeString();
-        $OrdenTrabajo->Cliente=$request->numeroclientefacturaa;
-        $OrdenTrabajo->DelCliente=$request->numeroclientedelcliente;
-        $OrdenTrabajo->Agente=$request->numeroagente;
-        $OrdenTrabajo->Caso=$request->caso;
-        $OrdenTrabajo->TipoServicio=$request->tiposervicio;
-        $OrdenTrabajo->Vin=$request->vin;
-        $OrdenTrabajo->Motor=$request->motor;
-        $OrdenTrabajo->Marca=$request->marca;
-        $OrdenTrabajo->Modelo=$request->modelo;
-        $OrdenTrabajo->Año=$request->ano;
-        $OrdenTrabajo->Kilometros=$request->kilometros;
-        $OrdenTrabajo->Placas=$request->placas;
-        $OrdenTrabajo->Economico=$request->economico;
-        $OrdenTrabajo->Color=$request->color;
-        $OrdenTrabajo->KmProximoServicio=$request->kmproxservicio;
-        $OrdenTrabajo->FechaRecordatorio=Carbon::parse($request->fecharecordatoriocliente)->toDateTimeString();
-        $OrdenTrabajo->Reclamo=$request->reclamo;
-        $OrdenTrabajo->Pedido=$request->ordencliente;
-        $OrdenTrabajo->Campaña=$request->campana;
-        $OrdenTrabajo->Promocion=$request->promocion;
-        $OrdenTrabajo->Bahia=$request->bahia;
-        $OrdenTrabajo->HorasReales=$request->horasreales;
-        $OrdenTrabajo->Rodar=$request->rodar;
-        $OrdenTrabajo->Plazo=$request->plazodias;
-        $OrdenTrabajo->Falla=$request->falla;
-        $OrdenTrabajo->ObsOrden=$request->observaciones;
-        $OrdenTrabajo->Causa=$request->causa;
-        $OrdenTrabajo->Correccion=$request->correccion;
-        $OrdenTrabajo->Importe=$request->importe;
-        $OrdenTrabajo->Descuento=$request->descuento;
-        $OrdenTrabajo->SubTotal=$request->subtotal;
-        $OrdenTrabajo->Iva=$request->iva;
-        $OrdenTrabajo->Total=$request->total;
-        $OrdenTrabajo->Utilidad=$request->subtotal;
-        $OrdenTrabajo->save();
+        //modificar orden
+        OrdenTrabajo::where('Orden', $orden)
+        ->update([
+            'Tipo'=>$request->tipoorden,
+            'Unidad'=>$request->tipounidad,
+            'Fecha'=>Carbon::parse($request->fecha)->toDateTimeString(),
+            'Entrega'=>Carbon::parse($request->fechaentregapromesa)->toDateTimeString(),
+            'Cliente'=>$request->numeroclientefacturaa,
+            'DelCliente'=>$request->numeroclientedelcliente,
+            'Agente'=>$request->numeroagente,
+            'Caso'=>$request->caso,
+            'TipoServicio'=>$request->tiposervicio,
+            'Vin'=>$request->vin,
+            'Motor'=>$request->motor,
+            'Marca'=>$request->marca,
+            'Modelo'=>$request->modelo,
+            'Año'=>$request->ano,
+            'Kilometros'=>$request->kilometros,
+            'Placas'=>$request->placas,
+            'Economico'=>$request->economico,
+            'Color'=>$request->color,
+            'KmProximoServicio'=>$request->kmproxservicio,
+            'FechaRecordatorio'=>Carbon::parse($request->fecharecordatoriocliente)->toDateTimeString(),
+            'Reclamo'=>$request->reclamo,
+            'Pedido'=>$request->ordencliente,
+            'Campaña'=>$request->campana,
+            'Promocion'=>$request->promocion,
+            'Bahia'=>$request->bahia,
+            'HorasReales'=>$request->horasreales,
+            'Rodar'=>$request->rodar,
+            'Plazo'=>$request->plazodias,
+            'Falla'=>$request->falla,
+            'ObsOrden'=>$request->observaciones,
+            'Causa'=>$request->causa,
+            'Correccion'=>$request->correccion,
+            'Importe'=>$request->importe,
+            'Descuento'=>$request->descuento,
+            'SubTotal'=>$request->subtotal,
+            'Iva'=>$request->iva,
+            'Total'=>$request->total,
+            'Utilidad'=>$request->subtotal
+        ]);
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
         $BitacoraDocumento->Documento = "ORDENES DE TRABAJO";
@@ -521,7 +575,6 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             foreach($DetallesOrdenTrabajoAntesDeModificacion as $dotadm){
                 array_push($array_detalles_antes_de_modificar, $dotadm->Orden.'#'.$dotadm->Codigo.'#'.$dotadm->Item);
             }
-    
             $array_detalles_despues_de_modificar = [];
             foreach ($request->codigopartida as $key => $codigopartida){   
                 if($request->tipofila [$key] == 'consultado'){
@@ -534,7 +587,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                 $diff = $explode_d[0];
                 $EliminaDetalle = OrdenTrabajoDetalle::where('Orden', $explode_d[0])->where('Codigo', $explode_d[1])->where('Item', $explode_d[2])->forceDelete();
             }
-            //agregar todos los detalles agregados en la modificación
+            //modificar partidas que no se eliminaron
             foreach ($request->codigopartida as $key => $codigopartida){   
                 if($request->tipofila [$key] == 'consultado'){
                     OrdenTrabajoDetalle::where('Orden', $orden)
@@ -583,6 +636,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                         'Partida' => $request->partidapartida [$key]
                     ]);
                 }elseif($request->tipofila [$key] == 'agregado'){
+                    //agregar todas las partidas agregadas en la modificación
                     $OrdenTrabajoDetalle=new OrdenTrabajoDetalle;
                     $OrdenTrabajoDetalle->Orden = $orden;
                     $OrdenTrabajoDetalle->Cliente = $request->numeroclientefacturaa;
@@ -634,13 +688,17 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
 
     //verificar el registro que se dara de baja
     public function ordenes_trabajo_verificar_uso_en_modulos(Request $request){
+        $OrdenTrabajo = OrdenTrabajo::where('Orden', $request->ordendesactivar)->first();
         $resultado = OrdenTrabajoDetalle::where('Orden', $request->ordendesactivar)->count();
         $condetalles = false;
         if($resultado > 0){
             $condetalles = true;
         }
-        $data = array (
-            'condetalles' => $condetalles
+        $resultadofechas = Helpers::compararanoymesfechas($OrdenTrabajo->Fecha);
+        $data = array(
+            'resultadofechas' => $resultadofechas,
+            'condetalles' => $condetalles,
+            'Status' => $OrdenTrabajo->Status
         );
         return response()->json($data);
     }
@@ -648,9 +706,25 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
     //dar de baja registro
     public function ordenes_trabajo_alta_o_baja(Request $request){
         $OrdenTrabajo = OrdenTrabajo::where('Orden', $request->ordendesactivar)->first();
-        $OrdenTrabajo->MotivoBaja = $request->motivobaja.', '.Helpers::fecha_exacta_accion_datetimestring().', '.Auth::user()->user;
-        $OrdenTrabajo->Status = 'BAJA';
-        $OrdenTrabajo->save();
+        //cambiar status y colocar valores en 0
+        $MotivoBaja = $request->motivobaja.', '.Helpers::fecha_exacta_accion_datetimestring().', '.Auth::user()->user;
+        OrdenTrabajo::where('Orden', $request->ordendesactivar)
+                ->update([
+                    'MotivoBaja' => $MotivoBaja,
+                    'Status' => 'BAJA',
+                    'Impuesto' => '0.000000',
+                    'Importe' => '0.000000',
+                    'Descuento' => '0.000000',
+                    'SubTotal' => '0.000000',
+                    'Iva' => '0.000000',
+                    'Total' => '0.000000',
+                    'Facturado' => '0.000000',
+                    'Costo' => '0.000000',
+                    'Comision' => '0.000000',
+                    'Utilidad' => '0.000000',
+                    'HorasReales' => '0.000000'
+                ]);
+        $detalles = OrdenTrabajoDetalle::where('Orden', $request->ordendesactivar)->get();
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
         $BitacoraDocumento->Documento = "ORDENES DE TRABAJO";
@@ -750,25 +824,28 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     "ivaordentrabajo"=>Helpers::convertirvalorcorrecto($ot->Iva),
                     "totalordentrabajo"=>Helpers::convertirvalorcorrecto($ot->Total),
                     "cliente" => $cliente,
-                    "datadetalle" => $datadetalle
+                    "datadetalle" => $datadetalle,
+                    "numerodecimalesdocumento"=> $request->numerodecimalesdocumento
             );
         }
-        //$footerHtml = view()->make('seccionespdf.footer', compact('fechaformato'))->render();
+        //dd($data);
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.ordenestrabajo.formato_pdf_ordenestrabajo', compact('data'))
-        //->setOption('footer-html', $footerHtml, 'Página [page]')
         ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
         ->setOption('footer-center', 'Página [page] de [toPage]')
         ->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 5)
+        ->setOption('margin-right', 5)
         ->setOption('margin-bottom', 10);
-        //return $pdf->download('contrarecibos.pdf');
         return $pdf->stream();
     }
     //funcion exportar excel
-    public function ordenes_trabajo_exportar_excel(){
+    public function ordenes_trabajo_exportar_excel(Request $request){
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
-        return Excel::download(new OrdenesDeTrabajoExport($this->campos_consulta), "ordenesdetrabajo.xlsx");    
+        return Excel::download(new OrdenesDeTrabajoExport($this->campos_consulta,$request->periodo), "ordenesdetrabajo-".$request->periodo.".xlsx");   
     }  
     //configuracion tabla  
     public function ordenes_trabajo_guardar_configuracion_tabla(Request $request){

@@ -46,6 +46,8 @@ function ocultarformulario(){
 //listar todos los registros de la tabla
 function listar(){
     tabla=$('#tbllistado').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "350px",
         "bScrollCollapse": true,  
@@ -179,41 +181,41 @@ function alta(){
                             '</div>'+
                             '<div class="col-md-6">'+
                                 '<label>Económico</label>'+
-                                '<input type="text" class="form-control" name="economico" id="economico" data-parsley-length="[0, 30]" required onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="economico" id="economico" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Vin</label>'+
-                                '<input type="text" class="form-control" name="vin" id="vin" data-parsley-length="[0, 30]" required onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="vin" id="vin" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Placas</label>'+
-                                '<input type="text" class="form-control" name="placas" id="placas" data-parsley-length="[0, 10]" required onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="placas" id="placas" required data-parsley-length="[1, 10]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Motor</label>'+
-                                '<input type="text" class="form-control" name="motor" id="motor" data-parsley-length="[0, 30]" required onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="motor" id="motor" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Marca</label>'+
-                                '<input type="text" class="form-control" name="marca" id="marca" data-parsley-length="[0, 30]" required onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="marca" id="marca" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Modelo</label>'+
-                                '<input type="text" class="form-control" name="modelo" id="modelo" data-parsley-length="[0, 30]" required onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="modelo" id="modelo" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Año</label>'+
-                                '<input type="text" class="form-control" name="ano" id="ano" data-parsley-type="integer" data-parsley-length="[0, 4]" required onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="ano" id="ano" data-parsley-type="integer" required data-parsley-length="[4, 4]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Color</label>'+
-                                '<input type="text" class="form-control" name="color" id="color" data-parsley-length="[0, 30]" required onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="color" id="color" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                         '</div>' 
                     '</div>'+
@@ -330,41 +332,41 @@ function obtenerdatos(numerovin){
                             '</div>'+
                             '<div class="col-md-6">'+
                                 '<label>Económico</label>'+
-                                '<input type="text" class="form-control" name="economico" id="economico" data-parsley-length="[0, 30]" required onkeyup="tipoLetra(this);" readonly>'+
+                                '<input type="text" class="form-control" name="economico" id="economico" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);" readonly>'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Vin</label>'+
-                                '<input type="text" class="form-control" name="vin" id="vin" data-parsley-length="[0, 30]" required onkeyup="tipoLetra(this);" readonly>'+
+                                '<input type="text" class="form-control" name="vin" id="vin" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);" readonly>'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Placas</label>'+
-                                '<input type="text" class="form-control" name="placas" id="placas" data-parsley-length="[0, 10]" required onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="placas" id="placas" required data-parsley-length="[1, 10]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Motor</label>'+
-                                '<input type="text" class="form-control" name="motor" id="motor" data-parsley-length="[0, 30]" required onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="motor" id="motor" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Marca</label>'+
-                                '<input type="text" class="form-control" name="marca" id="marca" data-parsley-length="[0, 30]" required onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="marca" id="marca" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Modelo</label>'+
-                                '<input type="text" class="form-control" name="modelo" id="modelo" data-parsley-length="[0, 30]" required onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="modelo" id="modelo" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Año</label>'+
-                                '<input type="text" class="form-control" name="ano" id="ano" data-parsley-type="integer" data-parsley-length="[0, 4]" required onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="ano" id="ano" data-parsley-type="integer"  data-parsley-length="[4, 4]" required onkeyup="tipoLetra(this);">'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Color</label>'+
-                                '<input type="text" class="form-control" name="color" id="color" data-parsley-length="[0, 30]" required onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="color" id="color" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                         '</div>' 
                     '</div>'+
@@ -383,6 +385,9 @@ function obtenerdatos(numerovin){
     $("#ano").val(data.vin.Año);
     $("#color").val(data.vin.Color);
     mostrarmodalformulario('MODIFICACION');
+    $('.page-loader-wrapper').css('display', 'none');
+  }).fail( function() {
+    msj_errorajax();
     $('.page-loader-wrapper').css('display', 'none');
   })
 }

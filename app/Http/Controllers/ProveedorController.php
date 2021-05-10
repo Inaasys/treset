@@ -44,7 +44,7 @@ class ProveedorController extends ConfiguracionSistemaController{
                                         '<div class="btn bg-red btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar('.$data->Numero.')"><i class="material-icons">cancel</i></div>';
                         }else{
                             $boton = '';
-                            $boton =    '<div class="btn bg-green btn-xs waves-effect" onclick="desactivar('.$data->Numero.')">Altas</div>';
+                            //$boton =    '<div class="btn bg-green btn-xs waves-effect" onclick="desactivar('.$data->Numero.')">Altas</div>';
                         } 
                         return $boton;
                     })
