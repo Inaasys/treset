@@ -1224,8 +1224,8 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
         ->setOption('footer-center', 'Página [page] de [toPage]')
         ->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
-        ->setOption('margin-left', 5)
-        ->setOption('margin-right', 5)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
         //return $pdf->download('contrarecibos.pdf');
         return $pdf->stream();

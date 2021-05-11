@@ -266,6 +266,7 @@
                         </table>
                     </div>
                 </div>
+                @if($d['pagare'] != "")
                 <div id ="contenedor" style="margin-top:10px;">
                     <div style="width:100%;">
                         <table style="width: 100%;max-width: 100%;border: 1px solid #ddd;">
@@ -278,6 +279,7 @@
                         </table>
                     </div>
                 </div>
+                @endif
             </section>
         </div>
     </body>

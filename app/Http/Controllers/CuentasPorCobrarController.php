@@ -590,8 +590,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $estadocliente = Estado::where('Clave', $cliente->Estado)->first();
             $formapago = FormaPago::where('Clave', $cxc->FormaPago)->first();
             $regimenfiscal = c_RegimenFiscal::where('Clave', $cxc->RegimenFiscal)->first();
-            $comprobantetimbrado = Comprobante::where('Folio', $cxc->Folio)->where('Serie', $cxc->Serie)->count();
-            $comprobante = Comprobante::where('Folio', $cxc->Folio)->where('Serie', $cxc->Serie)->first();
+            $comprobantetimbrado = Comprobante::where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->count();
+            $comprobante = Comprobante::where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->first();
             $formatter = new NumeroALetras;
             $totalletras = $formatter->toInvoice($cxc->Abono, 2, 'M.N.');
             $data[]=array(
@@ -620,8 +620,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         ->setOption('footer-center', 'Página [page] de [toPage]')
         ->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
-        ->setOption('margin-left', 5)
-        ->setOption('margin-right', 5)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
         return $pdf->stream();
     }

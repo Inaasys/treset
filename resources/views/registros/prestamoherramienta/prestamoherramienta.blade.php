@@ -15,12 +15,12 @@
                     <div class="card" id="listadoregistros">
                         <div class="header bg-red">
                             <div class="row clearfix">
-                                <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 table-responsive button-demo">
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                    <h5>&nbsp;&nbsp;&nbsp;PRESTAMO DE HERRAMIENTA&nbsp;&nbsp;&nbsp;</h5>
+                                </div>
+                                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 table-responsive button-demo">
                                     <table>
                                         <tr>
-                                            <td>
-                                                <h5>&nbsp;&nbsp;&nbsp;Prestamo de Herramienta&nbsp;&nbsp;&nbsp;</h5>
-                                            </td>
                                             <td >
                                                 <div class="btn bg-blue btn-xs waves-effect" onclick="alta()">
                                                     Altas

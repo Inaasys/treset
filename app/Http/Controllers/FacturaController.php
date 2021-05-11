@@ -1284,8 +1284,8 @@ class FacturaController extends ConfiguracionSistemaController{
             $formapago = FormaPago::where('Clave', $f->FormaPago)->first();
             $metodopago = MetodoPago::where('Clave', $f->MetodoPago)->first();
             $usocfdi = UsoCFDI::where('Clave', $f->UsoCfdi)->first();
-            $comprobantetimbrado = Comprobante::where('Folio', $f->Folio)->where('Serie', $f->Serie)->count();
-            $comprobante = Comprobante::where('Folio', $f->Folio)->where('Serie', $f->Serie)->first();
+            $comprobantetimbrado = Comprobante::where('Folio', '' . $f->Folio . '')->where('Serie', '' . $f->Serie . '')->count();
+            $comprobante = Comprobante::where('Folio', '' . $f->Folio . '')->where('Serie', '' . $f->Serie . '')->first();
             $regimenfiscal = c_RegimenFiscal::where('Clave', $f->RegimenFiscal)->first();
             $formatter = new NumeroALetras;
             $totalletras = $formatter->toInvoice($f->Total, 2, 'M.N.');
@@ -1332,8 +1332,8 @@ class FacturaController extends ConfiguracionSistemaController{
         ->setOption('footer-center', 'Página [page] de [toPage]')
         ->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
-        ->setOption('margin-left', 5)
-        ->setOption('margin-right', 5)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
         return $pdf->stream();
     }

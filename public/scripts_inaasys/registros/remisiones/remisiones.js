@@ -981,7 +981,9 @@ function alta(){
     //asignar el tipo de operacion que se realizara
     $("#tipooperacion").val("alta");
     //activar seelct2
-    $(".select2").select2();
+    //$(".select2").select2();
+    $("#tipo").select2();
+    $("#unidad").select2();
     //reiniciar los contadores
     contadorproductos=0;
     contadorfilas = 0;
@@ -1395,7 +1397,9 @@ function obtenerdatos(remisionmodificar){
     //mostrar el buscador de productos
     mostrarbuscadorcodigoproducto();
     //activar seelct2
-    $(".select2").select2();
+    //$(".select2").select2();
+    $("#tipo").select2();
+    $("#unidad").select2();
     //activar busqueda de codigos
     $("#codigoabuscar").keypress(function(e) {
         //recomentable para mayor compatibilidad entre navegadores.

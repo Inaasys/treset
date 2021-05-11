@@ -106,12 +106,12 @@
                             <tr>
                                 <td colspan="5" style="font-size:11px"></td>
                                 <td style="font-size:11px;text-align: right;">SubTotal $ : </td>
-                                <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"><b>{{ number_format($d['descuentocompra'], $d['numerodecimalesdocumento']) }}</b></td>
+                                <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"><b>{{ number_format($d['subtotalcompra'], $d['numerodecimalesdocumento']) }}</b></td>
                             </tr>
                             <tr>
                                 <td colspan="5" style="font-size:11px"></td>
                                 <td style="font-size:11px;text-align: right;">IVA $ : </td>
-                                <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"><b>{{ number_format($d['descuentocompra'], $d['numerodecimalesdocumento']) }}</b></td>
+                                <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"><b>{{ number_format($d['ivacompra'], $d['numerodecimalesdocumento']) }}</b></td>
                             </tr>
                             <tr>
                                 <td colspan="5" style="font-size:11px"></td>
@@ -121,7 +121,7 @@
                             <tr>
                                 <td colspan="5" style="font-size:11px"></td>
                                 <td style="font-size:11px;text-align: right;">Total $ : </td>
-                                <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"><b>{{ number_format($d['descuentocompra'], $d['numerodecimalesdocumento']) }}</b></td>
+                                <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"><b>{{ number_format($d['totalcompra'], $d['numerodecimalesdocumento']) }}</b></td>
                             </tr>
                         </tbody>
                     </table>

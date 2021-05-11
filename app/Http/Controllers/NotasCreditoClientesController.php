@@ -1269,8 +1269,8 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $formatter = new NumeroALetras;
             $totalletras = $formatter->toInvoice($ncc->Total, 2, 'M.N.');
             $notaclientedocumento = NotaClienteDocumento::where('Nota', $ncc->Nota)->first();
-            $comprobantetimbrado = Comprobante::where('Folio', $ncc->Folio)->where('Serie', $ncc->Serie)->count();
-            $comprobante = Comprobante::where('Folio', $ncc->Folio)->where('Serie', $ncc->Serie)->first();
+            $comprobantetimbrado = Comprobante::where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->count();
+            $comprobante = Comprobante::where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->first();
             $regimenfiscal = c_RegimenFiscal::where('Clave', $ncc->RegimenFiscal)->first();
             $data[]=array(
                 "notacreditocliente"=>$ncc,
@@ -1288,7 +1288,6 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                 "numerodecimalesdocumento"=> $request->numerodecimalesdocumento
             );
         }
-        //dd($data);
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.notascreditoclientes.formato_pdf_notascreditoclientes', compact('data'))
@@ -1296,8 +1295,8 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
         ->setOption('footer-center', 'Página [page] de [toPage]')
         ->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
-        ->setOption('margin-left', 5)
-        ->setOption('margin-right', 5)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
         return $pdf->stream();
     }

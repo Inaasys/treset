@@ -15,12 +15,12 @@
                     <div class="card" id="listadoregistros">
                         <div class="header bg-red">
                             <div class="row clearfix">
-                                <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 table-responsive button-demo">
+                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                    <h5>&nbsp;&nbsp;&nbsp;ORDENES DE TRABAJO&nbsp;&nbsp;&nbsp;</h5>
+                                </div>
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 table-responsive button-demo">
                                     <table>
                                         <tr>
-                                            <td>
-                                                <h5>Ordenes de Trabajo&nbsp;&nbsp;&nbsp;</h5>
-                                            </td>
                                             <td >
                                                 <div class="btn bg-blue btn-xs waves-effect" onclick="alta()">
                                                     Altas

@@ -30,7 +30,7 @@
     @foreach($data as $d)
     <body>
         <div class="saltopagina">
-            <section style="height:1150px">
+            <section style="height:1100px">
                 <div id ="contenedor">
                     <div style="float:left;width:20%;text-align: left;">
                     <img src="{!! public_path('logotipo_empresa/') !!}{{$empresa->Logo}}" width="125px" height="80px">
