@@ -18,28 +18,30 @@
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
                                     <h5>&nbsp;&nbsp;&nbsp;COTIZACIONES&nbsp;&nbsp;&nbsp;</h5>
                                 </div>
-                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 table-responsive button-demo">
-                                    <table>
-                                        <tr>
-                                            <td >
-                                                <div class="btn bg-blue btn-xs waves-effect" onclick="alta()">
-                                                    Altas
-                                                </div>
-                                            </td>
-                                            <td >
-                                                <a class="btn bg-blue btn-xs waves-effect" href="{{route('cotizaciones_exportar_excel')}}" target="_blank">
-                                                    Excel
-                                                </a>
-                                            </td>
-                                            @if(Auth::user()->role_id == 1)
-                                            <td>
-                                                <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
-                                                    Configurar Tabla
-                                                </div>
-                                            </td>
-                                            @endif
-                        		        </tr>
-                        	        </table>
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 button-demo">
+                                    <div class="table-responsive">
+                                        <table>
+                                            <tr>
+                                                <td >
+                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="alta()">
+                                                        Altas
+                                                    </div>
+                                                </td>
+                                                <td >
+                                                    <a class="btn bg-blue btn-xs waves-effect" href="{{route('cotizaciones_exportar_excel')}}" target="_blank">
+                                                        Excel
+                                                    </a>
+                                                </td>
+                                                @if(Auth::user()->role_id == 1)
+                                                <td>
+                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
+                                                        Configurar Tabla
+                                                    </div>
+                                                </td>
+                                                @endif
+                                            </tr>
+                                        </table>
+                                    </div>
                                 </div>
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
                                     <div class="row">

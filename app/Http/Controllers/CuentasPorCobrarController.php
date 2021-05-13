@@ -164,6 +164,63 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         }
     }
 
+
+    //obtener codifos postales
+    public function cuentas_por_cobrar_obtener_codigos_postales(Request $request){
+        if($request->ajax()){
+            $data = CodigoPostal::query();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarlugarexpedicion(\''.$data->Clave .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+
+    //obtener regimenes fiscales
+    public function cuentas_por_cobrar_obtener_regimenes_fiscales(Request $request){
+        if($request->ajax()){
+            $data = c_RegimenFiscal::query();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarregimenfiscal(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+
+    //obtener tipos relacion
+    public function cuentas_por_cobrar_obtener_tipos_relacion(Request $request){
+        if($request->ajax()){
+            $data = c_TipoRelacion::query();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionartiporelacion(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+
+    //obtener formas pago
+    public function cuentas_por_cobrar_obtener_formas_pago(Request $request){
+        if($request->ajax()){
+            $data = FormaPago::query();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarformapago(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+
     //obtener metodos pago
     public function cuentas_por_cobrar_obtener_metodos_pago(Request $request){
         if($request->ajax()){

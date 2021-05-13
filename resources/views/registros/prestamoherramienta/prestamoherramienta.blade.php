@@ -18,30 +18,32 @@
                                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                                     <h5>&nbsp;&nbsp;&nbsp;PRESTAMO DE HERRAMIENTA&nbsp;&nbsp;&nbsp;</h5>
                                 </div>
-                                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 table-responsive button-demo">
-                                    <table>
-                                        <tr>
-                                            <td >
-                                                <div class="btn bg-blue btn-xs waves-effect" onclick="alta()">
-                                                    Altas
-                                                </div>
-                                            </td>
-                                            <td >
-                                                <a class="btn bg-blue btn-xs waves-effect" id="btnGenerarFormatoExcel" href="{{route('prestamo_herramienta_exportar_excel')}}" target="_blank">
-                                                    Excel
-                                                </a>
-                                            </td>
-                                            @if(Auth::user()->role_id == 1)
-                                            <td>
-                                                <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
-                                                    Configurar Tabla
-                                                </div>
-                                            </td>
-                                            @endif
-                        		        </tr>
-                        	        </table>
+                                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 button-demo">
+                                    <div class="table-responsive">
+                                        <table>
+                                            <tr>
+                                                <td >
+                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="alta()">
+                                                        Altas
+                                                    </div>
+                                                </td>
+                                                <td >
+                                                    <a class="btn bg-blue btn-xs waves-effect" id="btnGenerarFormatoExcel" href="{{route('prestamo_herramienta_exportar_excel')}}" target="_blank">
+                                                        Excel
+                                                    </a>
+                                                </td>
+                                                @if(Auth::user()->role_id == 1)
+                                                <td>
+                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
+                                                        Configurar Tabla
+                                                    </div>
+                                                </td>
+                                                @endif
+                                            </tr>
+                                        </table>
+                                    </div>
                                 </div>
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
                                     <div class="row">
                                         <div class="col-md-7 col-md-offset-4">
                                             <select class="select2 form-control" name="periodo" id="periodo" onchange="relistar()" style="width75% !important;">

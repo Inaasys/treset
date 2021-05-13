@@ -311,6 +311,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/cuentas_por_cobrar_obtener_clientes', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_clientes')->name('cuentas_por_cobrar_obtener_clientes')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
     Route::get('/cuentas_por_cobrar_obtener_bancos', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_bancos')->name('cuentas_por_cobrar_obtener_bancos')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
     Route::get('/cuentas_por_cobrar_obtener_metodos_pago', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_metodos_pago')->name('cuentas_por_cobrar_obtener_metodos_pago')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+
+    Route::get('/cuentas_por_cobrar_obtener_codigos_postales', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_codigos_postales')->name('cuentas_por_cobrar_obtener_codigos_postales')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::get('/cuentas_por_cobrar_obtener_regimenes_fiscales', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_regimenes_fiscales')->name('cuentas_por_cobrar_obtener_regimenes_fiscales')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::get('/cuentas_por_cobrar_obtener_tipos_relacion', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_tipos_relacion')->name('cuentas_por_cobrar_obtener_tipos_relacion')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::get('/cuentas_por_cobrar_obtener_formas_pago', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_formas_pago')->name('cuentas_por_cobrar_obtener_formas_pago')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+
     Route::get('/cuentas_por_cobrar_obtener_facturas', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_facturas')->name('cuentas_por_cobrar_obtener_facturas')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
     Route::get('/cuentas_por_cobrar_obtener_factura', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_factura')->name('cuentas_por_cobrar_obtener_factura')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
     Route::get('/cuentas_por_cobrar_obtener_folios_fiscales', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_folios_fiscales')->name('cuentas_por_cobrar_obtener_folios_fiscales')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');

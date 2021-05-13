@@ -269,6 +269,282 @@ function seleccionarbanco(Numero, Nombre){
     $("#banco").val(Nombre);
     mostrarformulario();
 }
+
+
+
+
+//obtener lugares expedicion
+function obtenerlugaresexpedicion(){
+    ocultarformulario();
+    var tablacodigospostales =  '<div class="modal-header bg-red">'+
+                                  '<h4 class="modal-title">Códigos Postales</h4>'+
+                                '</div>'+
+                                '<div class="modal-body">'+
+                                  '<div class="row">'+
+                                      '<div class="col-md-12">'+
+                                          '<div class="table-responsive">'+
+                                              '<table id="tbllistadocodigopostal" class="tbllistadocodigopostal table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                                  '<thead class="customercolor">'+
+                                                      '<tr>'+
+                                                          '<th>Operaciones</th>'+
+                                                          '<th>Clave</th>'+
+                                                          '<th>Estado</th>'+
+                                                          '<th>Municipio</th>'+
+                                                      '</tr>'+
+                                                  '</thead>'+
+                                                  '<tbody></tbody>'+
+                                              '</table>'+
+                                          '</div>'+
+                                      '</div>'+   
+                                  '</div>'+
+                                '</div>'+
+                                '<div class="modal-footer">'+
+                                  '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                                '</div>';  
+    $("#contenidomodaltablas").html(tablacodigospostales);
+    $('#tbllistadocodigopostal').DataTable({
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,  
+        processing: true,
+        'language': {
+          'loadingRecords': '&nbsp;',
+          'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+          url: cuentas_por_cobrar_obtener_codigos_postales,
+          data: function (d) {
+              //d.numeroestado = $("#estado").val();
+          }
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Clave', name: 'Clave' },
+            { data: 'Estado', name: 'Estado', orderable: false, searchable: false},
+            { data: 'Municipio', name: 'Municipio', orderable: false, searchable: false}
+        ],
+        "initComplete": function() {
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistadocodigopostal').DataTable().search( this.value ).draw();
+              }
+          });
+        },
+        "iDisplayLength": 8,
+    });
+  } 
+  //seleccionar lugar expedicion
+  function seleccionarlugarexpedicion(Clave){
+  $("#lugarexpedicion").val(Clave);
+  mostrarformulario();
+  }
+  //obtener regimenes fiscales
+  function obtenerregimenesfiscales(){
+    ocultarformulario();
+    var tablaregimenesfiscales ='<div class="modal-header bg-red">'+
+                                  '<h4 class="modal-title">Regimenes Fiscales</h4>'+
+                                '</div>'+
+                                '<div class="modal-body">'+
+                                  '<div class="row">'+
+                                      '<div class="col-md-12">'+
+                                          '<div class="table-responsive">'+
+                                              '<table id="tbllistadoregimenfiscal" class="tbllistadoregimenfiscal table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                                  '<thead class="customercolor">'+
+                                                      '<tr>'+
+                                                          '<th>Operaciones</th>'+
+                                                          '<th>Clave</th>'+
+                                                          '<th>Nombre</th>'+
+                                                          '<th>Física</th>'+
+                                                          '<th>Moral</th>'+
+                                                      '</tr>'+
+                                                  '</thead>'+
+                                                  '<tbody></tbody>'+
+                                              '</table>'+
+                                          '</div>'+
+                                      '</div>'+   
+                                  '</div>'+
+                                '</div>'+
+                                '<div class="modal-footer">'+
+                                  '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                                '</div>';  
+    $("#contenidomodaltablas").html(tablaregimenesfiscales);
+    $('#tbllistadoregimenfiscal').DataTable({
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,  
+        processing: true,
+        'language': {
+          'loadingRecords': '&nbsp;',
+          'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+          url: cuentas_por_cobrar_obtener_regimenes_fiscales
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Clave', name: 'Clave' },
+            { data: 'Nombre', name: 'Nombre', orderable: false, searchable: false},
+            { data: 'Fisica', name: 'Fisica', orderable: false, searchable: false},
+            { data: 'Moral', name: 'Moral', orderable: false, searchable: false}
+        ],
+        "initComplete": function() {
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistadoregimenfiscal').DataTable().search( this.value ).draw();
+              }
+          });
+        },
+        "iDisplayLength": 8,
+    });
+  } 
+  //seleccionar lugar expedicion
+  function seleccionarregimenfiscal(Clave, Nombre){
+    $("#claveregimenfiscal").val(Clave);
+    $("#regimenfiscal").val(Nombre);
+    mostrarformulario();
+  }
+  //obtener tipos relacion
+  function obtenertiposrelaciones(){
+    ocultarformulario();
+    var tablatiposrelaciones ='<div class="modal-header bg-red">'+
+                                  '<h4 class="modal-title">Tipos Relación</h4>'+
+                                '</div>'+
+                                '<div class="modal-body">'+
+                                  '<div class="row">'+
+                                      '<div class="col-md-12">'+
+                                          '<div class="table-responsive">'+
+                                              '<table id="tbllistadotiporelacion" class="tbllistadotiporelacion table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                                  '<thead class="customercolor">'+
+                                                      '<tr>'+
+                                                          '<th>Operaciones</th>'+
+                                                          '<th>Clave</th>'+
+                                                          '<th>Nombre</th>'+
+                                                      '</tr>'+
+                                                  '</thead>'+
+                                                  '<tbody></tbody>'+
+                                              '</table>'+
+                                          '</div>'+
+                                      '</div>'+   
+                                  '</div>'+
+                                '</div>'+
+                                '<div class="modal-footer">'+
+                                  '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                                '</div>';  
+    $("#contenidomodaltablas").html(tablatiposrelaciones);
+    $('#tbllistadotiporelacion').DataTable({
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,  
+        processing: true,
+        'language': {
+          'loadingRecords': '&nbsp;',
+          'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+          url: cuentas_por_cobrar_obtener_tipos_relacion
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Clave', name: 'Clave' },
+            { data: 'Nombre', name: 'Nombre', orderable: false, searchable: false}
+        ],
+        "initComplete": function() {
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistadotiporelacion').DataTable().search( this.value ).draw();
+              }
+          });
+        },
+        "iDisplayLength": 8,
+    });
+  } 
+  //seleccionar lugar expedicion
+  function seleccionartiporelacion(Clave, Nombre){
+    $("#clavetiporelacion").val(Clave);
+    $("#tiporelacion").val(Nombre);
+    mostrarformulario();
+  }
+  //obtener formas de pago
+  function obtenerformaspago(){
+    ocultarformulario();
+    var tablaformaspago ='<div class="modal-header bg-red">'+
+                                  '<h4 class="modal-title">Formas Pago</h4>'+
+                                '</div>'+
+                                '<div class="modal-body">'+
+                                  '<div class="row">'+
+                                      '<div class="col-md-12">'+
+                                          '<div class="table-responsive">'+
+                                              '<table id="tbllistadoformapago" class="tbllistadoformapago table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                                  '<thead class="customercolor">'+
+                                                      '<tr>'+
+                                                          '<th>Operaciones</th>'+
+                                                          '<th>Clave</th>'+
+                                                          '<th>Nombre</th>'+
+                                                          '<th>Descripción</th>'+
+                                                      '</tr>'+
+                                                  '</thead>'+
+                                                  '<tbody></tbody>'+
+                                              '</table>'+
+                                          '</div>'+
+                                      '</div>'+   
+                                  '</div>'+
+                                '</div>'+
+                                '<div class="modal-footer">'+
+                                  '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                                '</div>';  
+    $("#contenidomodaltablas").html(tablaformaspago);
+    $('#tbllistadoformapago').DataTable({
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,  
+        processing: true,
+        'language': {
+          'loadingRecords': '&nbsp;',
+          'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+          url: cuentas_por_cobrar_obtener_formas_pago
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Clave', name: 'Clave' },
+            { data: 'Nombre', name: 'Nombre', orderable: false, searchable: false},
+            { data: 'Descripcion', name: 'Descripcion', orderable: false, searchable: false}
+        ],
+        "initComplete": function() {
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistadoformapago').DataTable().search( this.value ).draw();
+              }
+          });
+        },
+        "iDisplayLength": 8,
+    });
+  } 
+  //seleccionar forma pago
+  function seleccionarformapago(Clave, Nombre){
+    $("#claveformapago").val(Clave);
+    $("#formapago").val(Nombre);
+    mostrarformulario();
+  }
+
+
+
+
+
+
 //listar metodos pago
 function listarmetodospago(fila){
     ocultarformulario();

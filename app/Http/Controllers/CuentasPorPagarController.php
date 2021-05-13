@@ -139,6 +139,8 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                     '</tr>';
                     $contadorfilas++;
             }
+        }else{
+            $numerocontrarecibos = 0;
         }       
         $data = array(
             "filascompras" => $filascompras,
