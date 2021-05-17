@@ -67,7 +67,7 @@
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover" style="width:100% !important;"> 
                                     <thead class="customercolor">
                                         <tr>
-                                            <th><div style="width:80px !important;">Operaciones</div></th>
+                                            <th><div style="width:150px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
                                             <th>{{$co}}</th>
                                             @endforeach
@@ -170,6 +170,9 @@
 <!-- modal para crear documento en PDF-->
 @include('secciones.modalcreardocumento')
 <!-- fin modal para crear documento en PDF-->
+<!-- modal para enviar por email documento en PDF-->
+@include('secciones.modalenviardocumentoemail')
+<!-- fin modal para enviar por email documento en PDF-->
 <!-- modal para configuraciones de tablas-->
 @include('secciones.modalconfiguraciontablas')
 <!-- fin modal para configuraciones de tablas-->
@@ -196,6 +199,8 @@
         var contrarecibos_verificar_si_continua_baja = '{!!URL::to('contrarecibos_verificar_si_continua_baja')!!}';
         var contrarecibos_baja  = '{!!URL::to('contrarecibos_baja')!!}';
         var contrarecibos_obtener_contrarecibo =  '{!!URL::to('contrarecibos_obtener_contrarecibo')!!}';
+        var contrarecibos_obtener_datos_envio_email = '{!!URL::to('contrarecibos_obtener_datos_envio_email')!!}';
+        var contrarecibos_enviar_pdfs_email = '{!!URL::to('contrarecibos_enviar_pdfs_email')!!}';
         var contrarecibos_buscar_folio_string_like = '{!!URL::to('contrarecibos_buscar_folio_string_like')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')

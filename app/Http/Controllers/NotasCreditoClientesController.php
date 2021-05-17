@@ -37,8 +37,11 @@ use App\ClaveProdServ;
 use App\ClaveUnidad;
 use App\Configuracion_Tabla;
 use App\VistaNotaCreditoCliente;
+use App\VistaObtenerExistenciaProducto;
 use App\FolioComprobanteNota;
 use App\Comprobante;
+use Config;
+use Mail;
 
 class NotasCreditoClientesController extends ConfiguracionSistemaController{
 
@@ -68,16 +71,15 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
         $rutaconfiguraciontabla = route('notas_credito_clientes_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('notas_credito_clientes_exportar_excel');
         $rutacreardocumento = route('notas_credito_clientes_generar_pdfs');
-        $tiporelacion = c_TipoRelacion::where('Numero', 1)->first();
-        $contarregimenfiscal = c_RegimenFiscal::where('Clave', $this->empresa->RegimenFiscal)->count();
+        $lugarexpedicion = $this->lugarexpedicion;
         $claveregimenfiscal = '';
         $regimenfiscal = '';
-        if($contarregimenfiscal > 0){
-            $c_RegimenFiscal = c_RegimenFiscal::where('Clave', $this->empresa->RegimenFiscal)->first();
-            $claveregimenfiscal = $regimenfiscal->Clave;
-            $regimenfiscal = $regimenfiscal->Nombre;            
+        if($this->regimenfiscal != ''){
+            $c_RegimenFiscal = c_RegimenFiscal::where('Clave', $this->regimenfiscal)->first();
+            $claveregimenfiscal = $c_RegimenFiscal->Clave;
+            $regimenfiscal = $c_RegimenFiscal->Nombre;            
         }
-        return view('registros.notascreditoclientes.notascreditoclientes', compact('serieusuario','esquema','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','rutacreardocumento','tiporelacion','claveregimenfiscal','regimenfiscal'));
+        return view('registros.notascreditoclientes.notascreditoclientes', compact('serieusuario','esquema','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','rutacreardocumento','lugarexpedicion','claveregimenfiscal','regimenfiscal'));
     }
 
     public function notas_credito_clientes_obtener(Request $request){
@@ -90,7 +92,9 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                     ->addColumn('operaciones', function($data){
                         $botoncambios  =   '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Nota .'\')"><i class="material-icons">mode_edit</i></div> '; 
                         $botonbajas     =   '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Nota .'\')"><i class="material-icons">cancel</i></div>  ';
-                        $operaciones =      $botoncambios.$botonbajas;
+                        $botondocumentopdf = '<a href="'.route('notas_credito_clientes_generar_pdfs_indiv',$data->Nota).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
+                        $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Nota .'\')"><i class="material-icons">email</i></div> ';
+                        $operaciones =      $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
                         return $operaciones;
                     })
                     ->addColumn('SubTotal', function($data){ return $data->SubTotal; })
@@ -119,38 +123,19 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
     //obtener clientes
     public function notas_credito_clientes_obtener_clientes(Request $request){
         if($request->ajax()){
-            $data = Cliente::where('Status', 'ALTA')->orderBy("Numero", "DESC")->get();
+            //$data = Cliente::where('Status', 'ALTA')->orderBy("Numero", "DESC")->get();
+            $data = DB::table('Clientes as c')
+            ->leftJoin('c_FormaPago as fp', 'fp.Clave', '=', 'c.FormaPago')
+            ->leftJoin('c_MetodoPago as mp', 'mp.Clave', '=', 'c.MetodoPago')
+            ->leftJoin('c_UsoCFDI as uc', 'uc.Clave', '=', 'c.UsoCfdi')
+            ->leftJoin('c_Pais as p', 'p.Clave', '=', 'c.Pais')
+            ->select('c.Numero', 'c.Nombre', 'c.Plazo', 'c.Rfc', 'c.Agente', 'c.Credito', 'c.Saldo', 'c.Status', 'c.Municipio', 'c.Tipo', 'fp.Clave AS ClaveFormaPago', 'fp.Nombre AS NombreFormaPago', 'mp.Clave AS ClaveMetodoPago', 'mp.Nombre AS NombreMetodoPago', 'uc.Clave AS ClaveUsoCfdi', 'uc.Nombre AS NombreUsoCfdi', 'p.Clave AS ClavePais', 'p.Nombre AS NombrePais')
+            ->where('c.Status', 'ALTA')
+            ->orderBy("Numero", "DESC")
+            ->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        $claveformapago = '';
-                        $formapago = '';
-                        $clavemetodopago = '';
-                        $metodopago = '';
-                        $claveusocfdi = '';
-                        $usocfdi = '';
-                        $claveresidenciafiscal = '';
-                        $residenciafiscal = '';
-                        if($data->FormaPago != ''){
-                            $FormaPago = FormaPago::where('Clave', $data->FormaPago)->first();
-                            $claveformapago = $FormaPago->Clave;
-                            $formapago = $FormaPago->Nombre;
-                        }
-                        if($data->MetodoPago != ''){
-                            $MetodoPago = MetodoPago::where('Clave', $data->MetodoPago)->first();
-                            $clavemetodopago = $MetodoPago->Clave;
-                            $metodopago = $MetodoPago->Nombre;
-                        }
-                        if($data->UsoCfdi != ''){
-                            $UsoCFDI = UsoCFDI::where('Clave', $data->UsoCfdi)->first();
-                            $claveusocfdi = $UsoCFDI->Clave;
-                            $usocfdi = $UsoCFDI->Nombre;
-                        }
-                        if($data->Pais != ''){
-                            $Pais = Pais::where('Clave', $data->Pais)->first();
-                            $claveresidenciafiscal = $Pais->Clave;
-                            $residenciafiscal = $Pais->Nombre;
-                        }
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarcliente('.$data->Numero.',\''.$data->Nombre .'\','.$data->Plazo.',\''.$data->Rfc.'\',\''.$claveformapago.'\',\''.$formapago.'\',\''.$clavemetodopago.'\',\''.$metodopago.'\',\''.$claveusocfdi.'\',\''.$usocfdi.'\',\''.$claveresidenciafiscal.'\',\''.$residenciafiscal.'\')">Seleccionar</div>';
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarcliente('.$data->Numero.',\''.$data->Nombre .'\','.$data->Plazo.',\''.$data->Rfc.'\',\''.$data->ClaveFormaPago.'\',\''.$data->NombreFormaPago.'\',\''.$data->ClaveMetodoPago.'\',\''.$data->NombreMetodoPago.'\',\''.$data->ClaveUsoCfdi.'\',\''.$data->NombreUsoCfdi.'\',\''.$data->ClavePais.'\',\''.$data->NombrePais.'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->rawColumns(['operaciones'])
@@ -362,31 +347,14 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                     array_push($arrayproductosseleccionables, $detalle->Codigo);
                 }
             }
-            $data = DB::table('Productos as t')
-            ->leftJoin('Marcas as m', 'm.Numero', '=', 't.Marca')
-            ->leftJoin(DB::raw("(select codigo, sum(existencias) as existencias from Existencias group by codigo) as e"),
-                function($join){
-                    $join->on("e.codigo","=","t.codigo");
-                })
-            ->select('t.Codigo as Codigo', 't.Producto as Producto', 't.Ubicacion as Ubicacion', 'e.Existencias as Existencias', 't.Costo as Costo', 't.SubTotal as SubTotal', 't.Marca as Marca', 't.Status as Status', 't.Unidad AS Unidad', 't.Impuesto AS Impuesto', 't.Insumo AS Insumo', 't.ClaveProducto AS ClaveProducto', 't.ClaveUnidad AS ClaveUnidad', 't.CostoDeLista AS CostoDeLista')
-            ->whereIn('t.Codigo', $arrayproductosseleccionables)
-            ->where('t.Codigo', 'like', '%' . $codigoabuscar . '%')
-            ->get();
+            $data = VistaObtenerExistenciaProducto::whereIn('Codigo', $arrayproductosseleccionables)->where('Codigo', 'like', '%' . $codigoabuscar . '%')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($numeroalmacen, $tipooperacion, $stringfacturasseleccionadas){
-                        //claveproducto
-                        $claveproducto = ClaveProdServ::where('Clave', $data->ClaveProducto)->first();
-                        //claveunidad
-                        $claveunidad = ClaveUnidad::where('Clave', $data->ClaveUnidad)->first();
-                        //obtener existencias del codigo en el almacen seleccionado
-                        $ContarExistencia = Existencia::where('Codigo', $data->Codigo)->where('Almacen', $numeroalmacen)->count();
-                        if($ContarExistencia > 0){
-                            $Existencia = Existencia::where('Codigo', $data->Codigo)->where('Almacen', $numeroalmacen)->first();
-                            $Existencias = Helpers::convertirvalorcorrecto($Existencia->Existencias);
+                        if($data->Almacen == $numeroalmacen){
+                            $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$tipooperacion.'\',\''.$data->Insumo.'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$data->NombreClaveProducto.'\',\''.$data->NombreClaveUnidad.'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\')">Seleccionar</div>';
                         }else{
-                            $Existencias = 0;
+                            $boton = '';
                         }
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($Existencias).'\',\''.$tipooperacion.'\',\''.$data->Insumo.'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$claveproducto->Nombre.'\',\''.$claveunidad->Nombre.'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->addColumn('Existencias', function($data){ 
@@ -398,7 +366,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                     ->addColumn('SubTotal', function($data){ 
                         return Helpers::convertirvalorcorrecto($data->SubTotal);
                     })
-                    ->rawColumns(['operaciones','Costo','Existencias','SubTotal'])
+                    ->rawColumns(['operaciones'])
                     ->make(true);
         } 
     }
@@ -1300,6 +1268,168 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
         ->setOption('margin-bottom', 10);
         return $pdf->stream();
     }
+
+    //generacion de formato en PDF
+    public function notas_credito_clientes_generar_pdfs_indiv($documento){
+        $notascreditocliente = NotaCliente::where('Nota', $documento)->get(); 
+        $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $data=array();
+        foreach ($notascreditocliente as $ncc){
+            $notascreditoclientedetalle = NotaClienteDetalle::where('Nota', $ncc->Nota)->get();
+            $datadetalle=array();
+            foreach($notascreditoclientedetalle as $nccd){
+                $claveproducto = ClaveProdServ::where('Clave', $nccd->ClaveProducto)->first();
+                $claveunidad = ClaveUnidad::where('Clave', $nccd->ClaveUnidad)->first();
+                $datadetalle[]=array(
+                    "cantidaddetalle"=> Helpers::convertirvalorcorrecto($nccd->Cantidad),
+                    "codigodetalle"=>$nccd->Codigo,
+                    "descripciondetalle"=>$nccd->Descripcion,
+                    "preciodetalle" => Helpers::convertirvalorcorrecto($nccd->Precio),
+                    "porcentajedescuentodetalle" => Helpers::convertirvalorcorrecto($nccd->Dcto),
+                    "pesosdescuentodetalle" => Helpers::convertirvalorcorrecto($nccd->Descuento),
+                    "subtotaldetalle" => Helpers::convertirvalorcorrecto($nccd->SubTotal),
+                    "impuestodetalle" => Helpers::convertirvalorcorrecto($nccd->Impuesto),
+                    "ivadetalle" => Helpers::convertirvalorcorrecto($nccd->Iva),
+                    "claveproducto" => $claveproducto,
+                    "claveunidad" => $claveunidad
+                );
+            } 
+            $cliente = Cliente::where('Numero', $ncc->Cliente)->first();
+            $formatter = new NumeroALetras;
+            $totalletras = $formatter->toInvoice($ncc->Total, 2, 'M.N.');
+            $notaclientedocumento = NotaClienteDocumento::where('Nota', $ncc->Nota)->first();
+            $comprobantetimbrado = Comprobante::where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->count();
+            $comprobante = Comprobante::where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->first();
+            $regimenfiscal = c_RegimenFiscal::where('Clave', $ncc->RegimenFiscal)->first();
+            $data[]=array(
+                "notacreditocliente"=>$ncc,
+                "notaclientedocumento"=>$notaclientedocumento,
+                "comprobante" => $comprobante,
+                "comprobantetimbrado" => $comprobantetimbrado,
+                "regimenfiscal"=> $regimenfiscal,
+                "subtotalnotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->SubTotal),
+                "ivanotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->Iva),
+                "totalnotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->Total),
+                "cliente" => $cliente,
+                "datadetalle" => $datadetalle,
+                "tipocambiofactura"=>Helpers::convertirvalorcorrecto($ncc->TipoCambio),
+                "totalletras"=>$totalletras,
+                "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
+            );
+        }
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('registros.notascreditoclientes.formato_pdf_notascreditoclientes', compact('data'))
+        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-right', ''.$fechaformato.'')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        return $pdf->stream();
+    }
+
+    //obtener datos para enviar email
+    public function notas_credito_clientes_obtener_datos_envio_email(Request $request){
+        $notacliente = NotaCliente::where('Nota', $request->documento)->first();
+        $cliente = Cliente::where('Numero',$notacliente->Cliente)->first();
+        $data = array(
+            'notacliente' => $notacliente,
+            'cliente' => $cliente,
+            'emailde' => Config::get('mail.from.address'),
+            'emailpara' => $cliente->Email1
+        );
+        return response()->json($data);
+    }
+
+    //enviar pdf por emial
+    public function notas_credito_clientes_enviar_pdfs_email(Request $request){
+        $notascreditocliente = NotaCliente::where('Nota', $request->emaildocumento)->get(); 
+        $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $data=array();
+        foreach ($notascreditocliente as $ncc){
+            $notascreditoclientedetalle = NotaClienteDetalle::where('Nota', $ncc->Nota)->get();
+            $datadetalle=array();
+            foreach($notascreditoclientedetalle as $nccd){
+                $claveproducto = ClaveProdServ::where('Clave', $nccd->ClaveProducto)->first();
+                $claveunidad = ClaveUnidad::where('Clave', $nccd->ClaveUnidad)->first();
+                $datadetalle[]=array(
+                    "cantidaddetalle"=> Helpers::convertirvalorcorrecto($nccd->Cantidad),
+                    "codigodetalle"=>$nccd->Codigo,
+                    "descripciondetalle"=>$nccd->Descripcion,
+                    "preciodetalle" => Helpers::convertirvalorcorrecto($nccd->Precio),
+                    "porcentajedescuentodetalle" => Helpers::convertirvalorcorrecto($nccd->Dcto),
+                    "pesosdescuentodetalle" => Helpers::convertirvalorcorrecto($nccd->Descuento),
+                    "subtotaldetalle" => Helpers::convertirvalorcorrecto($nccd->SubTotal),
+                    "impuestodetalle" => Helpers::convertirvalorcorrecto($nccd->Impuesto),
+                    "ivadetalle" => Helpers::convertirvalorcorrecto($nccd->Iva),
+                    "claveproducto" => $claveproducto,
+                    "claveunidad" => $claveunidad
+                );
+            } 
+            $cliente = Cliente::where('Numero', $ncc->Cliente)->first();
+            $formatter = new NumeroALetras;
+            $totalletras = $formatter->toInvoice($ncc->Total, 2, 'M.N.');
+            $notaclientedocumento = NotaClienteDocumento::where('Nota', $ncc->Nota)->first();
+            $comprobantetimbrado = Comprobante::where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->count();
+            $comprobante = Comprobante::where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->first();
+            $regimenfiscal = c_RegimenFiscal::where('Clave', $ncc->RegimenFiscal)->first();
+            $data[]=array(
+                "notacreditocliente"=>$ncc,
+                "notaclientedocumento"=>$notaclientedocumento,
+                "comprobante" => $comprobante,
+                "comprobantetimbrado" => $comprobantetimbrado,
+                "regimenfiscal"=> $regimenfiscal,
+                "subtotalnotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->SubTotal),
+                "ivanotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->Iva),
+                "totalnotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->Total),
+                "cliente" => $cliente,
+                "datadetalle" => $datadetalle,
+                "tipocambiofactura"=>Helpers::convertirvalorcorrecto($ncc->TipoCambio),
+                "totalletras"=>$totalletras,
+                "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
+            );
+        }
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('registros.notascreditoclientes.formato_pdf_notascreditoclientes', compact('data'))
+        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-right', ''.$fechaformato.'')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        try{
+            //enviar correo electrónico	
+            $nombre = 'Receptor envio de correos';
+            $receptor = $request->emailpara;
+            $correos = [$request->emailpara];
+            $asunto = $request->emailasunto;
+            $emaildocumento = $request->emaildocumento;
+            $name = "Receptor envio de correos";
+            $body = $request->emailasunto;
+            $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
+            $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
+            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
+                $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                        ->cc($correos)
+                        ->subject($asunto)
+                        ->attachData($pdf->output(), "NotaCreditoClienteNo".$emaildocumento.".pdf");
+            });
+        } catch(\Exception $e) {
+            $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
+            $correos = ['osbaldo.anzaldo@utpcamiones.com.mx'];
+            $msj = 'Error al enviar correo';
+            Mail::send('correos.errorenvio.error', compact('e','msj'), function($message) use ($receptor, $correos) {
+                $message->to($receptor)
+                        ->cc($correos)
+                        ->subject('Error al enviar correo nuevo usuario');
+            });
+        }
+    }
+
     //exportar a excel
     public function notas_credito_clientes_exportar_excel(Request $request){
         ini_set('max_execution_time', 300); // 5 minutos

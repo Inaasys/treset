@@ -35,6 +35,8 @@ use App\c_RegimenFiscal;
 use App\c_TipoRelacion;
 use App\FolioComprobantePago;
 use App\Comprobante;
+use Config;
+use Mail;
 
 class CuentasPorCobrarController extends ConfiguracionSistemaController{
 
@@ -64,16 +66,15 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         $rutaconfiguraciontabla = route('cuentas_por_cobrar_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('cuentas_por_cobrar_exportar_excel');
         $rutacreardocumento = route('cuentas_por_cobrar_generar_pdfs');
-        $tiporelacion = c_TipoRelacion::where('Numero', 1)->first();
-        $contarregimenfiscal = c_RegimenFiscal::where('Clave', $this->empresa->RegimenFiscal)->count();
+        $lugarexpedicion = $this->lugarexpedicion;
         $claveregimenfiscal = '';
         $regimenfiscal = '';
-        if($contarregimenfiscal > 0){
-            $c_RegimenFiscal = c_RegimenFiscal::where('Clave', $this->empresa->RegimenFiscal)->first();
-            $claveregimenfiscal = $regimenfiscal->Clave;
-            $regimenfiscal = $regimenfiscal->Nombre;            
+        if($this->regimenfiscal != ''){
+            $c_RegimenFiscal = c_RegimenFiscal::where('Clave', $this->regimenfiscal)->first();
+            $claveregimenfiscal = $c_RegimenFiscal->Clave;
+            $regimenfiscal = $c_RegimenFiscal->Nombre;            
         }
-        return view('registros.cuentasporcobrar.cuentasporcobrar', compact('serieusuario','esquema','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','rutacreardocumento','claveregimenfiscal','regimenfiscal','tiporelacion'));
+        return view('registros.cuentasporcobrar.cuentasporcobrar', compact('serieusuario','esquema','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','rutacreardocumento','lugarexpedicion','claveregimenfiscal','regimenfiscal'));
     }
 
     //obtener registro tabla
@@ -86,7 +87,9 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                 ->addColumn('operaciones', function($data){
                         $botoncambios   =   '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Pago .'\')"><i class="material-icons">mode_edit</i></div> '; 
                         $botonbajas     =   '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Pago .'\')"><i class="material-icons">cancel</i></div>  ';
-                        $operaciones    = $botoncambios.$botonbajas;
+                        $botondocumentopdf = '<a href="'.route('cuentas_por_cobrar_generar_pdfs_indiv',$data->Pago).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
+                        $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Pago .'\')"><i class="material-icons">email</i></div> ';
+                        $operaciones    = $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
                     return $operaciones;
                 })
                 ->addColumn('Abono', function($data){ return $data->Abono; })
@@ -111,10 +114,19 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
     //obtener clientes
     public function cuentas_por_cobrar_obtener_clientes(Request $request){
         if($request->ajax()){
-            $data = Cliente::where('Status', 'ALTA')->orderBy("Numero", "DESC")->get();
+            //$data = Cliente::where('Status', 'ALTA')->orderBy("Numero", "DESC")->get();
+            $data = DB::table('Clientes as c')
+            ->leftJoin('c_FormaPago as fp', 'fp.Clave', '=', 'c.FormaPago')
+            ->leftJoin('c_MetodoPago as mp', 'mp.Clave', '=', 'c.MetodoPago')
+            ->leftJoin('c_UsoCFDI as uc', 'uc.Clave', '=', 'c.UsoCfdi')
+            ->leftJoin('c_Pais as p', 'p.Clave', '=', 'c.Pais')
+            ->select('c.Numero', 'c.Nombre', 'c.Plazo', 'c.Rfc', 'c.Agente', 'c.Credito', 'c.Saldo', 'c.Status', 'c.Municipio', 'c.Tipo', 'fp.Clave AS ClaveFormaPago', 'fp.Nombre AS NombreFormaPago', 'mp.Clave AS ClaveMetodoPago', 'mp.Nombre AS NombreMetodoPago', 'uc.Clave AS ClaveUsoCfdi', 'uc.Nombre AS NombreUsoCfdi', 'p.Clave AS ClavePais', 'p.Nombre AS NombrePais')
+            ->where('c.Status', 'ALTA')
+            ->orderBy("Numero", "DESC")
+            ->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        $claveformapago = '';
+                        /*$claveformapago = '';
                         $formapago = '';
                         $clavemetodopago = '';
                         $metodopago = '';
@@ -141,8 +153,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                             $Pais = Pais::where('Clave', $data->Pais)->first();
                             $claveresidenciafiscal = $Pais->Clave;
                             $residenciafiscal = $Pais->Nombre;
-                        }
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarcliente('.$data->Numero.',\''.$data->Nombre .'\','.$data->Plazo.',\''.$data->Rfc.'\',\''.$claveformapago.'\',\''.$formapago.'\',\''.$clavemetodopago.'\',\''.$metodopago.'\',\''.$claveusocfdi.'\',\''.$usocfdi.'\',\''.$claveresidenciafiscal.'\',\''.$residenciafiscal.'\')">Seleccionar</div>';
+                        }*/
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarcliente('.$data->Numero.',\''.$data->Nombre .'\','.$data->Plazo.',\''.$data->Rfc.'\',\''.$data->ClaveFormaPago.'\',\''.$data->NombreFormaPago.'\',\''.$data->ClaveMetodoPago.'\',\''.$data->NombreMetodoPago.'\',\''.$data->ClaveUsoCfdi.'\',\''.$data->NombreUsoCfdi.'\',\''.$data->ClavePais.'\',\''.$data->NombrePais.'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->rawColumns(['operaciones'])
@@ -681,6 +693,195 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
         return $pdf->stream();
+    }
+
+    //generacion de formato en PDF
+    public function cuentas_por_cobrar_generar_pdfs_indiv($documento){
+        $cuentasporcobrar = CuentaXCobrar::where('Pago', $documento)->get(); 
+        $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $data=array();
+        foreach ($cuentasporcobrar as $cxc){
+            $formatter = new NumeroALetras;
+            $abonoletras =  $formatter->toInvoice($cxc->Abono, $this->numerodecimales, 'M.N.');
+            $cuentaporcobrardetalle = CuentaXCobrarDetalle::where('Pago', $cxc->Pago)->get();
+            $datadetalle=array();
+            $importepagado = 0;
+            $importesaldoinsoluto = 0;
+            foreach($cuentaporcobrardetalle as $cxcd){
+                $importepagado = $importepagado + $cxcd->ImpPagado;
+                $importesaldoinsoluto = $importesaldoinsoluto + $cxcd->ImpSaldoInsoluto;
+                $clientedetalle = Cliente::where('Numero', $cxcd->Cliente)->first();
+                $facturadetalle = Factura::where('Factura', $cxcd->Factura)->first();
+                $metodopagofacturadetalle = MetodoPago::where('Clave', $facturadetalle->MetodoPago)->first();
+                $datadetalle[]=array(
+                    "clientedetalle"=> $clientedetalle,
+                    "iddocumentodetalle" => $cxcd->idDocumento,
+                    "facturadetalle" => $cxcd->Factura,
+                    "fechadetalle" => Carbon::parse($facturadetalle->Fecha)->toDateString(),
+                    "plazodetalle" => $facturadetalle->Plazo,
+                    "vencedetalle" => Carbon::parse($facturadetalle->Fecha)->addDays($facturadetalle->Plazo)->toDateString(),
+                    "totalfactura" => Helpers::convertirvalorcorrecto($facturadetalle->Total),
+                    "numparcialidaddetalle" => $cxcd->NumParcialidad,
+                    "impsaldoantdetalle" => Helpers::convertirvalorcorrecto($cxcd->ImpSaldoAnt),
+                    "imppagadodetalle" => Helpers::convertirvalorcorrecto($cxcd->ImpPagado),
+                    "impsaldoinsolutodetalle" => Helpers::convertirvalorcorrecto($cxcd->ImpSaldoInsoluto),
+                    "tipocambiofacturadetalle" => Helpers::convertirvalorcorrecto($facturadetalle->TipoCambio),
+                    "clavemetodopagodetalle" => $metodopagofacturadetalle->Clave,
+                    "nombremetodopagodetalle" => $metodopagofacturadetalle->Nombre
+                );
+            } 
+            $cliente = Cliente::where('Numero', $cxc->Cliente)->first();
+            $estadocliente = Estado::where('Clave', $cliente->Estado)->first();
+            $formapago = FormaPago::where('Clave', $cxc->FormaPago)->first();
+            $regimenfiscal = c_RegimenFiscal::where('Clave', $cxc->RegimenFiscal)->first();
+            $comprobantetimbrado = Comprobante::where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->count();
+            $comprobante = Comprobante::where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->first();
+            $formatter = new NumeroALetras;
+            $totalletras = $formatter->toInvoice($cxc->Abono, 2, 'M.N.');
+            $data[]=array(
+                        "cuentaporcobrar"=>$cxc,
+                        "fechaespanolcuentaporcobrar"=>Helpers::fecha_espanol($cxc->Fecha),
+                        "abonocuentaporcobrar"=>Helpers::convertirvalorcorrecto($cxc->Abono),
+                        "importepagado" =>Helpers::convertirvalorcorrecto($importepagado),
+                        "importesaldoinsoluto" =>Helpers::convertirvalorcorrecto($importesaldoinsoluto),
+                        "abonoletras"=>$abonoletras,
+                        "formapago" => $formapago,
+                        "comprobante" => $comprobante,
+                        "comprobantetimbrado" => $comprobantetimbrado,
+                        "regimenfiscal"=> $regimenfiscal,
+                        "cliente" => $cliente,
+                        "estadocliente" => $estadocliente,
+                        "datadetalle" => $datadetalle,
+                        "tipocambiocxc"=>Helpers::convertirvalorcorrecto($cxc->TipoCambio),
+                        "totalletras"=>$totalletras,
+                        "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
+            );
+        }
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('registros.cuentasporcobrar.formato_pdf_cuentasporcobrar', compact('data'))
+        ->setOption('footer-left', 'Este pago es una representación impresa de un CFDi')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-right', ''.$fechaformato.'')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        return $pdf->stream();
+    }
+
+    //obtener datos para enviar email
+    public function cuentas_por_cobrar_obtener_datos_envio_email(Request $request){
+        $cuentaporcobrar = CuentaXCobrar::where('Pago', $request->documento)->first();
+        $cliente = Cliente::where('Numero',$cuentaporcobrar->Cliente)->first();
+        $data = array(
+            'cuentaporcobrar' => $cuentaporcobrar,
+            'cliente' => $cliente,
+            'emailde' => Config::get('mail.from.address'),
+            'emailpara' => $cliente->Email1
+        );
+        return response()->json($data);
+    }
+
+    //enviar pdf por emial
+    public function cuentas_por_cobrar_enviar_pdfs_email(Request $request){
+        $cuentasporcobrar = CuentaXCobrar::where('Pago', $request->emaildocumento)->get(); 
+        $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $data=array();
+        foreach ($cuentasporcobrar as $cxc){
+            $formatter = new NumeroALetras;
+            $abonoletras =  $formatter->toInvoice($cxc->Abono, $this->numerodecimales, 'M.N.');
+            $cuentaporcobrardetalle = CuentaXCobrarDetalle::where('Pago', $cxc->Pago)->get();
+            $datadetalle=array();
+            $importepagado = 0;
+            $importesaldoinsoluto = 0;
+            foreach($cuentaporcobrardetalle as $cxcd){
+                $importepagado = $importepagado + $cxcd->ImpPagado;
+                $importesaldoinsoluto = $importesaldoinsoluto + $cxcd->ImpSaldoInsoluto;
+                $clientedetalle = Cliente::where('Numero', $cxcd->Cliente)->first();
+                $facturadetalle = Factura::where('Factura', $cxcd->Factura)->first();
+                $metodopagofacturadetalle = MetodoPago::where('Clave', $facturadetalle->MetodoPago)->first();
+                $datadetalle[]=array(
+                    "clientedetalle"=> $clientedetalle,
+                    "iddocumentodetalle" => $cxcd->idDocumento,
+                    "facturadetalle" => $cxcd->Factura,
+                    "fechadetalle" => Carbon::parse($facturadetalle->Fecha)->toDateString(),
+                    "plazodetalle" => $facturadetalle->Plazo,
+                    "vencedetalle" => Carbon::parse($facturadetalle->Fecha)->addDays($facturadetalle->Plazo)->toDateString(),
+                    "totalfactura" => Helpers::convertirvalorcorrecto($facturadetalle->Total),
+                    "numparcialidaddetalle" => $cxcd->NumParcialidad,
+                    "impsaldoantdetalle" => Helpers::convertirvalorcorrecto($cxcd->ImpSaldoAnt),
+                    "imppagadodetalle" => Helpers::convertirvalorcorrecto($cxcd->ImpPagado),
+                    "impsaldoinsolutodetalle" => Helpers::convertirvalorcorrecto($cxcd->ImpSaldoInsoluto),
+                    "tipocambiofacturadetalle" => Helpers::convertirvalorcorrecto($facturadetalle->TipoCambio),
+                    "clavemetodopagodetalle" => $metodopagofacturadetalle->Clave,
+                    "nombremetodopagodetalle" => $metodopagofacturadetalle->Nombre
+                );
+            } 
+            $cliente = Cliente::where('Numero', $cxc->Cliente)->first();
+            $estadocliente = Estado::where('Clave', $cliente->Estado)->first();
+            $formapago = FormaPago::where('Clave', $cxc->FormaPago)->first();
+            $regimenfiscal = c_RegimenFiscal::where('Clave', $cxc->RegimenFiscal)->first();
+            $comprobantetimbrado = Comprobante::where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->count();
+            $comprobante = Comprobante::where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->first();
+            $formatter = new NumeroALetras;
+            $totalletras = $formatter->toInvoice($cxc->Abono, 2, 'M.N.');
+            $data[]=array(
+                        "cuentaporcobrar"=>$cxc,
+                        "fechaespanolcuentaporcobrar"=>Helpers::fecha_espanol($cxc->Fecha),
+                        "abonocuentaporcobrar"=>Helpers::convertirvalorcorrecto($cxc->Abono),
+                        "importepagado" =>Helpers::convertirvalorcorrecto($importepagado),
+                        "importesaldoinsoluto" =>Helpers::convertirvalorcorrecto($importesaldoinsoluto),
+                        "abonoletras"=>$abonoletras,
+                        "formapago" => $formapago,
+                        "comprobante" => $comprobante,
+                        "comprobantetimbrado" => $comprobantetimbrado,
+                        "regimenfiscal"=> $regimenfiscal,
+                        "cliente" => $cliente,
+                        "estadocliente" => $estadocliente,
+                        "datadetalle" => $datadetalle,
+                        "tipocambiocxc"=>Helpers::convertirvalorcorrecto($cxc->TipoCambio),
+                        "totalletras"=>$totalletras,
+                        "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
+            );
+        }
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('registros.cuentasporcobrar.formato_pdf_cuentasporcobrar', compact('data'))
+        ->setOption('footer-left', 'Este pago es una representación impresa de un CFDi')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-right', ''.$fechaformato.'')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        try{
+            //enviar correo electrónico	
+            $nombre = 'Receptor envio de correos';
+            $receptor = $request->emailpara;
+            $correos = [$request->emailpara];
+            $asunto = $request->emailasunto;
+            $emaildocumento = $request->emaildocumento;
+            $name = "Receptor envio de correos";
+            $body = $request->emailasunto;
+            $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
+            $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
+            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
+                $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                        ->cc($correos)
+                        ->subject($asunto)
+                        ->attachData($pdf->output(), "CuentaPorCobrarNo".$emaildocumento.".pdf");
+            });
+        } catch(\Exception $e) {
+            $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
+            $correos = ['osbaldo.anzaldo@utpcamiones.com.mx'];
+            $msj = 'Error al enviar correo';
+            Mail::send('correos.errorenvio.error', compact('e','msj'), function($message) use ($receptor, $correos) {
+                $message->to($receptor)
+                        ->cc($correos)
+                        ->subject('Error al enviar correo nuevo usuario');
+            });
+        }
     }
 
     //exportar excel

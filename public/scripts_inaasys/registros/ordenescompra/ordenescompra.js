@@ -34,6 +34,16 @@ function limpiar(){
   //volver a aplicar configuracion a datatable principal para que realize la busqueda con la tecla enter
   regresarbusquedadatatableprincipal();
 }
+//validar si se debe mostrar o no el buscador de productos
+function mostrarbuscadorcodigoproducto(){
+  var almacen = $("#almacen").val();
+  var proveedor = $("#proveedor").val();
+  if(almacen != "" && proveedor != ""){
+    $("#divbuscarcodigoproducto").show();
+  }else{
+    $("#divbuscarcodigoproducto").hide();
+  }
+}
 //mostrar modal formulario
 function mostrarmodalformulario(tipo, modificacionpermitida){
     $("#ModalFormulario").modal('show');
@@ -164,6 +174,8 @@ function obtenerproveedores(){
                     '</div>';
     $("#contenidomodaltablas").html(tablaproveedores);
     $('#tbllistadoproveedor').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,
@@ -194,7 +206,7 @@ function obtenerproveedores(){
                 }
             });
         },
-        "iDisplayLength": 8,
+        
     }); 
 } 
 //obtener registros de almacenes
@@ -226,6 +238,8 @@ function obteneralmacenes(){
                         '</div>';
       $("#contenidomodaltablas").html(tablaalmacenes);
       $('#tbllistadoalmacen').DataTable({
+          "lengthMenu": [ 10, 50, 100, 250, 500 ],
+          "pageLength": 250,
           "sScrollX": "110%",
           "sScrollY": "370px",
           "bScrollCollapse": true,
@@ -252,7 +266,7 @@ function obteneralmacenes(){
                   }
               });
           },
-          "iDisplayLength": 8,
+          
       }); 
   } 
 function seleccionarproveedor(Numero, Nombre, Plazo){
@@ -261,11 +275,13 @@ function seleccionarproveedor(Numero, Nombre, Plazo){
     //colocar el plazo del proveedor
     $("#plazo").val(Plazo);
     mostrarformulario();
+    mostrarbuscadorcodigoproducto();
 }
 function seleccionaralmacen(Numero, Nombre){
     $("#numeroalmacen").val(Numero);
     $("#almacen").val(Nombre);
     mostrarformulario();
+    mostrarbuscadorcodigoproducto();
 }
 //detectar cuando en el input de buscar por codigo de producto el usuario presione la tecla enter, si es asi se realizara la busqueda con el codigo escrito
 $(document).ready(function(){
@@ -294,9 +310,9 @@ function listarproductos(){
                                       '<th>Código</th>'+
                                       '<th>Marca</th>'+
                                       '<th>Producto</th>'+
-                                      '<th>Almacen</th>'+
                                       '<th>Ubicación</th>'+
-                                      '<th>Existen</th>'+
+                                      '<th>Existencias</th>'+
+                                      '<th>Almacen</th>'+
                                       '<th>Costo $</th>'+
                                       '<th>Sub Total $</th>'+
                                     '</tr>'+
@@ -312,6 +328,8 @@ function listarproductos(){
                         '</div>';   
   $("#contenidomodaltablas").html(tablaproductos);
   $('#tbllistadoproducto').DataTable({
+    "lengthMenu": [ 10, 50, 100, 250, 500 ],
+    "pageLength": 250,
     "sScrollX": "110%",
     "sScrollY": "370px",
     "bScrollCollapse": true,
@@ -326,6 +344,7 @@ function listarproductos(){
       data: function (d) {
         d.codigoabuscar = $("#codigoabuscar").val();
         d.tipooperacion = $("#tipooperacion").val();
+        d.numeroalmacen = $("#numeroalmacen").val();
       }
     },
     columns: [
@@ -334,8 +353,8 @@ function listarproductos(){
       { data: 'Marca', name: 'Marca', orderable: false, searchable: false  },
       { data: 'Producto', name: 'Producto', orderable: false, searchable: false  },
       { data: 'Ubicacion', name: 'Ubicacion', orderable: false, searchable: false  },
-      { data: 'Ubicacion', name: 'Ubicacion', orderable: false, searchable: false  },
       { data: 'Existencias', name: 'Existencias', orderable: false, searchable: false  },
+      { data: 'Almacen', name: 'Almacen', orderable: false, searchable: false  },
       { data: 'Costo', name: 'Costo', orderable: false, searchable: false  },
       { data: 'SubTotal', name: 'SubTotal', orderable: false, searchable: false  } 
     ],
@@ -348,7 +367,7 @@ function listarproductos(){
         }
       });
     },
-    "iDisplayLength": 8,
+    
   });
 }
 //función que evalua si la partida que quieren ingresar ya existe o no en el detalle de la orden de compra
@@ -656,7 +675,7 @@ function alta(){
   contadorproductos=0;
   contadorfilas = 0;
   //se debe motrar el input para buscar los productos
-  $("#divbuscarcodigoproducto").show();
+  mostrarbuscadorcodigoproducto();
   $("#ModalAlta").modal('show');
 }
 //guardar el registro
@@ -918,7 +937,7 @@ async function seleccionartipoordencompra(data){
   await retraso();
   $("#tipo").val(data.ordencompra.Tipo).change();
   //se debe esconder el input para buscar los productos porque en la modificacion no se permiten agregar productos
-  $("#divbuscarcodigoproducto").show();
+  mostrarbuscadorcodigoproducto();
   mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
   $('.page-loader-wrapper').css('display', 'none');
 }
@@ -958,7 +977,52 @@ $("#btnGuardarModificacion").on('click', function (e) {
     form.parsley().validate();
   }
 });
-
+//obtener datos para el envio del documento por email
+function enviardocumentoemail(documento){
+  $.get(ordenes_compra_obtener_datos_envio_email,{documento:documento}, function(data){
+    $("#textomodalenviarpdfemail").html("Enviar email Orden de Compra No." + documento);
+    $("#emaildocumento").val(documento);
+    $("#emailde").val(data.emailde);
+    $("#emailpara").val(data.emailpara);
+    $("#emailasunto").val("ORDEN DE COMPRA NO. " + documento +" DE USADOS TRACTOCAMIONES Y PARTES REFACCIONARIAS SA DE CV");
+    $("#modalenviarpdfemail").modal('show');
+  })   
+}
+//enviar documento pdf por email
+$("#btnenviarpdfemail").on('click', function (e) {
+  e.preventDefault();
+  var formData = new FormData($("#formenviarpdfemail")[0]);
+  var form = $("#formenviarpdfemail");
+  if (form.parsley().isValid()){
+    $('.page-loader-wrapper').css('display', 'block');
+    $.ajax({
+      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+      url:ordenes_compra_enviar_pdfs_email,
+      type: "post",
+      dataType: "html",
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false,
+      success:function(data){
+        msj_documentoenviadoporemailcorrectamente();
+        $("#modalenviarpdfemail").modal('hide');
+        $('.page-loader-wrapper').css('display', 'none');
+      },
+      error:function(data){
+        if(data.status == 403){
+          msj_errorenpermisos();
+        }else{
+          msj_errorajax();
+        }
+        $("#modalenviarpdfemail").modal('hide');
+        $('.page-loader-wrapper').css('display', 'none');
+      }
+    })
+  }else{
+    form.parsley().validate();
+  }
+});
 //hacer busqueda de folio para exportacion en pdf
 function relistarbuscarstringlike(){
   var tabla = $('#tablafoliosencontrados').DataTable();

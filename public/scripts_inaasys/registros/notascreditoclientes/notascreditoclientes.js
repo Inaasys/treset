@@ -160,6 +160,8 @@ function obtenerclientes(){
                     '</div>';
     $("#contenidomodaltablas").html(tablaclientes);
     $('#tbllistadocliente').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,  
@@ -191,7 +193,7 @@ function obtenerclientes(){
                 }
             });
         },
-        "iDisplayLength": 8,
+        
     }); 
 } 
 //seleccionar proveedor
@@ -241,6 +243,8 @@ function obteneralmacenes(){
                         '</div>';
       $("#contenidomodaltablas").html(tablaalmacenes);
       $('#tbllistadoalmacen').DataTable({
+          "lengthMenu": [ 10, 50, 100, 250, 500 ],
+          "pageLength": 250,
           "sScrollX": "110%",
           "sScrollY": "370px",
           "bScrollCollapse": true,  
@@ -267,7 +271,7 @@ function obteneralmacenes(){
                   }
               });
           },
-          "iDisplayLength": 8,
+          
       }); 
 } 
 //seleccionar almacen
@@ -307,6 +311,8 @@ function obtenerlugaresexpedicion(){
                               '</div>';  
   $("#contenidomodaltablas").html(tablacodigospostales);
   $('#tbllistadocodigopostal').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
       "bScrollCollapse": true,  
@@ -337,7 +343,7 @@ function obtenerlugaresexpedicion(){
             }
         });
       },
-      "iDisplayLength": 8,
+      
   });
 } 
 //seleccionar lugar expedicion
@@ -376,6 +382,8 @@ function obtenerregimenesfiscales(){
                               '</div>';  
   $("#contenidomodaltablas").html(tablaregimenesfiscales);
   $('#tbllistadoregimenfiscal').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
       "bScrollCollapse": true,  
@@ -404,7 +412,7 @@ function obtenerregimenesfiscales(){
             }
         });
       },
-      "iDisplayLength": 8,
+      
   });
 } 
 //seleccionar lugar expedicion
@@ -442,6 +450,8 @@ function obtenertiposrelaciones(){
                               '</div>';  
   $("#contenidomodaltablas").html(tablatiposrelaciones);
   $('#tbllistadotiporelacion').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
       "bScrollCollapse": true,  
@@ -468,7 +478,7 @@ function obtenertiposrelaciones(){
             }
         });
       },
-      "iDisplayLength": 8,
+      
   });
 } 
 //seleccionar lugar expedicion
@@ -507,6 +517,8 @@ function obtenerformaspago(){
                               '</div>';  
   $("#contenidomodaltablas").html(tablaformaspago);
   $('#tbllistadoformapago').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
       "bScrollCollapse": true,  
@@ -534,7 +546,7 @@ function obtenerformaspago(){
             }
         });
       },
-      "iDisplayLength": 8,
+      
   });
 } 
 //seleccionar forma pago
@@ -572,6 +584,8 @@ function obtenermetodospago(){
                               '</div>';  
   $("#contenidomodaltablas").html(tablametodospago);
   $('#tbllistadometodopago').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
       "bScrollCollapse": true,  
@@ -598,7 +612,7 @@ function obtenermetodospago(){
             }
         });
       },
-      "iDisplayLength": 8,
+      
   });
 } 
 //seleccionar metodo pago
@@ -638,6 +652,8 @@ function obtenerusoscfdi(){
                               '</div>';  
   $("#contenidomodaltablas").html(tablausoscfdi);
   $('#tbllistadousocfdi').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
       "bScrollCollapse": true,  
@@ -666,7 +682,7 @@ function obtenerusoscfdi(){
             }
         });
       },
-      "iDisplayLength": 8,
+      
   });
 } 
 //seleccionar uso cfdi
@@ -704,6 +720,8 @@ function obtenerresidenciasfiscales(){
                               '</div>';  
   $("#contenidomodaltablas").html(tablaresidenciasfiscales);
   $('#tbllistadoresidencialfiscal').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
       "bScrollCollapse": true,  
@@ -730,7 +748,7 @@ function obtenerresidenciasfiscales(){
             }
         });
       },
-      "iDisplayLength": 8,
+      
   });
 } 
 //seleccionar residencia fiscal
@@ -768,6 +786,8 @@ function obtenerfoliosnotas(){
                               '</div>';  
   $("#contenidomodaltablas").html(tablafoliosfiscales);
   $('#tbllistadofoliofiscal').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
       "bScrollCollapse": true,  
@@ -794,7 +814,7 @@ function obtenerfoliosnotas(){
             }
         });
       },
-      "iDisplayLength": 8,
+      
   });  
 }
 function seleccionarfoliofiscal(Serie, Esquema){
@@ -851,6 +871,8 @@ function listarfacturas (){
                       '</div>';
     $("#contenidomodaltablas").html(tablafacturas);
     $('#tbllistadofactura').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,  
@@ -888,7 +910,7 @@ function listarfacturas (){
                 }
             });
         },
-        "iDisplayLength": 8,
+        
     });  
 } 
 //obtener todos los datos de la orden de compra seleccionada
@@ -1042,7 +1064,8 @@ function listarproductos(){
                                           '<th>Marca</th>'+
                                           '<th>Producto</th>'+
                                           '<th>Ubicación</th>'+
-                                          '<th>Existencias Totales</th>'+
+                                          '<th>Existencias</th>'+
+                                          '<th>Almacen</th>'+
                                           '<th>Costo $</th>'+
                                           '<th>Sub Total $</th>'+
                                         '</tr>'+
@@ -1058,6 +1081,8 @@ function listarproductos(){
                             '</div>';   
       $("#contenidomodaltablas").html(tablaproductos);
       $('#tbllistadoproducto').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,
@@ -1083,6 +1108,7 @@ function listarproductos(){
           { data: 'Producto', name: 'Producto', orderable: false, searchable: false  },
           { data: 'Ubicacion', name: 'Ubicacion', orderable: false, searchable: false  },
           { data: 'Existencias', name: 'Existencias', orderable: false, searchable: false  },
+          { data: 'Almacen', name: 'Almacen', orderable: false, searchable: false  },
           { data: 'Costo', name: 'Costo', orderable: false, searchable: false  },
           { data: 'SubTotal', name: 'SubTotal', orderable: false, searchable: false  } 
         ],
@@ -1095,7 +1121,7 @@ function listarproductos(){
             }
           });
         },
-        "iDisplayLength": 8,
+        
       });
     }
   }
@@ -1431,8 +1457,8 @@ function alta(){
                                               '</td>'+
                                               '<td>'+
                                                   '<div class="form-line">'+
-                                                      '<input type="hidden" class="form-control" name="clavetiporelacion" id="clavetiporelacion" value="'+clavetiporelacion+'" required readonly onkeyup="tipoLetra(this)">'+
-                                                      '<input type="text" class="form-control" name="tiporelacion" id="tiporelacion" value="'+tiporelacion+'" required readonly>'+
+                                                      '<input type="hidden" class="form-control" name="clavetiporelacion" id="clavetiporelacion" readonly onkeyup="tipoLetra(this)">'+
+                                                      '<input type="text" class="form-control" name="tiporelacion" id="tiporelacion" readonly>'+
                                                   '</div>'+
                                               '</td>'+
                                           '</tr>'+    
@@ -2143,8 +2169,8 @@ function obtenerdatos(notamodificar){
                                               '</td>'+
                                               '<td>'+
                                                   '<div class="form-line">'+
-                                                      '<input type="hidden" class="form-control" name="clavetiporelacion" id="clavetiporelacion" value="'+clavetiporelacion+'" required readonly onkeyup="tipoLetra(this)">'+
-                                                      '<input type="text" class="form-control" name="tiporelacion" id="tiporelacion" value="'+tiporelacion+'" required readonly>'+
+                                                      '<input type="hidden" class="form-control" name="clavetiporelacion" id="clavetiporelacion"  readonly onkeyup="tipoLetra(this)">'+
+                                                      '<input type="text" class="form-control" name="tiporelacion" id="tiporelacion" readonly>'+
                                                   '</div>'+
                                               '</td>'+
                                           '</tr>'+    
@@ -2573,6 +2599,52 @@ $("#btnbaja").on('click', function(e){
           msj_errorajax();
         }
         $('#estatusregistro').modal('hide');
+        $('.page-loader-wrapper').css('display', 'none');
+      }
+    })
+  }else{
+    form.parsley().validate();
+  }
+});
+//obtener datos para el envio del documento por email
+function enviardocumentoemail(documento){
+  $.get(notas_credito_clientes_obtener_datos_envio_email,{documento:documento}, function(data){
+    $("#textomodalenviarpdfemail").html("Enviar email Nota de Crédito Cliente No." + documento);
+    $("#emaildocumento").val(documento);
+    $("#emailde").val(data.emailde);
+    $("#emailpara").val(data.emailpara);
+    $("#emailasunto").val("NOTA DE CRÉDITO CLIENTE NO. " + documento +" DE USADOS TRACTOCAMIONES Y PARTES REFACCIONARIAS SA DE CV");
+    $("#modalenviarpdfemail").modal('show');
+  })   
+}
+//enviar documento pdf por email
+$("#btnenviarpdfemail").on('click', function (e) {
+  e.preventDefault();
+  var formData = new FormData($("#formenviarpdfemail")[0]);
+  var form = $("#formenviarpdfemail");
+  if (form.parsley().isValid()){
+    $('.page-loader-wrapper').css('display', 'block');
+    $.ajax({
+      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+      url:notas_credito_clientes_enviar_pdfs_email,
+      type: "post",
+      dataType: "html",
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false,
+      success:function(data){
+        msj_documentoenviadoporemailcorrectamente();
+        $("#modalenviarpdfemail").modal('hide');
+        $('.page-loader-wrapper').css('display', 'none');
+      },
+      error:function(data){
+        if(data.status == 403){
+          msj_errorenpermisos();
+        }else{
+          msj_errorajax();
+        }
+        $("#modalenviarpdfemail").modal('hide');
         $('.page-loader-wrapper').css('display', 'none');
       }
     })

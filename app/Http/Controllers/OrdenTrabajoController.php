@@ -24,6 +24,8 @@ use App\Servicio;
 use App\Configuracion_Tabla;
 use App\VistaOrdenTrabajo;
 use App\BitacoraDocumento;
+use Config;
+use Mail;
 
 class OrdenTrabajoController extends ConfiguracionSistemaController
 {
@@ -57,7 +59,9 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     $botoncambios   =   '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Orden .'\')"><i class="material-icons">mode_edit</i></div> '; 
                     $botonbajas     =   '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Orden .'\')"><i class="material-icons">cancel</i></div>  ';
                     $botonterminar  =   '<div class="btn bg-green btn-xs waves-effect" data-toggle="tooltip" title="Terminar" onclick="terminar(\''.$data->Orden .'\')"><i class="material-icons">playlist_add_check</i></div> ';
-                    $operaciones = $botoncambios.$botonbajas.$botonterminar;
+                    $botondocumentopdf = '<a href="'.route('ordenes_trabajo_generar_pdfs_indiv',$data->Orden).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
+                    $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Orden .'\')"><i class="material-icons">email</i></div> ';
+                    $operaciones = $botoncambios.$botonbajas.$botonterminar.$botondocumentopdf.$botonenviaremail;
                     return $operaciones;
                 })
                 ->addColumn('Total', function($data){ return $data->Total; })
@@ -108,18 +112,15 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
     //obtener clientes factura a
     public function ordenes_trabajo_obtener_clientes_facturaa(Request $request){
         if($request->ajax()){
-            $data = Cliente::where('Status', 'ALTA')->orderBy("Numero", "DESC")->get();
+            $data = DB::table('Clientes as c')
+            ->leftJoin('Agentes as a', 'a.Numero', '=', 'c.Agente')
+            ->select('c.Numero', 'c.Nombre', 'c.Plazo', 'c.Rfc', 'c.Agente', 'c.Credito', 'c.Saldo', 'c.Status', 'c.Municipio', 'c.Tipo', 'a.Numero AS NumeroAgente', 'a.Nombre AS NombreAgente')
+            ->where('c.Status', 'ALTA')
+            ->orderBy("Numero", "DESC")
+            ->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        $contaragente = Agente::where('Numero', $data->Agente)->count();
-                        $nombreagente = '';
-                        $numeroagente = '';
-                        if($contaragente > 0){
-                            $agente = Agente::where('Numero', $data->Agente)->first();
-                            $nombreagente = $agente->Nombre;
-                            $numeroagente = $agente->Numero;
-                        }
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarclientefacturaa('.$data->Numero.',\''.$data->Nombre .'\','.$data->Plazo.',\''.$numeroagente.'\',\''.$nombreagente.'\')">Seleccionar</div>';
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarclientefacturaa('.$data->Numero.',\''.$data->Nombre .'\','.$data->Plazo.',\''.$data->NumeroAgente.'\',\''.$data->NombreAgente.'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->rawColumns(['operaciones'])
@@ -841,6 +842,137 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         ->setOption('margin-bottom', 10);
         return $pdf->stream();
     }
+
+    //generacion de formato en PDF
+    public function ordenes_trabajo_generar_pdfs_indiv($documento){
+        $ordenestrabajo = OrdenTrabajo::where('Orden', $documento)->get(); 
+        $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $data=array();
+        foreach ($ordenestrabajo as $ot){
+            $ordentrabajodetalle = OrdenTrabajoDetalle::where('Orden', $ot->Orden)->get();
+            $datadetalle=array();
+            foreach($ordentrabajodetalle as $otd){
+                $serviciodetalle = Servicio::where('Codigo', $otd->Codigo)->first();
+                $datadetalle[]=array(
+                    "codigodetalle"=>$otd->Codigo,
+                    "descripciondetalle"=>$otd->Descripcion,
+                    "unidaddetalle"=>$otd->Unidad,
+                    "cantidaddetalle"=> Helpers::convertirvalorcorrecto($otd->Cantidad),
+                    "preciodetalle" => Helpers::convertirvalorcorrecto($otd->Precio),
+                    "descuentodetalle" => Helpers::convertirvalorcorrecto($otd->Descuento),
+                    "subtotaldetalle" => Helpers::convertirvalorcorrecto($otd->SubTotal),
+                    "totaldetalle" => Helpers::convertirvalorcorrecto($otd->Total)
+                );
+            } 
+            $cliente = Cliente::where('Numero', $ot->Cliente)->first();
+            $data[]=array(
+                    "ordentrabajo"=>$ot,
+                    "importeordentrabajo"=>Helpers::convertirvalorcorrecto($ot->Importe),
+                    "descuentoordentrabajo"=>Helpers::convertirvalorcorrecto($ot->Descuento),
+                    "subtotalordentrabajo"=>Helpers::convertirvalorcorrecto($ot->SubTotal),
+                    "ivaordentrabajo"=>Helpers::convertirvalorcorrecto($ot->Iva),
+                    "totalordentrabajo"=>Helpers::convertirvalorcorrecto($ot->Total),
+                    "cliente" => $cliente,
+                    "datadetalle" => $datadetalle,
+                    "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
+            );
+        }
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('registros.ordenestrabajo.formato_pdf_ordenestrabajo', compact('data'))
+        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-right', ''.$fechaformato.'')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        return $pdf->stream();
+    }
+
+    //obtener datos para enviar email
+    public function ordenes_trabajo_obtener_datos_envio_email(Request $request){
+        $ordentrabajo= OrdenTrabajo::where('Orden', $request->documento)->first();
+        $data = array(
+            'ordentrabajo' => $ordentrabajo,
+            'emailde' => Config::get('mail.from.address'),
+        );
+        return response()->json($data);
+    }
+
+    //enviar pdf por emial
+    public function ordenes_trabajo_enviar_pdfs_email(Request $request){
+        $ordenestrabajo = OrdenTrabajo::where('Orden', $request->emaildocumento)->get(); 
+        $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $data=array();
+        foreach ($ordenestrabajo as $ot){
+            $ordentrabajodetalle = OrdenTrabajoDetalle::where('Orden', $ot->Orden)->get();
+            $datadetalle=array();
+            foreach($ordentrabajodetalle as $otd){
+                $serviciodetalle = Servicio::where('Codigo', $otd->Codigo)->first();
+                $datadetalle[]=array(
+                    "codigodetalle"=>$otd->Codigo,
+                    "descripciondetalle"=>$otd->Descripcion,
+                    "unidaddetalle"=>$otd->Unidad,
+                    "cantidaddetalle"=> Helpers::convertirvalorcorrecto($otd->Cantidad),
+                    "preciodetalle" => Helpers::convertirvalorcorrecto($otd->Precio),
+                    "descuentodetalle" => Helpers::convertirvalorcorrecto($otd->Descuento),
+                    "subtotaldetalle" => Helpers::convertirvalorcorrecto($otd->SubTotal),
+                    "totaldetalle" => Helpers::convertirvalorcorrecto($otd->Total)
+                );
+            } 
+            $cliente = Cliente::where('Numero', $ot->Cliente)->first();
+            $data[]=array(
+                    "ordentrabajo"=>$ot,
+                    "importeordentrabajo"=>Helpers::convertirvalorcorrecto($ot->Importe),
+                    "descuentoordentrabajo"=>Helpers::convertirvalorcorrecto($ot->Descuento),
+                    "subtotalordentrabajo"=>Helpers::convertirvalorcorrecto($ot->SubTotal),
+                    "ivaordentrabajo"=>Helpers::convertirvalorcorrecto($ot->Iva),
+                    "totalordentrabajo"=>Helpers::convertirvalorcorrecto($ot->Total),
+                    "cliente" => $cliente,
+                    "datadetalle" => $datadetalle,
+                    "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
+            );
+        }
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('registros.ordenestrabajo.formato_pdf_ordenestrabajo', compact('data'))
+        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-right', ''.$fechaformato.'')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        try{
+            //enviar correo electrónico	
+            $nombre = 'Receptor envio de correos';
+            $receptor = $request->emailpara;
+            $correos = [$request->emailpara];
+            $asunto = $request->emailasunto;
+            $emaildocumento = $request->emaildocumento;
+            $name = "Receptor envio de correos";
+            $body = $request->emailasunto;
+            $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
+            $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
+            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
+                $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                        ->cc($correos)
+                        ->subject($asunto)
+                        ->attachData($pdf->output(), "OrdenTrabajoNo".$emaildocumento.".pdf");
+            });
+        } catch(\Exception $e) {
+            $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
+            $correos = ['osbaldo.anzaldo@utpcamiones.com.mx'];
+            $msj = 'Error al enviar correo';
+            Mail::send('correos.errorenvio.error', compact('e','msj'), function($message) use ($receptor, $correos) {
+                $message->to($receptor)
+                        ->cc($correos)
+                        ->subject('Error al enviar correo nuevo usuario');
+            });
+        }
+    }
+
     //funcion exportar excel
     public function ordenes_trabajo_exportar_excel(Request $request){
         ini_set('max_execution_time', 300); // 5 minutos

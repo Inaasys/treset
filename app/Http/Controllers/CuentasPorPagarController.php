@@ -25,6 +25,8 @@ use Luecano\NumeroALetras\NumeroALetras;
 use App\Configuracion_Tabla;
 use App\VistaCuentaPorPagar;
 use App\ContraReciboDetalle;
+use Config;
+use Mail;
 
 class CuentasPorPagarController extends ConfiguracionSistemaController{
 
@@ -57,7 +59,9 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                 ->addColumn('operaciones', function($data){
                     $botoncambios   =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Pago .'\')"><i class="material-icons">mode_edit</i></div> '; 
                     $botonbajas     =    '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Pago .'\')"><i class="material-icons">cancel</i></div>  ';
-                    $operaciones =  $botoncambios.$botonbajas;
+                    $botondocumentopdf = '<a href="'.route('cuentas_por_pagar_generar_pdfs_indiv',$data->Pago).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
+                    $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Pago .'\')"><i class="material-icons">email</i></div> ';
+                    $operaciones =  $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
                     return $operaciones;
                 })
                 ->addColumn('Abono', function($data){ return $data->Abono; })
@@ -417,6 +421,154 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
         ->setOption('margin-bottom', 10);
         return $pdf->stream();
     }
+
+    //generacion de formato en PDF
+    public function cuentas_por_pagar_generar_pdfs_indiv($documento){
+        $cuentasporpagar = CuentaXPagar::where('Pago', $documento)->get(); 
+        $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $data=array();
+        foreach ($cuentasporpagar as $cxp){
+            $formatter = new NumeroALetras;
+            $abonoletras =  $formatter->toInvoice($cxp->Abono, $this->numerodecimales, 'M.N.');
+            $cuentaporpagardetalle = CuentaXPagarDetalle::where('Pago', $cxp->Pago)->get();
+            $datadetalle=array();
+            foreach($cuentaporpagardetalle as $cxpd){
+                $proveedordetalle = Proveedor::where('Numero', $cxpd->Proveedor)->first();
+                $contarcompradetalle = Compra::where('Compra', $cxpd->Compra)->count();
+                $compradetalle = Compra::where('Compra', $cxpd->Compra)->first();
+                if($contarcompradetalle == 0){
+                    $remisiondetalle = "";
+                    $facturadetalle = "";
+                }else{
+                    $remisiondetalle = $compradetalle->Remision;
+                    $facturadetalle = $compradetalle->Factura;
+                }
+                $datadetalle[]=array(
+                    "proveedordetalle"=> $proveedordetalle,
+                    "remisiondetalle"=>$remisiondetalle,
+                    "facturadetalle"=>$facturadetalle,
+                    "abonodetalle" => Helpers::convertirvalorcorrecto($cxpd->Abono)
+                );
+            } 
+            $banco = Banco::where('Numero', $cxp->Banco)->first();
+            $proveedor = Proveedor::where('Numero', $cxp->Proveedor)->first();
+            $data[]=array(
+                      "cuentaporpagar"=>$cxp,
+                      "fechaespanolcuentaporpagar"=>Helpers::fecha_espanol($cxp->Fecha),
+                      "abonocuentaporpagar"=>Helpers::convertirvalorcorrecto($cxp->Abono),
+                      "abonoletras"=>$abonoletras,
+                      "proveedor" => $proveedor,
+                      "banco"=> $banco,
+                      "datadetalle" => $datadetalle,
+                      "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
+            );
+        }
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('registros.cuentasporpagar.formato_pdf_cuentasporpagar', compact('data'))
+        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-right', ''.$fechaformato.'')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        return $pdf->stream();
+    }
+
+    //obtener datos para enviar email
+    public function cuentas_por_pagar_obtener_datos_envio_email(Request $request){
+        $cuentaxpagar = CuentaXPagar::where('Pago', $request->documento)->first();
+        $proveedor = Proveedor::where('Numero',$cuentaxpagar->Proveedor)->first();
+        $data = array(
+            'cuentaxpagar' => $cuentaxpagar,
+            'proveedor' => $proveedor,
+            'emailde' => Config::get('mail.from.address'),
+            'emailpara' => $proveedor->Email1
+        );
+        return response()->json($data);
+    }
+
+    //enviar pdf por emial
+    public function cuentas_por_pagar_enviar_pdfs_email(Request $request){
+        $cuentasporpagar = CuentaXPagar::where('Pago', $request->emaildocumento)->get(); 
+        $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $data=array();
+        foreach ($cuentasporpagar as $cxp){
+            $formatter = new NumeroALetras;
+            $abonoletras =  $formatter->toInvoice($cxp->Abono, $this->numerodecimales, 'M.N.');
+            $cuentaporpagardetalle = CuentaXPagarDetalle::where('Pago', $cxp->Pago)->get();
+            $datadetalle=array();
+            foreach($cuentaporpagardetalle as $cxpd){
+                $proveedordetalle = Proveedor::where('Numero', $cxpd->Proveedor)->first();
+                $contarcompradetalle = Compra::where('Compra', $cxpd->Compra)->count();
+                $compradetalle = Compra::where('Compra', $cxpd->Compra)->first();
+                if($contarcompradetalle == 0){
+                    $remisiondetalle = "";
+                    $facturadetalle = "";
+                }else{
+                    $remisiondetalle = $compradetalle->Remision;
+                    $facturadetalle = $compradetalle->Factura;
+                }
+                $datadetalle[]=array(
+                    "proveedordetalle"=> $proveedordetalle,
+                    "remisiondetalle"=>$remisiondetalle,
+                    "facturadetalle"=>$facturadetalle,
+                    "abonodetalle" => Helpers::convertirvalorcorrecto($cxpd->Abono)
+                );
+            } 
+            $banco = Banco::where('Numero', $cxp->Banco)->first();
+            $proveedor = Proveedor::where('Numero', $cxp->Proveedor)->first();
+            $data[]=array(
+                      "cuentaporpagar"=>$cxp,
+                      "fechaespanolcuentaporpagar"=>Helpers::fecha_espanol($cxp->Fecha),
+                      "abonocuentaporpagar"=>Helpers::convertirvalorcorrecto($cxp->Abono),
+                      "abonoletras"=>$abonoletras,
+                      "proveedor" => $proveedor,
+                      "banco"=> $banco,
+                      "datadetalle" => $datadetalle,
+                      "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
+            );
+        }
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('registros.cuentasporpagar.formato_pdf_cuentasporpagar', compact('data'))
+        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-right', ''.$fechaformato.'')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        try{
+            //enviar correo electrónico	
+            $nombre = 'Receptor envio de correos';
+            $receptor = $request->emailpara;
+            $correos = [$request->emailpara];
+            $asunto = $request->emailasunto;
+            $emaildocumento = $request->emaildocumento;
+            $name = "Receptor envio de correos";
+            $body = $request->emailasunto;
+            $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
+            $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
+            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
+                $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                        ->cc($correos)
+                        ->subject($asunto)
+                        ->attachData($pdf->output(), "CuentaPorPagarNo".$emaildocumento.".pdf");
+            });
+        } catch(\Exception $e) {
+            $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
+            $correos = ['osbaldo.anzaldo@utpcamiones.com.mx'];
+            $msj = 'Error al enviar correo';
+            Mail::send('correos.errorenvio.error', compact('e','msj'), function($message) use ($receptor, $correos) {
+                $message->to($receptor)
+                        ->cc($correos)
+                        ->subject('Error al enviar correo nuevo usuario');
+            });
+        }
+    }
+
     //exportar a excel
     public function cuentas_por_pagar_exportar_excel(Request $request){
         ini_set('max_execution_time', 300); // 5 minutos

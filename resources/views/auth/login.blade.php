@@ -21,13 +21,13 @@
 <body class="login-page">
     <div class="login-box">
         <div class="logo text-center">
-            <img  src="images/iniciarsesion2.png" height="130px" width="135px;">
+            <img  src="images/iconapp1.png" height="130px" width="135px;">
         </div>
         <div class="card">
             <div class="body">
                 <form method="POST" action="{{ route('login') }}">
                     @csrf
-                    <div class="msg">Iniciar sesión</div>
+                    <div class="msg">INAASYS - Iniciar sesión</div>
                     <div class="input-group">
                         <span class="input-group-addon">
                             <i class="material-icons">person</i>

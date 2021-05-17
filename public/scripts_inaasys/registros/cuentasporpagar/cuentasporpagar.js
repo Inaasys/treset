@@ -157,6 +157,8 @@ function obtenerproveedores(){
                     '</div>';
     $("#contenidomodaltablas").html(tablaproveedores);
     $('#tbllistadoproveedor').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,
@@ -187,7 +189,7 @@ function obtenerproveedores(){
                 }
             });
         },
-        "iDisplayLength": 8,
+        
     }); 
 } 
 //obtener registros de almacenes
@@ -219,33 +221,35 @@ function obtenerbancos(){
                         '</div>';
       $("#contenidomodaltablas").html(tablabancos);
       $('#tbllistadobanco').DataTable({
+            "lengthMenu": [ 10, 50, 100, 250, 500 ],
+            "pageLength": 250,
             "sScrollX": "110%",
             "sScrollY": "370px",
             "bScrollCollapse": true,
-          processing: true,
-          'language': {
-              'loadingRecords': '&nbsp;',
-              'processing': '<div class="spinner"></div>'
-          },
-          serverSide: true,
-          ajax: {
-              url: cuentas_por_pagar_obtener_bancos,
-          },
-          columns: [
-              { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
-              { data: 'Numero', name: 'Numero' },
-              { data: 'Nombre', name: 'Nombre' }
-          ],
-          "initComplete": function() {
-              var $buscar = $('div.dataTables_filter input');
-              $buscar.unbind();
-              $buscar.bind('keyup change', function(e) {
-                  if(e.keyCode == 13 || this.value == "") {
-                  $('#tbllistadoalmacen').DataTable().search( this.value ).draw();
-                  }
-              });
-          },
-          "iDisplayLength": 8,
+            processing: true,
+            'language': {
+                'loadingRecords': '&nbsp;',
+                'processing': '<div class="spinner"></div>'
+            },
+            serverSide: true,
+            ajax: {
+                url: cuentas_por_pagar_obtener_bancos,
+            },
+            columns: [
+                { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+                { data: 'Numero', name: 'Numero' },
+                { data: 'Nombre', name: 'Nombre' }
+            ],
+            "initComplete": function() {
+                var $buscar = $('div.dataTables_filter input');
+                $buscar.unbind();
+                $buscar.bind('keyup change', function(e) {
+                    if(e.keyCode == 13 || this.value == "") {
+                    $('#tbllistadoalmacen').DataTable().search( this.value ).draw();
+                    }
+                });
+            },
+          
       }); 
 } 
 function seleccionarproveedor(Numero, Nombre){
@@ -555,7 +559,52 @@ $("#btnGuardarModificacion").on('click', function (e) {
         form.parsley().validate();
     }
 });
-
+//obtener datos para el envio del documento por email
+function enviardocumentoemail(documento){
+    $.get(cuentas_por_pagar_obtener_datos_envio_email,{documento:documento}, function(data){
+      $("#textomodalenviarpdfemail").html("Enviar email Cuenta Por Pagar No." + documento);
+      $("#emaildocumento").val(documento);
+      $("#emailde").val(data.emailde);
+      $("#emailpara").val(data.emailpara);
+      $("#emailasunto").val("CUENTA POR PAGAR NO. " + documento +" DE USADOS TRACTOCAMIONES Y PARTES REFACCIONARIAS SA DE CV");
+      $("#modalenviarpdfemail").modal('show');
+    })   
+}
+//enviar documento pdf por email
+$("#btnenviarpdfemail").on('click', function (e) {
+    e.preventDefault();
+    var formData = new FormData($("#formenviarpdfemail")[0]);
+    var form = $("#formenviarpdfemail");
+    if (form.parsley().isValid()){
+      $('.page-loader-wrapper').css('display', 'block');
+      $.ajax({
+        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+        url:cuentas_por_pagar_enviar_pdfs_email,
+        type: "post",
+        dataType: "html",
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success:function(data){
+          msj_documentoenviadoporemailcorrectamente();
+          $("#modalenviarpdfemail").modal('hide');
+          $('.page-loader-wrapper').css('display', 'none');
+        },
+        error:function(data){
+          if(data.status == 403){
+            msj_errorenpermisos();
+          }else{
+            msj_errorajax();
+          }
+          $("#modalenviarpdfemail").modal('hide');
+          $('.page-loader-wrapper').css('display', 'none');
+        }
+      })
+    }else{
+      form.parsley().validate();
+    }
+});
 //hacer busqueda de folio para exportacion en pdf
 function relistarbuscarstringlike(){
     var tabla = $('#tablafoliosencontrados').DataTable();

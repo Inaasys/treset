@@ -194,6 +194,8 @@ function listarclientesfacturaa(){
                               '</div>';
     $("#contenidomodaltablas").html(tablaclientesfacturaa);
     $('#tbllistadoclientesfacturaa').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,
@@ -225,7 +227,6 @@ function listarclientesfacturaa(){
                 }
             });
         },
-        "iDisplayLength": 8,
     }); 
 } 
 function seleccionarclientefacturaa(Numero, Nombre, Plazo, NumeroAgente, Agente){
@@ -271,6 +272,8 @@ function listarclientesdelcliente(){
                               '</div>';
     $("#contenidomodaltablas").html(tablaclientesdelcliente);
     $('#tbllistadoclientesdelcliente').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,
@@ -302,7 +305,6 @@ function listarclientesdelcliente(){
                 }
             });
         },
-        "iDisplayLength": 8,
     }); 
 } 
 function seleccionarclientedelcliente(Numero, Nombre, Plazo){
@@ -340,6 +342,8 @@ function listaragentes(){
                               '</div>';
     $("#contenidomodaltablas").html(tablaagentes);
     $('#tbllistadoagentes').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,
@@ -367,7 +371,6 @@ function listaragentes(){
                 }
             });
         },
-        "iDisplayLength": 8,
     }); 
 } 
 function seleccionaragente(Numero, Nombre){
@@ -405,6 +408,8 @@ function listartecnicos(){
                               '</div>';
     $("#asignaciontecnicoscontenidomodaltablas").html(tablatecnicos);
     $('#tbllistadotecnicos').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,
@@ -431,7 +436,6 @@ function listartecnicos(){
                 }
             });
         },
-        "iDisplayLength": 8,
     }); 
   }else{
     msjsolo4tecnicospermitidos();
@@ -470,6 +474,8 @@ function listarvines(){
                               '</div>';
     $("#contenidomodaltablas").html(tablavines);
     $('#tbllistadovines').DataTable({ 
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,
@@ -503,7 +509,6 @@ function listarvines(){
                 }
             });
         },
-        "iDisplayLength": 8,
     }); 
 } 
 function seleccionarvin(Cliente, Economico, Vin, Placas, Motor, Marca, Modelo, Año, Color){
@@ -558,6 +563,8 @@ function listarservicios(){
                         '</div>';   
   $("#contenidomodaltablas").html(tablaservicios);
   $('#tbllistadoservicio').DataTable({
+    "lengthMenu": [ 10, 50, 100, 250, 500 ],
+    "pageLength": 250,
     "sScrollX": "110%",
     "sScrollY": "370px",
     "bScrollCollapse": true,
@@ -590,7 +597,6 @@ function listarservicios(){
         }
       });
     },
-    "iDisplayLength": 8,
   });
 }
 //calcular total detalles orden de trabajo
@@ -1626,9 +1632,51 @@ $("#btnterminar").on('click', function(e){
     form.parsley().validate();
   }
 });
-
-
-
+//obtener datos para el envio del documento por email
+function enviardocumentoemail(documento){
+  $.get(ordenes_trabajo_obtener_datos_envio_email,{documento:documento}, function(data){
+    $("#textomodalenviarpdfemail").html("Enviar email Orden de Trabajo No." + documento);
+    $("#emaildocumento").val(documento);
+    $("#emailde").val(data.emailde);
+    $("#emailasunto").val("ORDEN DE TRABAJO NO. " + documento +" DE USADOS TRACTOCAMIONES Y PARTES REFACCIONARIAS SA DE CV");
+    $("#modalenviarpdfemail").modal('show');
+  })   
+}
+//enviar documento pdf por email
+$("#btnenviarpdfemail").on('click', function (e) {
+  e.preventDefault();
+  var formData = new FormData($("#formenviarpdfemail")[0]);
+  var form = $("#formenviarpdfemail");
+  if (form.parsley().isValid()){
+    $('.page-loader-wrapper').css('display', 'block');
+    $.ajax({
+      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+      url:ordenes_trabajo_enviar_pdfs_email,
+      type: "post",
+      dataType: "html",
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false,
+      success:function(data){
+        msj_documentoenviadoporemailcorrectamente();
+        $("#modalenviarpdfemail").modal('hide');
+        $('.page-loader-wrapper').css('display', 'none');
+      },
+      error:function(data){
+        if(data.status == 403){
+          msj_errorenpermisos();
+        }else{
+          msj_errorajax();
+        }
+        $("#modalenviarpdfemail").modal('hide');
+        $('.page-loader-wrapper').css('display', 'none');
+      }
+    })
+  }else{
+    form.parsley().validate();
+  }
+});
 //hacer busqueda de folio para exportacion en pdf
 function relistarbuscarstringlike(){
   var tabla = $('#tablafoliosencontrados').DataTable();

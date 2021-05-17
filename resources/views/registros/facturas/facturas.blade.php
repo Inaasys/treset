@@ -67,7 +67,7 @@
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover">
                                     <thead class="customercolor">
                                         <tr>
-                                            <th><div style="width:80px !important;">Operaciones</div></th>
+                                            <th><div style="width:150px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
                                             <th>{{$co}}</th>
                                             @endforeach
@@ -141,6 +141,9 @@
 <!-- modal para crear documento en PDF-->
 @include('secciones.modalcreardocumento')
 <!-- fin modal para crear documento en PDF-->
+<!-- modal para enviar por email documento en PDF-->
+@include('secciones.modalenviardocumentoemail')
+<!-- fin modal para enviar por email documento en PDF-->
 <!-- modal para configuraciones de tablas-->
 @include('secciones.modalconfiguraciontablas')
 <!-- fin modal para configuraciones de tablas-->
@@ -162,11 +165,9 @@
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
         var rfcempresa = '{{$empresa->Rfc}}';
         var nombreempresa = '{{$empresa->Nombre}}';
-        var lugarexpedicion = '{{$empresa->LugarExpedicion}}';
+        var lugarexpedicion = '{{$lugarexpedicion}}';
         var claveregimenfiscal = '{{$claveregimenfiscal}}';
         var regimenfiscal = '{{$regimenfiscal}}';
-        var clavetiporelacion = '{{$tiporelacion->Clave}}';
-        var tiporelacion = '{{$tiporelacion->Nombre}}';
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var facturas_obtener = '{!!URL::to('facturas_obtener')!!}';
         var facturas_obtener_ultimo_folio = '{!!URL::to('facturas_obtener_ultimo_folio')!!}';
@@ -195,6 +196,8 @@
         var facturas_guardar_modificacion = '{!!URL::to('facturas_guardar_modificacion')!!}';
         var facturas_verificar_si_continua_baja = '{!!URL::to('facturas_verificar_si_continua_baja')!!}';
         var facturas_alta_o_baja = '{!!URL::to('facturas_alta_o_baja')!!}'; 
+        var facturas_obtener_datos_envio_email = '{!!URL::to('facturas_obtener_datos_envio_email')!!}';
+        var facturas_enviar_pdfs_email = '{!!URL::to('facturas_enviar_pdfs_email')!!}';
         var facturas_buscar_folio_string_like = '{!!URL::to('facturas_buscar_folio_string_like')!!}'; 
     </script>
     @include('secciones.libreriasregistrosycatalogos')

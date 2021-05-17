@@ -19,7 +19,8 @@ use App\Compra;
 use App\BitacoraDocumento;
 use App\Configuracion_Tabla;
 use App\VistaContraRecibo;
-
+use Config;
+use Mail;
 
 class ContraRecibosController extends ConfiguracionSistemaController{
 
@@ -51,8 +52,10 @@ class ContraRecibosController extends ConfiguracionSistemaController{
             return DataTables::of($data)
                 ->addColumn('operaciones', function($data){
                     $botoncambios   = '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->ContraRecibo .'\')"><i class="material-icons">mode_edit</i></div> ';
-                    $botonbaja      = '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->ContraRecibo .'\')"><i class="material-icons">cancel</i></div>  ';
-                    $boton =  $botoncambios.$botonbaja;
+                    $botonbaja      = '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->ContraRecibo .'\')"><i class="material-icons">cancel</i></div> ';
+                    $botondocumentopdf = '<a href="'.route('contrarecibos_generar_pdfs_indiv',$data->ContraRecibo).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
+                    $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->ContraRecibo .'\')"><i class="material-icons">email</i></div> ';
+                    $boton =  $botoncambios.$botonbaja.$botondocumentopdf.$botonenviaremail;
                     return $boton;
                 })
                 ->addColumn('Total', function($data){ return $data->Total; })
@@ -333,6 +336,131 @@ class ContraRecibosController extends ConfiguracionSistemaController{
         ->setOption('margin-bottom', 10);
         return $pdf->stream();
     }
+
+
+    //generacion de formato en PDF
+    public function contrarecibos_generar_pdfs_indiv($documento){
+        $contrarecibos = ContraRecibo::where('ContraRecibo', $documento)->orderBy('Folio', 'ASC')->get(); 
+        $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $data=array();
+        foreach ($contrarecibos as $cr){
+            $contrarecibodetalle = ContraReciboDetalle::where('ContraRecibo', $cr->ContraRecibo)->get();
+            $datadetalle=array();
+            foreach($contrarecibodetalle as $crd){
+                $datadetalle[]=array(
+                    "fechadetalle"=>$crd->Fecha,
+                    "facturadetalle"=>$crd->Factura,
+                    "remisiondetalle"=>$crd->Remision,
+                    "totaldetalle" => Helpers::convertirvalorcorrecto($crd->Total),
+                    "fechaapagardetalle"=> $crd->FechaAPagar,
+                    "compradetalle" => $crd->Compra
+                );
+            } 
+            $proveedor = Proveedor::where('Numero', $cr->Proveedor)->first();
+            $data[]=array(
+                      "contrarecibo"=>$cr,
+                      "totalcontrarecibo"=>Helpers::convertirvalorcorrecto($cr->Total),
+                      "contrarecibodetalle"=>$contrarecibodetalle,
+                      "proveedor" => $proveedor,
+                      "fechaformato"=> $fechaformato,
+                      "datadetalle" => $datadetalle,
+                      "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
+            );
+        }
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('registros.contrarecibos.formato_pdf_contrarecibos', compact('data'))
+        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-right', ''.$fechaformato.'')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        return $pdf->stream();
+    }
+
+    //obtener datos para enviar email
+    public function contrarecibos_obtener_datos_envio_email(Request $request){
+        $contrarecibo = ContraRecibo::where('ContraRecibo', $request->documento)->first();
+        $proveedor = Proveedor::where('Numero',$contrarecibo->Proveedor)->first();
+        $data = array(
+            'contrarecibo' => $contrarecibo,
+            'proveedor' => $proveedor,
+            'emailde' => Config::get('mail.from.address'),
+            'emailpara' => $proveedor->Email1
+        );
+        return response()->json($data);
+    }
+
+    //enviar pdf por emial
+    public function contrarecibos_enviar_pdfs_email(Request $request){
+        $contrarecibos = ContraRecibo::where('ContraRecibo', $request->emaildocumento)->orderBy('Folio', 'ASC')->get(); 
+        $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $data=array();
+        foreach ($contrarecibos as $cr){
+            $contrarecibodetalle = ContraReciboDetalle::where('ContraRecibo', $cr->ContraRecibo)->get();
+            $datadetalle=array();
+            foreach($contrarecibodetalle as $crd){
+                $datadetalle[]=array(
+                    "fechadetalle"=>$crd->Fecha,
+                    "facturadetalle"=>$crd->Factura,
+                    "remisiondetalle"=>$crd->Remision,
+                    "totaldetalle" => Helpers::convertirvalorcorrecto($crd->Total),
+                    "fechaapagardetalle"=> $crd->FechaAPagar,
+                    "compradetalle" => $crd->Compra
+                );
+            } 
+            $proveedor = Proveedor::where('Numero', $cr->Proveedor)->first();
+            $data[]=array(
+                      "contrarecibo"=>$cr,
+                      "totalcontrarecibo"=>Helpers::convertirvalorcorrecto($cr->Total),
+                      "contrarecibodetalle"=>$contrarecibodetalle,
+                      "proveedor" => $proveedor,
+                      "fechaformato"=> $fechaformato,
+                      "datadetalle" => $datadetalle,
+                      "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
+            );
+        }
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('registros.contrarecibos.formato_pdf_contrarecibos', compact('data'))
+        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-right', ''.$fechaformato.'')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        try{
+            //enviar correo electrónico	
+            $nombre = 'Receptor envio de correos';
+            $receptor = $request->emailpara;
+            $correos = [$request->emailpara];
+            $asunto = $request->emailasunto;
+            $emaildocumento = $request->emaildocumento;
+            $name = "Receptor envio de correos";
+            $body = $request->emailasunto;
+            $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
+            $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
+            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
+                $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                        ->cc($correos)
+                        ->subject($asunto)
+                        ->attachData($pdf->output(), "ContraReciboNo".$emaildocumento.".pdf");
+            });
+        } catch(\Exception $e) {
+            $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
+            $correos = ['osbaldo.anzaldo@utpcamiones.com.mx'];
+            $msj = 'Error al enviar correo';
+            Mail::send('correos.errorenvio.error', compact('e','msj'), function($message) use ($receptor, $correos) {
+                $message->to($receptor)
+                        ->cc($correos)
+                        ->subject('Error al enviar correo nuevo usuario');
+            });
+        }
+    }
+
     //exportar excel
     public function contrarecibos_exportar_excel(Request $request){
         ini_set('max_execution_time', 300); // 5 minutos

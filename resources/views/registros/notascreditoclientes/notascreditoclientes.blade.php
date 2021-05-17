@@ -67,7 +67,7 @@
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover">
                                     <thead class="customercolor">
                                         <tr>
-                                            <th><div style="width:80px !important;">Operaciones</div></th>
+                                            <th><div style="width:150px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
                                             <th>{{$co}}</th>
                                             @endforeach
@@ -159,6 +159,9 @@
 <!-- modal para crear documento en PDF-->
 @include('secciones.modalcreardocumento')
 <!-- fin modal para crear documento en PDF-->
+<!-- modal para enviar por email documento en PDF-->
+@include('secciones.modalenviardocumentoemail')
+<!-- fin modal para enviar por email documento en PDF-->
 <!-- modal para configuraciones de tablas-->
 @include('secciones.modalconfiguraciontablas')
 <!-- fin modal para configuraciones de tablas-->
@@ -179,11 +182,9 @@
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
         var rfcempresa = '{{$empresa->Rfc}}';
         var nombreempresa = '{{$empresa->Nombre}}';
-        var lugarexpedicion = '{{$empresa->LugarExpedicion}}';
+        var lugarexpedicion = '{{$lugarexpedicion}}';
         var claveregimenfiscal = '{{$claveregimenfiscal}}';
         var regimenfiscal = '{{$regimenfiscal}}';
-        var clavetiporelacion = '{{$tiporelacion->Clave}}';
-        var tiporelacion = '{{$tiporelacion->Nombre}}';
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var notas_credito_clientes_obtener = '{!!URL::to('notas_credito_clientes_obtener')!!}';
         var notas_credito_clientes_obtener_ultimo_folio = '{!!URL::to('notas_credito_clientes_obtener_ultimo_folio')!!}';
@@ -208,6 +209,8 @@
         var notas_credito_clientes_alta_o_baja = '{!!URL::to('notas_credito_clientes_alta_o_baja')!!}'; 
         var notas_credito_clientes_obtener_nota_cliente = '{!!URL::to('notas_credito_clientes_obtener_nota_cliente')!!}';
         var notas_credito_clientes_guardar_modificacion = '{!!URL::to('notas_credito_clientes_guardar_modificacion')!!}';
+        var notas_credito_clientes_obtener_datos_envio_email = '{!!URL::to('notas_credito_clientes_obtener_datos_envio_email')!!}';
+        var notas_credito_clientes_enviar_pdfs_email = '{!!URL::to('notas_credito_clientes_enviar_pdfs_email')!!}';
         var notas_credito_clientes_buscar_folio_string_like = '{!!URL::to('notas_credito_clientes_buscar_folio_string_like')!!}'; 
     </script>
     @include('secciones.libreriasregistrosycatalogos')

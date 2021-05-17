@@ -159,6 +159,8 @@ function obtenerproveedores(){
                             '</div>';
     $("#contenidomodaltablas").html(tablaproveedores);
     $('#tbllistadoproveedor').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,
@@ -189,7 +191,7 @@ function obtenerproveedores(){
                 }
             });
         },
-        "iDisplayLength": 8,
+        
     }); 
 } 
 function seleccionarproveedor(Numero, Nombre){
@@ -462,6 +464,52 @@ function obtenerdatos(contrarecibomodificar){
     $('.page-loader-wrapper').css('display', 'none');
   })
 }
+//obtener datos para el envio del documento por email
+function enviardocumentoemail(documento){
+    $.get(contrarecibos_obtener_datos_envio_email,{documento:documento}, function(data){
+      $("#textomodalenviarpdfemail").html("Enviar email ContraRecibo No." + documento);
+      $("#emaildocumento").val(documento);
+      $("#emailde").val(data.emailde);
+      $("#emailpara").val(data.emailpara);
+      $("#emailasunto").val("CONTRARECIBO NO. " + documento +" DE USADOS TRACTOCAMIONES Y PARTES REFACCIONARIAS SA DE CV");
+      $("#modalenviarpdfemail").modal('show');
+    })   
+}
+//enviar documento pdf por email
+$("#btnenviarpdfemail").on('click', function (e) {
+    e.preventDefault();
+    var formData = new FormData($("#formenviarpdfemail")[0]);
+    var form = $("#formenviarpdfemail");
+    if (form.parsley().isValid()){
+      $('.page-loader-wrapper').css('display', 'block');
+      $.ajax({
+        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+        url:contrarecibos_enviar_pdfs_email,
+        type: "post",
+        dataType: "html",
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success:function(data){
+          msj_documentoenviadoporemailcorrectamente();
+          $("#modalenviarpdfemail").modal('hide');
+          $('.page-loader-wrapper').css('display', 'none');
+        },
+        error:function(data){
+          if(data.status == 403){
+            msj_errorenpermisos();
+          }else{
+            msj_errorajax();
+          }
+          $("#modalenviarpdfemail").modal('hide');
+          $('.page-loader-wrapper').css('display', 'none');
+        }
+      })
+    }else{
+      form.parsley().validate();
+    }
+});
 //hacer busqueda de folio para exportacion en pdf
 function relistarbuscarstringlike(){
     var tabla = $('#tablafoliosencontrados').DataTable();

@@ -176,6 +176,8 @@ function obtenerclientes(){
                           '</div>';
         $("#contenidomodaltablas").html(tablaclientes);
         $('#tbllistadocliente').DataTable({
+            "lengthMenu": [ 10, 50, 100, 250, 500 ],
+            "pageLength": 250,
             "sScrollX": "110%",
             "sScrollY": "370px",
             "bScrollCollapse": true,
@@ -202,7 +204,7 @@ function obtenerclientes(){
                     }
                 });
             },
-            "iDisplayLength": 8,
+            
         }); 
 } 
 //obtener datos de remision seleccionada
@@ -246,6 +248,8 @@ function obteneragentes(){
                           '</div>';
     $("#contenidomodaltablas").html(tablaagentes);
     $('#tbllistadoagente').DataTable({
+            "lengthMenu": [ 10, 50, 100, 250, 500 ],
+            "pageLength": 250,
           "sScrollX": "110%",
           "sScrollY": "370px",
           "bScrollCollapse": true,
@@ -272,7 +276,7 @@ function obteneragentes(){
                   }
               });
           },
-          "iDisplayLength": 8,
+          
     }); 
 } 
 //obtener datos de remision seleccionada
@@ -311,6 +315,8 @@ function obteneralmacenes(){
                         '</div>';
     $("#contenidomodaltablas").html(tablaalmacenes);
     $('#tbllistadoalmacen').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,
@@ -340,7 +346,7 @@ function obteneralmacenes(){
                 }
             });
         },
-        "iDisplayLength": 8,
+        
     }); 
 } 
 //obtener datos de remision seleccionada
@@ -382,7 +388,8 @@ function listarproductos(){
                                         '<th>Marca</th>'+
                                         '<th>Producto</th>'+
                                         '<th>Ubicación</th>'+
-                                        '<th>Existencias Totales</th>'+
+                                        '<th>Existencias</th>'+
+                                        '<th>Almacen</th>'+
                                         '<th>Costo $</th>'+
                                         '<th>Sub Total $</th>'+
                                       '</tr>'+
@@ -398,43 +405,46 @@ function listarproductos(){
                           '</div>';   
     $("#contenidomodaltablas").html(tablaproductos);
     $('#tbllistadoproducto').DataTable({
-      "sScrollX": "110%",
-      "sScrollY": "370px",
-      "bScrollCollapse": true,
-      processing: true,
-        'language': {
-          'loadingRecords': '&nbsp;',
-          'processing': '<div class="spinner"></div>'
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,
+        processing: true,
+            'language': {
+            'loadingRecords': '&nbsp;',
+            'processing': '<div class="spinner"></div>'
+            },
+        serverSide: true,
+        ajax: {
+            url: remisiones_obtener_productos,
+            data: function (d) {
+            d.codigoabuscar = $("#codigoabuscar").val();
+            d.numeroalmacen = $("#numeroalmacen").val();
+            d.tipooperacion = $("#tipooperacion").val();
+            }
         },
-      serverSide: true,
-      ajax: {
-        url: remisiones_obtener_productos,
-        data: function (d) {
-          d.codigoabuscar = $("#codigoabuscar").val();
-          d.numeroalmacen = $("#numeroalmacen").val();
-          d.tipooperacion = $("#tipooperacion").val();
-        }
-      },
-      columns: [
-        { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false  },
-        { data: 'Codigo', name: 'Codigo' },
-        { data: 'Marca', name: 'Marca', orderable: false, searchable: false  },
-        { data: 'Producto', name: 'Producto', orderable: false, searchable: false  },
-        { data: 'Ubicacion', name: 'Ubicacion', orderable: false, searchable: false  },
-        { data: 'Existencias', name: 'Existencias', orderable: false, searchable: false  },
-        { data: 'Costo', name: 'Costo', orderable: false, searchable: false  },
-        { data: 'SubTotal', name: 'SubTotal', orderable: false, searchable: false  } 
-      ],
-      "initComplete": function() {
-        var $buscar = $('div.dataTables_filter input');
-        $buscar.unbind();
-        $buscar.bind('keyup change', function(e) {
-          if(e.keyCode == 13 || this.value == "") {
-            $('#tbllistadoproducto').DataTable().search( this.value ).draw();
-          }
-        });
-      },
-      "iDisplayLength": 8,
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false  },
+            { data: 'Codigo', name: 'Codigo' },
+            { data: 'Marca', name: 'Marca', orderable: false, searchable: false  },
+            { data: 'Producto', name: 'Producto', orderable: false, searchable: false  },
+            { data: 'Ubicacion', name: 'Ubicacion', orderable: false, searchable: false  },
+            { data: 'Existencias', name: 'Existencias', orderable: false, searchable: false  },
+            { data: 'Almacen', name: 'Almacen', orderable: false, searchable: false  },
+            { data: 'Costo', name: 'Costo', orderable: false, searchable: false  },
+            { data: 'SubTotal', name: 'SubTotal', orderable: false, searchable: false  } 
+        ],
+        "initComplete": function() {
+            var $buscar = $('div.dataTables_filter input');
+            $buscar.unbind();
+            $buscar.bind('keyup change', function(e) {
+            if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistadoproducto').DataTable().search( this.value ).draw();
+            }
+            });
+        },
+        
     });
 }
 //función que evalua si la partida que quieren ingresar ya existe o no en el detalle de la orden de compra
@@ -513,37 +523,22 @@ function cambiodecantidadopreciopartida(fila,tipo){
   var cuentaFilas = 0;
   $("tr.filasproductos").each(function () {
     if(fila === cuentaFilas){  
-      $('.descuentopesospartida', this).val('0.'+numerocerosconfigurados); 
-      $('.descuentoporcentajepartida',this).val('0.'+numerocerosconfigurados);
-      calculartotalesfilas(fila);
-      //verificar si el almacen principal cuenta con las existencias requeridas
-      var numeroalmacen = $("#numeroalmacen").val();
-      var codigo = $(".codigoproductopartida", this).val();
-      var cantidadpartida = $(".cantidadpartida", this).val();
-      comprobarexistenciasenbd(fila, tipo, numeroalmacen, codigo).then(existencias=>{
-        /*if(cantidadpartida > existencias){*/
-            if(tipo == "alta"){
-            var dataparsleymax = existencias;
-            }else if(tipo == "modificacion"){
-            var dataparsleymax = new Decimal(existencias).plus($("#filaproducto"+fila+" .cantidadpartidadb").val());
-            }
-            $("#filaproducto"+fila+" .cantidadpartida").attr('data-parsley-existencias',dataparsleymax);
-            //$("#formparsley").parsley().validate();
-            $('.cantidadpartida', this).parsley().validate();
-            /*//mostrar error en existencias
-            $(".cantidaderrorexistencias", this).css('display','block');
-            $(".cantidaderrorexistencias", this).html("Error el almacen no cuenta con existencias suficientes");
-            $("#btnGuardar").attr('disabled', 'disabled');
-            $("#btnGuardarModificacion").attr('disabled', 'disabled');
-        }else{
-            //esconder error en existencias
-            $(".cantidaderrorexistencias", this).css('display','none');
-            $(".cantidaderrorexistencias", this).html("");
-            $(".cantidadincorrecta", this).val(0);
-            $("#btnGuardar").removeAttr('disabled');
-            $("#btnGuardarModificacion").removeAttr('disabled');
-        }*/
-      })
+        $('.descuentopesospartida', this).val('0.'+numerocerosconfigurados); 
+        $('.descuentoporcentajepartida',this).val('0.'+numerocerosconfigurados);
+        calculartotalesfilas(fila);
+        //verificar si el almacen principal cuenta con las existencias requeridas
+        var numeroalmacen = $("#numeroalmacen").val();
+        var codigo = $(".codigoproductopartida", this).val();
+        var cantidadpartida = $(".cantidadpartida", this).val();
+        comprobarexistenciasenbd(fila, tipo, numeroalmacen, codigo).then(existencias=>{
+                if(tipo == "alta"){
+                var dataparsleymax = existencias;
+                }else if(tipo == "modificacion"){
+                var dataparsleymax = new Decimal(existencias).plus($("#filaproducto"+fila+" .cantidadpartidadb").val());
+                }
+                $("#filaproducto"+fila+" .cantidadpartida").attr('data-parsley-existencias',dataparsleymax);
+                $('.cantidadpartida', this).parsley().validate();
+        })
     }  
     cuentaFilas++;
   });  
@@ -832,7 +827,7 @@ function alta(){
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Pedido</label>'+
-                                '<input type="text" class="form-control" name="pedido" id="pedido" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 50]">'+
+                                '<input type="text" class="form-control" name="pedido" id="pedido" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Solicitado por</label>'+
@@ -846,19 +841,19 @@ function alta(){
                         '<div class="row">'+
                             '<div class="col-md-3">'+
                                 '<label>Referencia</label>'+
-                                '<input type="text" class="form-control" name="referencia" id="referencia" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 50]">'+
+                                '<input type="text" class="form-control" name="referencia" id="referencia" onkeyup="tipoLetra(this);"  data-parsley-length="[1, 50]">'+
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Orden Servicio</label>'+
-                                '<input type="text" class="form-control" name="ordenservicio" id="ordenservicio" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control" name="ordenservicio" id="ordenservicio" onkeyup="tipoLetra(this);"  data-parsley-length="[1, 20]">'+
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Equipo </label>'+
-                                '<input type="text" class="form-control" name="equipo" id="equipo" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control" name="equipo" id="equipo" onkeyup="tipoLetra(this);"  data-parsley-length="[1, 20]">'+
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Requisición </label>'+
-                                '<input type="text" class="form-control" name="requisicion" id="requisicion"  onkeyup="tipoLetra(this);" required data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control" name="requisicion" id="requisicion"  onkeyup="tipoLetra(this);"  data-parsley-length="[1, 20]">'+
                             '</div>'+
                         '</div>'+
                     '</div>'+
@@ -1451,6 +1446,52 @@ $("#btnGuardarModificacion").on('click', function (e) {
         })
     }else{
         form.parsley().validate();
+    }
+});
+//obtener datos para el envio del documento por email
+function enviardocumentoemail(documento){
+    $.get(remisiones_obtener_datos_envio_email,{documento:documento}, function(data){
+      $("#textomodalenviarpdfemail").html("Enviar email Remisión No." + documento);
+      $("#emaildocumento").val(documento);
+      $("#emailde").val(data.emailde);
+      $("#emailpara").val(data.emailpara);
+      $("#emailasunto").val("REMISIÓN NO. " + documento +" DE USADOS TRACTOCAMIONES Y PARTES REFACCIONARIAS SA DE CV");
+      $("#modalenviarpdfemail").modal('show');
+    })   
+}
+//enviar documento pdf por email
+$("#btnenviarpdfemail").on('click', function (e) {
+    e.preventDefault();
+    var formData = new FormData($("#formenviarpdfemail")[0]);
+    var form = $("#formenviarpdfemail");
+    if (form.parsley().isValid()){
+      $('.page-loader-wrapper').css('display', 'block');
+      $.ajax({
+        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+        url:remisiones_enviar_pdfs_email,
+        type: "post",
+        dataType: "html",
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success:function(data){
+          msj_documentoenviadoporemailcorrectamente();
+          $("#modalenviarpdfemail").modal('hide');
+          $('.page-loader-wrapper').css('display', 'none');
+        },
+        error:function(data){
+          if(data.status == 403){
+            msj_errorenpermisos();
+          }else{
+            msj_errorajax();
+          }
+          $("#modalenviarpdfemail").modal('hide');
+          $('.page-loader-wrapper').css('display', 'none');
+        }
+      })
+    }else{
+      form.parsley().validate();
     }
 });
 //hacer busqueda de folio para exportacion en pdf

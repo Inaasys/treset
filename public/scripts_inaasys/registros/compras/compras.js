@@ -174,6 +174,8 @@ function obtenerproveedores(){
                     '</div>';
     $("#contenidomodaltablas").html(tablaproveedores);
     $('#tbllistadoproveedor').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,  
@@ -204,7 +206,7 @@ function obtenerproveedores(){
                 }
             });
         },
-        "iDisplayLength": 8,
+        
     }); 
 } 
 //obtener datos del proveedor
@@ -247,6 +249,8 @@ function obteneralmacenes(){
                         '</div>';
       $("#contenidomodaltablas").html(tablaalmacenes);
       $('#tbllistadoalmacen').DataTable({
+          "lengthMenu": [ 10, 50, 100, 250, 500 ],
+          "pageLength": 250,
           "sScrollX": "110%",
           "sScrollY": "370px",
           "bScrollCollapse": true,  
@@ -273,7 +277,7 @@ function obteneralmacenes(){
                   }
               });
           },
-          "iDisplayLength": 8,
+          
       }); 
 } 
 //obtener datos del almacen
@@ -311,6 +315,8 @@ function listardepartamentos(fila){
                             '</div>';   
   $("#contenidomodaltablas").html(tabladepartamentos);
   $('#tbllistadodepartamento').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
       "bScrollCollapse": true,  
@@ -340,7 +346,7 @@ function listardepartamentos(fila){
               }
           });
       },
-      "iDisplayLength": 8,
+      
   });
 }
 //seleccion de departamento
@@ -389,6 +395,8 @@ function listarordenesdecompra (){
                             '</div>';
     $("#contenidomodaltablas").html(tablaordenescompra);
     $('#tbllistadoordencompra').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,  
@@ -423,7 +431,7 @@ function listarordenesdecompra (){
                 }
             });
         },
-        "iDisplayLength": 8,
+        
     });  
 } 
 //obtener todos los datos de la orden de compra seleccionada
@@ -552,7 +560,8 @@ function listarproductos(){
                                       '<th>Marca</th>'+
                                       '<th>Producto</th>'+
                                       '<th>Ubicación</th>'+
-                                      '<th>Existencias Totales</th>'+
+                                      '<th>Existencias</th>'+
+                                      '<th>Almacen</th>'+
                                       '<th>Costo $</th>'+
                                       '<th>Sub Total $</th>'+
                                     '</tr>'+
@@ -568,6 +577,8 @@ function listarproductos(){
                         '</div>';   
   $("#contenidomodaltablas").html(tablaproductos);
   $('#tbllistadoproducto').DataTable({
+    "lengthMenu": [ 10, 50, 100, 250, 500 ],
+    "pageLength": 250,
     "sScrollX": "110%",
     "sScrollY": "370px",
     "bScrollCollapse": true,
@@ -592,6 +603,7 @@ function listarproductos(){
       { data: 'Producto', name: 'Producto', orderable: false, searchable: false  },
       { data: 'Ubicacion', name: 'Ubicacion', orderable: false, searchable: false  },
       { data: 'Existencias', name: 'Existencias', orderable: false, searchable: false  },
+      { data: 'Almacen', name: 'Almacen', orderable: false, searchable: false  },
       { data: 'Costo', name: 'Costo', orderable: false, searchable: false  },
       { data: 'SubTotal', name: 'SubTotal', orderable: false, searchable: false  } 
     ],
@@ -604,7 +616,7 @@ function listarproductos(){
         }
       });
     },
-    "iDisplayLength": 8,
+    
   });
 }
 //funcion que evalua si el codigo agregado existe en la orden de compra
@@ -1925,6 +1937,52 @@ function movimientoscompra(compra){
     $("#filasmovimientos").html(data.filasmovimientos);
   });
 }
+//obtener datos para el envio del documento por email
+function enviardocumentoemail(documento){
+  $.get(compras_obtener_datos_envio_email,{documento:documento}, function(data){
+    $("#textomodalenviarpdfemail").html("Enviar email Compra No." + documento);
+    $("#emaildocumento").val(documento);
+    $("#emailde").val(data.emailde);
+    $("#emailpara").val(data.emailpara);
+    $("#emailasunto").val("COMPRA NO. " + documento +" DE USADOS TRACTOCAMIONES Y PARTES REFACCIONARIAS SA DE CV");
+    $("#modalenviarpdfemail").modal('show');
+  })   
+}
+//enviar documento pdf por email
+$("#btnenviarpdfemail").on('click', function (e) {
+  e.preventDefault();
+  var formData = new FormData($("#formenviarpdfemail")[0]);
+  var form = $("#formenviarpdfemail");
+  if (form.parsley().isValid()){
+    $('.page-loader-wrapper').css('display', 'block');
+    $.ajax({
+      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+      url:compras_enviar_pdfs_email,
+      type: "post",
+      dataType: "html",
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false,
+      success:function(data){
+        msj_documentoenviadoporemailcorrectamente();
+        $("#modalenviarpdfemail").modal('hide');
+        $('.page-loader-wrapper').css('display', 'none');
+      },
+      error:function(data){
+        if(data.status == 403){
+          msj_errorenpermisos();
+        }else{
+          msj_errorajax();
+        }
+        $("#modalenviarpdfemail").modal('hide');
+        $('.page-loader-wrapper').css('display', 'none');
+      }
+    })
+  }else{
+    form.parsley().validate();
+  }
+});
 //hacer busqueda de folio para exportacion en pdf
 function relistarbuscarstringlike(){
   var tabla = $('#tablafoliosencontrados').DataTable();

@@ -171,6 +171,8 @@ function obtenerpersonalrecibe(){
                     '</div>';
     $("#contenidomodaltablas").html(tablapersonalrecibe);
     $('#tbllistadopersonalrecibe').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,
@@ -203,7 +205,7 @@ function obtenerpersonalrecibe(){
                 }
             });
         },
-        "iDisplayLength": 8,
+        
     }); 
 } 
 function seleccionarpersonalrecibe(id, nombre){
@@ -254,10 +256,10 @@ function calculartotalesfilasordencompra(fila){
       // obtener los datos de la fila:
       var cantidadpartida = $(".cantidadpartida", this).val();
       var preciopartida = $('.preciopartida', this).val();
-      var totalpesospartida = $('.totalpesospartida', this).val(); 
+      var totalpesospartida = $('.totalpartida', this).val(); 
       //total de la partida
       totalpesospartida =  new Decimal(cantidadpartida).times(preciopartida);
-      $('.totalpesospartida', this).val(number_format(round(totalpesospartida, numerodecimales), numerodecimales, '.', ''));
+      $('.totalpartida', this).val(number_format(round(totalpesospartida, numerodecimales), numerodecimales, '.', ''));
       calculartotal();
     }  
     cuentaFilas++;
@@ -319,6 +321,8 @@ function herramientaasignadapersonal(){
                                                           '</div>';
   $("#contenidomodaltablas").html(tablaherramientasasignadaspersonalseleccionado);
   $('#tablaherramientasasignadaspersonalseleccionado').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
       "bScrollCollapse": true,
@@ -349,11 +353,11 @@ function herramientaasignadapersonal(){
           $buscar.unbind();
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {
-              $('#tablaherramientasasignadaspersonalseleccionado').DataTable().search( this.value ).draw();
+                $('#tablaherramientasasignadaspersonalseleccionado').DataTable().search( this.value ).draw();
               }
           });
       },
-      "iDisplayLength": 8,
+      
   });   
 }
 //evaluar nunmero de filas

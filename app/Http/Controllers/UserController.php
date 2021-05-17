@@ -76,7 +76,7 @@ class UserController extends ConfiguracionSistemaController
             $Usuario = 1;
 	    }else{
             //insertar registro
-            if (App::environment('local')) {
+            if (App::environment('local') || App::environment('production')) {
                 DB::unprepared('SET IDENTITY_INSERT users ON');
             }
             $id = Helpers::ultimoidregistrotabla('App\User');
@@ -89,7 +89,7 @@ class UserController extends ConfiguracionSistemaController
             $Usuario->role_id=$request->rol;
 		    $Usuario->status="ALTA";
             $Usuario->save();
-            if (App::environment('local')) {
+            if (App::environment('local') || App::environment('production')) {
                 DB::unprepared('SET IDENTITY_INSERT users OFF');
             }
                 //dar de alta en tabla personal
@@ -229,7 +229,7 @@ class UserController extends ConfiguracionSistemaController
             $submenuexplode = explode(',',$submenu);
             $menu = Menu::where('name', $submenuexplode[0])->first();
             $id = Helpers::ultimoidregistrotabla('App\User_Rel_Menu');
-            if (App::environment('local')) {
+            if (App::environment('local') || App::environment('production')) {
                 DB::unprepared('SET IDENTITY_INSERT user_rel_menus ON');
             }
             $User_Rel_Menu = new User_Rel_Menu;
@@ -238,7 +238,7 @@ class UserController extends ConfiguracionSistemaController
             $User_Rel_Menu->user_id = $request->id_usuario_permisos;
             $User_Rel_Menu->status = $submenuexplode[1];
             $User_Rel_Menu->save();
-            if (App::environment('local')) {
+            if (App::environment('local') || App::environment('production')) {
                 DB::unprepared('SET IDENTITY_INSERT user_rel_menus OFF');
             }
         }
@@ -250,7 +250,7 @@ class UserController extends ConfiguracionSistemaController
             $permiso_crudexplode = explode(',',$permiso_crud);
             $permiso = Permiso::where('name', $permiso_crudexplode[0])->first();
             $id = Helpers::ultimoidregistrotabla('App\User_Rel_Permiso');
-            if (App::environment('local')) {
+            if (App::environment('local') || App::environment('production')) {
                 DB::unprepared('SET IDENTITY_INSERT user_rel_permisos ON');
             }
             $User_Rel_Permiso = new User_Rel_Permiso;
@@ -259,7 +259,7 @@ class UserController extends ConfiguracionSistemaController
             $User_Rel_Permiso->permiso_id = $permiso->id;
             $User_Rel_Permiso->status = $permiso_crudexplode[1];
             $User_Rel_Permiso->save();
-            if (App::environment('local')) {
+            if (App::environment('local') || App::environment('production')) {
                 DB::unprepared('SET IDENTITY_INSERT user_rel_permisos OFF');
             }
         }

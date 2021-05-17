@@ -21,6 +21,9 @@ use App\BitacoraDocumento;
 use App\Producto;
 use App\Configuracion_Tabla;
 use App\VistaAjusteInventario;
+use App\VistaObtenerExistenciaProducto;
+use Config;
+use Mail;
 
 class AjusteInventarioController extends ConfiguracionSistemaController{
 
@@ -53,7 +56,9 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
                     ->addColumn('operaciones', function($data){
                         $botoncambios =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Ajuste .'\')"><i class="material-icons">mode_edit</i></div> '; 
                         $botonbajas =      '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Ajuste .'\')"><i class="material-icons">cancel</i></div> ';
-                        $operaciones =  $botoncambios.$botonbajas;
+                        $botondocumentopdf = '<a href="'.route('ajustesinventario_generar_pdfs_indiv',$data->Ajuste).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
+                        $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Ajuste .'\')"><i class="material-icons">email</i></div> ';
+                        $operaciones =  $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
                         return $operaciones;
                     })
                     ->addColumn('total', function($data){ return $data->Total; })
@@ -87,37 +92,15 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
         if($request->ajax()){
             $codigoabuscar = $request->codigoabuscar;
             $tipooperacion = $request->tipooperacion;
-            $data = DB::table('Productos as t')
-            ->leftJoin('Marcas as m', 'm.Numero', '=', 't.Marca')
-            ->leftJoin(DB::raw("(select codigo, sum(existencias) as existencias from Existencias group by codigo) as e"),
-                function($join){
-                    $join->on("e.codigo","=","t.codigo");
-                })
-            ->select('t.Codigo as Codigo', 't.Producto as Producto', 't.Ubicacion as Ubicacion', 'e.Existencias as Existencias', 't.Costo as Costo', 't.SubTotal as SubTotal', 't.Marca as Marca', 't.Status as Status', 't.Unidad AS Unidad', 't.Impuesto AS Impuesto')
-            ->where('t.Codigo', 'like', '%' . $codigoabuscar . '%')
-            ->get();
-            /*
-            $data = DB::table('Productos as t')
-            ->leftJoin('Marcas as m', 'm.Numero', '=', 't.Marca')
-            ->join('Existencias as e', 'e.Codigo', '=', 't.Codigo')
-            ->leftJoin(DB::raw("(
-                                    select t.Codigo, t.Almacen, t.Ubicacion
-                                    From
-                                    (
-                                        select 1 as Almacen, Codigo, Ubicacion from productos
-                                        Union All
-                                        select Almacen, Codigo, Ubicacion from [Productos Ubicaciones] where almacen > 1
-                                    ) as t
-                                ) as u "),
-            function($join){
-                $join->on("u.Codigo","=","e.Codigo")->on("u.Almacen","=","e.Almacen");
-            })
-            ->select('t.Codigo as Codigo', 't.Producto as Producto', 'e.Almacen as Almacen', 'u.Ubicacion as Ubicacion', 'e.Existencias as Existencias', 't.Costo as Costo', 't.SubTotal as SubTotal', 't.Marca as Marca', 't.Status as Status', 't.Unidad AS Unidad', 't.Impuesto AS Impuesto')
-            ->where('t.Codigo', 'like', '%' . $codigoabuscar . '%')
-            ->get();*/
+            $numeroalmacen = $request->numeroalmacen;
+            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->get();
             return DataTables::of($data)
-                    ->addColumn('operaciones', function($data) use ($tipooperacion){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.$tipooperacion.'\')">Seleccionar</div>';
+                    ->addColumn('operaciones', function($data) use ($tipooperacion, $numeroalmacen){
+                        if($data->Almacen == $numeroalmacen){
+                            $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.$tipooperacion.'\')">Seleccionar</div>';
+                        }else{
+                            $boton = '';
+                        }    
                         return $boton;
                     })
                     ->addColumn('Existencias', function($data){ 
@@ -129,7 +112,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
                     ->addColumn('SubTotal', function($data){ 
                         return Helpers::convertirvalorcorrecto($data->SubTotal);
                     })
-                    ->rawColumns(['operaciones','Costo','Existencias','SubTotal'])
+                    ->rawColumns(['operaciones'])
                     ->make(true);
         } 
     }
@@ -699,6 +682,142 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
         ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
         return $pdf->stream();
+    }
+
+    //generacion de formato en PDF
+    public function ajustesinventario_generar_pdfs_indiv($documento){
+        $ajustes = AjusteInventario::where('Ajuste', $documento)->get(); 
+        $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $data=array();
+        foreach ($ajustes as $a){
+            $ajustedetalle = AjusteInventarioDetalle::where('Ajuste', $a->Ajuste)->get();
+            $datadetalle=array();
+            foreach($ajustedetalle as $ad){
+                $producto = Producto::where('Codigo', $ad->Codigo)->first();
+                $totalentradas=$ad->Entradas*$ad->Costo;
+                $totalsalidas=$ad->Salidas*$ad->Costo;
+                if($totalentradas >= $totalsalidas){
+                    $total = $totalentradas - $totalsalidas;
+                }else{
+                    $total = $totalsalidas - $totalentradas;
+                }
+                $datadetalle[]=array(
+                    "codigodetalle"=>$ad->Codigo,
+                    "descripciondetalle"=>$ad->Descripcion,
+                    "ubicaciondetalle"=>$producto->Ubicacion,
+                    "existendetalle"=> Helpers::convertirvalorcorrecto($ad->Existencias),
+                    "entradasdetalle" => Helpers::convertirvalorcorrecto($ad->Entradas),
+                    "salidasdetalle" => Helpers::convertirvalorcorrecto($ad->Salidas),
+                    "realdetalle" => Helpers::convertirvalorcorrecto($ad->Real),
+                    "costodetalle" => Helpers::convertirvalorcorrecto($ad->Costo),
+                    "totaldetalle" => Helpers::convertirvalorcorrecto($total)
+                );
+            } 
+            $data[]=array(
+                      "ajuste"=>$a,
+                      "totalajuste"=>Helpers::convertirvalorcorrecto($a->Total),
+                      "fechaformato"=> $fechaformato,
+                      "datadetalle" => $datadetalle,
+                      "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
+            );
+        }
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('registros.ajustesinventario.formato_pdf_ajustesinventario', compact('data'))
+        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-right', ''.$fechaformato.'')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        return $pdf->stream();
+    }
+
+    //obtener datos para enviar email
+    public function ajustesinventario_obtener_datos_envio_email(Request $request){
+        $ajusteinventario = AjusteInventario::where('Ajuste', $request->documento)->first();
+        $data = array(
+            'ajusteinventario' => $ajusteinventario,
+            'emailde' => Config::get('mail.from.address'),
+        );
+        return response()->json($data);
+    }
+
+    //enviar pdf por emial
+    public function ajustesinventario_enviar_pdfs_email(Request $request){
+        $ajustes = AjusteInventario::where('Ajuste', $request->emaildocumento)->get(); 
+        $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $data=array();
+        foreach ($ajustes as $a){
+            $ajustedetalle = AjusteInventarioDetalle::where('Ajuste', $a->Ajuste)->get();
+            $datadetalle=array();
+            foreach($ajustedetalle as $ad){
+                $producto = Producto::where('Codigo', $ad->Codigo)->first();
+                $totalentradas=$ad->Entradas*$ad->Costo;
+                $totalsalidas=$ad->Salidas*$ad->Costo;
+                if($totalentradas >= $totalsalidas){
+                    $total = $totalentradas - $totalsalidas;
+                }else{
+                    $total = $totalsalidas - $totalentradas;
+                }
+                $datadetalle[]=array(
+                    "codigodetalle"=>$ad->Codigo,
+                    "descripciondetalle"=>$ad->Descripcion,
+                    "ubicaciondetalle"=>$producto->Ubicacion,
+                    "existendetalle"=> Helpers::convertirvalorcorrecto($ad->Existencias),
+                    "entradasdetalle" => Helpers::convertirvalorcorrecto($ad->Entradas),
+                    "salidasdetalle" => Helpers::convertirvalorcorrecto($ad->Salidas),
+                    "realdetalle" => Helpers::convertirvalorcorrecto($ad->Real),
+                    "costodetalle" => Helpers::convertirvalorcorrecto($ad->Costo),
+                    "totaldetalle" => Helpers::convertirvalorcorrecto($total)
+                );
+            } 
+            $data[]=array(
+                      "ajuste"=>$a,
+                      "totalajuste"=>Helpers::convertirvalorcorrecto($a->Total),
+                      "fechaformato"=> $fechaformato,
+                      "datadetalle" => $datadetalle,
+                      "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
+            );
+        }
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('registros.ajustesinventario.formato_pdf_ajustesinventario', compact('data'))
+        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-right', ''.$fechaformato.'')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        try{
+            //enviar correo electrónico	
+            $nombre = 'Receptor envio de correos';
+            $receptor = $request->emailpara;
+            $correos = [$request->emailpara];
+            $asunto = $request->emailasunto;
+            $emaildocumento = $request->emaildocumento;
+            $name = "Receptor envio de correos";
+            $body = $request->emailasunto;
+            $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
+            $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
+            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
+                $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                        ->cc($correos)
+                        ->subject($asunto)
+                        ->attachData($pdf->output(), "AjusteInventarioNo".$emaildocumento.".pdf");
+            });
+        } catch(\Exception $e) {
+            $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
+            $correos = ['osbaldo.anzaldo@utpcamiones.com.mx'];
+            $msj = 'Error al enviar correo';
+            Mail::send('correos.errorenvio.error', compact('e','msj'), function($message) use ($receptor, $correos) {
+                $message->to($receptor)
+                        ->cc($correos)
+                        ->subject('Error al enviar correo nuevo usuario');
+            });
+        }
     }
 
     public function ajustesinventario_exportar_excel(Request $request){

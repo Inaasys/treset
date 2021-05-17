@@ -25,6 +25,10 @@ use App\Producto;
 use App\Marca;
 use App\Configuracion_Tabla;
 use App\VistaOrdenCompra;
+use App\VistaObtenerExistenciaProducto;
+use Config;
+use Mail;
+
 
 class OrdenCompraController extends ConfiguracionSistemaController{
 
@@ -57,8 +61,10 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     ->addColumn('operaciones', function($data) use ($tipousuariologueado){
                         $botoncambios = '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Orden .'\')"><i class="material-icons">mode_edit</i></div> ';
                         $botonautorizar = '<div class="btn bg-green btn-xs waves-effect" data-toggle="tooltip" title="Autorizar" onclick="autorizarordencompra(\''.$data->Orden .'\')"><i class="material-icons">check</i></div> ';
-                        $botonbajas = '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Orden .'\')"><i class="material-icons">cancel</i></div>';
-                        $boton = $botoncambios.$botonautorizar.$botonbajas;
+                        $botonbajas = '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Orden .'\')"><i class="material-icons">cancel</i></div> ';
+                        $botondocumentopdf = '<a href="'.route('ordenes_compra_generar_pdfs_indiv',$data->Orden).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
+                        $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Orden .'\')"><i class="material-icons">email</i></div> ';
+                        $boton = $botoncambios.$botonautorizar.$botonbajas.$botondocumentopdf.$botonenviaremail;
                         return $boton;
                     })
                     ->addColumn('SubTotal', function($data){ return $data->SubTotal; })
@@ -114,33 +120,27 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         if($request->ajax()){
             $codigoabuscar = $request->codigoabuscar;
             $tipooperacion = $request->tipooperacion;
-            $data = DB::table('Productos as t')
-            ->leftJoin('Marcas as m', 'm.Numero', '=', 't.Marca')
-            ->leftJoin(DB::raw("(select codigo, sum(existencias) as existencias from Existencias group by codigo) as e"),
-            function($join){
-                $join->on("e.codigo","=","t.codigo");
-            })
-            ->select('t.Codigo as Codigo', 't.Producto as Producto', 't.Ubicacion as Ubicacion', 'e.Existencias as Existencias', 't.Costo as Costo', 't.SubTotal as SubTotal', 't.Marca as Marca', 't.Status as Status', 't.Unidad AS Unidad', 't.Impuesto AS Impuesto')
-            ->where('t.Codigo', 'like', '%' . $codigoabuscar . '%')
-            ->get();
+            $numeroalmacen = $request->numeroalmacen;
+            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->get();
             return DataTables::of($data)
-                    ->addColumn('operaciones', function($data) use ($tipooperacion){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.$tipooperacion.'\')">Seleccionar</div>';
+                    ->addColumn('operaciones', function($data) use ($tipooperacion, $numeroalmacen){
+                        if($data->Almacen == $numeroalmacen){
+                            $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.$tipooperacion.'\')">Seleccionar</div>';
+                        }else{
+                            $boton = '';
+                        }
                         return $boton;
                     })
                     ->addColumn('Existencias', function($data){ 
-                        $existencias = Helpers::convertirvalorcorrecto($data->Existencias);
-                        return $existencias;
+                        return Helpers::convertirvalorcorrecto($data->Existencias);
                     })
                     ->addColumn('Costo', function($data){ 
-                        $costo = Helpers::convertirvalorcorrecto($data->Costo);
-                        return $costo;
+                        return Helpers::convertirvalorcorrecto($data->Costo);
                     })
                     ->addColumn('SubTotal', function($data){ 
-                        $subtotal = Helpers::convertirvalorcorrecto($data->SubTotal);
-                        return $subtotal;
+                        return Helpers::convertirvalorcorrecto($data->SubTotal);
                     })
-                    ->rawColumns(['operaciones','Costo','Existencias','SubTotal'])
+                    ->rawColumns(['operaciones'])
                     ->make(true);
         } 
     }
@@ -583,13 +583,150 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         ->setOption('margin-bottom', 10);
         return $pdf->stream();
     }
+
+    //generacion de formato en PDF
+    public function ordenes_compra_generar_pdfs_indiv($documento){
+        $ordenescompra = OrdenCompra::where('Orden', $documento)->orderBy('Folio', 'ASC')->get(); 
+        $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $data=array();
+        foreach ($ordenescompra as $oc){
+            $ordencompradetalle = OrdenCompraDetalle::where('Orden', $oc->Orden)->get();
+            $datadetalle=array();
+            foreach($ordencompradetalle as $ocd){
+                $producto = Producto::where('Codigo', $ocd->Codigo)->first();
+                $marca = Marca::where('Numero', $producto->Marca)->first();
+                $datadetalle[]=array(
+                    "cantidaddetalle"=> Helpers::convertirvalorcorrecto($ocd->Cantidad),
+                    "codigodetalle"=>$ocd->Codigo,
+                    "descripciondetalle"=>$ocd->Descripcion,
+                    "marcadetalle"=>$marca->Nombre,
+                    "ubicaciondetalle"=>$producto->Ubicacion,
+                    "preciodetalle" => Helpers::convertirvalorcorrecto($ocd->Precio),
+                    "descuentodetalle" => Helpers::convertirvalorcorrecto($ocd->Dcto),
+                    "subtotaldetalle" => Helpers::convertirvalorcorrecto($ocd->SubTotal)
+                );
+            } 
+            $proveedor = Proveedor::where('Numero', $oc->Proveedor)->first();
+            $data[]=array(
+                      "ordencompra"=>$oc,
+                      "descuentoordencompra"=>Helpers::convertirvalorcorrecto($oc->Descuento),
+                      "subtotalordencompra"=>Helpers::convertirvalorcorrecto($oc->SubTotal),
+                      "ivaordencompra"=>Helpers::convertirvalorcorrecto($oc->Iva),
+                      "totalordencompra"=>Helpers::convertirvalorcorrecto($oc->Total),
+                      "proveedor" => $proveedor,
+                      "fechaformato"=> $fechaformato,
+                      "datadetalle" => $datadetalle,
+                      "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
+            );
+        }
+        //dd($data);
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('registros.ordenescompra.formato_pdf_ordenescompra', compact('data'))
+        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-right', ''.$fechaformato.'')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        return $pdf->stream();
+    }
+
+    //obtener datos para enviar email
+    public function ordenes_compra_obtener_datos_envio_email(Request $request){
+        $ordencompra = OrdenCompra::where('Orden', $request->documento)->first();
+        $proveedor = Proveedor::where('Numero',$ordencompra->Proveedor)->first();
+        $data = array(
+            'ordencompra' => $ordencompra,
+            'proveedor' => $proveedor,
+            'emailde' => Config::get('mail.from.address'),
+            'emailpara' => $proveedor->Email1
+        );
+        return response()->json($data);
+    }
+
+    //enviar pdf por emial
+    public function ordenes_compra_enviar_pdfs_email(Request $request){
+        $ordenescompra = OrdenCompra::where('Orden', $request->emaildocumento)->orderBy('Folio', 'ASC')->get(); 
+        $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $data=array();
+        foreach ($ordenescompra as $oc){
+            $ordencompradetalle = OrdenCompraDetalle::where('Orden', $oc->Orden)->get();
+            $datadetalle=array();
+            foreach($ordencompradetalle as $ocd){
+                $producto = Producto::where('Codigo', $ocd->Codigo)->first();
+                $marca = Marca::where('Numero', $producto->Marca)->first();
+                $datadetalle[]=array(
+                    "cantidaddetalle"=> Helpers::convertirvalorcorrecto($ocd->Cantidad),
+                    "codigodetalle"=>$ocd->Codigo,
+                    "descripciondetalle"=>$ocd->Descripcion,
+                    "marcadetalle"=>$marca->Nombre,
+                    "ubicaciondetalle"=>$producto->Ubicacion,
+                    "preciodetalle" => Helpers::convertirvalorcorrecto($ocd->Precio),
+                    "descuentodetalle" => Helpers::convertirvalorcorrecto($ocd->Dcto),
+                    "subtotaldetalle" => Helpers::convertirvalorcorrecto($ocd->SubTotal)
+                );
+            } 
+            $proveedor = Proveedor::where('Numero', $oc->Proveedor)->first();
+            $data[]=array(
+                      "ordencompra"=>$oc,
+                      "descuentoordencompra"=>Helpers::convertirvalorcorrecto($oc->Descuento),
+                      "subtotalordencompra"=>Helpers::convertirvalorcorrecto($oc->SubTotal),
+                      "ivaordencompra"=>Helpers::convertirvalorcorrecto($oc->Iva),
+                      "totalordencompra"=>Helpers::convertirvalorcorrecto($oc->Total),
+                      "proveedor" => $proveedor,
+                      "fechaformato"=> $fechaformato,
+                      "datadetalle" => $datadetalle,
+                      "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
+            );
+        }
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('registros.ordenescompra.formato_pdf_ordenescompra', compact('data'))
+        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-right', ''.$fechaformato.'')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        try{
+            //enviar correo electrónico	
+            $nombre = 'Receptor envio de correos';
+            $receptor = $request->emailpara;
+            $correos = [$request->emailpara];
+            $asunto = $request->emailasunto;
+            $emaildocumento = $request->emaildocumento;
+            $name = "Receptor envio de correos";
+            $body = $request->emailasunto;
+            $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
+            $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
+            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
+                $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                        ->cc($correos)
+                        ->subject($asunto)
+                        ->attachData($pdf->output(), "OrdenCompraNo".$emaildocumento.".pdf");
+            });
+        } catch(\Exception $e) {
+            $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
+            $correos = ['osbaldo.anzaldo@utpcamiones.com.mx'];
+            $msj = 'Error al enviar correo';
+            Mail::send('correos.errorenvio.error', compact('e','msj'), function($message) use ($receptor, $correos) {
+                $message->to($receptor)
+                        ->cc($correos)
+                        ->subject('Error al enviar correo nuevo usuario');
+            });
+        }
+    }
+
     //exportar ordenes de compra en excel
     public function ordenes_compra_exportar_excel(Request $request){
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         return Excel::download(new OrdenesDeCompraExport($this->campos_consulta,$request->periodo), "ordenesdecompra-".$request->periodo.".xlsx");   
-
     }
+
     //configurar tabla
     public function ordenes_compra_guardar_configuracion_tabla(Request $request){
         if($request->string_datos_tabla_false == null){

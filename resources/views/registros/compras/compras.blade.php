@@ -72,7 +72,7 @@
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover">
                                     <thead class="customercolor">
                                         <tr>
-                                            <th><div style="width:80px !important;">Operaciones</div></th>
+                                            <th><div style="width:150px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
                                             <th>{{$co}}</th>
                                             @endforeach
@@ -217,6 +217,9 @@
 <!-- modal para crear documento en PDF-->
 @include('secciones.modalcreardocumento')
 <!-- fin modal para crear documento en PDF-->
+<!-- modal para enviar por email documento en PDF-->
+@include('secciones.modalenviardocumentoemail')
+<!-- fin modal para enviar por email documento en PDF-->
 <!-- modal para configuraciones de tablas-->
 @include('secciones.modalconfiguraciontablas')
 <!-- fin modal para configuraciones de tablas-->
@@ -257,6 +260,8 @@
         var compras_guardar_modificacion = '{!!URL::to('compras_guardar_modificacion')!!}';
         var compras_verificar_uso_en_modulos =  '{!!URL::to('compras_verificar_uso_en_modulos')!!}';
         var compras_alta_o_baja = '{!!URL::to('compras_alta_o_baja')!!}'; 
+        var compras_obtener_datos_envio_email = '{!!URL::to('compras_obtener_datos_envio_email')!!}';
+        var compras_enviar_pdfs_email = '{!!URL::to('compras_enviar_pdfs_email')!!}';
         var compras_buscar_folio_string_like = '{!!URL::to('compras_buscar_folio_string_like')!!}'; 
     </script>
     @include('secciones.libreriasregistrosycatalogos')

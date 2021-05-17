@@ -152,6 +152,8 @@ function obteneralmacenes(){
                         '</div>';
     $("#contenidomodaltablas").html(tablaalmacenes);
     $('#tbllistadoalmacen').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,
@@ -178,7 +180,7 @@ function obteneralmacenes(){
                 }
             });
         },
-        "iDisplayLength": 8,
+        
     }); 
 } 
 //obtener datos de remision seleccionada
@@ -214,7 +216,6 @@ function cargarnuevosdatosenfilas(){
       fila++;
   });  
 }
-
 //funcion asincrona para buscar existencias de la partida
 function obtenernuevosdatosfila(numeroalmacen, codigopartida, folio, serie, fila, entradaspartida, salidaspartida){
   return new Promise((ejecuta)=>{
@@ -225,9 +226,6 @@ function obtenernuevosdatosfila(numeroalmacen, codigopartida, folio, serie, fila
     },500);
   })
 }
-
-
-
 //detectar cuando en el input de buscar por codigo de producto el usuario presione la tecla enter, si es asi se realizara la busqueda con el codigo escrito
 $(document).ready(function(){
     $("#codigoabuscar").keypress(function(e) {
@@ -256,7 +254,8 @@ function listarproductos(){
                                         '<th>Marca</th>'+
                                         '<th>Producto</th>'+
                                         '<th>Ubicación</th>'+
-                                        '<th>Existencias Totales</th>'+
+                                        '<th>Existencias</th>'+
+                                        '<th>Almacen</th>'+
                                         '<th>Costo $</th>'+
                                         '<th>Sub Total $</th>'+
                                       '</tr>'+
@@ -272,6 +271,8 @@ function listarproductos(){
                           '</div>';   
     $("#contenidomodaltablas").html(tablaproductos);
     $('#tbllistadoproducto').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
       "bScrollCollapse": true,
@@ -286,6 +287,7 @@ function listarproductos(){
         data: function (d) {
           d.codigoabuscar = $("#codigoabuscar").val();
           d.tipooperacion = $("#tipooperacion").val();
+          d.numeroalmacen = $("#numeroalmacen").val();
         }
       },
       columns: [
@@ -295,6 +297,7 @@ function listarproductos(){
         { data: 'Producto', name: 'Producto', orderable: false, searchable: false  },
         { data: 'Ubicacion', name: 'Ubicacion', orderable: false, searchable: false  },
         { data: 'Existencias', name: 'Existencias', orderable: false, searchable: false  },
+        { data: 'Almacen', name: 'Almacen', orderable: false, searchable: false  },
         { data: 'Costo', name: 'Costo', orderable: false, searchable: false  },
         { data: 'SubTotal', name: 'SubTotal', orderable: false, searchable: false  } 
       ],
@@ -307,7 +310,7 @@ function listarproductos(){
           }
         });
       },
-      "iDisplayLength": 8,
+      
     });
   }
   //función que evalua si la partida que quieren ingresar ya existe o no en el detalle de la orden de compra
@@ -801,6 +804,51 @@ $("#btnGuardarModificacion").on('click', function (e) {
         }else{
           msj_errorajax();
         }
+        $('.page-loader-wrapper').css('display', 'none');
+      }
+    })
+  }else{
+    form.parsley().validate();
+  }
+});
+//obtener datos para el envio del documento por email
+function enviardocumentoemail(documento){
+  $.get(ajustesinventario_obtener_datos_envio_email,{documento:documento}, function(data){
+    $("#textomodalenviarpdfemail").html("Enviar email Ajuste de Inventario No." + documento);
+    $("#emaildocumento").val(documento);
+    $("#emailde").val(data.emailde);
+    $("#emailasunto").val("AJUSTE DE INVENTARIO NO. " + documento +" DE USADOS TRACTOCAMIONES Y PARTES REFACCIONARIAS SA DE CV");
+    $("#modalenviarpdfemail").modal('show');
+  })   
+}
+//enviar documento pdf por email
+$("#btnenviarpdfemail").on('click', function (e) {
+  e.preventDefault();
+  var formData = new FormData($("#formenviarpdfemail")[0]);
+  var form = $("#formenviarpdfemail");
+  if (form.parsley().isValid()){
+    $('.page-loader-wrapper').css('display', 'block');
+    $.ajax({
+      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+      url:ajustesinventario_enviar_pdfs_email,
+      type: "post",
+      dataType: "html",
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false,
+      success:function(data){
+        msj_documentoenviadoporemailcorrectamente();
+        $("#modalenviarpdfemail").modal('hide');
+        $('.page-loader-wrapper').css('display', 'none');
+      },
+      error:function(data){
+        if(data.status == 403){
+          msj_errorenpermisos();
+        }else{
+          msj_errorajax();
+        }
+        $("#modalenviarpdfemail").modal('hide');
         $('.page-loader-wrapper').css('display', 'none');
       }
     })

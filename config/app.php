@@ -137,7 +137,18 @@ return [
     'keyapicurrencylayer' => '6e2993559ed8ce04ef56d47f792e5a52',
     'periodoincialmodulos' => '2014', //aqui se asigna el periodo inicial de los select de los modulos
     'numerodedecimales' => '6', //aqui se asignan el numero de decimales que se utilizaran en todas las cantidades utilizadas en el sistema
+    'numerodecimalesendocumentos' => '2', //numero de decimales que se ocuparan en documentos PDF
     'mayusculas_sistema' => 'S', //aqui se aisgna si el sistema utilizara solo mayusculas o no
+    'calleempresa' => 'BLVD. MIGUEL ALEMAN', //calle de la empresa
+    'noexteriorempresa' => '122', //no exterior de la empresa
+    'coloniaempresa' => 'ALVARO OBREGON', //colonia de la empresa
+    'cpempresa' => '52105', //cp de la empresa
+    'municipioempresa' => 'SAN MATEO ATENCO',//municipio de la empresa
+    'estadoempresa' => 'EDO DE MEXICO MEXICO',//estado de la empresa
+    'telefonosempresa' => '7226490843, 7222716890',//telefonos de la empresa
+    //para emisor documentos
+    'lugarexpedicion' => '52105',//lugar expedicion
+    'regimenfiscal' => '601',//regimen fiscal
 
     /*
     |--------------------------------------------------------------------------

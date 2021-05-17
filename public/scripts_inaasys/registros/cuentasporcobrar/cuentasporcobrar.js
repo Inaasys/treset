@@ -159,6 +159,8 @@ function obtenerclientes(){
                       '</div>';
     $("#contenidomodaltablas").html(tablaclientes);
     $('#tbllistadocliente').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,  
@@ -190,7 +192,7 @@ function obtenerclientes(){
                     }
                 });
             },
-            "iDisplayLength": 8,
+            
     }); 
 } 
 //seleccionar cliente
@@ -235,6 +237,8 @@ function obtenerbancos(){
                         '</div>';
       $("#contenidomodaltablas").html(tablabancos);
       $('#tbllistadobanco').DataTable({
+            "lengthMenu": [ 10, 50, 100, 250, 500 ],
+            "pageLength": 250,
             "sScrollX": "110%",
             "sScrollY": "370px",
             "bScrollCollapse": true,
@@ -261,7 +265,7 @@ function obtenerbancos(){
                   }
               });
           },
-          "iDisplayLength": 8,
+          
       }); 
 } 
 function seleccionarbanco(Numero, Nombre){
@@ -269,10 +273,6 @@ function seleccionarbanco(Numero, Nombre){
     $("#banco").val(Nombre);
     mostrarformulario();
 }
-
-
-
-
 //obtener lugares expedicion
 function obtenerlugaresexpedicion(){
     ocultarformulario();
@@ -303,6 +303,8 @@ function obtenerlugaresexpedicion(){
                                 '</div>';  
     $("#contenidomodaltablas").html(tablacodigospostales);
     $('#tbllistadocodigopostal').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,  
@@ -333,7 +335,7 @@ function obtenerlugaresexpedicion(){
               }
           });
         },
-        "iDisplayLength": 8,
+        
     });
   } 
   //seleccionar lugar expedicion
@@ -372,6 +374,8 @@ function obtenerlugaresexpedicion(){
                                 '</div>';  
     $("#contenidomodaltablas").html(tablaregimenesfiscales);
     $('#tbllistadoregimenfiscal').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,  
@@ -400,7 +404,7 @@ function obtenerlugaresexpedicion(){
               }
           });
         },
-        "iDisplayLength": 8,
+        
     });
   } 
   //seleccionar lugar expedicion
@@ -438,6 +442,8 @@ function obtenerlugaresexpedicion(){
                                 '</div>';  
     $("#contenidomodaltablas").html(tablatiposrelaciones);
     $('#tbllistadotiporelacion').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,  
@@ -464,7 +470,7 @@ function obtenerlugaresexpedicion(){
               }
           });
         },
-        "iDisplayLength": 8,
+        
     });
   } 
   //seleccionar lugar expedicion
@@ -503,6 +509,8 @@ function obtenerlugaresexpedicion(){
                                 '</div>';  
     $("#contenidomodaltablas").html(tablaformaspago);
     $('#tbllistadoformapago').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,  
@@ -530,7 +538,7 @@ function obtenerlugaresexpedicion(){
               }
           });
         },
-        "iDisplayLength": 8,
+        
     });
   } 
   //seleccionar forma pago
@@ -539,12 +547,6 @@ function obtenerlugaresexpedicion(){
     $("#formapago").val(Nombre);
     mostrarformulario();
   }
-
-
-
-
-
-
 //listar metodos pago
 function listarmetodospago(fila){
     ocultarformulario();
@@ -574,6 +576,8 @@ function listarmetodospago(fila){
                             '</div>';   
     $("#contenidomodaltablas").html(tablametodospago);
     $('#tbllistadometodopago').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,  
@@ -603,7 +607,7 @@ function listarmetodospago(fila){
                 }
             });
         },
-        "iDisplayLength": 8,
+        
     });
 }
 //seleccion de metodo de pago
@@ -640,6 +644,8 @@ function obtenerfoliosnotas(){
                                 '</div>';  
     $("#contenidomodaltablas").html(tablafoliosfiscales);
     $('#tbllistadofoliofiscal').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,  
@@ -666,7 +672,7 @@ function obtenerfoliosnotas(){
               }
           });
         },
-        "iDisplayLength": 8,
+        
     });  
 }
 function seleccionarfoliofiscal(Serie, Esquema){
@@ -723,44 +729,46 @@ function listarfacturas (){
                         '</div>';
       $("#contenidomodaltablas").html(tablafacturas);
       $('#tbllistadofactura').DataTable({
-          "sScrollX": "110%",
-          "sScrollY": "370px",
-          "bScrollCollapse": true,  
-          processing: true,
-          'language': {
-              'loadingRecords': '&nbsp;',
-              'processing': '<div class="spinner"></div>'
-          },
-          serverSide: true,
-          ajax: {
-            url: cuentas_por_cobrar_obtener_facturas,
-            data: function (d) {
-                d.numerocliente = $("#numerocliente").val();
-                d.stringfacturasseleccionadas = $("#stringfacturasseleccionadas").val();
-            }
-          },
-          columns: [
-              { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
-              { data: 'Factura', name: 'Factura' },
-              { data: 'Depto', name: 'Depto' },
-              { data: 'Fecha', name: 'Fecha' },
-              { data: 'Plazo', name: 'Plazo', orderable: false, searchable: false },
-              { data: 'Items', name: 'Items', orderable: false, searchable: false },
-              { data: 'Total', name: 'Total', orderable: false, searchable: false },
-              { data: 'Abonos', name: 'Abonos', orderable: false, searchable: false },
-              { data: 'Descuentos', name: 'Descuentos', orderable: false, searchable: false },
-              { data: 'Saldo', name: 'Saldo', orderable: false, searchable: false }
-          ],
-          "initComplete": function() {
-              var $buscar = $('div.dataTables_filter input');
-              $buscar.unbind();
-              $buscar.bind('keyup change', function(e) {
-                  if(e.keyCode == 13 || this.value == "") {
-                  $('#tbllistadofactura').DataTable().search( this.value ).draw();
-                  }
-              });
-          },
-          "iDisplayLength": 8,
+            "lengthMenu": [ 10, 50, 100, 250, 500 ],
+            "pageLength": 250,
+            "sScrollX": "110%",
+            "sScrollY": "370px",
+            "bScrollCollapse": true,  
+            processing: true,
+            'language': {
+                'loadingRecords': '&nbsp;',
+                'processing': '<div class="spinner"></div>'
+            },
+            serverSide: true,
+            ajax: {
+                url: cuentas_por_cobrar_obtener_facturas,
+                data: function (d) {
+                    d.numerocliente = $("#numerocliente").val();
+                    d.stringfacturasseleccionadas = $("#stringfacturasseleccionadas").val();
+                }
+            },
+            columns: [
+                { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+                { data: 'Factura', name: 'Factura' },
+                { data: 'Depto', name: 'Depto' },
+                { data: 'Fecha', name: 'Fecha' },
+                { data: 'Plazo', name: 'Plazo', orderable: false, searchable: false },
+                { data: 'Items', name: 'Items', orderable: false, searchable: false },
+                { data: 'Total', name: 'Total', orderable: false, searchable: false },
+                { data: 'Abonos', name: 'Abonos', orderable: false, searchable: false },
+                { data: 'Descuentos', name: 'Descuentos', orderable: false, searchable: false },
+                { data: 'Saldo', name: 'Saldo', orderable: false, searchable: false }
+            ],
+            "initComplete": function() {
+                var $buscar = $('div.dataTables_filter input');
+                $buscar.unbind();
+                $buscar.bind('keyup change', function(e) {
+                    if(e.keyCode == 13 || this.value == "") {
+                    $('#tbllistadofactura').DataTable().search( this.value ).draw();
+                    }
+                });
+            },
+          
       });  
   } 
   //obtener todos los datos de la orden de compra seleccionada
@@ -1012,8 +1020,8 @@ function alta(){
                                             '</td>'+
                                             '<td>'+
                                                 '<div class="form-line">'+
-                                                    '<input type="hidden" class="form-control" name="clavetiporelacion" id="clavetiporelacion" value="'+clavetiporelacion+'" required readonly onkeyup="tipoLetra(this)">'+
-                                                    '<input type="text" class="form-control" name="tiporelacion" id="tiporelacion" value="'+tiporelacion+'" required readonly>'+
+                                                    '<input type="hidden" class="form-control" name="clavetiporelacion" id="clavetiporelacion" readonly onkeyup="tipoLetra(this)">'+
+                                                    '<input type="text" class="form-control" name="tiporelacion" id="tiporelacion" readonly>'+
                                                 '</div>'+
                                             '</td>'+
                                         '</tr>'+    
@@ -1372,8 +1380,8 @@ function obtenerdatos(cxcmodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="clavetiporelacion" id="clavetiporelacion" value="'+clavetiporelacion+'" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="tiporelacion" id="tiporelacion" value="'+tiporelacion+'" required readonly>'+
+                                                        '<input type="hidden" class="form-control" name="clavetiporelacion" id="clavetiporelacion" readonly onkeyup="tipoLetra(this)">'+
+                                                        '<input type="text" class="form-control" name="tiporelacion" id="tiporelacion"  readonly>'+
                                                     '</div>'+
                                                 '</td>'+
                                             '</tr>'+    
@@ -1561,6 +1569,52 @@ $("#btnGuardarModificacion").on('click', function (e) {
         form.parsley().validate();
     }
 });
+//obtener datos para el envio del documento por email
+function enviardocumentoemail(documento){
+    $.get(cuentas_por_cobrar_obtener_datos_envio_email,{documento:documento}, function(data){
+      $("#textomodalenviarpdfemail").html("Enviar email Cuenta Por Cobrar No." + documento);
+      $("#emaildocumento").val(documento);
+      $("#emailde").val(data.emailde);
+      $("#emailpara").val(data.emailpara);
+      $("#emailasunto").val("CUENTA POR COBRAR NO. " + documento +" DE USADOS TRACTOCAMIONES Y PARTES REFACCIONARIAS SA DE CV");
+      $("#modalenviarpdfemail").modal('show');
+    })   
+  }
+  //enviar documento pdf por email
+  $("#btnenviarpdfemail").on('click', function (e) {
+    e.preventDefault();
+    var formData = new FormData($("#formenviarpdfemail")[0]);
+    var form = $("#formenviarpdfemail");
+    if (form.parsley().isValid()){
+      $('.page-loader-wrapper').css('display', 'block');
+      $.ajax({
+        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+        url:cuentas_por_cobrar_enviar_pdfs_email,
+        type: "post",
+        dataType: "html",
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success:function(data){
+          msj_documentoenviadoporemailcorrectamente();
+          $("#modalenviarpdfemail").modal('hide');
+          $('.page-loader-wrapper').css('display', 'none');
+        },
+        error:function(data){
+          if(data.status == 403){
+            msj_errorenpermisos();
+          }else{
+            msj_errorajax();
+          }
+          $("#modalenviarpdfemail").modal('hide');
+          $('.page-loader-wrapper').css('display', 'none');
+        }
+      })
+    }else{
+      form.parsley().validate();
+    }
+  });
 //hacer busqueda de folio para exportacion en pdf
 function relistarbuscarstringlike(){
     var tabla = $('#tablafoliosencontrados').DataTable();

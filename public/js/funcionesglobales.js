@@ -607,6 +607,14 @@ function ordeneliminadacorrectamente(){
         "extendedTImeout": "6000"
     });
 } 
+//mensaje documento enviado correctamente
+function msj_documentoenviadoporemailcorrectamente(){
+    toastr.success( "Correcto, el documento se envió", "Mensaje", {
+        "timeOut": "6000",
+        "progressBar": true,
+        "extendedTImeout": "6000"
+    });  
+}
 ///////////////////////////////////FIN MENSAJES TOASTR.JS INAASYS///////////////////////////////////////
 //////////////////////////////FUNCIONES PARA CONFIGURACION DE COLUMNAS DE TABLAS/////////////////////////////////////////
 //ordenar las columnas para vista de tabla

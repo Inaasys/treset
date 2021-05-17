@@ -25,6 +25,9 @@ use App\OrdenTrabajoDetalle;
 use App\Cliente;
 use App\Configuracion_Tabla;
 use App\VistaTraspaso;
+use App\VistaObtenerExistenciaProducto;
+use Config;
+use Mail;
 
 class TraspasoController extends ConfiguracionSistemaController{
 
@@ -56,7 +59,9 @@ class TraspasoController extends ConfiguracionSistemaController{
                     ->addColumn('operaciones', function($data){
                         $botoncambios =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Traspaso .'\')"><i class="material-icons">mode_edit</i></div> '; 
                         $botonbajas =      '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Traspaso .'\')"><i class="material-icons">cancel</i></div> ';
-                        $operaciones =  $botoncambios.$botonbajas;
+                        $botondocumentopdf = '<a href="'.route('traspasos_generar_pdfs_indiv',$data->Traspaso).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
+                        $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Traspaso .'\')"><i class="material-icons">email</i></div> ';
+                        $operaciones =  $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
                         return $operaciones;
                     })
                     ->addColumn('subtotal', function($data){ return $data->SubTotal; })
@@ -130,26 +135,14 @@ class TraspasoController extends ConfiguracionSistemaController{
             $codigoabuscar = $request->codigoabuscar;
             $numeroalmacende = $request->numeroalmacende;
             $tipooperacion = $request->tipooperacion;
-            $data = DB::table('Productos as t')
-            ->leftJoin('Marcas as m', 'm.Numero', '=', 't.Marca')
-            ->leftJoin(DB::raw("(select codigo, sum(existencias) as existencias from Existencias group by codigo) as e"),
-                function($join){
-                    $join->on("e.codigo","=","t.codigo");
-                })
-            ->select('t.Codigo as Codigo', 't.Producto as Producto', 't.Ubicacion as Ubicacion', 'e.Existencias as Existencias', 't.Costo as Costo', 't.SubTotal as SubTotal', 't.Marca as Marca', 't.Status as Status', 't.Unidad AS Unidad', 't.Impuesto AS Impuesto')
-            ->where('t.Codigo', 'like', '%' . $codigoabuscar . '%')
-            ->get();
+            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($numeroalmacende, $tipooperacion){
-                        //obtener existencias del codigo en el almacen seleccionado
-                        $ContarExistencia = Existencia::where('Codigo', $data->Codigo)->where('Almacen', $numeroalmacende)->count();
-                        if($ContarExistencia > 0){
-                            $Existencia = Existencia::where('Codigo', $data->Codigo)->where('Almacen', $numeroalmacende)->first();
-                            $Existencias = Helpers::convertirvalorcorrecto($Existencia->Existencias);
+                        if($data->Almacen == $numeroalmacende){
+                            $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$tipooperacion.'\')">Seleccionar</div>';
                         }else{
-                            $Existencias = 0;
+                            $boton = '';
                         }
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($Existencias).'\',\''.$tipooperacion.'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->addColumn('Existencias', function($data){ 
@@ -161,7 +154,7 @@ class TraspasoController extends ConfiguracionSistemaController{
                     ->addColumn('SubTotal', function($data){ 
                         return Helpers::convertirvalorcorrecto($data->SubTotal);
                     })
-                    ->rawColumns(['operaciones','Costo','Existencias','SubTotal'])
+                    ->rawColumns(['operaciones'])
                     ->make(true);
         } 
     }
@@ -912,6 +905,152 @@ class TraspasoController extends ConfiguracionSistemaController{
         ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
         return $pdf->stream();
+    }
+
+    //generacion de formato en PDF
+    public function traspasos_generar_pdfs_indiv($documento){
+        $traspasos = Traspaso::where('Traspaso', $documento)->get(); 
+        $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $data=array();
+        foreach ($traspasos as $t){
+            $traspasodetalle = TraspasoDetalle::where('Traspaso', $t->Traspaso)->get();
+            $datadetalle=array();
+            foreach($traspasodetalle as $td){
+                $producto = Producto::where('Codigo', $td->Codigo)->first();
+                $marca = Marca::where('Numero', $producto->Marca)->first();
+                $datadetalle[]=array(
+                    "cantidaddetalle"=> Helpers::convertirvalorcorrecto($td->Cantidad),
+                    "codigodetalle"=>$td->Codigo,
+                    "descripciondetalle"=>$td->Descripcion,
+                    "marcadetalle"=>$marca->Nombre,
+                    "ubicaciondetalle"=>$producto->Ubicacion,
+                    "preciodetalle" => Helpers::convertirvalorcorrecto($td->Precio),
+                    "descuentodetalle" => Helpers::convertirvalorcorrecto($td->Dcto),
+                    "subtotaldetalle" => Helpers::convertirvalorcorrecto($td->SubTotal)
+                );
+            } 
+            $almacende = Almacen::where('Numero', $t->De)->first();
+            $almacena = '';
+            $orden = '';
+            if($t->A > 0){
+                $almacenforaneo = Almacen::where('Numero', $t->A)->first();
+                $almacena = $almacenforaneo->Nombre.' ('.$almacenforaneo->Numero.')';
+            }
+            $data[]=array(
+                      "traspaso"=>$t,
+                      "descuentotraspaso"=>Helpers::convertirvalorcorrecto($t->Descuento),
+                      "subtotaltraspaso"=>Helpers::convertirvalorcorrecto($t->SubTotal),
+                      "ivatraspaso"=>Helpers::convertirvalorcorrecto($t->Iva),
+                      "totaltraspaso"=>Helpers::convertirvalorcorrecto($t->Total),
+                      "almacende" => $almacende,
+                      "almacena" => $almacena,
+                      "fechaformato"=> $fechaformato,
+                      "datadetalle" => $datadetalle,
+                      "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
+            );
+        }
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('registros.traspasos.formato_pdf_traspasos', compact('data'))
+        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-right', ''.$fechaformato.'')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        return $pdf->stream();
+    }
+
+    //obtener datos para enviar email
+    public function traspasos_obtener_datos_envio_email(Request $request){
+        $traspaso = Traspaso::where('Traspaso', $request->documento)->first();
+        $data = array(
+            'traspaso' => $traspaso,
+            'emailde' => Config::get('mail.from.address'),
+        );
+        return response()->json($data);
+    }
+
+    //enviar pdf por emial
+    public function traspasos_enviar_pdfs_email(Request $request){
+        $traspasos = Traspaso::where('Traspaso', $request->emaildocumento)->get(); 
+        $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $data=array();
+        foreach ($traspasos as $t){
+            $traspasodetalle = TraspasoDetalle::where('Traspaso', $t->Traspaso)->get();
+            $datadetalle=array();
+            foreach($traspasodetalle as $td){
+                $producto = Producto::where('Codigo', $td->Codigo)->first();
+                $marca = Marca::where('Numero', $producto->Marca)->first();
+                $datadetalle[]=array(
+                    "cantidaddetalle"=> Helpers::convertirvalorcorrecto($td->Cantidad),
+                    "codigodetalle"=>$td->Codigo,
+                    "descripciondetalle"=>$td->Descripcion,
+                    "marcadetalle"=>$marca->Nombre,
+                    "ubicaciondetalle"=>$producto->Ubicacion,
+                    "preciodetalle" => Helpers::convertirvalorcorrecto($td->Precio),
+                    "descuentodetalle" => Helpers::convertirvalorcorrecto($td->Dcto),
+                    "subtotaldetalle" => Helpers::convertirvalorcorrecto($td->SubTotal)
+                );
+            } 
+            $almacende = Almacen::where('Numero', $t->De)->first();
+            $almacena = '';
+            $orden = '';
+            if($t->A > 0){
+                $almacenforaneo = Almacen::where('Numero', $t->A)->first();
+                $almacena = $almacenforaneo->Nombre.' ('.$almacenforaneo->Numero.')';
+            }
+            $data[]=array(
+                      "traspaso"=>$t,
+                      "descuentotraspaso"=>Helpers::convertirvalorcorrecto($t->Descuento),
+                      "subtotaltraspaso"=>Helpers::convertirvalorcorrecto($t->SubTotal),
+                      "ivatraspaso"=>Helpers::convertirvalorcorrecto($t->Iva),
+                      "totaltraspaso"=>Helpers::convertirvalorcorrecto($t->Total),
+                      "almacende" => $almacende,
+                      "almacena" => $almacena,
+                      "fechaformato"=> $fechaformato,
+                      "datadetalle" => $datadetalle,
+                      "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
+            );
+        }
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('registros.traspasos.formato_pdf_traspasos', compact('data'))
+        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-right', ''.$fechaformato.'')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        try{
+            //enviar correo electrónico	
+            $nombre = 'Receptor envio de correos';
+            $receptor = $request->emailpara;
+            $correos = [$request->emailpara];
+            $asunto = $request->emailasunto;
+            $emaildocumento = $request->emaildocumento;
+            $name = "Receptor envio de correos";
+            $body = $request->emailasunto;
+            $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
+            $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
+            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
+                $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                        ->cc($correos)
+                        ->subject($asunto)
+                        ->attachData($pdf->output(), "TraspasoNo".$emaildocumento.".pdf");
+            });
+        } catch(\Exception $e) {
+            $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
+            $correos = ['osbaldo.anzaldo@utpcamiones.com.mx'];
+            $msj = 'Error al enviar correo';
+            Mail::send('correos.errorenvio.error', compact('e','msj'), function($message) use ($receptor, $correos) {
+                $message->to($receptor)
+                        ->cc($correos)
+                        ->subject('Error al enviar correo nuevo usuario');
+            });
+        }
     }
 
     //exportar excel

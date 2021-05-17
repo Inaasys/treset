@@ -157,6 +157,8 @@ function obtenerpersonalrecibe(){
                     '</div>';
     $("#contenidomodaltablas").html(tablapersonalrecibe);
     $('#tbllistadopersonalrecibe').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,
@@ -186,7 +188,7 @@ function obtenerpersonalrecibe(){
                 }
             });
         },
-        "iDisplayLength": 8,
+        
     }); 
 } 
 //obtener registros de almacenes
@@ -221,6 +223,8 @@ function obtenerpersonalentrega(){
                         '</div>';
       $("#contenidomodaltablas").html(tablapersonalentrega);
       $('#tbllistadopersonalentrega').DataTable({
+          "lengthMenu": [ 10, 50, 100, 250, 500 ],
+          "pageLength": 250,
           "sScrollX": "110%",
           "sScrollY": "370px",
           "bScrollCollapse": true,
@@ -253,7 +257,7 @@ function obtenerpersonalentrega(){
                   }
               });
           },
-          "iDisplayLength": 8,
+          
       }); 
   } 
 function seleccionarpersonalrecibe(id, nombre){
@@ -292,10 +296,13 @@ function listarherramientas(){
                                     '<tr>'+
                                       '<th>Operaciones</th>'+
                                       '<th>Código</th>'+
+                                      '<th>Marca</th>'+
                                       '<th>Producto</th>'+
-                                      '<th>Unidad</th>'+
+                                      '<th>Ubicación</th>'+
                                       '<th>Existencias</th>'+
-                                      '<th>Costo</th>'+
+                                      '<th>Almacen</th>'+
+                                      '<th>Costo $</th>'+
+                                      '<th>Sub Total $</th>'+
                                     '</tr>'+
                                   '</thead>'+
                                   '<tbody></tbody>'+
@@ -309,6 +316,8 @@ function listarherramientas(){
                         '</div>';   
   $("#contenidomodaltablas").html(tablaherramientas);
   $('#tbllistadoherramienta').DataTable({
+    "lengthMenu": [ 10, 50, 100, 250, 500 ],
+    "pageLength": 250,
     "sScrollX": "110%",
     "sScrollY": "370px",
     "bScrollCollapse": true,
@@ -328,10 +337,13 @@ function listarherramientas(){
     columns: [
       { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false  },
       { data: 'Codigo', name: 'Codigo' },
-      { data: 'Producto', name: 'Producto' },
-      { data: 'Unidad', name: 'Unidad', orderable: false, searchable: false },
+      { data: 'Marca', name: 'Marca', orderable: false, searchable: false  },
+      { data: 'Producto', name: 'Producto', orderable: false, searchable: false  },
+      { data: 'Ubicacion', name: 'Ubicacion', orderable: false, searchable: false  },
       { data: 'Existencias', name: 'Existencias', orderable: false, searchable: false  },
-      { data: 'Costo', name: 'Costo', orderable: false, searchable: false  }
+      { data: 'Almacen', name: 'Almacen', orderable: false, searchable: false  },
+      { data: 'Costo', name: 'Costo', orderable: false, searchable: false  },
+      { data: 'SubTotal', name: 'SubTotal', orderable: false, searchable: false  } 
     ],
     "initComplete": function() {
       var $buscar = $('div.dataTables_filter input');
@@ -342,7 +354,7 @@ function listarherramientas(){
         }
       });
     },
-    "iDisplayLength": 8,
+    
   });
 }
 //función que evalua si la partida que quieren ingresar ya existe o no en el detalle de la orden de compra

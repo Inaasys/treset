@@ -67,7 +67,7 @@
                             <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover" style="width:100% !important;">
                                     <thead class="customercolor">
                                         <tr>
-                                            <th><div style="width:80px !important;">Operaciones</div></th>
+                                            <th><div style="width:150px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
                                             <th>{{$co}}</th>
                                             @endforeach
@@ -139,6 +139,9 @@
 <!-- modal para crear documento en PDF-->
 @include('secciones.modalcreardocumento')
 <!-- fin modal para crear documento en PDF-->
+<!-- modal para enviar por email documento en PDF-->
+@include('secciones.modalenviardocumentoemail')
+<!-- fin modal para enviar por email documento en PDF-->
 <!-- modal para configuraciones de tablas-->
 @include('secciones.modalconfiguraciontablas')
 <!-- fin modal para configuraciones de tablas-->
@@ -159,25 +162,19 @@
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
         var rfcempresa = '{{$empresa->Rfc}}';
         var nombreempresa = '{{$empresa->Nombre}}';
-        var lugarexpedicion = '{{$empresa->LugarExpedicion}}';
+        var lugarexpedicion = '{{$lugarexpedicion}}';
         var claveregimenfiscal = '{{$claveregimenfiscal}}';
         var regimenfiscal = '{{$regimenfiscal}}';
-        var clavetiporelacion = '{{$tiporelacion->Clave}}';
-        var tiporelacion = '{{$tiporelacion->Nombre}}';
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var cuentas_por_cobrar_obtener = '{!!URL::to('cuentas_por_cobrar_obtener')!!}';
         var cuentas_por_cobrar_obtener_ultimo_folio = '{!!URL::to('cuentas_por_cobrar_obtener_ultimo_folio')!!}';
         var cuentas_por_cobrar_obtener_fecha_datetime = '{!!URL::to('cuentas_por_cobrar_obtener_fecha_datetime')!!}';
         var cuentas_por_cobrar_obtener_clientes = '{!!URL::to('cuentas_por_cobrar_obtener_clientes')!!}';
         var cuentas_por_cobrar_obtener_bancos = '{!!URL::to('cuentas_por_cobrar_obtener_bancos')!!}';
-        
-        
         var cuentas_por_cobrar_obtener_codigos_postales = '{!!URL::to('cuentas_por_cobrar_obtener_codigos_postales')!!}';
         var cuentas_por_cobrar_obtener_regimenes_fiscales = '{!!URL::to('cuentas_por_cobrar_obtener_regimenes_fiscales')!!}';
         var cuentas_por_cobrar_obtener_tipos_relacion = '{!!URL::to('cuentas_por_cobrar_obtener_tipos_relacion')!!}';
         var cuentas_por_cobrar_obtener_formas_pago = '{!!URL::to('cuentas_por_cobrar_obtener_formas_pago')!!}';
-        
-        
         var cuentas_por_cobrar_obtener_metodos_pago = '{!!URL::to('cuentas_por_cobrar_obtener_metodos_pago')!!}';
         var cuentas_por_cobrar_obtener_facturas = '{!!URL::to('cuentas_por_cobrar_obtener_facturas')!!}';
         var cuentas_por_cobrar_obtener_factura = '{!!URL::to('cuentas_por_cobrar_obtener_factura')!!}';        
@@ -187,6 +184,8 @@
         var cuentas_por_cobrar_comprobar_baja = '{!!URL::to('cuentas_por_cobrar_comprobar_baja')!!}';
         var cuentas_por_cobrar_baja  = '{!!URL::to('cuentas_por_cobrar_baja')!!}';
         var cuentas_por_cobrar_obtener_cuenta_por_cobrar =  '{!!URL::to('cuentas_por_cobrar_obtener_cuenta_por_cobrar')!!}';
+        var cuentas_por_cobrar_obtener_datos_envio_email = '{!!URL::to('cuentas_por_cobrar_obtener_datos_envio_email')!!}';
+        var cuentas_por_cobrar_enviar_pdfs_email = '{!!URL::to('cuentas_por_cobrar_enviar_pdfs_email')!!}';
         var cuentas_por_cobrar_buscar_folio_string_like =  '{!!URL::to('cuentas_por_cobrar_buscar_folio_string_like')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')

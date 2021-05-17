@@ -19,6 +19,7 @@ use App\Prestamo_Herramienta_Detalle;
 use App\Personal;
 use App\BitacoraDocumento;
 use App\VistaAsignacionHerramienta;
+use App\VistaObtenerExistenciaProducto;
 use App\Producto;
 use App\Existencia;
 use App\Almacen;
@@ -98,15 +99,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
         if($request->ajax()){
             $codigoabuscar = $request->codigoabuscar;
             $tipooperacion = $request->tipooperacion;
-            $data = DB::table('Productos as t')
-            ->leftJoin('Marcas as m', 'm.Numero', '=', 't.Marca')
-            ->leftJoin(DB::raw("(select codigo, sum(existencias) as existencias from Existencias group by codigo) as e"),
-            function($join){
-                $join->on("e.codigo","=","t.codigo");
-            })
-            ->select('t.Codigo as Codigo', 't.Producto as Producto', 't.Unidad as Unidad', 'e.Existencias as Existencias', 't.Costo as Costo')
-            ->where('t.Codigo', 'like', '%' . $codigoabuscar . '%')
-            ->get();
+            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->get();
             $almacenes = Almacen::where('status', 'ALTA')->get();
             $selectalmacenes = "<option selected disabled hidden>Selecciona el almacén</option>";
             foreach($almacenes as $a){
@@ -521,8 +514,8 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                             ]);
 
             }else{
-                $Asignacion_Herramienta_Detalle = Asignacion_Herramienta_Detalle::where('id_asignacion_herramienta', $request->id)->first();
-                Asignacion_Herramienta_Detalle::where('id_asignacion_herramienta', $request->id)
+                $Asignacion_Herramienta_Detalle = Asignacion_Herramienta_Detalle::where('id_asignacion_herramienta', $request->id)->where('herramienta', $codigoproductopartida)->where('item', $request->itempartida [$key])->first();
+                Asignacion_Herramienta_Detalle::where('id_asignacion_herramienta', $request->id)->where('herramienta', $codigoproductopartida)->where('item', $request->itempartida [$key])
                                                 ->update([
                                                     'descripcion' => $request->nombreproductopartida [$key],
                                                     'cantidad' =>  $request->cantidadpartida  [$key],

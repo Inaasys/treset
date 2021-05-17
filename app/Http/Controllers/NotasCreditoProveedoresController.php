@@ -27,6 +27,9 @@ use App\ClaveProdServ;
 use App\ClaveUnidad;
 use App\Configuracion_Tabla;
 use App\VistaNotaCreditoProveedor;
+use App\VistaObtenerExistenciaProducto;
+use Config;
+use Mail;
 
 class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
 
@@ -71,7 +74,9 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                     ->addColumn('operaciones', function($data){
                             $botoncambios   =   '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Nota .'\')"><i class="material-icons">mode_edit</i></div> '; 
                             $botonbajas     =   '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Nota .'\')"><i class="material-icons">cancel</i></div>  ';
-                            $operaciones    =   $botoncambios.$botonbajas;
+                            $botondocumentopdf = '<a href="'.route('notas_credito_proveedores_generar_pdfs_indiv',$data->Nota).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
+                            $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Nota .'\')"><i class="material-icons">email</i></div> ';
+                            $operaciones    =   $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
                         return $operaciones;
                     })
                     ->addColumn('SubTotal', function($data){ return $data->SubTotal; })
@@ -162,31 +167,14 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                     array_push($arrayproductosseleccionables, $detalle->Codigo);
                 }
             }
-            $data = DB::table('Productos as t')
-            ->leftJoin('Marcas as m', 'm.Numero', '=', 't.Marca')
-            ->leftJoin(DB::raw("(select codigo, sum(existencias) as existencias from Existencias group by codigo) as e"),
-                function($join){
-                    $join->on("e.codigo","=","t.codigo");
-                })
-            ->select('t.Codigo as Codigo', 't.Producto as Producto', 't.Ubicacion as Ubicacion', 'e.Existencias as Existencias', 't.Costo as Costo', 't.SubTotal as SubTotal', 't.Marca as Marca', 't.Status as Status', 't.Unidad AS Unidad', 't.Impuesto AS Impuesto', 't.Insumo AS Insumo', 't.ClaveProducto AS ClaveProducto', 't.ClaveUnidad AS ClaveUnidad', 't.CostoDeLista AS CostoDeLista')
-            ->whereIn('t.Codigo', $arrayproductosseleccionables)
-            ->where('t.Codigo', 'like', '%' . $codigoabuscar . '%')
-            ->get();
+            $data = VistaObtenerExistenciaProducto::whereIn('Codigo', $arrayproductosseleccionables)->where('Codigo', 'like', '%' . $codigoabuscar . '%')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($numeroalmacen, $tipooperacion, $stringcomprasseleccionadas){
-                        //claveproducto
-                        $claveproducto = ClaveProdServ::where('Clave', $data->ClaveProducto)->first();
-                        //claveunidad
-                        $claveunidad = ClaveUnidad::where('Clave', $data->ClaveUnidad)->first();
-                        //obtener existencias del codigo en el almacen seleccionado
-                        $ContarExistencia = Existencia::where('Codigo', $data->Codigo)->where('Almacen', $numeroalmacen)->count();
-                        if($ContarExistencia > 0){
-                            $Existencia = Existencia::where('Codigo', $data->Codigo)->where('Almacen', $numeroalmacen)->first();
-                            $Existencias = Helpers::convertirvalorcorrecto($Existencia->Existencias);
+                        if($data->Almacen == $numeroalmacen){
+                            $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$tipooperacion.'\',\''.$data->Insumo.'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$data->NombreClaveProducto.'\',\''.$data->NombreClaveUnidad.'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\')">Seleccionar</div>';
                         }else{
-                            $Existencias = 0;
+                            $boton = '';
                         }
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($Existencias).'\',\''.$tipooperacion.'\',\''.$data->Insumo.'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$claveproducto->Nombre.'\',\''.$claveunidad->Nombre.'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->addColumn('Existencias', function($data){ 
@@ -198,7 +186,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                     ->addColumn('SubTotal', function($data){ 
                         return Helpers::convertirvalorcorrecto($data->SubTotal);
                     })
-                    ->rawColumns(['operaciones','Costo','Existencias','SubTotal'])
+                    ->rawColumns(['operaciones'])
                     ->make(true);
         } 
     }
@@ -1214,12 +1202,9 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                 "numerodecimalesdocumento"=> $request->numerodecimalesdocumento
             );
         }
-        //dd($data);
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
-        //$footerHtml = view()->make('seccionespdf.footer', compact('fechaformato'))->render();
         $pdf = PDF::loadView('registros.notascreditoproveedores.formato_pdf_notascreditoproveedores', compact('data'))
-        //->setOption('footer-html', $footerHtml, 'Página [page]')
         ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
         ->setOption('footer-center', 'Página [page] de [toPage]')
         ->setOption('footer-right', ''.$fechaformato.'')
@@ -1227,9 +1212,156 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
         ->setOption('margin-left', 2)
         ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
-        //return $pdf->download('contrarecibos.pdf');
         return $pdf->stream();
     }
+
+    //generacion de formato en PDF
+    public function notas_credito_proveedores_generar_pdfs_indiv($documento){
+        $notascreditoproveedor = NotaProveedor::where('Nota', $documento)->get(); 
+        $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $data=array();
+        foreach ($notascreditoproveedor as $ncp){
+            $notascreditoproveedordetalle = NotaProveedorDetalle::where('Nota', $ncp->Nota)->get();
+            $datadetalle=array();
+            foreach($notascreditoproveedordetalle as $ncpd){
+                $contarcompradetalle = Compra::where('Compra', $ncpd->Compra)->count();
+                $compradetalle = Compra::where('Compra', $ncpd->Compra)->first();
+                if($contarcompradetalle == 0){
+                    $remisiondetalle = "";
+                    $facturadetalle = "";
+                }else{
+                    $remisiondetalle = $compradetalle->Remision;
+                    $facturadetalle = $compradetalle->Factura;
+                }
+                $datadetalle[]=array(
+                    "cantidaddetalle"=> Helpers::convertirvalorcorrecto($ncpd->Cantidad),
+                    "codigodetalle"=>$ncpd->Codigo,
+                    "descripciondetalle"=>$ncpd->Descripcion,
+                    "compradetalle"=>$ncpd->Compra,
+                    "remisiondetalle"=>$remisiondetalle,
+                    "facturadetalle"=>$facturadetalle,
+                    "preciodetalle" => Helpers::convertirvalorcorrecto($ncpd->Precio),
+                    "subtotaldetalle" => Helpers::convertirvalorcorrecto($ncpd->SubTotal)
+                );
+            } 
+            $proveedor = Proveedor::where('Numero', $ncp->Proveedor)->first();
+            $data[]=array(
+                "notacreditoproveedor"=>$ncp,
+                "descuentonotacreditoproveedor"=>Helpers::convertirvalorcorrecto($ncp->Descuento),
+                "subtotalnotacreditoproveedor"=>Helpers::convertirvalorcorrecto($ncp->SubTotal),
+                "ivanotacreditoproveedor"=>Helpers::convertirvalorcorrecto($ncp->Iva),
+                "totalnotacreditoproveedor"=>Helpers::convertirvalorcorrecto($ncp->Total),
+                "proveedor" => $proveedor,
+                "datadetalle" => $datadetalle,
+                "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
+            );
+        }
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('registros.notascreditoproveedores.formato_pdf_notascreditoproveedores', compact('data'))
+        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-right', ''.$fechaformato.'')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        return $pdf->stream();
+    }
+
+    //obtener datos para enviar email
+    public function notas_credito_proveedores_obtener_datos_envio_email(Request $request){
+        $notaproveedor = NotaProveedor::where('Nota', $request->documento)->first();
+        $proveedor = Proveedor::where('Numero',$notaproveedor->Proveedor)->first();
+        $data = array(
+            'notaproveedor' => $notaproveedor,
+            'proveedor' => $proveedor,
+            'emailde' => Config::get('mail.from.address'),
+            'emailpara' => $proveedor->Email1
+        );
+        return response()->json($data);
+    }
+
+    //enviar pdf por emial
+    public function notas_credito_proveedores_enviar_pdfs_email(Request $request){
+        $notascreditoproveedor = NotaProveedor::where('Nota', $request->emaildocumento)->get(); 
+        $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $data=array();
+        foreach ($notascreditoproveedor as $ncp){
+            $notascreditoproveedordetalle = NotaProveedorDetalle::where('Nota', $ncp->Nota)->get();
+            $datadetalle=array();
+            foreach($notascreditoproveedordetalle as $ncpd){
+                $contarcompradetalle = Compra::where('Compra', $ncpd->Compra)->count();
+                $compradetalle = Compra::where('Compra', $ncpd->Compra)->first();
+                if($contarcompradetalle == 0){
+                    $remisiondetalle = "";
+                    $facturadetalle = "";
+                }else{
+                    $remisiondetalle = $compradetalle->Remision;
+                    $facturadetalle = $compradetalle->Factura;
+                }
+                $datadetalle[]=array(
+                    "cantidaddetalle"=> Helpers::convertirvalorcorrecto($ncpd->Cantidad),
+                    "codigodetalle"=>$ncpd->Codigo,
+                    "descripciondetalle"=>$ncpd->Descripcion,
+                    "compradetalle"=>$ncpd->Compra,
+                    "remisiondetalle"=>$remisiondetalle,
+                    "facturadetalle"=>$facturadetalle,
+                    "preciodetalle" => Helpers::convertirvalorcorrecto($ncpd->Precio),
+                    "subtotaldetalle" => Helpers::convertirvalorcorrecto($ncpd->SubTotal)
+                );
+            } 
+            $proveedor = Proveedor::where('Numero', $ncp->Proveedor)->first();
+            $data[]=array(
+                "notacreditoproveedor"=>$ncp,
+                "descuentonotacreditoproveedor"=>Helpers::convertirvalorcorrecto($ncp->Descuento),
+                "subtotalnotacreditoproveedor"=>Helpers::convertirvalorcorrecto($ncp->SubTotal),
+                "ivanotacreditoproveedor"=>Helpers::convertirvalorcorrecto($ncp->Iva),
+                "totalnotacreditoproveedor"=>Helpers::convertirvalorcorrecto($ncp->Total),
+                "proveedor" => $proveedor,
+                "datadetalle" => $datadetalle,
+                "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
+            );
+        }
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('registros.notascreditoproveedores.formato_pdf_notascreditoproveedores', compact('data'))
+        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-right', ''.$fechaformato.'')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        try{
+            //enviar correo electrónico	
+            $nombre = 'Receptor envio de correos';
+            $receptor = $request->emailpara;
+            $correos = [$request->emailpara];
+            $asunto = $request->emailasunto;
+            $emaildocumento = $request->emaildocumento;
+            $name = "Receptor envio de correos";
+            $body = $request->emailasunto;
+            $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
+            $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
+            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
+                $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                        ->cc($correos)
+                        ->subject($asunto)
+                        ->attachData($pdf->output(), "NotaCreditoProveedorNo".$emaildocumento.".pdf");
+            });
+        } catch(\Exception $e) {
+            $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
+            $correos = ['osbaldo.anzaldo@utpcamiones.com.mx'];
+            $msj = 'Error al enviar correo';
+            Mail::send('correos.errorenvio.error', compact('e','msj'), function($message) use ($receptor, $correos) {
+                $message->to($receptor)
+                        ->cc($correos)
+                        ->subject('Error al enviar correo nuevo usuario');
+            });
+        }
+    }
+
     //exportar a excel
     public function notas_credito_proveedores_exportar_excel(Request $request){
         ini_set('max_execution_time', 300); // 5 minutos

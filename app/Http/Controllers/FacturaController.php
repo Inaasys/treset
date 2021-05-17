@@ -41,10 +41,14 @@ use App\ClaveUnidad;
 use App\Comprobante;
 use App\Configuracion_Tabla;
 use App\VistaFactura;
+use App\VistaObtenerExistenciaProducto;
 use App\FolioComprobanteFactura;
 use App\TipoOrdenCompra;
 use App\TipoUnidad;
 use App\CuentaXCobrarDetalle;
+use Config;
+use Mail;
+
 
 class FacturaController extends ConfiguracionSistemaController{
 
@@ -60,6 +64,7 @@ class FacturaController extends ConfiguracionSistemaController{
     }
     
     public function facturas(){
+        //dd($this->regimenfiscal);
         $contarserieusuario = FolioComprobanteFactura::where('Predeterminar', '+')->count();
         if($contarserieusuario == 0){
             $FolioComprobanteFactura = FolioComprobanteFactura::orderBy('Numero','DESC')->take(1)->get();
@@ -76,16 +81,15 @@ class FacturaController extends ConfiguracionSistemaController{
         $rutaconfiguraciontabla = route('facturas_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('facturas_exportar_excel');
         $rutacreardocumento = route('facturas_generar_pdfs');
-        $tiporelacion = c_TipoRelacion::where('Numero', 1)->first();
-        $contarregimenfiscal = c_RegimenFiscal::where('Clave', $this->empresa->RegimenFiscal)->count();
+        $lugarexpedicion = $this->lugarexpedicion;
         $claveregimenfiscal = '';
         $regimenfiscal = '';
-        if($contarregimenfiscal > 0){
-            $c_RegimenFiscal = c_RegimenFiscal::where('Clave', $this->empresa->RegimenFiscal)->first();
-            $claveregimenfiscal = $regimenfiscal->Clave;
-            $regimenfiscal = $regimenfiscal->Nombre;            
+        if($this->regimenfiscal != ''){
+            $c_RegimenFiscal = c_RegimenFiscal::where('Clave', $this->regimenfiscal)->first();
+            $claveregimenfiscal = $c_RegimenFiscal->Clave;
+            $regimenfiscal = $c_RegimenFiscal->Nombre;            
         }
-        return view('registros.facturas.facturas', compact('serieusuario','esquema','depto','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','rutacreardocumento','tiporelacion','claveregimenfiscal','regimenfiscal'));
+        return view('registros.facturas.facturas', compact('serieusuario','esquema','depto','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','rutacreardocumento','lugarexpedicion','claveregimenfiscal','regimenfiscal'));
     }
 
     public function facturas_obtener(Request $request){
@@ -98,7 +102,9 @@ class FacturaController extends ConfiguracionSistemaController{
                     ->addColumn('operaciones', function($data){
                         $botoncambios =     '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Factura .'\')"><i class="material-icons">mode_edit</i></div> '; 
                         $botonbajas   =     '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Factura .'\')"><i class="material-icons">cancel</i></div>  ';
-                        $boton =   $botoncambios.$botonbajas;
+                        $botondocumentopdf = '<a href="'.route('facturas_generar_pdfs_indiv',$data->Factura).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
+                        $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Factura .'\')"><i class="material-icons">email</i></div> ';
+                        $boton =   $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
                         return $boton;
                     })
                     ->addColumn('SubTotal', function($data){ return $data->SubTotal; })
@@ -153,38 +159,19 @@ class FacturaController extends ConfiguracionSistemaController{
     //obtener clientes
     public function facturas_obtener_clientes(Request $request){
         if($request->ajax()){
-            $data = Cliente::where('Status', 'ALTA')->orderBy("Numero", "DESC")->get();
+            //$data = Cliente::where('Status', 'ALTA')->orderBy("Numero", "DESC")->get();
+            $data = DB::table('Clientes as c')
+            ->leftJoin('c_FormaPago as fp', 'fp.Clave', '=', 'c.FormaPago')
+            ->leftJoin('c_MetodoPago as mp', 'mp.Clave', '=', 'c.MetodoPago')
+            ->leftJoin('c_UsoCFDI as uc', 'uc.Clave', '=', 'c.UsoCfdi')
+            ->leftJoin('c_Pais as p', 'p.Clave', '=', 'c.Pais')
+            ->select('c.Numero', 'c.Nombre', 'c.Plazo', 'c.Rfc', 'c.Agente', 'c.Credito', 'c.Saldo', 'c.Status', 'c.Municipio', 'c.Tipo', 'fp.Clave AS ClaveFormaPago', 'fp.Nombre AS NombreFormaPago', 'mp.Clave AS ClaveMetodoPago', 'mp.Nombre AS NombreMetodoPago', 'uc.Clave AS ClaveUsoCfdi', 'uc.Nombre AS NombreUsoCfdi', 'p.Clave AS ClavePais', 'p.Nombre AS NombrePais')
+            ->where('c.Status', 'ALTA')
+            ->orderBy("Numero", "DESC")
+            ->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        $claveformapago = '';
-                        $formapago = '';
-                        $clavemetodopago = '';
-                        $metodopago = '';
-                        $claveusocfdi = '';
-                        $usocfdi = '';
-                        $claveresidenciafiscal = '';
-                        $residenciafiscal = '';
-                        if($data->FormaPago != ''){
-                            $FormaPago = FormaPago::where('Clave', $data->FormaPago)->first();
-                            $claveformapago = $FormaPago->Clave;
-                            $formapago = $FormaPago->Nombre;
-                        }
-                        if($data->MetodoPago != ''){
-                            $MetodoPago = MetodoPago::where('Clave', $data->MetodoPago)->first();
-                            $clavemetodopago = $MetodoPago->Clave;
-                            $metodopago = $MetodoPago->Nombre;
-                        }
-                        if($data->UsoCfdi != ''){
-                            $UsoCFDI = UsoCFDI::where('Clave', $data->UsoCfdi)->first();
-                            $claveusocfdi = $UsoCFDI->Clave;
-                            $usocfdi = $UsoCFDI->Nombre;
-                        }
-                        if($data->Pais != ''){
-                            $Pais = Pais::where('Clave', $data->Pais)->first();
-                            $claveresidenciafiscal = $Pais->Clave;
-                            $residenciafiscal = $Pais->Nombre;
-                        }
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarcliente('.$data->Numero.',\''.$data->Nombre .'\','.$data->Plazo.',\''.$data->Rfc.'\',\''.$claveformapago.'\',\''.$formapago.'\',\''.$clavemetodopago.'\',\''.$metodopago.'\',\''.$claveusocfdi.'\',\''.$usocfdi.'\',\''.$claveresidenciafiscal.'\',\''.$residenciafiscal.'\','.$data->Agente.','.Helpers::convertirvalorcorrecto($data->Credito).','.Helpers::convertirvalorcorrecto($data->Saldo).')">Seleccionar</div>';
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarcliente('.$data->Numero.',\''.$data->Nombre .'\','.$data->Plazo.',\''.$data->Rfc.'\',\''.$data->ClaveFormaPago.'\',\''.$data->NombreFormaPago.'\',\''.$data->ClaveMetodoPago.'\',\''.$data->NombreMetodoPago.'\',\''.$data->ClaveUsoCfdi.'\',\''.$data->NombreUsoCfdi.'\',\''.$data->ClavePais.'\',\''.$data->NombrePais.'\','.$data->Agente.','.Helpers::convertirvalorcorrecto($data->Credito).','.Helpers::convertirvalorcorrecto($data->Saldo).')">Seleccionar</div>';
                         return $boton;
                     })
                     ->rawColumns(['operaciones'])
@@ -565,36 +552,10 @@ class FacturaController extends ConfiguracionSistemaController{
         if($request->ajax()){
             $codigoabuscar = $request->codigoabuscar;
             $tipooperacion = $request->tipooperacion;
-            $data = DB::table('Productos as t')
-            ->leftJoin('Marcas as m', 'm.Numero', '=', 't.Marca')
-            ->leftJoin(DB::raw("(select codigo, sum(existencias) as existencias from Existencias group by codigo) as e"),
-                function($join){
-                    $join->on("e.codigo","=","t.codigo");
-                })
-            ->select('t.Codigo as Codigo', 't.Producto as Producto', 't.Ubicacion as Ubicacion', 'e.Existencias as Existencias', 't.Costo as Costo', 't.SubTotal as SubTotal', 't.Marca as Marca', 't.Status as Status', 't.Unidad AS Unidad', 't.Impuesto AS Impuesto', 't.Insumo AS Insumo', 't.ClaveProducto AS ClaveProducto', 't.ClaveUnidad AS ClaveUnidad', 't.CostoDeLista AS CostoDeLista')
-            ->where('t.Codigo', 'like', '%' . $codigoabuscar . '%')
-            ->get();
+            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($tipooperacion){
-                        $claveproducto = '';
-                        $nombreclaveproducto = '';
-                        $claveunidad = '';
-                        $nombreclaveunidad = '';
-                        //claveproducto
-                        $contarclaveproducto = ClaveProdServ::where('Clave', $data->ClaveProducto)->count();
-                        if($contarclaveproducto > 0){
-                            $ClaveProdServ = ClaveProdServ::where('Clave', $data->ClaveProducto)->first();
-                            $claveproducto = $ClaveProdServ->Clave;
-                            $nombreclaveproducto = $ClaveProdServ->Nombre;
-                        }
-                        $contarclaveunidad = ClaveUnidad::where('Clave', $data->ClaveUnidad)->count();
-                        if($contarclaveproducto > 0){
-                            //claveunidad
-                            $ClaveUnidad = ClaveUnidad::where('Clave', $data->ClaveUnidad)->first();
-                            $claveunidad = $ClaveUnidad->Clave;
-                            $nombreclaveunidad = $ClaveUnidad->Nombre;
-                        }
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.$tipooperacion.'\',\''.$data->Insumo.'\',\''.$claveproducto.'\',\''.$claveunidad.'\',\''.$nombreclaveproducto.'\',\''.$nombreclaveunidad.'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\')">Seleccionar</div>';
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.$tipooperacion.'\',\''.$data->Insumo.'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$data->NombreClaveProducto.'\',\''.$data->NombreClaveUnidad.'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->addColumn('Existencias', function($data){ 
@@ -606,7 +567,7 @@ class FacturaController extends ConfiguracionSistemaController{
                     ->addColumn('SubTotal', function($data){ 
                         return Helpers::convertirvalorcorrecto($data->SubTotal);
                     })
-                    ->rawColumns(['operaciones','Costo','Existencias','SubTotal'])
+                    ->rawColumns(['operaciones'])
                     ->make(true);
         } 
     }
@@ -1337,6 +1298,377 @@ class FacturaController extends ConfiguracionSistemaController{
         ->setOption('margin-bottom', 10);
         return $pdf->stream();
     }
+
+    //generacion de formato en PDF
+    public function facturas_generar_pdfs_indiv($documento){
+        $facturas = Factura::where('Factura', $documento)->get(); 
+        $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $data=array();
+        foreach ($facturas as $f){
+            $facturadetalles = FacturaDetalle::where('Factura', $f->Factura)->get();
+            $arraytipofactura=array();
+            $tipodetalles = '';
+            foreach($facturadetalles as $fd){
+                if($fd->Facturar == 'PRODUCTOS'){
+                    array_push($arraytipofactura, $fd->Remision);
+                    $tipodetalles = 'remisiones';
+                }else if($fd->Facturar == 'SERVICIO'){
+                    array_push($arraytipofactura, $fd->Orden);
+                    $tipodetalles = 'ordenes';
+                }else if($fd->Facturar == 'LIBRE'){
+                    $tipodetalles = 'libre';
+                } 
+            }
+            //if la factura es para remisiones o ordenes
+            if(sizeof($arraytipofactura) > 0){
+                $serviciosoremisionesfactura = array_unique($arraytipofactura);
+                sort($serviciosoremisionesfactura, SORT_NATURAL | SORT_FLAG_CASE);
+                $datageneral = array();
+                foreach($serviciosoremisionesfactura as $sorf){
+                    $datadetalle=array();
+                    switch ($tipodetalles) {
+                        case 'remisiones':
+                            $datosgenerales = Remision::where('Remision', $sorf)->first();
+                            $detallesfacturaremision = FacturaDetalle::where('Factura', $f->Factura)->where('Remision', $sorf)->get();
+                            $sumatotaldetalles = 0;
+                            foreach($detallesfacturaremision as $dfr){
+                                $sumatotaldetalles = $sumatotaldetalles + $dfr->SubTotal;
+                                $claveproducto = ClaveProdServ::where('Clave', $dfr->ClaveProducto)->first();
+                                $claveunidad = ClaveUnidad::where('Clave', $dfr->ClaveUnidad)->first();
+                                $producto = Producto::where('Codigo', $dfr->Codigo)->first();
+                                $datadetalle[]=array(
+                                    "cantidaddetalle"=> Helpers::convertirvalorcorrecto($dfr->Cantidad),
+                                    "codigodetalle"=>$dfr->Codigo,
+                                    "descripciondetalle"=>$dfr->Descripcion,
+                                    "insumodetalle"=>$producto->Insumo,
+                                    "preciodetalle" => Helpers::convertirvalorcorrecto($dfr->Precio),
+                                    "subtotaldetalle" => Helpers::convertirvalorcorrecto($dfr->SubTotal),
+                                    "impuestodetalle" => Helpers::convertirvalorcorrecto($dfr->Impuesto),
+                                    "ivadetalle" => Helpers::convertirvalorcorrecto($dfr->Iva),
+                                    "claveproducto" => $claveproducto,
+                                    "claveunidad" => $claveunidad
+                                );
+                            } 
+                            break;
+                        case 'ordenes':
+                            $datosgenerales = OrdenTrabajo::where('Orden', $sorf)->first();
+                            $detallesfacturaremision = FacturaDetalle::where('Factura', $f->Factura)->where('Orden', $sorf)->get();
+                            $sumatotaldetalles = 0;
+                            foreach($detallesfacturaremision as $dfr){
+                                $sumatotaldetalles = $sumatotaldetalles + $dfr->SubTotal;
+                                $claveproducto = ClaveProdServ::where('Clave', $dfr->ClaveProducto)->first();
+                                $claveunidad = ClaveUnidad::where('Clave', $dfr->ClaveUnidad)->first();
+                                $producto = Producto::where('Codigo', $dfr->Codigo)->first();
+                                $datadetalle[]=array(
+                                    "cantidaddetalle"=> Helpers::convertirvalorcorrecto($dfr->Cantidad),
+                                    "codigodetalle"=>$dfr->Codigo,
+                                    "descripciondetalle"=>$dfr->Descripcion,
+                                    "preciodetalle" => Helpers::convertirvalorcorrecto($dfr->Precio),
+                                    "subtotaldetalle" => Helpers::convertirvalorcorrecto($dfr->SubTotal),
+                                    "impuestodetalle" => Helpers::convertirvalorcorrecto($dfr->Impuesto),
+                                    "ivadetalle" => Helpers::convertirvalorcorrecto($dfr->Iva),
+                                    "claveproducto" => $claveproducto,
+                                    "claveunidad" => $claveunidad
+                                );
+                            }
+                            break;
+                    }
+                    $datageneral[]=array(
+                        "datosgenerales"=>$datosgenerales,
+                        "datadetalle" => $datadetalle,
+                        "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles)
+                    );
+                }
+            //si la factura es libre
+            }else{
+                $datageneral = array();
+                $datadetalle=array();
+                $detallesfacturaremision = FacturaDetalle::where('Factura', $f->Factura)->get();
+                $sumatotaldetalles = 0;
+                foreach($detallesfacturaremision as $dfr){
+                    $sumatotaldetalles = $sumatotaldetalles + $dfr->SubTotal;
+                    $claveproducto = ClaveProdServ::where('Clave', $dfr->ClaveProducto)->first();
+                    $claveunidad = ClaveUnidad::where('Clave', $dfr->ClaveUnidad)->first();
+                    $datadetalle[]=array(
+                        "cantidaddetalle"=> Helpers::convertirvalorcorrecto($dfr->Cantidad),
+                        "codigodetalle"=>$dfr->Codigo,
+                        "descripciondetalle"=>$dfr->Descripcion,
+                        "preciodetalle" => Helpers::convertirvalorcorrecto($dfr->Precio),
+                        "subtotaldetalle" => Helpers::convertirvalorcorrecto($dfr->SubTotal),
+                        "impuestodetalle" => Helpers::convertirvalorcorrecto($dfr->Impuesto),
+                        "ivadetalle" => Helpers::convertirvalorcorrecto($dfr->Iva),
+                        "claveproducto" => $claveproducto,
+                        "claveunidad" => $claveunidad
+                    );
+                }  
+                $datageneral[]=array(
+                    "datadetalle" => $datadetalle,
+                    "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles)
+                );
+            }
+            $cliente = Cliente::where('Numero', $f->Cliente)->first();
+            $agente = Agente::where('Numero', $f->Agente)->first();
+            $formapago = FormaPago::where('Clave', $f->FormaPago)->first();
+            $metodopago = MetodoPago::where('Clave', $f->MetodoPago)->first();
+            $usocfdi = UsoCFDI::where('Clave', $f->UsoCfdi)->first();
+            $comprobantetimbrado = Comprobante::where('Folio', '' . $f->Folio . '')->where('Serie', '' . $f->Serie . '')->count();
+            $comprobante = Comprobante::where('Folio', '' . $f->Folio . '')->where('Serie', '' . $f->Serie . '')->first();
+            $regimenfiscal = c_RegimenFiscal::where('Clave', $f->RegimenFiscal)->first();
+            $formatter = new NumeroALetras;
+            $totalletras = $formatter->toInvoice($f->Total, 2, 'M.N.');
+            $foliofiscalfactura = FolioComprobanteFactura::where('Serie', $f->Serie)->where('Esquema', $f->Esquema)->first();
+            $pagares = $foliofiscalfactura->Pagare;
+            $reemplazarbeneficiario = str_replace("%beneficiario", $this->empresa->Empresa, $pagares);
+            $reemplazarvence = str_replace("%vence", Helpers::fecha_espanol(Carbon::parse($f->Fecha)->addDays($f->Plazo)->toDateTimeString()), $reemplazarbeneficiario);
+            $reemplazartotal = str_replace("%total", Helpers::convertirvalorcorrecto($f->Total), $reemplazarvence);
+            $reemplazartotalletra = str_replace("%letratotal", $totalletras, $reemplazartotal);
+            $reemplazarortorgante = str_replace("%nombre", $cliente->Nombre.' ('.$cliente->Numero.')', $reemplazartotalletra);
+            $reemplazardomicilio = str_replace("%direccion", $cliente->Calle.' '.$cliente->noExterior.' '.$cliente->noInterior.' Colonia: '.$cliente->Colonia.' Estado: '.$cliente->Localidad, $reemplazarortorgante);
+            $reemplazarciudad = str_replace("%ciudad", $cliente->Municipio.' C.P. '.$cliente->CodigoPostal, $reemplazardomicilio);
+            $reemplazarestado = str_replace("%estadobeneficiario", $this->empresa->Estado, $reemplazarciudad);
+            $reemplazarfecha = str_replace("%fecha", Helpers::fecha_espanol(Carbon::parse($f->Fecha)->toDateTimeString()), $reemplazarestado);
+            $reemplazarbr = str_replace("%br", "\n\n", $reemplazarfecha);
+            $pagare = $reemplazarbr;
+            $data[]=array(
+                "factura"=>$f,
+                "datageneral" => $datageneral,
+                "cliente" => $cliente,
+                "agente" => $agente,
+                "formapago" => $formapago,
+                "metodopago" => $metodopago,
+                "usocfdi" => $usocfdi,
+                "comprobante" => $comprobante,
+                "comprobantetimbrado" => $comprobantetimbrado,
+                "regimenfiscal"=> $regimenfiscal,
+                "pagare"=> $pagare,
+                "tipodetalles" => $tipodetalles,
+                "fechavence" => Carbon::parse($f->Fecha)->addDays($f->Plazo)->toDateTimeString(),
+                "subtotalfactura"=>Helpers::convertirvalorcorrecto($f->SubTotal),
+                "ivafactura"=>Helpers::convertirvalorcorrecto($f->Iva),
+                "totalfactura"=>Helpers::convertirvalorcorrecto($f->Total),
+                "tipocambiofactura"=>Helpers::convertirvalorcorrecto($f->TipoCambio),
+                "totalletras"=>$totalletras,
+                "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
+            );
+        }
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('registros.facturas.formato_pdf_facturas', compact('data'))
+        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-right', ''.$fechaformato.'')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        return $pdf->stream();
+    }
+
+    //obtener datos para enviar email
+    public function facturas_obtener_datos_envio_email(Request $request){
+        $factura = Factura::where('Factura', $request->documento)->first();
+        $cliente = Cliente::where('Numero',$factura->Cliente)->first();
+        $data = array(
+            'factura' => $factura,
+            'cliente' => $cliente,
+            'emailde' => Config::get('mail.from.address'),
+            'emailpara' => $cliente->Email1
+        );
+        return response()->json($data);
+    }
+
+    //enviar pdf por emial
+    public function facturas_enviar_pdfs_email(Request $request){
+        $facturas = Factura::where('Factura', $request->emaildocumento)->get(); 
+        $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $data=array();
+        foreach ($facturas as $f){
+            $facturadetalles = FacturaDetalle::where('Factura', $f->Factura)->get();
+            $arraytipofactura=array();
+            $tipodetalles = '';
+            foreach($facturadetalles as $fd){
+                if($fd->Facturar == 'PRODUCTOS'){
+                    array_push($arraytipofactura, $fd->Remision);
+                    $tipodetalles = 'remisiones';
+                }else if($fd->Facturar == 'SERVICIO'){
+                    array_push($arraytipofactura, $fd->Orden);
+                    $tipodetalles = 'ordenes';
+                }else if($fd->Facturar == 'LIBRE'){
+                    $tipodetalles = 'libre';
+                } 
+            }
+            //if la factura es para remisiones o ordenes
+            if(sizeof($arraytipofactura) > 0){
+                $serviciosoremisionesfactura = array_unique($arraytipofactura);
+                sort($serviciosoremisionesfactura, SORT_NATURAL | SORT_FLAG_CASE);
+                $datageneral = array();
+                foreach($serviciosoremisionesfactura as $sorf){
+                    $datadetalle=array();
+                    switch ($tipodetalles) {
+                        case 'remisiones':
+                            $datosgenerales = Remision::where('Remision', $sorf)->first();
+                            $detallesfacturaremision = FacturaDetalle::where('Factura', $f->Factura)->where('Remision', $sorf)->get();
+                            $sumatotaldetalles = 0;
+                            foreach($detallesfacturaremision as $dfr){
+                                $sumatotaldetalles = $sumatotaldetalles + $dfr->SubTotal;
+                                $claveproducto = ClaveProdServ::where('Clave', $dfr->ClaveProducto)->first();
+                                $claveunidad = ClaveUnidad::where('Clave', $dfr->ClaveUnidad)->first();
+                                $producto = Producto::where('Codigo', $dfr->Codigo)->first();
+                                $datadetalle[]=array(
+                                    "cantidaddetalle"=> Helpers::convertirvalorcorrecto($dfr->Cantidad),
+                                    "codigodetalle"=>$dfr->Codigo,
+                                    "descripciondetalle"=>$dfr->Descripcion,
+                                    "insumodetalle"=>$producto->Insumo,
+                                    "preciodetalle" => Helpers::convertirvalorcorrecto($dfr->Precio),
+                                    "subtotaldetalle" => Helpers::convertirvalorcorrecto($dfr->SubTotal),
+                                    "impuestodetalle" => Helpers::convertirvalorcorrecto($dfr->Impuesto),
+                                    "ivadetalle" => Helpers::convertirvalorcorrecto($dfr->Iva),
+                                    "claveproducto" => $claveproducto,
+                                    "claveunidad" => $claveunidad
+                                );
+                            } 
+                            break;
+                        case 'ordenes':
+                            $datosgenerales = OrdenTrabajo::where('Orden', $sorf)->first();
+                            $detallesfacturaremision = FacturaDetalle::where('Factura', $f->Factura)->where('Orden', $sorf)->get();
+                            $sumatotaldetalles = 0;
+                            foreach($detallesfacturaremision as $dfr){
+                                $sumatotaldetalles = $sumatotaldetalles + $dfr->SubTotal;
+                                $claveproducto = ClaveProdServ::where('Clave', $dfr->ClaveProducto)->first();
+                                $claveunidad = ClaveUnidad::where('Clave', $dfr->ClaveUnidad)->first();
+                                $producto = Producto::where('Codigo', $dfr->Codigo)->first();
+                                $datadetalle[]=array(
+                                    "cantidaddetalle"=> Helpers::convertirvalorcorrecto($dfr->Cantidad),
+                                    "codigodetalle"=>$dfr->Codigo,
+                                    "descripciondetalle"=>$dfr->Descripcion,
+                                    "preciodetalle" => Helpers::convertirvalorcorrecto($dfr->Precio),
+                                    "subtotaldetalle" => Helpers::convertirvalorcorrecto($dfr->SubTotal),
+                                    "impuestodetalle" => Helpers::convertirvalorcorrecto($dfr->Impuesto),
+                                    "ivadetalle" => Helpers::convertirvalorcorrecto($dfr->Iva),
+                                    "claveproducto" => $claveproducto,
+                                    "claveunidad" => $claveunidad
+                                );
+                            }
+                            break;
+                    }
+                    $datageneral[]=array(
+                        "datosgenerales"=>$datosgenerales,
+                        "datadetalle" => $datadetalle,
+                        "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles)
+                    );
+                }
+            //si la factura es libre
+            }else{
+                $datageneral = array();
+                $datadetalle=array();
+                $detallesfacturaremision = FacturaDetalle::where('Factura', $f->Factura)->get();
+                $sumatotaldetalles = 0;
+                foreach($detallesfacturaremision as $dfr){
+                    $sumatotaldetalles = $sumatotaldetalles + $dfr->SubTotal;
+                    $claveproducto = ClaveProdServ::where('Clave', $dfr->ClaveProducto)->first();
+                    $claveunidad = ClaveUnidad::where('Clave', $dfr->ClaveUnidad)->first();
+                    $datadetalle[]=array(
+                        "cantidaddetalle"=> Helpers::convertirvalorcorrecto($dfr->Cantidad),
+                        "codigodetalle"=>$dfr->Codigo,
+                        "descripciondetalle"=>$dfr->Descripcion,
+                        "preciodetalle" => Helpers::convertirvalorcorrecto($dfr->Precio),
+                        "subtotaldetalle" => Helpers::convertirvalorcorrecto($dfr->SubTotal),
+                        "impuestodetalle" => Helpers::convertirvalorcorrecto($dfr->Impuesto),
+                        "ivadetalle" => Helpers::convertirvalorcorrecto($dfr->Iva),
+                        "claveproducto" => $claveproducto,
+                        "claveunidad" => $claveunidad
+                    );
+                }  
+                $datageneral[]=array(
+                    "datadetalle" => $datadetalle,
+                    "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles)
+                );
+            }
+            $cliente = Cliente::where('Numero', $f->Cliente)->first();
+            $agente = Agente::where('Numero', $f->Agente)->first();
+            $formapago = FormaPago::where('Clave', $f->FormaPago)->first();
+            $metodopago = MetodoPago::where('Clave', $f->MetodoPago)->first();
+            $usocfdi = UsoCFDI::where('Clave', $f->UsoCfdi)->first();
+            $comprobantetimbrado = Comprobante::where('Folio', '' . $f->Folio . '')->where('Serie', '' . $f->Serie . '')->count();
+            $comprobante = Comprobante::where('Folio', '' . $f->Folio . '')->where('Serie', '' . $f->Serie . '')->first();
+            $regimenfiscal = c_RegimenFiscal::where('Clave', $f->RegimenFiscal)->first();
+            $formatter = new NumeroALetras;
+            $totalletras = $formatter->toInvoice($f->Total, 2, 'M.N.');
+            $foliofiscalfactura = FolioComprobanteFactura::where('Serie', $f->Serie)->where('Esquema', $f->Esquema)->first();
+            $pagares = $foliofiscalfactura->Pagare;
+            $reemplazarbeneficiario = str_replace("%beneficiario", $this->empresa->Empresa, $pagares);
+            $reemplazarvence = str_replace("%vence", Helpers::fecha_espanol(Carbon::parse($f->Fecha)->addDays($f->Plazo)->toDateTimeString()), $reemplazarbeneficiario);
+            $reemplazartotal = str_replace("%total", Helpers::convertirvalorcorrecto($f->Total), $reemplazarvence);
+            $reemplazartotalletra = str_replace("%letratotal", $totalletras, $reemplazartotal);
+            $reemplazarortorgante = str_replace("%nombre", $cliente->Nombre.' ('.$cliente->Numero.')', $reemplazartotalletra);
+            $reemplazardomicilio = str_replace("%direccion", $cliente->Calle.' '.$cliente->noExterior.' '.$cliente->noInterior.' Colonia: '.$cliente->Colonia.' Estado: '.$cliente->Localidad, $reemplazarortorgante);
+            $reemplazarciudad = str_replace("%ciudad", $cliente->Municipio.' C.P. '.$cliente->CodigoPostal, $reemplazardomicilio);
+            $reemplazarestado = str_replace("%estadobeneficiario", $this->empresa->Estado, $reemplazarciudad);
+            $reemplazarfecha = str_replace("%fecha", Helpers::fecha_espanol(Carbon::parse($f->Fecha)->toDateTimeString()), $reemplazarestado);
+            $reemplazarbr = str_replace("%br", "\n\n", $reemplazarfecha);
+            $pagare = $reemplazarbr;
+            $data[]=array(
+                "factura"=>$f,
+                "datageneral" => $datageneral,
+                "cliente" => $cliente,
+                "agente" => $agente,
+                "formapago" => $formapago,
+                "metodopago" => $metodopago,
+                "usocfdi" => $usocfdi,
+                "comprobante" => $comprobante,
+                "comprobantetimbrado" => $comprobantetimbrado,
+                "regimenfiscal"=> $regimenfiscal,
+                "pagare"=> $pagare,
+                "tipodetalles" => $tipodetalles,
+                "fechavence" => Carbon::parse($f->Fecha)->addDays($f->Plazo)->toDateTimeString(),
+                "subtotalfactura"=>Helpers::convertirvalorcorrecto($f->SubTotal),
+                "ivafactura"=>Helpers::convertirvalorcorrecto($f->Iva),
+                "totalfactura"=>Helpers::convertirvalorcorrecto($f->Total),
+                "tipocambiofactura"=>Helpers::convertirvalorcorrecto($f->TipoCambio),
+                "totalletras"=>$totalletras,
+                "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
+            );
+        }
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('registros.facturas.formato_pdf_facturas', compact('data'))
+        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-right', ''.$fechaformato.'')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        try{
+            //enviar correo electrónico	
+            $nombre = 'Receptor envio de correos';
+            $receptor = $request->emailpara;
+            $correos = [$request->emailpara];
+            $asunto = $request->emailasunto;
+            $emaildocumento = $request->emaildocumento;
+            $name = "Receptor envio de correos";
+            $body = $request->emailasunto;
+            $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
+            $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
+            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
+                $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                        ->cc($correos)
+                        ->subject($asunto)
+                        ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf");
+            });
+        } catch(\Exception $e) {
+            $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
+            $correos = ['osbaldo.anzaldo@utpcamiones.com.mx'];
+            $msj = 'Error al enviar correo';
+            Mail::send('correos.errorenvio.error', compact('e','msj'), function($message) use ($receptor, $correos) {
+                $message->to($receptor)
+                        ->cc($correos)
+                        ->subject('Error al enviar correo nuevo usuario');
+            });
+        }
+    }
+
+
     //exportar a excel
     public function facturas_exportar_excel(Request $request){
         ini_set('max_execution_time', 300); // 5 minutos
