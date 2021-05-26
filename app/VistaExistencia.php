@@ -16,6 +16,7 @@ class VistaExistencia extends Model
         'Almacen',
         'Existencias',
         'Costo',
+        'totalCostoInventario',
         'CostoDeLista',
         'Moneda',
         'CostoDeVenta',
@@ -42,6 +43,10 @@ class VistaExistencia extends Model
     public function getCostoAttribute($value){
         return Helpers::convertirvalorcorrecto($value);
     }
+    //totalCostoInventario
+    public function gettotalCostoInventarioAttribute($value){
+        return Helpers::convertirvalorcorrecto($value);
+    }
     //costo de lista
     public function getCostoDeListaAttribute($value){
         return Helpers::convertirvalorcorrecto($value);
@@ -64,14 +69,6 @@ class VistaExistencia extends Model
     }
     //total
     public function getTotalAttribute($value){
-        return Helpers::convertirvalorcorrecto($value);
-    }
-    //FechaUltimaCompra
-    public function getFechaUltimaCompraAttribute($value){
-        return Helpers::convertirvalorcorrecto($value);
-    }
-    //FechaUltimaVenta
-    public function getFechaUltimaVentaAttribute($value){
         return Helpers::convertirvalorcorrecto($value);
     }
     //precio

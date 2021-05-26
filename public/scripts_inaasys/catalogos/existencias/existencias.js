@@ -94,6 +94,10 @@ function configurar_tabla(){
                                         '<label for="idCosto">Costo</label>'+
                                     '</div>'+
                                     '<div class="col-md-4 form-check">'+
+                                        '<input type="checkbox" name="totalCostoInventario" id="idtotalCostoInventario" class="filled-in datotabla" value="totalCostoInventario" onchange="construirarraydatostabla(this);" />'+
+                                        '<label for="idtotalCostoInventario">totalCostoInventario</label>'+
+                                    '</div>'+
+                                    '<div class="col-md-4 form-check">'+
                                         '<input type="checkbox" name="CostoDeLista" id="idCostoDeLista" class="filled-in datotabla" value="CostoDeLista" onchange="construirarraydatostabla(this);" />'+
                                         '<label for="idCostoDeLista">CostoDeLista</label>'+
                                     '</div>'+
