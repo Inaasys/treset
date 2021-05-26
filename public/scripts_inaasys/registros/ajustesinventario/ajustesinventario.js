@@ -186,7 +186,9 @@ function obteneralmacenes(){
 //obtener datos de remision seleccionada
 function seleccionaralmacen(Numero, Nombre){
   $("#numeroalmacen").val(Numero);
+  $("#numeroalmacenanterior").val(Numero);
   $("#almacen").val(Nombre);
+  $("#textonombrealmacen").html(Nombre.substring(0, 40));
   mostrarformulario();
   var tipooperacion = $("#tipooperacion").val();
   if(tipooperacion == 'alta'){
@@ -209,9 +211,14 @@ function cargarnuevosdatosenfilas(){
       var entradaspartida = $(".entradaspartida", this).val();
       var salidaspartida = $(".salidaspartida", this).val();
       obtenernuevosdatosfila(numeroalmacen, codigopartida, folio, serie, fila, entradaspartida, salidaspartida).then(nuevosdatosfila=>{
-        console.log(nuevosdatosfila);
         $(".existenciaactualpartida", this).val(nuevosdatosfila.nuevaexistencia);
-        $(".existencianuevapartida", this).val(nuevosdatosfila.existencianuevapartida);
+        if(parseFloat(entradaspartida) > 0 ){
+          $(".entradaspartida", this).change();
+        }
+        if(parseFloat(salidaspartida) > 0){
+          $(".salidaspartida", this).change();
+        }
+        //$(".existencianuevapartida", this).val(nuevosdatosfila.existencianuevapartida);
       })
       fila++;
   });  
@@ -236,6 +243,36 @@ $(document).ready(function(){
         }
     });
 });
+
+//obtener por numero
+function obteneralmacenpornumero(){
+  if($("#numeroalmacen").parsley().isValid()){
+      var numeroalmacen = $("#numeroalmacen").val();
+      $.get(ajustesinventario_obtener_almacen_por_numero, {numeroalmacen:numeroalmacen}, function(data){
+        $("#numeroalmacen").val(data.numero);
+        $("#numeroalmacenanterior").val(data.numero);
+        $("#almacen").val(data.nombre);
+        $("#textonombrealmacen").html(data.nombre.substring(0, 40));
+        mostrarformulario();
+        var tipooperacion = $("#tipooperacion").val();
+        if(tipooperacion == 'alta'){
+          $("#divbuscarcodigoproducto").show();
+        }
+        //si se cambia el almacen cambiar datos en las filas
+        var numerofilas = $("#numerofilas").val();
+        if(parseInt(numerofilas) > parseInt(0)){
+          cargarnuevosdatosenfilas();
+        }
+      }) 
+  }
+}
+//regresar numero
+function regresarnumeroalmacen(){
+  var numeroalmacenanterior = $("#numeroalmacenanterior").val();
+  $("#numeroalmacen").val(numeroalmacenanterior);
+}
+
+
 //listar productos para tab consumos
 function listarproductos(){
     ocultarformulario();
@@ -589,16 +626,29 @@ function alta(){
   //reiniciar contadores
   contadorproductos=0;
   contadorfilas = 0;
+  $("#numerofilas").val("0");
+  //activar busqueda
+  $('#numeroalmacen').on('keypress', function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+    obteneralmacenpornumero();
+    }
+  });
+  //regresar numero
+  $('#numeroalmacen').on('change', function(e) {
+    regresarnumeroalmacen();
+  });
   $("#ModalAlta").modal('show');
 }
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
   e.preventDefault();
-  var numerofilas = $("#numerofilas").val();
-  if(numerofilas > 0){
-    var formData = new FormData($("#formparsley")[0]);
-    var form = $("#formparsley");
-    if (form.parsley().isValid()){
+  var formData = new FormData($("#formparsley")[0]);
+  var form = $("#formparsley");
+  if (form.parsley().isValid()){
+    var numerofilas = $("#numerofilas").val();
+    if(parseInt(numerofilas) > 0){
       $('.page-loader-wrapper').css('display', 'block');
       $.ajax({
         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
@@ -626,11 +676,13 @@ $("#btnGuardar").on('click', function (e) {
         }
       })
     }else{
-      form.parsley().validate();
+      msj_erroralmenosunaentrada();
     }
   }else{
-    msj_erroralmenosunaentrada();
+    msjfaltandatosporcapturar();
   }
+  //validar formulario
+  form.parsley().validate();
 });
 //bajas
 //verificar si la orden de compra se esta utilzando en alguna orden de compra
@@ -758,7 +810,9 @@ function obtenerdatos(ajustemodificar){
     $("#serietexto").html("Serie: "+data.ajuste.Serie);
     $("#fecha").val(data.fecha);
     $("#almacen").val(data.almacen.Nombre);
+    $("#textonombrealmacen").html(data.almacen.Nombre.substring(0, 40));
     $("#numeroalmacen").val(data.almacen.Numero);
+    $("#numeroalmacenanterior").val(data.almacen.Numero);
     $("#almacendb").val(data.almacen.Nombre);
     $("#numeroalmacendb").val(data.almacen.Numero);
     $("#observaciones").val(data.ajuste.Obs);
@@ -768,6 +822,18 @@ function obtenerdatos(ajustemodificar){
     $("#numerofilas").val(data.numerodetallesajuste);
     //asignar el tipo de operacion que se realizara
     $("#tipooperacion").val("modificacion");
+    //activar busqueda
+    $('#numeroalmacen').on('keypress', function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+      obteneralmacenpornumero();
+      }
+    });
+    //regresar numero
+    $('#numeroalmacen').on('change', function(e) {
+      regresarnumeroalmacen();
+    });
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {
@@ -781,35 +847,42 @@ $("#btnGuardarModificacion").on('click', function (e) {
   var formData = new FormData($("#formparsley")[0]);
   var form = $("#formparsley");
   if (form.parsley().isValid()){
-    $('.page-loader-wrapper').css('display', 'block');
-    $.ajax({
-      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-      url:ajustesinventario_guardar_modificacion,
-      type: "post",
-      dataType: "html",
-      data: formData,
-      cache: false,
-      contentType: false,
-      processData: false,
-      success:function(data){
-        msj_datosguardadoscorrectamente();
-        limpiar();
-        ocultarmodalformulario();
-        limpiarmodales();
-        $('.page-loader-wrapper').css('display', 'none');
-      },
-      error:function(data){
-        if(data.status == 403){
-          msj_errorenpermisos();
-        }else{
-          msj_errorajax();
+    var numerofilas = $("#numerofilas").val();
+    if(parseInt(numerofilas) > 0){
+      $('.page-loader-wrapper').css('display', 'block');
+      $.ajax({
+        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+        url:ajustesinventario_guardar_modificacion,
+        type: "post",
+        dataType: "html",
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success:function(data){
+          msj_datosguardadoscorrectamente();
+          limpiar();
+          ocultarmodalformulario();
+          limpiarmodales();
+          $('.page-loader-wrapper').css('display', 'none');
+        },
+        error:function(data){
+          if(data.status == 403){
+            msj_errorenpermisos();
+          }else{
+            msj_errorajax();
+          }
+          $('.page-loader-wrapper').css('display', 'none');
         }
-        $('.page-loader-wrapper').css('display', 'none');
-      }
-    })
+      })
+    }else{
+      msj_erroralmenosunaentrada();
+    }
   }else{
-    form.parsley().validate();
+    msjfaltandatosporcapturar();
   }
+  //validar formulario
+  form.parsley().validate();
 });
 //obtener datos para el envio del documento por email
 function enviardocumentoemail(documento){

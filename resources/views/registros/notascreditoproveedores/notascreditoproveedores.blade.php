@@ -211,7 +211,9 @@
         var notas_credito_proveedores_obtener = '{!!URL::to('notas_credito_proveedores_obtener')!!}';
         var notas_credito_proveedores_obtener_ultimo_folio = '{!!URL::to('notas_credito_proveedores_obtener_ultimo_folio')!!}';
         var notas_credito_proveedores_obtener_proveedores = '{!!URL::to('notas_credito_proveedores_obtener_proveedores')!!}';
+        var notas_credito_proveedores_obtener_proveedor_por_numero = '{!!URL::to('notas_credito_proveedores_obtener_proveedor_por_numero')!!}';
         var notas_credito_proveedores_obtener_almacenes = '{!!URL::to('notas_credito_proveedores_obtener_almacenes')!!}';
+        var notas_credito_proveedores_obtener_almacen_por_numero = '{!!URL::to('notas_credito_proveedores_obtener_almacen_por_numero')!!}';
         var notas_credito_proveedores_obtener_compras = '{!!URL::to('notas_credito_proveedores_obtener_compras')!!}'; 
         var notas_credito_proveedores_obtener_compra = '{!!URL::to('notas_credito_proveedores_obtener_compra')!!}';
         var notas_credito_proveedor_obtener_codigos_compra = '{!!URL::to('notas_credito_proveedor_obtener_codigos_compra')!!}';
@@ -221,6 +223,8 @@
         var notas_credito_proveedor_obtener_existencias_partida = '{!!URL::to('notas_credito_proveedor_obtener_existencias_partida')!!}';
         var notas_credito_proveedor_obtener_tipos_ordenes_compra = '{!!URL::to('notas_credito_proveedor_obtener_tipos_ordenes_compra')!!}';
         var notas_credito_proveedores_obtener_productos = '{!!URL::to('notas_credito_proveedores_obtener_productos')!!}';
+        var notas_credito_proveedores_obtener_claves_productos = '{!!URL::to('notas_credito_proveedores_obtener_claves_productos')!!}';
+        var notas_credito_proveedores_obtener_claves_unidades = '{!!URL::to('notas_credito_proveedores_obtener_claves_unidades')!!}';
         var notas_credito_proveedores_verificar_uso_en_modulos =  '{!!URL::to('notas_credito_proveedores_verificar_uso_en_modulos')!!}';
         var notas_credito_proveedores_alta_o_baja = '{!!URL::to('notas_credito_proveedores_alta_o_baja')!!}'; 
         var notas_credito_proveedores_obtener_nota_proveedor = '{!!URL::to('notas_credito_proveedores_obtener_nota_proveedor')!!}';

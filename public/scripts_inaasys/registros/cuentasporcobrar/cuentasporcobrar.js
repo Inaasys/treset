@@ -198,14 +198,23 @@ function obtenerclientes(){
 //seleccionar cliente
 function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapago, clavemetodopago, metodopago, claveusocfdi, usocfdi, claveresidenciafiscal, residenciafiscal){
     $("#numerocliente").val(Numero);
+    $("#numeroclienteanterior").val(Numero);
     $("#cliente").val(Nombre);
+    $("#textonombrecliente").html(Nombre.substring(0, 40));
     $("#rfccliente").val(Rfc);
     //datos pestaña receptor o cliente
     $("#receptorrfc").val(Rfc);
     $("#receptornombre").val(Nombre);
     $("#claveformapago").val(claveformapago);
+    $("#claveformapagoanterior").val(claveformapago);
     $("#formapago").val(formapago);
+    $("#textonombreformapago").html(formapago.substring(0, 40));
     $("#btnlistarfacturas").show();
+    var tipooperacion = $("#tipooperacion").val();
+    var numerocliente = Numero;
+    $.get(cuentas_por_cobrar_obtener_facturas_cliente, {numerocliente:numerocliente,tipooperacion:tipooperacion}, function(data){
+        $("#tabladetallesfacturas tbody").html(data.filasfacturas);
+    });
     mostrarformulario();
 }
 //obtener registros de almacenes
@@ -270,7 +279,9 @@ function obtenerbancos(){
 } 
 function seleccionarbanco(Numero, Nombre){
     $("#numerobanco").val(Numero);
+    $("#numerobancoanterior").val(Numero);
     $("#banco").val(Nombre);
+    $("#textonombrebanco").html(Nombre.substring(0, 40));
     mostrarformulario();
 }
 //obtener lugares expedicion
@@ -340,8 +351,10 @@ function obtenerlugaresexpedicion(){
   } 
   //seleccionar lugar expedicion
   function seleccionarlugarexpedicion(Clave){
-  $("#lugarexpedicion").val(Clave);
-  mostrarformulario();
+    $("#lugarexpedicion").val(Clave);
+    $("#lugarexpedicionanterior").val(Clave);
+    $("#textonombrelugarexpedicion").html(Clave.substring(0, 40));
+    mostrarformulario();
   }
   //obtener regimenes fiscales
   function obtenerregimenesfiscales(){
@@ -410,7 +423,9 @@ function obtenerlugaresexpedicion(){
   //seleccionar lugar expedicion
   function seleccionarregimenfiscal(Clave, Nombre){
     $("#claveregimenfiscal").val(Clave);
+    $("#claveregimenfiscalanterior").val(Clave);
     $("#regimenfiscal").val(Nombre);
+    $("#textonombreregimenfiscal").html(Nombre.substring(0, 40));
     mostrarformulario();
   }
   //obtener tipos relacion
@@ -476,7 +491,9 @@ function obtenerlugaresexpedicion(){
   //seleccionar lugar expedicion
   function seleccionartiporelacion(Clave, Nombre){
     $("#clavetiporelacion").val(Clave);
+    $("#clavetiporelacionanterior").val(Clave);
     $("#tiporelacion").val(Nombre);
+    $("#textonombretiporelacion").html(Nombre.substring(0, 40));
     mostrarformulario();
   }
   //obtener formas de pago
@@ -544,7 +561,9 @@ function obtenerlugaresexpedicion(){
   //seleccionar forma pago
   function seleccionarformapago(Clave, Nombre){
     $("#claveformapago").val(Clave);
+    $("#claveformapagoanterior").val(Clave);
     $("#formapago").val(Nombre);
+    $("#textonombreformapago").html(Nombre.substring(0, 40));
     mostrarformulario();
   }
 //listar metodos pago
@@ -693,6 +712,124 @@ function seleccionarfoliofiscal(Serie, Esquema){
       }) 
     }
 }
+//obtener por numero
+function obtenerclientepornumero(){
+    if($("#numerocliente").parsley().isValid()){
+        var numerocliente = $("#numerocliente").val();
+        var tipooperacion = $("#tipooperacion").val();
+        $.get(cuentas_por_cobrar_obtener_cliente_por_numero, {numerocliente:numerocliente,tipooperacion:tipooperacion}, function(data){
+            $("#numerocliente").val(data.numero);
+            $("#numeroclienteanterior").val(data.numero);
+            $("#cliente").val(data.nombre);
+            $("#textonombrecliente").html(data.nombre.substring(0, 40));
+            $("#rfccliente").val(data.rfc);
+            //datos pestaña receptor o cliente
+            $("#receptorrfc").val(data.rfc);
+            $("#receptornombre").val(data.nombre);
+            $("#claveformapago").val(data.claveformapago);
+            $("#claveformapagoanterior").val(data.claveformapago);
+            $("#formapago").val(data.formapago);
+            $("#textonombreformapago").html(data.formapago.substring(0, 40));
+            $("#btnlistarfacturas").show();
+            $("#tabladetallesfacturas tbody").html(data.filasfacturas);
+            mostrarformulario(); 
+        }) 
+    }
+  }
+//regresar numero
+function regresarnumerocliente(){
+    var numeroclienteanterior = $("#numeroclienteanterior").val();
+    $("#numerocliente").val(numeroclienteanterior);
+}
+//obtener por numero
+function obtenerbancopornumero(){
+    if($("#numerobanco").parsley().isValid()){
+        var numerobanco = $("#numerobanco").val();
+        $.get(cuentas_por_cobrar_obtener_banco_por_numero, {numerobanco:numerobanco}, function(data){
+            $("#numerobanco").val(data.numero);
+            $("#numerobancoanterior").val(data.numero);
+            $("#banco").val(data.nombre);
+            $("#textonombrebanco").html(data.nombre.substring(0, 40));
+            mostrarformulario();
+        }) 
+    }
+}
+//regresar numero
+function regresarnumerobanco(){
+    var numerobancoanterior = $("#numerobancoanterior").val();
+    $("#numerobanco").val(numerobancoanterior);
+}
+//obtener por clave
+function obtenerlugarexpedicionporclave(){
+    if($("#lugarexpedicion").parsley().isValid()){
+        var lugarexpedicion = $("#lugarexpedicion").val();
+        $.get(cuentas_por_cobrar_obtener_lugar_expedicion_por_clave, {lugarexpedicion:lugarexpedicion}, function(data){
+          $("#lugarexpedicion").val(data.clave);
+          $("#lugarexpedicionanterior").val(data.clave);
+          $("#textonombrelugarexpedicion").html(data.estado.substring(0, 40));
+          mostrarformulario();
+        }) 
+    }
+}
+//regresar clave
+function regresarclavelugarexpedicion(){
+    var lugarexpedicionanterior = $("#lugarexpedicionanterior").val();
+    $("#lugarexpedicion").val(lugarexpedicionanterior);
+}
+//obtener por clave
+function obtenerregimenfiscalporclave(){
+    if($("#claveregimenfiscal").parsley().isValid()){
+        var claveregimenfiscal = $("#claveregimenfiscal").val();
+        $.get(cuentas_por_cobrar_obtener_regimen_fiscal_por_clave, {claveregimenfiscal:claveregimenfiscal}, function(data){
+          $("#claveregimenfiscal").val(data.clave);
+          $("#claveregimenfiscalanterior").val(data.clave);
+          $("#regimenfiscal").val(data.nombre);
+          $("#textonombreregimenfiscal").html(data.nombre.substring(0, 40));
+          mostrarformulario();
+        }) 
+    }
+}
+//regresar clave
+function regresarclaveregimenfiscal(){
+    var claveregimenfiscalanterior = $("#claveregimenfiscalanterior").val();
+    $("#claveregimenfiscal").val(claveregimenfiscalanterior);
+}
+//obtener por clave
+function obtenertiporelacionporclave(){
+    if($("#clavetiporelacion").parsley().isValid()){
+        var clavetiporelacion = $("#clavetiporelacion").val();
+        $.get(cuentas_por_cobrar_obtener_tipo_relacion_por_clave, {clavetiporelacion:clavetiporelacion}, function(data){
+          $("#clavetiporelacion").val(data.clave);
+          $("#clavetiporelacionanterior").val(data.clave);  
+          $("#tiporelacion").val(data.nombre);
+          $("#textonombretiporelacion").html(data.nombre.substring(0, 40));
+          mostrarformulario();
+        }) 
+    }
+}
+//regresar clave
+function regresarclavetiporelacion(){
+    var clavetiporelacionanterior = $("#clavetiporelacionanterior").val();
+    $("#clavetiporelacion").val(clavetiporelacionanterior);
+}
+//obtener por clave
+function obtenerformapagoporclave(){
+    if($("#claveformapago").parsley().isValid()){
+        var claveformapago = $("#claveformapago").val();
+        $.get(cuentas_por_cobrar_obtener_forma_pago_por_clave, {claveformapago:claveformapago}, function(data){
+          $("#claveformapago").val(data.clave);
+          $("#claveformapagoanterior").val(data.clave);
+          $("#formapago").val(data.nombre);
+          $("#textonombreformapago").html(data.nombre.substring(0, 40));
+          mostrarformulario();
+        }) 
+    }
+}
+//regresar clave
+function regresarclaveformapago(){
+    var claveformapagoanterior = $("#claveformapagoanterior").val();
+    $("#claveformapago").val(claveformapagoanterior);
+}
 //listar todas las facturas
 function listarfacturas (){
     ocultarformulario();
@@ -770,8 +907,8 @@ function listarfacturas (){
             },
           
       });  
-  } 
-  //obtener todos los datos de la orden de compra seleccionada
+} 
+//obtener todos los datos de la orden de compra seleccionada
 var contadorproductos=0;
 var contadorfilas = 0;
 function seleccionarfactura(Folio, Factura){
@@ -900,7 +1037,7 @@ function alta(){
                                     '<input type="hidden" class="form-control" name="esquema" id="esquema" value="'+esquema+'" readonly data-parsley-length="[1, 10]">'+
                                 '</div>'+  
                                 '<div class="col-md-3">'+
-                                    '<label>Cliente</label>'+
+                                    '<label>Cliente <span class="label label-danger" id="textonombrecliente"></span></label>'+
                                     '<table class="col-md-12">'+
                                         '<tr>'+
                                             '<td>'+
@@ -908,8 +1045,9 @@ function alta(){
                                             '</td>'+
                                             '<td>'+
                                                 '<div class="form-line">'+
-                                                    '<input type="hidden" class="form-control" name="numerocliente" id="numerocliente" required readonly onkeyup="tipoLetra(this)">'+
-                                                    '<input type="text" class="form-control" name="cliente" id="cliente" required readonly>'+
+                                                    '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required data-parsley-type="integer">'+
+                                                    '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
+                                                    '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
                                                     '<input type="hidden" class="form-control" name="rfccliente" id="rfccliente" required readonly>'+
                                                 '</div>'+
                                             '</td>'+    
@@ -917,7 +1055,7 @@ function alta(){
                                     '</table>'+
                                 '</div>'+ 
                                 '<div class="col-md-3">'+
-                                    '<label>Banco</label>'+
+                                    '<label>Banco <span class="label label-danger" id="textonombrebanco"></span></label>'+
                                     '<table class="col-md-12">'+
                                         '<tr>'+
                                             '<td>'+
@@ -925,8 +1063,9 @@ function alta(){
                                             '</td>'+
                                             '<td>'+
                                                 '<div class="form-line">'+
-                                                    '<input type="hidden" class="form-control" name="numerobanco" id="numerobanco" required readonly onkeyup="tipoLetra(this)">'+
-                                                    '<input type="text" class="form-control" name="banco" id="banco" required readonly>'+
+                                                    '<input type="text" class="form-control" name="numerobanco" id="numerobanco" required data-parsley-type="integer">'+
+                                                    '<input type="hidden" class="form-control" name="numerobancoanterior" id="numerobancoanterior" required data-parsley-type="integer">'+
+                                                    '<input type="hidden" class="form-control" name="banco" id="banco" required readonly>'+
                                                 '</div>'+
                                             '</td>'+    
                                         '</tr>'+    
@@ -962,7 +1101,7 @@ function alta(){
                                     '<label>Fecha aplicación pagos</label>'+
                                     '<input type="datetime-local" class="form-control" name="fechaaplicacionpagos" id="fechaaplicacionpagos" required>'+
                                 '</div>'+
-                                '<div class="col-md-3">'+
+                                '<div class="col-md-3" hidden>'+
                                         '<label>Cargar Facturas</label>'+
                                         '<div class="btn btn-block bg-blue waves-effect" id="btnlistarfacturas" onclick="listarfacturas()" style="display:none">Agregar Factura</div>'+
                                 '</div>'+  
@@ -979,7 +1118,7 @@ function alta(){
                                     '<input type="text" class="form-control" name="emisornombre" id="emisornombre" value="'+nombreempresa+'" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                                 '<div class="col-md-4">'+
-                                    '<label>Lugar Expedición</label>'+
+                                    '<label>Lugar Expedición <span class="label label-danger" id="textonombrelugarexpedicion"></span></label>'+
                                     '<table class="col-md-12">'+
                                         '<tr>'+
                                             '<td>'+
@@ -987,7 +1126,8 @@ function alta(){
                                             '</td>'+
                                             '<td>'+
                                                 '<div class="form-line">'+
-                                                    '<input type="text" class="form-control" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" required readonly>'+
+                                                    '<input type="text" class="form-control" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" required>'+
+                                                    '<input type="hidden" class="form-control" name="lugarexpedicionanterior" id="lugarexpedicionanterior" value="'+lugarexpedicion+'" required readonly>'+
                                                 '</div>'+
                                             '</td>'+
                                         '</tr>'+    
@@ -996,7 +1136,7 @@ function alta(){
                             '</div>'+
                             '<div class="row">'+
                                 '<div class="col-md-4">'+
-                                    '<label>Régimen Fiscal</label>'+
+                                    '<label>Régimen Fiscal <span class="label label-danger" id="textonombreregimenfiscal">'+regimenfiscal+'</span></label>'+
                                     '<table class="col-md-12">'+
                                         '<tr>'+
                                             '<td>'+
@@ -1004,15 +1144,16 @@ function alta(){
                                             '</td>'+
                                             '<td>'+
                                                 '<div class="form-line">'+
-                                                    '<input type="hidden" class="form-control" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" required readonly onkeyup="tipoLetra(this)">'+
-                                                    '<input type="text" class="form-control" name="regimenfiscal" id="regimenfiscal" value="'+regimenfiscal+'" required readonly>'+
+                                                    '<input type="text" class="form-control" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" required>'+
+                                                    '<input type="hidden" class="form-control" name="claveregimenfiscalanterior" id="claveregimenfiscalanterior" value="'+claveregimenfiscal+'" required>'+
+                                                    '<input type="hidden" class="form-control" name="regimenfiscal" id="regimenfiscal" value="'+regimenfiscal+'" required readonly>'+
                                                 '</div>'+
                                             '</td>'+
                                         '</tr>'+    
                                     '</table>'+
                                 '</div>'+
                                 '<div class="col-md-4">'+
-                                    '<label>Tipo Relación</label>'+
+                                    '<label>Tipo Relación <span class="label label-danger" id="textonombretiporelacion"></span></label>'+
                                     '<table class="col-md-12">'+
                                         '<tr>'+
                                             '<td>'+
@@ -1020,8 +1161,9 @@ function alta(){
                                             '</td>'+
                                             '<td>'+
                                                 '<div class="form-line">'+
-                                                    '<input type="hidden" class="form-control" name="clavetiporelacion" id="clavetiporelacion" readonly onkeyup="tipoLetra(this)">'+
-                                                    '<input type="text" class="form-control" name="tiporelacion" id="tiporelacion" readonly>'+
+                                                    '<input type="text" class="form-control" name="clavetiporelacion" id="clavetiporelacion" >'+
+                                                    '<input type="hidden" class="form-control" name="clavetiporelacionanterior" id="clavetiporelacionanterior" >'+
+                                                    '<input type="hidden" class="form-control" name="tiporelacion" id="tiporelacion" readonly>'+
                                                 '</div>'+
                                             '</td>'+
                                         '</tr>'+    
@@ -1040,7 +1182,7 @@ function alta(){
                                     '<input type="text" class="form-control" name="receptornombre" id="receptornombre"  required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                                 '<div class="col-md-3">'+
-                                    '<label>Forma de Pago</label>'+
+                                    '<label>Forma de Pago <span class="label label-danger" id="textonombreformapago"></span></label>'+
                                     '<table class="col-md-12">'+
                                         '<tr>'+
                                             '<td>'+
@@ -1048,8 +1190,9 @@ function alta(){
                                             '</td>'+
                                             '<td>'+
                                                 '<div class="form-line">'+
-                                                    '<input type="hidden" class="form-control" name="claveformapago" id="claveformapago" required readonly onkeyup="tipoLetra(this)">'+
-                                                    '<input type="text" class="form-control" name="formapago" id="formapago" required readonly>'+
+                                                    '<input type="text" class="form-control" name="claveformapago" id="claveformapago" required>'+
+                                                    '<input type="hidden" class="form-control" name="claveformapagoanterior" id="claveformapagoanterior" required>'+
+                                                    '<input type="hidden" class="form-control" name="formapago" id="formapago" required readonly>'+
                                                 '</div>'+
                                             '</td>'+
                                         '</tr>'+    
@@ -1132,6 +1275,79 @@ function alta(){
     //reiniciar contadores
     contadorproductos=0;
     contadorfilas = 0;
+    $("#numerofilas").val("0");
+    //activar busqueda para clientes
+    $('#numerocliente').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerclientepornumero();
+        }
+    });
+    //regresar numero cliente
+    $('#numerocliente').on('change', function(e) {
+        regresarnumerocliente();
+    });
+    //activar busqueda para bancos
+    $('#numerobanco').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerbancopornumero();
+        }
+    });
+    //regresar numero banco
+    $('#numerobanco').on('change', function(e) {
+        regresarnumerobanco();
+    });
+    //activar busqueda para lugar expedicion
+    $('#lugarexpedicion').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerlugarexpedicionporclave();
+        }
+    });
+    //regresar clave
+    $('#lugarexpedicion').on('change', function(e) {
+        regresarclavelugarexpedicion();
+    });
+    //activar busqueda para regimen fiscal
+    $('#claveregimenfiscal').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerregimenfiscalporclave();
+        }
+    });
+    //regresar clave
+    $('#claveregimenfiscal').on('change', function(e) {
+        regresarclaveregimenfiscal();
+    });
+    //activar busqueda para tipo relacion
+    $('#clavetiporelacion').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenertiporelacionporclave();
+        }
+    });
+    //regresar clave
+    $('#clavetiporelacion').on('change', function(e) {
+        regresarclavetiporelacion();
+    });
+    //activar busqueda para forma pago
+    $('#claveformapago').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerformapagoporclave();
+        }
+    });
+    //regresar clave
+    $('#claveformapago').on('change', function(e) {
+        regresarclaveformapago();
+    });
 }
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
@@ -1139,35 +1355,37 @@ $("#btnGuardar").on('click', function (e) {
     var formData = new FormData($("#formparsley")[0]);
     var form = $("#formparsley");
     if (form.parsley().isValid()){
-        $('.page-loader-wrapper').css('display', 'block');
-        $.ajax({
-            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-            url:cuentas_por_cobrar_guardar,
-            type: "post",
-            dataType: "html",
-            data: formData,
-            cache: false,
-            contentType: false,
-            processData: false,
-            success:function(data){
-                msj_datosguardadoscorrectamente();
-                limpiar();
-                ocultarmodalformulario();
-                limpiarmodales();
-                $('.page-loader-wrapper').css('display', 'none');
-            },
-            error:function(data){
-                if(data.status == 403){
-                    msj_errorenpermisos();
-                }else{
-                    msj_errorajax();
+            $('.page-loader-wrapper').css('display', 'block');
+            $.ajax({
+                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                url:cuentas_por_cobrar_guardar,
+                type: "post",
+                dataType: "html",
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success:function(data){
+                    msj_datosguardadoscorrectamente();
+                    limpiar();
+                    ocultarmodalformulario();
+                    limpiarmodales();
+                    $('.page-loader-wrapper').css('display', 'none');
+                },
+                error:function(data){
+                    if(data.status == 403){
+                        msj_errorenpermisos();
+                    }else{
+                        msj_errorajax();
+                    }
+                    $('.page-loader-wrapper').css('display', 'none');
                 }
-                $('.page-loader-wrapper').css('display', 'none');
-            }
-        })
+            })
     }else{
-        form.parsley().validate();
+        msjfaltandatosporcapturar();
     }
+    //validar formulario
+    form.parsley().validate();
 });
 //verificar si la orden de compra se esta utilzando en alguna orden de compra
 function desactivar(cxcdesactivar){
@@ -1260,7 +1478,7 @@ function obtenerdatos(cxcmodificar){
                                         '<input type="hidden" class="form-control" name="pago" id="pago" readonly>'+
                                     '</div>'+  
                                     '<div class="col-md-3">'+
-                                        '<label>Cliente</label>'+
+                                        '<label>Cliente <span class="label label-danger" id="textonombrecliente"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td>'+
@@ -1268,8 +1486,9 @@ function obtenerdatos(cxcmodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="numerocliente" id="numerocliente" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="cliente" id="cliente" required readonly>'+
+                                                        '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required>'+
+                                                        '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required>'+
+                                                        '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
                                                         '<input type="hidden" class="form-control" name="rfccliente" id="rfccliente" required readonly>'+
                                                     '</div>'+
                                                 '</td>'+    
@@ -1277,7 +1496,7 @@ function obtenerdatos(cxcmodificar){
                                         '</table>'+
                                     '</div>'+ 
                                     '<div class="col-md-3">'+
-                                        '<label>Banco</label>'+
+                                        '<label>Banco <span class="label label-danger" id="textonombrebanco"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td>'+
@@ -1285,8 +1504,9 @@ function obtenerdatos(cxcmodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="numerobanco" id="numerobanco" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="banco" id="banco" required readonly>'+
+                                                        '<input type="text" class="form-control" name="numerobanco" id="numerobanco" required>'+
+                                                        '<input type="hidden" class="form-control" name="numerobancoanterior" id="numerobancoanterior" required>'+
+                                                        '<input type="hidden" class="form-control" name="banco" id="banco" required readonly>'+
                                                     '</div>'+
                                                 '</td>'+    
                                             '</tr>'+    
@@ -1322,7 +1542,7 @@ function obtenerdatos(cxcmodificar){
                                         '<label>Fecha aplicación pagos</label>'+
                                         '<input type="datetime-local" class="form-control" name="fechaaplicacionpagos" id="fechaaplicacionpagos" required>'+
                                     '</div>'+
-                                    '<div class="col-md-3">'+
+                                    '<div class="col-md-3" hidden>'+
                                             '<label>Cargar Facturas</label>'+
                                             '<div class="btn btn-block bg-blue waves-effect" id="btnlistarfacturas" onclick="listarfacturas()" style="display:none">Agregar Factura</div>'+
                                     '</div>'+  
@@ -1339,7 +1559,7 @@ function obtenerdatos(cxcmodificar){
                                         '<input type="text" class="form-control" name="emisornombre" id="emisornombre" value="'+nombreempresa+'" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                     '<div class="col-md-4">'+
-                                        '<label>Lugar Expedición</label>'+
+                                        '<label>Lugar Expedición <span class="label label-danger" id="textonombrelugarexpedicion"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td>'+
@@ -1347,7 +1567,8 @@ function obtenerdatos(cxcmodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" required readonly>'+
+                                                        '<input type="text" class="form-control" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" required>'+
+                                                        '<input type="hidden" class="form-control" name="lugarexpedicionanterior" id="lugarexpedicionanterior" value="'+lugarexpedicion+'" required>'+
                                                     '</div>'+
                                                 '</td>'+
                                             '</tr>'+    
@@ -1356,7 +1577,7 @@ function obtenerdatos(cxcmodificar){
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-md-4">'+
-                                        '<label>Régimen Fiscal</label>'+
+                                        '<label>Régimen Fiscal <span class="label label-danger" id="textonombreregimenfiscal"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td>'+
@@ -1364,15 +1585,16 @@ function obtenerdatos(cxcmodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="regimenfiscal" id="regimenfiscal" value="'+regimenfiscal+'" required readonly>'+
+                                                        '<input type="text" class="form-control" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" required>'+
+                                                        '<input type="hidden" class="form-control" name="claveregimenfiscalanterior" id="claveregimenfiscalanterior" value="'+claveregimenfiscal+'" required>'+
+                                                        '<input type="hidden" class="form-control" name="regimenfiscal" id="regimenfiscal" value="'+regimenfiscal+'" required readonly>'+
                                                     '</div>'+
                                                 '</td>'+
                                             '</tr>'+    
                                         '</table>'+
                                     '</div>'+
                                     '<div class="col-md-4">'+
-                                        '<label>Tipo Relación</label>'+
+                                        '<label>Tipo Relación <span class="label label-danger" id="textonombretiporelacion"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td>'+
@@ -1380,8 +1602,9 @@ function obtenerdatos(cxcmodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="clavetiporelacion" id="clavetiporelacion" readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="tiporelacion" id="tiporelacion"  readonly>'+
+                                                        '<input type="text" class="form-control" name="clavetiporelacion" id="clavetiporelacion">'+
+                                                        '<input type="hidden" class="form-control" name="clavetiporelacionanterior" id="clavetiporelacionanterior">'+
+                                                        '<input type="hidden" class="form-control" name="tiporelacion" id="tiporelacion"  readonly>'+
                                                     '</div>'+
                                                 '</td>'+
                                             '</tr>'+    
@@ -1400,7 +1623,7 @@ function obtenerdatos(cxcmodificar){
                                         '<input type="text" class="form-control" name="receptornombre" id="receptornombre"  required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
-                                        '<label>Forma de Pago</label>'+
+                                        '<label>Forma de Pago <span class="label label-danger" id="textonombreformapago"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td>'+
@@ -1408,8 +1631,9 @@ function obtenerdatos(cxcmodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="claveformapago" id="claveformapago" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="formapago" id="formapago" required readonly>'+
+                                                        '<input type="text" class="form-control" name="claveformapago" id="claveformapago" required>'+
+                                                        '<input type="hidden" class="form-control" name="claveformapagoanterior" id="claveformapagoanterior" required>'+
+                                                        '<input type="hidden" class="form-control" name="formapago" id="formapago" required readonly>'+
                                                     '</div>'+
                                                 '</td>'+
                                             '</tr>'+    
@@ -1496,24 +1720,35 @@ function obtenerdatos(cxcmodificar){
     $("#numerofilas").val(data.numerocuentaxcobrardetalle);
     $("#fecha").val(data.fecha);
     $("#fechaaplicacionpagos").val(data.fechapago);
-    $("#cliente").val(data.cliente.Nombre)
-    $("#numerocliente").val(data.cliente.Numero);
+    $("#cliente").val(data.cliente.Nombre);
+    $("#textonombrecliente").html(data.cliente.Nombre.substring(0, 40));
+    $("#numerocliente").val(data.cliente.Numero).attr('readonly', 'readonly');
+    $("#numeroclienteanterior").val(data.cliente.Numero);
     $("#rfccliente").val(data.cliente.Rfc);
     $("#banco").val(data.banco.Nombre);
+    $("#textonombrebanco").html(data.banco.Nombre.substring(0, 40));
     $("#numerobanco").val(data.banco.Numero);
+    $("#numerobancoanterior").val(data.banco.Numero);
     $("#moneda").val(data.cuentaxcobrar.Moneda).change();
     $("#pesosmoneda").val(data.tipocambio);
     $("#emisorrfc").val(data.cuentaxcobrar.EmisorRfc);
     $("#emisornombre").val(data.cuentaxcobrar.EmisorNombre);
     $("#lugarexpedicion").val(data.cuentaxcobrar.LugarExpedicion);
+    $("#lugarexpedicionanterior").val(data.cuentaxcobrar.LugarExpedicion);
     $("#regimenfiscal").val(data.regimenfiscal.Nombre);
+    $("#textonombreregimenfiscal").html(data.regimenfiscal.Nombre);
     $("#claveregimenfiscal").val(data.regimenfiscal.Clave);
+    $("#claveregimenfiscalanterior").val(data.regimenfiscal.Clave);
     $("#tiporelacion").val(data.tiporelacion.Nombre);
+    $("#textonombretiporelacion").html(data.tiporelacion.Nombre);
     $("#clavetiporelacion").val(data.tiporelacion.Clave);
+    $("#clavetiporelacionanterior").val(data.tiporelacion.Clave);
     $("#receptorrfc").val(data.cuentaxcobrar.ReceptorRfc);
     $("#receptornombre").val(data.cuentaxcobrar.ReceptorNombre);
     $("#formapago").val(data.formapago.Nombre);
+    $("#textonombreformapago").html(data.formapago.Nombre);
     $("#claveformapago").val(data.formapago.Clave);
+    $("#claveformapagoanterior").val(data.formapago.Clave);
     $("#anotacion").val(data.cuentaxcobrar.Anotacion);
     //cargar todos los detalles
     $("#tabladetallesfacturas tbody").html(data.filasdetallecuentasporcobrar);
@@ -1526,10 +1761,82 @@ function obtenerdatos(cxcmodificar){
     //reiniciar contadores
     contadorproductos=data.contadorproductos;
     contadorfilas = data.contadorfilas;
+    //activar busqueda para clientes
+    $('#numerocliente').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerclientepornumero();
+        }
+    });
+    //regresar numero cliente
+    $('#numerocliente').on('change', function(e) {
+        regresarnumerocliente();
+    });
+    //activar busqueda para bancos
+    $('#numerobanco').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerbancopornumero();
+        }
+    });
+    //regresar numero banco
+    $('#numerobanco').on('change', function(e) {
+        regresarnumerobanco();
+    });
+    //activar busqueda para lugar expedicion
+    $('#lugarexpedicion').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerlugarexpedicionporclave();
+        }
+    });
+    //regresar clave
+    $('#lugarexpedicion').on('change', function(e) {
+        regresarclavelugarexpedicion();
+    });
+    //activar busqueda para regimen fiscal
+    $('#claveregimenfiscal').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerregimenfiscalporclave();
+        }
+    });
+    //regresar clave
+    $('#claveregimenfiscal').on('change', function(e) {
+        regresarclaveregimenfiscal();
+    });
+    //activar busqueda para tipo relacion
+    $('#clavetiporelacion').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenertiporelacionporclave();
+        }
+    });
+    //regresar clave
+    $('#clavetiporelacion').on('change', function(e) {
+        regresarclavetiporelacion();
+    });
+    //activar busqueda para forma pago
+    $('#claveformapago').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerformapagoporclave();
+        }
+    });
+    //regresar clave
+    $('#claveformapago').on('change', function(e) {
+        regresarclaveformapago();
+    });
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {
-    msj_mantenimientoajax();    
+    msj_errorajax();    
     $('.page-loader-wrapper').css('display', 'none');
   })
 }
@@ -1542,7 +1849,7 @@ $("#btnGuardarModificacion").on('click', function (e) {
         $('.page-loader-wrapper').css('display', 'block');
         $.ajax({
             headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-            url:ordenes_compra_guardar_modificacion,
+            url:cuentas_por_cobrar_guardar_modificacion,
             type: "post",
             dataType: "html",
             data: formData,
@@ -1566,8 +1873,10 @@ $("#btnGuardarModificacion").on('click', function (e) {
             }
         })
     }else{
-        form.parsley().validate();
+        msjfaltandatosporcapturar();
     }
+    //validar formulario
+    form.parsley().validate();
 });
 //obtener datos para el envio del documento por email
 function enviardocumentoemail(documento){

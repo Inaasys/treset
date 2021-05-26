@@ -170,11 +170,18 @@
         var cuentas_por_cobrar_obtener_ultimo_folio = '{!!URL::to('cuentas_por_cobrar_obtener_ultimo_folio')!!}';
         var cuentas_por_cobrar_obtener_fecha_datetime = '{!!URL::to('cuentas_por_cobrar_obtener_fecha_datetime')!!}';
         var cuentas_por_cobrar_obtener_clientes = '{!!URL::to('cuentas_por_cobrar_obtener_clientes')!!}';
+        var cuentas_por_cobrar_obtener_cliente_por_numero = '{!!URL::to('cuentas_por_cobrar_obtener_cliente_por_numero')!!}';
+        var cuentas_por_cobrar_obtener_facturas_cliente = '{!!URL::to('cuentas_por_cobrar_obtener_facturas_cliente')!!}';
         var cuentas_por_cobrar_obtener_bancos = '{!!URL::to('cuentas_por_cobrar_obtener_bancos')!!}';
+        var cuentas_por_cobrar_obtener_banco_por_numero = '{!!URL::to('cuentas_por_cobrar_obtener_banco_por_numero')!!}';
         var cuentas_por_cobrar_obtener_codigos_postales = '{!!URL::to('cuentas_por_cobrar_obtener_codigos_postales')!!}';
+        var cuentas_por_cobrar_obtener_lugar_expedicion_por_clave = '{!!URL::to('cuentas_por_cobrar_obtener_lugar_expedicion_por_clave')!!}';
         var cuentas_por_cobrar_obtener_regimenes_fiscales = '{!!URL::to('cuentas_por_cobrar_obtener_regimenes_fiscales')!!}';
+        var cuentas_por_cobrar_obtener_regimen_fiscal_por_clave = '{!!URL::to('cuentas_por_cobrar_obtener_regimen_fiscal_por_clave')!!}';
         var cuentas_por_cobrar_obtener_tipos_relacion = '{!!URL::to('cuentas_por_cobrar_obtener_tipos_relacion')!!}';
+        var cuentas_por_cobrar_obtener_tipo_relacion_por_clave = '{!!URL::to('cuentas_por_cobrar_obtener_tipo_relacion_por_clave')!!}';
         var cuentas_por_cobrar_obtener_formas_pago = '{!!URL::to('cuentas_por_cobrar_obtener_formas_pago')!!}';
+        var cuentas_por_cobrar_obtener_forma_pago_por_clave = '{!!URL::to('cuentas_por_cobrar_obtener_forma_pago_por_clave')!!}';
         var cuentas_por_cobrar_obtener_metodos_pago = '{!!URL::to('cuentas_por_cobrar_obtener_metodos_pago')!!}';
         var cuentas_por_cobrar_obtener_facturas = '{!!URL::to('cuentas_por_cobrar_obtener_facturas')!!}';
         var cuentas_por_cobrar_obtener_factura = '{!!URL::to('cuentas_por_cobrar_obtener_factura')!!}';        
@@ -184,6 +191,7 @@
         var cuentas_por_cobrar_comprobar_baja = '{!!URL::to('cuentas_por_cobrar_comprobar_baja')!!}';
         var cuentas_por_cobrar_baja  = '{!!URL::to('cuentas_por_cobrar_baja')!!}';
         var cuentas_por_cobrar_obtener_cuenta_por_cobrar =  '{!!URL::to('cuentas_por_cobrar_obtener_cuenta_por_cobrar')!!}';
+        var cuentas_por_cobrar_guardar_modificacion = '{!!URL::to('cuentas_por_cobrar_guardar_modificacion')!!}';
         var cuentas_por_cobrar_obtener_datos_envio_email = '{!!URL::to('cuentas_por_cobrar_obtener_datos_envio_email')!!}';
         var cuentas_por_cobrar_enviar_pdfs_email = '{!!URL::to('cuentas_por_cobrar_enviar_pdfs_email')!!}';
         var cuentas_por_cobrar_buscar_folio_string_like =  '{!!URL::to('cuentas_por_cobrar_buscar_folio_string_like')!!}';

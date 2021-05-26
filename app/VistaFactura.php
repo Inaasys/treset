@@ -77,6 +77,9 @@ class VistaFactura extends Model
         'FechaTimbrado',
         'Hora'
     ];
+    protected $casts = [
+        'Fecha' => 'datetime:Y-m-d',
+    ];
     //SubTotal
     public function getSubTotalAttribute($value){
         return Helpers::convertirvalorcorrecto($value);

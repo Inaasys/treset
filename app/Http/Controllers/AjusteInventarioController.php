@@ -87,6 +87,23 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
         }
     }
 
+    //obtener almacen por numero
+    public function ajustesinventario_obtener_almacen_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $existealmacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->count();
+        if($existealmacen > 0){
+            $almacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->first();
+            $numero = $almacen->Numero;
+            $nombre = $almacen->Nombre;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre,
+        );
+        return response()->json($data); 
+    }
+
     //obtener productos
     public function ajustesinventario_obtener_productos(Request $request){
         if($request->ajax()){
@@ -96,7 +113,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
             $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($tipooperacion, $numeroalmacen){
-                        if($data->Almacen == $numeroalmacen){
+                        if($data->Almacen == $numeroalmacen || $data->Almacen == NULL){
                             $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.$tipooperacion.'\')">Seleccionar</div>';
                         }else{
                             $boton = '';
@@ -351,11 +368,11 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm existenciaactualpartida" name="existenciaactualpartida[]" value="'.Helpers::convertirvalorcorrecto($da->Existencias).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                     '<td class="tdmod">'.
                         '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm entradaspartidadb" name="entradaspartidadb[]" value="'.Helpers::convertirvalorcorrecto($da->Entradas).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
-                        '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm entradaspartida" name="entradaspartida[]" value="'.Helpers::convertirvalorcorrecto($da->Entradas).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularsubtotalentradas('.$contadorfilas.');calcularexistencianueva('.$contadorfilas.');">'.
+                        '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm entradaspartida" name="entradaspartida[]" value="'.Helpers::convertirvalorcorrecto($da->Entradas).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularsubtotalentradas('.$contadorfilas.');calcularexistencianueva('.$contadorfilas.');colocardataparsleyminentradas('.$contadorfilas.');">'.
                     '</td>'.
                     '<td class="tdmod">'.
                         '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm salidaspartidadb" name="salidaspartidadb[]" value="'.Helpers::convertirvalorcorrecto($da->Salidas).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/"  readonly>'.
-                        '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm salidaspartida" name="salidaspartida[]" value="'.Helpers::convertirvalorcorrecto($da->Salidas).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" data-parsley-existencias="'.$parsleymax.'" onchange="formatocorrectoinputcantidades(this);calcularsubtotalsalidas('.$contadorfilas.');calcularexistencianueva('.$contadorfilas.');">'.
+                        '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm salidaspartida" name="salidaspartida[]" value="'.Helpers::convertirvalorcorrecto($da->Salidas).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" data-parsley-existencias="'.$parsleymax.'" onchange="formatocorrectoinputcantidades(this);calcularsubtotalsalidas('.$contadorfilas.');calcularexistencianueva('.$contadorfilas.');revisarexistenciasalmacen('.$contadorfilas.');colocardataparsleyminsalidas('.$contadorfilas.');">'.
                     '</td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm existencianuevapartida" name="existencianuevapartida[]" value="'.Helpers::convertirvalorcorrecto($da->Real).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'.Helpers::convertirvalorcorrecto($da->Costo).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);cambiocosto('.$contadorfilas.');"></td>'.

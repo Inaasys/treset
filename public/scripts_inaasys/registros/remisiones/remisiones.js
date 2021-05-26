@@ -209,15 +209,27 @@ function obtenerclientes(){
 } 
 //obtener datos de remision seleccionada
 function seleccionarcliente(Numero, Nombre, Credito, Saldo, NumeroAgente, Agente){
-    $("#numerocliente").val(Numero);
-    $("#cliente").val(Nombre);
-    $("#credito").val(Credito);
-    $("#saldo").val(Saldo);
-    //datos agente
-    $("#numeroagente").val(NumeroAgente);
-    $("#agente").val(Agente);
-    mostrarformulario();
-    mostrarbuscadorcodigoproducto();
+    var numeroclienteanterior = $("#numeroclienteanterior").val();
+    var numerocliente = Numero;
+    if(numeroclienteanterior != numerocliente){
+        $("#numerocliente").val(Numero);
+        $("#numeroclienteanterior").val(Numero);
+        $("#cliente").val(Nombre);
+        if(Nombre != null){
+            $("#textonombrecliente").html(Nombre.substring(0, 40));
+        }
+        $("#credito").val(Credito);
+        $("#saldo").val(Saldo);
+        //datos agente
+        $("#numeroagente").val(NumeroAgente);
+        $("#numeroagenteanterior").val(NumeroAgente);
+        $("#agente").val(Agente);
+        if(Agente != null){
+            $("#textonombreagente").html(Agente.substring(0, 40));
+        }
+        mostrarformulario();
+        mostrarbuscadorcodigoproducto();
+    }
 }
 //obtener agentes
 function obteneragentes(){
@@ -281,10 +293,18 @@ function obteneragentes(){
 } 
 //obtener datos de remision seleccionada
 function seleccionaragente(Numero, Nombre){
-    $("#numeroagente").val(Numero);
-    $("#agente").val(Nombre);
-    mostrarformulario();
-    mostrarbuscadorcodigoproducto();
+    var numeroagenteanterior = $("#numeroagenteanterior").val();
+    var numeroagente = Numero;
+    if(numeroagenteanterior != numeroagente){
+        $("#numeroagente").val(Numero);
+        $("#numeroagenteanterior").val(Numero);
+        $("#agente").val(Nombre);
+        if(Nombre != null){
+            $("#textonombreagente").html(Nombre.substring(0, 40));
+        }
+        mostrarformulario();
+        mostrarbuscadorcodigoproducto();
+    }
 }
 //obtener almacenes
 function obteneralmacenes(){
@@ -351,14 +371,22 @@ function obteneralmacenes(){
 } 
 //obtener datos de remision seleccionada
 function seleccionaralmacen(Numero, Nombre){
-    $("#numeroalmacen").val(Numero);
-    $("#almacen").val(Nombre);
-    mostrarformulario();
-    mostrarbuscadorcodigoproducto();
-    //recargar existencias actuales del nuevo almacen seleccionado en data-parsley-existencias de las partidas
-    $("tr.filasproductos").each(function () {
-      $('.cantidadpartida', this).change();
-    });
+    var numeroalmacenanterior = $("#numeroalmacenanterior").val();
+    var numeroalmacen = Numero;
+    if(numeroalmacenanterior != numeroalmacen){
+        $("#numeroalmacen").val(Numero);
+        $("#numeroalmacenanterior").val(Numero);
+        $("#almacen").val(Nombre);
+        if(Nombre != null){
+            $("#textonombrealmacen").html(Nombre.substring(0, 40));
+        }
+        mostrarformulario();
+        mostrarbuscadorcodigoproducto();
+        //recargar existencias actuales del nuevo almacen seleccionado en data-parsley-existencias de las partidas
+        $("tr.filasproductos").each(function () {
+        $('.cantidadpartida', this).change();
+        });
+    }
 }
 //detectar cuando en el input de buscar por codigo de producto el usuario presione la tecla enter, si es asi se realizara la busqueda con el codigo escrito
 $(document).ready(function(){
@@ -370,6 +398,92 @@ $(document).ready(function(){
         }
     });
 });
+//obtener por numero
+function obtenerclientepornumero(){
+    var numeroclienteanterior = $("#numeroclienteanterior").val();
+    var numerocliente = $("#numerocliente").val();
+    if(numeroclienteanterior != numerocliente){
+        if($("#numerocliente").parsley().isValid()){
+            $.get(remisiones_obtener_cliente_por_numero, {numerocliente:numerocliente}, function(data){
+                $("#numerocliente").val(data.numero);
+                $("#numeroclienteanterior").val(data.numero);
+                $("#cliente").val(data.nombre);
+                if(data.nombre != null){
+                    $("#textonombrecliente").html(data.nombre.substring(0, 40));
+                }
+                $("#credito").val(data.credito);
+                $("#saldo").val(data.saldo);
+                //datos agente
+                $("#numeroagente").val(data.numeroagente);
+                $("#numeroagenteanterior").val(data.numeroagente);
+                $("#agente").val(data.nombreagente);
+                if(data.nombreagente != null){
+                    $("#textonombreagente").html(data.nombreagente.substring(0, 40));
+                }
+                mostrarformulario();
+                mostrarbuscadorcodigoproducto();
+            }) 
+        }
+    }
+}
+//regresar numero
+function regresarnumerocliente(){
+    var numeroclienteanterior = $("#numeroclienteanterior").val();
+    $("#numerocliente").val(numeroclienteanterior);
+}
+//obtener por numero
+function obteneragentepornumero(){
+    var numeroagenteanterior = $("#numeroagenteanterior").val();
+    var numeroagente = $("#numeroagente").val();
+    if(numeroagenteanterior != numeroagente){
+        if($("#numeroagente").parsley().isValid()){
+            $.get(remisiones_obtener_agente_por_numero, {numeroagente:numeroagente}, function(data){
+                $("#numeroagente").val(data.numero);
+                $("#numeroagenteanterior").val(data.numero);
+                $("#agente").val(data.nombre);
+                if(data.nombre != null){
+                    $("#textonombreagente").html(data.nombre.substring(0, 40));
+                }
+                mostrarformulario();
+                mostrarbuscadorcodigoproducto();
+
+            }) 
+        }
+    }
+}
+//regresar numero
+function regresarnumeroagente(){
+    var numeroagenteanterior = $("#numeroagenteanterior").val();
+    $("#numeroagente").val(numeroagenteanterior);
+}
+//obtener por numero
+function obteneralmacenpornumero(){
+    var numeroalmacenanterior = $("#numeroalmacenanterior").val();
+    var numeroalmacen = $("#numeroalmacen").val();
+    if(numeroalmacenanterior != numeroalmacen){
+        if($("#numeroalmacen").parsley().isValid()){
+            $.get(remisiones_obtener_almacen_por_numero, {numeroalmacen:numeroalmacen}, function(data){
+                $("#numeroalmacen").val(data.numero);
+                $("#numeroalmacenanterior").val(data.numero);
+                $("#almacen").val(data.nombre);
+                if(data.nombre != null){
+                    $("#textonombrealmacen").html(data.nombre.substring(0, 40));
+                }
+                mostrarformulario();
+                mostrarbuscadorcodigoproducto();
+                //recargar existencias actuales del nuevo almacen seleccionado en data-parsley-existencias de las partidas
+                $("tr.filasproductos").each(function () {
+                $('.cantidadpartida', this).change();
+                });
+            }) 
+        }
+    }
+}
+//regresar numero
+function regresarnumeroalmacen(){
+    var numeroalmacenanterior = $("#numeroalmacenanterior").val();
+    $("#numeroalmacen").val(numeroalmacenanterior);
+}
 //listar productos para tab consumos
 function listarproductos(){
     ocultarformulario();
@@ -523,6 +637,14 @@ function cambiodecantidadopreciopartida(fila,tipo){
   var cuentaFilas = 0;
   $("tr.filasproductos").each(function () {
     if(fila === cuentaFilas){  
+        //validar si se capturara precio neto
+        if( $('#idcapturaprecioneto').prop('checked') ) {
+            var preciopartida = $('.preciopartida', this).val();
+            var ivaporcentajepartida = $('.ivaporcentajepartida', this).val();
+            var nuevoiva = new Decimal(ivaporcentajepartida).dividedBy(100).plus(1);
+            var precioneto = new Decimal(preciopartida).dividedBy(nuevoiva);
+            $(".preciopartida", this).val(number_format(round(precioneto, numerodecimales), numerodecimales, '.', ''));
+        }
         $('.descuentopesospartida', this).val('0.'+numerocerosconfigurados); 
         $('.descuentoporcentajepartida',this).val('0.'+numerocerosconfigurados);
         calculartotalesfilas(fila);
@@ -722,7 +844,7 @@ function renumerarfilas(){
   // renumero porcentaje de comision
   lista = document.getElementsByClassName("comisionporcentajepartida");
   for (var i = 0; i < lista.length; i++){
-    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+')');
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculardescuentopesospartida("+i+')');
   }
 }  
 //alta
@@ -747,11 +869,11 @@ function alta(){
                                 '<label>Remisión <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
                                 '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                                 '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
-                                '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
-                                '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
+                                '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
+                                '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
                             '</div>'+
                             '<div class="col-md-3">'+
-                                '<label>Cliente</label>'+
+                                '<label>Cliente <span class="label label-danger" id="textonombrecliente"></span></label>'+
                                 '<table class="col-md-12">'+
                                     '<tr>'+
                                         '<td>'+
@@ -759,15 +881,16 @@ function alta(){
                                         '</td>'+
                                         '<td>'+
                                             '<div class="form-line">'+
-                                                '<input type="hidden" class="form-control" name="numerocliente" id="numerocliente" required readonly onkeyup="tipoLetra(this)">'+
-                                                '<input type="text" class="form-control" name="cliente" id="cliente" required readonly>'+
+                                                '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required data-parsley-type="integer">'+
+                                                '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
+                                                '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
                                             '</div>'+
                                         '</td>'+
                                     '</tr>'+  
                                 '</table>'+
                             '</div>'+
                             '<div class="col-md-3">'+
-                                '<label>Agente</label>'+
+                                '<label>Agente <span class="label label-danger" id="textonombreagente"></span></label>'+
                                 '<table class="col-md-12">'+
                                     '<tr>'+
                                         '<td>'+
@@ -775,8 +898,9 @@ function alta(){
                                         '</td>'+
                                         '<td>'+
                                             '<div class="form-line">'+
-                                                '<input type="hidden" class="form-control" name="numeroagente" id="numeroagente"  readonly onkeyup="tipoLetra(this)">'+
-                                                '<input type="text" class="form-control" name="agente" id="agente"  readonly>'+
+                                                '<input type="text" class="form-control" name="numeroagente" id="numeroagente"  required data-parsley-type="integer">'+
+                                                '<input type="hidden" class="form-control" name="numeroagenteanterior" id="numeroagenteanterior"  required data-parsley-type="integer">'+
+                                                '<input type="hidden" class="form-control" name="agente" id="agente" required readonly>'+
                                             '</div>'+
                                         '</td>'+
                                     '</tr>'+    
@@ -790,7 +914,7 @@ function alta(){
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-3">'+
-                                '<label>Almacén</label>'+
+                                '<label>Almacén <span class="label label-danger" id="textonombrealmacen"></span></label>'+
                                 '<table class="col-md-12">'+
                                     '<tr>'+
                                         '<td>'+
@@ -798,8 +922,9 @@ function alta(){
                                         '</td>'+
                                         '<td>'+
                                             '<div class="form-line">'+
-                                                '<input type="hidden" class="form-control" name="numeroalmacen" id="numeroalmacen" required readonly onkeyup="tipoLetra(this)">'+
-                                                '<input type="text" class="form-control" name="almacen" id="almacen" required readonly>'+
+                                                '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer">'+
+                                                '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required data-parsley-type="integer">'+
+                                                '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
                                             '</div>'+
                                         '</td>'+
                                     '</tr>'+    
@@ -908,10 +1033,16 @@ function alta(){
                         '<div class="row">'+
                           '<div class="col-md-6">'+   
                             '<label>Observaciones</label>'+
-                            '<textarea class="form-control" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
+                            '<textarea class="form-control" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]" rows="3"></textarea>'+
                           '</div>'+ 
                             '<div class="col-md-3">'+
                                 '<table class="table table-striped table-hover">'+
+                                    '<tr>'+
+                                        '<td style="padding:0px !important;" colspan="2">'+
+                                            '<input type="checkbox" name="capturaprecioneto" id="idcapturaprecioneto" class="filled-in datotabla" value="1" />'+
+                                            '<label for="idcapturaprecioneto">Capturar Precio Neto $</label>'+
+                                        '</td>'+
+                                    '</tr>'+
                                     '<tr>'+
                                         '<td style="padding:0px !important;">Crédito</td>'+
                                         '<td style="padding:0px !important;"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="credito" id="credito" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
@@ -967,16 +1098,9 @@ function alta(){
     obtenertiposcliente();
     obtenertiposunidad();
     asignarfechaactual();
-    //mostrar botones de seleccion
-    $("#botonobtenerclientes").show();
-    $("#botonobteneragentes").show();
-    $("#botonobteneralmacenes").show();
     //ocultar buscador de productos
     mostrarbuscadorcodigoproducto();
-    //asignar el tipo de operacion que se realizara
-    $("#tipooperacion").val("alta");
     //activar seelct2
-    //$(".select2").select2();
     $("#tipo").select2();
     $("#unidad").select2();
     //reiniciar los contadores
@@ -990,16 +1114,52 @@ function alta(){
           listarproductos();
         }
     });
+    //activar busqueda para clientes
+    $('#numerocliente').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerclientepornumero();
+        }
+    });
+    //regresar numero cliente
+    $('#numerocliente').on('change', function(e) {
+        regresarnumerocliente();
+    });
+    //activar busqueda para agentes
+    $('#numeroagente').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obteneragentepornumero();
+        }
+    });
+    //regresar numero agente
+    $('#numeroagente').on('change', function(e) {
+        regresarnumeroagente();
+    });
+    //activar busqueda para almacenes
+    $('#numeroalmacen').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obteneralmacenpornumero();
+        }
+    });
+    //regresar numero almacen
+    $('#numeroalmacen').on('change', function(e) {
+        regresarnumeroalmacen();
+    });
     $("#ModalAlta").modal('show');
 }
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
     e.preventDefault();
-    var numerofilas = $("#numerofilas").val();
-    if(numerofilas > 0){
-        var formData = new FormData($("#formparsley")[0]);
-        var form = $("#formparsley");
-        if (form.parsley().isValid()){
+    var formData = new FormData($("#formparsley")[0]);
+    var form = $("#formparsley");
+    if (form.parsley().isValid()){
+        var numerofilas = $("#numerofilas").val();
+        if(parseInt(numerofilas) > 0){
             $('.page-loader-wrapper').css('display', 'block');
             $.ajax({
                 headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
@@ -1027,12 +1187,13 @@ $("#btnGuardar").on('click', function (e) {
                 }
             })
         }else{
-        form.parsley().validate();
-        msjfaltandatosporcapturar();
+            msj_erroralmenosunaentrada();
         }
     }else{
-        msj_erroralmenosunaentrada();
+        msjfaltandatosporcapturar();
     }
+    //validar formulario
+    form.parsley().validate();
 });
 //bajas
 //verificar si la orden de compra se esta utilzando en alguna orden de compra
@@ -1129,14 +1290,14 @@ function obtenerdatos(remisionmodificar){
                     '<div role="tabpanel" class="tab-pane fade in active" id="remisiontab">'+
                         '<div class="row">'+
                             '<div class="col-md-3">'+
-                                '<label>Remisión <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
+                                '<label>Remisión <b style="color:#F44336 !important;" id="serietexto"> Serie:</b></label>'+
                                 '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
-                                '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
+                                '<input type="hidden" class="form-control" name="serie" id="serie" required readonly data-parsley-length="[1, 10]">'+
                                 '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
                                 '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
                             '</div>'+
                             '<div class="col-md-3">'+
-                                '<label>Cliente</label>'+
+                                '<label>Cliente <span class="label label-danger" id="textonombrecliente"></span></label>'+
                                 '<table class="col-md-12">'+
                                     '<tr>'+
                                         '<td>'+
@@ -1144,15 +1305,16 @@ function obtenerdatos(remisionmodificar){
                                         '</td>'+
                                         '<td>'+
                                             '<div class="form-line">'+
-                                                '<input type="hidden" class="form-control" name="numerocliente" id="numerocliente" required readonly onkeyup="tipoLetra(this)">'+
-                                                '<input type="text" class="form-control" name="cliente" id="cliente" required readonly>'+
+                                                '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required data-parsley-type="integer">'+
+                                                '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
+                                                '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
                                             '</div>'+
                                         '</td>'+
                                     '</tr>'+  
                                 '</table>'+
                             '</div>'+
                             '<div class="col-md-3">'+
-                                '<label>Agente</label>'+
+                                '<label>Agente <span class="label label-danger" id="textonombreagente"></span></label>'+
                                 '<table class="col-md-12">'+
                                     '<tr>'+
                                         '<td>'+
@@ -1160,8 +1322,9 @@ function obtenerdatos(remisionmodificar){
                                         '</td>'+
                                         '<td>'+
                                             '<div class="form-line">'+
-                                                '<input type="hidden" class="form-control" name="numeroagente" id="numeroagente"  readonly onkeyup="tipoLetra(this)">'+
-                                                '<input type="text" class="form-control" name="agente" id="agente"  readonly>'+
+                                                '<input type="text" class="form-control" name="numeroagente" id="numeroagente"  required data-parsley-type="integer">'+
+                                                '<input type="hidden" class="form-control" name="numeroagenteanterior" id="numeroagenteanterior"  required data-parsley-type="integer">'+
+                                                '<input type="hidden" class="form-control" name="agente" id="agente"  readonly>'+
                                             '</div>'+
                                         '</td>'+
                                     '</tr>'+    
@@ -1170,12 +1333,12 @@ function obtenerdatos(remisionmodificar){
                             '<div class="col-md-3">'+
                                 '<label>Fecha </label>'+
                                 '<input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" >'+
-                                '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
+                                '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy">'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-3">'+
-                                '<label>Almacén</label>'+
+                                '<label>Almacén <span class="label label-danger" id="textonombrealmacen"></span></label>'+
                                 '<table class="col-md-12">'+
                                     '<tr>'+
                                         '<td>'+
@@ -1183,8 +1346,9 @@ function obtenerdatos(remisionmodificar){
                                         '</td>'+
                                         '<td>'+
                                             '<div class="form-line">'+
-                                                '<input type="hidden" class="form-control" name="numeroalmacen" id="numeroalmacen" required readonly onkeyup="tipoLetra(this)">'+
-                                                '<input type="text" class="form-control" name="almacen" id="almacen" required readonly>'+
+                                                '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required readonly data-parsley-type="integer">'+
+                                                '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required data-parsley-type="integer">'+
+                                                '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
                                             '</div>'+
                                         '</td>'+
                                     '</tr>'+    
@@ -1200,7 +1364,7 @@ function obtenerdatos(remisionmodificar){
                             '</div>'+
                             '<div class="col-md-2">'+
                                 '<label>Plazo Días </label>'+
-                                '<input type="text" class="form-control" name="plazo" id="plazo" value="5" onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="plazo" id="plazo" onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-3" id="divbuscarcodigoproducto" hidden>'+
                                 '<label>Buscar producto por código</label>'+
@@ -1293,10 +1457,16 @@ function obtenerdatos(remisionmodificar){
                         '<div class="row">'+
                           '<div class="col-md-6">'+   
                             '<label>Observaciones</label>'+
-                            '<textarea class="form-control" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
+                            '<textarea class="form-control" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]" rows="3"></textarea>'+
                           '</div>'+ 
                             '<div class="col-md-3">'+
                                 '<table class="table table-striped table-hover">'+
+                                    '<tr>'+
+                                        '<td style="padding:0px !important;" colspan="2">'+
+                                            '<input type="checkbox" name="capturaprecioneto" id="idcapturaprecioneto" class="filled-in datotabla" value="1" />'+
+                                            '<label for="idcapturaprecioneto">Capturar Precio Neto $</label>'+
+                                        '</td>'+
+                                    '</tr>'+
                                     '<tr>'+
                                         '<td style="padding:0px !important;">Crédito</td>'+
                                         '<td style="padding:0px !important;"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="credito" id="credito" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
@@ -1348,16 +1518,29 @@ function obtenerdatos(remisionmodificar){
                 '</div>'+
             '</div>';
     $("#tabsform").html(tabs);
+    $("#periodohoy").val(data.remision.Periodo);
     $("#folio").val(data.remision.Folio);
     $("#serie").val(data.remision.Serie);
     $("#serietexto").html("Serie: "+data.remision.Serie);
     $("#fecha").val(data.fecha);
     $("#cliente").val(data.cliente.Nombre);
+    if(data.cliente.Nombre != null){
+        $("#textonombrecliente").html(data.cliente.Nombre.substring(0, 40));
+    }
     $("#numerocliente").val(data.cliente.Numero);
+    $("#numeroclienteanterior").val(data.cliente.Numero);
     $("#agente").val(data.agente.Nombre);
+    if(data.agente.Nombre != null){
+        $("#textonombreagente").html(data.agente.Nombre.substring(0, 40));
+    }
     $("#numeroagente").val(data.agente.Numero);
+    $("#numeroagenteanterior").val(data.agente.Numero);
     $("#almacen").val(data.almacen.Nombre);
+    if(data.almacen.Nombre != null){
+        $("#textonombrealmacen").html(data.almacen.Nombre.substring(0, 40));
+    }
     $("#numeroalmacen").val(data.almacen.Numero);
+    $("#numeroalmacenanterior").val(data.almacen.Numero);
     $("#tipo").html(data.select_tipos_cliente);
     $("#unidad").html(data.select_tipos_unidad);
     $("#plazo").val(data.remision.Plazo);
@@ -1403,6 +1586,34 @@ function obtenerdatos(remisionmodificar){
           listarproductos();
         }
     });
+    //activar busqueda para clientes
+    $('#numerocliente').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerclientepornumero();
+        }
+    });
+    //regresar numero cliente
+    $('#numerocliente').on('change', function(e) {
+        regresarnumerocliente();
+    });
+    //activar busqueda para agentes
+    $('#numeroagente').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obteneragentepornumero();
+        }
+    });
+    //regresar numero agente
+    $('#numeroagente').on('change', function(e) {
+        regresarnumeroagente();
+    });
+    //regresar numero almacen
+    $('#numeroalmacen').on('change', function(e) {
+        regresarnumeroalmacen();
+    });
     //asignar el tipo de operacion que se realizara
     $("#tipooperacion").val("modificacion");
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
@@ -1418,35 +1629,42 @@ $("#btnGuardarModificacion").on('click', function (e) {
     var formData = new FormData($("#formparsley")[0]);
     var form = $("#formparsley");
     if (form.parsley().isValid()){
-        $('.page-loader-wrapper').css('display', 'block');
-        $.ajax({
-        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-        url:remisiones_guardar_modificacion,
-        type: "post",
-        dataType: "html",
-        data: formData,
-        cache: false,
-        contentType: false,
-        processData: false,
-        success:function(data){
-            msj_datosguardadoscorrectamente();
-            limpiar();
-            ocultarmodalformulario();
-            limpiarmodales();
-            $('.page-loader-wrapper').css('display', 'none');
-        },
-        error:function(data){
-            if(data.status == 403){
-            msj_errorenpermisos();
-            }else{
-            msj_errorajax();
-            }
-            $('.page-loader-wrapper').css('display', 'none');
+        var numerofilas = $("#numerofilas").val();
+        if(parseInt(numerofilas) > 0){
+            $('.page-loader-wrapper').css('display', 'block');
+            $.ajax({
+                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                url:remisiones_guardar_modificacion,
+                type: "post",
+                dataType: "html",
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success:function(data){
+                    msj_datosguardadoscorrectamente();
+                    limpiar();
+                    ocultarmodalformulario();
+                    limpiarmodales();
+                    $('.page-loader-wrapper').css('display', 'none');
+                },
+                error:function(data){
+                    if(data.status == 403){
+                    msj_errorenpermisos();
+                    }else{
+                    msj_errorajax();
+                    }
+                    $('.page-loader-wrapper').css('display', 'none');
+                }
+            })
+        }else{
+            msj_erroralmenosunaentrada();
         }
-        })
     }else{
-        form.parsley().validate();
+        msjfaltandatosporcapturar();
     }
+    //validar formulario
+    form.parsley().validate();
 });
 //obtener datos para el envio del documento por email
 function enviardocumentoemail(documento){

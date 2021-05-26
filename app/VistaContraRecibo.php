@@ -30,6 +30,9 @@ class VistaContraRecibo extends Model
         'TelefonosProveedor',
         'Email1Proveedor',
     ];
+    protected $casts = [
+        'Fecha' => 'datetime:Y-m-d',
+    ];
     //Total
     public function getTotalAttribute($value){
         return Helpers::convertirvalorcorrecto($value);

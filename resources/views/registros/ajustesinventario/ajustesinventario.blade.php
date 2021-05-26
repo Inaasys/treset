@@ -102,7 +102,7 @@
                                 <input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>
                             </div>  
                             <div class="col-md-3">
-                                <label>Almacén</label>
+                                <label>Almacén <span class="label label-danger" id="textonombrealmacen"></span></label>
                                 <table class="col-md-12">
                                     <tr>
                                         <td>
@@ -110,8 +110,9 @@
                                         </td>
                                         <td>
                                             <div class="form-line">
-                                                <input type="hidden" class="form-control" name="numeroalmacen" id="numeroalmacen" required readonly onkeyup="tipoLetra(this)">
-                                                <input type="text" class="form-control" name="almacen" id="almacen" required readonly>
+                                                <input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer">
+                                                <input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required data-parsley-type="integer">
+                                                <input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>
                                                 <input type="hidden" class="form-control" name="almacendb" id="almacendb" required readonly>
                                                 <input type="hidden" class="form-control" name="numeroalmacendb" id="numeroalmacendb" required readonly>
                                             </div>
@@ -121,7 +122,7 @@
                             </div>
                             <div class="col-md-3">
                                 <label>Fecha </label>
-                                <input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" onkeyup="tipoLetra(this);">
+                                <input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();">
                                 <input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="{{$periodohoy}}">
                             </div>
                         </div>
@@ -199,6 +200,7 @@
         var ajustesinventario_obtener = '{!!URL::to('ajustesinventario_obtener')!!}';
         var ajustesinventario_obtener_ultimo_id = '{!!URL::to('ajustesinventario_obtener_ultimo_id')!!}';
         var ajustesinventario_obtener_almacenes = '{!!URL::to('ajustesinventario_obtener_almacenes')!!}';
+        var ajustesinventario_obtener_almacen_por_numero = '{!!URL::to('ajustesinventario_obtener_almacen_por_numero')!!}';
         var ajustesinventario_obtener_productos = '{!!URL::to('ajustesinventario_obtener_productos')!!}';
         var ajustesinventario_obtener_existencias_partida = '{!!URL::to('ajustesinventario_obtener_existencias_partida')!!}';
         var ajustesinventario_guardar = '{!!URL::to('ajustesinventario_guardar')!!}';

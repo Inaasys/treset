@@ -37,15 +37,17 @@
                             <div class="col-md-12">
                                 <input type="text" name="buscarfolio" id="buscarfolio" class="form-control" placeholder="Teclea el folio..." autocomplete="off" onkeyup="relistarbuscarstringlike()">
                             </div>    
-                            <div class="col-md-12 table-responsive">
-                                <table id="tablafoliosencontrados" class="tablafoliosencontrados table table-bordered table-striped table-hover" style="width:100% !important;"> 
-                                        <thead class="customercolor" id="columnastablafoliosencontrados">
-                                        <tr>
-                                            <th>campo1</th><!--IMPORTANTE NO QUITAR-->
-                                        </tr>
-                                        </thead>
-                                        <tbody></tbody>
-                                </table>
+                            <div class="col-md-12">
+                                <div class="table-responsive">
+                                    <table id="tablafoliosencontrados" class="tablafoliosencontrados table table-bordered table-striped table-hover" style="width:100% !important;"> 
+                                            <thead class="customercolor" id="columnastablafoliosencontrados">
+                                            <tr>
+                                                <th>campo1</th><!-- IMPORTANTE NO QUITAR -->
+                                            </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                    </table>
+                                </div>
                             </div>
                             <div class="col-md-12">
                                 <select  name="arraypdf[]" id="arraypdf" class="form-control select2" multiple="multiple" style="width:100% !important;" >
@@ -55,11 +57,11 @@
                         <div id="tipofiltracionfechas" hidden>
                             <div class="col-md-12">
                                 <label >Fecha Inicio</label>
-                                <input type="date"  name="fechainiciopdf" id="fechainiciopdf" onchange="validarrangofechascreaciondocumentos();" class="form-control"  >
+                                <input type="date"  name="fechainiciopdf" id="fechainiciopdf" onchange="validarrangofechascreaciondocumentos();" class="form-control"  style="min-width:95%;">
                             </div>
                             <div class="col-md-12">
                             <label >Fecha Terminación</label>
-                                <input type="date"  name="fechaterminacionpdf" id="fechaterminacionpdf" onchange="validarrangofechascreaciondocumentos();" class="form-control"  >
+                                <input type="date"  name="fechaterminacionpdf" id="fechaterminacionpdf" onchange="validarrangofechascreaciondocumentos();" class="form-control"  style="min-width:95%;">
                             </div>
                         </div>
                     </div>

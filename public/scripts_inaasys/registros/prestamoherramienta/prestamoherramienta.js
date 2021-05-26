@@ -517,8 +517,10 @@ $("#btnGuardar").on('click', function (e) {
       }
     })
   }else{
-    form.parsley().validate();
+    msjfaltandatosporcapturar();
   }
+  //validar formulario
+  form.parsley().validate();
 });
 //desactivar prestamo
 function desactivar(prestamodesactivar){
@@ -719,8 +721,10 @@ $("#btnGuardarModificacion").on('click', function (e) {
       }
     })
   }else{
-    form.parsley().validate();
+    msjfaltandatosporcapturar();
   }
+  //validar formulario
+  form.parsley().validate();
 });
 //configurar tabla
 function configurar_tabla(){

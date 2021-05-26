@@ -127,6 +127,34 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     ->make(true);
         }
     }
+
+    //obtener cliente factura a por numero
+    public function ordenes_trabajo_obtener_cliente_facturaa_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $plazo = '';
+        $numeroagente = '';
+        $nombreagente = '';
+        $existecliente = Cliente::where('Numero', $request->numeroclientefacturaa)->where('Status', 'ALTA')->count();
+        if($existecliente > 0){
+            $cliente = Cliente::where('Numero', $request->numeroclientefacturaa)->where('Status', 'ALTA')->first();
+            $agente = Agente::where('Numero', $cliente->Agente)->first();
+            $numero = $cliente->Numero;
+            $nombre = $cliente->Nombre;
+            $plazo = $cliente->Plazo;
+            $numeroagente = $agente->Numero;
+            $nombreagente = $agente->Nombre;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre,
+            'plazo' => $plazo,
+            'numeroagente' => $numeroagente,
+            'nombreagente' => $nombreagente,
+        );
+        return response()->json($data);
+    }
+
     //obtener clientes para campo Del Cliente
     public function ordenes_trabajo_obtener_clientes_delcliente(Request $request){
         if($request->ajax()){
@@ -140,6 +168,27 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     ->make(true);
         }  
     }
+
+    //obtener cliente del lciente por numero
+    public function ordenes_trabajo_obtener_cliente_delcliente_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $plazo = '';
+        $existecliente = Cliente::where('Numero', $request->numeroclientedelcliente)->where('Status', 'ALTA')->count();
+        if($existecliente > 0){
+            $cliente = Cliente::where('Numero', $request->numeroclientedelcliente)->where('Status', 'ALTA')->first();
+            $numero = $cliente->Numero;
+            $nombre = $cliente->Nombre;
+            $plazo = $cliente->Plazo;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre,
+            'plazo' => $plazo,
+        );
+        return response()->json($data);
+    }
+
     //obtener agentes
     public function ordenes_trabajo_obtener_agentes(Request $request){
         if($request->ajax()){
@@ -153,6 +202,24 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     ->make(true);
         }
     }
+
+    //obtener agente por numero
+    public function ordenes_trabajo_obtener_agente_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $existeagente = Agente::where('Numero', $request->numeroagente)->where('Status', 'ALTA')->count();
+        if($existeagente > 0){
+            $agente = Agente::where('Numero', $request->numeroagente)->where('Status', 'ALTA')->first();
+            $numero = $agente->Numero;
+            $nombre = $agente->Nombre;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre,
+        );
+        return response()->json($data); 
+    }
+
     //obtener vines
     public function ordenes_trabajo_obtener_vines(Request $request){
         if($request->ajax()){
@@ -166,6 +233,45 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     ->make(true);
         }
     }
+
+    //obtener vin por numero
+    public function ordenes_trabajo_obtener_vin_por_numero(Request $request){
+        $cliente = '';
+        $economico = '';
+        $vin = '';
+        $placas = '';
+        $motor = '';
+        $marca = '';
+        $modelo = '';
+        $año = '';
+        $color = '';
+        $existevin = Vine::where('Vin', $request->vin)->where('Cliente', $request->numeroclientefacturaa)->where('Status', 'ALTA')->count();
+        if($existevin > 0){
+            $vin = Vine::where('Vin', $request->vin)->where('Cliente', $request->numeroclientefacturaa)->where('Status', 'ALTA')->first();
+            $cliente = $vin->Cliente;
+            $economico = $vin->Economico;
+            $vin = $vin->Vin;
+            $placas = $vin->Placas;
+            $motor = $vin->Motor;
+            $marca = $vin->Marca;
+            $modelo = $vin->Modelo;
+            $año = $vin->Año;
+            $color = $vin->Color;
+        }
+        $data = array(
+            'cliente' => $cliente,
+            'economico' => $economico,
+            'vin' => $vin,
+            'placas' => $placas,
+            'motor' => $motor,
+            'marca' => $marca,
+            'modelo' => $modelo,
+            'año' => $año,
+            'color' => $color
+        );
+        return response()->json($data); 
+    }
+
     //obtener servicios
     public function ordenes_trabajo_obtener_servicios(Request $request){
         if($request->ajax()){
@@ -255,7 +361,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             $OrdenTrabajo->Utilidad=$request->subtotal;
             $OrdenTrabajo->Status="ABIERTA";
             $OrdenTrabajo->Usuario=Auth::user()->user;
-            $OrdenTrabajo->Periodo=$request->periodohoy;
+            $OrdenTrabajo->Periodo=$this->periodohoy;
             $OrdenTrabajo->save();
             //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
             $BitacoraDocumento = new BitacoraDocumento;
@@ -265,7 +371,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
             $BitacoraDocumento->Status = "ABIERTA";
             $BitacoraDocumento->Usuario = Auth::user()->user;
-            $BitacoraDocumento->Periodo = $request->periodohoy;
+            $BitacoraDocumento->Periodo = $this->periodohoy;
             $BitacoraDocumento->save();
             if($request->numerofilastablaservicios > 0){
                 //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
@@ -562,7 +668,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
         $BitacoraDocumento->Status = $OrdenTrabajo->Status;
         $BitacoraDocumento->Usuario = Auth::user()->user;
-        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
         $numerodetallesordentrabajomodificada = OrdenTrabajoDetalle::where('Orden', $orden)->count();
         if($request->numerofilastablaservicios == 0){

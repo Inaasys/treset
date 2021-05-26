@@ -54,6 +54,9 @@ class VistaCuentaPorCobrar extends Model
         'ClaveFormaPago',
         'NombreFormaPago'
     ];
+    protected $casts = [
+        'Fecha' => 'datetime:Y-m-d',
+    ];
     //Abono
     public function getAbonoAttribute($value){
         return Helpers::convertirvalorcorrecto($value);

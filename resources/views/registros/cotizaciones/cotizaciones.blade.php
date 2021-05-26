@@ -88,53 +88,6 @@
                 </div>
                 <form id="formparsley" action="#">
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <label>Cotización <b style="color:#F44336 !important;" id="serietexto"> Serie: {{$serieusuario}}</b></label>
-                                <input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">
-                                <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" required readonly data-parsley-length="[1, 10]">
-                                <input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>
-                            </div>   
-                            <div class="col-md-3">
-                                <label>OT Tecnodiesel</label>
-                                <input type="text" class="form-control" name="ottecnodiesel" id="ottecnodiesel"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">
-                            </div>
-                            <div class="col-md-3">
-                                <label>OT TyT</label>
-                                <input type="text" class="form-control" name="ottyt" id="ottyt" required data-parsley-length="[0, 50]" onkeyup="tipoLetra(this);">
-                            </div>   
-                            <div class="col-md-3">
-                                <label>Fecha </label>
-                                <input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" onkeyup="tipoLetra(this);">
-                                <input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="{{$periodohoy}}">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <label>Remisión</label>
-                                <table class="col-md-12">
-                                    <tr>
-                                        <td>
-                                            <div class="btn bg-blue waves-effect" onclick="obtenerremisiones()">Seleccionar</div>
-                                        </td>
-                                        <td>
-                                            <div class="form-line">
-                                                <input type="hidden" class="form-control" name="numeroremision" id="numeroremision" required readonly onkeyup="tipoLetra(this)">
-                                                <input type="text" class="form-control" name="remision" id="remision" required readonly>
-                                            </div>
-                                        </td>
-                                    </tr>    
-                                </table>
-                            </div>
-                            <div class="col-md-3">
-                                <label>Equipo</label>
-                                <input type="text" class="form-control" name="equipo" id="equipo" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">
-                            </div>  
-                            <div class="col-md-3">
-                                <label>Requisición</label>
-                                <input type="text" class="form-control" name="requisicion" id="requisicion" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">
-                            </div>  
-                        </div>
                         <div class="col-md-12" id="tabsform">
                             <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
                         </div>

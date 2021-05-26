@@ -162,6 +162,9 @@
         var remisiones_obtener = '{!!URL::to('remisiones_obtener')!!}';
         var remisiones_obtener_ultimo_folio = '{!!URL::to('remisiones_obtener_ultimo_folio')!!}';
         var remisiones_obtener_clientes = '{!!URL::to('remisiones_obtener_clientes')!!}';
+        var remisiones_obtener_cliente_por_numero = '{!!URL::to('remisiones_obtener_cliente_por_numero')!!}';
+        var remisiones_obtener_agente_por_numero = '{!!URL::to('remisiones_obtener_agente_por_numero')!!}';
+        var remisiones_obtener_almacen_por_numero = '{!!URL::to('remisiones_obtener_almacen_por_numero')!!}';
         var remisiones_obtener_agentes = '{!!URL::to('remisiones_obtener_agentes')!!}';
         var remisiones_obtener_almacenes = '{!!URL::to('remisiones_obtener_almacenes')!!}';
         var remisiones_obtener_tipos_cliente = '{!!URL::to('remisiones_obtener_tipos_cliente')!!}';

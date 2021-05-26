@@ -262,13 +262,17 @@ function obtenerpersonalentrega(){
   } 
 function seleccionarpersonalrecibe(id, nombre){
     $("#numeropersonalrecibe").val(id);
+    $("#numeropersonalrecibeanterior").val(id);
     $("#personalrecibe").val(nombre);
+    $("#textonombrepersonalrecibe").html(nombre.substring(0, 40));
     $("#btnbuscarpersonalqueentrega").show();
     mostrarformulario();
 }
 function seleccionarpersonalentrega(id, nombre){
     $("#numeropersonalentrega").val(id);
+    $("#numeropersonalentregaanterior").val(id);
     $("#personalentrega").val(nombre);
+    $("#textonombrepersonalentrega").html(nombre.substring(0, 40));
     mostrarformulario();
 }
 //detectar cuando en el input de buscar por codigo de producto el usuario presione la tecla enter, si es asi se realizara la busqueda con el codigo escrito
@@ -281,6 +285,46 @@ $(document).ready(function(){
       }
   });
 });
+//obtener por numero
+function obtenerpersonalrecibepornumero(){
+  if($("#numeropersonalrecibe").parsley().isValid()){
+      var numeropersonalrecibe = $("#numeropersonalrecibe").val();
+      $.get(asignacion_herramienta_obtener_personal_recibe_por_numero, {numeropersonalrecibe:numeropersonalrecibe}, function(data){
+
+          $("#numeropersonalrecibe").val(data.numero);
+          $("#numeropersonalrecibeanterior").val(data.numero);
+          $("#personalrecibe").val(data.nombre);
+          $("#textonombrepersonalrecibe").html(data.nombre.substring(0, 40));
+          $("#btnbuscarpersonalqueentrega").show();
+          mostrarformulario();
+
+
+      }) 
+  }
+}
+//regresar numero
+function regresarnumeropersonalrecibe(){
+  var numeropersonalrecibeanterior = $("#numeropersonalrecibeanterior").val();
+  $("#numeropersonalrecibe").val(numeropersonalrecibeanterior);
+}
+//obtener por numero
+function obtenerpersonalentregapornumero(){
+  if($("#numeropersonalentrega").parsley().isValid()){
+      var numeropersonalentrega = $("#numeropersonalentrega").val();
+      $.get(asignacion_herramienta_obtener_personal_entrega_por_numero, {numeropersonalentrega:numeropersonalentrega}, function(data){
+          $("#numeropersonalentrega").val(data.numero);
+          $("#numeropersonalentregaanterior").val(data.numero);
+          $("#personalentrega").val(data.nombre);
+          $("#textonombrepersonalentrega").html(data.nombre.substring(0, 40));
+          mostrarformulario();
+      }) 
+  }
+}
+//regresar numero
+function regresarnumeropersonalentrega(){
+  var numeropersonalentregaanterior = $("#numeropersonalentregaanterior").val();
+  $("#numeropersonalentrega").val(numeropersonalentregaanterior);
+}
 //listar productos para tab consumos
 function listarherramientas(){
   ocultarformulario();
@@ -567,8 +611,33 @@ function alta(){
   //reiniciar contadores  
   contadorproductos=0;
   contadorfilas = 0;
+  $("#numerofilas").val("0");
   //se debe motrar el input para buscar los productos
   $("#divbuscarcodigoproducto").show();
+  //activar busqueda
+  $('#numeropersonalrecibe').on('keypress', function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+    obtenerpersonalrecibepornumero();
+    }
+  });
+  //regresar numero
+  $('#numeropersonalrecibe').on('change', function(e) {
+    regresarnumeropersonalrecibe();
+  });
+  //activar busqueda
+  $('#numeropersonalentrega').on('keypress', function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+    obtenerpersonalentregapornumero();
+    }
+  });
+  //regresar numero
+  $('#numeropersonalentrega').on('change', function(e) {
+    regresarnumeropersonalentrega();
+  });
   $("#ModalAlta").modal('show');
 }
 //guardar el registro
@@ -577,35 +646,42 @@ $("#btnGuardar").on('click', function (e) {
   var formData = new FormData($("#formparsley")[0]);
   var form = $("#formparsley");
   if (form.parsley().isValid()){
-    $('.page-loader-wrapper').css('display', 'block');
-    $.ajax({
-      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-      url:asignacion_herramienta_guardar,
-      type: "post",
-      dataType: "html",
-      data: formData,
-      cache: false,
-      contentType: false,
-      processData: false,
-      success:function(data){
-        msj_datosguardadoscorrectamente();
-        limpiar();
-        ocultarmodalformulario();
-        limpiarmodales();
-        $('.page-loader-wrapper').css('display', 'none');
-      },
-      error:function(data){
-        if(data.status == 403){
-          msj_errorenpermisos();
-        }else{
-          msj_errorajax();
+    var numerofilas = $("#numerofilas").val();
+    if(parseInt(numerofilas) > 0){
+      $('.page-loader-wrapper').css('display', 'block');
+      $.ajax({
+        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+        url:asignacion_herramienta_guardar,
+        type: "post",
+        dataType: "html",
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success:function(data){
+          msj_datosguardadoscorrectamente();
+          limpiar();
+          ocultarmodalformulario();
+          limpiarmodales();
+          $('.page-loader-wrapper').css('display', 'none');
+        },
+        error:function(data){
+          if(data.status == 403){
+            msj_errorenpermisos();
+          }else{
+            msj_errorajax();
+          }
+          $('.page-loader-wrapper').css('display', 'none');
         }
-        $('.page-loader-wrapper').css('display', 'none');
-      }
-    })
+      })
+    }else{
+      msj_erroralmenosunaentrada();
+    }
   }else{
-    form.parsley().validate();
+    msjfaltandatosporcapturar();
   }
+  //validar formulario
+  form.parsley().validate();
 });
 //autorizar orden de compra
 function autorizarasignacion(asignacion){
@@ -769,19 +845,32 @@ function obtenerdatos(asignacionmodificar){
     $("#serie").val(data.Asignacion_Herramienta.serie);
     $("#serietexto").html("Serie: "+data.Asignacion_Herramienta.serie);
     $("#numeropersonalrecibe").val(data.personalrecibe.id);
+    $("#numeropersonalrecibeanterior").val(data.personalrecibe.id);
     $("#personalrecibe").val(data.personalrecibe.nombre);
+    $("#textonombrepersonalrecibe").html(data.personalrecibe.nombre.substring(0, 40));
     $("#numeropersonalentrega").val(data.personalentrega.id);
+    $("#numeropersonalentregaanterior").val(data.personalentrega.id);
     $("#personalentrega").val(data.personalentrega.nombre);
+    $("#textonombrepersonalentrega").html(data.personalentrega.nombre.substring(0, 40));
     $("#fecha").val(data.fecha);
     $("#observaciones").val(data.Asignacion_Herramienta.observaciones);
     $("#total").val(data.total);
     //tabs precios productos
     $("#tablaherramientasasignadas").append(data.filasdetallesasignacion);
+    $("#numerofilas").val(data.Numero_Asignacion_Herramienta_Detalle);
     //asignar el tipo de operacion que se realizara
     $("#tipooperacion").val("modificacion");
     //se deben asignar los valores a los contadores para que las sumas resulten correctas
     contadorproductos = data.contadorproductos;
     contadorfilas = data.contadorfilas;
+    //regresar numero
+    $('#numeropersonalrecibe').on('change', function(e) {
+      regresarnumeropersonalrecibe();
+    });
+    //regresar numero
+    $('#numeropersonalentrega').on('change', function(e) {
+      regresarnumeropersonalentrega();
+    });
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {
@@ -795,35 +884,42 @@ $("#btnGuardarModificacion").on('click', function (e) {
   var formData = new FormData($("#formparsley")[0]);
   var form = $("#formparsley");
   if (form.parsley().isValid()){
-    $('.page-loader-wrapper').css('display', 'block');
-    $.ajax({
-      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-      url:asignacion_herramienta_guardar_modificacion,
-      type: "post",
-      dataType: "html",
-      data: formData,
-      cache: false,
-      contentType: false,
-      processData: false,
-      success:function(data){
-        msj_datosguardadoscorrectamente();
-        limpiar();
-        ocultarmodalformulario();
-        limpiarmodales();
-        $('.page-loader-wrapper').css('display', 'none');
-      },
-      error:function(data){
-        if(data.status == 403){
-          msj_errorenpermisos();
-        }else{
-          msj_errorajax();
+    var numerofilas = $("#numerofilas").val();
+    if(parseInt(numerofilas) > 0){
+      $('.page-loader-wrapper').css('display', 'block');
+      $.ajax({
+        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+        url:asignacion_herramienta_guardar_modificacion,
+        type: "post",
+        dataType: "html",
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success:function(data){
+          msj_datosguardadoscorrectamente();
+          limpiar();
+          ocultarmodalformulario();
+          limpiarmodales();
+          $('.page-loader-wrapper').css('display', 'none');
+        },
+        error:function(data){
+          if(data.status == 403){
+            msj_errorenpermisos();
+          }else{
+            msj_errorajax();
+          }
+          $('.page-loader-wrapper').css('display', 'none');
         }
-        $('.page-loader-wrapper').css('display', 'none');
-      }
-    })
+      })
+    }else{
+      msj_erroralmenosunaentrada();
+    }
   }else{
-    form.parsley().validate();
+    msjfaltandatosporcapturar();
   }
+  //validar formulario
+  form.parsley().validate();
 });
 //hacer busqueda de folio para exportacion en pdf
 function relistarbuscarstringlike(){

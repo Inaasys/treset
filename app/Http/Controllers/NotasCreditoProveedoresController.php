@@ -113,6 +113,30 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                     ->make(true);
         }
     }
+
+    //obtener proveedor por numero
+    public function notas_credito_proveedores_obtener_proveedor_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $plazo = '';
+        $rfc = '';
+        $existeproveedor = Proveedor::where('Numero', $request->numeroproveedor)->where('Status', 'ALTA')->count();
+        if($existeproveedor > 0){
+            $proveedor = Proveedor::where('Numero', $request->numeroproveedor)->where('Status', 'ALTA')->first();
+            $numero = $proveedor->Numero;
+            $nombre = $proveedor->Nombre;
+            $plazo = $proveedor->Plazo;
+            $rfc = $proveedor->Rfc;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre,
+            'plazo' => $plazo,
+            'rfc' => $rfc
+        );
+        return response()->json($data); 
+    }
+
     //obtener almacenes
     public function notas_credito_proveedores_obtener_almacenes(Request $request){
         if($request->ajax()){
@@ -126,6 +150,24 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                 ->make(true);
         }
     }
+
+    //obtener almacen por numero
+    public function notas_credito_proveedores_obtener_almacen_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $existealmacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->count();
+        if($existealmacen > 0){
+            $almacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->first();
+            $numero = $almacen->Numero;
+            $nombre = $almacen->Nombre;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre,
+        );
+        return response()->json($data); 
+    }
+
     //obtener compras
     public function notas_credito_proveedores_obtener_compras(Request $request){
         if($request->ajax()){
@@ -170,7 +212,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             $data = VistaObtenerExistenciaProducto::whereIn('Codigo', $arrayproductosseleccionables)->where('Codigo', 'like', '%' . $codigoabuscar . '%')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($numeroalmacen, $tipooperacion, $stringcomprasseleccionadas){
-                        if($data->Almacen == $numeroalmacen){
+                        if($data->Almacen == $numeroalmacen || $data->Almacen == NULL){
                             $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$tipooperacion.'\',\''.$data->Insumo.'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$data->NombreClaveProducto.'\',\''.$data->NombreClaveUnidad.'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\')">Seleccionar</div>';
                         }else{
                             $boton = '';
@@ -189,6 +231,35 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
+    }
+
+    //obtener claves productos
+    public function notas_credito_proveedores_obtener_claves_productos(Request $request){
+        if($request->ajax()){
+            $fila = $request->fila;
+            $data = ClaveProdServ::query();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data) use ($fila){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarclaveproducto(\''.$data->Clave .'\',\''.$data->Nombre .'\','.$fila.')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }          
+    }
+    //obtener claves unidades
+    public function notas_credito_proveedores_obtener_claves_unidades(Request $request){
+        if($request->ajax()){
+            $fila = $request->fila;
+            $data = ClaveUnidad::query();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data) use ($fila){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarclaveunidad(\''.$data->Clave .'\',\''.$data->Nombre .'\','.$fila.')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }         
     }
 
     //obtener compra seleccionada
@@ -709,9 +780,27 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                             '<td class="tdmod" hidden><input type="text" class="form-control divorinputmodsm partidapartida" name="partidapartida[]"  value="0" readonly></td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciomonedapartida" name="preciomonedapartida[]" value="'.Helpers::convertirvalorcorrecto($dnp->PrecioMoneda).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentopartida" name="descuentopartida[]" value="'.Helpers::convertirvalorcorrecto($dnp->DescuentoMoneda).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproductopartida->Clave.'" readonly data-parsley-length="[1, 20]"></td>'.
+                            '<td class="tdmod">'.
+                                '<div class="row divorinputmodxl">'.
+                                    '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                                        '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
+                                    '</div>'.
+                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.
+                                        '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproductopartida->Clave.'" readonly data-parsley-length="[1, 20]">'.
+                                    '</div>'.
+                                '</div>'.
+                            '</td>'.
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$claveproductopartida->Nombre.'" readonly></td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidadpartida->Clave.'" readonly data-parsley-length="[1, 5]"></td>'.
+                            '<td class="tdmod">'.
+                                '<div class="row divorinputmodxl">'.
+                                    '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                                        '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
+                                    '</div>'.
+                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.   
+                                        '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidadpartida->Clave.'" readonly data-parsley-length="[1, 5]">'.
+                                    '</div>'.
+                                '</div>'.
+                            '</td>'.
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$claveunidadpartida->Nombre.'" readonly></td>'.
                         '</tr>';
                         $tipodetalles = 'dppp';
@@ -749,9 +838,27 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                             '<td class="tdmod" hidden><input type="text" class="form-control divorinputmodsm partidapartida" name="partidapartida[]"  value="0" readonly></td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciomonedapartida" name="preciomonedapartida[]" value="'.Helpers::convertirvalorcorrecto($dnp->PrecioMoneda).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentopartida" name="descuentopartida[]" value="'.Helpers::convertirvalorcorrecto($dnp->DescuentoMoneda).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproductopartida->Clave.'" readonly data-parsley-length="[1, 20]"></td>'.
+                            '<td class="tdmod">'.
+                                '<div class="row divorinputmodxl">'.
+                                    '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                                        '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
+                                    '</div>'.
+                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.
+                                        '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproductopartida->Clave.'" readonly data-parsley-length="[1, 20]">'.
+                                    '</div>'.
+                                '</div>'.
+                            '</td>'.
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$claveproductopartida->Nombre.'" readonly></td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidadpartida->Clave.'" readonly data-parsley-length="[1, 5]"></td>'.
+                            '<td class="tdmod">'.
+                                '<div class="row divorinputmodxl">'.
+                                    '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                                        '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
+                                    '</div>'.
+                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.   
+                                        '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidadpartida->Clave.'" readonly data-parsley-length="[1, 5]">'.
+                                    '</div>'.
+                                '</div>'.
+                            '</td>'.
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$claveunidadpartida->Nombre.'" readonly></td>'.
                         '</tr>';
                         $tipodetalles = 'codigos';

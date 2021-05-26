@@ -57,6 +57,9 @@ class VistaNotaCreditoCliente extends Model
         'NombreCliente',
         'RfcCliente'
     ];
+    protected $casts = [
+        'Fecha' => 'datetime:Y-m-d',
+    ];
     //Importe
     public function getImporteAttribute($value){
         return Helpers::convertirvalorcorrecto($value);

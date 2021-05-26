@@ -16,6 +16,7 @@ class VistaProducto extends Model
         'Unidad',
         'Ubicacion',
         'Existencias',
+        'Almacen',
         'Costo',
         'CostoDeLista',
         'Moneda',
@@ -39,14 +40,7 @@ class VistaProducto extends Model
         'FechaUltimaCompra',
         'FechaUltimaVenta',
         'UltimoCosto',
-        'UltimaVenta',
-        'NumeroMarca',
-        'Utilidad1Marca',
-        'Utilidad2Marca',
-        'Utilidad3Marca',
-        'Utilidad4Marca',
-        'Utilidad5Marca',
-        'NumeroLinea'
+        'UltimaVenta'
     ];
     //existencias
     public function getExistenciasAttribute($value){
@@ -98,26 +92,6 @@ class VistaProducto extends Model
     }
     //ultima venta
     public function getUltimaVentaAttribute($value){
-        return Helpers::convertirvalorcorrecto($value);
-    }
-    //utilidad1 marca
-    public function getUtilidad1MarcaAttribute($value){
-        return Helpers::convertirvalorcorrecto($value);
-    }
-    //utilidad2 marca
-    public function getUtilidad2MarcaAttribute($value){
-        return Helpers::convertirvalorcorrecto($value);
-    }
-    //utilidad3 marca
-    public function getUtilidad3MarcaAttribute($value){
-        return Helpers::convertirvalorcorrecto($value);
-    }
-    //utilidad4 marca
-    public function getUtilidad4MarcaAttribute($value){
-        return Helpers::convertirvalorcorrecto($value);
-    }
-    //utilidad5 marca
-    public function getUtilidad5MarcaAttribute($value){
         return Helpers::convertirvalorcorrecto($value);
     }
 }

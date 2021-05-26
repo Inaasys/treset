@@ -254,7 +254,9 @@ function obtenerbancos(){
 } 
 function seleccionarproveedor(Numero, Nombre){
     $("#numeroproveedor").val(Numero);
+    $("#numeroproveedoranterior").val(Numero);
     $("#proveedor").val(Nombre);
+    $("#textonombreproveedor").html(Nombre.substring(0, 40));
     $("#beneficiario").val(Nombre);
     $.get(cuentas_por_pagar_obtener_compras_proveedor, {Numero:Numero}, function(data){
         $("#tabladetallecuentasporpagar").html(data.filascompras);
@@ -263,8 +265,78 @@ function seleccionarproveedor(Numero, Nombre){
 }
 function seleccionarbanco(Numero, Nombre){
     $("#numerobanco").val(Numero);
+    $("#numerobancoanterior").val(Numero);
     $("#banco").val(Nombre);
+    $("#textonombrebanco").html(Nombre.substring(0, 40));
     mostrarformulario();
+}
+//detectar cuando en el input de buscar por codigo de producto el usuario presione la tecla enter, si es asi se realizara la busqueda con el codigo escrito
+$(document).ready(function(){
+    //activar busqueda para proveedores
+    $('#numeroproveedor').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerproveedorpornumero();
+        }
+    });
+    //regresar numero proveedor
+    $('#numeroproveedor').on('change', function(e) {
+        regresarnumeroproveedor();
+    });
+    //activar busqueda para bancos
+    $('#numerobanco').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerbancopornumero();
+        }
+    });
+    //regresar numero banco
+    $('#numerobanco').on('change', function(e) {
+        regresarnumerobanco();
+    });
+});
+//obtener por numero
+function obtenerproveedorpornumero(){
+    if($("#numeroproveedor").parsley().isValid()){
+        var numeroproveedor = $("#numeroproveedor").val();
+        $.get(cuentas_por_pagar_obtener_proveedor_por_numero, {numeroproveedor:numeroproveedor}, function(data){
+            $("#numeroproveedor").val(data.numero);
+            $("#numeroproveedoranterior").val(data.numero);
+            $("#proveedor").val(data.nombre);
+            $("#textonombreproveedor").html(data.nombre.substring(0, 40));
+            $("#beneficiario").val(data.nombre);
+            var Numero = data.numero;
+            $.get(cuentas_por_pagar_obtener_compras_proveedor, {Numero:Numero}, function(data){
+                $("#tabladetallecuentasporpagar").html(data.filascompras);
+            });
+            mostrarformulario();
+        }) 
+    }
+}
+//regresar numero
+function regresarnumeroproveedor(){
+    var numeroproveedoranterior = $("#numeroproveedoranterior").val();
+    $("#numeroproveedor").val(numeroproveedoranterior);
+}
+//obtener por numero
+function obtenerbancopornumero(){
+    if($("#numerobanco").parsley().isValid()){
+        var numerobanco = $("#numerobanco").val();
+        $.get(cuentas_por_pagar_obtener_banco_por_numero, {numerobanco:numerobanco}, function(data){
+            $("#numerobanco").val(data.numero);
+            $("#numerobancoanterior").val(data.numero);
+            $("#banco").val(data.nombre);
+            $("#textonombrebanco").html(data.nombre.substring(0, 40));
+            mostrarformulario();
+        }) 
+    }
+}
+//regresar numero
+function regresarnumerobanco(){
+    var numerobancoanterior = $("#numerobancoanterior").val();
+    $("#numerobanco").val(numerobancoanterior);
 }
 //alta clientes
 function alta(){
@@ -322,6 +394,10 @@ function alta(){
   $("#tabsform").html(tabs);
   $("#serie").val(serieusuario);
   $("#serietexto").html("Serie: "+serieusuario);
+  //proveedor
+  $("#textonombreproveedor").html("");
+  //banco
+  $("#textonombrebanco").html("");
   $("#btnobtenerproveedores").show();
   obtenultimonumero();
   asignarfechaactual();
@@ -385,8 +461,10 @@ $("#btnGuardar").on('click', function (e) {
             }
         })
     }else{
-        form.parsley().validate();
+        msjfaltandatosporcapturar();
     }
+    //validar formulario
+    form.parsley().validate();
 });
 //verificar si la orden de compra se esta utilzando en alguna orden de compra
 function desactivar(cxpdesactivar){
@@ -503,10 +581,14 @@ function obtenerdatos(cxpmodificar){
     $("#serie").val(data.CuentaXPagar.Serie);
     $("#serietexto").html("Serie: "+data.CuentaXPagar.Serie);
     $("#numeroproveedor").val(data.proveedor.Numero);
+    $("#numeroproveedoranterior").val(data.proveedor.Numero);
     $("#proveedor").val(data.proveedor.Nombre);
+    $("#textonombreproveedor").html(data.proveedor.Nombre.substring(0,40));
     $("#btnobtenerproveedores").hide();
     $("#numerobanco").val(data.banco.Numero);
+    $("#numerobancoanterior").val(data.banco.Numero);
     $("#banco").val(data.banco.Nombre);
+    $("#textonombrebanco").html(data.banco.Nombre.substring(0, 40));
     $("#fecha").val(data.fecha);
     $("#transferencia").val(data.CuentaXPagar.Transferencia)
     $("#cheque").val(data.CuentaXPagar.Cheque);
@@ -519,7 +601,7 @@ function obtenerdatos(cxpmodificar){
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {
-    msj_mantenimientoajax();    
+    msj_errorajax();    
     $('.page-loader-wrapper').css('display', 'none');
   })
 }
@@ -532,7 +614,7 @@ $("#btnGuardarModificacion").on('click', function (e) {
         $('.page-loader-wrapper').css('display', 'block');
         $.ajax({
             headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-            url:ordenes_compra_guardar_modificacion,
+            url:cuentas_por_pagar_guardar_modificacion,
             type: "post",
             dataType: "html",
             data: formData,
@@ -556,8 +638,10 @@ $("#btnGuardarModificacion").on('click', function (e) {
             }
         })
     }else{
-        form.parsley().validate();
+        msjfaltandatosporcapturar();
     }
+    //validar formulario
+    form.parsley().validate();
 });
 //obtener datos para el envio del documento por email
 function enviardocumentoemail(documento){

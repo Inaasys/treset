@@ -214,7 +214,7 @@ function msj_errorenpermisos(){
 }
 //error en peticion ajax
 function msj_mantenimientoajax(){
-    toastr.info( "Aviso, estamos en esta función, pronto podras hacer uso de ella", "Mensaje", {
+    toastr.info( "Aviso, estamos trabajando en esta función, pronto podras hacer uso de ella", "Mensaje", {
         "timeOut": "6000",
         "progressBar": true,
         "extendedTImeout": "6000"

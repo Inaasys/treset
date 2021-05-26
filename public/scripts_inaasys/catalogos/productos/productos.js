@@ -53,7 +53,7 @@ function listar(){
         campos_tabla.push({ 
             'data'    : campos[i],
             'name'  : campos[i],
-            'orderable': false,
+            'orderable': true,
             'searchable': true
         });
     }
@@ -1423,40 +1423,12 @@ function configurar_tabla(){
                                     '<div class="col-md-12 form-check">'+
                                         '<label>DATOS MARCA PRODUCTO</label>'+
                                     '</div>'+
-                                    '<div class="col-md-4 form-check">'+
-                                        '<input type="checkbox" name="NumeroMarca" id="idNumeroMarca" class="filled-in datotabla" value="NumeroMarca"  onchange="construirarraydatostabla(this);"/>'+
-                                        '<label for="idNumeroMarca">NumeroMarca</label>'+  
-                                    '</div>'+
                                     '<div class="col-md-4 form-check">'+  
                                         '<input type="checkbox" name="NombreMarca" id="idNombreMarca" class="filled-in datotabla" value="NombreMarca"  onchange="construirarraydatostabla(this);"/>'+
                                         '<label for="idNombreMarca">NombreMarca</label>'+ 
                                     '</div>'+
-                                    '<div class="col-md-4 form-check">'+
-                                        '<input type="checkbox" name="Utilidad1Marca" id="idUtilidad1Marca" class="filled-in datotabla" value="Utilidad1Marca"  onchange="construirarraydatostabla(this);"/>'+
-                                        '<label for="idUtilidad1Marca">Utilidad1Marca</label>'+ 
-                                    '</div>'+
-                                    '<div class="col-md-4 form-check">'+
-                                        '<input type="checkbox" name="Utilidad2Marca" id="idUtilidad2Marca" class="filled-in datotabla" value="Utilidad2Marca"  onchange="construirarraydatostabla(this);"/>'+
-                                        '<label for="idUtilidad2Marca">Utilidad2Marca</label>'+ 
-                                    '</div>'+
-                                    '<div class="col-md-4 form-check">'+
-                                        '<input type="checkbox" name="Utilidad3Marca" id="idUtilidad3Marca" class="filled-in datotabla" value="Utilidad3Marca"  onchange="construirarraydatostabla(this);"/>'+
-                                        '<label for="idUtilidad3Marca">Utilidad3Marca</label>'+ 
-                                    '</div>'+
-                                    '<div class="col-md-4 form-check">'+
-                                        '<input type="checkbox" name="Utilidad4Marca" id="idUtilidad4Marca" class="filled-in datotabla" value="Utilidad4Marca"  onchange="construirarraydatostabla(this);"/>'+
-                                        '<label for="idUtilidad4Marca">Utilidad4Marca</label>'+ 
-                                    '</div>'+
-                                    '<div class="col-md-4 form-check">'+
-                                        '<input type="checkbox" name="Utilidad5Marca" id="idUtilidad5Marca" class="filled-in datotabla" value="Utilidad5Marca"  onchange="construirarraydatostabla(this);"/>'+
-                                        '<label for="idUtilidad5Marca">Utilidad5Marca</label>'+                                     
-                                    '</div>'+
                                     '<div class="col-md-12 form-check">'+
                                         '<label>DATOS LINEA PRODUCTO</label>'+
-                                    '</div>'+
-                                    '<div class="col-md-4 form-check">'+
-                                        '<input type="checkbox" name="NumeroLinea" id="idNumeroLinea" class="filled-in datotabla" value="NumeroLinea"  onchange="construirarraydatostabla(this);"/>'+
-                                        '<label for="idNumeroLinea">NumeroLinea</label>'+ 
                                     '</div>'+
                                     '<div class="col-md-4 form-check">'+
                                         '<input type="checkbox" name="NombreLinea" id="idNombreLinea" class="filled-in datotabla" value="NombreLinea"  onchange="construirarraydatostabla(this);"/>'+

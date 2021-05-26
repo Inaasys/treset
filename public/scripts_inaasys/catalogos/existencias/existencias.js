@@ -14,7 +14,7 @@ function listar(){
         campos_tabla.push({ 
             'data'    : campos[i],
             'name'  : campos[i],
-            'orderable': false,
+            'orderable': true,
             'searchable': true
         });
     }

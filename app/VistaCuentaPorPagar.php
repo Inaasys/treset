@@ -37,6 +37,9 @@ class VistaCuentaPorPagar extends Model
         'TelefonosProveedor',
         'Email1Proveedor'
     ];
+    protected $casts = [
+        'Fecha' => 'datetime:Y-m-d',
+    ];
     //Abono
     public function getAbonoAttribute($value){
         return Helpers::convertirvalorcorrecto($value);

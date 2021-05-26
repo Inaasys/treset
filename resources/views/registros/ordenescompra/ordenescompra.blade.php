@@ -93,74 +93,6 @@
                 </div>
                 <form id="formparsley" action="#">
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <label>Orden <b style="color:#F44336 !important;" id="serietexto"> Serie: {{$serieusuario}}</b></label>
-                                <input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">
-                                <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" data-parsley-length="[0, 10]" required readonly>
-                                <input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>
-                                <input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>
-                            </div>   
-                            <div class="col-md-3">
-                                <label>Plazo Días (proveedor)</label>
-                                <input type="text" class="form-control" name="plazo" id="plazo"  required>
-                            </div>
-                            <div class="col-md-3">
-                                <label>Referencia</label>
-                                <input type="text" class="form-control" name="referencia" id="referencia" required data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">
-                            </div>   
-                            <div class="col-md-3">
-                                <label>Fecha</label>
-                                <input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();">
-                                <input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="{{$periodohoy}}">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label>Proveedor</label>
-                                <table class="col-md-12">
-                                    <tr>
-                                        <td>
-                                            <div class="btn bg-blue waves-effect" onclick="obtenerproveedores()">Seleccionar</div>
-                                        </td>
-                                        <td>
-                                            <div class="form-line">
-                                                <input type="hidden" class="form-control" name="numeroproveedor" id="numeroproveedor" required readonly >
-                                                <input type="text" class="form-control" name="proveedor" id="proveedor" required readonly onkeyup="tipoLetra(this)">
-                                            </div>
-                                        </td>
-                                    </tr>    
-                                </table>
-                            </div>
-                            <div class="col-md-4">
-                                <label>Almacen</label>
-                                <table class="col-md-12">
-                                    <tr>
-                                        <td>
-                                            <div class="btn bg-blue waves-effect" onclick="obteneralmacenes()">Seleccionar</div>
-                                        </td>
-                                        <td>    
-                                            <div class="form-line">
-                                                <input type="hidden" class="form-control" name="numeroalmacen" id="numeroalmacen" required readonly >
-                                                <input type="text" class="form-control" name="almacen" id="almacen" required readonly onkeyup="tipoLetra(this)">
-                                            </div>
-                                        </td>    
-                                    </tr>    
-                                </table>
-                            </div>
-                            <div class="col-md-4">
-                                <label>Tipo</label>
-                                <select name="tipo" id="tipo" class="form-control select2" style="width:100% !important;" required>
-                                    
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4" id="divbuscarcodigoproducto">
-                                <label>Buscar producto por código</label>
-                                <input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">
-                            </div>
-                        </div>
                         <div class="col-md-12" id="tabsform">
                             <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
                         </div>
@@ -252,6 +184,8 @@
         var ordenes_compra_obtener_proveedores = '{!!URL::to('ordenes_compra_obtener_proveedores')!!}';
         var ordenes_compra_obtener_almacenes = '{!!URL::to('ordenes_compra_obtener_almacenes')!!}';
         var ordenes_compra_obtener_productos = '{!!URL::to('ordenes_compra_obtener_productos')!!}';
+        var ordenes_compra_obtener_proveedor_por_numero = '{!!URL::to('ordenes_compra_obtener_proveedor_por_numero')!!}';
+        var ordenes_compra_obtener_almacen_por_numero = '{!!URL::to('ordenes_compra_obtener_almacen_por_numero')!!}';
         var ordenes_compra_guardar = '{!!URL::to('ordenes_compra_guardar')!!}';
         var ordenes_compra_autorizar = '{!!URL::to('ordenes_compra_autorizar')!!}'; 
         var ordenes_compra_verificar_uso_en_modulos = '{!!URL::to('ordenes_compra_verificar_uso_en_modulos')!!}'; 

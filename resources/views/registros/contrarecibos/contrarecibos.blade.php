@@ -93,39 +93,6 @@
                 </div>
                 <form id="formparsley" action="#">
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-2">
-                                <label>Contrarecibo <b style="color:#F44336 !important;" id="serietexto"> Serie: {{$serieusuario}}</b></label>
-                                <input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">
-                                <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" required readonly data-parsley-length="[1, 10]">
-                                <input type="hidden" class="form-control" name="numerofacturas" id="numerofacturas" value="0" required readonly>
-                            </div>   
-                            <div class="col-md-4">
-                                <label>Proveedor</label>
-                                <table class="col-md-12">
-                                    <tr>
-                                        <td>
-                                            <div class="btn bg-blue waves-effect" id="btnobtenerproveedores" onclick="obtenerproveedores()">Seleccionar</div>
-                                        </td>
-                                        <td>
-                                            <div class="form-line">
-                                                <input type="hidden" class="form-control" name="numeroproveedor" id="numeroproveedor" required readonly onkeyup="tipoLetra(this)">
-                                                <input type="text" class="form-control" name="proveedor" id="proveedor" required readonly>
-                                            </div>
-                                        </td>
-                                    </tr>    
-                                </table>
-                            </div>
-                            <div class="col-md-3">
-                                <label>Fecha Contrarecibo</label>
-                                <input type="date" class="form-control" name="fecha" id="fecha" onchange="validasolomesactual();asignafechapagoproveedor();" required>
-                                <input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="{{$periodohoy}}">
-                            </div>
-                            <div class="col-md-3">
-                                <label>Fecha del Pago al Proveedor</label>
-                                <input type="date" class="form-control" name="fechaapagar" id="fechaapagar" required readonly>
-                            </div>
-                        </div>
                         <div class="col-md-12" id="tabsform">
                             <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
                         </div>
@@ -195,7 +162,9 @@
         var contrarecibos_obtener_ultimo_folio = '{!!URL::to('contrarecibos_obtener_ultimo_folio')!!}';
         var contrarecibos_obtener_proveedores = '{!!URL::to('contrarecibos_obtener_proveedores')!!}';
         var contrarecibos_obtener_compras_proveedor = '{!!URL::to('contrarecibos_obtener_compras_proveedor')!!}';
+        var contrarecibos_obtener_compras_proveedor_por_numero = '{!!URL::to('contrarecibos_obtener_compras_proveedor_por_numero')!!}';
         var contrarecibos_guardar = '{!!URL::to('contrarecibos_guardar')!!}';
+        var contrarecibos_guardar_modificacion = '{!!URL::to('contrarecibos_guardar_modificacion')!!}';
         var contrarecibos_verificar_si_continua_baja = '{!!URL::to('contrarecibos_verificar_si_continua_baja')!!}';
         var contrarecibos_baja  = '{!!URL::to('contrarecibos_baja')!!}';
         var contrarecibos_obtener_contrarecibo =  '{!!URL::to('contrarecibos_obtener_contrarecibo')!!}';

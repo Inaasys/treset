@@ -143,6 +143,68 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
         }
     }
 
+    //obtener cliente por numero
+    public function notas_credito_clientes_obtener_cliente_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $rfc = '';
+        $plazo = '';
+        $credito = '';
+        $saldo = '';
+        $claveformapago = '';
+        $formapago = '';
+        $clavemetodopago = '';
+        $metodopago = '';
+        $claveusocfdi = '';
+        $usocfdi = '';
+        $claveresidenciafiscal = '';
+        $residenciafiscal = '';
+        $existecliente = Cliente::where('Numero', $request->numerocliente)->where('Status', 'ALTA')->count();
+        if($existecliente > 0){
+            $cliente = Cliente::where('Numero', $request->numerocliente)->where('Status', 'ALTA')->first();
+            $datos = DB::table('Clientes as c')
+            ->leftJoin('c_FormaPago as fp', 'fp.Clave', '=', 'c.FormaPago')
+            ->leftJoin('c_MetodoPago as mp', 'mp.Clave', '=', 'c.MetodoPago')
+            ->leftJoin('c_UsoCFDI as uc', 'uc.Clave', '=', 'c.UsoCfdi')
+            ->leftJoin('c_Pais as p', 'p.Clave', '=', 'c.Pais')
+            ->select('c.Numero', 'c.Status', 'fp.Clave AS claveformapago', 'fp.Nombre AS formapago', 'mp.Clave AS clavemetodopago', 'mp.Nombre AS metodopago', 'uc.Clave AS claveusocfdi', 'uc.Nombre AS usocfdi', 'p.Clave AS claveresidenciafiscal', 'p.Nombre AS residenciafiscal')
+            ->where('c.Numero', $request->numerocliente)
+            ->where('c.Status', 'ALTA')
+            ->get();
+            $claveformapago = $datos[0]->claveformapago;
+            $formapago = $datos[0]->formapago;
+            $clavemetodopago = $datos[0]->clavemetodopago;
+            $metodopago = $datos[0]->metodopago;
+            $claveusocfdi = $datos[0]->claveusocfdi;
+            $usocfdi = $datos[0]->usocfdi;
+            $claveresidenciafiscal = $datos[0]->claveresidenciafiscal;
+            $residenciafiscal = $datos[0]->residenciafiscal;
+            $numero = $cliente->Numero;
+            $nombre = $cliente->Nombre;
+            $rfc = $cliente->Rfc;
+            $plazo = $cliente->Plazo;
+            $credito = Helpers::convertirvalorcorrecto($cliente->Credito);
+            $saldo = Helpers::convertirvalorcorrecto($cliente->Saldo);
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre,
+            'rfc' => $rfc,
+            'plazo' => $plazo,
+            'credito' => $credito,
+            'saldo' => $saldo,
+            'claveformapago' => $claveformapago,
+            'formapago' => $formapago,
+            'clavemetodopago' => $clavemetodopago,
+            'metodopago' => $metodopago,
+            'claveusocfdi' => $claveusocfdi,
+            'usocfdi' => $usocfdi,
+            'claveresidenciafiscal' => $claveresidenciafiscal,
+            'residenciafiscal' => $residenciafiscal,
+        );
+        return response()->json($data);
+    }
+
     //obtener almacenes
     public function notas_credito_clientes_obtener_almacenes(Request $request){
         if($request->ajax()){
@@ -157,6 +219,23 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
         }
     }
 
+    //obtener almacen por numero
+    public function notas_credito_clientes_obtener_almacen_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $existealmacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->count();
+        if($existealmacen > 0){
+            $almacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->first();
+            $numero = $almacen->Numero;
+            $nombre = $almacen->Nombre;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre,
+        );
+        return response()->json($data); 
+    }
+
     //obtener codifos postales
     public function notas_credito_clientes_obtener_codigos_postales(Request $request){
         if($request->ajax()){
@@ -169,6 +248,23 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         }
+    }
+    
+    //obtener lugar expedicion por clave
+    public function notas_credito_clientes_obtener_lugar_expedicion_por_clave(Request $request){
+        $clave = '';
+        $estado = '';
+        $existelugarexpedicion = CodigoPostal::where('Clave', $request->lugarexpedicion)->count();
+        if($existelugarexpedicion > 0){
+            $lugarexpedicion = CodigoPostal::where('Clave', $request->lugarexpedicion)->first();
+            $clave = $lugarexpedicion->Clave;
+            $estado = $lugarexpedicion->Estado;
+        }
+        $data = array(
+            'clave' => $clave,
+            'estado' => $estado
+        );
+        return response()->json($data); 
     }
 
     //obtener regimenes fiscales
@@ -185,6 +281,23 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
         }
     }
 
+    //obtener regimen fiscal por clave
+    public function notas_credito_clientes_obtener_regimen_fiscal_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existeregimenfiscal = c_RegimenFiscal::where('Clave', $request->claveregimenfiscal)->count();
+        if($existeregimenfiscal > 0){
+            $regimenfiscal = c_RegimenFiscal::where('Clave', $request->claveregimenfiscal)->first();
+            $clave = $regimenfiscal->Clave;
+            $nombre = $regimenfiscal->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data);  
+    }
+
     //obtener tipos relacion
     public function notas_credito_clientes_obtener_tipos_relacion(Request $request){
         if($request->ajax()){
@@ -197,6 +310,23 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         }
+    }
+
+    //obtener tipo relacion por clave
+    public function notas_credito_clientes_obtener_tipo_relacion_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existeretiporelacion = c_TipoRelacion::where('Clave', $request->clavetiporelacion)->count();
+        if($existeretiporelacion > 0){
+            $tiporelacion = c_TipoRelacion::where('Clave', $request->clavetiporelacion)->first();
+            $clave = $tiporelacion->Clave;
+            $nombre = $tiporelacion->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
     }
 
     //obtener formas pago
@@ -213,6 +343,23 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
         }
     }
 
+    //obtener forma pago por clave
+    public function notas_credito_clientes_obtener_forma_pago_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existereformapago = FormaPago::where('Clave', $request->claveformapago)->count();
+        if($existereformapago > 0){
+            $formapago = FormaPago::where('Clave', $request->claveformapago)->first();
+            $clave = $formapago->Clave;
+            $nombre = $formapago->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+    }
+
     //obtener metodos pago
     public function notas_credito_clientes_obtener_metodos_pago(Request $request){
         if($request->ajax()){
@@ -225,6 +372,23 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         }
+    }
+
+    //obtener metodo pago por clave
+    public function notas_credito_clientes_obtener_metodo_pago_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existeremetodopago = MetodoPago::where('Clave', $request->clavemetodopago)->count();
+        if($existeremetodopago > 0){
+            $metodopago = MetodoPago::where('Clave', $request->clavemetodopago)->first();
+            $clave = $metodopago->Clave;
+            $nombre = $metodopago->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
     }
 
     //obtener usos cfdi
@@ -241,6 +405,23 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
         }
     }
 
+    //obtener uso cfdi por clave
+    public function notas_credito_clientes_obtener_uso_cfdi_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existereusocfdi = UsoCFDI::where('Clave', $request->claveusocfdi)->count();
+        if($existereusocfdi > 0){
+            $usocfdi = UsoCFDI::where('Clave', $request->claveusocfdi)->first();
+            $clave = $usocfdi->Clave;
+            $nombre = $usocfdi->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+    }
+
     //obtener residencias fiscales
     public function notas_credito_clientes_obtener_residencias_fiscales(Request $request){
         if($request->ajax()){
@@ -253,6 +434,23 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         }
+    }
+
+    //obtener residencia fiscal por clave
+    public function notas_credito_clientes_obtener_residencia_fiscal_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existeresidenciafiscal = Pais::where('Clave', $request->claveresidenciafiscal)->count();
+        if($existeresidenciafiscal > 0){
+            $residencialfiscal = Pais::where('Clave', $request->claveresidenciafiscal)->first();
+            $clave = $residencialfiscal->Clave;
+            $nombre = $residencialfiscal->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
     }
 
     //obtener facturas
@@ -350,7 +548,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $data = VistaObtenerExistenciaProducto::whereIn('Codigo', $arrayproductosseleccionables)->where('Codigo', 'like', '%' . $codigoabuscar . '%')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($numeroalmacen, $tipooperacion, $stringfacturasseleccionadas){
-                        if($data->Almacen == $numeroalmacen){
+                        if($data->Almacen == $numeroalmacen || $data->Almacen == NULL){
                             $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$tipooperacion.'\',\''.$data->Insumo.'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$data->NombreClaveProducto.'\',\''.$data->NombreClaveUnidad.'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\')">Seleccionar</div>';
                         }else{
                             $boton = '';
@@ -369,6 +567,35 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
+    }
+
+    //obtener claves productos
+    public function notas_credito_clientes_obtener_claves_productos(Request $request){
+        if($request->ajax()){
+            $fila = $request->fila;
+            $data = ClaveProdServ::query();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data) use ($fila){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarclaveproducto(\''.$data->Clave .'\',\''.$data->Nombre .'\','.$fila.')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }          
+    }
+    //obtener claves unidades
+    public function notas_credito_clientes_obtener_claves_unidades(Request $request){
+        if($request->ajax()){
+            $fila = $request->fila;
+            $data = ClaveUnidad::query();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data) use ($fila){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarclaveunidad(\''.$data->Clave .'\',\''.$data->Nombre .'\','.$fila.')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }         
     }
 
     //comprobar cantidad nota vs cantidad factura
@@ -749,9 +976,27 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Total).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                             '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodsm partidapartida" name="partidapartida[]"  value="0" readonly></td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproductopartida->Clave.'" readonly data-parsley-length="[1, 20]"></td>'.
+                            '<td class="tdmod">'.
+                                '<div class="row divorinputmodxl">'.
+                                    '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                                        '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
+                                    '</div>'.
+                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.
+                                        '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproductopartida->Clave.'" readonly data-parsley-length="[1, 20]">'.
+                                    '</div>'.
+                                '</div>'.
+                            '</td>'.
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$claveproductopartida->Nombre.'" readonly></td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidadpartida->Clave.'" readonly data-parsley-length="[1, 5]"></td>'.
+                            '<td class="tdmod">'.
+                                '<div class="row divorinputmodxl">'.
+                                    '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                                        '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
+                                    '</div>'.
+                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.   
+                                        '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidadpartida->Clave.'" readonly data-parsley-length="[1, 5]">'.
+                                    '</div>'.
+                                '</div>'.
+                            '</td>'.
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$claveunidadpartida->Nombre.'" readonly></td>'.
                         '</tr>';
                         $tipodetalles = 'dppp';
@@ -788,9 +1033,27 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Total).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                             '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodsm partidapartida" name="partidapartida[]" value="0"></td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproductopartida->Clave.'" readonly data-parsley-length="[1, 20]"></td>'.
+                            '<td class="tdmod">'.
+                                '<div class="row divorinputmodxl">'.
+                                    '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                                        '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
+                                    '</div>'.
+                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.
+                                        '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproductopartida->Clave.'" readonly data-parsley-length="[1, 20]">'.
+                                    '</div>'.
+                                '</div>'.
+                            '</td>'.
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$claveproductopartida->Nombre.'" readonly></td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidadpartida->Clave.'" readonly data-parsley-length="[1, 5]"></td>'.
+                            '<td class="tdmod">'.
+                                '<div class="row divorinputmodxl">'.
+                                    '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                                        '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
+                                    '</div>'.
+                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.   
+                                        '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidadpartida->Clave.'" readonly data-parsley-length="[1, 5]">'.
+                                    '</div>'.
+                                '</div>'.
+                            '</td>'.
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$claveunidadpartida->Nombre.'" readonly></td>'.
                         '</tr>';
                         $tipodetalles = 'codigos';

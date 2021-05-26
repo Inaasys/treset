@@ -49,6 +49,9 @@ class VistaNotaCreditoProveedor extends Model
         'TelefonosProveedor',
         'Email1Proveedor'
     ];
+    protected $casts = [
+        'Fecha' => 'datetime:Y-m-d',
+    ];
     //SubTotal
     public function getSubTotalAttribute($value){
         return Helpers::convertirvalorcorrecto($value);

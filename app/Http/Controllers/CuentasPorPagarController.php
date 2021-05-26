@@ -20,6 +20,7 @@ use App\Compra;
 use App\CompraDetalle;
 use App\NotaProveedor;
 use App\NotaProveedorDetalle;
+use App\NotaProveedorDocumento;
 use App\BitacoraDocumento;
 use Luecano\NumeroALetras\NumeroALetras;
 use App\Configuracion_Tabla;
@@ -87,7 +88,27 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                     ->make(true);
         }
     }
-    //obtener almacenes
+    //obtener proveedor por numero
+    public function cuentas_por_pagar_obtener_proveedor_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $plazo = '';
+        $existeproveedor = Proveedor::where('Numero', $request->numeroproveedor)->where('Status', 'ALTA')->count();
+        if($existeproveedor > 0){
+            $proveedor = Proveedor::where('Numero', $request->numeroproveedor)->where('Status', 'ALTA')->first();
+            $numero = $proveedor->Numero;
+            $nombre = $proveedor->Nombre;
+            $plazo = $proveedor->Plazo;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre,
+            'plazo' => $plazo
+        );
+        return response()->json($data); 
+    }
+    
+    //obtener bancos
     public function cuentas_por_pagar_obtener_bancos(Request $request){
         if($request->ajax()){
             $data = Banco::where('Status', 'ALTA')->orderBy("Numero", "ASC")->get();
@@ -100,6 +121,24 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                     ->make(true);
         }
     }
+
+    //obtener banco por numero
+    public function cuentas_por_pagar_obtener_banco_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $existebanco = Banco::where('Numero', $request->numerobanco)->where('Status', 'ALTA')->count();
+        if($existebanco > 0){
+            $banco = Banco::where('Numero', $request->numerobanco)->where('Status', 'ALTA')->first();
+            $numero = $banco->Numero;
+            $nombre = $banco->Nombre;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre,
+        );
+        return response()->json($data); 
+    }
+
     //obtener compras por proveedor
     public function cuentas_por_pagar_obtener_compras_proveedor(Request $request){
         $compras = Compra::where('Proveedor', $request->Numero)->where('Status', 'POR PAGAR')->orderBy('Fecha', 'ASC')->get();
@@ -110,12 +149,11 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
             foreach($compras as $c){
                 //obtener nota de credito proveedor
                 $detallenotacredito = 0;
-                $contarnotacreditoproveedor = NotaProveedorDetalle::where('Proveedor', $request->Numero)->where('Compra', $c->Compra)->count();
+                $contarnotacreditoproveedor = NotaProveedorDocumento::where('Compra', $c->Compra)->count();
                 if($contarnotacreditoproveedor > 0){
-                    $detallenotacreditoproveedor = NotaProveedorDetalle::where('Proveedor', $request->Numero)->where('Compra', $c->Compra)->first();
-                    $notacredito = NotaProveedor::where('Nota', $detallenotacreditoproveedor->Nota)->where('STATUS', 'ALTA')->count();
-                    if($notacredito > 0){
-                        $detallenotacredito = $detallenotacreditoproveedor->Total;
+                    $detallenotacreditoproveedor = NotaProveedorDocumento::where('Compra', $c->Compra)->get();
+                    foreach($detallenotacreditoproveedor as $detalle){
+                        $detallenotacredito = $detalle->Descuento;
                     }
                 }
                 $contrarecibo = '';
@@ -283,12 +321,11 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
         foreach($CuentaXPagarDetalle as $cxpd){
             //obtener nota de credito proveedor
             $detallenotacredito = 0;
-            $contarnotacreditoproveedor = NotaProveedorDetalle::where('Proveedor', $CuentaXPagar->Proveedor)->where('Compra', $cxpd->Compra)->count();
+            $contarnotacreditoproveedor = NotaProveedorDocumento::where('Compra', $cxpd->Compra)->count();
             if($contarnotacreditoproveedor > 0){
-                $detallenotacreditoproveedor = NotaProveedorDetalle::where('Proveedor', $CuentaXPagar->Proveedor)->where('Compra', $cxpd->Compra)->first();
-                $notacredito = NotaProveedor::where('Nota', $detallenotacreditoproveedor->Nota)->where('STATUS', 'ALTA')->count();
-                if($notacredito > 0){
-                    $detallenotacredito = $detallenotacreditoproveedor->Total;
+                $detallenotacreditoproveedor = NotaProveedorDocumento::where('Compra', $cxpd->Compra)->get();
+                foreach($detallenotacreditoproveedor as $detalle){
+                    $detallenotacredito = $detalle->Descuento;
                 }
             }
             $c = Compra::where('Compra', $cxpd->Compra)->first();
@@ -338,10 +375,37 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
             'abonototal' => Helpers::convertirvalorcorrecto($CuentaXPagar->Abono),
             "modificacionpermitida" => $modificacionpermitida
         );
-        return response()->json($datas);
+        return response()->json($data);
     }
-
-
+    //cambios
+    public function cuentas_por_pagar_guardar_modificacion(Request $request){
+        ini_set('max_input_vars','10000' );
+        //INGRESAR DATOS A TABLA
+        $cuentaxpagar = $request->folio.'-'.$request->serie;
+		$CuentaXPagar = CuentaXPagar::where('Pago', $cuentaxpagar)->first();
+        //modificar
+        CuentaXPagar::where('Pago', $cuentaxpagar)
+        ->update([
+            'Fecha' => Carbon::parse($request->fecha)->toDateTimeString(),
+            'Banco' => $request->numerobanco,
+            'Cheque' => $request->cheque,
+            'Transferencia' => $request->transferencia,
+            'Beneficiario' => $request->beneficiario,
+            'CuentaDeposito' => $request->cuentadeposito,  
+            'Anotacion' => $request->anotacion
+        ]);
+        //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
+        $BitacoraDocumento = new BitacoraDocumento;
+        $BitacoraDocumento->Documento = "CXP";
+        $BitacoraDocumento->Movimiento = $cuentaxpagar;
+        $BitacoraDocumento->Aplicacion = "CAMBIO";
+        $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
+        $BitacoraDocumento->Status = $CuentaXPagar->Status;
+        $BitacoraDocumento->Usuario = Auth::user()->user;
+        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->save();
+    	return response()->json($CuentaXPagar);
+    }
     //buscar folio on key up
     public function cuentas_por_pagar_buscar_folio_string_like(Request $request){
         if($request->ajax()){

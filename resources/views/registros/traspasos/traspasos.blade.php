@@ -93,88 +93,6 @@
                 </div>
                 <form id="formparsley" action="#">
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <label>Traspaso <b style="color:#F44336 !important;" id="serietexto"> Serie: {{$serieusuario}}</b></label>
-                                <input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">
-                                <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" required readonly data-parsley-length="[1, 10]">
-                                <input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>
-                                <input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>
-                            </div>  
-                            <div class="col-md-3">
-                                <label>De Almacén</label>
-                                <table class="col-md-12">
-                                    <tr>
-                                        <td>
-                                            <div class="btn bg-blue waves-effect" id="botonobteneralmacenes" onclick="obteneralmacenes()">Seleccionar</div>
-                                        </td>
-                                        <td>
-                                            <div class="form-line">
-                                                <input type="hidden" class="form-control" name="numeroalmacende" id="numeroalmacende" required readonly onkeyup="tipoLetra(this)">
-                                                <input type="text" class="form-control" name="almacende" id="almacende" required readonly>
-                                            </div>
-                                        </td>
-                                    </tr>    
-                                </table>
-                            </div>
-                            <div class="col-md-3">
-                                <label>A Foráneo</label>
-                                <table class="col-md-12">
-                                    <tr>
-                                        <td>
-                                            <div class="btn bg-blue waves-effect" id="botonobteneralmacenesforaneos" onclick="obteneralmacenesforaneos()">Seleccionar</div>
-                                        </td>
-                                        <td>
-                                            <div class="form-line">
-                                                <input type="hidden" class="form-control" name="numeroalmacena" id="numeroalmacena"  readonly onkeyup="tipoLetra(this)">
-                                                <input type="text" class="form-control" name="almacena" id="almacena"  readonly>
-                                            </div>
-                                        </td>
-                                    </tr>    
-                                </table>
-                            </div>
-                            <div class="col-md-3">
-                                <label>Fecha </label>
-                                <input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" >
-                                <input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="{{$periodohoy}}">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <label>Orden Trabajo</label>
-                                <table class="col-md-12">
-                                    <tr>
-                                        <td>
-                                            <div class="btn bg-blue waves-effect" id="botonobtenerordenestrabajo" onclick="obtenerordenestrabajo()">Seleccionar</div>
-                                        </td>
-                                        <td>
-                                            <div class="form-line">
-                                                <input type="text" class="form-control" name="orden" id="orden"  readonly>
-                                                <input type="hidden" class="form-control" name="fechaorden" id="fechaorden"  readonly>
-                                                <input type="hidden" class="form-control" name="tipo" id="tipo"  readonly>
-                                                <input type="hidden" class="form-control" name="unidad" id="unidad"  readonly>
-                                            </div>
-                                        </td>
-                                    </tr>    
-                                </table>
-                            </div>
-                            <div class="col-md-2">
-                                <label>Status Orden</label>
-                                <input type="text" class="form-control" name="statusorden" id="statusorden"  required readonly onkeyup="tipoLetra(this);">
-                            </div>
-                            <div class="col-md-2">
-                                <label>Cliente </label>
-                                <input type="text" class="form-control" name="clienteorden" id="clienteorden"  required readonly onkeyup="tipoLetra(this);">
-                            </div>
-                            <div class="col-md-2">
-                                <label>Referencia </label>
-                                <input type="text" class="form-control" name="referencia" id="referencia" data-parsley-length="[1, 200]" onkeyup="tipoLetra(this);">
-                            </div>
-                            <div class="col-md-3" id="divbuscarcodigoproducto" hidden>
-                                <label>Buscar producto por código</label>
-                                <input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">
-                            </div>
-                        </div>
                         <div class="col-md-12" id="tabsform">
                             <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
                         </div>
@@ -240,11 +158,16 @@
         var campos_desactivados = '{{$configuracion_tabla->campos_desactivados}}';
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
+        var almacende = '{{$almacendedefault->Nombre}}';
+        var numeroalmacende = '{{$almacendedefault->Numero}}';
         var traspasos_obtener = '{!!URL::to('traspasos_obtener')!!}';
         var traspasos_obtener_ultimo_folio = '{!!URL::to('traspasos_obtener_ultimo_folio')!!}';
         var traspasos_obtener_almacenes = '{!!URL::to('traspasos_obtener_almacenes')!!}';
+        var traspasos_obtener_almacen_de_por_numero = '{!!URL::to('traspasos_obtener_almacen_de_por_numero')!!}';
         var traspasos_obtener_almacenes_foraneos = '{!!URL::to('traspasos_obtener_almacenes_foraneos')!!}';
+        var traspasos_obtener_almacen_a_por_numero = '{!!URL::to('traspasos_obtener_almacen_a_por_numero')!!}';
         var traspasos_obtener_ordenes_trabajo = '{!!URL::to('traspasos_obtener_ordenes_trabajo')!!}';
+        var traspasos_obtener_orden_trabajo_por_folio = '{!!URL::to('traspasos_obtener_orden_trabajo_por_folio')!!}';
         var traspasos_obtener_productos = '{!!URL::to('traspasos_obtener_productos')!!}';
         var traspasos_obtener_existencias_partida = '{!!URL::to('traspasos_obtener_existencias_partida')!!}';
         var traspasos_obtener_existencias_almacen_foraneo = '{!!URL::to('traspasos_obtener_existencias_almacen_foraneo')!!}';

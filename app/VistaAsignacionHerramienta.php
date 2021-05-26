@@ -29,6 +29,9 @@ class VistaAsignacionHerramienta extends Model
         'nombre_entrega_herramienta',
         'tipo_entrega_herramienta'
     ];
+    protected $casts = [
+        'fecha' => 'datetime:Y-m-d',
+    ];
     //total
     public function gettotalAttribute($value){
         return Helpers::convertirvalorcorrecto($value);

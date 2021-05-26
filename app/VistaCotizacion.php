@@ -26,7 +26,9 @@ class VistaCotizacion extends Model
         'periodo',
         'num_remision'
     ];
-
+    protected $casts = [
+        'fecha' => 'datetime:Y-m-d',
+    ];
     //SubTotal
     public function getsubtotalAttribute($value){
         return Helpers::convertirvalorcorrecto($value);

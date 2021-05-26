@@ -179,6 +179,78 @@ class FacturaController extends ConfiguracionSistemaController{
         }
     }
 
+    //obtener cliente por numero
+    public function facturas_obtener_cliente_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $rfc = '';
+        $plazo = '';
+        $credito = '';
+        $saldo = '';
+        $claveformapago = '';
+        $formapago = '';
+        $clavemetodopago = '';
+        $metodopago = '';
+        $claveusocfdi = '';
+        $usocfdi = '';
+        $claveresidenciafiscal = '';
+        $residenciafiscal = '';
+        $numeroagente = '';
+        $nombreagente = '';
+        $rfcagente = '';
+        $existecliente = Cliente::where('Numero', $request->numerocliente)->where('Status', 'ALTA')->count();
+        if($existecliente > 0){
+            $cliente = Cliente::where('Numero', $request->numerocliente)->where('Status', 'ALTA')->first();
+            $datos = DB::table('Clientes as c')
+            ->leftJoin('c_FormaPago as fp', 'fp.Clave', '=', 'c.FormaPago')
+            ->leftJoin('c_MetodoPago as mp', 'mp.Clave', '=', 'c.MetodoPago')
+            ->leftJoin('c_UsoCFDI as uc', 'uc.Clave', '=', 'c.UsoCfdi')
+            ->leftJoin('c_Pais as p', 'p.Clave', '=', 'c.Pais')
+            ->select('c.Numero', 'c.Status', 'fp.Clave AS claveformapago', 'fp.Nombre AS formapago', 'mp.Clave AS clavemetodopago', 'mp.Nombre AS metodopago', 'uc.Clave AS claveusocfdi', 'uc.Nombre AS usocfdi', 'p.Clave AS claveresidenciafiscal', 'p.Nombre AS residenciafiscal')
+            ->where('c.Numero', $request->numerocliente)
+            ->where('c.Status', 'ALTA')
+            ->get();
+            $claveformapago = $datos[0]->claveformapago;
+            $formapago = $datos[0]->formapago;
+            $clavemetodopago = $datos[0]->clavemetodopago;
+            $metodopago = $datos[0]->metodopago;
+            $claveusocfdi = $datos[0]->claveusocfdi;
+            $usocfdi = $datos[0]->usocfdi;
+            $claveresidenciafiscal = $datos[0]->claveresidenciafiscal;
+            $residenciafiscal = $datos[0]->residenciafiscal;
+            $agente = Agente::where('Numero', $cliente->Agente)->first();
+            $numero = $cliente->Numero;
+            $nombre = $cliente->Nombre;
+            $rfc = $cliente->Rfc;
+            $plazo = $cliente->Plazo;
+            $credito = Helpers::convertirvalorcorrecto($cliente->Credito);
+            $saldo = Helpers::convertirvalorcorrecto($cliente->Saldo);
+            $numeroagente = $agente->Numero;
+            $nombreagente = $agente->Nombre;
+            $rfcagente = $agente->Rfc;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre,
+            'rfc' => $rfc,
+            'plazo' => $plazo,
+            'credito' => $credito,
+            'saldo' => $saldo,
+            'claveformapago' => $claveformapago,
+            'formapago' => $formapago,
+            'clavemetodopago' => $clavemetodopago,
+            'metodopago' => $metodopago,
+            'claveusocfdi' => $claveusocfdi,
+            'usocfdi' => $usocfdi,
+            'claveresidenciafiscal' => $claveresidenciafiscal,
+            'residenciafiscal' => $residenciafiscal,
+            'numeroagente' => $numeroagente,
+            'nombreagente' => $nombreagente,
+            'rfcagente' => $rfcagente
+        );
+        return response()->json($data);
+    }
+
     //obtener datos agente
     public function facturas_obtener_datos_agente(Request $request){
         $Agente = Agente::where('Numero', $request->NumeroAgente)->first();
@@ -199,18 +271,55 @@ class FacturaController extends ConfiguracionSistemaController{
         }
     }
 
+    //obtener agente por numero 
+    public function facturas_obtener_agente_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $rfc = '';
+        $existeagente = Agente::where('Numero', $request->numeroagente)->where('Status', 'ALTA')->count();
+        if($existeagente > 0){
+            $agente = Agente::where('Numero', $request->numeroagente)->where('Status', 'ALTA')->first();
+            $numero = $agente->Numero;
+            $nombre = $agente->Nombre;
+            $rfc = $agente->Rfc;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre,
+            'rfc' => $rfc
+        );
+        return response()->json($data); 
+    }
+
     //obtener codigo postal
     public function facturas_obtener_codigos_postales(Request $request){
         if($request->ajax()){
             $data = CodigoPostal::query();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarlugarexpedicion(\''.$data->Clave .'\')">Seleccionar</div>';
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarlugarexpedicion(\''.$data->Clave .'\',\''.$data->Estado .'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
         }
+    }
+
+    //obtener lugar expedicion por clave
+    public function facturas_obtener_lugar_expedicion_por_clave(Request $request){
+        $clave = '';
+        $estado = '';
+        $existelugarexpedicion = CodigoPostal::where('Clave', $request->lugarexpedicion)->count();
+        if($existelugarexpedicion > 0){
+            $lugarexpedicion = CodigoPostal::where('Clave', $request->lugarexpedicion)->first();
+            $clave = $lugarexpedicion->Clave;
+            $estado = $lugarexpedicion->Estado;
+        }
+        $data = array(
+            'clave' => $clave,
+            'estado' => $estado
+        );
+        return response()->json($data); 
     }
 
     //obtener regimen fiscal
@@ -227,6 +336,23 @@ class FacturaController extends ConfiguracionSistemaController{
         }
     }
 
+    //obtener regimen fiscal por clave
+    public function facturas_obtener_regimen_fiscal_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existeregimenfiscal = c_RegimenFiscal::where('Clave', $request->claveregimenfiscal)->count();
+        if($existeregimenfiscal > 0){
+            $regimenfiscal = c_RegimenFiscal::where('Clave', $request->claveregimenfiscal)->first();
+            $clave = $regimenfiscal->Clave;
+            $nombre = $regimenfiscal->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data);   
+    }
+
     //obtener tipo relacion
     public function facturas_obtener_tipos_relacion(Request $request){
         if($request->ajax()){
@@ -239,6 +365,23 @@ class FacturaController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         }
+    }
+
+    //obtener tipo relacion or clave
+    public function facturas_obtener_tipo_relacion_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existeretiporelacion = c_TipoRelacion::where('Clave', $request->clavetiporelacion)->count();
+        if($existeretiporelacion > 0){
+            $tiporelacion = c_TipoRelacion::where('Clave', $request->clavetiporelacion)->first();
+            $clave = $tiporelacion->Clave;
+            $nombre = $tiporelacion->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
     }
 
     //obtener formas pago
@@ -255,6 +398,23 @@ class FacturaController extends ConfiguracionSistemaController{
         }
     }
 
+    //obtener forma pago por clave
+    public function facturas_obtener_forma_pago_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existereformapago = FormaPago::where('Clave', $request->claveformapago)->count();
+        if($existereformapago > 0){
+            $formapago = FormaPago::where('Clave', $request->claveformapago)->first();
+            $clave = $formapago->Clave;
+            $nombre = $formapago->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+    }
+
     //obtener metodos pago
     public function facturas_obtener_metodos_pago(Request $request){
         if($request->ajax()){
@@ -267,6 +427,23 @@ class FacturaController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         }
+    }
+
+    //obtener forma pago por clave
+    public function facturas_obtener_metodo_pago_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existeremetodopago = MetodoPago::where('Clave', $request->clavemetodopago)->count();
+        if($existeremetodopago > 0){
+            $metodopago = MetodoPago::where('Clave', $request->clavemetodopago)->first();
+            $clave = $metodopago->Clave;
+            $nombre = $metodopago->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
     }
 
     //obtener usos cfdi
@@ -283,6 +460,23 @@ class FacturaController extends ConfiguracionSistemaController{
         }
     }
 
+    //obtener forma pago por clave
+    public function facturas_obtener_uso_cfdi_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existereusocfdi = UsoCFDI::where('Clave', $request->claveusocfdi)->count();
+        if($existereusocfdi > 0){
+            $usocfdi = UsoCFDI::where('Clave', $request->claveusocfdi)->first();
+            $clave = $usocfdi->Clave;
+            $nombre = $usocfdi->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+    }
+
     //obtener residencias fiscales
     public function facturas_obtener_residencias_fiscales(Request $request){
         if($request->ajax()){
@@ -295,6 +489,23 @@ class FacturaController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         }
+    }
+
+    //obtener forma pago por clave
+    public function facturas_obtener_residencia_fiscal_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existeresidenciafiscal = Pais::where('Clave', $request->claveresidenciafiscal)->count();
+        if($existeresidenciafiscal > 0){
+            $residencialfiscal = Pais::where('Clave', $request->claveresidenciafiscal)->first();
+            $clave = $residencialfiscal->Clave;
+            $nombre = $residencialfiscal->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
     }
 
     //obtener folios fiscales
@@ -417,9 +628,27 @@ class FacturaController extends ConfiguracionSistemaController{
                 '<td class="tdmod"><input type="text" class="form-control divorinputmodsm monedapartida" name="monedapartida[]" value="'.$detalle->Moneda.'" readonly></td>'.
                 '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costodelistapartida" name="costodelistapartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->CostoDeLista).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                 '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm tipocambiopartida" name="tipocambiopartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->TipoDeCambio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproductopartida->Clave.'" readonly></td>'.
+                '<td class="tdmod">'.
+                    '<div class="row divorinputmodxl">'.
+                        '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                            '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
+                        '</div>'.
+                        '<div class="col-xs-10 col-sm-10 col-md-10">'.
+                            '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproductopartida->Clave.'" readonly data-parsley-length="[1, 20]">'.
+                        '</div>'.
+                    '</div>'.
+                '</td>'.
                 '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$claveproductopartida->Nombre.'" readonly></td>'.
-                '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidadpartida->Clave.'" readonly></td>'.
+                '<td class="tdmod">'.
+                    '<div class="row divorinputmodxl">'.
+                        '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                            '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
+                        '</div>'.
+                        '<div class="col-xs-10 col-sm-10 col-md-10">'.   
+                            '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidadpartida->Clave.'" readonly data-parsley-length="[1, 5]">'.
+                        '</div>'.
+                    '</div>'.
+                '</td>'.
                 '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$claveunidadpartida->Nombre.'" readonly></td>'.
             '</tr>';
             $contadorfilas++;
@@ -530,9 +759,27 @@ class FacturaController extends ConfiguracionSistemaController{
                 '<td class="tdmod"><input type="text" class="form-control divorinputmodsm monedapartida" name="monedapartida[]" value="MXN" readonly></td>'.
                 '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costodelistapartida" name="costodelistapartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                 '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm tipocambiopartida" name="tipocambiopartida[]" value="'.Helpers::convertirvalorcorrecto(1).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproductopartida->Clave.'" readonly></td>'.
+                '<td class="tdmod">'.
+                    '<div class="row divorinputmodxl">'.
+                        '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                            '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
+                        '</div>'.
+                        '<div class="col-xs-10 col-sm-10 col-md-10">'.
+                            '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproductopartida->Clave.'" readonly data-parsley-length="[1, 20]">'.
+                        '</div>'.
+                    '</div>'.
+                '</td>'.
                 '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$claveproductopartida->Nombre.'" readonly></td>'.
-                '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidadpartida->Clave.'" readonly></td>'.
+                '<td class="tdmod">'.
+                    '<div class="row divorinputmodxl">'.
+                        '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                            '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
+                        '</div>'.
+                        '<div class="col-xs-10 col-sm-10 col-md-10">'.   
+                            '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidadpartida->Clave.'" readonly data-parsley-length="[1, 5]">'.
+                        '</div>'.
+                    '</div>'.
+                '</td>'.
                 '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$claveunidadpartida->Nombre.'" readonly></td>'.
             '</tr>';
             $contadorfilas++;
@@ -570,6 +817,35 @@ class FacturaController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
+    }
+
+    //obtener claves productos
+    public function facturas_obtener_claves_productos(Request $request){
+        if($request->ajax()){
+            $fila = $request->fila;
+            $data = ClaveProdServ::query();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data) use ($fila){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarclaveproducto(\''.$data->Clave .'\',\''.$data->Nombre .'\','.$fila.')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }          
+    }
+    //obtener claves unidades
+    public function facturas_obtener_claves_unidades(Request $request){
+        if($request->ajax()){
+            $fila = $request->fila;
+            $data = ClaveUnidad::query();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data) use ($fila){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarclaveunidad(\''.$data->Clave .'\',\''.$data->Nombre .'\','.$fila.')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }         
     }
 
     //cargar uuid relacionado
@@ -657,7 +933,7 @@ class FacturaController extends ConfiguracionSistemaController{
         $Factura->ReceptorRfc=$request->receptorrfc;
         $Factura->ReceptorNombre=$request->receptornombre;
         $Factura->Hora=Helpers::fecha_mas_hora_exacta_accion_datetimestring($request->fecha);
-        $Factura->Periodo=$request->periodohoy;
+        $Factura->Periodo=$this->periodohoy;
         $Factura->save();
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
@@ -667,7 +943,7 @@ class FacturaController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
         $BitacoraDocumento->Status = "POR COBRAR";
         $BitacoraDocumento->Usuario = Auth::user()->user;
-        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA  DETALLES
         $item = 1;
@@ -770,8 +1046,7 @@ class FacturaController extends ConfiguracionSistemaController{
             $partida = 1;
             $tipo="modificacion";
             foreach($detallesfactura as $df){
-                $claveproductopartida = ClaveProdServ::where('Clave', $df->ClaveProducto)->first();
-                $claveunidadpartida = ClaveUnidad::where('Clave', $df->ClaveUnidad)->first();
+                $claves = VistaObtenerExistenciaProducto::where('Codigo', $df->Codigo)->first();
                 $filasdetallesfactura= $filasdetallesfactura.
                 '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                     '<td class="tdmod"><div class="numeropartida">'.$partida.'</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$df->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
@@ -814,10 +1089,28 @@ class FacturaController extends ConfiguracionSistemaController{
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm monedapartida" name="monedapartida[]" value="'.$df->Moneda.'" readonly></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costodelistapartida" name="costodelistapartida[]" value="'.Helpers::convertirvalorcorrecto($df->CostoDeLista).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm tipocambiopartida" name="tipocambiopartida[]" value="'.Helpers::convertirvalorcorrecto($df->TipoDeCambio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproductopartida->Clave.'" readonly></td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$claveproductopartida->Nombre.'" readonly></td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidadpartida->Clave.'" readonly></td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$claveunidadpartida->Nombre.'" readonly></td>'.
+                    '<td class="tdmod">'.
+                        '<div class="row divorinputmodxl">'.
+                            '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                                '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
+                            '</div>'.
+                            '<div class="col-xs-10 col-sm-10 col-md-10">'.
+                                '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claves->ClaveProducto.'" readonly data-parsley-length="[1, 20]">'.
+                            '</div>'.
+                        '</div>'.
+                    '</td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$claves->NombreClaveProducto.'" readonly></td>'.
+                    '<td class="tdmod">'.
+                        '<div class="row divorinputmodxl">'.
+                            '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                                '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
+                            '</div>'.
+                            '<div class="col-xs-10 col-sm-10 col-md-10">'.   
+                                '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claves->ClaveUnidad.'" readonly data-parsley-length="[1, 5]">'.
+                            '</div>'.
+                        '</div>'.
+                    '</td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$claves->NombreClaveUnidad.'" readonly></td>'.
                 '</tr>';
                 if($df->Remision != null){
                     array_push($consarrayremisiones, $df->Remision);
@@ -973,7 +1266,7 @@ class FacturaController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
         $BitacoraDocumento->Status = $Factura->Status;
         $BitacoraDocumento->Usuario = Auth::user()->user;
-        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
         //detalles
         foreach ($request->codigopartida as $key => $codigopartida){  

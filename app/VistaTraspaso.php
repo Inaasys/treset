@@ -39,6 +39,9 @@ class VistaTraspaso extends Model
         'NombreDe',
         'NombreA',
     ];
+    protected $casts = [
+        'Fecha' => 'datetime:Y-m-d',
+    ];
     //total
     public function getTotalAttribute($value){
         return Helpers::convertirvalorcorrecto($value);

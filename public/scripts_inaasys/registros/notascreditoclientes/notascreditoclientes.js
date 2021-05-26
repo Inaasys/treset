@@ -37,6 +37,16 @@ function limpiar(){
   //volver a aplicar configuracion a datatable principal para que realize la busqueda con la tecla enter
   regresarbusquedadatatableprincipal();
 }
+//mostrar boton de mostrar facturas
+function mostrarbotonlistarfacturas(){
+  var cliente = $("#cliente").val();
+  var almacen = $("#almacen").val();
+  if(cliente != "" && almacen != ""){
+    $("#btnlistarfacturas").show();
+  }else{
+    $("#btnlistarfacturas").hide();
+  } 
+}
 //mostrar modal formulario
 function mostrarmodalformulario(tipo, modificacionpermitida){
     $("#ModalFormulario").modal('show');
@@ -199,19 +209,25 @@ function obtenerclientes(){
 //seleccionar proveedor
 function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapago, clavemetodopago, metodopago, claveusocfdi, usocfdi, claveresidenciafiscal, residenciafiscal){
   $("#numerocliente").val(Numero);
+  $("#numeroclienteanterior").val(Numero);
   $("#cliente").val(Nombre);
+  $("#textonombrecliente").html(Nombre.substring(0, 40));
   $("#rfccliente").val(Rfc);
   //datos pestaña receptor o cliente
   $("#receptorrfc").val(Rfc);
   $("#receptornombre").val(Nombre);
   $("#claveformapago").val(claveformapago);
   $("#formapago").val(formapago);
+  $("#textonombreformapago").html(formapago.substring(0, 40));
   $("#clavemetodopago").val(clavemetodopago);
   $("#metodopago").val(metodopago);
+  $("#textonombremetodopago").html(metodopago.substring(0, 40));
   $("#claveusocfdi").val(claveusocfdi);
   $("#usocfdi").val(usocfdi);
+  $("#textonombreusocfdi").html(usocfdi.substring(0, 40));
   $("#claveresidenciafiscal").val(claveresidenciafiscal);
   $("#residenciafiscal").val(residenciafiscal);
+  $("#textonombreresidenciafiscal").html(residenciafiscal.substring(0, 40));
   mostrarformulario();
 }
 //obtener registros de almacenes
@@ -277,7 +293,9 @@ function obteneralmacenes(){
 //seleccionar almacen
 function seleccionaralmacen(Numero, Nombre){
     $("#numeroalmacen").val(Numero);
+    $("#numeroalmacenanterior").val(Numero);
     $("#almacen").val(Nombre);
+    $("#textonombrealmacen").html(Nombre.substring(0, 40));
     $("#btnlistarfacturas").show();
     mostrarformulario();
 }
@@ -348,8 +366,9 @@ function obtenerlugaresexpedicion(){
 } 
 //seleccionar lugar expedicion
 function seleccionarlugarexpedicion(Clave){
-$("#lugarexpedicion").val(Clave);
-mostrarformulario();
+  $("#lugarexpedicion").val(Clave);
+  $("#lugarexpedicionanterior").val(Clave);
+  mostrarformulario();
 }
 //obtener regimenes fiscales
 function obtenerregimenesfiscales(){
@@ -418,7 +437,9 @@ function obtenerregimenesfiscales(){
 //seleccionar lugar expedicion
 function seleccionarregimenfiscal(Clave, Nombre){
   $("#claveregimenfiscal").val(Clave);
+  $("#claveregimenfiscalanterior").val(Clave);
   $("#regimenfiscal").val(Nombre);
+  $("#textonombreregimenfiscal").html(Nombre.substring(0, 40));
   mostrarformulario();
 }
 //obtener tipos relacion
@@ -484,7 +505,9 @@ function obtenertiposrelaciones(){
 //seleccionar lugar expedicion
 function seleccionartiporelacion(Clave, Nombre){
   $("#clavetiporelacion").val(Clave);
+  $("#clavetiporelacionanterior").val(Clave);
   $("#tiporelacion").val(Nombre);
+  $("#textonombretiporelacion").html(Nombre.substring(0, 40));
   mostrarformulario();
 }
 //obtener formas de pago
@@ -552,7 +575,9 @@ function obtenerformaspago(){
 //seleccionar forma pago
 function seleccionarformapago(Clave, Nombre){
   $("#claveformapago").val(Clave);
+  $("#claveformapagoanterior").val(Clave);
   $("#formapago").val(Nombre);
+  $("#textonombreformapago").html(Nombre.substring(0, 40));
   mostrarformulario();
 }
 //obtener metodos de pago
@@ -618,7 +643,9 @@ function obtenermetodospago(){
 //seleccionar metodo pago
 function seleccionarmetodopago(Clave, Nombre){
   $("#clavemetodopago").val(Clave);
+  $("#clavemetodopagoanterior").val(Clave);
   $("#metodopago").val(Nombre);
+  $("#textonombremetodopago").html(Nombre.substring(0, 40));
   mostrarformulario();
 }
 //obtener usos cfdi
@@ -688,7 +715,9 @@ function obtenerusoscfdi(){
 //seleccionar uso cfdi
 function seleccionarusocfdi(Clave, Nombre){
   $("#claveusocfdi").val(Clave);
+  $("#claveusocfdianterior").val(Clave);
   $("#usocfdi").val(Nombre);
+  $("#textonombreusocfdi").html(Nombre.substring(0, 40));
   mostrarformulario();
 }
 //obtener residencias fiscales
@@ -754,7 +783,9 @@ function obtenerresidenciasfiscales(){
 //seleccionar residencia fiscal
 function seleccionarresidenciafiscal(Clave, Nombre){
   $("#claveresidenciafiscal").val(Clave);
+  $("#claveresidenciafiscalanterior").val(Clave);
   $("#residenciafiscal").val(Nombre);
+  $("#textonombreresidenciafiscal").html(Nombre.substring(0, 40));
   mostrarformulario();
 }
 //obtener folio serie nota
@@ -997,13 +1028,19 @@ function comprobarfilasfacturanotacliente(){
   var numerofilas = $("#numerofilas").val();
   if(parseInt(numerofilasfacturas) > parseInt(1) ){
     $("#almacen").val(0);
+    $("#textonombrealmacen").html("");
     $("#numeroalmacen").val(0);
+    $("#numeroalmacenanterior").val(0);
   }else if(parseInt(numerofilasfacturas) == parseInt(1) && parseInt(numerofilas) == parseInt(0) ){
       $("#almacen").val("");
+      $("#textonombrealmacen").html("");
       $("#numeroalmacen").val("");
+      $("#numeroalmacenanterior").val("");
   }else if(parseInt(numerofilasfacturas) == parseInt(1) && parseInt(numerofilas) >= parseInt(1) && (tipodetalles == '' || tipodetalles == 'dppp')  ){
     $("#almacen").val(0);
+    $("#textonombrealmacen").html("");
     $("#numeroalmacen").val(0);
+    $("#numeroalmacenanterior").val(0);
   }
 }
 //renumerar las filas de la orden de factura
@@ -1024,6 +1061,16 @@ function renumerarfilasfacturanotacliente(){
   for (var i = 0; i < lista.length; i++) {
     lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilastablafacturas("+i+')');
   }
+  //renumerar btnlistarclavesproductos
+  lista = document.getElementsByClassName("btnlistarclavesproductos");
+  for (var i = 0; i < lista.length; i++){
+    lista[i].setAttribute("onclick", "listarclavesproductos("+i+')');
+  }
+  //renumerar btnlistarclavesunidades
+  lista = document.getElementsByClassName("btnlistarclavesunidades");
+  for (var i = 0; i < lista.length; i++){
+    lista[i].setAttribute("onclick", "listarclavesunidades("+i+')');
+  }
 }  
 //detectar cuando en el input de buscar por codigo de producto el usuario presione la tecla enter, si es asi se realizara la busqueda con el codigo escrito
 $(document).ready(function(){
@@ -1035,6 +1082,189 @@ $(document).ready(function(){
       }
   });
 });
+
+//obtener por numero
+function obtenerclientepornumero(){
+  if($("#numerocliente").parsley().isValid()){
+      var numerocliente = $("#numerocliente").val();
+      $.get(notas_credito_clientes_obtener_cliente_por_numero, {numerocliente:numerocliente}, function(data){
+        $("#numerocliente").val(data.numero);
+        $("#numeroclienteanterior").val(data.numero);
+        $("#cliente").val(data.nombre);
+        $("#textonombrecliente").html(data.nombre.substring(0, 40));
+        $("#rfccliente").val(data.rfc);
+        //datos pestaña receptor o cliente
+        $("#receptorrfc").val(data.rfc);
+        $("#receptornombre").val(data.nombre);
+        $("#claveformapago").val(data.claveformapago);
+        $("#claveformapagoanterior").val(data.claveformapago);
+        $("#formapago").val(data.formapago);
+        $("#textonombreformapago").html(data.formapago.substring(0, 40));
+        $("#clavemetodopago").val(data.clavemetodopago);
+        $("#clavemetodopagoanterior").val(data.clavemetodopago);
+        $("#metodopago").val(data.metodopago);
+        $("#textonombremetodopago").html(data.metodopago.substring(0, 40));
+        $("#claveusocfdi").val(data.claveusocfdi);
+        $("#claveusocfdianterior").val(data.claveusocfdi);
+        $("#usocfdi").val(data.usocfdi);
+        $("#textonombreusocfdi").html(data.usocfdi.substring(0, 40));
+        $("#claveresidenciafiscal").val(data.claveresidenciafiscal);
+        $("#claveresidenciafiscalanterior").val(data.claveresidenciafiscal);
+        $("#residenciafiscal").val(data.residenciafiscal);
+        $("#textonombreresidenciafiscal").html(data.residenciafiscal.substring(0, 40));
+        mostrarformulario();
+      }) 
+  }
+}
+//regresar numero
+function regresarnumerocliente(){
+  var numeroclienteanterior = $("#numeroclienteanterior").val();
+  $("#numerocliente").val(numeroclienteanterior);
+}
+//obtener por numero
+function obteneralmacenpornumero(){
+  if($("#numeroalmacen").parsley().isValid()){
+      var numeroalmacen = $("#numeroalmacen").val();
+      $.get(notas_credito_clientes_obtener_almacen_por_numero, {numeroalmacen:numeroalmacen}, function(data){
+          $("#numeroalmacen").val(data.numero);
+          $("#numeroalmacenanterior").val(data.numero);
+          $("#almacen").val(data.nombre);
+          $("#textonombrealmacen").html(data.nombre.substring(0, 40));
+          mostrarbotonlistarfacturas();
+          mostrarformulario();
+      }) 
+  }
+}
+//regresar numero
+function regresarnumeroalmacen(){
+  var numeroalmacenanterior = $("#numeroalmacenanterior").val();
+  $("#numeroalmacen").val(numeroalmacenanterior);
+}
+//obtener por clave
+function obtenerlugarexpedicionporclave(){
+  if($("#lugarexpedicion").parsley().isValid()){
+      var lugarexpedicion = $("#lugarexpedicion").val();
+      $.get(notas_credito_clientes_obtener_lugar_expedicion_por_clave, {lugarexpedicion:lugarexpedicion}, function(data){
+        $("#lugarexpedicion").val(data.clave);
+        $("#lugarexpedicionanterior").val(data.clave);
+        $("#textonombrelugarexpedicion").html(data.estado.substring(0, 40));
+        mostrarformulario();
+      }) 
+  }
+}
+//regresar clave
+function regresarclavelugarexpedicion(){
+  var lugarexpedicionanterior = $("#lugarexpedicionanterior").val();
+  $("#lugarexpedicion").val(lugarexpedicionanterior);
+}
+//obtener por clave
+function obtenerregimenfiscalporclave(){
+  if($("#claveregimenfiscal").parsley().isValid()){
+      var claveregimenfiscal = $("#claveregimenfiscal").val();
+      $.get(notas_credito_clientes_obtener_regimen_fiscal_por_clave, {claveregimenfiscal:claveregimenfiscal}, function(data){
+        $("#claveregimenfiscal").val(data.clave);
+        $("#claveregimenfiscalanterior").val(data.clave);
+        $("#regimenfiscal").val(data.nombre);
+        $("#textonombreregimenfiscal").html(data.nombre.substring(0, 40));
+        mostrarformulario();
+      }) 
+  }
+}
+//regresar clave
+function regresarclaveregimenfiscal(){
+  var claveregimenfiscalanterior = $("#claveregimenfiscalanterior").val();
+  $("#claveregimenfiscal").val(claveregimenfiscalanterior);
+}
+//obtener por clave
+function obtenertiporelacionporclave(){
+  if($("#clavetiporelacion").parsley().isValid()){
+      var clavetiporelacion = $("#clavetiporelacion").val();
+      $.get(notas_credito_clientes_obtener_tipo_relacion_por_clave, {clavetiporelacion:clavetiporelacion}, function(data){
+        $("#clavetiporelacion").val(data.clave);
+        $("#clavetiporelacionanterior").val(data.clave);  
+        $("#tiporelacion").val(data.nombre);
+        $("#textonombretiporelacion").html(data.nombre.substring(0, 40));
+        mostrarformulario();
+      }) 
+  }
+}
+//regresar clave
+function regresarclavetiporelacion(){
+  var clavetiporelacionanterior = $("#clavetiporelacionanterior").val();
+  $("#clavetiporelacion").val(clavetiporelacionanterior);
+}
+//obtener por clave
+function obtenerformapagoporclave(){
+  if($("#claveformapago").parsley().isValid()){
+      var claveformapago = $("#claveformapago").val();
+      $.get(notas_credito_clientes_obtener_forma_pago_por_clave, {claveformapago:claveformapago}, function(data){
+        $("#claveformapago").val(data.clave);
+        $("#claveformapagoanterior").val(data.clave);
+        $("#formapago").val(data.nombre);
+        $("#textonombreformapago").html(data.nombre.substring(0, 40));
+        mostrarformulario();
+      }) 
+  }
+}
+//regresar clave
+function regresarclaveformapago(){
+  var claveformapagoanterior = $("#claveformapagoanterior").val();
+  $("#claveformapago").val(claveformapagoanterior);
+}
+//obtener por clave
+function obtenermetodopagoporclave(){
+  if($("#clavemetodopago").parsley().isValid()){
+      var clavemetodopago = $("#clavemetodopago").val();
+      $.get(notas_credito_clientes_obtener_metodo_pago_por_clave, {clavemetodopago:clavemetodopago}, function(data){
+        $("#clavemetodopago").val(data.clave);
+        $("#clavemetodopagoanterior").val(data.clave);
+        $("#metodopago").val(data.nombre);
+        $("#textonombremetodopago").html(data.nombre.substring(0, 40));
+        mostrarformulario();
+      }) 
+  }
+}
+//regresar clave
+function regresarclavemetodopago(){
+  var clavemetodopagoanterior = $("#clavemetodopagoanterior").val();
+  $("#clavemetodopago").val(clavemetodopagoanterior);
+}
+//obtener por clave
+function obtenerusocfdiporclave(){
+  if($("#claveusocfdi").parsley().isValid()){
+      var claveusocfdi = $("#claveusocfdi").val();
+      $.get(notas_credito_clientes_obtener_uso_cfdi_por_clave, {claveusocfdi:claveusocfdi}, function(data){
+        $("#claveusocfdi").val(data.clave);
+        $("#claveusocfdianterior").val(data.clave);
+        $("#usocfdi").val(data.nombre);
+        $("#textonombreusocfdi").html(data.nombre.substring(0, 40));
+        mostrarformulario();
+      }) 
+  }
+}
+//regresar clave
+function regresarclaveusocfdi(){
+  var claveusocfdianterior = $("#claveusocfdianterior").val();
+  $("#claveusocfdi").val(claveusocfdianterior);
+}
+//obtener por clave
+function obtenerresidenciafiscalporclave(){
+  if($("#claveresidenciafiscal").parsley().isValid()){
+      var claveresidenciafiscal = $("#claveresidenciafiscal").val();
+      $.get(notas_credito_clientes_obtener_residencia_fiscal_por_clave, {claveresidenciafiscal:claveresidenciafiscal}, function(data){
+        $("#claveresidenciafiscal").val(data.clave);
+        $("#claveresidenciafiscalanterior").val(data.clave);
+        $("#residenciafiscal").val(data.nombre);
+        $("#textonombreresidenciafiscal").html(data.nombre.substring(0, 40));
+        mostrarformulario();
+      }) 
+  }
+}
+//regresar clave
+function regresarclaveresidenciafiscal(){
+  var claveresidenciafiscalanterior = $("#claveresidenciafiscalanterior").val();
+  $("#claveresidenciafiscal").val(claveresidenciafiscalanterior);
+}
 //listar productos para tab consumos
 function listarproductos(){
   var numerofilasfacturas = $("#numerofilasfacturas").val();
@@ -1126,6 +1356,144 @@ function listarproductos(){
     }
   }
 }
+//listar claves productos
+function listarclavesproductos(fila){
+  ocultarformulario();
+  var tablaclavesproducto = '<div class="modal-header bg-red">'+
+                                '<h4 class="modal-title">Claves Productos</h4>'+
+                            '</div>'+
+                            '<div class="modal-body">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-12">'+
+                                        '<div class="table-responsive">'+
+                                            '<table id="tbllistadoclaveproducto" class="tbllistadoclaveproducto table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                                '<thead class="customercolor">'+
+                                                    '<tr>'+
+                                                        '<th>Operaciones</th>'+
+                                                        '<th>Clave</th>'+
+                                                        '<th>Nombre</th>'+
+                                                    '</tr>'+
+                                                '</thead>'+
+                                                '<tbody></tbody>'+
+                                            '</table>'+
+                                        '</div>'+
+                                    '</div>'+  
+                                '</div>'+
+                            '</div>'+
+                            '<div class="modal-footer">'+
+                                '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                            '</div>';   
+  $("#contenidomodaltablas").html(tablaclavesproducto);
+  $('#tbllistadoclaveproducto').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
+      "sScrollX": "110%",
+      "sScrollY": "370px",
+      "bScrollCollapse": true,  
+      processing: true,
+      'language': {
+          'loadingRecords': '&nbsp;',
+          'processing': '<div class="spinner"></div>'
+      },
+      serverSide: true,
+      ajax: {
+          url: notas_credito_clientes_obtener_claves_productos,
+          data: function (d) {
+            d.fila = fila;
+          }
+      },
+      columns: [
+          { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+          { data: 'Clave', name: 'Clave' },
+          { data: 'Nombre', name: 'Nombre' }
+      ],
+      "initComplete": function() {
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistadoclaveproducto').DataTable().search( this.value ).draw();
+              }
+          });
+      },
+      
+  });
+}
+//seleccion de clave producto
+function seleccionarclaveproducto(clave, nombre, fila){
+  $("#filaproducto"+fila+" .claveproductopartida").val(clave);
+  $("#filaproducto"+fila+" .nombreclaveproductopartida").val(nombre);
+  mostrarformulario();
+}
+//listar claves unidades
+function listarclavesunidades(fila){
+  ocultarformulario();
+  var tablaclavesunidades = '<div class="modal-header bg-red">'+
+                                '<h4 class="modal-title">Claves Unidades</h4>'+
+                            '</div>'+
+                            '<div class="modal-body">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-12">'+
+                                        '<div class="table-responsive">'+
+                                            '<table id="tbllistadoclaveunidad" class="tbllistadoclaveunidad table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                                '<thead class="customercolor">'+
+                                                    '<tr>'+
+                                                        '<th>Operaciones</th>'+
+                                                        '<th>Clave</th>'+
+                                                        '<th>Nombre</th>'+
+                                                    '</tr>'+
+                                                '</thead>'+
+                                                '<tbody></tbody>'+
+                                            '</table>'+
+                                        '</div>'+
+                                    '</div>'+  
+                                '</div>'+
+                            '</div>'+
+                            '<div class="modal-footer">'+
+                                '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                            '</div>';   
+  $("#contenidomodaltablas").html(tablaclavesunidades);
+  $('#tbllistadoclaveunidad').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
+      "sScrollX": "110%",
+      "sScrollY": "370px",
+      "bScrollCollapse": true,  
+      processing: true,
+      'language': {
+          'loadingRecords': '&nbsp;',
+          'processing': '<div class="spinner"></div>'
+      },
+      serverSide: true,
+      ajax: {
+          url: notas_credito_clientes_obtener_claves_unidades,
+          data: function (d) {
+            d.fila = fila;
+          }
+      },
+      columns: [
+          { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+          { data: 'Clave', name: 'Clave' },
+          { data: 'Nombre', name: 'Nombre' }
+      ],
+      "initComplete": function() {
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistadoclaveunidad').DataTable().search( this.value ).draw();
+              }
+          });
+      },
+      
+  });
+}
+//seleccion de clave unidad
+function seleccionarclaveunidad(clave, nombre, fila){
+  $("#filaproducto"+fila+" .claveunidadpartida").val(clave);
+  $("#filaproducto"+fila+" .nombreclaveunidadpartida").val(nombre);
+  mostrarformulario();
+}
 //función que evalua si la partida que quieren ingresar ya existe o no en el detalle de la orden de compra
 function evaluarproductoexistente(Codigo){
   var sumaiguales=0;
@@ -1214,9 +1582,27 @@ function agregarfiladppp(){
                 '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
                 '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
                 '<td class="tdmod"><input type="text" class="form-control divorinputmodsm partidapartida" name="partidapartida[]"  value="0" readonly></td>'+
-                '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="84111506" readonly data-parsley-length="[1, 20]"></td>'+
+                '<td class="tdmod">'+
+                  '<div class="row divorinputmodxl">'+
+                    '<div class="col-xs-2 col-sm-2 col-md-2">'+
+                      '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('+contadorfilas+');" ><i class="material-icons">remove_red_eye</i></div>'+
+                    '</div>'+
+                    '<div class="col-xs-10 col-sm-10 col-md-10">'+    
+                      '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="84111506" readonly data-parsley-length="[1, 20]">'+
+                    '</div>'+
+                  '</div>'+
+                '</td>'+
                 '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="Servicios de facturación" readonly></td>'+
-                '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="ACT" readonly data-parsley-length="[1, 5]"></td>'+
+                '<td class="tdmod">'+
+                  '<div class="row divorinputmodxl">'+
+                    '<div class="col-xs-2 col-sm-2 col-md-2">'+
+                      '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('+contadorfilas+');" ><i class="material-icons">remove_red_eye</i></div>'+
+                    '</div>'+
+                    '<div class="col-xs-10 col-sm-10 col-md-10">'+    
+                      '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="ACT" readonly data-parsley-length="[1, 5]">'+
+                    '</div>'+
+                  '</div>'+
+                '</td>'+
                 '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="Actividad" readonly></td>'+
               '</tr>';
     contadorproductos++;
@@ -1276,9 +1662,27 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'+number_format(round(total, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
                     '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'+Costo+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm partidapartida" name="partidapartida[]" value="0"></td>'+
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'+ClaveProducto+'" readonly data-parsley-length="[1, 20]"></td>'+
+                    '<td class="tdmod">'+
+                      '<div class="row divorinputmodxl">'+
+                        '<div class="col-xs-2 col-sm-2 col-md-2">'+
+                          '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('+contadorfilas+');" ><i class="material-icons">remove_red_eye</i></div>'+
+                        '</div>'+
+                        '<div class="col-xs-10 col-sm-10 col-md-10">'+    
+                          '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'+ClaveProducto+'" readonly data-parsley-length="[1, 20]">'+
+                        '</div>'+
+                      '</div>'+
+                    '</td>'+
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'+NombreClaveProducto+'" readonly></td>'+
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'+ClaveUnidad+'" readonly data-parsley-length="[1, 5]"></td>'+
+                    '<td class="tdmod">'+
+                      '<div class="row divorinputmodxl">'+
+                        '<div class="col-xs-2 col-sm-2 col-md-2">'+
+                          '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('+contadorfilas+');" ><i class="material-icons">remove_red_eye</i></div>'+
+                        '</div>'+
+                        '<div class="col-xs-10 col-sm-10 col-md-10">'+    
+                          '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'+ClaveUnidad+'" readonly data-parsley-length="[1, 5]">'+
+                        '</div>'+
+                      '</div>'+
+                    '</td>'+
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'+NombreClaveUnidad+'" readonly></td>'+
                   '</tr>';
         contadorproductos++;
@@ -1333,7 +1737,7 @@ function alta(){
                                         '<input type="hidden" class="form-control" name="esquema" id="esquema" value="'+esquema+'" readonly data-parsley-length="[1, 10]">'+
                                     '</div>'+  
                                     '<div class="col-md-3">'+
-                                        '<label>Cliente</label>'+
+                                        '<label>Cliente <span class="label label-danger" id="textonombrecliente"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td>'+
@@ -1341,8 +1745,9 @@ function alta(){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="numerocliente" id="numerocliente" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="cliente" id="cliente" required readonly>'+
+                                                        '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required data-parsley-type="integer">'+
+                                                        '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
+                                                        '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
                                                         '<input type="hidden" class="form-control" name="rfccliente" id="rfccliente" required readonly>'+
                                                     '</div>'+
                                                 '</td>'+    
@@ -1350,7 +1755,7 @@ function alta(){
                                         '</table>'+
                                     '</div>'+ 
                                     '<div class="col-md-3">'+
-                                        '<label>Almacen</label>'+
+                                        '<label>Almacen <span class="label label-danger" id="textonombrealmacen"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td>'+
@@ -1358,8 +1763,9 @@ function alta(){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="numeroalmacen" id="numeroalmacen" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="almacen" id="almacen" required readonly>'+
+                                                        '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer">'+
+                                                        '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior"  required data-parsley-type="integer">'+
+                                                        '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
                                                     '</div>'+
                                                 '</td>'+
                                             '</tr>'+    
@@ -1418,7 +1824,7 @@ function alta(){
                                 '</div>'+
                                 '<div class="row">'+
                                   '<div class="col-md-4">'+
-                                      '<label>Lugar Expedición</label>'+
+                                      '<label>Lugar Expedición <span class="label label-danger" id="textonombrelugarexpedicion"></span></label>'+
                                       '<table class="col-md-12">'+
                                           '<tr>'+
                                               '<td>'+
@@ -1426,14 +1832,15 @@ function alta(){
                                               '</td>'+
                                               '<td>'+
                                                   '<div class="form-line">'+
-                                                      '<input type="text" class="form-control" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" required readonly>'+
+                                                      '<input type="text" class="form-control" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" required>'+
+                                                      '<input type="hidden" class="form-control" name="lugarexpedicionanterior" id="lugarexpedicionanterior" value="'+lugarexpedicion+'" required>'+
                                                   '</div>'+
                                               '</td>'+
                                           '</tr>'+    
                                       '</table>'+
                                   '</div>'+
                                   '<div class="col-md-4">'+
-                                      '<label>Régimen Fiscal</label>'+
+                                      '<label>Régimen Fiscal <span class="label label-danger" id="textonombreregimenfiscal">'+regimenfiscal+'</span></label>'+
                                       '<table class="col-md-12">'+
                                           '<tr>'+
                                               '<td>'+
@@ -1441,15 +1848,16 @@ function alta(){
                                               '</td>'+
                                               '<td>'+
                                                   '<div class="form-line">'+
-                                                      '<input type="hidden" class="form-control" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" required readonly onkeyup="tipoLetra(this)">'+
-                                                      '<input type="text" class="form-control" name="regimenfiscal" id="regimenfiscal" value="'+regimenfiscal+'" required readonly>'+
+                                                      '<input type="text" class="form-control" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" required onkeyup="tipoLetra(this)">'+
+                                                      '<input type="hidden" class="form-control" name="claveregimenfiscalanterior" id="claveregimenfiscalanterior" value="'+claveregimenfiscal+'" required>'+
+                                                      '<input type="hidden" class="form-control" name="regimenfiscal" id="regimenfiscal" value="'+regimenfiscal+'" required readonly>'+
                                                   '</div>'+
                                               '</td>'+
                                           '</tr>'+    
                                       '</table>'+
                                   '</div>'+
                                   '<div class="col-md-4">'+
-                                      '<label>Tipo Relación</label>'+
+                                      '<label>Tipo Relación <span class="label label-danger" id="textonombretiporelacion"></span></label>'+
                                       '<table class="col-md-12">'+
                                           '<tr>'+
                                               '<td>'+
@@ -1457,8 +1865,9 @@ function alta(){
                                               '</td>'+
                                               '<td>'+
                                                   '<div class="form-line">'+
-                                                      '<input type="hidden" class="form-control" name="clavetiporelacion" id="clavetiporelacion" readonly onkeyup="tipoLetra(this)">'+
-                                                      '<input type="text" class="form-control" name="tiporelacion" id="tiporelacion" readonly>'+
+                                                      '<input type="text" class="form-control" name="clavetiporelacion" id="clavetiporelacion" onkeyup="tipoLetra(this)">'+
+                                                      '<input type="hidden" class="form-control" name="clavetiporelacionanterior" id="clavetiporelacionanterior" onkeyup="tipoLetra(this)">'+
+                                                      '<input type="hidden" class="form-control" name="tiporelacion" id="tiporelacion" readonly>'+
                                                   '</div>'+
                                               '</td>'+
                                           '</tr>'+    
@@ -1477,7 +1886,7 @@ function alta(){
                                         '<input type="text" class="form-control" name="receptornombre" id="receptornombre"  required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
-                                        '<label>Forma de Pago</label>'+
+                                        '<label>Forma de Pago  <span class="label label-danger" id="textonombreformapago"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td>'+
@@ -1485,15 +1894,16 @@ function alta(){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="claveformapago" id="claveformapago" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="formapago" id="formapago" required readonly>'+
+                                                        '<input type="text" class="form-control" name="claveformapago" id="claveformapago" required onkeyup="tipoLetra(this)">'+
+                                                        '<input type="hidden" class="form-control" name="claveformapagoanterior" id="claveformapagoanterior" required readonly onkeyup="tipoLetra(this)">'+
+                                                        '<input type="hidden" class="form-control" name="formapago" id="formapago" required readonly>'+
                                                     '</div>'+
                                                 '</td>'+
                                             '</tr>'+    
                                         '</table>'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
-                                        '<label>Método de Pago</label>'+
+                                        '<label>Método de Pago <span class="label label-danger" id="textonombremetodopago"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td>'+
@@ -1501,8 +1911,9 @@ function alta(){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="clavemetodopago" id="clavemetodopago" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="metodopago" id="metodopago" required readonly>'+
+                                                        '<input type="text" class="form-control" name="clavemetodopago" id="clavemetodopago" required onkeyup="tipoLetra(this)">'+
+                                                        '<input type="hidden" class="form-control" name="clavemetodopagoanterior" id="clavemetodopagoanterior" required readonly onkeyup="tipoLetra(this)">'+
+                                                        '<input type="hidden" class="form-control" name="metodopago" id="metodopago" required readonly>'+
                                                     '</div>'+
                                                 '</td>'+
                                             '</tr>'+    
@@ -1513,7 +1924,7 @@ function alta(){
                                         '<input type="text" class="form-control" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required readonly data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
-                                        '<label>Uso CFDI</label>'+
+                                        '<label>Uso CFDI <span class="label label-danger" id="textonombreusocfdi"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td>'+
@@ -1521,15 +1932,16 @@ function alta(){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="claveusocfdi" id="claveusocfdi" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="usocfdi" id="usocfdi" required readonly>'+
+                                                        '<input type="text" class="form-control" name="claveusocfdi" id="claveusocfdi" required onkeyup="tipoLetra(this)">'+
+                                                        '<input type="hidden" class="form-control" name="claveusocfdianterior" id="claveusocfdianterior" required readonly onkeyup="tipoLetra(this)">'+
+                                                        '<input type="hidden" class="form-control" name="usocfdi" id="usocfdi" required readonly>'+
                                                     '</div>'+
                                                 '</td>'+
                                             '</tr>'+    
                                         '</table>'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
-                                        '<label>Residencial Fiscal</label>'+
+                                        '<label>Residencial Fiscal <span class="label label-danger" id="textonombreresidenciafiscal"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td>'+
@@ -1537,8 +1949,9 @@ function alta(){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="claveresidenciafiscal" id="claveresidenciafiscal" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="residenciafiscal" id="residenciafiscal" required readonly>'+
+                                                        '<input type="text" class="form-control" name="claveresidenciafiscal" id="claveresidenciafiscal" required onkeyup="tipoLetra(this)">'+
+                                                        '<input type="hidden" class="form-control" name="claveresidenciafiscalanterior" id="claveresidenciafiscalanterior" required readonly onkeyup="tipoLetra(this)">'+
+                                                        '<input type="hidden" class="form-control" name="residenciafiscal" id="residenciafiscal" required readonly>'+
                                                     '</div>'+
                                                 '</td>'+
                                             '</tr>'+    
@@ -1594,9 +2007,9 @@ function alta(){
                                                   '<th class="customercolor" hidden>Retención Ieps $</th>'+
                                                   '<th class="customercolor">Total $</th>'+
                                                   '<th class="customercolortheadth">Partida</th>'+
-                                                  '<th class="customercolor">ClaveProducto</th>'+
+                                                  '<th class="customercolortheadth">ClaveProducto</th>'+
                                                   '<th class="customercolor">Nombre ClaveProducto</th>'+
-                                                  '<th class="customercolor">ClaveUnidad</th>'+
+                                                  '<th class="customercolortheadth">ClaveUnidad</th>'+
                                                   '<th class="customercolor">Nombre ClaveUnidad</th>'+
                                                 '</tr>'+
                                             '</thead>'+
@@ -1703,6 +2116,114 @@ function alta(){
     if(code==13){
       listarproductos();
     }
+  });
+  //activar busqueda para clientes
+  $('#numerocliente').on('keypress', function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+    obtenerclientepornumero();
+    }
+  });
+  //regresar numero cliente
+  $('#numerocliente').on('change', function(e) {
+    regresarnumerocliente();
+  });
+  //activar busqueda para almacenes
+  $('#numeroalmacen').on('keypress', function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+    obteneralmacenpornumero();
+    }
+  });
+  //regresar numero almacen
+  $('#numeroalmacen').on('change', function(e) {
+    regresarnumeroalmacen();
+  });
+  //activar busqueda para lugar expedicion
+  $('#lugarexpedicion').on('keypress', function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+    obtenerlugarexpedicionporclave();
+    }
+  });
+  //regresar clave
+  $('#lugarexpedicion').on('change', function(e) {
+    regresarclavelugarexpedicion();
+  });
+  //activar busqueda para regimen fiscal
+  $('#claveregimenfiscal').on('keypress', function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+    obtenerregimenfiscalporclave();
+    }
+  });
+  //regresar clave
+  $('#claveregimenfiscal').on('change', function(e) {
+    regresarclaveregimenfiscal();
+  });
+  //activar busqueda para tipo relacion
+  $('#clavetiporelacion').on('keypress', function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      obtenertiporelacionporclave();
+    }
+  });
+  //regresar clave
+  $('#clavetiporelacion').on('change', function(e) {
+    regresarclavetiporelacion();
+  });
+  //activar busqueda para forma pago
+  $('#claveformapago').on('keypress', function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+    obtenerformapagoporclave();
+    }
+  });
+  //regresar clave
+  $('#claveformapago').on('change', function(e) {
+    regresarclaveformapago();
+  });
+  //activar busqueda para metodo pago
+  $('#clavemetodopago').on('keypress', function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+    obtenermetodopagoporclave();
+    }
+  });
+  //regresar clave
+  $('#clavemetodopago').on('change', function(e) {
+    regresarclavemetodopago();
+  });
+  //activar busqueda para uso cfdi
+  $('#claveusocfdi').on('keypress', function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+    obtenerusocfdiporclave();
+    }
+  });
+  //regresar clave
+  $('#claveusocfdi').on('change', function(e) {
+    regresarclaveusocfdi();
+  });
+  //activar busqueda para residencia fiscal
+  $('#claveresidenciafiscal').on('keypress', function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+    obtenerresidenciafiscalporclave();
+    }
+  });
+  //regresar clave
+  $('#claveresidenciafiscal').on('change', function(e) {
+    regresarclaveresidenciafiscal();
   });
   $("#ModalAlta").modal('show');
 }
@@ -1965,14 +2486,14 @@ function comprobarcantidadnotavscantidadfactura(almacen, codigopartida, folio, s
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
   e.preventDefault();
-  var numerofilas = $("#numerofilas").val();
-  var numerofilasfacturas = $("#numerofilasfacturas").val();
-  if(parseInt(numerofilas) > 0 && parseInt(numerofilasfacturas) > 0){
-    var diferencia = $("#diferencia").val();
-    if(parseFloat(diferencia) <= parseFloat(0.01)){
-      var formData = new FormData($("#formparsley")[0]);
-      var form = $("#formparsley");
-      if (form.parsley().isValid()){
+  var formData = new FormData($("#formparsley")[0]);
+  var form = $("#formparsley");
+  if (form.parsley().isValid()){
+    var numerofilas = $("#numerofilas").val();
+    var numerofilasfacturas = $("#numerofilasfacturas").val();
+    if(parseInt(numerofilas) > 0 && parseInt(numerofilasfacturas) > 0){
+      var diferencia = $("#diferencia").val();
+      if(parseFloat(diferencia) <= parseFloat(0.01)){
         $('.page-loader-wrapper').css('display', 'block');
         $.ajax({
           headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
@@ -2000,14 +2521,16 @@ $("#btnGuardar").on('click', function (e) {
           }
         })
       }else{
-        form.parsley().validate();
+        msj_errorendiferenciatotalnotatotaldescuentos();
       }
     }else{
-      msj_errorendiferenciatotalnotatotaldescuentos();
+      msj_erroralmenosunapartidaagregada();
     }
   }else{
-    msj_erroralmenosunapartidaagregada();
+    msjfaltandatosporcapturar();
   }
+  //validar formulario
+  form.parsley().validate();
 });
 //modificacion compra
 function obtenerdatos(notamodificar){
@@ -2045,7 +2568,7 @@ function obtenerdatos(notamodificar){
                                         '<input type="hidden" class="form-control" name="esquema" id="esquema" value="'+esquema+'" readonly data-parsley-length="[1, 10]">'+
                                     '</div>'+  
                                     '<div class="col-md-3">'+
-                                        '<label>Cliente</label>'+
+                                        '<label>Cliente <span class="label label-danger" id="textonombrecliente"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td>'+
@@ -2053,8 +2576,9 @@ function obtenerdatos(notamodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="numerocliente" id="numerocliente" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="cliente" id="cliente" required readonly>'+
+                                                        '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required readonly data-parsley-type="integer">'+
+                                                        '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
+                                                        '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
                                                         '<input type="hidden" class="form-control" name="rfccliente" id="rfccliente" required readonly>'+
                                                     '</div>'+
                                                 '</td>'+    
@@ -2062,7 +2586,7 @@ function obtenerdatos(notamodificar){
                                         '</table>'+
                                     '</div>'+ 
                                     '<div class="col-md-3">'+
-                                        '<label>Almacen</label>'+
+                                        '<label>Almacen <span class="label label-danger" id="textonombrealmacen"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td>'+
@@ -2070,8 +2594,9 @@ function obtenerdatos(notamodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="numeroalmacen" id="numeroalmacen" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="almacen" id="almacen" required readonly>'+
+                                                        '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required readonly onkeyup="tipoLetra(this)">'+
+                                                        '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior"  required data-parsley-type="integer">'+
+                                                        '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
                                                     '</div>'+
                                                 '</td>'+
                                             '</tr>'+    
@@ -2130,7 +2655,7 @@ function obtenerdatos(notamodificar){
                                 '</div>'+
                                 '<div class="row">'+
                                   '<div class="col-md-4">'+
-                                      '<label>Lugar Expedición</label>'+
+                                      '<label>Lugar Expedición <span class="label label-danger" id="textonombrelugarexpedicion"></span></label>'+
                                       '<table class="col-md-12">'+
                                           '<tr>'+
                                               '<td>'+
@@ -2138,14 +2663,15 @@ function obtenerdatos(notamodificar){
                                               '</td>'+
                                               '<td>'+
                                                   '<div class="form-line">'+
-                                                      '<input type="text" class="form-control" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" required readonly>'+
+                                                      '<input type="text" class="form-control" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" required>'+
+                                                      '<input type="hidden" class="form-control" name="lugarexpedicionanterior" id="lugarexpedicionanterior" value="'+lugarexpedicion+'" required>'+
                                                   '</div>'+
                                               '</td>'+
                                           '</tr>'+    
                                       '</table>'+
                                   '</div>'+
                                   '<div class="col-md-4">'+
-                                      '<label>Régimen Fiscal</label>'+
+                                      '<label>Régimen Fiscal <span class="label label-danger" id="textonombreregimenfiscal">'+regimenfiscal+'</span></label>'+
                                       '<table class="col-md-12">'+
                                           '<tr>'+
                                               '<td>'+
@@ -2153,15 +2679,16 @@ function obtenerdatos(notamodificar){
                                               '</td>'+
                                               '<td>'+
                                                   '<div class="form-line">'+
-                                                      '<input type="hidden" class="form-control" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" required readonly onkeyup="tipoLetra(this)">'+
-                                                      '<input type="text" class="form-control" name="regimenfiscal" id="regimenfiscal" value="'+regimenfiscal+'" required readonly>'+
+                                                      '<input type="text" class="form-control" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" required onkeyup="tipoLetra(this)">'+
+                                                      '<input type="hidden" class="form-control" name="claveregimenfiscalanterior" id="claveregimenfiscalanterior" value="'+claveregimenfiscal+'" required readonly onkeyup="tipoLetra(this)">'+
+                                                      '<input type="hidden" class="form-control" name="regimenfiscal" id="regimenfiscal" value="'+regimenfiscal+'" required readonly>'+
                                                   '</div>'+
                                               '</td>'+
                                           '</tr>'+    
                                       '</table>'+
                                   '</div>'+
                                   '<div class="col-md-4">'+
-                                      '<label>Tipo Relación</label>'+
+                                      '<label>Tipo Relación  <span class="label label-danger" id="textonombretiporelacion"></span></label>'+
                                       '<table class="col-md-12">'+
                                           '<tr>'+
                                               '<td>'+
@@ -2169,8 +2696,9 @@ function obtenerdatos(notamodificar){
                                               '</td>'+
                                               '<td>'+
                                                   '<div class="form-line">'+
-                                                      '<input type="hidden" class="form-control" name="clavetiporelacion" id="clavetiporelacion"  readonly onkeyup="tipoLetra(this)">'+
-                                                      '<input type="text" class="form-control" name="tiporelacion" id="tiporelacion" readonly>'+
+                                                      '<input type="text" class="form-control" name="clavetiporelacion" id="clavetiporelacion"  onkeyup="tipoLetra(this)">'+
+                                                      '<input type="hidden" class="form-control" name="clavetiporelacionanterior" id="clavetiporelacionanterior"  readonly onkeyup="tipoLetra(this)">'+
+                                                      '<input type="hidden" class="form-control" name="tiporelacion" id="tiporelacion" readonly>'+
                                                   '</div>'+
                                               '</td>'+
                                           '</tr>'+    
@@ -2189,7 +2717,7 @@ function obtenerdatos(notamodificar){
                                         '<input type="text" class="form-control" name="receptornombre" id="receptornombre"  required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
-                                        '<label>Forma de Pago</label>'+
+                                        '<label>Forma de Pago <span class="label label-danger" id="textonombreformapago"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td>'+
@@ -2197,15 +2725,16 @@ function obtenerdatos(notamodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="claveformapago" id="claveformapago" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="formapago" id="formapago" required readonly>'+
+                                                        '<input type="text" class="form-control" name="claveformapago" id="claveformapago" required onkeyup="tipoLetra(this)">'+
+                                                        '<input type="hidden" class="form-control" name="claveformapagoanterior" id="claveformapagoanterior" required readonly onkeyup="tipoLetra(this)">'+
+                                                        '<input type="hidden" class="form-control" name="formapago" id="formapago" required readonly>'+
                                                     '</div>'+
                                                 '</td>'+
                                             '</tr>'+    
                                         '</table>'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
-                                        '<label>Método de Pago</label>'+
+                                        '<label>Método de Pago <span class="label label-danger" id="textonombremetodopago"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td>'+
@@ -2213,8 +2742,9 @@ function obtenerdatos(notamodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="clavemetodopago" id="clavemetodopago" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="metodopago" id="metodopago" required readonly>'+
+                                                        '<input type="text" class="form-control" name="clavemetodopago" id="clavemetodopago" required onkeyup="tipoLetra(this)">'+
+                                                        '<input type="hidden" class="form-control" name="clavemetodopagoanterior" id="clavemetodopagoanterior" required readonly onkeyup="tipoLetra(this)">'+
+                                                        '<input type="hidden" class="form-control" name="metodopago" id="metodopago" required readonly>'+
                                                     '</div>'+
                                                 '</td>'+
                                             '</tr>'+    
@@ -2225,7 +2755,7 @@ function obtenerdatos(notamodificar){
                                         '<input type="text" class="form-control" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required readonly data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
-                                        '<label>Uso CFDI</label>'+
+                                        '<label>Uso CFDI  <span class="label label-danger" id="textonombreusocfdi"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td>'+
@@ -2233,15 +2763,16 @@ function obtenerdatos(notamodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="claveusocfdi" id="claveusocfdi" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="usocfdi" id="usocfdi" required readonly>'+
+                                                        '<input type="text" class="form-control" name="claveusocfdi" id="claveusocfdi" required onkeyup="tipoLetra(this)">'+
+                                                        '<input type="hidden" class="form-control" name="claveusocfdianterior" id="claveusocfdianterior" required readonly onkeyup="tipoLetra(this)">'+
+                                                        '<input type="hidden" class="form-control" name="usocfdi" id="usocfdi" required readonly>'+
                                                     '</div>'+
                                                 '</td>'+
                                             '</tr>'+    
                                         '</table>'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
-                                        '<label>Residencial Fiscal</label>'+
+                                        '<label>Residencial Fiscal <span class="label label-danger" id="textonombreresidenciafiscal"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td>'+
@@ -2249,8 +2780,9 @@ function obtenerdatos(notamodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="claveresidenciafiscal" id="claveresidenciafiscal" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="residenciafiscal" id="residenciafiscal" required readonly>'+
+                                                        '<input type="text" class="form-control" name="claveresidenciafiscal" id="claveresidenciafiscal" required onkeyup="tipoLetra(this)">'+
+                                                        '<input type="hidden" class="form-control" name="claveresidenciafiscalanterior" id="claveresidenciafiscalanterior" required readonly onkeyup="tipoLetra(this)">'+
+                                                        '<input type="hidden" class="form-control" name="residenciafiscal" id="residenciafiscal" required readonly>'+
                                                     '</div>'+
                                                 '</td>'+
                                             '</tr>'+    
@@ -2306,9 +2838,9 @@ function obtenerdatos(notamodificar){
                                                   '<th class="customercolor" hidden>Retención Ieps $</th>'+
                                                   '<th class="customercolor">Total $</th>'+
                                                   '<th class="customercolortheadth">Partida</th>'+
-                                                  '<th class="customercolor">ClaveProducto</th>'+
+                                                  '<th class="customercolortheadth">ClaveProducto</th>'+
                                                   '<th class="customercolor">Nombre ClaveProducto</th>'+
-                                                  '<th class="customercolor">ClaveUnidad</th>'+
+                                                  '<th class="customercolortheadth">ClaveUnidad</th>'+
                                                   '<th class="customercolor">Nombre ClaveUnidad</th>'+
                                                 '</tr>'+
                                             '</thead>'+
@@ -2412,15 +2944,21 @@ function obtenerdatos(notamodificar){
     $("#numerofilasfacturas").val(data.numerodocumentosnotacliente);
     $("#tipodetalles").val(data.tipodetalles);
     $("#fecha").val(data.fecha);
-    $("#cliente").val(data.cliente.Nombre)
+    $("#cliente").val(data.cliente.Nombre);
+    $("#textonombrecliente").html(data.cliente.Nombre.substring(0, 40));
     $("#numerocliente").val(data.cliente.Numero);
+    $("#numeroclienteanterior").val(data.cliente.Numero);
     $("#rfccliente").val(data.cliente.Rfc);
     if(parseInt(data.almacen) == parseInt(0)){
       $("#almacen").val(0);
+      $("#textonombrealmacen").html("");
       $("#numeroalmacen").val(0);
+      $("#numeroalmacenanterior").val(0);
     }else{
       $("#almacen").val(data.almacen.Nombre);
+      $("#textonombrealmacen").html(data.almacen.Nombre.substring(0, 40));
       $("#numeroalmacen").val(data.almacen.Numero);
+      $("#numeroalmacenanterior").val(data.almacen.Numero);
     }
     $("#moneda").val(data.notacliente.Moneda).change();
     $("#pesosmoneda").val(data.tipocambio);
@@ -2429,21 +2967,34 @@ function obtenerdatos(notamodificar){
     $("#emisornombre").val(data.notacliente.EmisorNombre);
     $("#confirmacion").val(data.notacliente.Confirmacion);
     $("#lugarexpedicion").val(data.notacliente.LugarExpedicion);
+    $("#lugarexpedicionanterior").val(data.notacliente.LugarExpedicion);
     $("#regimenfiscal").val(data.regimenfiscal.Nombre);
+    $("#textonombreregimenfiscal").html(data.regimenfiscal.Nombre.substring(0, 40));
     $("#claveregimenfiscal").val(data.regimenfiscal.Clave);
+    $("#claveregimenfiscalanterior").val(data.regimenfiscal.Clave);
     $("#tiporelacion").val(data.tiporelacion.Nombre);
+    $("#textonombretiporelacion").html(data.tiporelacion.Nombre.substring(0, 40));
     $("#clavetiporelacion").val(data.tiporelacion.Clave);
+    $("#clavetiporelacionanterior").val(data.tiporelacion.Clave);
     $("#receptorrfc").val(data.notacliente.ReceptorRfc);
     $("#receptornombre").val(data.notacliente.ReceptorNombre);
     $("#formapago").val(data.formapago.Nombre);
+    $("#textonombreformapago").html(data.formapago.Nombre.substring(0, 40));
     $("#claveformapago").val(data.formapago.Clave);
+    $("#claveformapagoanterior").val(data.formapago.Clave);
     $("#metodopago").val(data.metodopago.Nombre);
+    $("#textonombremetodopago").html(data.metodopago.Nombre.substring(0, 40));
     $("#clavemetodopago").val(data.metodopago.Clave);
+    $("#clavemetodopagoanterior").val(data.metodopago.Clave);
     $("#condicionesdepago").val(data.notacliente.CondicionesDePago);
     $("#usocfdi").val(data.usocfdi.Nombre);
+    $("#textonombreusocfdi").html(data.usocfdi.Nombre.substring(0, 40));
     $("#claveusocfdi").val(data.usocfdi.Clave);
+    $("#claveusocfdianterior").val(data.usocfdi.Clave);
     $("#residenciafiscal").val(data.residenciafiscal.Nombre);
+    $("#textonombreresidenciafiscal").html(data.residenciafiscal.Nombre.substring(0, 40));
     $("#claveresidenciafiscal").val(data.residenciafiscal.Clave);
+    $("#claveresidenciafiscalanterior").val(data.residenciafiscal.Clave);
     $("#numeroregidtrib").val(data.notacliente.NumRegIdTrib);
     //cargar todos los detalles
     $("#tabladetallesnotacliente tbody").html(data.filasdetallesnotacliente);
@@ -2483,6 +3034,114 @@ function obtenerdatos(notamodificar){
         listarproductos();
       }
     });
+    //activar busqueda para clientes
+    $('#numerocliente').on('keypress', function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+      obtenerclientepornumero();
+      }
+    });
+    //regresar numero cliente
+    $('#numerocliente').on('change', function(e) {
+      regresarnumerocliente();
+    });
+    //activar busqueda para almacenes
+    $('#numeroalmacen').on('keypress', function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+      obteneralmacenpornumero();
+      }
+    });
+    //regresar numero almacen
+    $('#numeroalmacen').on('change', function(e) {
+      regresarnumeroalmacen();
+    });
+    //activar busqueda para lugar expedicion
+    $('#lugarexpedicion').on('keypress', function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+      obtenerlugarexpedicionporclave();
+      }
+    });
+    //regresar clave
+    $('#lugarexpedicion').on('change', function(e) {
+      regresarclavelugarexpedicion();
+    });
+    //activar busqueda para regimen fiscal
+    $('#claveregimenfiscal').on('keypress', function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+      obtenerregimenfiscalporclave();
+      }
+    });
+    //regresar clave
+    $('#claveregimenfiscal').on('change', function(e) {
+      regresarclaveregimenfiscal();
+    });
+    //activar busqueda para tipo relacion
+    $('#clavetiporelacion').on('keypress', function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        obtenertiporelacionporclave();
+      }
+    });
+    //regresar clave
+    $('#clavetiporelacion').on('change', function(e) {
+      regresarclavetiporelacion();
+    });
+    //activar busqueda para forma pago
+    $('#claveformapago').on('keypress', function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+      obtenerformapagoporclave();
+      }
+    });
+    //regresar clave
+    $('#claveformapago').on('change', function(e) {
+      regresarclaveformapago();
+    });
+    //activar busqueda para metodo pago
+    $('#clavemetodopago').on('keypress', function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+      obtenermetodopagoporclave();
+      }
+    });
+    //regresar clave
+    $('#clavemetodopago').on('change', function(e) {
+      regresarclavemetodopago();
+    });
+    //activar busqueda para uso cfdi
+    $('#claveusocfdi').on('keypress', function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+      obtenerusocfdiporclave();
+      }
+    });
+    //regresar clave
+    $('#claveusocfdi').on('change', function(e) {
+      regresarclaveusocfdi();
+    });
+    //activar busqueda para residencia fiscal
+    $('#claveresidenciafiscal').on('keypress', function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+      obtenerresidenciafiscalporclave();
+      }
+    });
+    //regresar clave
+    $('#claveresidenciafiscal').on('change', function(e) {
+      regresarclaveresidenciafiscal();
+    });
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {
@@ -2493,49 +3152,51 @@ function obtenerdatos(notamodificar){
 //guardar modificación
 $("#btnGuardarModificacion").on('click', function (e) {
   e.preventDefault();
-  var numerofilas = $("#numerofilas").val();
-  var numerofilasfacturas = $("#numerofilasfacturas").val();
-  if(parseInt(numerofilas) > 0 && parseInt(numerofilasfacturas) > 0){
-    var diferencia = $("#diferencia").val();
-    if(parseFloat(diferencia) <= parseFloat(0.01)){
-          var formData = new FormData($("#formparsley")[0]);
-          var form = $("#formparsley");
-          if (form.parsley().isValid()){
-            $('.page-loader-wrapper').css('display', 'block');
-            $.ajax({
-              headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-              url:notas_credito_clientes_guardar_modificacion,
-              type: "post",
-              dataType: "html",
-              data: formData,
-              cache: false,
-              contentType: false,
-              processData: false,
-              success:function(data){
-                  msj_datosguardadoscorrectamente();
-                  limpiar();
-                  ocultarmodalformulario();
-                  limpiarmodales();
-                  $('.page-loader-wrapper').css('display', 'none');
-              },
-              error:function(data){
-                if(data.status == 403){
-                  msj_errorenpermisos();
-                }else{
-                  msj_errorajax();
-                }
-                $('.page-loader-wrapper').css('display', 'none');
-              }
-            })
-          }else{
-            form.parsley().validate();
+  var formData = new FormData($("#formparsley")[0]);
+  var form = $("#formparsley");
+  if (form.parsley().isValid()){
+    var numerofilas = $("#numerofilas").val();
+    var numerofilasfacturas = $("#numerofilasfacturas").val();
+    if(parseInt(numerofilas) > 0 && parseInt(numerofilasfacturas) > 0){
+      var diferencia = $("#diferencia").val();
+      if(parseFloat(diferencia) <= parseFloat(0.01)){
+        $('.page-loader-wrapper').css('display', 'block');
+        $.ajax({
+          headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+          url:notas_credito_clientes_guardar_modificacion,
+          type: "post",
+          dataType: "html",
+          data: formData,
+          cache: false,
+          contentType: false,
+          processData: false,
+          success:function(data){
+            msj_datosguardadoscorrectamente();
+            limpiar();
+            ocultarmodalformulario();
+            limpiarmodales();
+            $('.page-loader-wrapper').css('display', 'none');
+          },
+          error:function(data){
+            if(data.status == 403){
+              msj_errorenpermisos();
+            }else{
+              msj_errorajax();
+            }
+            $('.page-loader-wrapper').css('display', 'none');
           }
+        })
+      }else{
+        msj_errorendiferenciatotalnotatotaldescuentos();
+      }
     }else{
-      msj_errorendiferenciatotalnotatotaldescuentos();
+      msj_erroralmenosunapartidaagregada();
     }
   }else{
-    msj_erroralmenosunapartidaagregada();
+    msjfaltandatosporcapturar();
   }
+  //validar formulario
+  form.parsley().validate();
 });
 //verificar si hay existencias suficientes en los almacenes para dar de baja nota de credito
 function desactivar(notadesactivar){

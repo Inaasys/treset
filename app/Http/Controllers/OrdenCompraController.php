@@ -124,11 +124,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($tipooperacion, $numeroalmacen){
-                        if($data->Almacen == $numeroalmacen){
-                            $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.$tipooperacion.'\')">Seleccionar</div>';
-                        }else{
-                            $boton = '';
-                        }
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.$tipooperacion.'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->addColumn('Existencias', function($data){ 
@@ -143,6 +139,42 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
+    }
+    //obtener proveedor por numero
+    public function ordenes_compra_obtener_proveedor_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $plazo = '';
+        $existeproveedor = Proveedor::where('Numero', $request->numeroproveedor)->where('Status', 'ALTA')->count();
+        if($existeproveedor > 0){
+            $proveedor = Proveedor::where('Numero', $request->numeroproveedor)->where('Status', 'ALTA')->first();
+            $numero = $proveedor->Numero;
+            $nombre = $proveedor->Nombre;
+            $plazo = $proveedor->Plazo;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre,
+            'plazo' => $plazo
+        );
+        return response()->json($data);
+    }
+    //obtener almacen por numero
+    public function ordenes_compra_obtener_almacen_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $plazo = '';
+        $existealmacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->count();
+        if($existealmacen > 0){
+            $almacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->first();
+            $numero = $almacen->Numero;
+            $nombre = $almacen->Nombre;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre,
+        );
+        return response()->json($data); 
     }
     //guardar en el módulo
     public function ordenes_compra_guardar(Request $request){
@@ -168,9 +200,8 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         $OrdenCompra->Total=$request->total;
         $OrdenCompra->Obs=$request->observaciones;
         $OrdenCompra->Status="POR SURTIR";
-        //$OrdenCompra->Equipo=$request->equipo;
         $OrdenCompra->Usuario=Auth::user()->user;
-        $OrdenCompra->Periodo=$request->periodohoy;
+        $OrdenCompra->Periodo=$this->periodohoy;
         $OrdenCompra->save();
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
@@ -180,8 +211,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
         $BitacoraDocumento->Status = "POR SURTIR";
         $BitacoraDocumento->Usuario = Auth::user()->user;
-        //$BitacoraDocumento->Equipo = $request->equipo;
-        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
         $item = 1;
@@ -444,7 +474,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
         $BitacoraDocumento->Status = $OrdenCompra->Status;
         $BitacoraDocumento->Usuario = Auth::user()->user;
-        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
         $detallesporsurtir = 0;

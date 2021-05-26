@@ -163,7 +163,7 @@ class CotizacionController extends ConfiguracionSistemaController{
         $Cotizacion->ot_tyt=$request->ottyt;
         $Cotizacion->status="ALTA";
         $Cotizacion->usuario=Auth::user()->user;
-        $Cotizacion->periodo=$request->periodohoy;
+        $Cotizacion->periodo=$this->periodohoy;
         $Cotizacion->save();
         DB::unprepared('SET IDENTITY_INSERT cotizaciones_t OFF');
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
@@ -174,7 +174,7 @@ class CotizacionController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
         $BitacoraDocumento->Status = "ALTA";
         $BitacoraDocumento->Usuario = Auth::user()->user;
-        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
         $item = 1;
@@ -382,7 +382,7 @@ class CotizacionController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
         $BitacoraDocumento->Status = $Cotizacion->status;
         $BitacoraDocumento->Usuario = Auth::user()->user;
-        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA DETALLES
         foreach ($request->codigopartida as $key => $codigopartida){   

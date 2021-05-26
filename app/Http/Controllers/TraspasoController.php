@@ -48,7 +48,8 @@ class TraspasoController extends ConfiguracionSistemaController{
         $rutaconfiguraciontabla = route('traspasos_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('traspasos_exportar_excel');
         $rutacreardocumento = route('traspasos_generar_pdfs');
-        return view('registros.traspasos.traspasos', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','rutacreardocumento'));
+        $almacendedefault = Almacen::where('Numero', 1)->first();
+        return view('registros.traspasos.traspasos', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','rutacreardocumento','almacendedefault'));
     }
 
     public function traspasos_obtener(Request $request){
@@ -97,6 +98,23 @@ class TraspasoController extends ConfiguracionSistemaController{
         }
     }
 
+    //obtenr alamcen de porn umero
+    public function  traspasos_obtener_almacen_de_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $existealmacen = Almacen::where('Numero', $request->numeroalmacende)->where('Numero', '<>', $request->numeroalmacena)->where('Status', 'ALTA')->count();
+        if($existealmacen > 0){
+            $almacen = Almacen::where('Numero', $request->numeroalmacende)->where('Numero', '<>', $request->numeroalmacena)->where('Status', 'ALTA')->first();
+            $numero = $almacen->Numero;
+            $nombre = $almacen->Nombre;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+    }
+
     //obtener alamcenes foraneos
     public function traspasos_obtener_almacenes_foraneos(Request $request){
         if($request->ajax()){
@@ -109,6 +127,23 @@ class TraspasoController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         }
+    }
+
+    //obtener almacen a por numero
+    public function traspasos_obtener_almacen_a_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $existealmacen = Almacen::where('Numero', $request->numeroalmacena)->where('Numero', '<>', $request->numeroalmacende)->where('Status', 'ALTA')->count();
+        if($existealmacen > 0){
+            $almacen = Almacen::where('Numero', $request->numeroalmacena)->where('Numero', '<>', $request->numeroalmacende)->where('Status', 'ALTA')->first();
+            $numero = $almacen->Numero;
+            $nombre = $almacen->Nombre;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
     }
 
     //obtener ordenes de trabajo
@@ -129,6 +164,45 @@ class TraspasoController extends ConfiguracionSistemaController{
         }
     }
 
+    //obtener orden trabajo por folio
+    public function traspasos_obtener_orden_trabajo_por_folio(Request $request){
+        $orden = '';
+        $fecha = '';
+        $cliente = '';
+        $tipo = '';
+        $unidad = '';
+        $statusorden = '';
+        $existeorden = DB::table('Ordenes de Trabajo as ot')
+                            ->join('Clientes as c', 'ot.Cliente', '=', 'c.Numero')
+                            ->select('ot.Orden as Orden', 'ot.Fecha as Fecha', 'c.Nombre as Cliente', 'ot.Tipo as Tipo', 'ot.Unidad as Unidad', 'ot.Status AS StatusOrden')
+                            ->where('ot.Status', 'ABIERTA')
+                            ->where('ot.Orden', $request->orden)
+                            ->count();
+        if($existeorden > 0){
+            $orden = DB::table('Ordenes de Trabajo as ot')
+                        ->join('Clientes as c', 'ot.Cliente', '=', 'c.Numero')
+                        ->select('ot.Orden as Orden', 'ot.Fecha as Fecha', 'c.Nombre as Cliente', 'ot.Tipo as Tipo', 'ot.Unidad as Unidad', 'ot.Status AS StatusOrden')
+                        ->where('ot.Status', 'ABIERTA')
+                        ->where('ot.Orden', $request->orden)
+                        ->get();
+            $orden = $orden[0]->Orden;
+            $fecha = $orden[0]->Fecha;
+            $cliente = $orden[0]->Cliente;
+            $tipo = $orden[0]->Tipo;
+            $unidad = $orden[0]->Unidad;
+            $statusorden = $orden[0]->StatusOrden;
+        }
+        $data = array(
+            'orden' => $orden,
+            'fecha' => $fecha,
+            'cliente' => $cliente,
+            'tipo' => $tipo,
+            'unidad' => $unidad,
+            'statusorden' => $statusorden
+        );
+        return response()->json($data); 
+    }
+
     //obtener productos
     public function traspasos_obtener_productos(Request $request){
         if($request->ajax()){
@@ -138,7 +212,7 @@ class TraspasoController extends ConfiguracionSistemaController{
             $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($numeroalmacende, $tipooperacion){
-                        if($data->Almacen == $numeroalmacende){
+                        if($data->Almacen == $numeroalmacende || $data->Almacen == NULL){
                             $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$tipooperacion.'\')">Seleccionar</div>';
                         }else{
                             $boton = '';
@@ -209,7 +283,7 @@ class TraspasoController extends ConfiguracionSistemaController{
         $Traspaso->Obs=$request->observaciones;
         $Traspaso->Status="APLICADO";
         $Traspaso->Usuario=Auth::user()->user;
-        $Traspaso->Periodo=$request->periodohoy;
+        $Traspaso->Periodo=$this->periodohoy;
         $Traspaso->save();
         //modificar totales orden trabajo
         if($request->orden != ""){
@@ -233,7 +307,7 @@ class TraspasoController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
         $BitacoraDocumento->Status = "APLICADO";
         $BitacoraDocumento->Usuario = Auth::user()->user;
-        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
         $item = 1;
@@ -644,7 +718,7 @@ class TraspasoController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
         $BitacoraDocumento->Status = $Traspaso->Status;
         $BitacoraDocumento->Usuario = Auth::user()->user;
-        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA DETALLES
         $item = TraspasoDetalle::select('Item')->where('Traspaso', $traspaso)->orderBy('Item', 'DESC')->take(1)->get();

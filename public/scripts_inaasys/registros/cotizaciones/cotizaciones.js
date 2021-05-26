@@ -279,59 +279,109 @@ function alta(){
   mostrarmodalformulario('ALTA', 1);
   mostrarformulario();
   //formulario alta
-  var tabs =    '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
-                    '<li role="presentation" class="active">'+
-                        '<a href="#productostab" data-toggle="tab">Productos</a>'+
-                    '</li>'+
-                '</ul>'+
-                '<div class="tab-content">'+
-                    '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
-                        '<div class="row">'+
-                            '<div class="col-md-12 table-responsive cabecerafija" style="height: 275px;overflow-y: scroll;padding: 0px 0px;">'+
-                                '<table id="tablaproductocotizacion" class="table table-bordered tablaproductocotizacion">'+
-                                    '<thead class="customercolor">'+
-                                        '<tr>'+
-                                          '<th class="customercolor">#</th>'+
-                                          '<th class="customercolortheadth">numero_parte</th>'+
-                                          '<th class="customercolortheadth"><div style="width:200px !important;">descripcion</div></th>'+
-                                          '<th class="customercolortheadth">unidad</th>'+
-                                          '<th class="customercolor">insumo</th>'+
-                                          '<th class="customercolortheadth">status_refaccion</th>'+
-                                          '<th class="customercolortheadth">precio $</th>'+
-                                          '<th class="customercolortheadth">cantidad</th>'+
-                                          '<th class="customercolor">importe $</th>'+
-                                        '</tr>'+
-                                    '</thead>'+
-                                    '<tbody>'+           
-                                    '</tbody>'+
-                                '</table>'+
-                            '</div>'+
-                        '</div>'+ 
-                        '<div class="row">'+
-                          '<div class="col-md-6">'+   
-                          '</div>'+ 
-                          '<div class="col-md-3 col-md-offset-3">'+
-                                '<table class="table table-striped table-hover">'+
-                                    '<tr>'+
-                                        '<td class="tdmod">SubTotal</td>'+
-                                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="subtotal" id="subtotal" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                    '</tr>'+
-                                    '<tr>'+
-                                        '<td class="tdmod">Iva</td>'+
-                                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="iva" id="iva" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                    '</tr>'+
-                                    '<tr>'+
-                                        '<td class="tdmod">Total</td>'+
-                                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                    '</tr>'+
-                                '</table>'+
-                            '</div>'+
-                        '</div>'+   
+  var tabs ='<div class="col-md-12">'+  
+              '<div class="row">'+
+                '<div class="col-md-3">'+
+                  '<label>Cotización <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
+                  '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                  '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
+                  '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
+                  '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
+                '</div>'+ 
+                '<div class="col-md-3">'+
+                  '<label>OT Tecnodiesel</label>'+
+                  '<input type="text" class="form-control" name="ottecnodiesel" id="ottecnodiesel"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">'+
+                '</div>'+
+                '<div class="col-md-3">'+
+                  '<label>OT TyT</label>'+
+                  '<input type="text" class="form-control" name="ottyt" id="ottyt" required data-parsley-length="[0, 50]" onkeyup="tipoLetra(this);">'+
+                '</div>'+ 
+                '<div class="col-md-3">'+
+                  '<label>Fecha </label>'+
+                  '<input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" onkeyup="tipoLetra(this);">'+
+                  '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="{{$periodohoy}}">'+
+                '</div>'+
+              '</div>'+
+              '<div class="row">'+
+                '<div class="col-md-3">'+
+                  '<label>Remisión</label>'+
+                  '<table class="col-md-12">'+
+                    '<tr>'+
+                      '<td>'+
+                        '<div class="btn bg-blue waves-effect" onclick="obtenerremisiones()">Seleccionar</div>'+
+                      '</td>'+
+                      '<td>'+
+                        '<div class="form-line">'+
+                          '<input type="hidden" class="form-control" name="numeroremision" id="numeroremision" required readonly onkeyup="tipoLetra(this)">'+
+                          '<input type="text" class="form-control" name="remision" id="remision" required readonly>'+
+                        '</div>'+
+                      '</td>'+
+                    '</tr>'+   
+                  '</table>'+
+                '</div>'+
+                '<div class="col-md-3">'+
+                  '<label>Equipo</label>'+
+                  '<input type="text" class="form-control" name="equipo" id="equipo" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">'+
+                '</div>'+ 
+                '<div class="col-md-3">'+
+                  '<label>Requisición</label>'+
+                  '<input type="text" class="form-control" name="requisicion" id="requisicion" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">'+
+                '</div>'+  
+              '</div>'+
+            '</div>'+
+            '<div class="col-md-12">'+ 
+              '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                '<li role="presentation" class="active">'+
+                  '<a href="#productostab" data-toggle="tab">Productos</a>'+
+                '</li>'+
+              '</ul>'+
+              '<div class="tab-content">'+
+                '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
+                  '<div class="row">'+
+                    '<div class="col-md-12 table-responsive cabecerafija" style="height: 275px;overflow-y: scroll;padding: 0px 0px;">'+
+                      '<table id="tablaproductocotizacion" class="table table-bordered tablaproductocotizacion">'+
+                        '<thead class="customercolor">'+
+                          '<tr>'+
+                            '<th class="customercolor">#</th>'+
+                            '<th class="customercolortheadth">numero_parte</th>'+
+                            '<th class="customercolortheadth"><div style="width:200px !important;">descripcion</div></th>'+
+                            '<th class="customercolortheadth">unidad</th>'+
+                            '<th class="customercolor">insumo</th>'+
+                            '<th class="customercolortheadth">status_refaccion</th>'+
+                            '<th class="customercolortheadth">precio $</th>'+
+                            '<th class="customercolortheadth">cantidad</th>'+
+                            '<th class="customercolor">importe $</th>'+
+                          '</tr>'+
+                        '</thead>'+
+                        '<tbody>'+           
+                        '</tbody>'+
+                      '</table>'+
+                    '</div>'+
+                  '</div>'+ 
+                  '<div class="row">'+
+                    '<div class="col-md-6">'+   
                     '</div>'+ 
-                '</div>';
+                    '<div class="col-md-3 col-md-offset-3">'+
+                      '<table class="table table-striped table-hover">'+
+                        '<tr>'+
+                          '<td class="tdmod">SubTotal</td>'+
+                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="subtotal" id="subtotal" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                        '</tr>'+
+                        '<tr>'+
+                          '<td class="tdmod">Iva</td>'+
+                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="iva" id="iva" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                        '</tr>'+
+                        '<tr>'+
+                          '<td class="tdmod">Total</td>'+
+                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                        '</tr>'+
+                      '</table>'+
+                    '</div>'+
+                  '</div>'+   
+                '</div>'+ 
+              '</div>'+ 
+            '</div>';
   $("#tabsform").html(tabs);
-  $("#serie").val(serieusuario);
-  $("#serietexto").html("Serie: "+serieusuario);
   obtenultimonumero();
   asignarfechaactual();
   $("#ModalAlta").modal('show');
@@ -339,11 +389,11 @@ function alta(){
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
   e.preventDefault();
-  var numerofilas = $("#numerofilas").val();
-  if(numerofilas > 0){
-    var formData = new FormData($("#formparsley")[0]);
-    var form = $("#formparsley");
-    if (form.parsley().isValid()){
+  var formData = new FormData($("#formparsley")[0]);
+  var form = $("#formparsley");
+  if (form.parsley().isValid()){
+    var numerofilas = $("#numerofilas").val();
+    if(numerofilas > 0){
       $('.page-loader-wrapper').css('display', 'block');
       $.ajax({
         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
@@ -371,11 +421,13 @@ $("#btnGuardar").on('click', function (e) {
         }
       })
     }else{
-      form.parsley().validate();
+      msj_erroralmenosunaentrada();
     }
   }else{
-    msj_erroralmenosunaentrada();
+    msjfaltandatosporcapturar();
   }
+  //validar formulario
+  form.parsley().validate();
 });
 //bajas
 function desactivar(cotizaciondesactivar){
@@ -443,57 +495,110 @@ function obtenerdatos(cotizacionmodificar){
   $('.page-loader-wrapper').css('display', 'block');
   $.get(cotizaciones_obtener_cotizacion,{cotizacionmodificar:cotizacionmodificar },function(data){
     //formulario modificacion
-    var tabs =  '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
-                    '<li role="presentation" class="active">'+
-                        '<a href="#productostab" data-toggle="tab">Productos</a>'+
-                    '</li>'+
+    var tabs ='<div class="col-md-12">'+  
+                '<div class="row">'+
+                  '<div class="col-md-3">'+
+                    '<label>Cotización <b style="color:#F44336 !important;" id="serietexto"> Serie: </b></label>'+
+                    '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                    '<input type="hidden" class="form-control" name="serie" id="serie" required readonly data-parsley-length="[1, 10]">'+
+                    '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
+                    '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
+                  '</div>'+ 
+                  '<div class="col-md-3">'+
+                    '<label>OT Tecnodiesel</label>'+
+                    '<input type="text" class="form-control" name="ottecnodiesel" id="ottecnodiesel"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">'+
+                  '</div>'+
+                  '<div class="col-md-3">'+
+                    '<label>OT TyT</label>'+
+                    '<input type="text" class="form-control" name="ottyt" id="ottyt" required data-parsley-length="[0, 50]" onkeyup="tipoLetra(this);">'+
+                  '</div>'+ 
+                  '<div class="col-md-3">'+
+                    '<label>Fecha </label>'+
+                    '<input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" onkeyup="tipoLetra(this);">'+
+                    '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy">'+
+                  '</div>'+
+                '</div>'+
+                '<div class="row">'+
+                  '<div class="col-md-3">'+
+                    '<label>Remisión</label>'+
+                    '<table class="col-md-12">'+
+                      '<tr>'+
+                        '<td>'+
+                          '<div class="btn bg-blue waves-effect" onclick="obtenerremisiones()">Seleccionar</div>'+
+                        '</td>'+
+                        '<td>'+
+                          '<div class="form-line">'+
+                            '<input type="hidden" class="form-control" name="numeroremision" id="numeroremision" required readonly onkeyup="tipoLetra(this)">'+
+                            '<input type="text" class="form-control" name="remision" id="remision" required readonly>'+
+                          '</div>'+
+                        '</td>'+
+                      '</tr>'+   
+                    '</table>'+
+                  '</div>'+
+                  '<div class="col-md-3">'+
+                    '<label>Equipo</label>'+
+                    '<input type="text" class="form-control" name="equipo" id="equipo" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">'+
+                  '</div>'+ 
+                  '<div class="col-md-3">'+
+                    '<label>Requisición</label>'+
+                    '<input type="text" class="form-control" name="requisicion" id="requisicion" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">'+
+                  '</div>'+  
+                '</div>'+
+              '</div>'+
+              '<div class="col-md-12">'+   
+                '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                  '<li role="presentation" class="active">'+
+                    '<a href="#productostab" data-toggle="tab">Productos</a>'+
+                  '</li>'+
                 '</ul>'+
                 '<div class="tab-content">'+
-                    '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
-                        '<div class="row">'+
-                            '<div class="col-md-12 table-responsive cabecerafija" style="height: 275px;overflow-y: scroll;padding: 0px 0px;">'+
-                                '<table id="tablaproductocotizacion" class="table table-bordered tablaproductocotizacion">'+
-                                    '<thead class="customercolor">'+
-                                        '<tr>'+
-                                          '<th class="customercolor">#</th>'+
-                                          '<th class="customercolortheadth">numero_parte</th>'+
-                                          '<th class="customercolortheadth"><div style="width:200px !important;">descripcion</div></th>'+
-                                          '<th class="customercolortheadth">unidad</th>'+
-                                          '<th class="customercolor">insumo</th>'+
-                                          '<th class="customercolortheadth">status_refaccion</th>'+
-                                          '<th class="customercolortheadth">precio $</th>'+
-                                          '<th class="customercolortheadth">cantidad</th>'+
-                                          '<th class="customercolor">importe $</th>'+
-                                        '</tr>'+
-                                    '</thead>'+
-                                    '<tbody>'+           
-                                    '</tbody>'+
-                                '</table>'+
-                            '</div>'+
-                        '</div>'+ 
-                        '<div class="row">'+
-                          '<div class="col-md-6">'+   
-                          '</div>'+ 
-                          '<div class="col-md-3 col-md-offset-3">'+
-                                '<table class="table table-striped table-hover">'+
-                                    '<tr>'+
-                                        '<td class="tdmod">SubTotal</td>'+
-                                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="subtotal" id="subtotal" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                    '</tr>'+
-                                    '<tr>'+
-                                        '<td class="tdmod">Iva</td>'+
-                                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="iva" id="iva" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                    '</tr>'+
-                                    '<tr>'+
-                                        '<td class="tdmod">Total</td>'+
-                                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                    '</tr>'+
-                                '</table>'+
-                            '</div>'+
-                        '</div>'+   
+                  '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
+                    '<div class="row">'+
+                      '<div class="col-md-12 table-responsive cabecerafija" style="height: 275px;overflow-y: scroll;padding: 0px 0px;">'+
+                        '<table id="tablaproductocotizacion" class="table table-bordered tablaproductocotizacion">'+
+                          '<thead class="customercolor">'+
+                            '<tr>'+
+                              '<th class="customercolor">#</th>'+
+                              '<th class="customercolortheadth">numero_parte</th>'+
+                              '<th class="customercolortheadth"><div style="width:200px !important;">descripcion</div></th>'+
+                              '<th class="customercolortheadth">unidad</th>'+
+                              '<th class="customercolor">insumo</th>'+
+                              '<th class="customercolortheadth">status_refaccion</th>'+
+                              '<th class="customercolortheadth">precio $</th>'+
+                              '<th class="customercolortheadth">cantidad</th>'+
+                              '<th class="customercolor">importe $</th>'+
+                            '</tr>'+
+                          '</thead>'+
+                          '<tbody>'+           
+                          '</tbody>'+
+                        '</table>'+
+                      '</div>'+
                     '</div>'+ 
-                '</div>';
+                    '<div class="row">'+
+                      '<div class="col-md-6">'+   
+                      '</div>'+ 
+                      '<div class="col-md-3 col-md-offset-3">'+
+                        '<table class="table table-striped table-hover">'+
+                          '<tr>'+
+                            '<td class="tdmod">SubTotal</td>'+
+                            '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="subtotal" id="subtotal" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                          '</tr>'+
+                          '<tr>'+
+                            '<td class="tdmod">Iva</td>'+
+                            '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="iva" id="iva" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                          '</tr>'+
+                          '<tr>'+
+                            '<td class="tdmod">Total</td>'+
+                            '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                          '</tr>'+
+                        '</table>'+
+                      '</div>'+
+                    '</div>'+   
+                  '</div>'+ 
+                '</div>'+ 
+              '</div>';
     $("#tabsform").html(tabs);
+    $("#periodohoy").val(data.cotizacion.periodo);
     $("#folio").val(data.cotizacion.id);
     $("#serie").val(data.cotizacion.Serie);
     $("#serietexto").html("Serie: "+data.cotizacion.Serie);
@@ -506,6 +611,8 @@ function obtenerdatos(cotizacionmodificar){
     $("#subtotal").val(data.subtotal);
     $("#iva").val(data.iva);
     $("#total").val(data.total);
+    //asignar el tipo de operacion que se realizara
+    $("#tipooperacion").val("modificacion");
     //detalles
     $("#tablaproductocotizacion tbody").html(data.filasdetallescotizacion);
     $("#numerofilas").val(data.numerodetallescotizacion);
@@ -522,35 +629,42 @@ $("#btnGuardarModificacion").on('click', function (e) {
   var formData = new FormData($("#formparsley")[0]);
   var form = $("#formparsley");
   if (form.parsley().isValid()){
-    $('.page-loader-wrapper').css('display', 'block');
-    $.ajax({
-      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-      url:cotizaciones_guardar_modificacion,
-      type: "post",
-      dataType: "html",
-      data: formData,
-      cache: false,
-      contentType: false,
-      processData: false,
-      success:function(data){
-        msj_datosguardadoscorrectamente();
-        limpiar();
-        ocultarmodalformulario();
-        limpiarmodales();
-        $('.page-loader-wrapper').css('display', 'none');
-      },
-      error:function(data){
-        if(data.status == 403){
-          msj_errorenpermisos();
-        }else{
-          msj_errorajax();
+    var numerofilas = $("#numerofilas").val();
+    if(numerofilas > 0){
+      $('.page-loader-wrapper').css('display', 'block');
+      $.ajax({
+        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+        url:cotizaciones_guardar_modificacion,
+        type: "post",
+        dataType: "html",
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success:function(data){
+          msj_datosguardadoscorrectamente();
+          limpiar();
+          ocultarmodalformulario();
+          limpiarmodales();
+          $('.page-loader-wrapper').css('display', 'none');
+        },
+        error:function(data){
+          if(data.status == 403){
+            msj_errorenpermisos();
+          }else{
+            msj_errorajax();
+          }
+          $('.page-loader-wrapper').css('display', 'none');
         }
-        $('.page-loader-wrapper').css('display', 'none');
-      }
-    })
+      })
+    }else{
+      msj_erroralmenosunaentrada();
+    }
   }else{
-    form.parsley().validate();
+    msjfaltandatosporcapturar();
   }
+  //validar formulario
+  form.parsley().validate();
 });
 //hacer busqueda de folio para exportacion en pdf
 function relistarbuscarstringlike(){

@@ -107,7 +107,7 @@
                                 <input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>
                             </div>   
                             <div class="col-md-4">
-                                <label>Personal que recibe</label>
+                                <label>Personal que recibe <span class="label label-danger" id="textonombrepersonalrecibe"></span></label>
                                 <table class="col-md-12">
                                     <tr>
                                         <td>
@@ -115,15 +115,16 @@
                                         </td>
                                         <td>
                                             <div class="form-line">
-                                                <input type="hidden" class="form-control" name="numeropersonalrecibe" id="numeropersonalrecibe" required readonly onkeyup="tipoLetra(this)">
-                                                <input type="text" class="form-control" name="personalrecibe" id="personalrecibe" required readonly>
+                                                <input type="text" class="form-control" name="numeropersonalrecibe" id="numeropersonalrecibe" required data-parsley-type="integer">
+                                                <input type="hidden" class="form-control" name="numeropersonalrecibeanterior" id="numeropersonalrecibeanterior" required data-parsley-type="integer">
+                                                <input type="hidden" class="form-control" name="personalrecibe" id="personalrecibe" required readonly>
                                             </div>
                                         </td>
                                     </tr>    
                                 </table>
                             </div>
                             <div class="col-md-4">
-                                <label>Personal que entrega</label>
+                                <label>Personal que entrega <span class="label label-danger" id="textonombrepersonalentrega"></span></label>
                                 <table class="col-md-12">
                                     <tr>
                                         <td>
@@ -131,8 +132,9 @@
                                         </td>
                                         <td>    
                                             <div class="form-line">
-                                                <input type="hidden" class="form-control" name="numeropersonalentrega" id="numeropersonalentrega" required readonly onkeyup="tipoLetra(this)">
-                                                <input type="text" class="form-control" name="personalentrega" id="personalentrega" required readonly>
+                                                <input type="text" class="form-control" name="numeropersonalentrega" id="numeropersonalentrega" required data-parsley-type="integer">
+                                                <input type="hidden" class="form-control" name="numeropersonalentregaanterior" id="numeropersonalentregaanterior" required data-parsley-type="integer">
+                                                <input type="hidden" class="form-control" name="personalentrega" id="personalentrega" required readonly>
                                             </div>
                                         </td>    
                                     </tr>    
@@ -281,7 +283,9 @@
         var asignacion_herramienta_obtener = '{!!URL::to('asignacion_herramienta_obtener')!!}';
         var asignacion_herramienta_obtener_ultimo_id = '{!!URL::to('asignacion_herramienta_obtener_ultimo_id')!!}';
         var asignacion_herramienta_obtener_personal_recibe = '{!!URL::to('asignacion_herramienta_obtener_personal_recibe')!!}';
+        var asignacion_herramienta_obtener_personal_recibe_por_numero = '{!!URL::to('asignacion_herramienta_obtener_personal_recibe_por_numero')!!}';
         var asignacion_herramienta_obtener_personal_entrega = '{!!URL::to('asignacion_herramienta_obtener_personal_entrega')!!}';
+        var asignacion_herramienta_obtener_personal_entrega_por_numero = '{!!URL::to('asignacion_herramienta_obtener_personal_entrega_por_numero')!!}';
         var asignacion_herramienta_obtener_herramienta = '{!!URL::to('asignacion_herramienta_obtener_herramienta')!!}';
         var asignacion_herramienta_obtener_existencias_almacen = '{!!URL::to('asignacion_herramienta_obtener_existencias_almacen')!!}';
         var asignacion_herramienta_guardar = '{!!URL::to('asignacion_herramienta_guardar')!!}';

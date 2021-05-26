@@ -26,6 +26,7 @@ use App\FormaPago;
 use App\UsoCFDI;
 use App\NotaCliente;
 use App\NotaClienteDetalle;
+use App\NotaClienteDocumento;
 use App\BitacoraDocumento;
 use Luecano\NumeroALetras\NumeroALetras;
 use App\Configuracion_Tabla;
@@ -82,7 +83,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         if($request->ajax()){
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = VistaCuentaPorCobrar::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Folio', 'DESC')->get();
+            $data = VistaCuentaPorCobrar::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->get();
             return DataTables::of($data)
                 ->addColumn('operaciones', function($data){
                         $botoncambios   =   '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Pago .'\')"><i class="material-icons">mode_edit</i></div> '; 
@@ -114,7 +115,6 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
     //obtener clientes
     public function cuentas_por_cobrar_obtener_clientes(Request $request){
         if($request->ajax()){
-            //$data = Cliente::where('Status', 'ALTA')->orderBy("Numero", "DESC")->get();
             $data = DB::table('Clientes as c')
             ->leftJoin('c_FormaPago as fp', 'fp.Clave', '=', 'c.FormaPago')
             ->leftJoin('c_MetodoPago as mp', 'mp.Clave', '=', 'c.MetodoPago')
@@ -126,40 +126,98 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             ->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        /*$claveformapago = '';
-                        $formapago = '';
-                        $clavemetodopago = '';
-                        $metodopago = '';
-                        $claveusocfdi = '';
-                        $usocfdi = '';
-                        $claveresidenciafiscal = '';
-                        $residenciafiscal = '';
-                        if($data->FormaPago != ''){
-                            $FormaPago = FormaPago::where('Clave', $data->FormaPago)->first();
-                            $claveformapago = $FormaPago->Clave;
-                            $formapago = $FormaPago->Nombre;
-                        }
-                        if($data->MetodoPago != ''){
-                            $MetodoPago = MetodoPago::where('Clave', $data->MetodoPago)->first();
-                            $clavemetodopago = $MetodoPago->Clave;
-                            $metodopago = $MetodoPago->Nombre;
-                        }
-                        if($data->UsoCfdi != ''){
-                            $UsoCFDI = UsoCFDI::where('Clave', $data->UsoCfdi)->first();
-                            $claveusocfdi = $UsoCFDI->Clave;
-                            $usocfdi = $UsoCFDI->Nombre;
-                        }
-                        if($data->Pais != ''){
-                            $Pais = Pais::where('Clave', $data->Pais)->first();
-                            $claveresidenciafiscal = $Pais->Clave;
-                            $residenciafiscal = $Pais->Nombre;
-                        }*/
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarcliente('.$data->Numero.',\''.$data->Nombre .'\','.$data->Plazo.',\''.$data->Rfc.'\',\''.$data->ClaveFormaPago.'\',\''.$data->NombreFormaPago.'\',\''.$data->ClaveMetodoPago.'\',\''.$data->NombreMetodoPago.'\',\''.$data->ClaveUsoCfdi.'\',\''.$data->NombreUsoCfdi.'\',\''.$data->ClavePais.'\',\''.$data->NombrePais.'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
         }
+    }
+
+    //obtener cliente por numero
+    public function cuentas_por_cobrar_obtener_cliente_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $rfc = '';
+        $claveformapago = '';
+        $formapago = '';
+        $existecliente = Cliente::where('Numero', $request->numerocliente)->where('Status', 'ALTA')->count();
+        if($existecliente > 0){
+            $cliente = Cliente::where('Numero', $request->numerocliente)->where('Status', 'ALTA')->first();
+            $datos = DB::table('Clientes as c')
+            ->leftJoin('c_FormaPago as fp', 'fp.Clave', '=', 'c.FormaPago')
+            ->leftJoin('c_MetodoPago as mp', 'mp.Clave', '=', 'c.MetodoPago')
+            ->leftJoin('c_UsoCFDI as uc', 'uc.Clave', '=', 'c.UsoCfdi')
+            ->leftJoin('c_Pais as p', 'p.Clave', '=', 'c.Pais')
+            ->select('c.Numero', 'c.Status', 'fp.Clave AS claveformapago', 'fp.Nombre AS formapago', 'mp.Clave AS clavemetodopago', 'mp.Nombre AS metodopago', 'uc.Clave AS claveusocfdi', 'uc.Nombre AS usocfdi', 'p.Clave AS claveresidenciafiscal', 'p.Nombre AS residenciafiscal')
+            ->where('c.Numero', $request->numerocliente)
+            ->where('c.Status', 'ALTA')
+            ->get();
+            $claveformapago = $datos[0]->claveformapago;
+            $formapago = $datos[0]->formapago;
+            $numero = $cliente->Numero;
+            $nombre = $cliente->Nombre;
+            $rfc = $cliente->Rfc;
+            $facturas = Factura::where('Cliente', $request->numerocliente)->where('Status', 'POR COBRAR')->orderBy('Folio', 'DESC')->get();
+            $numerofacturas = Factura::where('Cliente', $request->numerocliente)->where('Status', 'POR COBRAR')->count();
+            $filasfacturas= '';
+            $contadorfilas = 0;
+            if($numerofacturas > 0){
+                foreach($facturas as $f){
+                    $porcentajeiva = Helpers::calcular_porcentaje_iva_aritmetico($f->Iva, $f->SubTotal);
+                    $tipooperacion = $request->tipooperacion;
+                    $numparcialidades = CuentaXCobrarDetalle::where('Factura', $f->Factura)->where('Abono', '>', 0)->count();
+                    $numeroparcialidades = 1;
+                    if($numparcialidades > 0){
+                        $numeroparcialidades = $numeroparcialidades + $numparcialidades;
+                    }
+                    //detalles factura
+                    $filasfacturas= $filasfacturas.
+                    '<tr class="filasfacturas" id="filafactura'.$contadorfilas.'">'.
+                        '<td class="tdmod"><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
+                        '<td class="tdmod"><input type="hidden" class="form-control facturaaplicarpartida" name="facturaaplicarpartida[]" value="'.$f->Factura.'" readonly>'.$f->Factura.'</td>'.
+                        '<td class="tdmod"><input type="hidden" class="form-control fechafacturapartida" name="fechafacturapartida[]" value="'.Helpers::fecha_espanol($f->Fecha).'" readonly>'.Helpers::fecha_espanol($f->Fecha).'</td>'.
+                        '<td class="tdmod"><input type="hidden" class="form-control plazofacturapartida" name="plazofacturapartida[]" value="'.$f->Plazo.'" readonly>'.$f->Plazo.'</td>'.
+                        '<td class="tdmod"><input type="hidden" class="form-control vencefacturapartida" name="vencefacturapartida[]" value="'.Helpers::fecha_espanol(Carbon::parse($f->Fecha)->addDays($f->Plazo)->toDateTimeString()).'" readonly>'.Helpers::fecha_espanol(Carbon::parse($f->Fecha)->addDays($f->Plazo)->toDateTimeString()).'</td>'.
+                        '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd totalpesosfacturapartida" name="totalpesosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto($f->Total).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                        '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd abonosfacturapartida" name="abonosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto($f->Abonos).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                        '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd notascreditofacturapartida" name="notascreditofacturapartida[]" value="'.Helpers::convertirvalorcorrecto($f->Descuentos).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                        '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd abonopesosfacturapartida" name="abonopesosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-max="'.Helpers::convertirvalorcorrecto($f->Saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularnuevosaldo('.$contadorfilas.');calculartotal('.$contadorfilas.');" ></td>'.
+                        '<td class="tdmod" hidden><input type="number" class="form-control divorinputmodmd saldofacturapartidadb" name="saldofacturapartidadb[]" value="'.Helpers::convertirvalorcorrecto($f->Saldo).'"></td>'.
+                        '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd saldofacturapartida" name="saldofacturapartida[]" value="'.Helpers::convertirvalorcorrecto($f->Saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                        '<td class="tdmod"><input type="hidden" class="form-control uuidfacturapartida" name="uuidfacturapartida[]" value="'.$f->UUID.'" readonly>'.$f->UUID.'</td>'.
+                        '<td class="tdmod"><input type="hidden" class="form-control seriefacturapartida" name="seriefacturapartida[]" value="'.$f->Serie.'" readonly>'.$f->Serie.'</td>'.
+                        '<td class="tdmod"><input type="hidden" class="form-control foliofacturapartida" name="foliofacturapartida[]" value="'.$f->Folio.'" readonly>'.$f->Folio.'</td>'.
+                        '<td class="tdmod"><input type="hidden" class="form-control monedadrfacturapartida" name="monedadrfacturapartida[]" value="'.$f->Moneda.'" readonly>'.$f->Moneda.'</td>'.
+                        '<td class="tdmod"><input type="hidden" class="form-control tipocambiodrfacturapartida" name="tipocambiodrfacturapartida[]" value="'.$f->TipoCambio.'" readonly>'.$f->TipoCambio.'</td>'.
+                        '<td class="tdmod">'.
+                            '<div class="row divorinputmodl">'.
+                                '<div class="col-md-2">'.
+                                    '<div class="btn bg-blue btn-xs waves-effect" data-toggle="tooltip" title="Cambiar Método de Pago" onclick="listarmetodospago('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
+                                '</div>'.
+                                '<div class="col-md-10">'.    
+                                    '<input type="text" class="form-control divorinputmodsm metodopagodrfacturapartida" name="metodopagodrfacturapartida[]" value="'.$f->MetodoPago.'" readonly>'.                 
+                                '</div>'.
+                            '</div>'.
+                        '</td>'.
+                        '<td class="tdmod"><input type="hidden" class="form-control numparcialidadfacturapartida" name="numparcialidadfacturapartida[]" value="'.$numeroparcialidades.'" readonly>'.$numeroparcialidades.'</td>'.
+                        '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd impsaldoantfacturapartida" name="impsaldoantfacturapartida[]" value="'.Helpers::convertirvalorcorrecto($f->Saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                        '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd imppagadofacturapartida" name="imppagadofacturapartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                        '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd impsaldoinsolutofacturapartida" name="impsaldoinsolutofacturapartida[]" value="'.Helpers::convertirvalorcorrecto($f->Saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                    '</tr>';
+                    $contadorfilas++;
+                }
+            }  
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre,
+            'rfc' => $rfc,
+            'claveformapago' => $claveformapago,
+            'formapago' => $formapago,
+            'filasfacturas' => $filasfacturas
+        );
+        return response()->json($data);
     }
 
     //obtener bancos
@@ -175,7 +233,81 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     ->make(true);
         }
     }
-
+    
+    //obtener banco por numero
+    public function cuentas_por_cobrar_obtener_banco_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $existebanco = Banco::where('Numero', $request->numerobanco)->where('Status', 'ALTA')->count();
+        if($existebanco > 0){
+            $banco = Banco::where('Numero', $request->numerobanco)->where('Status', 'ALTA')->first();
+            $numero = $banco->Numero;
+            $nombre = $banco->Nombre;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre,
+        );
+        return response()->json($data); 
+    }
+    
+    //obtener facturs clientes
+    public function cuentas_por_cobrar_obtener_facturas_cliente(Request $request){
+        $facturas = Factura::where('Cliente', $request->numerocliente)->where('Status', 'POR COBRAR')->orderBy('Folio', 'DESC')->get();
+        $numerofacturas = Factura::where('Cliente', $request->numerocliente)->where('Status', 'POR COBRAR')->count();
+        $filasfacturas= '';
+        $contadorfilas = 0;
+        if($numerofacturas > 0){
+            foreach($facturas as $f){
+                $porcentajeiva = Helpers::calcular_porcentaje_iva_aritmetico($f->Iva, $f->SubTotal);
+                $tipooperacion = $request->tipooperacion;
+                $numparcialidades = CuentaXCobrarDetalle::where('Factura', $f->Factura)->where('Abono', '>', 0)->count();
+                $numeroparcialidades = 1;
+                if($numparcialidades > 0){
+                    $numeroparcialidades = $numeroparcialidades + $numparcialidades;
+                }
+                //detalles factura
+                $filasfacturas= $filasfacturas.
+                '<tr class="filasfacturas" id="filafactura'.$contadorfilas.'">'.
+                    '<td class="tdmod"><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control facturaaplicarpartida" name="facturaaplicarpartida[]" value="'.$f->Factura.'" readonly>'.$f->Factura.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control fechafacturapartida" name="fechafacturapartida[]" value="'.Helpers::fecha_espanol($f->Fecha).'" readonly>'.Helpers::fecha_espanol($f->Fecha).'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control plazofacturapartida" name="plazofacturapartida[]" value="'.$f->Plazo.'" readonly>'.$f->Plazo.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control vencefacturapartida" name="vencefacturapartida[]" value="'.Helpers::fecha_espanol(Carbon::parse($f->Fecha)->addDays($f->Plazo)->toDateTimeString()).'" readonly>'.Helpers::fecha_espanol(Carbon::parse($f->Fecha)->addDays($f->Plazo)->toDateTimeString()).'</td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd totalpesosfacturapartida" name="totalpesosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto($f->Total).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd abonosfacturapartida" name="abonosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto($f->Abonos).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd notascreditofacturapartida" name="notascreditofacturapartida[]" value="'.Helpers::convertirvalorcorrecto($f->Descuentos).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd abonopesosfacturapartida" name="abonopesosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-max="'.Helpers::convertirvalorcorrecto($f->Saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularnuevosaldo('.$contadorfilas.');calculartotal('.$contadorfilas.');" ></td>'.
+                    '<td class="tdmod" hidden><input type="number" class="form-control divorinputmodmd saldofacturapartidadb" name="saldofacturapartidadb[]" value="'.Helpers::convertirvalorcorrecto($f->Saldo).'"></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd saldofacturapartida" name="saldofacturapartida[]" value="'.Helpers::convertirvalorcorrecto($f->Saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control uuidfacturapartida" name="uuidfacturapartida[]" value="'.$f->UUID.'" readonly>'.$f->UUID.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control seriefacturapartida" name="seriefacturapartida[]" value="'.$f->Serie.'" readonly>'.$f->Serie.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control foliofacturapartida" name="foliofacturapartida[]" value="'.$f->Folio.'" readonly>'.$f->Folio.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control monedadrfacturapartida" name="monedadrfacturapartida[]" value="'.$f->Moneda.'" readonly>'.$f->Moneda.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control tipocambiodrfacturapartida" name="tipocambiodrfacturapartida[]" value="'.$f->TipoCambio.'" readonly>'.$f->TipoCambio.'</td>'.
+                    '<td class="tdmod">'.
+                        '<div class="row divorinputmodl">'.
+                            '<div class="col-md-2">'.
+                                '<div class="btn bg-blue btn-xs waves-effect" data-toggle="tooltip" title="Cambiar Método de Pago" onclick="listarmetodospago('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
+                            '</div>'.
+                            '<div class="col-md-10">'.    
+                                '<input type="text" class="form-control divorinputmodsm metodopagodrfacturapartida" name="metodopagodrfacturapartida[]" value="'.$f->MetodoPago.'" readonly>'.                 
+                            '</div>'.
+                        '</div>'.
+                    '</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control numparcialidadfacturapartida" name="numparcialidadfacturapartida[]" value="'.$numeroparcialidades.'" readonly>'.$numeroparcialidades.'</td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd impsaldoantfacturapartida" name="impsaldoantfacturapartida[]" value="'.Helpers::convertirvalorcorrecto($f->Saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd imppagadofacturapartida" name="imppagadofacturapartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd impsaldoinsolutofacturapartida" name="impsaldoinsolutofacturapartida[]" value="'.Helpers::convertirvalorcorrecto($f->Saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                '</tr>';
+                $contadorfilas++;
+            }
+        }     
+        $data = array(
+            "filasfacturas" => $filasfacturas,
+        );
+        return response()->json($data);
+    }
 
     //obtener codifos postales
     public function cuentas_por_cobrar_obtener_codigos_postales(Request $request){
@@ -189,6 +321,23 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         }
+    }
+
+    //obtener lugar expedicion por clave
+    public function cuentas_por_cobrar_obtener_lugar_expedicion_por_clave(Request $request){
+        $clave = '';
+        $estado = '';
+        $existelugarexpedicion = CodigoPostal::where('Clave', $request->lugarexpedicion)->count();
+        if($existelugarexpedicion > 0){
+            $lugarexpedicion = CodigoPostal::where('Clave', $request->lugarexpedicion)->first();
+            $clave = $lugarexpedicion->Clave;
+            $estado = $lugarexpedicion->Estado;
+        }
+        $data = array(
+            'clave' => $clave,
+            'estado' => $estado
+        );
+        return response()->json($data); 
     }
 
     //obtener regimenes fiscales
@@ -205,6 +354,23 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         }
     }
 
+    //obtener regimen fiscal por clave
+    public function cuentas_por_cobrar_obtener_regimen_fiscal_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existeregimenfiscal = c_RegimenFiscal::where('Clave', $request->claveregimenfiscal)->count();
+        if($existeregimenfiscal > 0){
+            $regimenfiscal = c_RegimenFiscal::where('Clave', $request->claveregimenfiscal)->first();
+            $clave = $regimenfiscal->Clave;
+            $nombre = $regimenfiscal->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data);  
+    }
+
     //obtener tipos relacion
     public function cuentas_por_cobrar_obtener_tipos_relacion(Request $request){
         if($request->ajax()){
@@ -219,6 +385,23 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         }
     }
 
+    //obtener tipo relacion por clave
+    public function cuentas_por_cobrar_obtener_tipo_relacion_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existeretiporelacion = c_TipoRelacion::where('Clave', $request->clavetiporelacion)->count();
+        if($existeretiporelacion > 0){
+            $tiporelacion = c_TipoRelacion::where('Clave', $request->clavetiporelacion)->first();
+            $clave = $tiporelacion->Clave;
+            $nombre = $tiporelacion->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+    }
+
     //obtener formas pago
     public function cuentas_por_cobrar_obtener_formas_pago(Request $request){
         if($request->ajax()){
@@ -231,6 +414,23 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         }
+    }
+
+    //obtener forma pago por clave
+    public function cuentas_por_cobrar_obtener_forma_pago_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existereformapago = FormaPago::where('Clave', $request->claveformapago)->count();
+        if($existereformapago > 0){
+            $formapago = FormaPago::where('Clave', $request->claveformapago)->first();
+            $clave = $formapago->Clave;
+            $nombre = $formapago->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
     }
 
     //obtener metodos pago
@@ -310,7 +510,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd totalpesosfacturapartida" name="totalpesosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto($factura->Total).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd abonosfacturapartida" name="abonosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto($factura->Abonos).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd notascreditofacturapartida" name="notascreditofacturapartida[]" value="'.Helpers::convertirvalorcorrecto($factura->Descuentos).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd abonopesosfacturapartida" name="abonopesosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-min="0.1" data-parsley-max="'.Helpers::convertirvalorcorrecto($factura->Saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularnuevosaldo('.$request->contadorfilas.');calculartotal('.$request->contadorfilas.');" ></td>'.
+            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd abonopesosfacturapartida" name="abonopesosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-max="'.Helpers::convertirvalorcorrecto($factura->Saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularnuevosaldo('.$request->contadorfilas.');calculartotal('.$request->contadorfilas.');" ></td>'.
             '<td class="tdmod" hidden><input type="number" class="form-control divorinputmodmd saldofacturapartidadb" name="saldofacturapartidadb[]" value="'.Helpers::convertirvalorcorrecto($factura->Saldo).'"></td>'.
             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd saldofacturapartida" name="saldofacturapartida[]" value="'.Helpers::convertirvalorcorrecto($factura->Saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
             '<td class="tdmod"><input type="hidden" class="form-control uuidfacturapartida" name="uuidfacturapartida[]" value="'.$factura->UUID.'" readonly>'.$factura->UUID.'</td>'.
@@ -404,7 +604,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA DETALLES
         $item = 1;
-        foreach ($request->facturaaplicarpartida as $key => $factura){     
+        foreach ($request->facturaaplicarpartida as $key => $factura){    
+            if($request->abonopesosfacturapartida [$key] > Helpers::convertirvalorcorrecto(0)){     
                 $CuentaXCobrarDetalle=new CuentaXCobrarDetalle;
                 $CuentaXCobrarDetalle->Pago = $pago;
                 $CuentaXCobrarDetalle->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
@@ -440,6 +641,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     'Saldo' => Helpers::convertirvalorcorrecto($NuevoSaldo),
                     'Status' => $Status
                 ]);
+            }
         }
     	return response()->json($CuentaXCobrar); 
     }
@@ -518,24 +720,24 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                 $factura = Factura::where('Factura', $cxcd->Factura)->first();
                 $filasdetallecuentasporcobrar= $filasdetallecuentasporcobrar.
                 '<tr class="filasfacturas" id="filafactura'.$contadorfilas.'">'.
-                    '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfilafactura" onclick="eliminarfilafactura('.$contadorfilas.')" >X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control facturaaplicarpartida" name="facturaaplicarpartida[]" value="'.$factura->Factura.'" readonly>'.$factura->Factura.'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control fechafacturapartida" name="fechafacturapartida[]" value="'.Helpers::fecha_espanol($factura->Fecha).'" readonly>'.Helpers::fecha_espanol($factura->Fecha).'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control plazofacturapartida" name="plazofacturapartida[]" value="'.$factura->Plazo.'" readonly>'.$factura->Plazo.'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control vencefacturapartida" name="vencefacturapartida[]" value="'.Helpers::fecha_espanol(Carbon::parse($factura->Fecha)->addDays($factura->Plazo)->toDateTimeString()).'" readonly>'.Helpers::fecha_espanol(Carbon::parse($factura->Fecha)->addDays($factura->Plazo)->toDateTimeString()).'</td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd totalpesosfacturapartida" name="totalpesosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto($factura->Total).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd abonosfacturapartida" name="abonosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto($factura->Abonos).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd notascreditofacturapartida" name="notascreditofacturapartida[]" value="'.Helpers::convertirvalorcorrecto($factura->Descuentos).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd abonopesosfacturapartida" name="abonopesosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto($cxcd->Abono).'" data-parsley-min="0.1" data-parsley-max="'.Helpers::convertirvalorcorrecto($factura->Saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularnuevosaldo('.$contadorfilas.');calculartotal('.$contadorfilas.');" ></td>'.
-                    '<td class="tdmod" hidden><input type="number" class="form-control divorinputmodmd saldofacturapartidadb" name="saldofacturapartidadb[]" value="'.Helpers::convertirvalorcorrecto($factura->Saldo).'"></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd saldofacturapartida" name="saldofacturapartida[]" value="'.Helpers::convertirvalorcorrecto($factura->Saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                    '<td class="tdmod"><input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd totalpesosfacturapartida" name="totalpesosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto($factura->Total).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.Helpers::convertirvalorcorrecto($factura->Total).'</td>'.
+                    '<td class="tdmod"><input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd abonosfacturapartida" name="abonosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto($factura->Abonos).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.Helpers::convertirvalorcorrecto($factura->Abonos).'</td>'.
+                    '<td class="tdmod"><input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd notascreditofacturapartida" name="notascreditofacturapartida[]" value="'.Helpers::convertirvalorcorrecto($factura->Descuentos).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.Helpers::convertirvalorcorrecto($factura->Descuentos).'</td>'.
+                    '<td class="tdmod"><input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd abonopesosfacturapartida" name="abonopesosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto($cxcd->Abono).'" data-parsley-max="'.Helpers::convertirvalorcorrecto($factura->Saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularnuevosaldo('.$contadorfilas.');calculartotal('.$contadorfilas.');" >'.Helpers::convertirvalorcorrecto($factura->Saldo).'</td>'.
+                    '<td class="tdmod" hidden><input type="hidden" class="form-control divorinputmodmd saldofacturapartidadb" name="saldofacturapartidadb[]" value="'.Helpers::convertirvalorcorrecto($factura->Saldo).'">'.Helpers::convertirvalorcorrecto($factura->Saldo).'</td>'.
+                    '<td class="tdmod"><input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd saldofacturapartida" name="saldofacturapartida[]" value="'.Helpers::convertirvalorcorrecto($factura->Saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.Helpers::convertirvalorcorrecto($factura->Saldo).'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control uuidfacturapartida" name="uuidfacturapartida[]" value="'.$cxcd->idDocumento.'" readonly>'.$cxcd->idDocumento.'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control seriefacturapartida" name="seriefacturapartida[]" value="'.$cxcd->Serie.'" readonly>'.$cxcd->Serie.'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control foliofacturapartida" name="foliofacturapartida[]" value="'.$cxcd->Folio.'" readonly>'.$cxcd->Folio.'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control monedadrfacturapartida" name="monedadrfacturapartida[]" value="'.$cxcd->MonedaDR.'" readonly>'.$cxcd->MonedaDR.'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control tipocambiodrfacturapartida" name="tipocambiodrfacturapartida[]" value="'.$cxcd->TipoCambioDR.'" readonly>'.$cxcd->TipoCambioDR.'</td>'.
                     '<td class="tdmod">'.
-                        '<div class="row divorinputmodl">'.
+                        '<div class="row divorinputmodl" hidden>'.
                             '<div class="col-md-2">'.
                                 '<div class="btn bg-blue btn-xs waves-effect" data-toggle="tooltip" title="Cambiar Método de Pago" onclick="listarmetodospago('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
@@ -543,11 +745,12 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                                 '<input type="text" class="form-control divorinputmodsm metodopagodrfacturapartida" name="metodopagodrfacturapartida[]" value="'.$cxcd->MetodoDePagoDR.'" readonly>'.                 
                             '</div>'.
                         '</div>'.
+                        $cxcd->MetodoDePagoDR.
                     '</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control numparcialidadfacturapartida" name="numparcialidadfacturapartida[]" value="'.$cxcd->NumParcialidad.'" readonly>'.$cxcd->NumParcialidad.'</td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd impsaldoantfacturapartida" name="impsaldoantfacturapartida[]" value="'.Helpers::convertirvalorcorrecto($cxcd->ImpSaldoAnt).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd imppagadofacturapartida" name="imppagadofacturapartida[]" value="'.Helpers::convertirvalorcorrecto($cxcd->ImpPagado).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd impsaldoinsolutofacturapartida" name="impsaldoinsolutofacturapartida[]" value="'.Helpers::convertirvalorcorrecto($cxcd->ImpSaldoInsoluto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                    '<td class="tdmod"><input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd impsaldoantfacturapartida" name="impsaldoantfacturapartida[]" value="'.Helpers::convertirvalorcorrecto($cxcd->ImpSaldoAnt).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.Helpers::convertirvalorcorrecto($cxcd->ImpSaldoAnt).'</td>'.
+                    '<td class="tdmod"><input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd imppagadofacturapartida" name="imppagadofacturapartida[]" value="'.Helpers::convertirvalorcorrecto($cxcd->ImpPagado).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.Helpers::convertirvalorcorrecto($cxcd->ImpPagado).'</td>'.
+                    '<td class="tdmod"><input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd impsaldoinsolutofacturapartida" name="impsaldoinsolutofacturapartida[]" value="'.Helpers::convertirvalorcorrecto($cxcd->ImpSaldoInsoluto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.Helpers::convertirvalorcorrecto($cxcd->ImpSaldoInsoluto).'</td>'.
                 '</tr>';
                 $contadorfilas++;
                 $contadorproductos++;
@@ -592,9 +795,39 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             'tipocambio' => Helpers::convertirvalorcorrecto($cuentaxcobrar->TipoCambio),
             "modificacionpermitida" => $modificacionpermitida
         );
-        return response()->json($datas);
+        return response()->json($data);
     }
-
+    //cambios
+    public function cuentas_por_cobrar_guardar_modificacion(Request $request){
+        ini_set('max_input_vars','10000' );
+        //INGRESAR DATOS A TABLA
+        $cuentaxcobrar = $request->folio.'-'.$request->serie;
+		$CuentaXCobrar = CuentaXCobrar::where('Pago', $cuentaxcobrar)->first();
+        //modificar
+        CuentaXCobrar::where('Pago', $cuentaxcobrar)
+        ->update([
+            'Fecha' => Carbon::parse($request->fecha)->toDateTimeString(),
+            'FechaPago' => Carbon::parse($request->fechaaplicacionpagos)->toDateTimeString(),
+            'Banco' => $request->numerobanco,
+            'Anotacion' => $request->anotacion,
+            'Moneda' => $request->moneda,
+            'TipoCambio' => $request->pesosmoneda,
+            'LugarExpedicion' => $request->lugarexpedicion,
+            'RegimenFiscal' => $request->claveregimenfiscal,
+            'FormaPago' => $request->claveformapago
+        ]);
+        //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
+        $BitacoraDocumento = new BitacoraDocumento;
+        $BitacoraDocumento->Documento = "CXC";
+        $BitacoraDocumento->Movimiento = $cuentaxcobrar;
+        $BitacoraDocumento->Aplicacion = "CAMBIO";
+        $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
+        $BitacoraDocumento->Status = $CuentaXCobrar->Status;
+        $BitacoraDocumento->Usuario = Auth::user()->user;
+        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->save();
+    	return response()->json($CuentaXCobrar);
+    }
     //buscar folio on key up
     public function cuentas_por_cobrar_buscar_folio_string_like(Request $request){
         if($request->ajax()){

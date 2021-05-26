@@ -211,14 +211,38 @@ function obtenerproveedores(){
 } 
 //obtener datos del proveedor
 function seleccionarproveedor(Numero, Nombre, Plazo, Rfc){
-  $("#numeroproveedor").val(Numero);
-  $("#proveedor").val(Nombre);
-  $("#emisornombredb").val(Nombre);
-  $("#emisorrfcdb").val(Rfc);
-  $("#plazo").val(Plazo);
-  //mostrar boton de buscar ordenes de compra
-  $("#btnlistarordenesdecompra").show();
-  mostrarformulario();
+  var numeroproveedoranterior = $("#numeroproveedoranterior").val();
+  var numeroproveedor = Numero;
+  if(numeroproveedoranterior != numeroproveedor){
+    var numerofilas = $("#numerofilas").val()
+    if(parseInt(numerofilas) > 0){
+      var confirmacion = confirm("Esta seguro de cambiar el proveedor?, esto eliminara las partidas agregadas"); 
+    }else{
+      var confirmacion = true;
+    }
+    if (confirmacion == true) { 
+      $("#tablaproductoscompras tbody").html("");
+      $("#numeroproveedor").val(Numero);
+      $("#numeroproveedoranterior").val(Numero);
+      $("#proveedor").val(Nombre);
+      $("#emisornombredb").val(Nombre);
+      $("#emisorrfcdb").val(Rfc);
+      $("#plazo").val(Plazo);
+      if(Nombre != null){
+        $("#textonombreproveedor").html(Nombre.substring(0, 40));
+      }
+      //mostrar boton de buscar ordenes de compra
+      $("#btnlistarordenesdecompra").show();
+      //comprobar numero de filas en la tabla
+      comprobarfilas();
+      //calcular totales
+      calculartotal();
+      //reiniciar contadores
+      contadorproductos = 0;
+      contadorfilas = 0;
+      mostrarformulario();
+    }
+  }
 }
 //obtener registros de almacenes
 function obteneralmacenes(){
@@ -282,9 +306,17 @@ function obteneralmacenes(){
 } 
 //obtener datos del almacen
 function seleccionaralmacen(Numero, Nombre){
+  var numeroalmacenanterior = $("#numeroalmacenanterior").val();
+  var numeroalmacen = Numero;
+  if(numeroalmacenanterior != numeroalmacen){
     $("#numeroalmacen").val(Numero);
+    $("#numeroalmacenanterior").val(Numero);
     $("#almacen").val(Nombre);
+    if(Nombre != null){
+      $("#textonombrealmacen").html(Nombre.substring(0, 40));
+    }
     mostrarformulario();
+  }
 }
 //listar departamentos
 function listardepartamentos(fila){
@@ -351,14 +383,146 @@ function listardepartamentos(fila){
 }
 //seleccion de departamento
 function seleccionardepartamento(numerodepartamento, departamento, fila){
-  var cuentaFilas = 0;
-  $("tr.filasproductos").each(function () {
-    if(fila === cuentaFilas){       
-      $(".numerodepartamentopartida", this).val(numerodepartamento);
-      $(".departamentopartida", this).val(departamento);
-    }  
-    cuentaFilas++;
-  });   
+  $("#filaproducto"+fila+" .numerodepartamentopartida").val(numerodepartamento);
+  $("#filaproducto"+fila+" .departamentopartida").val(departamento); 
+  mostrarformulario();
+}
+//listar claves productos
+function listarclavesproductos(fila){
+  ocultarformulario();
+  var tablaclavesproducto = '<div class="modal-header bg-red">'+
+                                '<h4 class="modal-title">Claves Productos</h4>'+
+                            '</div>'+
+                            '<div class="modal-body">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-12">'+
+                                        '<div class="table-responsive">'+
+                                            '<table id="tbllistadoclaveproducto" class="tbllistadoclaveproducto table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                                '<thead class="customercolor">'+
+                                                    '<tr>'+
+                                                        '<th>Operaciones</th>'+
+                                                        '<th>Clave</th>'+
+                                                        '<th>Nombre</th>'+
+                                                    '</tr>'+
+                                                '</thead>'+
+                                                '<tbody></tbody>'+
+                                            '</table>'+
+                                        '</div>'+
+                                    '</div>'+  
+                                '</div>'+
+                            '</div>'+
+                            '<div class="modal-footer">'+
+                                '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                            '</div>';   
+  $("#contenidomodaltablas").html(tablaclavesproducto);
+  $('#tbllistadoclaveproducto').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
+      "sScrollX": "110%",
+      "sScrollY": "370px",
+      "bScrollCollapse": true,  
+      processing: true,
+      'language': {
+          'loadingRecords': '&nbsp;',
+          'processing': '<div class="spinner"></div>'
+      },
+      serverSide: true,
+      ajax: {
+          url: compras_obtener_claves_productos,
+          data: function (d) {
+            d.fila = fila;
+          }
+      },
+      columns: [
+          { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+          { data: 'Clave', name: 'Clave' },
+          { data: 'Nombre', name: 'Nombre' }
+      ],
+      "initComplete": function() {
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistadoclaveproducto').DataTable().search( this.value ).draw();
+              }
+          });
+      },
+      
+  });
+}
+//seleccion de clave producto
+function seleccionarclaveproducto(clave, nombre, fila){
+  $("#filaproducto"+fila+" .claveproductopartida").val(clave);
+  $("#filaproducto"+fila+" .nombreclaveproductopartida").val(nombre);
+  mostrarformulario();
+}
+//listar claves unidades
+function listarclavesunidades(fila){
+  ocultarformulario();
+  var tablaclavesunidades = '<div class="modal-header bg-red">'+
+                                '<h4 class="modal-title">Claves Unidades</h4>'+
+                            '</div>'+
+                            '<div class="modal-body">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-12">'+
+                                        '<div class="table-responsive">'+
+                                            '<table id="tbllistadoclaveunidad" class="tbllistadoclaveunidad table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                                '<thead class="customercolor">'+
+                                                    '<tr>'+
+                                                        '<th>Operaciones</th>'+
+                                                        '<th>Clave</th>'+
+                                                        '<th>Nombre</th>'+
+                                                    '</tr>'+
+                                                '</thead>'+
+                                                '<tbody></tbody>'+
+                                            '</table>'+
+                                        '</div>'+
+                                    '</div>'+  
+                                '</div>'+
+                            '</div>'+
+                            '<div class="modal-footer">'+
+                                '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                            '</div>';   
+  $("#contenidomodaltablas").html(tablaclavesunidades);
+  $('#tbllistadoclaveunidad').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
+      "sScrollX": "110%",
+      "sScrollY": "370px",
+      "bScrollCollapse": true,  
+      processing: true,
+      'language': {
+          'loadingRecords': '&nbsp;',
+          'processing': '<div class="spinner"></div>'
+      },
+      serverSide: true,
+      ajax: {
+          url: compras_obtener_claves_unidades,
+          data: function (d) {
+            d.fila = fila;
+          }
+      },
+      columns: [
+          { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+          { data: 'Clave', name: 'Clave' },
+          { data: 'Nombre', name: 'Nombre' }
+      ],
+      "initComplete": function() {
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistadoclaveunidad').DataTable().search( this.value ).draw();
+              }
+          });
+      },
+      
+  });
+}
+//seleccion de clave unidad
+function seleccionarclaveunidad(clave, nombre, fila){
+  $("#filaproducto"+fila+" .claveunidadpartida").val(clave);
+  $("#filaproducto"+fila+" .nombreclaveunidadpartida").val(nombre);
   mostrarformulario();
 }
 //listar todas las ordenes de compra
@@ -439,8 +603,12 @@ function seleccionarordencompra(Folio, Orden){
   $('.page-loader-wrapper').css('display', 'block');
   $.get(compras_obtener_orden_compra, {Folio:Folio, Orden:Orden}, function(data){
     $("#orden").val(Orden);
+    if(data.almacen.Nombre != null){
+      $("#textonombrealmacen").html(data.almacen.Nombre.substring(0, 40));
+    }
     $("#almacen").val(data.almacen.Nombre);
     $("#numeroalmacen").val(data.almacen.Numero);
+    $("#numeroalmacenanterior").val(data.almacen.Numero);
     $("#observaciones").val(data.ordencompra.Obs);
     $("#plazo").val(data.ordencompra.Plazo);
     $("#tablaproductoscompras tbody").html(data.filasdetallesordencompra);
@@ -451,6 +619,7 @@ function seleccionarordencompra(Folio, Orden){
     $("#total").val(data.total);
     //detalles
     $("#arraycodigosdetallesordencompra").val(data.arraycodigosdetallesordencompra);
+    $("#numerofilas").val(data.numerodetallesordencompra);
     //colocar valores a contadores
     contadorproductos = data.contadorproductos;
     contadorfilas = data.contadorfilas;
@@ -483,7 +652,6 @@ $("#btnenviarxml").on('click', function(e){
           contentType: false,
           processData: false,
           success: function (data) {
-            console.log(data);
             if(data.array_comprobante.Descuento == null){
               var importexml = data.array_comprobante.SubTotal[0];
               var descuentoxml = '0.'+numerocerosconfigurados;
@@ -542,6 +710,75 @@ $(document).ready(function(){
       }
   });
 });
+//obtener por numero
+function obtenerproveedorpornumero(){
+  var numeroproveedoranterior = $("#numeroproveedoranterior").val();
+  var numeroproveedor = $("#numeroproveedor").val();
+  if(numeroproveedoranterior != numeroproveedor){
+    if($("#numeroproveedor").parsley().isValid()){
+      $.get(compras_obtener_proveedor_por_numero, {numeroproveedor:numeroproveedor}, function(data){
+        var numerofilas = $("#numerofilas").val()
+        if(parseInt(numerofilas) > 0){
+          var confirmacion = confirm("Esta seguro de cambiar el proveedor?, esto eliminara las partidas agregadas"); 
+        }else{
+          var confirmacion = true;
+        }
+        if (confirmacion == true) { 
+          $("#tablaproductoscompras tbody").html("");
+          $("#numeroproveedor").val(data.numero);
+          $("#numeroproveedoranterior").val(data.numero);
+          $("#proveedor").val(data.nombre);
+          $("#emisornombredb").val(data.nombre);
+          $("#emisorrfcdb").val(data.rfc);
+          $("#plazo").val(data.plazo);
+          if(data.nombre != null){
+            $("#textonombreproveedor").html(data.nombre.substring(0, 40));
+          }
+          //mostrar boton de buscar ordenes de compra
+          $("#btnlistarordenesdecompra").show();
+          //comprobar numero de filas en la tabla
+          comprobarfilas();
+          //calcular totales
+          calculartotal();
+          //reiniciar contadores
+          contadorproductos = 0;
+          contadorfilas = 0;
+          mostrarformulario();
+        }else{
+          $("#numeroproveedor").val(numeroproveedoranterior);
+        }
+      }) 
+    }
+  }
+}
+//regresar numero
+function regresarnumeroproveedor(){
+  var numeroproveedoranterior = $("#numeroproveedoranterior").val();
+  $("#numeroproveedor").val(numeroproveedoranterior);
+}
+//obtener por numero
+function obteneralmacenpornumero(){
+  var numeroalmacenanterior = $("#numeroalmacenanterior").val();
+  var numeroalmacen = $("#numeroalmacen").val();
+  if(numeroalmacenanterior != numeroalmacen){
+    if($("#numeroalmacen").parsley().isValid()){
+      $.get(compras_obtener_almacen_por_numero, {numeroalmacen:numeroalmacen}, function(data){
+          $("#numeroalmacen").val(data.numero);
+          $("#numeroalmacenanterior").val(data.numero);
+          $("#almacen").val(data.nombre);
+          if(data.nombre != null){
+            $("#textonombrealmacen").html(data.nombre.substring(0, 40));
+          }
+          mostrarformulario();
+      }) 
+    }
+  }
+}
+//regresar numero
+function regresarnumeroalmacen(){
+  var numeroalmacenanterior = $("#numeroalmacenanterior").val();
+  $("#numeroalmacen").val(numeroalmacenanterior);
+}
 //listar productos para tab consumos
 function listarproductos(){
   ocultarformulario();
@@ -887,30 +1124,48 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm trasladoiepspesospartida" name="trasladoiepspesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'+Impuesto+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" readonly></td>'+
-                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm trasladoivapesospartida" name="trasladoivapesospartida[]" value="'+ivapesos+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm trasladoivapesospartida" name="trasladoivapesospartida[]" value="'+number_format(round(ivapesos, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencionivaporcentajepartida" name="retencionivaporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" readonly></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencionivapesospartida" name="retencionivapesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencionisrporcentajepartida" name="retencionisrporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" readonly></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencionisrpesospartida" name="retencionisrpesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencioniepsporcentajepartida" name="retencioniepsporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" readonly></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencioniepspesospartida" name="retencioniepspesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'+total+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'+number_format(round(total, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm ordenpartida" name="ordenpartida[]" value="'+orden+'" readonly data-parsley-length="[1, 20]"></td>'+
                     '<td class="tdmod">'+
                         '<div class="row divorinputmodxl">'+
-                            '<div class="col-md-2">'+
-                                '<div class="btn bg-blue btn-xs waves-effect" data-toggle="tooltip" title="Ver Departamentos" onclick="listardepartamentos('+contadorfilas+');" ><i class="material-icons">remove_red_eye</i></div>'+
+                            '<div class="col-xs-2 col-sm-2 col-md-2">'+
+                                '<div class="btn bg-blue btn-xs waves-effect btnlistardepartamentos" data-toggle="tooltip" title="Ver Departamentos" onclick="listardepartamentos('+contadorfilas+');" ><i class="material-icons">remove_red_eye</i></div>'+
                             '</div>'+
-                            '<div class="col-md-10">'+    
+                            '<div class="col-xs-10 col-sm-10 col-md-10">'+    
                                 '<input type="hidden" class="form-control divorinputmodsm numerodepartamentopartida" name="numerodepartamentopartida[]" readonly><input type="text" class="form-control divorinputmodmd departamentopartida" name="departamentopartida[]" readonly>'+   
                             '</div>'+
                         '</div>'+
                     '</td>'+
                     '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm preciomonedapartida" name="preciomonedapartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" ></td>'+
                     '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm descuentopartida" name="descuentopartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" ></td>'+
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'+ClaveProducto+'" readonly data-parsley-length="[1, 20]"></td>'+
+                    '<td class="tdmod">'+
+                      '<div class="row divorinputmodxl">'+
+                        '<div class="col-xs-2 col-sm-2 col-md-2">'+
+                          '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('+contadorfilas+');" ><i class="material-icons">remove_red_eye</i></div>'+
+                        '</div>'+
+                        '<div class="col-xs-10 col-sm-10 col-md-10">'+    
+                          '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'+ClaveProducto+'" readonly data-parsley-length="[1, 20]">'+
+                        '</div>'+
+                      '</div>'+
+                    '</td>'+
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'+NombreClaveProducto+'" readonly></td>'+
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'+ClaveUnidad+'" readonly data-parsley-length="[1, 5]"></td>'+
+                    '<td class="tdmod">'+
+                      '<div class="row divorinputmodxl">'+
+                        '<div class="col-xs-2 col-sm-2 col-md-2">'+
+                          '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('+contadorfilas+');" ><i class="material-icons">remove_red_eye</i></div>'+
+                        '</div>'+
+                        '<div class="col-xs-10 col-sm-10 col-md-10">'+    
+                          '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'+ClaveUnidad+'" readonly data-parsley-length="[1, 5]">'+
+                        '</div>'+
+                      '</div>'+
+                    '</td>'+
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'+NombreClaveUnidad+'" readonly></td>'+
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm costocatalogopartida" name="costocatalogopartida[]" value="'+Costo+'"  readonly></td>'+
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm costoingresadopartida" name="costoingresadopartida[]" readonly></td>'+
@@ -992,6 +1247,22 @@ function renumerarfilas(){
   for (var i = 0; i < lista.length; i++){
     lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+')');
   }
+  // renumerar btnlistardepartamentos
+  lista = document.getElementsByClassName("btnlistardepartamentos");
+  for (var i = 0; i < lista.length; i++){
+    lista[i].setAttribute("onclick", "listardepartamentos("+i+')');
+  }
+  //renumerar btnlistarclavesproductos
+  lista = document.getElementsByClassName("btnlistarclavesproductos");
+  for (var i = 0; i < lista.length; i++){
+    lista[i].setAttribute("onclick", "listarclavesproductos("+i+')');
+  }
+  //renumerar btnlistarclavesunidades
+  lista = document.getElementsByClassName("btnlistarclavesunidades");
+  for (var i = 0; i < lista.length; i++){
+    lista[i].setAttribute("onclick", "listarclavesunidades("+i+')');
+  }
+  
 }  
 //alta clientes
 function alta(){
@@ -1018,8 +1289,8 @@ function alta(){
                                         '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'"  required readonly data-parsley-length="[1, 10]">'+
                                         '<input type="hidden" class="form-control" name="uuid" id="uuid" readonly required data-parsley-length="[1, 50]">'+
                                         '<input type="hidden" class="form-control" name="diferenciatotales" id="diferenciatotales" readonly required>'+
-                                        '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
-                                        '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
+                                        '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
+                                        '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
                                         '<input type="hidden" class="form-control" name="arraycodigosdetallesordencompra" id="arraycodigosdetallesordencompra" readonly>'+
                                     '</div>'+   
                                     '<div class="col-md-3">'+
@@ -1028,7 +1299,7 @@ function alta(){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Fecha</label>'+
-                                        '<input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();validarmescompra();">'+
+                                        '<input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();validarmescompra();" style="min-width:95%;">'+
                                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                         '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
                                     '</div>'+   
@@ -1040,23 +1311,24 @@ function alta(){
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-md-3">'+
-                                        '<label>Proveedor</label>'+
+                                        '<label>Proveedor <span class="label label-danger" id="textonombreproveedor"></span> </label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td>'+
-                                                    '<div class="btn bg-blue waves-effect" id="btnobtenerproveedores" onclick="obtenerproveedores()" style="display:none">Seleccionar</div>'+
+                                                    '<div class="btn bg-blue waves-effect" id="btnobtenerproveedores" onclick="obtenerproveedores()" >Seleccionar</div>'+
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="numeroproveedor" id="numeroproveedor" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="proveedor" id="proveedor" required readonly>'+
+                                                        '<input type="text" class="form-control" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer">'+
+                                                        '<input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior" required data-parsley-type="integer">'+
+                                                        '<input type="hidden" class="form-control" name="proveedor" id="proveedor" required readonly>'+
                                                     '</div>'+
                                                 '</td>'+    
                                             '</tr>'+    
                                         '</table>'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
-                                        '<label>Almacen</label>'+
+                                        '<label>Almacen <span class="label label-danger" id="textonombrealmacen"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td hidden>'+
@@ -1064,8 +1336,9 @@ function alta(){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="numeroalmacen" id="numeroalmacen" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="almacen" id="almacen" required readonly>'+
+                                                        '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required readonly data-parsley-type="integer">'+
+                                                        '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required readonly data-parsley-type="integer">'+
+                                                        '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
                                                     '</div>'+
                                                 '</td>'+
                                             '</tr>'+    
@@ -1092,7 +1365,7 @@ function alta(){
                                                 '<td>'+
                                                     '<label>Moneda</label>'+
                                                     '<select name="moneda" id="moneda" class="form-control select2" style="width:100% !important;" required data-parsley-length="[1, 5]">'+
-                                                        '<option value="MXN">MXN</option>'+
+                                                        '<option value="MXN" selected>MXN</option>'+
                                                         '<option value="USD">USD</option>'+
                                                         '<option value="EUR">EUR</option>'+
                                                     '</select>'+
@@ -1106,7 +1379,7 @@ function alta(){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Cargar Ordenes de Compra</label>'+
-                                        '<div class="btn btn-block bg-blue waves-effect" id="btnlistarordenesdecompra" onclick="listarordenesdecompra()" style="display:none">VER ORDENES DE COMPRA</div>'+
+                                        '<div class="btn btn-block bg-blue waves-effect" id="btnlistarordenesdecompra" onclick="listarordenesdecompra()">VER ORDENES DE COMPRA</div>'+
                                         '<input type="hidden" class="form-control" name="orden" id="orden" required readonly>'+
                                     '</div>'+
                                     '<div class="col-md-3" id="divbuscarcodigoproducto" hidden>'+
@@ -1183,9 +1456,9 @@ function alta(){
                                                 '<th class="customercolortheadth">Depto</th>'+
                                                 '<th class="customercolortheadth" hidden>Precio Moneda $</th>'+
                                                 '<th class="customercolortheadth" hidden>Descuento $</th>'+
-                                                '<th class="customercolor">ClaveProducto</th>'+
+                                                '<th class="customercolortheadth">ClaveProducto</th>'+
                                                 '<th class="customercolor">Nombre ClaveProducto</th>'+
-                                                '<th class="customercolor">ClaveUnidad</th>'+
+                                                '<th class="customercolortheadth">ClaveUnidad</th>'+
                                                 '<th class="customercolor">Nombre ClaveUnidad</th>'+
                                                 '<th class="customercolor">Costo Catálogo</th>'+
                                                 '<th class="customercolor">Costo Ingresado</th>'+
@@ -1266,8 +1539,6 @@ function alta(){
   asignarfechaactual();
   //ocultar buscador de productos
   mostrarbuscadorcodigoproducto();
-  //asignar el tipo de operacion que se realizara
-  $("#tipooperacion").val("alta");
   //activar los input select
   $("#tipo").select2({disabled: true});
   $("#moneda").select2();
@@ -1282,73 +1553,91 @@ function alta(){
       listarproductos();
     }
   });
+  //busquedas seleccion
+  //activar busqueda
+  $('#numeroproveedor').on('keypress', function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      obtenerproveedorpornumero();
+    }
+  });
+  //regresar numero
+  $('#numeroproveedor').on('change', function(e) {
+    regresarnumeroproveedor();
+  });
+  //regresar numero
+  $('#numeroalmacen').on('change', function(e) {
+    regresarnumeroalmacen();
+  });
   $("#ModalAlta").modal('show');
 }
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
   e.preventDefault();
-  var diferenciatotales = $("#diferenciatotales").val();
-  if(diferenciatotales <= 0.01){
-    var emisorrfc = $("#emisorrfc").val();
-    var emisorrfcdb = $("#emisorrfcdb").val();
-    if(emisorrfc == emisorrfcdb){
-      var receptorrfc = $("#receptorrfc").val();
-      var receptorrfcxml = $("#receptorrfcxml").val();
-      if(receptorrfc == receptorrfcxml){
-        $("#tipo").prop("disabled", false);
-        var formData = new FormData($("#formparsley")[0]);
-        var form = $("#formparsley");
-        if (form.parsley().isValid()){
-          $('.page-loader-wrapper').css('display', 'block');
-          $.ajax({
-            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-            url:compras_guardar,
-            type: "post",
-            dataType: "html",
-            data: formData,
-            cache: false,
-            contentType: false,
-            processData: false,
-            success:function(data){
-              if(data == 1){
-                msj_erroruuidexistente();
-                $('.page-loader-wrapper').css('display', 'none');
-              }else{
-                msj_datosguardadoscorrectamente();
-                limpiar();
-                ocultarmodalformulario();
-                limpiarmodales();
+  var formData = new FormData($("#formparsley")[0]);
+  var form = $("#formparsley");
+  if (form.parsley().isValid()){
+    var diferenciatotales = $("#diferenciatotales").val();
+    if(diferenciatotales <= 0.01){
+      var emisorrfc = $("#emisorrfc").val();
+      var emisorrfcdb = $("#emisorrfcdb").val();
+      if(emisorrfc == emisorrfcdb){
+        var receptorrfc = $("#receptorrfc").val();
+        var receptorrfcxml = $("#receptorrfcxml").val();
+        if(receptorrfc == receptorrfcxml){
+          $("#tipo").prop("disabled", false);
+            $('.page-loader-wrapper').css('display', 'block');
+            $.ajax({
+              headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+              url:compras_guardar,
+              type: "post",
+              dataType: "html",
+              data: formData,
+              cache: false,
+              contentType: false,
+              processData: false,
+              success:function(data){
+                if(data == 1){
+                  msj_erroruuidexistente();
+                  $('.page-loader-wrapper').css('display', 'none');
+                }else{
+                  msj_datosguardadoscorrectamente();
+                  limpiar();
+                  ocultarmodalformulario();
+                  limpiarmodales();
+                  $('.page-loader-wrapper').css('display', 'none');
+                }
+              },
+              error:function(data){
+                if(data.status == 403){
+                  msj_errorenpermisos();
+                }else{
+                  msj_errorajax();
+                }
                 $('.page-loader-wrapper').css('display', 'none');
               }
-            },
-            error:function(data){
-              if(data.status == 403){
-                msj_errorenpermisos();
-              }else{
-                msj_errorajax();
-              }
-              $('.page-loader-wrapper').css('display', 'none');
-            }
-          })    
+            })   
         }else{
-          form.parsley().validate();
+          msj_errorrfcreceptordistinto();
         }
       }else{
-        msj_errorrfcreceptordistinto();
+        msj_errorrfcdistinto();
       }
     }else{
-      msj_errorrfcdistinto();
+      msj_errortotalpartidasnocoincide();
     }
   }else{
-    msj_errortotalpartidasnocoincide();
+    msjfaltandatosporcapturar();
   }
+  //validar formulario
+  form.parsley().validate();
 });
 //modificacion compra
 function obtenerdatos(compramodificar){
   $("#titulomodal").html('Modificación Compra');
   $('.page-loader-wrapper').css('display', 'block');
   $.get(compras_obtener_compra,{compramodificar:compramodificar },function(data){
-    console.log(data);
     //formulario modificacion
     var tabs =    '<div class="row">'+
                     '<div class="col-md-12">'+
@@ -1380,7 +1669,7 @@ function obtenerdatos(compramodificar){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Fecha</label>'+
-                                        '<input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();validarmescompra();">'+
+                                        '<input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();validarmescompra();" style="min-width:95%;">'+
                                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                         '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
                                     '</div>'+   
@@ -1392,7 +1681,7 @@ function obtenerdatos(compramodificar){
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-md-3">'+
-                                        '<label>Proveedor</label>'+
+                                        '<label>Proveedor <span class="label label-danger" id="textonombreproveedor"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td>'+
@@ -1400,15 +1689,16 @@ function obtenerdatos(compramodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="numeroproveedor" id="numeroproveedor" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="proveedor" id="proveedor" required readonly>'+
+                                                        '<input type="text" class="form-control" name="numeroproveedor" id="numeroproveedor" required readonly data-parsley-type="integer">'+
+                                                        '<input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior" required data-parsley-type="integer">'+
+                                                        '<input type="hidden" class="form-control" name="proveedor" id="proveedor" required readonly>'+
                                                     '</div>'+
                                                 '</td>'+    
                                             '</tr>'+    
                                         '</table>'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
-                                        '<label>Almacen</label>'+
+                                        '<label>Almacen <span class="label label-danger" id="textonombrealmacen"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
                                                 '<td hidden>'+
@@ -1416,8 +1706,9 @@ function obtenerdatos(compramodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="hidden" class="form-control" name="numeroalmacen" id="numeroalmacen" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="text" class="form-control" name="almacen" id="almacen" required readonly>'+
+                                                        '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required readonly data-parsley-type="integer">'+
+                                                        '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required readonly data-parsley-type="integer">'+
+                                                        '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
                                                     '</div>'+
                                                 '</td>'+
                                             '</tr>'+    
@@ -1535,9 +1826,9 @@ function obtenerdatos(compramodificar){
                                                 '<th class="customercolortheadth">Depto</th>'+
                                                 '<th class="customercolortheadth" hidden>Precio Moneda $</th>'+
                                                 '<th class="customercolortheadth" hidden>Descuento $</th>'+
-                                                '<th class="customercolor">ClaveProducto</th>'+
+                                                '<th class="customercolortheadth">ClaveProducto</th>'+
                                                 '<th class="customercolor">Nombre ClaveProducto</th>'+
-                                                '<th class="customercolor">ClaveUnidad</th>'+
+                                                '<th class="customercolortheadth">ClaveUnidad</th>'+
                                                 '<th class="customercolor">Nombre ClaveUnidad</th>'+
                                                 '<th class="customercolor">Costo Catálogo</th>'+
                                                 '<th class="customercolor">Costo Ingresado</th>'+
@@ -1615,6 +1906,7 @@ function obtenerdatos(compramodificar){
     $("#tabsform").html(tabs);
     //esconder el div del boton listar ordenes
     $("#divbtnlistarordenes").hide();
+    $("#periodohoy").val(data.compra.Periodo);
     $("#folio").val(data.compra.Folio);
     $("#serie").val(data.compra.Serie);
     $("#serietexto").html("Serie: "+data.compra.Serie);
@@ -1626,9 +1918,17 @@ function obtenerdatos(compramodificar){
     $("#fechaemitida").val(data.fechaemitida);
     $("#fechatimbrado").val(data.fechatimbrado);
     $("#proveedor").val(data.proveedor.Nombre);
+    if(data.proveedor.Nombre != null){
+      $("#textonombreproveedor").html(data.proveedor.Nombre.substring(0, 40));
+    }
     $("#numeroproveedor").val(data.proveedor.Numero);
+    $("#numeroproveedoranterior").val(data.proveedor.Numero);
     $("#almacen").val(data.almacen.Nombre);
+    if(data.almacen.Nombre != null){
+      $("#textonombrealmacen").html(data.almacen.Nombre.substring(0, 40));
+    }
     $("#numeroalmacen").val(data.almacen.Numero);
+    $("#numeroalmacenanterior").val(data.almacen.Numero);
     $("#remision").val(data.compra.Remision);
     $("#factura").val(data.compra.Factura);
     $("#moneda").val(data.compra.Moneda).change();
@@ -1671,6 +1971,7 @@ function obtenerdatos(compramodificar){
     contadorfilas = data.contadorfilas;
     //mostrar el buscador de productos
     mostrarbuscadorcodigoproducto();
+    //busquedas seleccion
     //activar busqueda de codigos
     $("#codigoabuscar").keypress(function(e) {
         //recomentable para mayor compatibilidad entre navegadores.
@@ -1678,6 +1979,14 @@ function obtenerdatos(compramodificar){
         if(code==13){
           listarproductos();
         }
+    });
+    //regresar numero
+    $('#numeroproveedor').on('change', function(e) {
+      regresarnumeroproveedor();
+    });
+    //regresar numero
+    $('#numeroalmacen').on('change', function(e) {
+      regresarnumeroalmacen();
     });
     //asignar el tipo de operacion que se realizara
     $("#tipooperacion").val("modificacion");
@@ -1793,61 +2102,63 @@ function comprobarexistenciasenbd(fila, tipo, numeroalmacen, codigo){
 //guardar modificación
 $("#btnGuardarModificacion").on('click', function (e) {
   e.preventDefault();
-  var diferenciatotales = $("#diferenciatotales").val();
-  if(diferenciatotales <= 0.01){
-    var emisorrfc = $("#emisorrfc").val();
-    var emisorrfcdb = $("#emisorrfcdb").val();
-    if(emisorrfc == emisorrfcdb){
-      var receptorrfc = $("#receptorrfc").val();
-      var receptorrfcxml = $("#receptorrfcxml").val();
-      if(receptorrfc == receptorrfcxml){
-        $("#tipo").prop("disabled", false);
-        var formData = new FormData($("#formparsley")[0]);
-        var form = $("#formparsley");
-        if (form.parsley().isValid()){
-          $('.page-loader-wrapper').css('display', 'block');
-          $.ajax({
-            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-            url:compras_guardar_modificacion,
-            type: "post",
-            dataType: "html",
-            data: formData,
-            cache: false,
-            contentType: false,
-            processData: false,
-            success:function(data){
-              if(data == 1){
-                msj_erroruuidexistente();
-                $('.page-loader-wrapper').css('display', 'none');
-              }else{
-                msj_datosguardadoscorrectamente();
-                limpiar();
-                ocultarmodalformulario();
-                limpiarmodales();
+  var formData = new FormData($("#formparsley")[0]);
+  var form = $("#formparsley");
+  if (form.parsley().isValid()){
+    var diferenciatotales = $("#diferenciatotales").val();
+    if(diferenciatotales <= 0.01){
+      var emisorrfc = $("#emisorrfc").val();
+      var emisorrfcdb = $("#emisorrfcdb").val();
+      if(emisorrfc == emisorrfcdb){
+        var receptorrfc = $("#receptorrfc").val();
+        var receptorrfcxml = $("#receptorrfcxml").val();
+        if(receptorrfc == receptorrfcxml){
+          $("#tipo").prop("disabled", false);
+            $('.page-loader-wrapper').css('display', 'block');
+            $.ajax({
+              headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+              url:compras_guardar_modificacion,
+              type: "post",
+              dataType: "html",
+              data: formData,
+              cache: false,
+              contentType: false,
+              processData: false,
+              success:function(data){
+                if(data == 1){
+                  msj_erroruuidexistente();
+                  $('.page-loader-wrapper').css('display', 'none');
+                }else{
+                  msj_datosguardadoscorrectamente();
+                  limpiar();
+                  ocultarmodalformulario();
+                  limpiarmodales();
+                  $('.page-loader-wrapper').css('display', 'none');
+                }
+              },
+              error:function(data){
+                if(data.status == 403){
+                  msj_errorenpermisos();
+                }else{
+                  msj_errorajax();
+                }
                 $('.page-loader-wrapper').css('display', 'none');
               }
-            },
-            error:function(data){
-              if(data.status == 403){
-                msj_errorenpermisos();
-              }else{
-                msj_errorajax();
-              }
-              $('.page-loader-wrapper').css('display', 'none');
-            }
-          })   
+            }) 
         }else{
-          form.parsley().validate();
+          msj_errorrfcreceptordistinto();
         }
       }else{
-        msj_errorrfcreceptordistinto();
+        msj_errorrfcdistinto();
       }
     }else{
-      msj_errorrfcdistinto();
-    }
+      msj_errortotalpartidasnocoincide();
+    } 
   }else{
-    msj_errortotalpartidasnocoincide();
+    msjfaltandatosporcapturar();
   }
+  //validar formulario
+  form.parsley().validate();
 });
 //verificar si la orden de compra se esta utilzando en alguna orden de compra
 function desactivar(compradesactivar){

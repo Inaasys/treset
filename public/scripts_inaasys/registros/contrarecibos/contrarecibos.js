@@ -194,73 +194,172 @@ function obtenerproveedores(){
         
     }); 
 } 
-function seleccionarproveedor(Numero, Nombre){
-    $("#numeroproveedor").val(Numero);
-    $("#proveedor").val(Nombre);
-    $.get(contrarecibos_obtener_compras_proveedor, {Numero:Numero}, function(data){
-        $("#tabladetallecontrarecibos").html(data.filascompras);
-        $("#totalcontrarecibos").val(number_format(round(0, numerodecimales), numerodecimales, '.', ''));
-    });
-    mostrarformulario();
+function seleccionarproveedor(Numero, Nombre, Plazo, fechahoy, fechahoyespanol){
+    var numeroproveedoranterior = $("#numeroproveedoranterior").val();
+    var numeroproveedor = Numero;
+    if(numeroproveedoranterior != numeroproveedor){
+        $("#numeroproveedor").val(Numero);
+        $("#numeroproveedoranterior").val(Numero);
+        $("#proveedor").val(Nombre);
+        if(Nombre != null){
+            $("#textonombreproveedor").html(Nombre.substring(0, 60));
+        }
+        $.get(contrarecibos_obtener_compras_proveedor, {Numero:Numero}, function(data){
+            $("#tabladetallecontrarecibos").html(data.filascompras);
+            $("#totalcontrarecibos").val(number_format(round(0, numerodecimales), numerodecimales, '.', ''));
+            //funcion asincrona para colocar la fecha actual si el usuario lo desea
+            cambiarfechaapagar(fechahoy, fechahoyespanol).then(resultado=>{})
+        });
+        mostrarformulario();
+    }
+}
+//funcion asincrona para colocar la fecha actual si el usuario lo desea
+function cambiarfechaapagar(fechahoy, fechahoyespanol){
+    return new Promise((ejecuta)=>{
+      setTimeout(function(){ 
+        var confirmacion = confirm("Aplicar esta fecha de pago a facturas? " +fechahoyespanol); 
+        if (confirmacion == true) { 
+                $(".fechapagarproveedor").val(fechahoy);
+                $(".fechaespanoltexto").html(fechahoyespanol);
+        }
+        return ejecuta(confirmacion);
+      },500);
+    })
+}
+//obtener por numero
+function obtenerproveedorpornumero(){
+    var numeroproveedoranterior = $("#numeroproveedoranterior").val();
+    var numeroproveedor = $("#numeroproveedor").val();
+    if(numeroproveedoranterior != numeroproveedor){
+        if($("#numeroproveedor").parsley().isValid()){
+            var numeroproveedor = $("#numeroproveedor").val();
+            $.get(contrarecibos_obtener_compras_proveedor_por_numero, {numeroproveedor:numeroproveedor}, function(data){
+                $("#numeroproveedor").val(data.numero);
+                $("#numeroproveedoranterior").val(data.numero);
+                $("#proveedor").val(data.nombre);
+                if(data.nombre != null){
+                    $("#textonombreproveedor").html(data.nombre.substring(0, 60));
+                }
+                $("#tabladetallecontrarecibos").html(data.filascompras);
+                $("#totalcontrarecibos").val(number_format(round(0, numerodecimales), numerodecimales, '.', ''));
+                //funcion asincrona para colocar la fecha actual si el usuario lo desea
+                cambiarfechaapagar(data.fechahoy, data.fechahoyespanol).then(resultado=>{})
+                mostrarformulario();
+            }) 
+        }
+    }
+}
+//regresar numero
+function regresarnumeroproveedor(){
+    var numeroproveedoranterior = $("#numeroproveedoranterior").val();
+    $("#numeroproveedor").val(numeroproveedoranterior);
 }
 //alta
 function alta(){
-  $("#titulomodal").html('Alta ContraRecibos');
-  mostrarmodalformulario('ALTA');
-  mostrarformulario();
-  //formulario alta
-  var tabs =    '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
-                    '<li role="presentation" class="active">'+
-                        '<a href="#productostab" data-toggle="tab">Productos</a>'+
-                    '</li>'+
-                '</ul>'+
-                '<div class="tab-content">'+
-                    '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
-                        '<div class="row">'+
-                            '<div class="col-md-12 table-responsive cabecerafija" style="height: 350px;overflow-y: scroll;padding: 0px 0px;">'+
-                                '<table class="table table-bordered">'+
-                                    '<thead class="customercolor">'+
-                                        '<tr>'+
-                                          '<th class="customercolor">#</th>'+
-                                          '<th class="customercolor">Compra</th>'+
-                                          '<th class="customercolor">Factura</th>'+
-                                          '<th class="customercolor">Remisión</th>'+
-                                          '<th class="customercolor">Fecha Factura</th>'+
-                                          '<th class="customercolor">Plazo</th>'+
-                                          '<th class="customercolor">Fecha a Pagar</th>'+
-                                          '<th class="customercolor">Total $</th>'+
-                                          '<th class="customercolortheadth">ContraRecibo </th>'+
-                                        '</tr>'+
-                                    '</thead>'+
-                                    '<tbody id="tabladetallecontrarecibos">'+           
-                                    '</tbody>'+
-                                '</table>'+
-                            '</div>'+
-                        '</div>'+ 
-                        '<div class="row">'+
-                          '<div class="col-md-6">'+   
-                            '<label>Observaciones</label>'+
-                            '<textarea class="form-control" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" rows="2" required data-parsley-length="[1, 255]"></textarea>'+
-                          '</div>'+ 
-                          '<div class="col-md-3 col-md-offset-3">'+
-                                '<table class="table table-striped table-hover">'+
-                                    '<tr>'+
-                                        '<td class="tdmod">Total ContraRecibos</td>'+
-                                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="totalcontrarecibos" id="totalcontrarecibos" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                    '</tr>'+
-                                '</table>'+
-                            '</div>'+
+    $("#titulomodal").html('Alta ContraRecibos');
+    mostrarmodalformulario('ALTA');
+    mostrarformulario();
+    //formulario alta
+    var tabs =  '<div class="col-md-12">'+
+                    '<div class="row">'+
+                        '<div class="col-md-2">'+
+                            '<label>Contrarecibo <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
+                            '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                            '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
+                            '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
+                            '<input type="hidden" class="form-control" name="numerofacturas" id="numerofacturas" value="0" required readonly>'+
                         '</div>'+   
+                        '<div class="col-md-4">'+
+                            '<label>Proveedor <span class="label label-danger" id="textonombreproveedor"></span></label>'+
+                            '<table class="col-md-12">'+
+                                '<tr>'+
+                                    '<td>'+
+                                        '<div class="btn bg-blue waves-effect" id="btnobtenerproveedores" onclick="obtenerproveedores()">Seleccionar</div>'+
+                                    '</td>'+
+                                    '<td>'+
+                                        '<div class="form-line">'+
+                                            '<input type="text" class="form-control" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer">'+
+                                            '<input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior" required data-parsley-type="integer">'+
+                                            '<input type="hidden" class="form-control" name="proveedor" id="proveedor" required readonly>'+
+                                        '</div>'+
+                                    '</td>'+
+                                '</tr>'+   
+                            '</table>'+
+                        '</div>'+
+                        '<div class="col-md-3">'+
+                            '<label>Fecha Contrarecibo</label>'+
+                            '<input type="date" class="form-control" name="fecha" id="fecha" onchange="validasolomesactual();asignafechapagoproveedor();" required>'+
+                            '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="{{$periodohoy}}">'+
+                        '</div>'+
+                        '<div class="col-md-3">'+
+                            '<label>Fecha del Pago al Proveedor</label>'+
+                            '<input type="date" class="form-control" name="fechaapagar" id="fechaapagar" required readonly>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+                '<div class="col-md-12">'+
+                    '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                        '<li role="presentation" class="active">'+
+                            '<a href="#productostab" data-toggle="tab">Productos</a>'+
+                        '</li>'+
+                    '</ul>'+
+                    '<div class="tab-content">'+
+                        '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
+                            '<div class="row">'+
+                                '<div class="col-md-12 table-responsive cabecerafija" style="height: 350px;overflow-y: scroll;padding: 0px 0px;">'+
+                                    '<table class="table table-bordered">'+
+                                        '<thead class="customercolor">'+
+                                            '<tr>'+
+                                            '<th class="customercolor">#</th>'+
+                                            '<th class="customercolor">Compra</th>'+
+                                            '<th class="customercolor">Factura</th>'+
+                                            '<th class="customercolor">Remisión</th>'+
+                                            '<th class="customercolor">Fecha Factura</th>'+
+                                            '<th class="customercolor">Plazo</th>'+
+                                            '<th class="customercolor">Fecha a Pagar</th>'+
+                                            '<th class="customercolor">Total $</th>'+
+                                            '<th class="customercolortheadth">ContraRecibo </th>'+
+                                            '</tr>'+
+                                        '</thead>'+
+                                        '<tbody id="tabladetallecontrarecibos">'+           
+                                        '</tbody>'+
+                                    '</table>'+
+                                '</div>'+
+                            '</div>'+ 
+                            '<div class="row">'+
+                            '<div class="col-md-6">'+   
+                                '<label>Observaciones</label>'+
+                                '<textarea class="form-control" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" rows="2" required data-parsley-length="[1, 255]"></textarea>'+
+                            '</div>'+ 
+                            '<div class="col-md-3 col-md-offset-3">'+
+                                    '<table class="table table-striped table-hover">'+
+                                        '<tr>'+
+                                            '<td class="tdmod">Total ContraRecibos</td>'+
+                                            '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="totalcontrarecibos" id="totalcontrarecibos" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '</tr>'+
+                                    '</table>'+
+                                '</div>'+
+                            '</div>'+   
+                        '</div>'+ 
                     '</div>'+ 
                 '</div>';
-  $("#tabsform").html(tabs);
-  $("#serie").val(serieusuario);
-  $("#serietexto").html("Serie: "+serieusuario);
-  $("#btnobtenerproveedores").show();
-  obtenultimonumero();
-  asignarfechaactual();
+    $("#tabsform").html(tabs);
+    obtenultimonumero();
+    asignarfechaactual();
+    //activar busqueda para proveedores
+    $('#numeroproveedor').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerproveedorpornumero();
+        }
+    });
+    //regresar numero proveedor
+    $('#numeroproveedor').on('change', function(e) {
+        regresarnumeroproveedor();
+    });
 }
-function calculartotalcontrarecibo(){
+function calculartotalcontrarecibo(tipo){
     var total = 0;
     var numerofacturas = 0;
     var lista = document.getElementsByClassName("contrarecibocompra");
@@ -275,6 +374,13 @@ function calculartotalcontrarecibo(){
     $("tr.filascompras").each(function () {
         if($(".contrarecibocompra", this).val() == 1){
             total = new Decimal(total).plus($('.totalcompra', this).val());
+            if(tipo == "modificacion"){
+                $(".agregadoen", this).val("NA");
+            }
+        }else if($(".contrarecibocompra", this).val() == 0){
+            if(tipo == "modificacion"){
+                $(".agregadoen", this).val("ELIMINADO");
+            }
         }
     }); 
     $("#totalcontrarecibos").val(number_format(round(total, numerodecimales), numerodecimales, '.', ''));
@@ -295,14 +401,12 @@ function allchecked(){
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
     e.preventDefault();
-    if($("#numerofacturas").val() == 0){
-        msj_errorentradacontrarecibo();
-    }else{
-        //colocar checked a todos los checboc antes de enviar el formulario para evitar error
-        allchecked();
-        var formData = new FormData($("#formparsley")[0]);
-        var form = $("#formparsley");
-        if (form.parsley().isValid()){
+    var formData = new FormData($("#formparsley")[0]);
+    var form = $("#formparsley");
+    if (form.parsley().isValid()){
+        if($("#numerofacturas").val() == 0){
+            msj_errorentradacontrarecibo();
+        }else{
             $('.page-loader-wrapper').css('display', 'block');
             $.ajax({
                 headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
@@ -329,10 +433,12 @@ $("#btnGuardar").on('click', function (e) {
                     $('.page-loader-wrapper').css('display', 'none');
                 }
             })
-        }else{
-            form.parsley().validate();
         }
+    }else{
+        msjfaltandatosporcapturar();
     }
+    //validar formulario
+    form.parsley().validate();
 });
 //verificar si la orden de compra se esta utilzando en alguna orden de compra
 function desactivar(contrarecibodesactivar){
@@ -399,71 +505,165 @@ function obtenerdatos(contrarecibomodificar){
     $('.page-loader-wrapper').css('display', 'block');
     $.get(contrarecibos_obtener_contrarecibo,{contrarecibomodificar:contrarecibomodificar },function(data){
     //formulario modificacion
-    var tabs =  '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
-                    '<li role="presentation" class="active">'+
-                        '<a href="#productostab" data-toggle="tab">Productos</a>'+
-                    '</li>'+
-                '</ul>'+
-                '<div class="tab-content">'+
-                    '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
-                        '<div class="row">'+
-                            '<div class="col-md-12 table-responsive cabecerafija" style="height: 350px;overflow-y: scroll;padding: 0px 0px;">'+
-                                '<table class="table table-bordered">'+
-                                    '<thead class="customercolor">'+
-                                        '<tr>'+
-                                          '<th class="customercolor">#</th>'+
-                                          '<th class="customercolor">Compra</th>'+
-                                          '<th class="customercolor">Factura</th>'+
-                                          '<th class="customercolor">Remisión</th>'+
-                                          '<th class="customercolor">Fecha Factura</th>'+
-                                          '<th class="customercolor">Plazo</th>'+
-                                          '<th class="customercolor">Fecha a Pagar</th>'+
-                                          '<th class="customercolor">Total $</th>'+
-                                          '<th class="customercolortheadth">ContraRecibo </th>'+
-                                        '</tr>'+
-                                    '</thead>'+
-                                    '<tbody id="tabladetallecontrarecibos">'+           
-                                    '</tbody>'+
-                                '</table>'+
-                            '</div>'+
-                        '</div>'+ 
-                        '<div class="row">'+
-                          '<div class="col-md-6">'+   
-                            '<label>Observaciones</label>'+
-                            '<textarea class="form-control" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" rows="2" required data-parsley-length="[1, 255]"></textarea>'+
-                          '</div>'+ 
-                          '<div class="col-md-3 col-md-offset-3">'+
-                                '<table class="table table-striped table-hover">'+
-                                    '<tr>'+
-                                        '<td class="tdmod">Total ContraRecibos</td>'+
-                                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="totalcontrarecibos" id="totalcontrarecibos" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                    '</tr>'+
-                                '</table>'+
-                            '</div>'+
+    var tabs =  '<div class="col-md-12">'+
+                    '<div class="row">'+
+                        '<div class="col-md-2">'+
+                            '<label>Contrarecibo <b style="color:#F44336 !important;" id="serietexto"> Serie:</b></label>'+
+                            '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                            '<input type="hidden" class="form-control" name="serie" id="serie" required readonly data-parsley-length="[1, 10]">'+
+                            '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
+                            '<input type="hidden" class="form-control" name="numerofacturas" id="numerofacturas" required readonly>'+
                         '</div>'+   
+                        '<div class="col-md-4">'+
+                            '<label>Proveedor <span class="label label-danger" id="textonombreproveedor"></span></label>'+
+                            '<table class="col-md-12">'+
+                                '<tr>'+
+                                    '<td hidden>'+
+                                        '<div class="btn bg-blue waves-effect" id="btnobtenerproveedores" onclick="obtenerproveedores()">Seleccionar</div>'+
+                                    '</td>'+
+                                    '<td>'+
+                                        '<div class="form-line">'+
+                                            '<input type="text" class="form-control" name="numeroproveedor" id="numeroproveedor" required readonly data-parsley-type="integer">'+
+                                            '<input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior"  required data-parsley-type="integer">'+
+                                            '<input type="hidden" class="form-control" name="proveedor" id="proveedor" required readonly>'+
+                                        '</div>'+
+                                    '</td>'+
+                                '</tr>'+   
+                            '</table>'+
+                        '</div>'+
+                        '<div class="col-md-3">'+
+                            '<label>Fecha Contrarecibo</label>'+
+                            '<input type="date" class="form-control" name="fecha" id="fecha" onchange="validasolomesactual();asignafechapagoproveedor();" required>'+
+                            '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy">'+
+                        '</div>'+
+                        '<div class="col-md-3">'+
+                            '<label>Fecha del Pago al Proveedor</label>'+
+                            '<input type="date" class="form-control" name="fechaapagar" id="fechaapagar" required readonly>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+                '<div class="col-md-12">'+
+                    '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                        '<li role="presentation" class="active">'+
+                            '<a href="#productostab" data-toggle="tab">Productos</a>'+
+                        '</li>'+
+                    '</ul>'+
+                    '<div class="tab-content">'+
+                        '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
+                            '<div class="row">'+
+                                '<div class="col-md-12 table-responsive cabecerafija" style="height: 350px;overflow-y: scroll;padding: 0px 0px;">'+
+                                    '<table class="table table-bordered">'+
+                                        '<thead class="customercolor">'+
+                                            '<tr>'+
+                                            '<th class="customercolor">#</th>'+
+                                            '<th class="customercolor">Compra</th>'+
+                                            '<th class="customercolor">Factura</th>'+
+                                            '<th class="customercolor">Remisión</th>'+
+                                            '<th class="customercolor">Fecha Factura</th>'+
+                                            '<th class="customercolor">Plazo</th>'+
+                                            '<th class="customercolor">Fecha a Pagar</th>'+
+                                            '<th class="customercolor">Total $</th>'+
+                                            '<th class="customercolortheadth">ContraRecibo </th>'+
+                                            '</tr>'+
+                                        '</thead>'+
+                                        '<tbody id="tabladetallecontrarecibos">'+         
+                                        '</tbody>'+
+                                    '</table>'+
+                                '</div>'+
+                            '</div>'+ 
+                            '<div class="row">'+
+                            '<div class="col-md-6">'+   
+                                '<label>Observaciones</label>'+
+                                '<textarea class="form-control" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" rows="2" required data-parsley-length="[1, 255]"></textarea>'+
+                            '</div>'+ 
+                            '<div class="col-md-3 col-md-offset-3">'+
+                                    '<table class="table table-striped table-hover">'+
+                                        '<tr>'+
+                                            '<td class="tdmod">Total ContraRecibos</td>'+
+                                            '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="totalcontrarecibos" id="totalcontrarecibos" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '</tr>'+
+                                    '</table>'+
+                                '</div>'+
+                            '</div>'+   
+                        '</div>'+ 
                     '</div>'+ 
                 '</div>';
-    $("#tabsform").html(tabs);        
+    $("#tabsform").html(tabs); 
+    $("#periodohoy").val(data.contrarecibo.Periodo);
     $("#folio").val(data.contrarecibo.Folio);
     $("#serie").val(data.contrarecibo.Serie);
     $("#serietexto").html("Serie: "+data.contrarecibo.Serie);
     $("#numeroproveedor").val(data.proveedor.Numero);
+    $("#numeroproveedoranterior").val(data.proveedor.Numero);
     $("#proveedor").val(data.proveedor.Nombre);
+    if(data.proveedor.Nombre != null){
+        $("#textonombreproveedor").html(data.proveedor.Nombre.substring(0, 60));
+    }
     $("#btnobtenerproveedores").hide();
     $("#fecha").val(data.fecha);
     $("#fechaapagar").val(data.fecha);
     $("#observaciones").val(data.contrarecibo.Obs);
     $("#totalcontrarecibos").val(data.total);
+    //asignar el tipo de operacion que se realizara
+    $("#tipooperacion").val("modificacion");
     //tabs detalles
     $("#tabladetallecontrarecibos").html(data.filasdetallescontrarecibo);
+    $("#numerofacturas").val(data.contrarecibo.Facturas);
+    //busquedas seleccion
+    //regresar numero proveedor
+    $('#numeroproveedor').on('change', function(e) {
+        regresarnumeroproveedor();
+    });
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
     mostrarformulario();
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {
-    msj_mantenimientoajax();    
+    msj_errorajax();    
     $('.page-loader-wrapper').css('display', 'none');
   })
 }
+//cambios
+$("#btnGuardarModificacion").on('click', function (e) {
+    e.preventDefault();
+    var formData = new FormData($("#formparsley")[0]);
+    var form = $("#formparsley");
+    if (form.parsley().isValid()){
+        if($("#numerofacturas").val() == 0){
+            msj_errorentradacontrarecibo();
+        }else{
+            $('.page-loader-wrapper').css('display', 'block');
+            $.ajax({
+                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                url:contrarecibos_guardar_modificacion,
+                type: "post",
+                dataType: "html",
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success:function(data){
+                    msj_datosguardadoscorrectamente();
+                    limpiar();
+                    ocultarmodalformulario();
+                    limpiarmodales();
+                    $('.page-loader-wrapper').css('display', 'none');
+                },
+                error:function(data){
+                    if(data.status == 403){
+                        msj_errorenpermisos();
+                    }else{
+                        msj_errorajax();
+                    }
+                    $('.page-loader-wrapper').css('display', 'none');
+                }
+            })
+        }
+    }else{
+        msjfaltandatosporcapturar();
+    }
+    //validar formulario
+    form.parsley().validate();
+});
 //obtener datos para el envio del documento por email
 function enviardocumentoemail(documento){
     $.get(contrarecibos_obtener_datos_envio_email,{documento:documento}, function(data){

@@ -81,6 +81,23 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                     ->make(true);
         }
     }
+    //obtener persona recibe por numero
+    public function  asignacion_herramienta_obtener_personal_recibe_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $existepersonal = Personal::where('id', $request->numeropersonalrecibe)->where('Status', 'ALTA')->count();
+        if($existepersonal > 0){
+            $personal = Personal::where('id', $request->numeropersonalrecibe)->where('Status', 'ALTA')->first();
+            $numero = $personal->id;
+            $nombre = $personal->nombre;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre,
+        );
+        return response()->json($data); 
+    }
+
     //obtener personal que entrega herramienta
     public function asignacion_herramienta_obtener_personal_entrega(Request $request){
         if($request->ajax()){
@@ -94,6 +111,24 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                     ->make(true);
         }
     }
+
+    //obtener personal entrega por numero
+    public function asignacion_herramienta_obtener_personal_entrega_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $existepersonal = Personal::where('id', $request->numeropersonalentrega)->where('Status', 'ALTA')->count();
+        if($existepersonal > 0){
+            $personal = Personal::where('id', $request->numeropersonalentrega)->where('Status', 'ALTA')->first();
+            $numero = $personal->id;
+            $nombre = $personal->nombre;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre,
+        );
+        return response()->json($data); 
+    }
+
     //obtener herramienta
     public function asignacion_herramienta_obtener_herramienta(Request $request){
         if($request->ajax()){

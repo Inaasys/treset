@@ -24,6 +24,9 @@ class VistaAjusteInventario extends Model
         'NumeroAlmacen',
         'NombreAlmacen'
     ];
+    protected $casts = [
+        'Fecha' => 'datetime:Y-m-d',
+    ];
     //total
     public function getTotalAttribute($value){
         return Helpers::convertirvalorcorrecto($value);

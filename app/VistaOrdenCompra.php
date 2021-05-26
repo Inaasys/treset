@@ -41,6 +41,9 @@ class VistaOrdenCompra extends Model
         'NumeroAlmacen',
         'NombreAlmacen'
     ];
+    protected $casts = [
+        'Fecha' => 'datetime:Y-m-d',
+    ];
     //subtotal
     public function getSubTotalAttribute($value){
         return Helpers::convertirvalorcorrecto($value);
@@ -57,4 +60,9 @@ class VistaOrdenCompra extends Model
     public function getDescuentoAttribute($value){
         return Helpers::convertirvalorcorrecto($value);
     }
+    /*
+    //fecha
+    public function setFechaAttribute($value){
+        $this->attributes['first_name'] = strtolower($value);
+    }*/
 }

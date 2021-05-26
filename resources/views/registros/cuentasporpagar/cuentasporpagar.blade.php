@@ -101,7 +101,7 @@
                                 <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" required readonly data-parsley-length="[1, 10]">
                             </div>   
                             <div class="col-md-4">
-                                <label>Proveedor</label>
+                                <label>Proveedor <span class="label label-danger" id="textonombreproveedor"></span></label>
                                 <table class="col-md-12">
                                     <tr>
                                         <td>
@@ -109,15 +109,16 @@
                                         </td>
                                         <td>
                                             <div class="form-line">
-                                                <input type="hidden" class="form-control" name="numeroproveedor" id="numeroproveedor" required readonly onkeyup="tipoLetra(this)">
-                                                <input type="text" class="form-control" name="proveedor" id="proveedor" required readonly>
+                                                <input type="text" class="form-control" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer">
+                                                <input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior" required data-parsley-type="integer">
+                                                <input type="hidden" class="form-control" name="proveedor" id="proveedor" required readonly>
                                             </div>
                                         </td>
                                     </tr>    
                                 </table>
                             </div>
                             <div class="col-md-4">
-                                <label>Banco</label>
+                                <label>Banco <span class="label label-danger" id="textonombrebanco"></span></label>
                                 <table class="col-md-12">
                                     <tr>
                                         <td>
@@ -125,8 +126,9 @@
                                         </td>
                                         <td>    
                                             <div class="form-line">
-                                                <input type="hidden" class="form-control" name="numerobanco" id="numerobanco" required readonly onkeyup="tipoLetra(this)">
-                                                <input type="text" class="form-control" name="banco" id="banco" required readonly>
+                                                <input type="text" class="form-control" name="numerobanco" id="numerobanco" required data-parsley-type="integer">
+                                                <input type="hidden" class="form-control" name="numerobancoanterior" id="numerobancoanterior" required data-parsley-type="integer">
+                                                <input type="hidden" class="form-control" name="banco" id="banco" required readonly>
                                             </div>
                                         </td>    
                                     </tr>    
@@ -141,11 +143,11 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <label>Transferencia</label>
-                                <input type="text" class="form-control" name="transferencia" id="transferencia" value="0" required onkeyup="tipoLetra(this);">
+                                <input type="text" class="form-control" name="transferencia" id="transferencia" value="0" required data-parsley-type="integer">
                             </div>
                             <div class="col-md-4">
                                 <label>Cheque</label>
-                                <input type="text" class="form-control" name="cheque" id="cheque" value="0" required onkeyup="tipoLetra(this);">
+                                <input type="text" class="form-control" name="cheque" id="cheque" value="0" required data-parsley-type="integer">
                             </div>
                             <div class="col-md-4">
                                 <label>Beneficiario</label>
@@ -250,12 +252,15 @@
         var cuentas_por_pagar_obtener = '{!!URL::to('cuentas_por_pagar_obtener')!!}';
         var cuentas_por_pagar_obtener_ultimo_folio = '{!!URL::to('cuentas_por_pagar_obtener_ultimo_folio')!!}';
         var cuentas_por_pagar_obtener_proveedores = '{!!URL::to('cuentas_por_pagar_obtener_proveedores')!!}';
+        var cuentas_por_pagar_obtener_proveedor_por_numero = '{!!URL::to('cuentas_por_pagar_obtener_proveedor_por_numero')!!}';
         var cuentas_por_pagar_obtener_bancos = '{!!URL::to('cuentas_por_pagar_obtener_bancos')!!}';
+        var cuentas_por_pagar_obtener_banco_por_numero = '{!!URL::to('cuentas_por_pagar_obtener_banco_por_numero')!!}';
         var cuentas_por_pagar_obtener_compras_proveedor = '{!!URL::to('cuentas_por_pagar_obtener_compras_proveedor')!!}';
         var cuentas_por_pagar_guardar = '{!!URL::to('cuentas_por_pagar_guardar')!!}';
         var cuentas_por_pagar_comprobar_baja = '{!!URL::to('cuentas_por_pagar_comprobar_baja')!!}';
         var cuentas_por_pagar_baja  = '{!!URL::to('cuentas_por_pagar_baja')!!}';
         var cuentas_por_pagar_obtener_cuenta_por_pagar =  '{!!URL::to('cuentas_por_pagar_obtener_cuenta_por_pagar')!!}';
+        var cuentas_por_pagar_guardar_modificacion = '{!!URL::to('cuentas_por_pagar_guardar_modificacion')!!}';
         var cuentas_por_pagar_obtener_datos_envio_email = '{!!URL::to('cuentas_por_pagar_obtener_datos_envio_email')!!}';
         var cuentas_por_pagar_enviar_pdfs_email = '{!!URL::to('cuentas_por_pagar_enviar_pdfs_email')!!}';
         var cuentas_por_pagar_buscar_folio_string_like =  '{!!URL::to('cuentas_por_pagar_buscar_folio_string_like')!!}';

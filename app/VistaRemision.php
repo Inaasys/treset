@@ -57,6 +57,9 @@ class VistaRemision extends Model
         'Lugar',
         'Personas'
     ];
+    protected $casts = [
+        'Fecha' => 'datetime:Y-m-d',
+    ];
     //subtotal
     public function getSubTotalAttribute($value){
         return Helpers::convertirvalorcorrecto($value);

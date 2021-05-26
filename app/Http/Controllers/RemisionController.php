@@ -114,6 +114,36 @@ class RemisionController extends ConfiguracionSistemaController{
         }
     }
 
+    //obtener cliente por numero
+    public function remisiones_obtener_cliente_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $credito = '';
+        $saldo = '';
+        $numeroagente = '';
+        $nombreagente = '';
+        $existecliente = Cliente::where('Numero', $request->numerocliente)->where('Status', 'ALTA')->count();
+        if($existecliente > 0){
+            $cliente = Cliente::where('Numero', $request->numerocliente)->where('Status', 'ALTA')->first();
+            $agente = Agente::where('Numero', $cliente->Agente)->first();
+            $numero = $cliente->Numero;
+            $nombre = $cliente->Nombre;
+            $credito = Helpers::convertirvalorcorrecto($cliente->Credito);
+            $saldo = Helpers::convertirvalorcorrecto($cliente->Saldo);
+            $numeroagente = $agente->Numero;
+            $nombreagente = $agente->Nombre;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre,
+            'credito' => $credito,
+            'saldo' => $saldo,
+            'numeroagente' => $numeroagente,
+            'nombreagente' => $nombreagente
+        );
+        return response()->json($data);
+    }
+
     //obtener oagentes
     public function remisiones_obtener_agentes(Request $request){
         if($request->ajax()){
@@ -128,6 +158,23 @@ class RemisionController extends ConfiguracionSistemaController{
         } 
     }
 
+    //obtener agente por numero
+    public function remisiones_obtener_agente_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $existeagente = Agente::where('Numero', $request->numeroagente)->where('Status', 'ALTA')->count();
+        if($existeagente > 0){
+            $agente = Agente::where('Numero', $request->numeroagente)->where('Status', 'ALTA')->first();
+            $numero = $agente->Numero;
+            $nombre = $agente->Nombre;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+    }
+
     //obtener almacenes
     public function remisiones_obtener_almacenes(Request $request){
         if($request->ajax()){
@@ -140,6 +187,23 @@ class RemisionController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
+    }
+
+    //obtener almacen por numero
+    public function remisiones_obtener_almacen_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $existealmacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->count();
+        if($existealmacen > 0){
+            $almacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->first();
+            $numero = $almacen->Numero;
+            $nombre = $almacen->Nombre;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
     }
 
     //obtener tipos cliente
@@ -241,7 +305,7 @@ class RemisionController extends ConfiguracionSistemaController{
         $Remision->Hora=Helpers::fecha_exacta_accion_datetimestring();
         $Remision->Status="POR FACTURAR";
         $Remision->Usuario=Auth::user()->user;
-        $Remision->Periodo=$request->periodohoy;
+        $Remision->Periodo=$this->periodohoy;
         $Remision->save();
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
@@ -251,7 +315,7 @@ class RemisionController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
         $BitacoraDocumento->Status = "POR FACTURAR";
         $BitacoraDocumento->Usuario = Auth::user()->user;
-        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
         $item = 1;
@@ -591,7 +655,7 @@ class RemisionController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
         $BitacoraDocumento->Status = $Remision->Status;
         $BitacoraDocumento->Usuario = Auth::user()->user;
-        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA DETALLES
         foreach ($request->codigoproductopartida as $key => $codigoproductopartida){    
