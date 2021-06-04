@@ -44,7 +44,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
     }
 
     public function ordenes_compra(){
-        $serieusuario = Helpers::obtenerserieusuario(Auth::user()->user, 'OrdenesDeCompra');
+        $serieusuario = 'A';
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('ordenes_compra_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('ordenes_compra_exportar_excel');
@@ -56,17 +56,32 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         if($request->ajax()){
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = VistaOrdenCompra::select($this->campos_consulta)->orderBy('Folio', 'DESC')->where('Periodo', $periodo)->get();
+            $data = VistaOrdenCompra::select($this->campos_consulta)->orderBy('Fecha', 'DESC')->where('Periodo', $periodo)->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($tipousuariologueado){
+                        $operaciones = '<div class="dropdown">'.
+                                            '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                                                'OPERACIONES <span class="caret"></span>'.
+                                            '</button>'.
+                                            '<ul class="dropdown-menu">'.
+                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Orden .'\')">Cambios</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="autorizarordencompra(\''.$data->Orden .'\')">Autorizar</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Orden .'\')">Bajas</a></li>'.
+                                                '<li><a href="'.route('ordenes_compra_generar_pdfs_indiv',$data->Orden).'" target="_blank">Ver Documento PDF</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Orden .'\')">Enviar Documento por Correo</a></li>'.
+                                            '</ul>'.
+                                        '</div>';
+                        /*
                         $botoncambios = '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Orden .'\')"><i class="material-icons">mode_edit</i></div> ';
                         $botonautorizar = '<div class="btn bg-green btn-xs waves-effect" data-toggle="tooltip" title="Autorizar" onclick="autorizarordencompra(\''.$data->Orden .'\')"><i class="material-icons">check</i></div> ';
                         $botonbajas = '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Orden .'\')"><i class="material-icons">cancel</i></div> ';
                         $botondocumentopdf = '<a href="'.route('ordenes_compra_generar_pdfs_indiv',$data->Orden).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
                         $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Orden .'\')"><i class="material-icons">email</i></div> ';
-                        $boton = $botoncambios.$botonautorizar.$botonbajas.$botondocumentopdf.$botonenviaremail;
-                        return $boton;
+                        $operaciones = $botoncambios.$botonautorizar.$botonbajas.$botondocumentopdf.$botonenviaremail;
+                        */
+                        return $operaciones;
                     })
+                    ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
                     ->addColumn('SubTotal', function($data){ return $data->SubTotal; })
                     ->addColumn('Iva', function($data){ return $data->Iva; })
                     ->addColumn('Total', function($data){ return $data->Total; })
@@ -75,14 +90,47 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     ->make(true);
         } 
     } 
-    //obtener el ultimo folio de la tabla
-    public function ordenes_compra_obtener_ultimo_folio(){
-        $folio = Helpers::ultimofoliotablamodulos('App\OrdenCompra');
+    //obtener series documento
+    public function ordenes_compra_obtener_series_documento(Request $request){
+        if($request->ajax()){
+            $data = Serie::where('Documento', 'OrdenesDeCompra')->where('Usuario', Auth::user()->user)->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''.$data->Serie.'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+    //obtener ultimo folio de la serie seleccionada
+    public function ordenes_compra_obtener_ultimo_folio_serie_seleccionada(Request $request){
+        $folio = Helpers::ultimofolioserietablamodulos('App\OrdenCompra',$request->Serie);
         return response()->json($folio);
     }
+    //obtener el ultimo folio de la tabla
+    public function ordenes_compra_obtener_ultimo_folio(Request $request){
+        $folio = Helpers::ultimofolioserietablamodulos('App\OrdenCompra',$request->serie);
+        return response()->json($folio);
+    }
+    //obtener fecha date time actual
+    public function ordenes_compra_obtener_fecha_actual_datetimelocal(Request $request){
+        $fechadatetimelocal = Helpers::fecha_exacta_accion_datetimelocal();
+        return response()->json($fechadatetimelocal);
+    }
     //obtener tipos ordenes de compra
-    public function ordenes_compra_obtener_tipos_ordenes_compra(){
-        $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->get();
+    public function ordenes_compra_obtener_tipos_ordenes_compra(Request $request){
+        switch ($request->tipoalta) {
+            case "GASTOS":
+                $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->where('Nombre', 'GASTOS')->get();
+                break;
+            case "TOT":
+                $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->where('Nombre', 'TOT')->get();
+                break;
+            default:
+                $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->where('Nombre', '<>', 'GASTOS')->Where('Nombre', '<>', 'TOT')->get();
+
+        } 
         $select_tipos_ordenes_compra = "<option disabled hidden>Selecciona...</option>";
         foreach($tipos_ordenes_compra as $tipo){
             $select_tipos_ordenes_compra = $select_tipos_ordenes_compra."<option value='".$tipo->Nombre."'>".$tipo->Nombre."</option>";
@@ -114,6 +162,47 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         }
+    }
+    //obtener ordenes trabajo
+    public function ordenes_compra_obtener_ordenes_trabajo(Request $request){
+        if($request->ajax()){
+            $data = DB::table('Ordenes de Trabajo as ot')
+                        ->join('Clientes as c', 'ot.Cliente', '=', 'c.Numero')
+                        ->select('ot.Orden as Orden', 'ot.Fecha as Fecha', 'c.Nombre as Cliente', 'ot.Tipo as Tipo', 'ot.Unidad as Unidad', 'ot.Status AS StatusOrden')
+                        ->where('ot.Status', 'ABIERTA')
+                        ->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarordentrabajo(\''.$data->Orden.'\',\''.Helpers::formatoinputdatetime($data->Fecha).'\',\''.$data->Cliente.'\',\''.$data->Tipo.'\',\''.$data->Unidad.'\',\''.$data->StatusOrden.'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+    //obtener orden trabajo por folio
+    public function ordenes_compra_obtener_orden_trabajo_por_folio(Request $request){
+        $orden = '';
+        $existeorden = DB::table('Ordenes de Trabajo as ot')
+                            ->join('Clientes as c', 'ot.Cliente', '=', 'c.Numero')
+                            ->select('ot.Orden as Orden', 'ot.Fecha as Fecha', 'c.Nombre as Cliente', 'ot.Tipo as Tipo', 'ot.Unidad as Unidad', 'ot.Status AS StatusOrden')
+                            ->where('ot.Status', 'ABIERTA')
+                            ->where('ot.Orden', $request->ordentrabajo)
+                            ->count();
+        if($existeorden > 0){
+            $orden = DB::table('Ordenes de Trabajo as ot')
+                        ->join('Clientes as c', 'ot.Cliente', '=', 'c.Numero')
+                        ->select('ot.Orden as Orden', 'ot.Fecha as Fecha', 'c.Nombre as Cliente', 'ot.Tipo as Tipo', 'ot.Unidad as Unidad', 'ot.Status AS StatusOrden')
+                        ->where('ot.Status', 'ABIERTA')
+                        ->where('ot.Orden', $request->ordentrabajo)
+                        ->get();
+                        //dd($orden[0]);
+            $orden = $orden[0]->Orden;
+        }
+        $data = array(
+            'orden' => $orden
+        );
+        return response()->json($data); 
     }
     //obtener productos
     public function ordenes_compra_obtener_productos(Request $request){
@@ -178,9 +267,9 @@ class OrdenCompraController extends ConfiguracionSistemaController{
     }
     //guardar en el módulo
     public function ordenes_compra_guardar(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         //obtener el ultimo id de la tabla
-        $folio = Helpers::ultimofoliotablamodulos('App\OrdenCompra');
+        $folio = Helpers::ultimofolioserietablamodulos('App\OrdenCompra',$request->serie);
         //INGRESAR DATOS A TABLA ORDEN COMPRA
         $orden = $folio.'-'.$request->serie;
 		$OrdenCompra = new OrdenCompra;
@@ -202,6 +291,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         $OrdenCompra->Status="POR SURTIR";
         $OrdenCompra->Usuario=Auth::user()->user;
         $OrdenCompra->Periodo=$this->periodohoy;
+        $OrdenCompra->OrdenTrabajo=$request->ordentrabajo;
         $OrdenCompra->save();
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
@@ -405,7 +495,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             "modificacionpermitida" => $modificacionpermitida,
             "proveedor" => $proveedor,
             "almacen" => $almacen,
-            "fecha" => Helpers::formatoinputdate($ordencompra->Fecha),
+            "fecha" => Helpers::formatoinputdatetime($ordencompra->Fecha),
             "importe" => Helpers::convertirvalorcorrecto($ordencompra->Importe),
             "descuento" => Helpers::convertirvalorcorrecto($ordencompra->Descuento),
             "subtotal" => Helpers::convertirvalorcorrecto($ordencompra->SubTotal),
@@ -419,7 +509,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
     }
     //modificar datos orden de compra
     public function ordenes_compra_guardar_modificacion(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         //INGRESAR DATOS A TABLA ORDEN COMPRA
         $orden = $request->folio.'-'.$request->serie;
 		$OrdenCompra = OrdenCompra::where('Orden', $orden)->first();
@@ -464,7 +554,8 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             'SubTotal'=>$request->subtotal,
             'Iva'=>$request->iva,
             'Total'=>$request->total,
-            'Obs'=>$request->observaciones
+            'Obs'=>$request->observaciones,
+            'OrdenTrabajo'=>$request->ordentrabajo
         ]);
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;

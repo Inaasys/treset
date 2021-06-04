@@ -32,6 +32,7 @@ class VistaOrdenCompra extends Model
         'Descuento',
         'Obs',
         'MotivoBaja',
+        'OrdenTrabajo',
         'NumeroProveedor',
         'RfcProveedor',
         'CodigoPostalProveedor',

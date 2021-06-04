@@ -13,26 +13,32 @@
             <div class="row clearfix">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="card" id="listadoregistros">
-                        <div class="header bg-red table-responsive button-demo">
-                        	<table>
-                        		<tr>
-                        			<td>
-                        				<h5>&nbsp;&nbsp;&nbsp;&nbsp;Usuarios&nbsp;&nbsp;&nbsp;</h5>
-                        			</td>
-                        			<td >
-                            			<div class="btn bg-blue btn-xs waves-effect" onclick="alta()">
-                                    		Altas
-                                		</div>
-                        			</td>
-                        		</tr>
-                        	</table>
+                        <div class="header bg-red">
+                            <div class="row clearfix">
+                                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+                                    <h5>&nbsp;&nbsp;&nbsp;USUARIOS&nbsp;&nbsp;&nbsp;</h5>
+                                </div>
+                                <div class="col-lg-11 col-md-11 col-sm-11 col-xs-12 button-demo">
+                                    <div class="table-responsive">
+                                        <table>
+                                            <tr>
+                                                <td >
+                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="alta()">
+                                                        Altas
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="body">
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover" style="width:100% !important;">
                                     <thead class="customercolor">
                                         <tr>
-                                            <th><div style="width:80px !important;">Operaciones</div></th>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
                                             <th>Número</th>
                                             <th>Nombre</th>
                     						<th>Correo</th>
@@ -73,7 +79,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
-                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Guardar</button>
+                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
                     </div>
                 </form> 
             </div>
@@ -99,11 +105,38 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
-                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarPermisos">Guardar</button>
+                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarPermisos">Confirmar Permisos</button>
                     </div>
                 </form> 
             </div>
             <div id="contenidomodaltablas">
+                <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
+            </div> 
+        </div>
+    </div>
+</div>
+<!-- Modal Series Documentos Por Usuario-->
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="ModalSeriesDocumentos" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div id="formularioserie">
+                <div class="modal-header bg-red">
+                    <h4 class="modal-title" id="titulomodalserie">Series Documentos</h4>
+                </div>
+                <form id="formparsleyserie" action="#">
+                    <div class="modal-body">
+                        <div class="col-md-12" id="tabsformserie">
+                            <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="mostrarlistadoseriesdocumentos()">Regresar</button>
+                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarSerie">Guardar</button>
+                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacionSerie">Confirmar Cambios</button>
+                    </div>
+                </form> 
+            </div>
+            <div id="tablasmodalserie">
                 <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
             </div> 
         </div>
@@ -124,7 +157,7 @@
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
-	        	<button type="button" class="btn btn-success btn-sm" id="aceptar">Guardar</button>
+	        	<button type="button" class="btn btn-success btn-sm" id="aceptar">Confirmar Baja</button>
 	      	</div>
     	</div>
   	</div>
@@ -146,6 +179,10 @@
         var usuarios_guardar_modificacion = '{!!URL::to('usuarios_guardar_modificacion')!!}';
         var usuarios_obtener_permisos = '{!!URL::to('usuarios_obtener_permisos')!!}';
         var usuarios_guardar_permisos = '{!!URL::to('usuarios_guardar_permisos')!!}';
+        var usuarios_obtener_series_documentos_usuario = '{!!URL::to('usuarios_obtener_series_documentos_usuario')!!}';
+        var usuarios_obtener_tipos_documentos = '{!!URL::to('usuarios_obtener_tipos_documentos')!!}';
+        var usuarios_guardar_serie_documento = '{!!URL::to('usuarios_guardar_serie_documento')!!}';
+        var usuarios_guardar_modificacion_serie_documento = '{!!URL::to('usuarios_guardar_modificacion_serie_documento')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="scripts_inaasys/catalogos/usuarios/usuarios.js"></script>

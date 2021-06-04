@@ -23,6 +23,7 @@ use App\VistaObtenerExistenciaProducto;
 use App\Producto;
 use App\Existencia;
 use App\Almacen;
+use App\Serie;
 
 class AsignacionHerramientaController extends ConfiguracionSistemaController{
 
@@ -37,7 +38,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
         //FIN CONFIGURACIONES DE LA TABLA//
     }
     public function asignacionherramienta(){
-        $serieusuario = Helpers::obtenerserieusuario(Auth::user()->user, 'AsignacionHerramienta');
+        $serieusuario = 'A';
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('asignacion_herramienta_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('asignacion_herramienta_exportar_excel');
@@ -49,29 +50,58 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
         if($request->ajax()){
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = VistaAsignacionHerramienta::select($this->campos_consulta)->orderBy('id', 'DESC')->where('periodo', $periodo)->get();
+            $data = VistaAsignacionHerramienta::select($this->campos_consulta)->orderBy('fecha', 'DESC')->where('periodo', $periodo)->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($tipousuariologueado){
+                        $operaciones = '<div class="dropdown">'.
+                                            '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                                                'OPERACIONES <span class="caret"></span>'.
+                                            '</button>'.
+                                            '<ul class="dropdown-menu">'.
+                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->asignacion .'\')">Cambios</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->asignacion .'\')">Bajas</a></li>'.
+                                            '</ul>'.
+                                        '</div>';
+                        /*
                         $botoncambios =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->asignacion .'\')"><i class="material-icons">mode_edit</i></div> '; 
                         //$botonautorizar =  '<div class="btn bg-green btn-xs waves-effect" data-toggle="tooltip" title="Autorizar" onclick="autorizarasignacion(\''.$data->asignacion .'\')"><i class="material-icons">check</i></div> ';
                         $botonbajas =      '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->asignacion .'\')"><i class="material-icons">cancel</i></div> ';
                         $operaciones =  $botoncambios.$botonbajas;
+                        */
                         return $operaciones;
                     })
+                    ->addColumn('fecha', function($data){ return Carbon::parse($data->fecha)->toDateTimeString(); })
                     ->addColumn('total', function($data){ return $data->total; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
     }
-    //obtener id
-    public function asignacion_herramienta_obtener_ultimo_id(){
-        $id = Helpers::ultimoidregistrotabla('App\Asignacion_Herramienta');
-        return response()->json($id);
+    //obtener series documento
+    public function asignacion_herramienta_obtener_series_documento(Request $request){
+        if($request->ajax()){
+            $data = Serie::where('Documento', 'asignacion_herramientas')->where('Usuario', Auth::user()->user)->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''.$data->Serie.'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+    //obtener ultimo folio de la serie seleccionada
+    public function asignacion_herramienta_obtener_ultimo_folio_serie_seleccionada(Request $request){
+        $folio = Helpers::ultimofolioserieregistrotabla('App\Asignacion_Herramienta',$request->serie);
+        return response()->json($folio);
+    }
+    public function asignacion_herramienta_obtener_ultimo_id(Request $request){
+        $folio = Helpers::ultimofolioserieregistrotabla('App\Asignacion_Herramienta',$request->serie);
+        return response()->json($folio);
     }
     //obtener personal que recibe herramienta
     public function asignacion_herramienta_obtener_personal_recibe(Request $request){
         if($request->ajax()){
-            $data = Personal::where('status', 'ALTA')->orderBy("id", "DESC")->get();
+            $data = Personal::where('status', 'ALTA')->where('id', '<>', $request->numeropersonalentrega)->orderBy("id", "DESC")->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarpersonalrecibe('.$data->id.',\''.$data->nombre .'\')">Seleccionar</div>';
@@ -85,9 +115,9 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
     public function  asignacion_herramienta_obtener_personal_recibe_por_numero(Request $request){
         $numero = '';
         $nombre = '';
-        $existepersonal = Personal::where('id', $request->numeropersonalrecibe)->where('Status', 'ALTA')->count();
+        $existepersonal = Personal::where('id', $request->numeropersonalrecibe)->where('id', '<>', $request->numeropersonalentrega)->where('Status', 'ALTA')->count();
         if($existepersonal > 0){
-            $personal = Personal::where('id', $request->numeropersonalrecibe)->where('Status', 'ALTA')->first();
+            $personal = Personal::where('id', $request->numeropersonalrecibe)->where('id', '<>', $request->numeropersonalentrega)->where('Status', 'ALTA')->first();
             $numero = $personal->id;
             $nombre = $personal->nombre;
         }
@@ -116,9 +146,9 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
     public function asignacion_herramienta_obtener_personal_entrega_por_numero(Request $request){
         $numero = '';
         $nombre = '';
-        $existepersonal = Personal::where('id', $request->numeropersonalentrega)->where('Status', 'ALTA')->count();
+        $existepersonal = Personal::where('id', $request->numeropersonalentrega)->where('id', '<>', $request->numeropersonalrecibe)->where('Status', 'ALTA')->count();
         if($existepersonal > 0){
-            $personal = Personal::where('id', $request->numeropersonalentrega)->where('Status', 'ALTA')->first();
+            $personal = Personal::where('id', $request->numeropersonalentrega)->where('id', '<>', $request->numeropersonalrecibe)->where('Status', 'ALTA')->first();
             $numero = $personal->id;
             $nombre = $personal->nombre;
         }
@@ -169,14 +199,16 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
     }
     //guardar regustro
     public function asignacion_herramienta_guardar(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         //obtener el ultimo id de la tabla
         DB::unprepared('SET IDENTITY_INSERT asignacion_herramientas ON');
         $id = Helpers::ultimoidregistrotabla('App\Asignacion_Herramienta');
+        $folio = Helpers::ultimofolioserieregistrotabla('App\Asignacion_Herramienta',$request->serie);
         //INGRESAR DATOS A TABLA ORDEN COMPRA
-        $asignacion = $id.'-'.$request->serie;
+        $asignacion = $folio.'-'.$request->serie;
 		$Asignacion_Herramienta = new Asignacion_Herramienta;
 		$Asignacion_Herramienta->id=$id;
+        $Asignacion_Herramienta->folio=$folio;
         $Asignacion_Herramienta->asignacion=$asignacion;
 		$Asignacion_Herramienta->serie=$request->serie;
         $Asignacion_Herramienta->fecha=Carbon::parse($request->fecha)->toDateTimeString();
@@ -185,9 +217,8 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
 		$Asignacion_Herramienta->total=$request->total;
         $Asignacion_Herramienta->observaciones=$request->observaciones;
         $Asignacion_Herramienta->status="ALTA";
-        //$Asignacion_Herramienta->equipo=$request->equipo;
         $Asignacion_Herramienta->usuario=Auth::user()->user;
-        $Asignacion_Herramienta->periodo=$request->periodohoy;
+        $Asignacion_Herramienta->periodo=$this->periodohoy;
         $Asignacion_Herramienta->save();
         DB::unprepared('SET IDENTITY_INSERT asignacion_herramientas OFF');
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
@@ -198,8 +229,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
         $BitacoraDocumento->Status = "ALTA";
         $BitacoraDocumento->Usuario = Auth::user()->user;
-        //$BitacoraDocumento->Equipo = $request->equipo;
-        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
         $item = 1;
@@ -446,7 +476,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
             "contadorproductos" => $contadorproductos,
             "contadorfilas" => $contadorfilas,
             "modificacionpermitida" => $modificacionpermitida,
-            "fecha" => Helpers::formatoinputdate($Asignacion_Herramienta->fecha),
+            "fecha" => Helpers::formatoinputdatetime($Asignacion_Herramienta->fecha),
             "total" => Helpers::convertirvalorcorrecto($Asignacion_Herramienta->total),
             "personalrecibe" => $personalrecibe,
             "personalentrega" => $personalentrega
@@ -456,8 +486,8 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
     //guardar cambios de la asignacion
     public function asignacion_herramienta_guardar_modificacion(Request $request){
         //INGRESAR DATOS A TABLA
-        $asignacion = $request->id.'-'.$request->serie;
-        $Asignacion_Herramienta = Asignacion_Herramienta::where('id', $request->id)->first();
+        $asignacion = $request->folio.'-'.$request->serie;
+        $Asignacion_Herramienta = Asignacion_Herramienta::where('asignacion', $asignacion)->first();
         //array detalles antes de modificacion
         $ArrayDetallesAsignacionAnterior = Array();
         $DetallesAsignacionAnterior = Asignacion_Herramienta_Detalle::where('asignacion', $asignacion)->get();
@@ -491,7 +521,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
             }
         }
         //modificar tabla general
-        Asignacion_Herramienta::where('id', $request->id)
+        Asignacion_Herramienta::where('asignacion', $asignacion)
                                 ->update([
                                     'fecha' => Carbon::parse($request->fecha)->toDateTimeString(),
                                     'recibe_herramienta' => $request->numeropersonalrecibe,
@@ -507,7 +537,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
         $BitacoraDocumento->Status = $Asignacion_Herramienta->status;
         $BitacoraDocumento->Usuario = Auth::user()->user;
-        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA  DETALLES
         foreach ($request->codigoproductopartida as $key => $codigoproductopartida){  
@@ -524,7 +554,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                 }        
                 $Asignacion_Herramienta_Detalle=new Asignacion_Herramienta_Detalle;
                 $Asignacion_Herramienta_Detalle->id = $iddetalle;
-                $Asignacion_Herramienta_Detalle->id_asignacion_herramienta = $request->id;
+                $Asignacion_Herramienta_Detalle->id_asignacion_herramienta = $Asignacion_Herramienta->id;
                 $Asignacion_Herramienta_Detalle->asignacion = $asignacion;
                 $Asignacion_Herramienta_Detalle->fecha = Carbon::parse($request->fecha)->toDateTimeString();
                 $Asignacion_Herramienta_Detalle->herramienta = $codigoproductopartida;
@@ -534,10 +564,9 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                 $Asignacion_Herramienta_Detalle->precio =  $request->preciopartida [$key];
                 $Asignacion_Herramienta_Detalle->total = $request->totalpesospartida [$key];
                 $Asignacion_Herramienta_Detalle->estado_herramienta = $request->estadopartida  [$key];
-                $Asignacion_Herramienta_Detalle->item = $item;
+                $Asignacion_Herramienta_Detalle->item = $ultimoitem;
                 $Asignacion_Herramienta_Detalle->id_almacen = $request->almacenpartida [$key];
                 $Asignacion_Herramienta_Detalle->save();
-                $item++;
                 DB::unprepared('SET IDENTITY_INSERT asignacion_herramientas_detalles OFF');
                 //restar existencias a almacen principal
                 $RestarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->almacenpartida [$key])->first();
@@ -549,8 +578,8 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                             ]);
 
             }else{
-                $Asignacion_Herramienta_Detalle = Asignacion_Herramienta_Detalle::where('id_asignacion_herramienta', $request->id)->where('herramienta', $codigoproductopartida)->where('item', $request->itempartida [$key])->first();
-                Asignacion_Herramienta_Detalle::where('id_asignacion_herramienta', $request->id)->where('herramienta', $codigoproductopartida)->where('item', $request->itempartida [$key])
+                $Asignacion_Herramienta_Detalle = Asignacion_Herramienta_Detalle::where('id_asignacion_herramienta', $Asignacion_Herramienta->id)->where('herramienta', $codigoproductopartida)->where('item', $request->itempartida [$key])->first();
+                Asignacion_Herramienta_Detalle::where('id_asignacion_herramienta', $Asignacion_Herramienta->id)->where('herramienta', $codigoproductopartida)->where('item', $request->itempartida [$key])
                                                 ->update([
                                                     'descripcion' => $request->nombreproductopartida [$key],
                                                     'cantidad' =>  $request->cantidadpartida  [$key],

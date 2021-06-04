@@ -30,6 +30,7 @@ use App\VistaNotaCreditoProveedor;
 use App\VistaObtenerExistenciaProducto;
 use Config;
 use Mail;
+use App\Serie;
 
 class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
 
@@ -45,22 +46,12 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
     }
     
     public function notas_credito_proveedores(){
-        $serieusuario = Helpers::obtenerserieusuario(Auth::user()->user, 'NotasCreditoProveedor');
+        $serieusuario = 'A';
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('notas_credito_proveedor_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('notas_credito_proveedores_exportar_excel');
         $rutacreardocumento = route('notas_credito_proveedores_generar_pdfs');
         return view('registros.notascreditoproveedores.notascreditoproveedores', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','rutacreardocumento'));
-    }
-
-    //obtener tipos ordenes de compra
-    public function notas_credito_proveedor_obtener_tipos_ordenes_compra(Request $request){
-        $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->get();
-        $select_tipos_ordenes_compra = "<option selected disabled hidden>Selecciona...</option>";
-        foreach($tipos_ordenes_compra as $tipo){
-            $select_tipos_ordenes_compra = $select_tipos_ordenes_compra."<option value='".$tipo->Nombre."'>".$tipo->Nombre."</option>";
-        }
-        return response()->json($select_tipos_ordenes_compra);
     }
 
     //obtener registros tabla
@@ -69,16 +60,30 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             $fechahoy = Carbon::now()->toDateString();
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = VistaNotaCreditoProveedor::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Folio', 'DESC')->get();
+            $data = VistaNotaCreditoProveedor::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                            $botoncambios   =   '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Nota .'\')"><i class="material-icons">mode_edit</i></div> '; 
-                            $botonbajas     =   '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Nota .'\')"><i class="material-icons">cancel</i></div>  ';
-                            $botondocumentopdf = '<a href="'.route('notas_credito_proveedores_generar_pdfs_indiv',$data->Nota).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
-                            $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Nota .'\')"><i class="material-icons">email</i></div> ';
-                            $operaciones    =   $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
+                        $operaciones = '<div class="dropdown">'.
+                                            '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                                                'OPERACIONES <span class="caret"></span>'.
+                                            '</button>'.
+                                            '<ul class="dropdown-menu">'.
+                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Nota .'\')">Cambios</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Nota .'\')">Bajas</a></li>'.
+                                                '<li><a href="'.route('notas_credito_proveedores_generar_pdfs_indiv',$data->Nota).'" target="_blank">Ver Documento PDF</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Nota .'\')">Enviar Documento por Correo</a></li>'.
+                                            '</ul>'.
+                                        '</div>';
+                        /*
+                        $botoncambios   =   '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Nota .'\')"><i class="material-icons">mode_edit</i></div> '; 
+                        $botonbajas     =   '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Nota .'\')"><i class="material-icons">cancel</i></div>  ';
+                        $botondocumentopdf = '<a href="'.route('notas_credito_proveedores_generar_pdfs_indiv',$data->Nota).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
+                        $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Nota .'\')"><i class="material-icons">email</i></div> ';
+                        $operaciones    =   $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
+                        */
                         return $operaciones;
                     })
+                    ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
                     ->addColumn('SubTotal', function($data){ return $data->SubTotal; })
                     ->addColumn('Iva', function($data){ return $data->Iva; })
                     ->addColumn('Total', function($data){ return $data->Total; })
@@ -95,10 +100,37 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                     ->make(true);
         } 
     }
+    //obtener series documento
+    public function notas_credito_proveedores_obtener_series_documento(Request $request){
+        if($request->ajax()){
+            $data = Serie::where('Documento', 'NotasCreditoProveedor')->where('Usuario', Auth::user()->user)->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''.$data->Serie.'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+    //obtener ultimo folio de la serie seleccionada
+    public function notas_credito_proveedores_obtener_ultimo_folio_serie_seleccionada(Request $request){
+        $folio = Helpers::ultimofolioserietablamodulos('App\NotaProveedor',$request->Serie);
+        return response()->json($folio);
+    }
     //obtener ultimo folio
     public function notas_credito_proveedores_obtener_ultimo_folio(Request $request){
-        $folio = Helpers::ultimofoliotablamodulos('App\NotaProveedor');
+        $folio = Helpers::ultimofolioserietablamodulos('App\NotaProveedor',$request->serie);
         return response()->json($folio);
+    }
+    //obtener tipos ordenes de compra
+    public function notas_credito_proveedor_obtener_tipos_ordenes_compra(Request $request){
+        $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->get();
+        $select_tipos_ordenes_compra = "<option selected disabled hidden>Selecciona...</option>";
+        foreach($tipos_ordenes_compra as $tipo){
+            $select_tipos_ordenes_compra = $select_tipos_ordenes_compra."<option value='".$tipo->Nombre."'>".$tipo->Nombre."</option>";
+        }
+        return response()->json($select_tipos_ordenes_compra);
     }
     //obtener proveedor
     public function notas_credito_proveedores_obtener_proveedores(Request $request){
@@ -177,11 +209,12 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             }
             $data = Compra::where('Proveedor', $request->numeroproveedor)
                                 ->whereNotIn('Compra', $arraycomprasseleccionadas)
+                                ->where('Status', 'POR PAGAR')
                                 ->orderBy('Folio', 'DESC')
                                 ->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarcompra('.$data->Folio.',\''.$data->Compra .'\')">Seleccionar</div>';
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarcompra('.$data->Folio.',\''.$data->Compra .'\',\''.$data->Tipo .'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->addColumn('Fecha', function($data){
@@ -212,10 +245,20 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             $data = VistaObtenerExistenciaProducto::whereIn('Codigo', $arrayproductosseleccionables)->where('Codigo', 'like', '%' . $codigoabuscar . '%')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($numeroalmacen, $tipooperacion, $stringcomprasseleccionadas){
-                        if($data->Almacen == $numeroalmacen || $data->Almacen == NULL){
-                            $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$tipooperacion.'\',\''.$data->Insumo.'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$data->NombreClaveProducto.'\',\''.$data->NombreClaveUnidad.'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\')">Seleccionar</div>';
-                        }else{
-                            $boton = '';
+                        $compra = Compra::where('Compra', $stringcomprasseleccionadas)->first();
+                        switch($compra->Tipo){
+                            case "GASTOS":
+                                $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$tipooperacion.'\',\''.$data->Insumo.'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$data->NombreClaveProducto.'\',\''.$data->NombreClaveUnidad.'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\')">Seleccionar</div>';
+                                break;
+                            case "TOT":
+                                $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$tipooperacion.'\',\''.$data->Insumo.'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$data->NombreClaveProducto.'\',\''.$data->NombreClaveUnidad.'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\')">Seleccionar</div>';
+                                break;
+                            default:
+                                if($data->Almacen == $numeroalmacen || $data->Almacen == NULL){
+                                    $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$tipooperacion.'\',\''.$data->Insumo.'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$data->NombreClaveProducto.'\',\''.$data->NombreClaveUnidad.'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\')">Seleccionar</div>';
+                                }else{
+                                    $boton = '';
+                                }
                         }
                         return $boton;
                     })
@@ -455,28 +498,38 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
 
     //obtener existencias actuales por codigo y almacen
     public function notas_credito_proveedor_obtener_existencias_partida(Request $request){
-        $existencias = Existencia::select('Existencias')->where('Codigo', $request->codigopartida)->where('Almacen', $request->almacen)->first();
-        $nota = $request->folio.'-'.$request->serie;
-        $detallenotaproveedor = NotaProveedorDetalle::where('Nota', $nota)->where('Codigo', $request->codigopartida)->count();
-        $nuevaexistencia = 0;
-        if($detallenotaproveedor > 0){
-            $detallenotaproveedor = NotaProveedorDetalle::where('Nota', $nota)->where('Codigo', $request->codigopartida)->first();
-            $nuevaexistencia = $existencias->Existencias + $detallenotaproveedor->Cantidad;
-        }else{
-            $nuevaexistencia = $existencias->Existencias;
+        $compra = Compra::where('Compra', $request->stringcomprasseleccionadas)->first();
+        switch ($compra->Tipo){
+            case "TOT":
+                $nuevaexistencia = $request->cantidadpartida;
+                break;
+            case "GASTOS":
+                $nuevaexistencia = $request->cantidadpartida;
+                break;
+            default:
+            $existencias = Existencia::select('Existencias')->where('Codigo', $request->codigopartida)->where('Almacen', $request->almacen)->first();
+            $nota = $request->folio.'-'.$request->serie;
+            $detallenotaproveedor = NotaProveedorDetalle::where('Nota', $nota)->where('Codigo', $request->codigopartida)->count();
+            $nuevaexistencia = 0;
+            if($detallenotaproveedor > 0){
+                $detallenotaproveedor = NotaProveedorDetalle::where('Nota', $nota)->where('Codigo', $request->codigopartida)->first();
+                $nuevaexistencia = $existencias->Existencias + $detallenotaproveedor->Cantidad;
+            }else{
+                $nuevaexistencia = $existencias->Existencias;
+            }
         }
         return response()->json(Helpers::convertirvalorcorrecto($nuevaexistencia));
     }
 
     public function notas_credito_proveedor_guardar(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         $uuid=$request->uuid;
 	    $ExisteUUID = NotaProveedor::where('UUID', $uuid )->where('Status', '<>', 'BAJA')->first();
 	    if($ExisteUUID == true){
 	        $NotaProveedor = 1;
 	    }else{  
             //obtener el ultimo id de la tabla
-            $folio = Helpers::ultimofoliotablamodulos('App\NotaProveedor');
+            $folio = Helpers::ultimofolioserietablamodulos('App\NotaProveedor',$request->serie);
             //INGRESAR DATOS A TABLA COMPRAS
             $notaproveedor = $folio.'-'.$request->serie;
             $NotaProveedor = new NotaProveedor;
@@ -507,7 +560,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             $NotaProveedor->ReceptorNombre=$request->receptornombre;
             $NotaProveedor->Status="ALTA";
             $NotaProveedor->Usuario=Auth::user()->user;
-            $NotaProveedor->Periodo=$request->periodohoy;
+            $NotaProveedor->Periodo=$this->periodohoy;
             $NotaProveedor->save();
             //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO NOTAS PROVEEDOR
             $BitacoraDocumento = new BitacoraDocumento;
@@ -517,7 +570,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
             $BitacoraDocumento->Status = "ALTA";
             $BitacoraDocumento->Usuario = Auth::user()->user;
-            $BitacoraDocumento->Periodo = $request->periodohoy;
+            $BitacoraDocumento->Periodo = $this->periodohoy;
             $BitacoraDocumento->save();
             //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO NOTAS PROVEEDOR DOC
             $BitacoraDocumento = new BitacoraDocumento;
@@ -527,7 +580,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
             $BitacoraDocumento->Status = "ALTA";
             $BitacoraDocumento->Usuario = Auth::user()->user;
-            $BitacoraDocumento->Periodo = $request->periodohoy;
+            $BitacoraDocumento->Periodo = $this->periodohoy;
             $BitacoraDocumento->save();
             //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
             $item = 1;
@@ -561,14 +614,22 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                 $NotaProveedorDetalle->Item = $item;
                 $NotaProveedorDetalle->save();
                 if($codigopartida != 'DPPP'){
-                    //restar existencias a almacen principal
-                    $RestarExistenciaAlmacen = Existencia::where('Codigo', $codigopartida)->where('Almacen', $request->numeroalmacen)->first();
-                    $RestarExistenciaNuevaAlmacen = $RestarExistenciaAlmacen->Existencias - $request->cantidadpartida  [$key];
-                    Existencia::where('Codigo', $codigopartida)
-                                ->where('Almacen', $request->numeroalmacen)
-                                ->update([
-                                    'Existencias' => Helpers::convertirvalorcorrecto($RestarExistenciaNuevaAlmacen)
-                                ]);
+                    $compra = Compra::where('Compra', $request->stringcomprasseleccionadas)->first();
+                    switch ($compra->Tipo){
+                        case "TOT":
+                            break;
+                        case "GASTOS":
+                            break;
+                        default:
+                        //restar existencias a almacen principal
+                        $RestarExistenciaAlmacen = Existencia::where('Codigo', $codigopartida)->where('Almacen', $request->numeroalmacen)->first();
+                        $RestarExistenciaNuevaAlmacen = $RestarExistenciaAlmacen->Existencias - $request->cantidadpartida  [$key];
+                        Existencia::where('Codigo', $codigopartida)
+                                    ->where('Almacen', $request->numeroalmacen)
+                                    ->update([
+                                        'Existencias' => Helpers::convertirvalorcorrecto($RestarExistenciaNuevaAlmacen)
+                                    ]);
+                    }
                 }
                 $item++;
             }
@@ -733,6 +794,10 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                     //$cantidadpartidadetalleordencompra = OrdenCompraDetalle::where('Orden', $compra->Orden)->where('Codigo', $dnp->Codigo)->first();
                     $claveproductopartida = ClaveProdServ::where('Clave', $dnp->ClaveProducto)->first();
                     $claveunidadpartida = ClaveUnidad::where('Clave', $dnp->ClaveUnidad)->first();
+                    $claveproducto = $claveproductopartida ? $claveproductopartida->Clave : '';
+                    $nombreclaveproducto = $claveproductopartida ? $claveproductopartida->Nombre : '';
+                    $claveunidad = $claveunidadpartida ? $claveunidadpartida->Clave : '';
+                    $nombreclaveunidad = $claveunidadpartida ? $claveunidadpartida->Nombre : '';
                     //importante porque si se quiere hacer una divison con 0 marca ERROR
                     $porcentajeieps = 0;
                     $porcentajeretencioniva = 0;
@@ -786,22 +851,22 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                                         '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                     '</div>'.
                                     '<div class="col-xs-10 col-sm-10 col-md-10">'.
-                                        '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproductopartida->Clave.'" readonly data-parsley-length="[1, 20]">'.
+                                        '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly data-parsley-length="[1, 20]">'.
                                     '</div>'.
                                 '</div>'.
                             '</td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$claveproductopartida->Nombre.'" readonly></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$nombreclaveproducto.'" readonly></td>'.
                             '<td class="tdmod">'.
                                 '<div class="row divorinputmodxl">'.
                                     '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                         '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                     '</div>'.
                                     '<div class="col-xs-10 col-sm-10 col-md-10">'.   
-                                        '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidadpartida->Clave.'" readonly data-parsley-length="[1, 5]">'.
+                                        '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
                                     '</div>'.
                                 '</div>'.
                             '</td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$claveunidadpartida->Nombre.'" readonly></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$nombreclaveunidad.'" readonly></td>'.
                         '</tr>';
                         $tipodetalles = 'dppp';
                     }else{
@@ -844,22 +909,22 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                                         '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                     '</div>'.
                                     '<div class="col-xs-10 col-sm-10 col-md-10">'.
-                                        '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproductopartida->Clave.'" readonly data-parsley-length="[1, 20]">'.
+                                        '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly data-parsley-length="[1, 20]">'.
                                     '</div>'.
                                 '</div>'.
                             '</td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$claveproductopartida->Nombre.'" readonly></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$nombreclaveproducto.'" readonly></td>'.
                             '<td class="tdmod">'.
                                 '<div class="row divorinputmodxl">'.
                                     '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                         '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                     '</div>'.
                                     '<div class="col-xs-10 col-sm-10 col-md-10">'.   
-                                        '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidadpartida->Clave.'" readonly data-parsley-length="[1, 5]">'.
+                                        '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
                                     '</div>'.
                                 '</div>'.
                             '</td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$claveunidadpartida->Nombre.'" readonly></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$nombreclaveunidad.'" readonly></td>'.
                         '</tr>';
                         $tipodetalles = 'codigos';
                     }
@@ -938,7 +1003,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             "arraycompras" => $arraycompras,
             "descuentocompras" => Helpers::convertirvalorcorrecto($descuentocompras),
             "diferencia" => Helpers::convertirvalorcorrecto($diferencia),
-            "fecha" => Helpers::formatoinputdate($notaproveedor->Fecha),
+            "fecha" => Helpers::formatoinputdatetime($notaproveedor->Fecha),
             "fechaemitida" => Helpers::formatoinputdatetime($notaproveedor->FechaEmitida),
             "importe" => Helpers::convertirvalorcorrecto($notaproveedor->Importe),
             "descuento" => Helpers::convertirvalorcorrecto($notaproveedor->Descuento),
@@ -957,7 +1022,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
 
     //cambios
     public function notas_credito_proveedores_guardar_modificacion(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         $uuid=$request->uuid;
         $notaproveedor = $request->notaproveedorbd;
 	    $ExisteUUID = NotaProveedor::where('Nota', '<>', $notaproveedor)->where('UUID', $uuid )->where('Status', '<>', 'BAJA')->first();
@@ -1069,7 +1134,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
             $BitacoraDocumento->Status = $NotaProveedor->Status;
             $BitacoraDocumento->Usuario = Auth::user()->user;
-            $BitacoraDocumento->Periodo = $request->periodohoy;
+            $BitacoraDocumento->Periodo = $this->periodohoy;
             $BitacoraDocumento->save();
             //detalles
             foreach ($request->codigopartida as $key => $codigopartida){  
@@ -1103,7 +1168,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                     $NotaProveedorDetalle->IsrRetencion = $request->retencionisrpesospartida [$key];
                     $NotaProveedorDetalle->IepsRetencion = $request->retencioniepspesospartida [$key];
                     $NotaProveedorDetalle->Total = $request->totalpesospartida [$key];
-                    $NotaProveedorDetalle->Partida = $request->partida [$key];
+                    $NotaProveedorDetalle->Partida = $request->partidapartida [$key];
                     $NotaProveedorDetalle->PrecioMoneda = $request->preciomonedapartida [$key];
                     $NotaProveedorDetalle->DescuentoMoneda = $request->descuentopartida [$key];
                     $NotaProveedorDetalle->ClaveProducto = $request->claveproductopartida [$key];

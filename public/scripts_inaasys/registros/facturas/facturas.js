@@ -10,12 +10,18 @@ function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1500));
 }
 function asignarfechaactual(){
+    /*
     var fechahoy = new Date();
     var dia = ("0" + fechahoy.getDate()).slice(-2);
     var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
     var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia) ;
     $('#fecha').val(hoy);
     $('input[type=datetime-local]').val(new Date().toJSON().slice(0,19));
+    */
+    $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechadatetimelocal){
+      $("#fecha").val(fechadatetimelocal);
+      $('input[type=datetime-local]').val(fechadatetimelocal);
+    }) 
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
@@ -1299,7 +1305,6 @@ function obtenerclientepornumero(){
   if(numeroclienteanterior != numerocliente){
     if($("#numerocliente").parsley().isValid()){
       $.get(facturas_obtener_cliente_por_numero, {numerocliente:numerocliente}, function(data){
-        console.log(data);
           var numerofilas = $("#numerofilas").val()
           if(parseInt(numerofilas) > 0){
             var confirmacion = confirm("Esta seguro de cambiar el cliente, esto eliminara las partidas agregadas (Remisiones ó Servicios)?"); 
@@ -1967,7 +1972,7 @@ function alta(){
                               '</div>'+  
                               '<div class="col-md-2">'+
                                 '<label>Fecha</label>'+
-                                '<input type="date" class="form-control" name="fecha" id="fecha" required onchange="validasolomesactual();">'+
+                                '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required onchange="validasolomesactual();">'+
                                 '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                 '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
                               '</div>'+   
@@ -2864,7 +2869,7 @@ function obtenerdatos(facturamodificar){
                               '</td>'+
                               '<td>'+
                                 '<div class="form-line">'+
-                                  '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required readonly data-parsley-type="integer">'+
+                                  '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required data-parsley-type="integer">'+
                                   '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
                                   '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
                                   '<input type="hidden" class="form-control" name="rfccliente" id="rfccliente" required readonly>'+
@@ -2897,7 +2902,7 @@ function obtenerdatos(facturamodificar){
                         '</div>'+  
                         '<div class="col-md-2">'+
                           '<label>Fecha</label>'+
-                          '<input type="date" class="form-control" name="fecha" id="fecha" required onchange="validasolomesactual();">'+
+                          '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required onchange="validasolomesactual();">'+
                           '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                           '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
                         '</div>'+   
@@ -3407,14 +3412,6 @@ function obtenerdatos(facturamodificar){
         listarproductos();
       }
     });
-    //activar busqueda para clientes
-    $('#numerocliente').on('keypress', function(e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-      obtenerclientepornumero();
-      }
-    });
     //regresar numero cliente
     $('#numerocliente').on('change', function(e) {
       regresarnumerocliente();
@@ -3589,9 +3586,15 @@ function desactivar(facturadesactivar){
           $("#divmotivobaja").hide();
           $("#btnbaja").hide();
           $('#estatusregistro').modal('show');
+        }else if(data.numeronotascliente > 0){
+          $("#facturadesactivar").val(0);
+          $("#textomodaldesactivar").html('Error esta factura tiene registros de notas crédito cliente con la nota: ' + data.numeronotacliente);
+          $("#divmotivobaja").hide();
+          $("#btnbaja").hide();
+          $('#estatusregistro').modal('show');
         }else{
           $("#facturadesactivar").val(facturadesactivar);
-          $("#textomodaldesactivar").html('Estas seguro de cambiar el estado el registro?');
+          $("#textomodaldesactivar").html('Estas seguro de dar de baja la factura? No'+ facturadesactivar);
           $("#divmotivobaja").show();
           $("#btnbaja").show();
           $('#estatusregistro').modal('show');

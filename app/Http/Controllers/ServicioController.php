@@ -34,14 +34,23 @@ class ServicioController extends ConfiguracionSistemaController{
             ->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        if($data->Status == 'ALTA'){
-                            $boton =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Codigo .'\')"><i class="material-icons">mode_edit</i></div> '. 
+                        $operaciones = '<div class="dropdown">'.
+                                            '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                                                'OPERACIONES <span class="caret"></span>'.
+                                            '</button>'.
+                                            '<ul class="dropdown-menu">'.
+                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Codigo .'\')">Cambios</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Codigo .'\')">Bajas</a></li>'.
+                                            '</ul>'.
+                                        '</div>';
+                        /*if($data->Status == 'ALTA'){
+                            $operaciones =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Codigo .'\')"><i class="material-icons">mode_edit</i></div> '. 
                                         '<div class="btn bg-red btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Codigo .'\')"><i class="material-icons">cancel</i></div>';
                         }else{
-                            $boton = '';
-                            //$boton =    '<div class="btn bg-green btn-xs waves-effect" onclick="desactivar(\''.$data->Codigo .'\')">Altas</div>';
-                        } 
-                        return $boton;
+                            $operaciones = '';
+                            //$operaciones =    '<div class="btn bg-green btn-xs waves-effect" onclick="desactivar(\''.$data->Codigo .'\')">Altas</div>';
+                        } */
+                        return $operaciones;
                     })
                     ->addColumn('Costo', function($data){
                         $costo = Helpers::convertirvalorcorrecto($data->Costo);

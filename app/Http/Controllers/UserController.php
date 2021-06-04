@@ -20,6 +20,8 @@ use App\User_Rel_Permiso;
 use App\User_Rel_Menu;
 use Mail;
 use App\Personal;
+use App\Serie;
+use App\Documento;
 
 class UserController extends ConfiguracionSistemaController
 {
@@ -36,15 +38,26 @@ class UserController extends ConfiguracionSistemaController
             $data = User::orderBy("id", "DESC")->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        if($data->status == 'ALTA'){
-                            $boton =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos('.$data->id.')"><i class="material-icons">mode_edit</i></div> '. 
+                        $operaciones = '<div class="dropdown">'.
+                                            '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                                                'OPERACIONES <span class="caret"></span>'.
+                                            '</button>'.
+                                            '<ul class="dropdown-menu">'.
+                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos('.$data->id.')">Cambios</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="desactivar('.$data->id.')">Bajas</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="permisos('.$data->id.')">Ver Permisos</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="seriesusuariodocumentos('.$data->id.',\''.$data->user.'\')">Ver Series Documentos</a></li>'.
+                                            '</ul>'.
+                                        '</div>';
+                        /*if($data->status == 'ALTA'){
+                            $operaciones =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos('.$data->id.')"><i class="material-icons">mode_edit</i></div> '. 
                                         '<div class="btn bg-red btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar('.$data->id.')"><i class="material-icons">cancel</i></div>  '. 
                                         '<div class="btn bg-blue btn-xs waves-effect" data-toggle="tooltip" title="Permisos" onclick="permisos('.$data->id.')"><i class="material-icons">vpn_key</i></div>';
                         }else{
-                            $boton = '';
-                            //$boton =    '<div class="btn bg-green btn-xs waves-effect" onclick="desactivar('.$data->id.')">Altas</div>';
-                        } 
-                        return $boton;
+                            $operaciones = '';
+                            //$operaciones =    '<div class="btn bg-green btn-xs waves-effect" onclick="desactivar('.$data->id.')">Altas</div>';
+                        } */
+                        return $operaciones;
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
@@ -265,6 +278,67 @@ class UserController extends ConfiguracionSistemaController
         }
         return response()->json($User_Rel_Menu);
     }
+
+    //obtener series en documentos del usuario
+    public function usuarios_obtener_series_documentos_usuario(Request $request){
+        if($request->ajax()){
+            $id = $request->id;
+            $usuario = User::where('id', $id)->first();
+            $data = Serie::where('Usuario', $usuario->user)->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $operaciones =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatosserie(\''.$data->Documento.'\',\''.$data->Serie.'\',\''.$data->Usuario.'\',\''.$data->Nombre.'\')"><i class="material-icons">mode_edit</i></div> ';
+                        return $operaciones;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        } 
+    }
+
+    //obtener tipos documentos
+    public function usuarios_obtener_tipos_documentos(){
+        $tipos_documentos = Documento::where('status', 'ALTA')->get();
+        $select_tipos_documentos = "<option selected disabled hidden>Selecciona...</option>";
+        foreach($tipos_documentos as $tipo){
+            $select_tipos_documentos = $select_tipos_documentos."<option value='".$tipo->documento."'>".$tipo->documento."</option>";
+        }
+        return response()->json($select_tipos_documentos);
+    }
+
+    //altas
+    public function usuarios_guardar_serie_documento(Request $request){
+        $documento=$request->documento;
+        $serie = $request->serie;
+        $usuario = $request->usuario;
+	    $ExisteSerie = Serie::where('Documento', $documento)->where('Serie', $serie)->where('Usuario', $usuario)->first();
+	    if($ExisteSerie == true){
+            $Serie = 1;
+	    }else{
+            //insertar registro
+            $Serie = new Serie;
+		    $Serie->Documento=$documento;
+		    $Serie->Serie=$serie;
+            $Serie->Nombre=$request->nombre;
+            $Serie->Usuario=$usuario;
+            $Serie->Item=1;
+            $Serie->save();
+      	}
+    	return response()->json($Serie); 
+    }
+
+    //cambios
+    public function usuarios_guardar_modificacion_serie_documento(Request $request){
+        $documento=$request->documento;
+        $serie = $request->serie;
+        $usuario = $request->usuario;
+	    $Serie = Serie::where('Documento', $documento)->where('Serie', $serie)->where('Usuario', $usuario)->first();
+        Serie::where('Documento', $documento)->where('Serie', $serie)->where('Usuario', $usuario)
+                ->update([
+                    'Nombre' => $request->nombre
+                ]);
+    	return response()->json($Serie); 
+    }
+
     //obtener acceso al menu y permisos que tiene asignado el usuario logueado
     public function usuarios_obtener_submenus_activos(){
         //accesos al menu

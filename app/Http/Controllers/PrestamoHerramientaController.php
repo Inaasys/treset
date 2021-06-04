@@ -22,6 +22,7 @@ use App\BitacoraDocumento;
 use App\VistaPrestamoHerramienta;
 use App\Producto;
 use Mail;
+use App\Serie;
 
 class PrestamoHerramientaController extends ConfiguracionSistemaController{
 
@@ -37,7 +38,7 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
     }   
 
     public function prestamoherramienta(){
-        $serieusuario = Helpers::obtenerserieusuario(Auth::user()->user, 'PrestamoHerramienta');
+        $serieusuario = 'A';
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('prestamo_herramienta_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('prestamo_herramienta_exportar_excel');
@@ -48,24 +49,55 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
         if($request->ajax()){
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = VistaPrestamoHerramienta::select($this->campos_consulta)->orderBy('id', 'DESC')->where('periodo', $periodo)->get();
+            $data = VistaPrestamoHerramienta::select($this->campos_consulta)->orderBy('fecha', 'DESC')->where('periodo', $periodo)->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($tipousuariologueado){
+                        $operaciones = '<div class="dropdown">'.
+                                            '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                                                'OPERACIONES <span class="caret"></span>'.
+                                            '</button>'.
+                                            '<ul class="dropdown-menu">'.
+                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->prestamo .'\')">Cambios</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="terminarprestamo(\''.$data->prestamo .'\')">Terminar Prestamo</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->prestamo .'\')">Bajas</a></li>'.
+                                            '</ul>'.
+                                        '</div>';
+                        /*
                         $botoncambios =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->prestamo .'\')"><i class="material-icons">mode_edit</i></div> '; 
                         $botonterminarprestamo=      '<div class="btn bg-green btn-xs waves-effect" data-toggle="tooltip" title="Terminar Prestamo" onclick="terminarprestamo(\''.$data->prestamo .'\')"><i class="material-icons">check</i></div> ';
                         $botonbajas =      '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->prestamo .'\')"><i class="material-icons">cancel</i></div> ';
                         $operaciones =  $botoncambios.$botonbajas.$botonterminarprestamo;
+                        */
                         return $operaciones;
                     })
+                    ->addColumn('fecha', function($data){ return Carbon::parse($data->fecha)->toDateTimeString(); })
                     ->addColumn('total', function($data){ return $data->total; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
     }
-    //obtener ultimo id
-    public function prestamo_herramienta_obtener_ultimo_id(){
-        $id = Helpers::ultimoidregistrotabla('App\Prestamo_Herramienta');
-        return response()->json($id);
+
+    //obtener series documento
+    public function prestamo_herramienta_obtener_series_documento(Request $request){
+        if($request->ajax()){
+            $data = Serie::where('Documento', 'prestamo_herramientas')->where('Usuario', Auth::user()->user)->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''.$data->Serie.'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+    //obtener ultimo folio de la serie seleccionada
+    public function prestamo_herramienta_obtener_ultimo_folio_serie_seleccionada(Request $request){
+        $folio = Helpers::ultimofolioserieregistrotabla('App\Prestamo_Herramienta',$request->serie);
+        return response()->json($folio);
+    }
+    public function prestamo_herramienta_obtener_ultimo_id(Request $request){
+        $folio = Helpers::ultimofolioserieregistrotabla('App\Prestamo_Herramienta',$request->serie);
+        return response()->json($folio);
     }
     //obtener personla
     public function prestamo_herramienta_obtener_personal(){
@@ -146,16 +178,34 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
                     ->make(true);
         }
     }
+    //obtener personal recibe por numero
+    public function prestamo_herramienta_obtener_personal_recibe_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $existepersonal = Personal::where('id', $request->numeropersonalrecibe)->where('id', '<>', $request->personalherramientacomun)->where('Status', 'ALTA')->count();
+        if($existepersonal > 0){
+            $personal = Personal::where('id', $request->numeropersonalrecibe)->where('id', '<>', $request->personalherramientacomun)->where('Status', 'ALTA')->first();
+            $numero = $personal->id;
+            $nombre = $personal->nombre;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre,
+        );
+        return response()->json($data); 
+    }
     //guardar prestamo herramienta
     public function prestamo_herramienta_guardar(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         //obtener el ultimo id de la tabla
         DB::unprepared('SET IDENTITY_INSERT prestamo_herramientas ON');
         $id = Helpers::ultimoidregistrotabla('App\Prestamo_Herramienta');
+        $folio = Helpers::ultimofolioserieregistrotabla('App\Prestamo_Herramienta',$request->serie);
         //INGRESAR DATOS A TABLA ORDEN COMPRA
-        $prestamo = $id.'-'.$request->serie;
+        $prestamo = $folio.'-'.$request->serie;
 		$Prestamo_Herramienta = new Prestamo_Herramienta;
 		$Prestamo_Herramienta->id=$id;
+        $Prestamo_Herramienta->folio=$folio;
         $Prestamo_Herramienta->prestamo=$prestamo;
 		$Prestamo_Herramienta->serie=$request->serie;
         $Prestamo_Herramienta->fecha=Carbon::parse($request->fecha)->toDateTimeString();
@@ -168,7 +218,7 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
         $Prestamo_Herramienta->inicio_prestamo = $request->inicioprestamo;
         $Prestamo_Herramienta->termino_prestamo = $request->terminoprestamo;
         $Prestamo_Herramienta->usuario=Auth::user()->user;
-        $Prestamo_Herramienta->periodo=$request->periodohoy;
+        $Prestamo_Herramienta->periodo=$this->periodohoy;
         $Prestamo_Herramienta->save();
         DB::unprepared('SET IDENTITY_INSERT prestamo_herramientas OFF');
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
@@ -179,7 +229,7 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
         $BitacoraDocumento->Status = "ALTA";
         $BitacoraDocumento->Usuario = Auth::user()->user;
-        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
         $item = 1;
@@ -337,12 +387,12 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
                 $filasdetallesprestamo= $filasdetallesprestamo.
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                             '<td class="tdmod"></td>'.
-                            '<td class="tdmod"><input type="hidden" class="form-control iddetalleasignacionherramienta" name="iddetalleasignacionherramienta[]" id="iddetalleasignacionherramienta[]" value="'.$phd->id_detalle_asignacion_herramienta.'" readonly><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'.$phd->herramienta.'" readonly>'.$phd->herramienta.'</td>'.
-                            '<td class="tdmod"><div class="divorinputmodl"><input type="hidden" class="form-control descripcionpartida" name="descripcionpartida[]" id="descripcionpartida[]" value="'.$phd->descripcion.'" readonly>'.$phd->descripcion.'</div></td>'.
-                            '<td class="tdmod"><input type="hidden" class="form-control unidadpartida" name="unidadpartida[]" id="unidadpartida[]" value="'.$phd->unidad.'" readonly>'.$phd->unidad.'</td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="'.$phd->cantidad.'" data-parsley-min="0.1" data-parsley-max="'.$phd->cantidad.'" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('.$contadorfilas.');" required readonly></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" id="preciopartida[]" value="'.$phd->precio.'" onchange="formatocorrectoinputcantidades(this);" required readonly></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpartida" name="totalpartida[]" id="totalpartida[]" value="'.$phd->precio.'" onchange="formatocorrectoinputcantidades(this);" required readonly></td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control iddetalleasignacionherramienta" name="iddetalleasignacionherramienta[]" value="'.$phd->id_detalle_asignacion_herramienta.'" readonly><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$phd->herramienta.'" readonly>'.$phd->herramienta.'</td>'.
+                            '<td class="tdmod"><div class="divorinputmodl"><input type="hidden" class="form-control descripcionpartida" name="descripcionpartida[]" value="'.$phd->descripcion.'" readonly>'.$phd->descripcion.'</div></td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control unidadpartida" name="unidadpartida[]" value="'.$phd->unidad.'" readonly>'.$phd->unidad.'</td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.$phd->cantidad.'" data-parsley-min="0.1" data-parsley-max="'.$phd->cantidad.'" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('.$contadorfilas.');" required readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" value="'.$phd->precio.'" onchange="formatocorrectoinputcantidades(this);" required readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpartida" name="totalpartida[]" value="'.$phd->precio.'" onchange="formatocorrectoinputcantidades(this);" required readonly></td>'.
                             '<td class="tdmod">'.
                               '<select name="estadopartida[]" class="form-control" style="width:100% !important;height: 28px !important;" required readonly disabled>'.
                                   $opciones.
@@ -392,7 +442,7 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
             "contadorproductos" => $contadorproductos,
             "contadorfilas" => $contadorfilas,
             "modificacionpermitida" => $modificacionpermitida,
-            "fecha" => Helpers::formatoinputdate($Prestamo_Herramienta->fecha),
+            "fecha" => Helpers::formatoinputdatetime($Prestamo_Herramienta->fecha),
             "total" => Helpers::convertirvalorcorrecto($Prestamo_Herramienta->total),
             "personalrecibe" => $personalrecibe,
             "personalentrega" => $personalentrega,
@@ -402,10 +452,10 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
     }
     //guardar modificacion del prestamo
     public function prestamo_herramienta_guardar_modificacion(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         //Modificar prestamo
-        $prestamo = $request->id.'-'.$request->serie;
-        $Prestamo_Herramienta = Prestamo_Herramienta::where('id', $request->id)->first();
+        $prestamo = $request->folio.'-'.$request->serie;
+        $Prestamo_Herramienta = Prestamo_Herramienta::where('prestamo', $prestamo)->first();
         if($Prestamo_Herramienta->termino_prestamo < $request->terminoprestamo){
             $Prestamo_Herramienta->correo_enviado = NULL;
         }
@@ -421,7 +471,7 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
         $BitacoraDocumento->Status = $Prestamo_Herramienta->status;
         $BitacoraDocumento->Usuario = Auth::user()->user;
-        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
     	return response()->json($Prestamo_Herramienta);
     }

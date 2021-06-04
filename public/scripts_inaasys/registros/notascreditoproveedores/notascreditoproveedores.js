@@ -10,16 +10,23 @@ function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1500));
 }
 function asignarfechaactual(){
+  /*
     var fechahoy = new Date();
     var dia = ("0" + fechahoy.getDate()).slice(-2);
     var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
     var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia) ;
     $('#fecha').val(hoy);
     $('input[type=datetime-local]').val(new Date().toJSON().slice(0,19));
+    */
+    $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechadatetimelocal){
+      $("#fecha").val(fechadatetimelocal);
+      $('input[type=datetime-local]').val(fechadatetimelocal);
+    })
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
-  $.get(notas_credito_proveedores_obtener_ultimo_folio, function(folio){
+  var serie = $("#serie").val();
+  $.get(notas_credito_proveedores_obtener_ultimo_folio,{serie:serie}, function(folio){
     $("#folio").val(folio);
   })  
 }
@@ -126,6 +133,77 @@ function listar(){
     }
   });
 }
+//obtener series documento
+function obtenerseriesdocumento(){
+  ocultarformulario();
+  var seriedefault = 'A';
+  var tablaseriesdocumento= '<div class="modal-header bg-red">'+
+                              '<h4 class="modal-title">Series Documento &nbsp;&nbsp; <div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''+seriedefault+'\')">Asignar Serie Default (A)</div></h4>'+
+                            '</div>'+
+                            '<div class="modal-body">'+
+                              '<div class="row">'+
+                                '<div class="col-md-12">'+
+                                  '<div class="table-responsive">'+
+                                    '<table id="tbllistadoseriedocumento" class="tbllistadoseriedocumento table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                      '<thead class="customercolor">'+
+                                        '<tr>'+
+                                          '<th>Operaciones</th>'+
+                                          '<th>Serie</th>'+
+                                          '<th>Documento</th>'+
+                                          '<th>Nombre</th>'+
+                                        '</tr>'+
+                                      '</thead>'+
+                                      '<tbody></tbody>'+
+                                    '</table>'+
+                                  '</div>'+
+                                '</div>'+   
+                              '</div>'+
+                            '</div>'+
+                            '<div class="modal-footer">'+
+                              '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                            '</div>';  
+  $("#contenidomodaltablas").html(tablaseriesdocumento);
+  $('#tbllistadoseriedocumento').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
+      "sScrollX": "110%",
+      "sScrollY": "370px",
+      "bScrollCollapse": true,  
+      processing: true,
+      'language': {
+        'loadingRecords': '&nbsp;',
+        'processing': '<div class="spinner"></div>'
+      },
+      serverSide: true,
+      ajax: {
+        url: notas_credito_proveedores_obtener_series_documento
+      },
+      columns: [
+          { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+          { data: 'Serie', name: 'Serie' },
+          { data: 'Documento', name: 'Documento' },
+          { data: 'Nombre', name: 'Nombre' }
+      ],
+      "initComplete": function() {
+        var $buscar = $('div.dataTables_filter input');
+        $buscar.unbind();
+        $buscar.bind('keyup change', function(e) {
+            if(e.keyCode == 13 || this.value == "") {
+              $('#tbllistadoseriedocumento').DataTable().search( this.value ).draw();
+            }
+        });
+      },
+      
+  });  
+}
+function seleccionarseriedocumento(Serie){
+  $.get(notas_credito_proveedores_obtener_ultimo_folio_serie_seleccionada, {Serie:Serie}, function(folio){
+      $("#folio").val(folio);
+      $("#serie").val(Serie);
+      $("#serietexto").html("Serie: "+Serie);
+      mostrarformulario();
+  }) 
+}
 //obtener registros de proveedores
 function obtenerproveedores(){
   ocultarformulario();
@@ -196,12 +274,18 @@ function obtenerproveedores(){
 } 
 //seleccionar proveedor
 function seleccionarproveedor(Numero, Nombre, Plazo, Rfc){
-  $("#numeroproveedor").val(Numero);
-  $("#numeroproveedoranterior").val(Numero);
-  $("#proveedor").val(Nombre);
-  $("#textonombreproveedor").html(Nombre.substring(0, 40));
-  $("#rfcproveedor").val(Rfc);
-  mostrarformulario();
+  var numeroproveedoranterior = $("#numeroproveedoranterior").val();
+  var numeroproveedor = Numero;
+  if(numeroproveedoranterior != numeroproveedor){
+    $("#numeroproveedor").val(Numero);
+    $("#numeroproveedoranterior").val(Numero);
+    $("#proveedor").val(Nombre);
+    if(Nombre != null){
+      $("#textonombreproveedor").html(Nombre.substring(0, 40));
+    }
+    $("#rfcproveedor").val(Rfc);
+    mostrarformulario();
+  }
 }
 //obtener registros de almacenes
 function obteneralmacenes(){
@@ -265,11 +349,17 @@ function obteneralmacenes(){
 } 
 //seleccionar almacen
 function seleccionaralmacen(Numero, Nombre){
+  var numeroalmacenanterior = $("#numeroalmacenanterior").val();
+  var numeroalmacen = Numero;
+  if(numeroalmacenanterior != numeroalmacen){
     $("#numeroalmacen").val(Numero);
     $("#numeroalmacenanterior").val(Numero);
     $("#almacen").val(Nombre);
-    $("#textonombrealmacen").html(Nombre.substring(0, 40));
+    if(Nombre != null){
+      $("#textonombrealmacen").html(Nombre.substring(0, 40));
+    }
     mostrarformulario();
+  }
 }
 //listar todas las ordenes de compra
 function listarcompras (){
@@ -289,6 +379,7 @@ function listarcompras (){
                                     '<th>Fecha</th>'+
                                     '<th>UUID</th>'+
                                     '<th>Proveedor</th>'+
+                                    '<th>Tipo</th>'+
                                     '<th>Almacen</th>'+
                                     '<th>Total</th>'+
                                   '</tr>'+
@@ -328,6 +419,7 @@ function listarcompras (){
             { data: 'Fecha', name: 'Fecha' },
             { data: 'UUID', name: 'UUID', orderable: false, searchable: false },
             { data: 'Proveedor', name: 'Proveedor', orderable: false, searchable: false },
+            { data: 'Tipo', name: 'Tipo', orderable: false, searchable: false },
             { data: 'Almacen', name: 'Almacen', orderable: false, searchable: false },
             { data: 'Total', name: 'Total', orderable: false, searchable: false }
         ],
@@ -344,15 +436,30 @@ function listarcompras (){
     });  
 } 
 //obtener todos los datos de la orden de compra seleccionada
-function seleccionarcompra(Folio, Compra){
+function seleccionarcompra(Folio, Compra, Tipo){
     $('.page-loader-wrapper').css('display', 'block');
     var tipooperacion = $("#tipooperacion").val();
     $.get(notas_credito_proveedores_obtener_compra, {Folio:Folio, Compra:Compra, contadorfilascompras:contadorfilascompras, tipooperacion:tipooperacion}, function(data){
       $("#tabladetallescomprasnotasproveedor tbody").append(data.filacompra);
-      $("#almacen").val(data.almacen.Nombre);
-      $("#textonombrealmacen").html(data.almacen.Nombre);
-      $("#numeroalmacen").val(data.almacen.Numero);
-      $("#numeroalmacenanterior").val(data.almacen.Numero);
+      switch (Tipo) {
+        case 'GASTOS':
+          //desabilitar almacen
+          $("#numeroalmacen").val(0).attr('readonly', 'readonly');
+          $("#numeroalmacenanterior").val(0).attr('readonly', 'readonly');
+          $("#almacen").val(0).attr('readonly', 'readonly');
+          break;
+        case 'TOT':
+          //desabilitar almacen
+          $("#numeroalmacen").val(0).attr('readonly', 'readonly');
+          $("#numeroalmacenanterior").val(0).attr('readonly', 'readonly');
+          $("#almacen").val(0).attr('readonly', 'readonly');
+          break;
+        default:
+          $("#almacen").val(data.almacen.Nombre);
+          $("#textonombrealmacen").html(data.almacen.Nombre);
+          $("#numeroalmacen").val(data.almacen.Numero);
+          $("#numeroalmacenanterior").val(data.almacen.Numero);
+      }
       //array de compras seleccionar
       construirarraycomprasseleccionadas();
       //activar buscador de codigos
@@ -437,10 +544,25 @@ function comprobarfilascompranotaproveedor(){
   }else if(parseInt(numerofilascompras) == parseInt(1) && parseInt(numerofilas) == parseInt(0) ){
     var compra = $(".compraaplicarpartida").val();
     $.get(notas_credito_proveedores_obtener_datos_almacen, {compra:compra}, function(data){
-      $("#almacen").val(data.almacen.Nombre);
-      $("#textonombrealmacen").html(data.almacen.Nombre);
-      $("#numeroalmacen").val(data.almacen.Numero);
-      $("#numeroalmacenanterior").val(data.almacen.Numero);
+      switch (data.compra.Tipo){
+        case 'GASTOS':
+          $("#almacen").val(0);
+          $("#textonombrealmacen").html("");
+          $("#numeroalmacen").val(0);
+          $("#numeroalmacenanterior").val(0);
+          break;
+        case 'TOT':
+          $("#almacen").val(0);
+          $("#textonombrealmacen").html("");
+          $("#numeroalmacen").val(0);
+          $("#numeroalmacenanterior").val(0);
+          break;
+        default:
+          $("#almacen").val(data.almacen.Nombre);
+          $("#textonombrealmacen").html(data.almacen.Nombre);
+          $("#numeroalmacen").val(data.almacen.Numero);
+          $("#numeroalmacenanterior").val(data.almacen.Numero);
+      } 
     })
   }else if(parseInt(numerofilascompras) == parseInt(1) && parseInt(numerofilas) >= parseInt(1) && tipodetalles == 'dppp' ){
     $("#almacen").val(0);
@@ -450,10 +572,25 @@ function comprobarfilascompranotaproveedor(){
   }else if(parseInt(numerofilascompras) == parseInt(1) && parseInt(numerofilas) >= parseInt(1) && (tipodetalles == '' || tipodetalles == 'codigos') ){
     var compra = $(".compraaplicarpartida").val();
     $.get(notas_credito_proveedores_obtener_datos_almacen, {compra:compra}, function(data){
-      $("#almacen").val(data.almacen.Nombre);
-      $("#textonombrealmacen").html(data.almacen.Nombre);
-      $("#numeroalmacen").val(data.almacen.Numero);
-      $("#numeroalmacenanterior").val(data.almacen.Numero);
+      switch (data.compra.Tipo){
+        case 'GASTOS':
+          $("#almacen").val(0);
+          $("#textonombrealmacen").html("");
+          $("#numeroalmacen").val(0);
+          $("#numeroalmacenanterior").val(0);
+          break;
+        case 'TOT':
+          $("#almacen").val(0);
+          $("#textonombrealmacen").html("");
+          $("#numeroalmacen").val(0);
+          $("#numeroalmacenanterior").val(0);
+          break;
+        default:
+          $("#almacen").val(data.almacen.Nombre);
+          $("#textonombrealmacen").html(data.almacen.Nombre);
+          $("#numeroalmacen").val(data.almacen.Numero);
+          $("#numeroalmacenanterior").val(data.almacen.Numero);
+      } 
     })
   }
 }
@@ -488,16 +625,21 @@ $(document).ready(function(){
 });
 //obtener por numero
 function obtenerproveedorpornumero(){
-  if($("#numeroproveedor").parsley().isValid()){
-      var numeroproveedor = $("#numeroproveedor").val();
+  var numeroproveedoranterior = $("#numeroproveedoranterior").val();
+  var numeroproveedor = $("#numeroproveedor").val();
+  if(numeroproveedoranterior != numeroproveedor){
+    if($("#numeroproveedor").parsley().isValid()){
       $.get(notas_credito_proveedores_obtener_proveedor_por_numero, {numeroproveedor:numeroproveedor}, function(data){
         $("#numeroproveedor").val(data.numero);
         $("#numeroproveedoranterior").val(data.numero);
         $("#proveedor").val(data.nombre);
-        $("#textonombreproveedor").html(data.nombre.substring(0, 40));
+        if(data.nombre != null){
+          $("#textonombreproveedor").html(data.nombre.substring(0, 40));
+        }
         $("#rfcproveedor").val(data.rfc);
         mostrarformulario();
       }) 
+    }
   }
 }
 //regresar numero
@@ -507,15 +649,20 @@ function regresarnumeroproveedor(){
 }
 //obtener por numero
 function obteneralmacenpornumero(){
-  if($("#numeroalmacen").parsley().isValid()){
-      var numeroalmacen = $("#numeroalmacen").val();
+  var numeroalmacenanterior = $("#numeroalmacenanterior").val();
+  var numeroalmacen = $("#numeroalmacen").val();
+  if(numeroalmacenanterior != numeroalmacen){
+    if($("#numeroalmacen").parsley().isValid()){
       $.get(notas_credito_proveedores_obtener_almacen_por_numero, {numeroalmacen:numeroalmacen}, function(data){
           $("#numeroalmacen").val(data.numero);
           $("#numeroalmacenanterior").val(data.numero);
           $("#almacen").val(data.nombre);
-          $("#textonombrealmacen").html(data.nombre.substring(0, 40));
+          if(data.nombre != null){
+            $("#textonombrealmacen").html(data.nombre.substring(0, 40));
+          }
           mostrarformulario();
       }) 
+    }
   }
 }
 //regresar numero
@@ -976,7 +1123,7 @@ function alta(){
                             '<div role="tabpanel" class="tab-pane fade in active" id="compratab">'+
                                 '<div class="row">'+
                                     '<div class="col-md-2">'+
-                                        '<label>Nota <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
+                                        '<label>Nota <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
                                         '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                                         '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                                         '<input type="hidden" class="form-control" name="uuid" id="uuid" readonly required data-parsley-length="[1, 50]">'+
@@ -1011,7 +1158,7 @@ function alta(){
                                     '</div>'+   
                                     '<div class="col-md-3">'+
                                         '<label>Fecha</label>'+
-                                        '<input type="date" class="form-control" name="fecha" id="fecha" required onchange="validasolomesactual();validarmescompra();">'+
+                                        '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required onchange="validasolomesactual();validarmescompra();">'+
                                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                         '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
                                     '</div>'+   
@@ -1515,9 +1662,12 @@ function validarmescompra(){
   var fechaxml = new Date($("#fechaemitida").val());
   var dia = ("0" + fechaxml.getDate()).slice(-2);
   var mes = ("0" + (fechaxml.getMonth() + 1)).slice(-2);
-  var fechafactura = fechaxml.getFullYear()+"-"+(mes)+"-"+(dia) ;  
-  var fechacompra = $("#fecha").val();
-  if(fechafactura != fechacompra){
+  var fechafacturasinhoras = fechaxml.getFullYear()+"-"+(mes)+"-"+(dia) ;  
+  var fechacompra = new Date($("#fecha").val());
+  var diacompra = ("0" + fechacompra.getDate()).slice(-2);
+  var mescompra = ("0" + (fechacompra.getMonth() + 1)).slice(-2);
+  var fechacomprasinhoras = fechacompra.getFullYear()+"-"+(mescompra)+"-"+(diacompra) ; 
+  if(fechafacturasinhoras != fechacomprasinhoras){
     $("#fecha").val("");
     msj_errorfechaigualafechafactura();
   }
@@ -1605,23 +1755,25 @@ function renumerarfilas(){
 }  
 //revisar si hay existencias de la partida en el almacen
 function revisarexistenciasalmacen(fila){
+  var stringcomprasseleccionadas = $("#stringcomprasseleccionadas").val();
   var folio = $("#folio").val();
   var serie = $("#serie").val();
   var almacen = $("#numeroalmacen").val();
   var codigopartida = $("#filaproducto"+fila+" .codigopartida").val();
+  var cantidadpartida = $("#filaproducto"+fila+" .cantidadpartida").val();
   var realizarbusquedaexistencias = $("#filaproducto"+fila+" .realizarbusquedaexistencias").val();
   if(realizarbusquedaexistencias === "1"){
-    comprobarexistenciaspartida(almacen, codigopartida, folio, serie).then(nuevaexistencia=>{
+    comprobarexistenciaspartida(almacen, codigopartida, folio, serie, stringcomprasseleccionadas, cantidadpartida).then(nuevaexistencia=>{
       $("#filaproducto"+fila+" .cantidadpartida").attr('data-parsley-existencias',nuevaexistencia);
       $("#filaproducto"+fila+" .cantidadpartida").parsley().validate();
     })
   }
 }
 //funcion asincrona para buscar existencias de la partida
-function comprobarexistenciaspartida(almacen, codigopartida, folio, serie){
+function comprobarexistenciaspartida(almacen, codigopartida, folio, serie, stringcomprasseleccionadas, cantidadpartida){
   return new Promise((ejecuta)=>{
     setTimeout(function(){ 
-      $.get(notas_credito_proveedor_obtener_existencias_partida,{'almacen':almacen,'codigopartida':codigopartida,'folio':folio,'serie':serie},nuevaexistencia=>{
+      $.get(notas_credito_proveedor_obtener_existencias_partida,{'almacen':almacen,'codigopartida':codigopartida,'folio':folio,'serie':serie,'stringcomprasseleccionadas':stringcomprasseleccionadas,'cantidadpartida':cantidadpartida},nuevaexistencia=>{
         return ejecuta(nuevaexistencia);
       })
     },500);
@@ -1755,7 +1907,7 @@ function obtenerdatos(notamodificar){
                       '</div>'+   
                       '<div class="col-md-3">'+
                         '<label>Fecha</label>'+
-                        '<input type="date" class="form-control" name="fecha" id="fecha" required onchange="validasolomesactual();validarmescompra();">'+
+                        '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required onchange="validasolomesactual();validarmescompra();">'+
                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                         '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
                       '</div>'+   
@@ -1992,7 +2144,9 @@ function obtenerdatos(notamodificar){
     $("#fecha").val(data.fecha);
     $("#fechaemitida").val(data.fechaemitida);
     $("#proveedor").val(data.proveedor.Nombre);
-    $("#textonombreproveedor").html(data.proveedor.Nombre.substring(0, 40));
+    if(data.proveedor.Nombre != null){
+      $("#textonombreproveedor").html(data.proveedor.Nombre.substring(0, 40));
+    }
     $("#numeroproveedor").val(data.proveedor.Numero);
     $("#numeroproveedoranterior").val(data.proveedor.Numero);
     $("#rfcproveedor").val(data.proveedor.Rfc);
@@ -2004,7 +2158,9 @@ function obtenerdatos(notamodificar){
       $("#numeroalmacenanterior").val(0);
     }else{
       $("#almacen").val(data.almacen.Nombre);
-      $("#textonombrealmacen").html(data.almacen.Nombre);
+      if(data.almacen.Nombre != null){
+        $("#textonombrealmacen").html(data.almacen.Nombre.substring(0, 40));
+      }
       $("#numeroalmacen").val(data.almacen.Numero);
       $("#numeroalmacenanterior").val(data.almacen.Numero);
     }
@@ -2061,14 +2217,6 @@ function obtenerdatos(notamodificar){
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
         listarproductos();
-      }
-    });
-    //activar busqueda para proveedores
-    $('#numeroproveedor').on('keypress', function(e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-      obtenerproveedorpornumero();
       }
     });
     //regresar numero proveedor
@@ -2169,7 +2317,7 @@ function desactivar(notadesactivar){
         $('#estatusregistro').modal('show');
       }else{
         $("#notadesactivar").val(notadesactivar);
-        $("#textomodaldesactivar").html('Estas seguro de cambiar el estado el registro?');
+        $("#textomodaldesactivar").html('Estas seguro de dar de baja la nota crédito proveedor? No'+notadesactivar);
         $("#divmotivobaja").show();
         $("#btnbaja").show();
         $('#estatusregistro').modal('show');

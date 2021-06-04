@@ -67,7 +67,7 @@
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover">
                                     <thead class="customercolor">
                                         <tr>
-                                            <th><div style="width:150px !important;">Operaciones</div></th>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
                                             <th>{{$co}}</th>
                                             @endforeach
@@ -128,7 +128,7 @@
                     <div class="col-md-4">
                         <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
-                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Guardar</button>
+                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
                     </div>
                         
                 </div>
@@ -139,26 +139,6 @@
         </div>
     </div>
 </div>
-<!-- Modal Autorizar Orden de Compra-->
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="autorizarorden" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  	<div class="modal-dialog" role="document">
-    	<div class="modal-content">
-      		<div class="modal-header bg-red">
-        		<h5 class="modal-title" id="exampleModalLabel">Aviso</h5>
-      		</div>
-      		<div class="modal-body">
-		      	<form id="formautorizar" action="#">
-		        	Estas seguro de autorizar la orden de compra?
-		        	<input type="hidden" id="ordenautorizar" name="ordenautorizar">
-		        </form>	
-      		</div>
-	      	<div class="modal-footer">
-	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
-	        	<button type="button" class="btn btn-success btn-sm" id="btnautorizar">Guardar</button>
-	      	</div>
-    	</div>
-  	</div>
-</div> 
 <!-- Modal Baja o Alta-->
 <div class="modal fade" data-backdrop="static" data-keyboard="false" id="estatusregistro" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   	<div class="modal-dialog" role="document">
@@ -178,7 +158,7 @@
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
-	        	<button type="button" class="btn btn-success btn-sm" id="btnbaja">Guardar</button>
+	        	<button type="button" class="btn btn-success btn-sm" id="btnbaja">Confirmar Baja</button>
 	      	</div>
     	</div>
   	</div>
@@ -209,7 +189,10 @@
         var rfcempresa = '{{$empresa->Rfc}}';
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var notas_credito_proveedores_obtener = '{!!URL::to('notas_credito_proveedores_obtener')!!}';
+        var notas_credito_proveedores_obtener_series_documento = '{!!URL::to('notas_credito_proveedores_obtener_series_documento')!!}';
+        var notas_credito_proveedores_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('notas_credito_proveedores_obtener_ultimo_folio_serie_seleccionada')!!}';
         var notas_credito_proveedores_obtener_ultimo_folio = '{!!URL::to('notas_credito_proveedores_obtener_ultimo_folio')!!}';
+        var ordenes_compra_obtener_fecha_actual_datetimelocal = '{!!URL::to('ordenes_compra_obtener_fecha_actual_datetimelocal')!!}';
         var notas_credito_proveedores_obtener_proveedores = '{!!URL::to('notas_credito_proveedores_obtener_proveedores')!!}';
         var notas_credito_proveedores_obtener_proveedor_por_numero = '{!!URL::to('notas_credito_proveedores_obtener_proveedor_por_numero')!!}';
         var notas_credito_proveedores_obtener_almacenes = '{!!URL::to('notas_credito_proveedores_obtener_almacenes')!!}';

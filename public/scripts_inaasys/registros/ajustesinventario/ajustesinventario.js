@@ -9,15 +9,21 @@ function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1000));
 }
 function asignarfechaactual(){
+  /*
     var fechahoy = new Date();
     var dia = ("0" + fechahoy.getDate()).slice(-2);
     var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
     var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia);
     $('#fecha').val(hoy);
+    */
+    $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechadatetimelocal){
+      $("#fecha").val(fechadatetimelocal);
+    })
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
-  $.get(ajustesinventario_obtener_ultimo_id, function(folio){
+  var serie = $("#serie").val();
+  $.get(ajustesinventario_obtener_ultimo_id,{serie:serie}, function(folio){
     $("#folio").val(folio);
   })  
 }
@@ -123,6 +129,77 @@ function listar(){
     }
   });
 }
+//obtener series documento
+function obtenerseriesdocumento(){
+  ocultarformulario();
+  var seriedefault = 'A';
+  var tablaseriesdocumento= '<div class="modal-header bg-red">'+
+                              '<h4 class="modal-title">Series Documento &nbsp;&nbsp; <div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''+seriedefault+'\')">Asignar Serie Default (A)</div></h4>'+
+                            '</div>'+
+                            '<div class="modal-body">'+
+                              '<div class="row">'+
+                                '<div class="col-md-12">'+
+                                  '<div class="table-responsive">'+
+                                    '<table id="tbllistadoseriedocumento" class="tbllistadoseriedocumento table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                      '<thead class="customercolor">'+
+                                        '<tr>'+
+                                          '<th>Operaciones</th>'+
+                                          '<th>Serie</th>'+
+                                          '<th>Documento</th>'+
+                                          '<th>Nombre</th>'+
+                                        '</tr>'+
+                                      '</thead>'+
+                                      '<tbody></tbody>'+
+                                    '</table>'+
+                                  '</div>'+
+                                '</div>'+   
+                              '</div>'+
+                            '</div>'+
+                            '<div class="modal-footer">'+
+                              '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                            '</div>';  
+  $("#contenidomodaltablas").html(tablaseriesdocumento);
+  $('#tbllistadoseriedocumento').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
+      "sScrollX": "110%",
+      "sScrollY": "370px",
+      "bScrollCollapse": true,  
+      processing: true,
+      'language': {
+        'loadingRecords': '&nbsp;',
+        'processing': '<div class="spinner"></div>'
+      },
+      serverSide: true,
+      ajax: {
+        url: ajustesinventario_obtener_series_documento
+      },
+      columns: [
+          { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+          { data: 'Serie', name: 'Serie' },
+          { data: 'Documento', name: 'Documento' },
+          { data: 'Nombre', name: 'Nombre' }
+      ],
+      "initComplete": function() {
+        var $buscar = $('div.dataTables_filter input');
+        $buscar.unbind();
+        $buscar.bind('keyup change', function(e) {
+            if(e.keyCode == 13 || this.value == "") {
+              $('#tbllistadoseriedocumento').DataTable().search( this.value ).draw();
+            }
+        });
+      },
+      
+  });  
+}
+function seleccionarseriedocumento(Serie){
+  $.get(ajustesinventario_obtener_ultimo_folio_serie_seleccionada, {Serie:Serie}, function(folio){
+      $("#folio").val(folio);
+      $("#serie").val(Serie);
+      $("#serietexto").html("Serie: "+Serie);
+      mostrarformulario();
+  }) 
+}
 //obtener registros de remisiones
 function obteneralmacenes(){
   ocultarformulario();
@@ -185,19 +262,25 @@ function obteneralmacenes(){
 } 
 //obtener datos de remision seleccionada
 function seleccionaralmacen(Numero, Nombre){
-  $("#numeroalmacen").val(Numero);
-  $("#numeroalmacenanterior").val(Numero);
-  $("#almacen").val(Nombre);
-  $("#textonombrealmacen").html(Nombre.substring(0, 40));
-  mostrarformulario();
-  var tipooperacion = $("#tipooperacion").val();
-  if(tipooperacion == 'alta'){
-    $("#divbuscarcodigoproducto").show();
-  }
-  //si se cambia el almacen cambiar datos en las filas
-  var numerofilas = $("#numerofilas").val();
-  if(parseInt(numerofilas) > parseInt(0)){
-    cargarnuevosdatosenfilas();
+  var numeroalmacenanterior = $("#numeroalmacenanterior").val();
+  var numeroalmacen = Numero;
+  if(numeroalmacenanterior != numeroalmacen){
+    $("#numeroalmacen").val(Numero);
+    $("#numeroalmacenanterior").val(Numero);
+    $("#almacen").val(Nombre);
+    if(Nombre != null){
+      $("#textonombrealmacen").html(Nombre.substring(0, 40));
+    }
+    mostrarformulario();
+    var tipooperacion = $("#tipooperacion").val();
+    if(tipooperacion == 'alta'){
+      $("#divbuscarcodigoproducto").show();
+    }
+    //si se cambia el almacen cambiar datos en las filas
+    var numerofilas = $("#numerofilas").val();
+    if(parseInt(numerofilas) > parseInt(0)){
+      cargarnuevosdatosenfilas();
+    }
   }
 }
 function cargarnuevosdatosenfilas(){
@@ -233,26 +316,20 @@ function obtenernuevosdatosfila(numeroalmacen, codigopartida, folio, serie, fila
     },500);
   })
 }
-//detectar cuando en el input de buscar por codigo de producto el usuario presione la tecla enter, si es asi se realizara la busqueda con el codigo escrito
-$(document).ready(function(){
-    $("#codigoabuscar").keypress(function(e) {
-        //recomentable para mayor compatibilidad entre navegadores.
-        var code = (e.keyCode ? e.keyCode : e.which);
-        if(code==13){
-          listarproductos();
-        }
-    });
-});
-
 //obtener por numero
 function obteneralmacenpornumero(){
-  if($("#numeroalmacen").parsley().isValid()){
+  var numeroalmacenanterior = $("#numeroalmacenanterior").val();
+  var numeroalmacen = $("#numeroalmacen").val();
+  if(numeroalmacenanterior != numeroalmacen){
+    if($("#numeroalmacen").parsley().isValid()){
       var numeroalmacen = $("#numeroalmacen").val();
       $.get(ajustesinventario_obtener_almacen_por_numero, {numeroalmacen:numeroalmacen}, function(data){
         $("#numeroalmacen").val(data.numero);
         $("#numeroalmacenanterior").val(data.numero);
         $("#almacen").val(data.nombre);
-        $("#textonombrealmacen").html(data.nombre.substring(0, 40));
+        if(data.nombre != null){
+          $("#textonombrealmacen").html(data.nombre.substring(0, 40));
+        }
         mostrarformulario();
         var tipooperacion = $("#tipooperacion").val();
         if(tipooperacion == 'alta'){
@@ -264,6 +341,7 @@ function obteneralmacenpornumero(){
           cargarnuevosdatosenfilas();
         }
       }) 
+    }
   }
 }
 //regresar numero
@@ -271,8 +349,6 @@ function regresarnumeroalmacen(){
   var numeroalmacenanterior = $("#numeroalmacenanterior").val();
   $("#numeroalmacen").val(numeroalmacenanterior);
 }
-
-
 //listar productos para tab consumos
 function listarproductos(){
     ocultarformulario();
@@ -572,50 +648,93 @@ function alta(){
   mostrarmodalformulario('ALTA', 1);
   mostrarformulario();
   //formulario alta
-  var tabs =    '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
-                    '<li role="presentation" class="active">'+
-                        '<a href="#productostab" data-toggle="tab">Productos</a>'+
-                    '</li>'+
-                '</ul>'+
-                '<div class="tab-content">'+
-                    '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
-                        '<div class="row">'+
-                            '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
-                                '<table id="tablaproductosajuste" class="table table-bordered tablaproductosajuste">'+
-                                    '<thead class="customercolor">'+
-                                        '<tr>'+
-                                          '<th class="customercolor">#</th>'+
-                                          '<th class="customercolor">Código</th>'+
-                                          '<th class="customercolor"><div style="width:200px !important;">Producto</div></th>'+
-                                          '<th class="customercolor">Unidad</th>'+
-                                          '<th class="customercolor">Existencia Actual</th>'+
-                                          '<th class="customercolortheadth">Entradas</th>'+
-                                          '<th class="customercolortheadth">Salidas</th>'+
-                                          '<th class="customercolor">Existencia Nueva</th>'+
-                                          '<th class="customercolor">Costo $</th>'+
-                                        '</tr>'+
-                                    '</thead>'+
-                                    '<tbody>'+           
-                                    '</tbody>'+
-                                '</table>'+
-                            '</div>'+
-                        '</div>'+ 
-                        '<div class="row">'+
-                          '<div class="col-md-6">'+   
-                            '<label>Observaciones</label>'+
-                            '<textarea class="form-control" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
-                          '</div>'+ 
-                          '<div class="col-md-3 col-md-offset-3">'+
-                                '<table class="table table-striped table-hover">'+
-                                    '<tr>'+
-                                        '<td class="tdmod">Total</td>'+
-                                        '<td class="tdmod"><input type="text" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" required readonly></td>'+
-                                    '</tr>'+
-                                '</table>'+
-                            '</div>'+
-                        '</div>'+   
+  var tabs ='<div class="col-md-12">'+  
+              '<div class="row">'+
+                '<div class="col-md-2">'+
+                  '<label>Ajuste <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
+                  '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                  '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
+                  '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
+                  '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
+                '</div>'+ 
+                '<div class="col-md-3">'+
+                  '<label>Almacén <span class="label label-danger" id="textonombrealmacen"></span></label>'+
+                  '<table class="col-md-12">'+
+                    '<tr>'+
+                      '<td>'+
+                        '<div class="btn bg-blue waves-effect" onclick="obteneralmacenes()">Seleccionar</div>'+
+                      '</td>'+
+                      '<td>'+
+                        '<div class="form-line">'+
+                          '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer">'+
+                          '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required data-parsley-type="integer">'+
+                          '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
+                          '<input type="hidden" class="form-control" name="almacendb" id="almacendb" required readonly>'+
+                          '<input type="hidden" class="form-control" name="numeroalmacendb" id="numeroalmacendb" required readonly>'+
+                        '</div>'+
+                      '</td>'+
+                    '</tr>'+   
+                  '</table>'+
+                '</div>'+
+                '<div class="col-md-3">'+
+                  '<label>Fecha </label>'+
+                  '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();">'+
+                  '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
+                '</div>'+
+              '</div>'+
+              '<div class="row">'+
+                '<div class="col-md-4" id="divbuscarcodigoproducto" hidden>'+
+                  '<label>Buscar producto por código</label>'+
+                  '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                '</div>'+
+              '</div>'+
+            '</div>'+
+            '<div class="col-md-12">'+  
+              '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                '<li role="presentation" class="active">'+
+                  '<a href="#productostab" data-toggle="tab">Productos</a>'+
+                '</li>'+
+              '</ul>'+
+              '<div class="tab-content">'+
+                '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
+                  '<div class="row">'+
+                    '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
+                      '<table id="tablaproductosajuste" class="table table-bordered tablaproductosajuste">'+
+                        '<thead class="customercolor">'+
+                          '<tr>'+
+                            '<th class="customercolor">#</th>'+
+                            '<th class="customercolor">Código</th>'+
+                            '<th class="customercolor"><div style="width:200px !important;">Producto</div></th>'+
+                            '<th class="customercolor">Unidad</th>'+
+                            '<th class="customercolor">Existencia Actual</th>'+
+                            '<th class="customercolortheadth">Entradas</th>'+
+                            '<th class="customercolortheadth">Salidas</th>'+
+                            '<th class="customercolor">Existencia Nueva</th>'+
+                            '<th class="customercolor">Costo $</th>'+
+                          '</tr>'+
+                        '</thead>'+
+                        '<tbody>'+           
+                        '</tbody>'+
+                      '</table>'+
+                    '</div>'+
+                  '</div>'+ 
+                  '<div class="row">'+
+                    '<div class="col-md-6">'+   
+                      '<label>Observaciones</label>'+
+                      '<textarea class="form-control" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
                     '</div>'+ 
-                '</div>';
+                    '<div class="col-md-3 col-md-offset-3">'+
+                      '<table class="table table-striped table-hover">'+
+                        '<tr>'+
+                          '<td class="tdmod">Total</td>'+
+                          '<td class="tdmod"><input type="text" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" required readonly></td>'+
+                        '</tr>'+
+                      '</table>'+
+                    '</div>'+
+                  '</div>'+   
+                '</div>'+ 
+              '</div>'+ 
+            '</div>';
   $("#tabsform").html(tabs);
   $("#serie").val(serieusuario);
   $("#serietexto").html("Serie: "+serieusuario);
@@ -627,6 +746,15 @@ function alta(){
   contadorproductos=0;
   contadorfilas = 0;
   $("#numerofilas").val("0");
+  //busquedas selecciona
+  //activar busqueda
+  $("#codigoabuscar").keypress(function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      listarproductos();
+    }
+  });
   //activar busqueda
   $('#numeroalmacen').on('keypress', function(e) {
     //recomentable para mayor compatibilidad entre navegadores.
@@ -710,7 +838,7 @@ function desactivar(ajustedesactivar){
           $('#estatusregistro').modal('show');
         }else{
           $("#ajustedesactivar").val(ajustedesactivar);
-          $("#textomodaldesactivar").html('Estas seguro de cambiar el estado el registro?');
+          $("#textomodaldesactivar").html('Estas seguro de dar de baja el ajuste de inventario? No'+ajustedesactivar);
           $("#divmotivobaja").show();
           $("#btnbaja").show();
           $('#estatusregistro').modal('show');
@@ -760,57 +888,103 @@ function obtenerdatos(ajustemodificar){
   $('.page-loader-wrapper').css('display', 'block');
   $.get(ajustesinventario_obtener_ajuste,{ajustemodificar:ajustemodificar },function(data){
     //formulario modificacion
-    var tabs ='<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+    var tabs ='<div class="col-md-12">'+  
+                '<div class="row">'+
+                  '<div class="col-md-2">'+
+                    '<label>Ajuste <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
+                    '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                    '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
+                    '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
+                    '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
+                  '</div>'+ 
+                  '<div class="col-md-3">'+
+                    '<label>Almacén <span class="label label-danger" id="textonombrealmacen"></span></label>'+
+                    '<table class="col-md-12">'+
+                      '<tr>'+
+                        '<td>'+
+                          '<div class="btn bg-blue waves-effect" onclick="obteneralmacenes()">Seleccionar</div>'+
+                        '</td>'+
+                        '<td>'+
+                          '<div class="form-line">'+
+                            '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer">'+
+                            '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required data-parsley-type="integer">'+
+                            '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
+                            '<input type="hidden" class="form-control" name="almacendb" id="almacendb" required readonly>'+
+                            '<input type="hidden" class="form-control" name="numeroalmacendb" id="numeroalmacendb" required readonly>'+
+                          '</div>'+
+                        '</td>'+
+                      '</tr>'+   
+                    '</table>'+
+                  '</div>'+
+                  '<div class="col-md-3">'+
+                    '<label>Fecha </label>'+
+                    '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();">'+
+                    '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
+                  '</div>'+
+                '</div>'+
+                '<div class="row">'+
+                  '<div class="col-md-4" id="divbuscarcodigoproducto" hidden>'+
+                    '<label>Buscar producto por código</label>'+
+                    '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                  '</div>'+
+                '</div>'+
+              '</div>'+
+              '<div class="col-md-12">'+ 
+                '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
                   '<li role="presentation" class="active">'+
                       '<a href="#productostab" data-toggle="tab">Productos</a>'+
                   '</li>'+
-              '</ul>'+
-              '<div class="tab-content">'+
+                '</ul>'+
+                '<div class="tab-content">'+
                   '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
-                      '<div class="row">'+
-                          '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
-                              '<table id="tablaproductosajuste" class="table table-bordered tablaproductosajuste">'+
-                                  '<thead class="customercolor">'+
-                                      '<tr>'+
-                                        '<th class="customercolor">#</th>'+
-                                        '<th class="customercolor">Código</th>'+
-                                        '<th class="customercolor"><div style="width:200px !important;">Producto</div></th>'+
-                                        '<th class="customercolor">Unidad</th>'+
-                                        '<th class="customercolor">Existencia Actual</th>'+
-                                        '<th class="customercolortheadth">Entradas</th>'+
-                                        '<th class="customercolortheadth">Salidas</th>'+
-                                        '<th class="customercolor">Existencia Nueva</th>'+
-                                        '<th class="customercolor">Costo $</th>'+
-                                      '</tr>'+
-                                  '</thead>'+
-                                  '<tbody>'+           
-                                  '</tbody>'+
-                              '</table>'+
-                          '</div>'+
+                    '<div class="row">'+
+                      '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
+                        '<table id="tablaproductosajuste" class="table table-bordered tablaproductosajuste">'+
+                          '<thead class="customercolor">'+
+                            '<tr>'+
+                              '<th class="customercolor">#</th>'+
+                              '<th class="customercolor">Código</th>'+
+                              '<th class="customercolor"><div style="width:200px !important;">Producto</div></th>'+
+                              '<th class="customercolor">Unidad</th>'+
+                              '<th class="customercolor">Existencia Actual</th>'+
+                              '<th class="customercolortheadth">Entradas</th>'+
+                              '<th class="customercolortheadth">Salidas</th>'+
+                              '<th class="customercolor">Existencia Nueva</th>'+
+                              '<th class="customercolor">Costo $</th>'+
+                            '</tr>'+
+                          '</thead>'+
+                          '<tbody>'+           
+                          '</tbody>'+
+                        '</table>'+
+                      '</div>'+
+                    '</div>'+ 
+                    '<div class="row">'+
+                      '<div class="col-md-6">'+   
+                        '<label>Observaciones</label>'+
+                        '<textarea class="form-control" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
                       '</div>'+ 
-                      '<div class="row">'+
-                        '<div class="col-md-6">'+   
-                          '<label>Observaciones</label>'+
-                          '<textarea class="form-control" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
-                        '</div>'+ 
-                        '<div class="col-md-3 col-md-offset-3">'+
-                              '<table class="table table-striped table-hover">'+
-                                  '<tr>'+
-                                      '<td class="tdmod">Total</td>'+
-                                      '<td class="tdmod"><input type="text" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" required readonly></td>'+
-                                  '</tr>'+
-                              '</table>'+
-                          '</div>'+
-                      '</div>'+   
+                      '<div class="col-md-3 col-md-offset-3">'+
+                        '<table class="table table-striped table-hover">'+
+                          '<tr>'+
+                            '<td class="tdmod">Total</td>'+
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" required readonly></td>'+
+                          '</tr>'+
+                        '</table>'+
+                      '</div>'+
+                    '</div>'+   
                   '</div>'+ 
+                '</div>'+ 
               '</div>';
     $("#tabsform").html(tabs);
+    $("#periodohoy").val(data.ajuste.Periodo);
     $("#folio").val(data.ajuste.Folio);
     $("#serie").val(data.ajuste.Serie);
     $("#serietexto").html("Serie: "+data.ajuste.Serie);
     $("#fecha").val(data.fecha);
     $("#almacen").val(data.almacen.Nombre);
-    $("#textonombrealmacen").html(data.almacen.Nombre.substring(0, 40));
+    if(data.almacen.Nombre != null){
+      $("#textonombrealmacen").html(data.almacen.Nombre.substring(0, 40));
+    }
     $("#numeroalmacen").val(data.almacen.Numero);
     $("#numeroalmacenanterior").val(data.almacen.Numero);
     $("#almacendb").val(data.almacen.Nombre);
@@ -822,6 +996,15 @@ function obtenerdatos(ajustemodificar){
     $("#numerofilas").val(data.numerodetallesajuste);
     //asignar el tipo de operacion que se realizara
     $("#tipooperacion").val("modificacion");
+    //busquedas selecciona
+    //activar busqueda
+    $("#codigoabuscar").keypress(function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        listarproductos();
+      }
+    });
     //activar busqueda
     $('#numeroalmacen').on('keypress', function(e) {
       //recomentable para mayor compatibilidad entre navegadores.

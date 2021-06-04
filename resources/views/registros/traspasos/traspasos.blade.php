@@ -67,7 +67,7 @@
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover">
                                     <thead class="customercolor">
                                         <tr>
-                                            <th><div style="width:150px !important;">Operaciones</div></th>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
                                             <th>{{$co}}</th>
                                             @endforeach
@@ -100,7 +100,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
-                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Guardar</button>
+                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
                     </div>
                 </form> 
             </div>
@@ -129,7 +129,7 @@
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
-	        	<button type="button" class="btn btn-success btn-sm" id="btnbaja">Guardar</button>
+	        	<button type="button" class="btn btn-success btn-sm" id="btnbaja">Confirmar Baja</button>
 	      	</div>
     	</div>
   	</div>
@@ -161,7 +161,10 @@
         var almacende = '{{$almacendedefault->Nombre}}';
         var numeroalmacende = '{{$almacendedefault->Numero}}';
         var traspasos_obtener = '{!!URL::to('traspasos_obtener')!!}';
+        var traspasos_obtener_series_documento = '{!!URL::to('traspasos_obtener_series_documento')!!}';
+        var traspasos_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('traspasos_obtener_ultimo_folio_serie_seleccionada')!!}';
         var traspasos_obtener_ultimo_folio = '{!!URL::to('traspasos_obtener_ultimo_folio')!!}';
+        var ordenes_compra_obtener_fecha_actual_datetimelocal = '{!!URL::to('ordenes_compra_obtener_fecha_actual_datetimelocal')!!}';
         var traspasos_obtener_almacenes = '{!!URL::to('traspasos_obtener_almacenes')!!}';
         var traspasos_obtener_almacen_de_por_numero = '{!!URL::to('traspasos_obtener_almacen_de_por_numero')!!}';
         var traspasos_obtener_almacenes_foraneos = '{!!URL::to('traspasos_obtener_almacenes_foraneos')!!}';

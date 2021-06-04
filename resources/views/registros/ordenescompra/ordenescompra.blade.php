@@ -23,8 +23,18 @@
                                         <table>
                                             <tr>
                                                 <td >
-                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="alta()">
-                                                        Altas
+                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="alta('')">
+                                                        Altas Prod
+                                                    </div>
+                                                </td>
+                                                <td >
+                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="alta('GASTOS')">
+                                                        Altas Gastos
+                                                    </div>
+                                                </td>
+                                                <td >
+                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="alta('TOT')">
+                                                        Altas Tot
                                                     </div>
                                                 </td>
                                                 <td >
@@ -67,7 +77,7 @@
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover">
                                     <thead class="customercolor">
                                         <tr>
-                                            <th><div style="width:150px !important;">Operaciones</div></th>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
                                             <th>{{$co}}</th>
                                             @endforeach
@@ -100,7 +110,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
-                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Guardar</button>
+                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
                     </div>
                 </form> 
             </div>
@@ -119,13 +129,13 @@
       		</div>
       		<div class="modal-body">
 		      	<form id="formautorizar" action="#">
-		        	Estas seguro de autorizar la orden de compra?
+		        	<h5 id="textomodalautorizar">Estas seguro de autorizar la orden de compra?</h5>
 		        	<input type="hidden" id="ordenautorizar" name="ordenautorizar">
 		        </form>	
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
-	        	<button type="button" class="btn btn-success btn-sm" id="btnautorizar">Guardar</button>
+	        	<button type="button" class="btn btn-success btn-sm" id="btnautorizar">Confirmar Autorización</button>
 	      	</div>
     	</div>
   	</div>
@@ -149,7 +159,7 @@
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
-	        	<button type="button" class="btn btn-success btn-sm" id="btnbaja">Guardar</button>
+	        	<button type="button" class="btn btn-success btn-sm" id="btnbaja">Confirmar Baja</button>
 	      	</div>
     	</div>
   	</div>
@@ -179,10 +189,15 @@
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var ordenes_compra_obtener = '{!!URL::to('ordenes_compra_obtener')!!}';
+        var ordenes_compra_obtener_series_documento = '{!!URL::to('ordenes_compra_obtener_series_documento')!!}';
+        var ordenes_compra_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('ordenes_compra_obtener_ultimo_folio_serie_seleccionada')!!}';
         var ordenes_compra_obtener_ultimo_folio = '{!!URL::to('ordenes_compra_obtener_ultimo_folio')!!}';
+        var ordenes_compra_obtener_fecha_actual_datetimelocal = '{!!URL::to('ordenes_compra_obtener_fecha_actual_datetimelocal')!!}';
         var ordenes_compra_obtener_tipos_ordenes_compra = '{!!URL::to('ordenes_compra_obtener_tipos_ordenes_compra')!!}';
         var ordenes_compra_obtener_proveedores = '{!!URL::to('ordenes_compra_obtener_proveedores')!!}';
         var ordenes_compra_obtener_almacenes = '{!!URL::to('ordenes_compra_obtener_almacenes')!!}';
+        var ordenes_compra_obtener_ordenes_trabajo = '{!!URL::to('ordenes_compra_obtener_ordenes_trabajo')!!}';
+        var ordenes_compra_obtener_orden_trabajo_por_folio = '{!!URL::to('ordenes_compra_obtener_orden_trabajo_por_folio')!!}';
         var ordenes_compra_obtener_productos = '{!!URL::to('ordenes_compra_obtener_productos')!!}';
         var ordenes_compra_obtener_proveedor_por_numero = '{!!URL::to('ordenes_compra_obtener_proveedor_por_numero')!!}';
         var ordenes_compra_obtener_almacen_por_numero = '{!!URL::to('ordenes_compra_obtener_almacen_por_numero')!!}';

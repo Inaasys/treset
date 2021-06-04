@@ -13,26 +13,32 @@
             <div class="row clearfix">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="card" id="listadoregistros">
-                        <div class="header bg-red table-responsive button-demo">
-                        	<table>
-                        		<tr>
-                        			<td>
-                        				<h5>&nbsp;&nbsp;&nbsp;&nbsp;Folios Comprobantes Pagos&nbsp;&nbsp;&nbsp;</h5>
-                        			</td>
-                        			<td >
-                            			<div class="btn bg-blue btn-xs waves-effect" onclick="alta()">
-                                    		Altas
-                                		</div>
-                        			</td>
-                        		</tr>
-                        	</table>
+                        <div class="header bg-red">
+                            <div class="row clearfix">
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                    <h5>&nbsp;&nbsp;&nbsp;FOLIOS COMPROBANTES PAGOS&nbsp;&nbsp;&nbsp;</h5>
+                                </div>
+                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 button-demo">
+                                    <div class="table-responsive">
+                                        <table>
+                                            <tr>
+                                                <td >
+                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="alta()">
+                                                        Altas
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="body">
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover" style="width:100% !important;">
                                     <thead class="customercolor">
                                         <tr>
-                                            <th><div style="width:80px !important;">Operaciones</div></th>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
                                             <th>Número</th>
                                             <th>Serie</th>
                     						<th>Esquema</th>
@@ -94,7 +100,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
-                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Guardar</button>
+                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
                     </div>
                 </form> 
             </div> 
@@ -113,13 +119,13 @@
       		</div>
       		<div class="modal-body">
 		      	<form id="formdesactivar" action="#">
-		        	Esta seguro de dar de baja este registro?
+		        	<h5>Esta seguro de dar de baja este registro?</h5>
 		        	<input type="hidden" id="numerofolio" name="numerofolio">
 		        </form>	
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
-	        	<button type="button" class="btn btn-success btn-sm" id="aceptar">Guardar</button>
+	        	<button type="button" class="btn btn-success btn-sm" id="aceptar">Confirmar Baja</button>
 	      	</div>
     	</div>
   	</div>

@@ -21,6 +21,7 @@ use App\Configuracion_Tabla;
 use App\VistaContraRecibo;
 use Config;
 use Mail;
+use App\Serie;
 
 class ContraRecibosController extends ConfiguracionSistemaController{
 
@@ -36,7 +37,7 @@ class ContraRecibosController extends ConfiguracionSistemaController{
     }
 
     public function contrarecibos(){
-        $serieusuario = Helpers::obtenerserieusuario(Auth::user()->user, 'ContraRecibos');
+        $serieusuario = 'A';
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('contrarecibos_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('contrarecibos_exportar_excel');
@@ -48,24 +49,56 @@ class ContraRecibosController extends ConfiguracionSistemaController{
         if($request->ajax()){
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = VistaContraRecibo::select($this->campos_consulta)->orderBy('Folio', 'DESC')->where('Periodo', $periodo)->get();
+            $data = VistaContraRecibo::select($this->campos_consulta)->orderBy('Fecha', 'DESC')->where('Periodo', $periodo)->get();
             return DataTables::of($data)
                 ->addColumn('operaciones', function($data){
+                        $operaciones =  '<div class="dropdown">'.
+                                            '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                                                'OPERACIONES <span class="caret"></span>'.
+                                            '</button>'.
+                                            '<ul class="dropdown-menu">'.
+                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->ContraRecibo .'\')">Cambios</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->ContraRecibo .'\')">Bajas</a></li>'.
+                                                '<li><a href="'.route('contrarecibos_generar_pdfs_indiv',$data->ContraRecibo).'" target="_blank">Ver Documento PDF</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->ContraRecibo .'\')">Enviar Documento por Correo</a></li>'.
+                                            '</ul>'.
+                                        '</div>';
+                    /*
                     $botoncambios   = '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->ContraRecibo .'\')"><i class="material-icons">mode_edit</i></div> ';
                     $botonbaja      = '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->ContraRecibo .'\')"><i class="material-icons">cancel</i></div> ';
                     $botondocumentopdf = '<a href="'.route('contrarecibos_generar_pdfs_indiv',$data->ContraRecibo).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
                     $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->ContraRecibo .'\')"><i class="material-icons">email</i></div> ';
-                    $boton =  $botoncambios.$botonbaja.$botondocumentopdf.$botonenviaremail;
-                    return $boton;
+                    $operaciones =  $botoncambios.$botonbaja.$botondocumentopdf.$botonenviaremail;
+                    */
+                    return $operaciones;
                 })
+                ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
                 ->addColumn('Total', function($data){ return $data->Total; })
                 ->rawColumns(['operaciones','Total'])
                 ->make(true);
         } 
     }
+    //obtener series documento
+    public function contrarecibos_obtener_series_documento(Request $request){
+        if($request->ajax()){
+            $data = Serie::where('Documento', 'ContraRecibos')->where('Usuario', Auth::user()->user)->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''.$data->Serie.'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+    //obtener ultimo folio de la serie seleccionada
+    public function contrarecibos_obtener_ultimo_folio_serie_seleccionada(Request $request){
+        $folio = Helpers::ultimofolioserietablamodulos('App\ContraRecibo',$request->Serie);
+        return response()->json($folio);
+    }
     //obtener ultimo folio
-    public function contrarecibos_obtener_ultimo_folio(){
-        $folio = Helpers::ultimofoliotablamodulos('App\ContraRecibo');
+    public function contrarecibos_obtener_ultimo_folio(Request $request){
+        $folio = Helpers::ultimofolioserietablamodulos('App\ContraRecibo',$request->serie);
         return response()->json($folio);
     }
     //obtener proveedor
@@ -169,9 +202,9 @@ class ContraRecibosController extends ConfiguracionSistemaController{
     }
     //guardar contrarecibo
     public function contrarecibos_guardar(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         //obtener el ultimo id de la tabla
-        $folio = Helpers::ultimofoliotablamodulos('App\ContraRecibo');
+        $folio = Helpers::ultimofolioserietablamodulos('App\ContraRecibo',$request->serie);
         //INGRESAR DATOS A TABLA ORDEN COMPRA
         $contrarecibo = $folio.'-'.$request->serie;
 		$ContraRecibo = new ContraRecibo;
@@ -314,7 +347,7 @@ class ContraRecibosController extends ConfiguracionSistemaController{
             "contrarecibo" => $contrarecibo,
             "detallescontrarecibo" => $detallescontrarecibo,
             "proveedor" => $proveedor,
-            "fecha" => Helpers::formatoinputdate($contrarecibo->Fecha),
+            "fecha" => Helpers::formatoinputdatetime($contrarecibo->Fecha),
             "total" => Helpers::convertirvalorcorrecto($contrarecibo->Total),
             "filasdetallescontrarecibo" => $filasdetallescontrarecibo,
             "modificacionpermitida" => $modificacionpermitida
@@ -323,7 +356,7 @@ class ContraRecibosController extends ConfiguracionSistemaController{
     }
     //cambios
     public function contrarecibos_guardar_modificacion(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         //INGRESAR DATOS A TABLA
         $contrarecibo = $request->folio.'-'.$request->serie;
 		$ContraRecibo = ContraRecibo::where('ContraRecibo', $contrarecibo)->first();

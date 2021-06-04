@@ -9,17 +9,23 @@ function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1000));
 }
 function asignarfechaactual(){
+    /*
     var fechahoy = new Date();
     var dia = ("0" + fechahoy.getDate()).slice(-2);
     var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
     var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia) ;
     $('#fecha').val(hoy).css('font-size', '12px');
+    */
+    $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechadatetimelocal){
+        $("#fecha").val(fechadatetimelocal);
+    }) 
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
-  $.get(cuentas_por_pagar_obtener_ultimo_folio, function(folio){
-    $("#folio").val(folio);
-  })  
+    var serie = $("#serie").val();
+    $.get(cuentas_por_pagar_obtener_ultimo_folio,{serie:serie}, function(folio){
+        $("#folio").val(folio);
+    })  
 }
 //cerrar modales
 function limpiarmodales(){
@@ -123,6 +129,77 @@ function listar(){
             });
         }
     });
+}
+//obtener series documento
+function obtenerseriesdocumento(){
+    ocultarformulario();
+    var seriedefault = 'A';
+    var tablaseriesdocumento=   '<div class="modal-header bg-red">'+
+                                    '<h4 class="modal-title">Series Documento &nbsp;&nbsp; <div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''+seriedefault+'\')">Asignar Serie Default (A)</div></h4>'+
+                                '</div>'+
+                                '<div class="modal-body">'+
+                                    '<div class="row">'+
+                                    '<div class="col-md-12">'+
+                                        '<div class="table-responsive">'+
+                                        '<table id="tbllistadoseriedocumento" class="tbllistadoseriedocumento table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                            '<thead class="customercolor">'+
+                                            '<tr>'+
+                                                '<th>Operaciones</th>'+
+                                                '<th>Serie</th>'+
+                                                '<th>Documento</th>'+
+                                                '<th>Nombre</th>'+
+                                            '</tr>'+
+                                            '</thead>'+
+                                            '<tbody></tbody>'+
+                                        '</table>'+
+                                        '</div>'+
+                                    '</div>'+   
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="modal-footer">'+
+                                    '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                                '</div>';  
+    $("#contenidomodaltablas").html(tablaseriesdocumento);
+    $('#tbllistadoseriedocumento').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,  
+        processing: true,
+        'language': {
+          'loadingRecords': '&nbsp;',
+          'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+          url: cuentas_por_pagar_obtener_series_documento
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Serie', name: 'Serie' },
+            { data: 'Documento', name: 'Documento' },
+            { data: 'Nombre', name: 'Nombre' }
+        ],
+        "initComplete": function() {
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistadoseriedocumento').DataTable().search( this.value ).draw();
+              }
+          });
+        },
+        
+    });  
+}
+function seleccionarseriedocumento(Serie){
+    $.get(cuentas_por_pagar_obtener_ultimo_folio_serie_seleccionada, {Serie:Serie}, function(folio){
+        $("#folio").val(folio);
+        $("#serie").val(Serie);
+        $("#serietexto").html("Serie: "+Serie);
+        mostrarformulario();
+    }) 
 }
 //obtener registros de proveedores
 function obtenerproveedores(){
@@ -253,66 +330,61 @@ function obtenerbancos(){
       }); 
 } 
 function seleccionarproveedor(Numero, Nombre){
-    $("#numeroproveedor").val(Numero);
-    $("#numeroproveedoranterior").val(Numero);
-    $("#proveedor").val(Nombre);
-    $("#textonombreproveedor").html(Nombre.substring(0, 40));
-    $("#beneficiario").val(Nombre);
-    $.get(cuentas_por_pagar_obtener_compras_proveedor, {Numero:Numero}, function(data){
-        $("#tabladetallecuentasporpagar").html(data.filascompras);
-    });
-    mostrarformulario();
-}
-function seleccionarbanco(Numero, Nombre){
-    $("#numerobanco").val(Numero);
-    $("#numerobancoanterior").val(Numero);
-    $("#banco").val(Nombre);
-    $("#textonombrebanco").html(Nombre.substring(0, 40));
-    mostrarformulario();
-}
-//detectar cuando en el input de buscar por codigo de producto el usuario presione la tecla enter, si es asi se realizara la busqueda con el codigo escrito
-$(document).ready(function(){
-    //activar busqueda para proveedores
-    $('#numeroproveedor').on('keypress', function(e) {
-        //recomentable para mayor compatibilidad entre navegadores.
-        var code = (e.keyCode ? e.keyCode : e.which);
-        if(code==13){
-        obtenerproveedorpornumero();
+    $('.page-loader-wrapper').css('display', 'block');
+    var numeroproveedoranterior = $("#numeroproveedoranterior").val();
+    var numeroproveedor = Numero;
+    if(numeroproveedoranterior != numeroproveedor){
+        $("#numeroproveedor").val(Numero);
+        $("#numeroproveedoranterior").val(Numero);
+        $("#proveedor").val(Nombre);
+        if(Nombre != null){
+            $("#textonombreproveedor").html(Nombre.substring(0, 40));
         }
-    });
-    //regresar numero proveedor
-    $('#numeroproveedor').on('change', function(e) {
-        regresarnumeroproveedor();
-    });
-    //activar busqueda para bancos
-    $('#numerobanco').on('keypress', function(e) {
-        //recomentable para mayor compatibilidad entre navegadores.
-        var code = (e.keyCode ? e.keyCode : e.which);
-        if(code==13){
-        obtenerbancopornumero();
+        $("#beneficiario").val(Nombre);
+        $.get(cuentas_por_pagar_obtener_compras_proveedor, {Numero:Numero}, function(data){
+            $("#tabladetallecuentasporpagar").html(data.filascompras);
+            $('.page-loader-wrapper').css('display', 'none');
+        });
+        mostrarformulario();
+    }
+}
+function seleccionarbanco(Numero, Nombre, ultimatransferencia){
+    var numerobancoanterior = $("#numerobancoanterior").val();
+    var numerobanco = Numero;
+    if(numerobancoanterior != numerobanco){
+        $("#numerobanco").val(Numero);
+        $("#numerobancoanterior").val(Numero);
+        $("#banco").val(Nombre);
+        if(Nombre != null){
+            $("#textonombrebanco").html(Nombre.substring(0, 40));
         }
-    });
-    //regresar numero banco
-    $('#numerobanco').on('change', function(e) {
-        regresarnumerobanco();
-    });
-});
+        $("#transferencia").val(parseInt(ultimatransferencia)+parseInt(1));
+        mostrarformulario();
+    }
+}
 //obtener por numero
 function obtenerproveedorpornumero(){
-    if($("#numeroproveedor").parsley().isValid()){
-        var numeroproveedor = $("#numeroproveedor").val();
-        $.get(cuentas_por_pagar_obtener_proveedor_por_numero, {numeroproveedor:numeroproveedor}, function(data){
-            $("#numeroproveedor").val(data.numero);
-            $("#numeroproveedoranterior").val(data.numero);
-            $("#proveedor").val(data.nombre);
-            $("#textonombreproveedor").html(data.nombre.substring(0, 40));
-            $("#beneficiario").val(data.nombre);
-            var Numero = data.numero;
-            $.get(cuentas_por_pagar_obtener_compras_proveedor, {Numero:Numero}, function(data){
-                $("#tabladetallecuentasporpagar").html(data.filascompras);
-            });
-            mostrarformulario();
-        }) 
+    $('.page-loader-wrapper').css('display', 'block');
+    var numeroproveedoranterior = $("#numeroproveedoranterior").val();
+    var numeroproveedor = $("#numeroproveedor").val();
+    if(numeroproveedoranterior != numeroproveedor){
+        if($("#numeroproveedor").parsley().isValid()){
+            $.get(cuentas_por_pagar_obtener_proveedor_por_numero, {numeroproveedor:numeroproveedor}, function(data){
+                $("#numeroproveedor").val(data.numero);
+                $("#numeroproveedoranterior").val(data.numero);
+                $("#proveedor").val(data.nombre);
+                if(data.nombre != null){
+                    $("#textonombreproveedor").html(data.nombre.substring(0, 40));
+                }
+                $("#beneficiario").val(data.nombre);
+                var Numero = data.numero;
+                $.get(cuentas_por_pagar_obtener_compras_proveedor, {Numero:Numero}, function(data){
+                    $("#tabladetallecuentasporpagar").html(data.filascompras);
+                    $('.page-loader-wrapper').css('display', 'none');
+                });
+                mostrarformulario();
+            }) 
+        }
     }
 }
 //regresar numero
@@ -322,15 +394,21 @@ function regresarnumeroproveedor(){
 }
 //obtener por numero
 function obtenerbancopornumero(){
-    if($("#numerobanco").parsley().isValid()){
-        var numerobanco = $("#numerobanco").val();
-        $.get(cuentas_por_pagar_obtener_banco_por_numero, {numerobanco:numerobanco}, function(data){
-            $("#numerobanco").val(data.numero);
-            $("#numerobancoanterior").val(data.numero);
-            $("#banco").val(data.nombre);
-            $("#textonombrebanco").html(data.nombre.substring(0, 40));
-            mostrarformulario();
-        }) 
+    var numerobancoanterior = $("#numerobancoanterior").val();
+    var numerobanco = $("#numerobanco").val();
+    if(numerobancoanterior != numerobanco){
+        if($("#numerobanco").parsley().isValid()){
+            $.get(cuentas_por_pagar_obtener_banco_por_numero, {numerobanco:numerobanco}, function(data){
+                $("#numerobanco").val(data.numero);
+                $("#numerobancoanterior").val(data.numero);
+                $("#banco").val(data.nombre);
+                if(data.nombre != null){
+                    $("#textonombrebanco").html(data.nombre.substring(0, 40));
+                }
+                $("#transferencia").val(parseInt(data.transferencia)+parseInt(1));
+                mostrarformulario();
+            }) 
+        }
     }
 }
 //regresar numero
@@ -344,7 +422,80 @@ function alta(){
   mostrarmodalformulario('ALTA');
   mostrarformulario();
   //formulario alta
-  var tabs =    '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+  var tabs ='<div class="col-md-12">'+    
+                '<div class="row">'+ 
+                    '<div class="col-md-2">'+ 
+                        '<label>Pago <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+ 
+                        '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+ 
+                        '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+ 
+                    '</div>'+   
+                    '<div class="col-md-4">'+ 
+                        '<label>Proveedor <span class="label label-danger" id="textonombreproveedor"></span></label>'+ 
+                        '<table class="col-md-12">'+ 
+                            '<tr>'+ 
+                                '<td>'+ 
+                                    '<div class="btn bg-blue waves-effect" id="btnobtenerproveedores" onclick="obtenerproveedores()">Seleccionar</div>'+ 
+                                '</td>'+ 
+                                '<td>'+ 
+                                    '<div class="form-line">'+ 
+                                        '<input type="text" class="form-control" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer">'+ 
+                                        '<input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior" required data-parsley-type="integer">'+ 
+                                        '<input type="hidden" class="form-control" name="proveedor" id="proveedor" required readonly>'+ 
+                                    '</div>'+ 
+                                '</td>'+ 
+                            '</tr>'+     
+                        '</table>'+ 
+                    '</div>'+ 
+                    '<div class="col-md-4">'+ 
+                        '<label>Banco <span class="label label-danger" id="textonombrebanco"></span></label>'+ 
+                        '<table class="col-md-12">'+ 
+                            '<tr>'+ 
+                                '<td>'+ 
+                                    '<div class="btn bg-blue waves-effect" onclick="obtenerbancos()">Seleccionar</div>'+ 
+                                '</td>'+ 
+                                '<td>'+    
+                                    '<div class="form-line">'+ 
+                                        '<input type="text" class="form-control" name="numerobanco" id="numerobanco" required data-parsley-type="integer">'+ 
+                                        '<input type="hidden" class="form-control" name="numerobancoanterior" id="numerobancoanterior" required data-parsley-type="integer">'+ 
+                                        '<input type="hidden" class="form-control" name="banco" id="banco" required readonly>'+ 
+                                    '</div>'+ 
+                                '</td>'+     
+                            '</tr>'+   
+                        '</table>'+ 
+                    '</div>'+    
+                    '<div class="col-md-2">'+ 
+                        '<label>Fecha</label>'+
+                        '<input type="datetime-local" class="form-control" name="fecha" id="fecha" onchange="validasolomesactual();" required>'+ 
+                        '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+ 
+                    '</div>'+ 
+                    '</div>'+ 
+                    '<div class="row">'+ 
+                    '<div class="col-md-4">'+ 
+                        '<label>Transferencia</label>'+ 
+                        '<input type="text" class="form-control" name="transferencia" id="transferencia" value="0" required data-parsley-type="integer">'+ 
+                    '</div>'+ 
+                    '<div class="col-md-4">'+ 
+                        '<label>Cheque</label>'+ 
+                        '<input type="text" class="form-control" name="cheque" id="cheque" value="0" required data-parsley-type="integer">'+ 
+                    '</div>'+ 
+                    '<div class="col-md-4">'+ 
+                        '<label>Beneficiario</label>'+ 
+                        '<input type="text" class="form-control" name="beneficiario" id="beneficiario"  required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+ 
+                    '</div>'+ 
+                    '</div>'+ 
+                    '<div class="row">'+ 
+                    '<div class="col-md-6">'+ 
+                        '<label>Cuenta a la que se Depositó</label>'+ 
+                        '<input type="text" class="form-control" name="cuentadeposito" id="cuentadeposito" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+ 
+                    '</div>'+ 
+                    '<div class="col-md-6">'+ 
+                        '<label>Anotación</label>'+ 
+                        '<textarea class="form-control" name="anotacion" id="anotacion" rows="2" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+ 
+                    '</div>'+ 
+                '</div>'+ 
+            '</div>'+ 
+            '<div class="col-md-12">'+
+                '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
                     '<li role="presentation" class="active">'+
                         '<a href="#productostab" data-toggle="tab">Productos</a>'+
                     '</li>'+
@@ -390,17 +541,38 @@ function alta(){
                             '</div>'+
                         '</div>'+   
                     '</div>'+ 
-                '</div>';
-  $("#tabsform").html(tabs);
-  $("#serie").val(serieusuario);
-  $("#serietexto").html("Serie: "+serieusuario);
-  //proveedor
-  $("#textonombreproveedor").html("");
-  //banco
-  $("#textonombrebanco").html("");
-  $("#btnobtenerproveedores").show();
-  obtenultimonumero();
-  asignarfechaactual();
+                '</div>'+ 
+            '</div>';
+    $("#tabsform").html(tabs);
+    obtenultimonumero();
+    asignarfechaactual();
+    $("#serie").val(serieusuario);
+    $("#serietexto").html("Serie: "+serieusuario);
+    //busquedas seleccion
+    //activar busqueda para proveedores
+    $('#numeroproveedor').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerproveedorpornumero();
+        }
+    });
+    //regresar numero proveedor
+    $('#numeroproveedor').on('change', function(e) {
+        regresarnumeroproveedor();
+    });
+    //activar busqueda para bancos
+    $('#numerobanco').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerbancopornumero();
+        }
+    });
+    //regresar numero banco
+    $('#numerobanco').on('change', function(e) {
+        regresarnumerobanco();
+    });
 }
 function calcularnuevosaldo(fila){
     var cuentaFilas = 0;
@@ -431,34 +603,36 @@ function calculartotalcuentaporpagar(){
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
     e.preventDefault();
-    var formData = new FormData($("#formparsley")[0]);
     var form = $("#formparsley");
     if (form.parsley().isValid()){
         $('.page-loader-wrapper').css('display', 'block');
-        $.ajax({
-            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-            url:cuentas_por_pagar_guardar,
-            type: "post",
-            dataType: "html",
-            data: formData,
-            cache: false,
-            contentType: false,
-            processData: false,
-            success:function(data){
-                msj_datosguardadoscorrectamente();
-                limpiar();
-                ocultarmodalformulario();
-                limpiarmodales();
-                $('.page-loader-wrapper').css('display', 'none');
-            },
-            error:function(data){
-                if(data.status == 403){
-                    msj_errorenpermisos();
-                }else{
-                    msj_errorajax();
+        enviarfilasutilizadas().then(resultado=>{
+            var formData = new FormData($("#formparsley")[0]);
+            $.ajax({
+                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                url:cuentas_por_pagar_guardar,
+                type: "post",
+                dataType: "html",
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success:function(data){
+                    msj_datosguardadoscorrectamente();
+                    limpiar();
+                    ocultarmodalformulario();
+                    limpiarmodales();
+                    $('.page-loader-wrapper').css('display', 'none');
+                },
+                error:function(data){
+                    if(data.status == 403){
+                        msj_errorenpermisos();
+                    }else{
+                        msj_errorajax();
+                    }
+                    $('.page-loader-wrapper').css('display', 'none');
                 }
-                $('.page-loader-wrapper').css('display', 'none');
-            }
+            })
         })
     }else{
         msjfaltandatosporcapturar();
@@ -466,9 +640,27 @@ $("#btnGuardar").on('click', function (e) {
     //validar formulario
     form.parsley().validate();
 });
+//funcion asincrona para buscar existencias de la partida
+function enviarfilasutilizadas(){
+    return new Promise((ejecuta)=>{
+        setTimeout(function(){ 
+            var cuentaFilas = 0;
+            $("tr.filascompras").each(function () {
+                var abonocompra = $(".abonocompra", this).val();
+                if(parseFloat(abonocompra) == parseFloat(0) || parseFloat(abonocompra) < parseFloat(0)){
+                    $("#filacompra"+cuentaFilas).remove();
+                }
+                cuentaFilas++;
+            }); 
+            var resultado = true;
+            return ejecuta(resultado);
+        },1000);
+    })
+}
 //verificar si la orden de compra se esta utilzando en alguna orden de compra
 function desactivar(cxpdesactivar){
     $.get(cuentas_por_pagar_comprobar_baja,{cxpdesactivar:cxpdesactivar}, function(data){
+        console.log(data);
         if(data.Status == 'BAJA'){
             $("#cxpdesactivar").val(0);
             $("#textomodaldesactivar").html('Error, esta cuenta por pagar ya fue dado de baja');
@@ -485,7 +677,8 @@ function desactivar(cxpdesactivar){
             }else{
                 $("#cxpdesactivar").val(cxpdesactivar);
                 $("#divmotivobaja").show();
-                $("#textomodaldesactivar").html('Estas seguro de dar de baja el registro?');
+                $("#btnbaja").show();
+                $("#textomodaldesactivar").html('Estas seguro de dar de baja la cuenta por pagar? No'+cxpdesactivar);
                 $('#estatusregistro').modal('show');
             }
         }
@@ -530,65 +723,143 @@ function obtenerdatos(cxpmodificar){
   $('.page-loader-wrapper').css('display', 'block');
   $.get(cuentas_por_pagar_obtener_cuenta_por_pagar,{cxpmodificar:cxpmodificar },function(data){
     //formulario modificacion
-    var tabs =  '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
-                    '<li role="presentation" class="active">'+
-                        '<a href="#productostab" data-toggle="tab">Productos</a>'+
-                    '</li>'+
-                '</ul>'+
-                '<div class="tab-content">'+
-                    '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
-                        '<div class="row">'+
-                            '<div class="col-md-12 table-responsive cabecerafija" style="height: 225px;overflow-y: scroll;padding: 0px 0px;">'+
-                                '<table class="table table-bordered">'+
-                                    '<thead class="customercolor">'+
-                                        '<tr>'+
-                                          '<th class="customercolor">#</th>'+
-                                          '<th class="customercolor">Compra</th>'+
-                                          '<th class="customercolor">Factura</th>'+
-                                          '<th class="customercolor">Fecha</th>'+
-                                          '<th class="customercolor">Plazo</th>'+
-                                          '<th class="customercolor">Vence</th>'+
-                                          '<th class="customercolor">Total $</th>'+
-                                          '<th class="customercolor">Abonos $</th>'+
-                                          '<th class="customercolor">Notas Crédito $</th>'+
-                                          '<th class="customercolortheadth">Abono</th>'+
-                                          '<th class="customercolor">Saldo $</th>'+
-                                        '</tr>'+
-                                    '</thead>'+
-                                    '<tbody id="tabladetallecuentasporpagar">'+           
-                                    '</tbody>'+
-                                '</table>'+
-                            '</div>'+
-                        '</div>'+ 
-                        '<div class="row">'+
-                        '<div class="col-md-6">'+   
-                            '<label>Contrarecibo</label>'+
-                            '<input type="text" class="form-control" name="contrarecibo" id="contrarecibo" onkeyup="tipoLetra(this);" >'+
-                        '</div>'+ 
-                        '<div class="col-md-3 col-md-offset-3">'+
-                                '<table class="table table-striped table-hover">'+
-                                    '<tr>'+
-                                        '<td class="tdmod">Total</td>'+
-                                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                    '</tr>'+
-                                '</table>'+
-                            '</div>'+
+    var tabs =  '<div class="col-md-12">'+    
+                    '<div class="row">'+ 
+                        '<div class="col-md-2">'+ 
+                            '<label>Pago <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+ 
+                            '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+ 
+                            '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+ 
                         '</div>'+   
+                        '<div class="col-md-4">'+ 
+                            '<label>Proveedor <span class="label label-danger" id="textonombreproveedor"></span></label>'+ 
+                            '<table class="col-md-12">'+ 
+                                '<tr>'+ 
+                                    '<td hidden>'+ 
+                                        '<div class="btn bg-blue waves-effect" id="btnobtenerproveedores" onclick="obtenerproveedores()">Seleccionar</div>'+ 
+                                    '</td>'+ 
+                                    '<td>'+ 
+                                        '<div class="form-line">'+ 
+                                            '<input type="text" class="form-control" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer">'+ 
+                                            '<input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior" required data-parsley-type="integer">'+ 
+                                            '<input type="hidden" class="form-control" name="proveedor" id="proveedor" required readonly>'+ 
+                                        '</div>'+ 
+                                    '</td>'+ 
+                                '</tr>'+     
+                            '</table>'+ 
+                        '</div>'+ 
+                        '<div class="col-md-4">'+ 
+                            '<label>Banco <span class="label label-danger" id="textonombrebanco"></span></label>'+ 
+                            '<table class="col-md-12">'+ 
+                                '<tr>'+ 
+                                    '<td>'+ 
+                                        '<div class="btn bg-blue waves-effect" onclick="obtenerbancos()">Seleccionar</div>'+ 
+                                    '</td>'+ 
+                                    '<td>'+    
+                                        '<div class="form-line">'+ 
+                                            '<input type="text" class="form-control" name="numerobanco" id="numerobanco" required data-parsley-type="integer">'+ 
+                                            '<input type="hidden" class="form-control" name="numerobancoanterior" id="numerobancoanterior" required data-parsley-type="integer">'+ 
+                                            '<input type="hidden" class="form-control" name="banco" id="banco" required readonly>'+ 
+                                        '</div>'+ 
+                                    '</td>'+     
+                                '</tr>'+   
+                            '</table>'+ 
+                        '</div>'+    
+                        '<div class="col-md-2">'+ 
+                            '<label>Fecha</label>'+
+                            '<input type="datetime-local" class="form-control" name="fecha" id="fecha" onchange="validasolomesactual();" required>'+ 
+                            '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+ 
+                        '</div>'+ 
+                        '</div>'+ 
+                        '<div class="row">'+ 
+                        '<div class="col-md-4">'+ 
+                            '<label>Transferencia</label>'+ 
+                            '<input type="text" class="form-control" name="transferencia" id="transferencia" value="0" required data-parsley-type="integer">'+ 
+                        '</div>'+ 
+                        '<div class="col-md-4">'+ 
+                            '<label>Cheque</label>'+ 
+                            '<input type="text" class="form-control" name="cheque" id="cheque" value="0" required data-parsley-type="integer">'+ 
+                        '</div>'+ 
+                        '<div class="col-md-4">'+ 
+                            '<label>Beneficiario</label>'+ 
+                            '<input type="text" class="form-control" name="beneficiario" id="beneficiario"  required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+ 
+                        '</div>'+ 
+                        '</div>'+ 
+                        '<div class="row">'+ 
+                        '<div class="col-md-6">'+ 
+                            '<label>Cuenta a la que se Depositó</label>'+ 
+                            '<input type="text" class="form-control" name="cuentadeposito" id="cuentadeposito" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+ 
+                        '</div>'+ 
+                        '<div class="col-md-6">'+ 
+                            '<label>Anotación</label>'+ 
+                            '<textarea class="form-control" name="anotacion" id="anotacion" rows="2" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+ 
+                        '</div>'+ 
+                    '</div>'+ 
+                '</div>'+ 
+                '<div class="col-md-12">'+
+                    '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                        '<li role="presentation" class="active">'+
+                            '<a href="#productostab" data-toggle="tab">Productos</a>'+
+                        '</li>'+
+                    '</ul>'+
+                    '<div class="tab-content">'+
+                        '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
+                            '<div class="row">'+
+                                '<div class="col-md-12 table-responsive cabecerafija" style="height: 225px;overflow-y: scroll;padding: 0px 0px;">'+
+                                    '<table class="table table-bordered">'+
+                                        '<thead class="customercolor">'+
+                                            '<tr>'+
+                                            '<th class="customercolor">#</th>'+
+                                            '<th class="customercolor">Compra</th>'+
+                                            '<th class="customercolor">Factura</th>'+
+                                            '<th class="customercolor">Fecha</th>'+
+                                            '<th class="customercolor">Plazo</th>'+
+                                            '<th class="customercolor">Vence</th>'+
+                                            '<th class="customercolor">Total $</th>'+
+                                            '<th class="customercolor">Abonos $</th>'+
+                                            '<th class="customercolor">Notas Crédito $</th>'+
+                                            '<th class="customercolortheadth">Abono</th>'+
+                                            '<th class="customercolor">Saldo $</th>'+
+                                            '</tr>'+
+                                        '</thead>'+
+                                        '<tbody id="tabladetallecuentasporpagar">'+           
+                                        '</tbody>'+
+                                    '</table>'+
+                                '</div>'+
+                            '</div>'+ 
+                            '<div class="row">'+
+                            '<div class="col-md-6">'+   
+                                '<label>Contrarecibo</label>'+
+                                '<input type="text" class="form-control" name="contrarecibo" id="contrarecibo" onkeyup="tipoLetra(this);" >'+
+                            '</div>'+ 
+                            '<div class="col-md-3 col-md-offset-3">'+
+                                    '<table class="table table-striped table-hover">'+
+                                        '<tr>'+
+                                            '<td class="tdmod">Total</td>'+
+                                            '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '</tr>'+
+                                    '</table>'+
+                                '</div>'+
+                            '</div>'+   
+                        '</div>'+ 
                     '</div>'+ 
                 '</div>';
-                $("#tabsform").html(tabs);        
+    $("#tabsform").html(tabs);        
+    $("#periodohoy").val(data.CuentaXPagar.Periodo);
     $("#folio").val(data.CuentaXPagar.Folio);
     $("#serie").val(data.CuentaXPagar.Serie);
     $("#serietexto").html("Serie: "+data.CuentaXPagar.Serie);
     $("#numeroproveedor").val(data.proveedor.Numero);
     $("#numeroproveedoranterior").val(data.proveedor.Numero);
     $("#proveedor").val(data.proveedor.Nombre);
-    $("#textonombreproveedor").html(data.proveedor.Nombre.substring(0,40));
-    $("#btnobtenerproveedores").hide();
+    if(data.proveedor.Nombre != null){
+        $("#textonombreproveedor").html(data.proveedor.Nombre.substring(0,40));
+    }
     $("#numerobanco").val(data.banco.Numero);
     $("#numerobancoanterior").val(data.banco.Numero);
     $("#banco").val(data.banco.Nombre);
-    $("#textonombrebanco").html(data.banco.Nombre.substring(0, 40));
+    if(data.banco.Nombre != null){
+        $("#textonombrebanco").html(data.banco.Nombre.substring(0, 40));
+    }
     $("#fecha").val(data.fecha);
     $("#transferencia").val(data.CuentaXPagar.Transferencia)
     $("#cheque").val(data.CuentaXPagar.Cheque);
@@ -598,6 +869,23 @@ function obtenerdatos(cxpmodificar){
     $("#total").val(data.abonototal);
     //tabs precios productos
     $("#tabladetallecuentasporpagar").html(data.filasdetallecuentasporpagar);
+    //busquedas seleccion
+    //regresar numero proveedor
+    $('#numeroproveedor').on('change', function(e) {
+        regresarnumeroproveedor();
+    });
+    //activar busqueda para bancos
+    $('#numerobanco').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerbancopornumero();
+        }
+    });
+    //regresar numero banco
+    $('#numerobanco').on('change', function(e) {
+        regresarnumerobanco();
+    });
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {

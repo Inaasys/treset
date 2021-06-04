@@ -37,6 +37,7 @@ class VistaCompra extends Model
         'Folio',
         'Serie',
         'MotivoBaja',
+        'OrdenTrabajo',
         'ReceptorNombre',
         'ReceptorRfc',
         'EmisorNombre',

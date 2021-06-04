@@ -160,6 +160,77 @@ function obtenertiposunidades(){
     $("#tipounidad").html(select_tipos_unidades);
   }) 
 }
+//obtener series documento
+function obtenerseriesdocumento(){
+  ocultarformulario();
+  var seriedefault = 'A';
+  var tablaseriesdocumento= '<div class="modal-header bg-red">'+
+                              '<h4 class="modal-title">Series Documento &nbsp;&nbsp; <div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''+seriedefault+'\')">Asignar Serie Default (A)</div></h4>'+
+                            '</div>'+
+                            '<div class="modal-body">'+
+                              '<div class="row">'+
+                                '<div class="col-md-12">'+
+                                  '<div class="table-responsive">'+
+                                    '<table id="tbllistadoseriedocumento" class="tbllistadoseriedocumento table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                      '<thead class="customercolor">'+
+                                        '<tr>'+
+                                          '<th>Operaciones</th>'+
+                                          '<th>Serie</th>'+
+                                          '<th>Documento</th>'+
+                                          '<th>Nombre</th>'+
+                                        '</tr>'+
+                                      '</thead>'+
+                                      '<tbody></tbody>'+
+                                    '</table>'+
+                                  '</div>'+
+                                '</div>'+   
+                              '</div>'+
+                            '</div>'+
+                            '<div class="modal-footer">'+
+                              '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                            '</div>';  
+  $("#contenidomodaltablas").html(tablaseriesdocumento);
+  $('#tbllistadoseriedocumento').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
+      "sScrollX": "110%",
+      "sScrollY": "370px",
+      "bScrollCollapse": true,  
+      processing: true,
+      'language': {
+        'loadingRecords': '&nbsp;',
+        'processing': '<div class="spinner"></div>'
+      },
+      serverSide: true,
+      ajax: {
+        url: ordenes_trabajo_obtener_series_documento
+      },
+      columns: [
+          { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+          { data: 'Serie', name: 'Serie' },
+          { data: 'Documento', name: 'Documento' },
+          { data: 'Nombre', name: 'Nombre' }
+      ],
+      "initComplete": function() {
+        var $buscar = $('div.dataTables_filter input');
+        $buscar.unbind();
+        $buscar.bind('keyup change', function(e) {
+            if(e.keyCode == 13 || this.value == "") {
+              $('#tbllistadoseriedocumento').DataTable().search( this.value ).draw();
+            }
+        });
+      },
+      
+  });  
+}
+function seleccionarseriedocumento(Serie){
+  $.get(ordenes_trabajo_obtener_ultimo_folio_serie_seleccionada, {Serie:Serie}, function(folio){
+      $("#folio").val(folio);
+      $("#serie").val(Serie);
+      $("#serietexto").html("Serie: "+Serie);
+      mostrarformulario();
+  }) 
+}
 //obtener registros de clientes
 function listarclientesfacturaa(){
   ocultarformulario();
@@ -830,10 +901,7 @@ function agregarfilaservicio(Codigo, Servicio, Unidad, Costo, Venta, Cantidad, C
     var ivapesos = new Decimal(multiplicacioncostoimpuesto/100);
     var total = new Decimal(importepartida).plus(ivapesos);
     var tipo = "alta";
-    var fechahoy = new Date();
-    var dia = ("0" + fechahoy.getDate()).slice(-2);
-    var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
-    var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia) ;
+    var hoy = $("#fecha").val();
     var fila=   '<tr class="filasservicios" id="filaservicio'+contadorservicios+'">'+
                         '<td class="tdmod"><div class="divorinputmodmd">'+
                           '<div class="btn bg-red btn-xs" data-toggle="tooltip" title="Eliminar Fila" onclick="eliminarfila('+contadorservicios+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly> '+
@@ -858,7 +926,7 @@ function agregarfilaservicio(Codigo, Servicio, Unidad, Costo, Venta, Cantidad, C
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'+number_format(round(importepartida, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)" readonly></td>'+
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxs departamentopartida" name="departamentopartida[]" value="SERVICIO" readonly data-parsley-length="[1, 20]"></td>'+
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxs cargopartida" name="cargopartida[]" value="SERVICIO" readonly data-parsley-length="[1, 20]"></td>'+
-                        '<td class="tdmod"><input type="date" class="form-control divorinputmodmd fechapartida" name="fechapartida[]" value="'+hoy+'" readonly></td>'+
+                        '<td class="tdmod"><input type="datetime-local" class="form-control divorinputmodxl fechapartida" name="fechapartida[]" value="'+hoy+'" readonly></td>'+
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxs traspasopartida" name="traspasopartida[]" readonly></td>'+
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxs comprapartida" name="comprapartida[]" readonly data-parsley-length="[1, 20]"></td>'+
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxs usuariopartida" name="usuariopartida[]" value="'+usuario+'" readonly></td>'+
@@ -1201,7 +1269,7 @@ function alta(){
                 '<div role="tabpanel" class="tab-pane fade in active" id="datosgeneralesordentrabajotab">'+
                   '<div class="row">'+
                     '<div class="col-md-2">'+
-                      '<label>Orden <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
+                      '<label>Orden <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
                       '<input type="text" class="form-control" name="folio" id="folio" required onkeyup="tipoLetra(this);">'+
                       '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                       '<input type="hidden" class="form-control" name="numerofilastablaservicios" id="numerofilastablaservicios" value="0" required readonly>'+
@@ -1725,7 +1793,7 @@ function desactivar(ordendesactivar){
           $('#estatusregistro').modal('show');
         }else{
           $("#ordendesactivar").val(ordendesactivar);
-          $("#textomodaldesactivar").html('Estas seguro de cambiar el estado el registro?');
+          $("#textomodaldesactivar").html('Estas seguro de dar de baja la orden de trabajo? No'+ ordendesactivar);
           $("#divmotivobaja").show();
           $("#btnbaja").show();
           $('#estatusregistro').modal('show');
@@ -2140,7 +2208,7 @@ function obtenerdatos(ordenmodificar){
     $("#campana").val(data.ordentrabajo.Campaña);
     $("#promocion").val(data.ordentrabajo.Promocion);
     $("#bahia").val(data.ordentrabajo.Bahia);
-    $("#horasreales").val(data.ordentrabajo.HorasReales);
+    $("#horasreales").val(data.horasreales);
     $("#rodar").val(data.ordentrabajo.Rodar);    
     $("#plazodias").val(data.ordentrabajo.Plazo);
     $("#falla").val(data.ordentrabajo.Falla);

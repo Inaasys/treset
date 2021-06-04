@@ -9,16 +9,22 @@ function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1000));
 }
 function asignarfechaactual(){
+    /*
     var fechahoy = new Date();
     var dia = ("0" + fechahoy.getDate()).slice(-2);
     var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
     var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia);
     $('#fecha').val(hoy);
+    */
+  $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechadatetimelocal){
+    $("#fecha").val(fechadatetimelocal);
+  }) 
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
-  $.get(cotizaciones_obtener_ultimo_id, function(id){
-    $("#folio").val(id);
+  var serie = $("#serie").val();
+  $.get(cotizaciones_obtener_ultimo_id,{serie:serie}, function(folio){
+    $("#folio").val(folio);
   })  
 }
 //cerrar modales
@@ -115,6 +121,77 @@ function listar(){
     }
   });
 }
+//obtener series documento
+function obtenerseriesdocumento(){
+  ocultarformulario();
+  var seriedefault = 'A';
+  var tablaseriesdocumento= '<div class="modal-header bg-red">'+
+                              '<h4 class="modal-title">Series Documento &nbsp;&nbsp; <div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''+seriedefault+'\')">Asignar Serie Default (A)</div></h4>'+
+                            '</div>'+
+                            '<div class="modal-body">'+
+                              '<div class="row">'+
+                                '<div class="col-md-12">'+
+                                  '<div class="table-responsive">'+
+                                    '<table id="tbllistadoseriedocumento" class="tbllistadoseriedocumento table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                      '<thead class="customercolor">'+
+                                        '<tr>'+
+                                          '<th>Operaciones</th>'+
+                                          '<th>Serie</th>'+
+                                          '<th>Documento</th>'+
+                                          '<th>Nombre</th>'+
+                                        '</tr>'+
+                                      '</thead>'+
+                                      '<tbody></tbody>'+
+                                    '</table>'+
+                                  '</div>'+
+                                '</div>'+   
+                              '</div>'+
+                            '</div>'+
+                            '<div class="modal-footer">'+
+                              '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                            '</div>';  
+  $("#contenidomodaltablas").html(tablaseriesdocumento);
+  $('#tbllistadoseriedocumento').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
+      "sScrollX": "110%",
+      "sScrollY": "370px",
+      "bScrollCollapse": true,  
+      processing: true,
+      'language': {
+        'loadingRecords': '&nbsp;',
+        'processing': '<div class="spinner"></div>'
+      },
+      serverSide: true,
+      ajax: {
+        url: cotizaciones_obtener_series_documento
+      },
+      columns: [
+          { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+          { data: 'Serie', name: 'Serie' },
+          { data: 'Documento', name: 'Documento' },
+          { data: 'Nombre', name: 'Nombre' }
+      ],
+      "initComplete": function() {
+        var $buscar = $('div.dataTables_filter input');
+        $buscar.unbind();
+        $buscar.bind('keyup change', function(e) {
+            if(e.keyCode == 13 || this.value == "") {
+              $('#tbllistadoseriedocumento').DataTable().search( this.value ).draw();
+            }
+        });
+      },
+      
+  });  
+}
+function seleccionarseriedocumento(serie){
+  $.get(cotizaciones_obtener_ultimo_folio_serie_seleccionada, {serie:serie}, function(folio){
+      $("#folio").val(folio);
+      $("#serie").val(serie);
+      $("#serietexto").html("Serie: "+serie);
+      mostrarformulario();
+  }) 
+}
 //obtener registros de remisiones
 function obtenerremisiones(){
   ocultarformulario();
@@ -161,7 +238,10 @@ function obtenerremisiones(){
         },
         serverSide: true,
         ajax: {
-            url: cotizaciones_obtener_remisiones,
+          url: cotizaciones_obtener_remisiones,
+          data: function (d) {
+            d.tipooperacion = $("#tipooperacion").val();
+          }
         },
         columns: [
             { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
@@ -187,11 +267,12 @@ function obtenerremisiones(){
 } 
 //obtener datos de remision seleccionada
 function seleccionarremision(Folio, Remision){
+    var tipooperacion = $("#tipooperacion").val();
     $("#numeroremision").val(Folio);
     $("#remision").val(Remision);
     mostrarformulario();
     $('.page-loader-wrapper').css('display', 'block');
-    $.get(cotizaciones_obtener_remision, {Folio:Folio, Remision:Remision}, function(data){
+    $.get(cotizaciones_obtener_remision, {Folio:Folio, Remision:Remision, tipooperacion:tipooperacion}, function(data){
       if(data.cotizacionyaexistente == 1){
         msjremisionyautilizada();
       }else{
@@ -282,7 +363,7 @@ function alta(){
   var tabs ='<div class="col-md-12">'+  
               '<div class="row">'+
                 '<div class="col-md-3">'+
-                  '<label>Cotización <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
+                  '<label>Cotización <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
                   '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                   '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                   '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
@@ -298,7 +379,7 @@ function alta(){
                 '</div>'+ 
                 '<div class="col-md-3">'+
                   '<label>Fecha </label>'+
-                  '<input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" onkeyup="tipoLetra(this);">'+
+                  '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" onkeyup="tipoLetra(this);">'+
                   '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="{{$periodohoy}}">'+
                 '</div>'+
               '</div>'+
@@ -447,7 +528,7 @@ function desactivar(cotizaciondesactivar){
         $('#estatusregistro').modal('show');
       }else{
         $("#cotizaciondesactivar").val(cotizaciondesactivar);
-        $("#textomodaldesactivar").html('Estas seguro de cambiar el estado el registro?');
+        $("#textomodaldesactivar").html('Estas seguro de desactivar la cotización? No'+ cotizaciondesactivar);
         $("#divmotivobaja").show();
         $("#btnbaja").show();
         $('#estatusregistro').modal('show');
@@ -514,7 +595,7 @@ function obtenerdatos(cotizacionmodificar){
                   '</div>'+ 
                   '<div class="col-md-3">'+
                     '<label>Fecha </label>'+
-                    '<input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" onkeyup="tipoLetra(this);">'+
+                    '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" onkeyup="tipoLetra(this);">'+
                     '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy">'+
                   '</div>'+
                 '</div>'+
@@ -599,9 +680,9 @@ function obtenerdatos(cotizacionmodificar){
               '</div>';
     $("#tabsform").html(tabs);
     $("#periodohoy").val(data.cotizacion.periodo);
-    $("#folio").val(data.cotizacion.id);
-    $("#serie").val(data.cotizacion.Serie);
-    $("#serietexto").html("Serie: "+data.cotizacion.Serie);
+    $("#folio").val(data.cotizacion.folio);
+    $("#serie").val(data.cotizacion.serie);
+    $("#serietexto").html("Serie: "+data.cotizacion.serie);
     $("#ottecnodiesel").val(data.cotizacion.ot_tecnodiesel);
     $("#ottyt").val(data.cotizacion.ot_tyt);
     $("#fecha").val(data.fecha);
@@ -722,7 +803,7 @@ function configurar_tabla(){
                                   '<label>DATOS COTIZACIÓN</label>'+
                               '</div>'+
                               '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="id" id="idid" class="filled-in datotabla" value="id" readonly onchange="construirarraydatostabla(this);" onclick="javascript: return false;"/>'+
+                                  '<input type="checkbox" name="id" id="idid" class="filled-in datotabla" value="id" readonly onchange="construirarraydatostabla(this);"/>'+
                                   '<label for="idid">id</label>'+
                               '</div>'+
                               '<div class="col-md-4 form-check">'+
@@ -784,6 +865,10 @@ function configurar_tabla(){
                               '<div class="col-md-4 form-check">'+
                                   '<input type="checkbox" name="num_remision" id="idnum_remision" class="filled-in datotabla" value="num_remision" onchange="construirarraydatostabla(this);" />'+
                                   '<label for="idnum_remision">num_remision</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="folio" id="idfolio" class="filled-in datotabla" value="folio" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idfolio">folio</label>'+
                               '</div>'+
                               '<input type="hidden" class="form-control" name="string_datos_tabla_true" id="string_datos_tabla_true" required>'+
                               '<input type="hidden" class="form-control" name="string_datos_tabla_false" id="string_datos_tabla_false" required>'+

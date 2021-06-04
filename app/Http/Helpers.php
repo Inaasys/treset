@@ -176,6 +176,17 @@ class Helpers{
         return $id;
     }
 
+    //se obtiene el ultimo id de la tabla que se requiere segun la serie
+    public static function ultimofolioserieregistrotabla($tabla,$serie){
+        $ultimofolioregistrotabla = $tabla::select("folio")->where('serie', $serie)->orderBy("folio", "DESC")->take(1)->get();
+        if(sizeof($ultimofolioregistrotabla) == 0 || sizeof($ultimofolioregistrotabla) == "" || sizeof($ultimofolioregistrotabla) == null){
+            $folio = 1;
+        }else{
+            $folio = $ultimofolioregistrotabla[0]->folio+1;   
+        }
+        return $folio;
+    }
+
     //se obtiene el ultimo id de la tabla que se requiere
     public static function ultimoidycuentacontablebanco($tabla){
         $ultimoNumeroTabla = $tabla::select("Numero")->orderBy("Numero", "DESC")->take(1)->get();
@@ -204,20 +215,25 @@ class Helpers{
         }
         if($valorbd == null){
             $valorcorrecto = '0.'.$decimalesconfigurados;
+            return number_format(round($valorcorrecto, $numerodecimalesconfigurados), $numerodecimalesconfigurados, '.', '');
         }else{
-            $encontrar = '.';
-            $result = strpos($valorbd, $encontrar);
-            if($result == 0){
-                $valorcorrecto = '0'.$valorbd;
-            }else{
-                $valorcorrecto = $valorbd;
-            }
+            /*if($valorbd<0){//si el numero es negativo
+                $numero = abs($valorbd);
+                $valorcorrecto = number_format($numero) * -1;
+                return number_format(round($valorcorrecto, $numerodecimalesconfigurados), $numerodecimalesconfigurados, '.', '');
+            }else {*/
+                $encontrar = '.';
+                $result = strpos($valorbd, $encontrar);
+                if($result == 0){
+                    $valorcorrecto = '0'.$valorbd;
+                }else{
+                    $valorcorrecto = $valorbd;
+                }
+                return number_format(round($valorcorrecto, $numerodecimalesconfigurados), $numerodecimalesconfigurados, '.', '');
+            //}
         }
         //dar formato correcto a la cantidad con base a los numero de decimales configurados y redondear
-        //$truncar = 10**$numerodecimalesconfigurados;
-        //return number_format(intval(round($valorcorrecto, $numerodecimalesconfigurados) * $truncar) / $truncar, $numerodecimalesconfigurados, '.', '');
-        return number_format(round($valorcorrecto, $numerodecimalesconfigurados), $numerodecimalesconfigurados, '.', '');
-
+        //return number_format(round($valorcorrecto, $numerodecimalesconfigurados), $numerodecimalesconfigurados, '.', '');
     }
 
     //obtener numero de ceros con base a los decimales configurados

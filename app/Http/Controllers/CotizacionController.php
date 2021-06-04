@@ -43,7 +43,7 @@ class CotizacionController extends ConfiguracionSistemaController{
     }
 
     public function cotizaciones(){
-        $serieusuario = Helpers::obtenerserieusuario(Auth::user()->user, 'Cotizaciones');
+        $serieusuario = 'A';
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('cotizaciones_guardar_configuracion_tabla');
         return view('registros.cotizaciones.cotizaciones', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla'));
@@ -53,24 +53,54 @@ class CotizacionController extends ConfiguracionSistemaController{
     public function cotizaciones_obtener(Request $request){
         if($request->ajax()){
             $periodo = $request->periodo;
-            $data = VistaCotizacion::select($this->campos_consulta)->orderBy('id', 'DESC')->where('periodo', $periodo)->get();
+            $data = VistaCotizacion::select($this->campos_consulta)->orderBy('fecha', 'DESC')->where('periodo', $periodo)->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
+                        $operaciones = '<div class="dropdown">'.
+                                            '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                                                'OPERACIONES <span class="caret"></span>'.
+                                            '</button>'.
+                                            '<ul class="dropdown-menu">'.
+                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->cotizacion .'\')">Cambios</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->cotizacion .'\')">Bajas</a></li>'.
+                                                '<li><a href="'.route('cotizaciones_crear_formato_excel',$data->cotizacion).'" target="_blank">Crear Formato Excel</a></li>'.
+                                            '</ul>'.
+                                        '</div>';
+                        /*
                         $botoncambios =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->cotizacion .'\')"><i class="material-icons">mode_edit</i></div> '; 
                         $botonbajas =      '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->cotizacion .'\')"><i class="material-icons">cancel</i></div> ';
                         $botonexcel =      '<a href="'.route('cotizaciones_crear_formato_excel',$data->cotizacion).'"><div class="btn bg-green btn-xs waves-effect" data-toggle="tooltip" title="Crear formato excel"><i class="material-icons">format_indent_increase</i></div></a> ';
                         $operaciones =  $botoncambios.$botonbajas.$botonexcel;
+                        */
                         return $operaciones;
                     })
+                    ->addColumn('fecha', function($data){ return Carbon::parse($data->fecha)->toDateTimeString(); })
                     ->addColumn('total', function($data){ return $data->total; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
     }
-
+    //obtener series documento
+    public function cotizaciones_obtener_series_documento(Request $request){
+        if($request->ajax()){
+            $data = Serie::where('Documento', 'cotizaciones_t')->where('Usuario', Auth::user()->user)->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''.$data->Serie.'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+    //obtener ultimo folio de la serie seleccionada
+    public function cotizaciones_obtener_ultimo_folio_serie_seleccionada(Request $request){
+        $folio = Helpers::ultimofolioserieregistrotabla('App\Cotizacion',$request->serie);
+        return response()->json($folio);
+    }
     public function cotizaciones_obtener_ultimo_id(Request $request){
-        $id = Helpers::ultimoidregistrotabla('App\Cotizacion');
-        return response()->json($id);
+        $folio = Helpers::ultimofolioserieregistrotabla('App\Cotizacion',$request->serie);
+        return response()->json($folio);
     }
 
     public function cotizaciones_obtener_remisiones(Request $request){
@@ -88,6 +118,7 @@ class CotizacionController extends ConfiguracionSistemaController{
     }
 
     public function cotizaciones_obtener_remision(Request $request){
+        $tipooperacion = $request->tipooperacion;
         $remision = Remision::where('Remision', $request->Remision)->first();
         $cotizacionyaexistente = Cotizacion::where('num_remision', $request->Remision)->where('status','<>','BAJA')->count();
         //detalles remision
@@ -101,7 +132,7 @@ class CotizacionController extends ConfiguracionSistemaController{
                     $producto = Producto::where('Codigo', $dr->Codigo)->first();
                     $filasdetallesremision= $filasdetallesremision.
                     '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
-                        '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.');">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dr->Item.'" readonly></td>'.
+                        '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.');">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dr->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dr->Codigo.'" readonly data-parsley-length="[1, 50]">'.$dr->Codigo.'</td>'.
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.$dr->Descripcion.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control unidadpartida" name="unidadpartida[]" value="'.$dr->Unidad.'" readonly data-parsley-length="[1, 50]">'.$dr->Unidad.'</td>'.
@@ -130,7 +161,7 @@ class CotizacionController extends ConfiguracionSistemaController{
             "numerodetallesremision" => $numerodetallesremision,
             "contadorproductos" => $contadorproductos,
             "contadorfilas" => $contadorfilas,
-            "fecha" => Helpers::formatoinputdate($remision->Fecha),
+            "fecha" => Helpers::formatoinputdatetime($remision->Fecha),
             "importe" => Helpers::convertirvalorcorrecto($remision->Importe),
             "descuento" => Helpers::convertirvalorcorrecto($remision->Descuento),
             "subtotal" => Helpers::convertirvalorcorrecto($remision->SubTotal),
@@ -143,14 +174,16 @@ class CotizacionController extends ConfiguracionSistemaController{
 
     //guardar registro
     public function cotizaciones_guardar(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         //obtener el ultimo id de la tabla
         DB::unprepared('SET IDENTITY_INSERT cotizaciones_t ON');
         $id = Helpers::ultimoidregistrotabla('App\Cotizacion');
+        $folio = Helpers::ultimofolioserieregistrotabla('App\Cotizacion',$request->serie);
         //INGRESAR DATOS A TABLA ORDEN COMPRA
-        $cotizacion = $id.'-'.$request->serie;
+        $cotizacion = $folio.'-'.$request->serie;
         $Cotizacion = new Cotizacion;
         $Cotizacion->id=$id;
+        $Cotizacion->folio=$folio;
 		$Cotizacion->cotizacion=$cotizacion;
 		$Cotizacion->serie=$request->serie;
 		$Cotizacion->fecha=Carbon::parse($request->fecha)->toDateTimeString();
@@ -279,7 +312,7 @@ class CotizacionController extends ConfiguracionSistemaController{
                 $producto = Producto::where('Codigo', $dc->numero_parte)->first();
                 $filasdetallescotizacion= $filasdetallescotizacion.
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
-                    '<td class="tdmod"><div class="btn btn-danger btn-xs" >X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dc->item.'" readonly></td>'.
+                    '<td class="tdmod"><div class="btn btn-danger btn-xs" >X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dc->item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dc->numero_parte.'" readonly data-parsley-length="[1, 50]">'.$dc->numero_parte.'</td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.$dc->descripcion.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadpartida" name="unidadpartida[]" value="'.$dc->unidad.'" readonly data-parsley-length="[1, 50]">'.$dc->unidad.'</td>'.
@@ -326,7 +359,7 @@ class CotizacionController extends ConfiguracionSistemaController{
             "numerodetallescotizacion" => $numerodetallescotizacion,
             "contadorproductos" => $contadorproductos,
             "contadorfilas" => $contadorfilas,
-            "fecha" => Helpers::formatoinputdate($cotizacion->fecha),
+            "fecha" => Helpers::formatoinputdatetime($cotizacion->fecha),
             "subtotal" => Helpers::convertirvalorcorrecto($cotizacion->subtotal),
             "iva" => Helpers::convertirvalorcorrecto($cotizacion->iva),
             "total" => Helpers::convertirvalorcorrecto($cotizacion->total),
@@ -337,7 +370,7 @@ class CotizacionController extends ConfiguracionSistemaController{
 
     //modificar
     public function cotizaciones_guardar_modificacion(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         $cotizacion = $request->folio.'-'.$request->serie;
         $Cotizacion = Cotizacion::where('cotizacion', $cotizacion)->first();
         //validar si las partidas en las modiifcacion son las mismas que los detalles
@@ -359,7 +392,7 @@ class CotizacionController extends ConfiguracionSistemaController{
         if(count($diferencias_arreglos) > 0){
             foreach($diferencias_arreglos as $eliminapartida){
                 //eliminar detalle de la remision eliminado
-                $eliminardetallecotizacion = CotizacionDetalle::where('cotizacion', $cotizacion)->where('Codigo', $eliminapartida)->forceDelete();
+                $eliminardetallecotizacion = CotizacionDetalle::where('cotizacion', $cotizacion)->where('numero_parte', $eliminapartida)->forceDelete();
             }
         }
         //modificar remision
@@ -388,13 +421,18 @@ class CotizacionController extends ConfiguracionSistemaController{
         foreach ($request->codigopartida as $key => $codigopartida){   
             //if la partida se agrego en la modificacion se agrega en los detalles de traspaso y de orden de trabajo si asi lo requiere
             if($request->agregadoen [$key] == 'modificacion'){
-                $item = CotizacionDetalle::select('item')->where('cotizacion', $cotizacion)->orderBy('item', 'DESC')->take(1)->get();
-                $ultimoitem = $item[0]->Item+1;                
+                $contaritems = CotizacionDetalle::select('item')->where('cotizacion', $cotizacion)->orderBy('item', 'DESC')->take(1)->count();
+                if($contaritems > 0){
+                    $item = CotizacionDetalle::select('item')->where('cotizacion', $cotizacion)->orderBy('item', 'DESC')->take(1)->get();
+                    $ultimoitem = $item[0]->Item+1;  
+                }else{
+                    $ultimoitem = 1;
+                }              
                 DB::unprepared('SET IDENTITY_INSERT cotizaciones_t_detalles ON');       
                 $iddetalle = Helpers::ultimoidregistrotabla('App\CotizacionDetalle');       
                 $CotizacionDetalle=new CotizacionDetalle;
                 $CotizacionDetalle->id = $iddetalle;
-                $CotizacionDetalle->id_cotizacion = $id;
+                $CotizacionDetalle->id_cotizacion = $Cotizacion->id;
                 $CotizacionDetalle->cotizacion = $cotizacion;
                 $CotizacionDetalle->fecha = Carbon::parse($request->fecha)->toDateTimeString();
                 $CotizacionDetalle->numero_parte = $codigopartida;
@@ -407,9 +445,7 @@ class CotizacionController extends ConfiguracionSistemaController{
                 $CotizacionDetalle->importe = $request->importepartida [$key];
                 $CotizacionDetalle->item = $ultimoitem;
                 $CotizacionDetalle->save();
-                $item++;
                 DB::unprepared('SET IDENTITY_INSERT cotizaciones_t_detalles OFF');
-                $ultimoitem++;
             }else{
                 //si la partida no se agrego en la modificacion solo se modifican los datos
                 //modificar detalle

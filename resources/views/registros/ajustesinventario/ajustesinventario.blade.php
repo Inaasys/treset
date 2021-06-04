@@ -67,7 +67,7 @@
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover">
                                     <thead class="customercolor">
                                         <tr>
-                                            <th><div style="width:150px !important;">Operaciones</div></th>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
                                             <th>{{$co}}</th>
                                             @endforeach
@@ -93,45 +93,6 @@
                 </div>
                 <form id="formparsley" action="#">
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-2">
-                                <label>Ajuste <b style="color:#F44336 !important;" id="serietexto"> Serie: {{$serieusuario}}</b></label>
-                                <input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">
-                                <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" required readonly data-parsley-length="[1, 10]">
-                                <input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>
-                                <input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>
-                            </div>  
-                            <div class="col-md-3">
-                                <label>Almacén <span class="label label-danger" id="textonombrealmacen"></span></label>
-                                <table class="col-md-12">
-                                    <tr>
-                                        <td>
-                                            <div class="btn bg-blue waves-effect" onclick="obteneralmacenes()">Seleccionar</div>
-                                        </td>
-                                        <td>
-                                            <div class="form-line">
-                                                <input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer">
-                                                <input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required data-parsley-type="integer">
-                                                <input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>
-                                                <input type="hidden" class="form-control" name="almacendb" id="almacendb" required readonly>
-                                                <input type="hidden" class="form-control" name="numeroalmacendb" id="numeroalmacendb" required readonly>
-                                            </div>
-                                        </td>
-                                    </tr>    
-                                </table>
-                            </div>
-                            <div class="col-md-3">
-                                <label>Fecha </label>
-                                <input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();">
-                                <input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="{{$periodohoy}}">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4" id="divbuscarcodigoproducto" hidden>
-                                <label>Buscar producto por código</label>
-                                <input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">
-                            </div>
-                        </div>
                         <div class="col-md-12" id="tabsform">
                             <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
                         </div>
@@ -139,7 +100,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
-                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Guardar</button>
+                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
                     </div>
                 </form> 
             </div>
@@ -168,7 +129,7 @@
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
-	        	<button type="button" class="btn btn-success btn-sm" id="btnbaja">Guardar</button>
+	        	<button type="button" class="btn btn-success btn-sm" id="btnbaja">Confirmar Baja</button>
 	      	</div>
     	</div>
   	</div>
@@ -198,7 +159,10 @@
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var ajustesinventario_obtener = '{!!URL::to('ajustesinventario_obtener')!!}';
+        var ajustesinventario_obtener_series_documento = '{!!URL::to('ajustesinventario_obtener_series_documento')!!}';
+        var ajustesinventario_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('ajustesinventario_obtener_ultimo_folio_serie_seleccionada')!!}';
         var ajustesinventario_obtener_ultimo_id = '{!!URL::to('ajustesinventario_obtener_ultimo_id')!!}';
+        var ordenes_compra_obtener_fecha_actual_datetimelocal = '{!!URL::to('ordenes_compra_obtener_fecha_actual_datetimelocal')!!}';
         var ajustesinventario_obtener_almacenes = '{!!URL::to('ajustesinventario_obtener_almacenes')!!}';
         var ajustesinventario_obtener_almacen_por_numero = '{!!URL::to('ajustesinventario_obtener_almacen_por_numero')!!}';
         var ajustesinventario_obtener_productos = '{!!URL::to('ajustesinventario_obtener_productos')!!}';

@@ -86,13 +86,27 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $data = VistaCuentaPorCobrar::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->get();
             return DataTables::of($data)
                 ->addColumn('operaciones', function($data){
-                        $botoncambios   =   '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Pago .'\')"><i class="material-icons">mode_edit</i></div> '; 
-                        $botonbajas     =   '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Pago .'\')"><i class="material-icons">cancel</i></div>  ';
-                        $botondocumentopdf = '<a href="'.route('cuentas_por_cobrar_generar_pdfs_indiv',$data->Pago).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
-                        $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Pago .'\')"><i class="material-icons">email</i></div> ';
-                        $operaciones    = $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
+                    $operaciones = '<div class="dropdown">'.
+                                        '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                                            'OPERACIONES <span class="caret"></span>'.
+                                        '</button>'.
+                                        '<ul class="dropdown-menu">'.
+                                            '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Pago .'\')">Cambios</a></li>'.
+                                            '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Pago .'\')">Bajas</a></li>'.
+                                            '<li><a href="'.route('cuentas_por_cobrar_generar_pdfs_indiv',$data->Pago).'" target="_blank">Ver Documento PDF</a></li>'.
+                                            '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Pago .'\')">Enviar Documento por Correo</a></li>'.
+                                        '</ul>'.
+                                    '</div>';
+                    /*
+                    $botoncambios   =   '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Pago .'\')"><i class="material-icons">mode_edit</i></div> '; 
+                    $botonbajas     =   '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Pago .'\')"><i class="material-icons">cancel</i></div>  ';
+                    $botondocumentopdf = '<a href="'.route('cuentas_por_cobrar_generar_pdfs_indiv',$data->Pago).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
+                    $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Pago .'\')"><i class="material-icons">email</i></div> ';
+                    $operaciones    = $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
+                    */
                     return $operaciones;
                 })
+                ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
                 ->addColumn('Abono', function($data){ return $data->Abono; })
                 ->addColumn('TipoCambio', function($data){ return $data->TipoCambio; })
                 ->rawColumns(['operaciones'])
@@ -562,7 +576,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
 
     //altas
     public function cuentas_por_cobrar_guardar(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         //obtener el ultimo id de la tabla
         $folio = Helpers::ultimofoliotablamodulos('App\CuentaXCobrar');
         //INGRESAR DATOS A TABLA
@@ -590,7 +604,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         $CuentaXCobrar->Hora=Carbon::parse($request->fecha)->toDateTimeString();
         $CuentaXCobrar->Status="ALTA";
         $CuentaXCobrar->Usuario=Auth::user()->user;
-        $CuentaXCobrar->Periodo=$request->periodohoy;
+        $CuentaXCobrar->Periodo=$this->periodohoy;
         $CuentaXCobrar->save();
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
@@ -600,7 +614,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
         $BitacoraDocumento->Status = "ALTA";
         $BitacoraDocumento->Usuario = Auth::user()->user;
-        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA DETALLES
         $item = 1;
@@ -799,7 +813,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
     }
     //cambios
     public function cuentas_por_cobrar_guardar_modificacion(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         //INGRESAR DATOS A TABLA
         $cuentaxcobrar = $request->folio.'-'.$request->serie;
 		$CuentaXCobrar = CuentaXCobrar::where('Pago', $cuentaxcobrar)->first();
@@ -824,7 +838,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
         $BitacoraDocumento->Status = $CuentaXCobrar->Status;
         $BitacoraDocumento->Usuario = Auth::user()->user;
-        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
     	return response()->json($CuentaXCobrar);
     }

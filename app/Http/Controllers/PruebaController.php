@@ -127,9 +127,9 @@ class PruebaController extends ConfiguracionSistemaController{
             $cuentasporpagar = CuentaXPagarDetalle::where('Compra', $compra)->get();
             dd($cuentasporpagar);
         }*/
-        $fecha='2021-03-08';
+        $val= -1.0;
 
-        dd(Helpers::fecha_mas_hora_exacta_accion_datetimestring($fecha));
+        dd(Helpers::convertirvalorcorrecto($val));
 
     }
 

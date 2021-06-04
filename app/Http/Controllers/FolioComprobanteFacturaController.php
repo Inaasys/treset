@@ -26,16 +26,26 @@ class FolioComprobanteFacturaController extends ConfiguracionSistemaController{
             $data = FolioComprobanteFactura::orderBy('Numero', 'DESC')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        $botoncambios =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos('.$data->Numero.')"><i class="material-icons">mode_edit</i></div> '; 
+                        $operaciones = '<div class="dropdown">'.
+                                            '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                                                'OPERACIONES <span class="caret"></span>'.
+                                            '</button>'.
+                                            '<ul class="dropdown-menu">'.
+                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos('.$data->Numero.')">Cambios</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="desactivar('.$data->Numero.')">Bajas</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="predeterminarfolio('.$data->Numero.')">Predeterminar Folio</a></li>'.
+                                            '</ul>'.
+                                        '</div>';
+                        /*$botoncambios =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos('.$data->Numero.')"><i class="material-icons">mode_edit</i></div> '; 
                         $botonbajas =      '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar('.$data->Numero.')"><i class="material-icons">cancel</i></div> ';
                         $botonpredeterminar = '<div class="btn bg-green btn-xs waves-effect" data-toggle="tooltip" title="Predeterminar Folio" onclick="predeterminarfolio('.$data->Numero.')"><i class="material-icons">check</i></div> ';
                         if($data->Status == 'ALTA'){
-                            $boton =    $botonpredeterminar.$botoncambios.$botonbajas;
+                            $operaciones =    $botonpredeterminar.$botoncambios.$botonbajas;
                         }else{
-                            $boton = '';
-                            //$boton =    '<div class="btn bg-green btn-xs waves-effect" onclick="desactivar(\''.$data->Numero .'\')">Altas</div>';
-                        } 
-                        return $boton;
+                            $operaciones = '';
+                            //$operaciones =    '<div class="btn bg-green btn-xs waves-effect" onclick="desactivar(\''.$data->Numero .'\')">Altas</div>';
+                        } */
+                        return $operaciones;
                     })
                     ->setRowClass(function ($data) {
                         return $data->Status == 'ALTA' ? '' : 'bg-orange';

@@ -39,7 +39,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
     }
 
     public function ajustesinventario(){
-        $serieusuario = Helpers::obtenerserieusuario(Auth::user()->user, 'AjustesInventario');
+        $serieusuario = 'A';
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('ajustesinventario_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('ajustesinventario_exportar_excel');
@@ -51,25 +51,56 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
     public function ajustesinventario_obtener(Request $request){
         if($request->ajax()){
             $periodo = $request->periodo;
-            $data = VistaAjusteInventario::select($this->campos_consulta)->orderBy('Folio', 'DESC')->where('periodo', $periodo)->get();
+            $data = VistaAjusteInventario::select($this->campos_consulta)->orderBy('Fecha', 'DESC')->where('periodo', $periodo)->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
+                        $operaciones = '<div class="dropdown">'.
+                                            '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                                                'OPERACIONES <span class="caret"></span>'.
+                                            '</button>'.
+                                            '<ul class="dropdown-menu">'.
+                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Ajuste .'\')">Cambios</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Ajuste .'\')">Bajas</a></li>'.
+                                                '<li><a href="'.route('ajustesinventario_generar_pdfs_indiv',$data->Ajuste).'" target="_blank">Ver Documento PDF</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Ajuste .'\')">Enviar Documento por Correo</a></li>'.
+                                            '</ul>'.
+                                        '</div>';
+                        /*
                         $botoncambios =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Ajuste .'\')"><i class="material-icons">mode_edit</i></div> '; 
                         $botonbajas =      '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Ajuste .'\')"><i class="material-icons">cancel</i></div> ';
                         $botondocumentopdf = '<a href="'.route('ajustesinventario_generar_pdfs_indiv',$data->Ajuste).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
                         $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Ajuste .'\')"><i class="material-icons">email</i></div> ';
                         $operaciones =  $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
+                        */
                         return $operaciones;
                     })
+                    ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
                     ->addColumn('total', function($data){ return $data->Total; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
     }
-
+    //obtener series documento
+    public function ajustesinventario_obtener_series_documento(Request $request){
+        if($request->ajax()){
+            $data = Serie::where('Documento', 'AjustesInventario')->where('Usuario', Auth::user()->user)->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''.$data->Serie.'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+    //obtener ultimo folio de la serie seleccionada
+    public function ajustesinventario_obtener_ultimo_folio_serie_seleccionada(Request $request){
+        $folio = Helpers::ultimofolioserietablamodulos('App\AjusteInventario',$request->Serie);
+        return response()->json($folio);
+    }
     //obtener ultimi registro
-    public function ajustesinventario_obtener_ultimo_id(){
-        $folio = Helpers::ultimofoliotablamodulos('App\AjusteInventario');
+    public function ajustesinventario_obtener_ultimo_id(Request $request){
+        $folio = Helpers::ultimofolioserietablamodulos('App\AjusteInventario',$request->serie);
         return response()->json($folio);
     }
 
@@ -157,9 +188,9 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
 
     //guardar
     public function ajustesinventario_guardar(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         //obtener el ultimo id de la tabla
-        $folio = Helpers::ultimofoliotablamodulos('App\AjusteInventario');
+        $folio = Helpers::ultimofolioserietablamodulos('App\AjusteInventario',$request->serie);
         //INGRESAR DATOS A TABLA ORDEN COMPRA
         $ajuste = $folio.'-'.$request->serie;
         $AjusteInventario = new AjusteInventario;
@@ -172,7 +203,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
         $AjusteInventario->Total=$request->total;
         $AjusteInventario->Status="ALTA";
         $AjusteInventario->Usuario=Auth::user()->user;
-        $AjusteInventario->Periodo=$request->periodohoy;
+        $AjusteInventario->Periodo=$this->periodohoy;
         $AjusteInventario->save();
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
@@ -182,7 +213,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
         $BitacoraDocumento->Status = "ALTA";
         $BitacoraDocumento->Usuario = Auth::user()->user;
-        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
         $item = 1;
@@ -412,7 +443,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
             "numerodetallesajuste" => $numerodetallesajuste,
             "contadorproductos" => $contadorproductos,
             "contadorfilas" => $contadorfilas,
-            "fecha" => Helpers::formatoinputdate($ajuste->Fecha),
+            "fecha" => Helpers::formatoinputdatetime($ajuste->Fecha),
             "total" => Helpers::convertirvalorcorrecto($ajuste->Total),
             "modificacionpermitida" => $modificacionpermitida
         );
@@ -421,7 +452,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
 
     //modificar
     public function ajustesinventario_guardar_modificacion(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         $ajuste = $request->folio.'-'.$request->serie;
         $AjusteInventario = AjusteInventario::where('Ajuste', $ajuste)->first();
         $numeroalmacendb = $request->numeroalmacendb;
@@ -518,7 +549,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
         $BitacoraDocumento->Status = $AjusteInventario->Status;
         $BitacoraDocumento->Usuario = Auth::user()->user;
-        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA DETALLES
         //if al ajuste no se le modifico el almacen

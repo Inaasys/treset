@@ -9,18 +9,25 @@ function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1000));
 }
 function asignarfechaactual(){
+    /*
     var fechahoy = new Date();
     var dia = ("0" + fechahoy.getDate()).slice(-2);
     var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
     var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia) ;
     $('#fecha').val(hoy);
     $('#fechaapagar').val(hoy);
+    */
+    $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechadatetimelocal){
+        $("#fecha").val(fechadatetimelocal);
+        $('#fechaapagar').val(fechadatetimelocal);
+    }) 
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
-  $.get(contrarecibos_obtener_ultimo_folio, function(folio){
-    $("#folio").val(folio);
-  })  
+    var serie = $("#serie").val();
+    $.get(contrarecibos_obtener_ultimo_folio,{serie:serie}, function(folio){
+        $("#folio").val(folio);
+    })  
 }
 //cerrar modales
 function limpiarmodales(){
@@ -126,6 +133,77 @@ function listar(){
         }
     });
 }
+//obtener series documento
+function obtenerseriesdocumento(){
+    ocultarformulario();
+    var seriedefault = 'A';
+    var tablaseriesdocumento=   '<div class="modal-header bg-red">'+
+                                    '<h4 class="modal-title">Series Documento &nbsp;&nbsp; <div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''+seriedefault+'\')">Asignar Serie Default (A)</div></h4>'+
+                                '</div>'+
+                                '<div class="modal-body">'+
+                                    '<div class="row">'+
+                                    '<div class="col-md-12">'+
+                                        '<div class="table-responsive">'+
+                                        '<table id="tbllistadoseriedocumento" class="tbllistadoseriedocumento table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                            '<thead class="customercolor">'+
+                                            '<tr>'+
+                                                '<th>Operaciones</th>'+
+                                                '<th>Serie</th>'+
+                                                '<th>Documento</th>'+
+                                                '<th>Nombre</th>'+
+                                            '</tr>'+
+                                            '</thead>'+
+                                            '<tbody></tbody>'+
+                                        '</table>'+
+                                        '</div>'+
+                                    '</div>'+   
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="modal-footer">'+
+                                    '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                                '</div>';  
+    $("#contenidomodaltablas").html(tablaseriesdocumento);
+    $('#tbllistadoseriedocumento').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,  
+        processing: true,
+        'language': {
+          'loadingRecords': '&nbsp;',
+          'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+          url: contrarecibos_obtener_series_documento
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Serie', name: 'Serie' },
+            { data: 'Documento', name: 'Documento' },
+            { data: 'Nombre', name: 'Nombre' }
+        ],
+        "initComplete": function() {
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistadoseriedocumento').DataTable().search( this.value ).draw();
+              }
+          });
+        },
+        
+    });  
+}
+function seleccionarseriedocumento(Serie){
+    $.get(contrarecibos_obtener_ultimo_folio_serie_seleccionada, {Serie:Serie}, function(folio){
+        $("#folio").val(folio);
+        $("#serie").val(Serie);
+        $("#serietexto").html("Serie: "+Serie);
+        mostrarformulario();
+    }) 
+}
 //obtener registros de proveedores
 function obtenerproveedores(){
     ocultarformulario();
@@ -198,6 +276,7 @@ function seleccionarproveedor(Numero, Nombre, Plazo, fechahoy, fechahoyespanol){
     var numeroproveedoranterior = $("#numeroproveedoranterior").val();
     var numeroproveedor = Numero;
     if(numeroproveedoranterior != numeroproveedor){
+        $('.page-loader-wrapper').css('display', 'block');
         $("#numeroproveedor").val(Numero);
         $("#numeroproveedoranterior").val(Numero);
         $("#proveedor").val(Nombre);
@@ -209,6 +288,7 @@ function seleccionarproveedor(Numero, Nombre, Plazo, fechahoy, fechahoyespanol){
             $("#totalcontrarecibos").val(number_format(round(0, numerodecimales), numerodecimales, '.', ''));
             //funcion asincrona para colocar la fecha actual si el usuario lo desea
             cambiarfechaapagar(fechahoy, fechahoyespanol).then(resultado=>{})
+            $('.page-loader-wrapper').css('display', 'none');
         });
         mostrarformulario();
     }
@@ -232,6 +312,7 @@ function obtenerproveedorpornumero(){
     var numeroproveedor = $("#numeroproveedor").val();
     if(numeroproveedoranterior != numeroproveedor){
         if($("#numeroproveedor").parsley().isValid()){
+            $('.page-loader-wrapper').css('display', 'block');
             var numeroproveedor = $("#numeroproveedor").val();
             $.get(contrarecibos_obtener_compras_proveedor_por_numero, {numeroproveedor:numeroproveedor}, function(data){
                 $("#numeroproveedor").val(data.numero);
@@ -245,6 +326,7 @@ function obtenerproveedorpornumero(){
                 //funcion asincrona para colocar la fecha actual si el usuario lo desea
                 cambiarfechaapagar(data.fechahoy, data.fechahoyespanol).then(resultado=>{})
                 mostrarformulario();
+                $('.page-loader-wrapper').css('display', 'none');
             }) 
         }
     }
@@ -262,14 +344,14 @@ function alta(){
     //formulario alta
     var tabs =  '<div class="col-md-12">'+
                     '<div class="row">'+
-                        '<div class="col-md-2">'+
-                            '<label>Contrarecibo <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
+                        '<div class="col-md-3">'+
+                            '<label>Contrarecibo <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
                             '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                             '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                             '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
                             '<input type="hidden" class="form-control" name="numerofacturas" id="numerofacturas" value="0" required readonly>'+
                         '</div>'+   
-                        '<div class="col-md-4">'+
+                        '<div class="col-md-3">'+
                             '<label>Proveedor <span class="label label-danger" id="textonombreproveedor"></span></label>'+
                             '<table class="col-md-12">'+
                                 '<tr>'+
@@ -288,12 +370,12 @@ function alta(){
                         '</div>'+
                         '<div class="col-md-3">'+
                             '<label>Fecha Contrarecibo</label>'+
-                            '<input type="date" class="form-control" name="fecha" id="fecha" onchange="validasolomesactual();asignafechapagoproveedor();" required>'+
+                            '<input type="datetime-local" class="form-control" name="fecha" id="fecha" onchange="validasolomesactual();asignafechapagoproveedor();" required>'+
                             '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="{{$periodohoy}}">'+
                         '</div>'+
                         '<div class="col-md-3">'+
                             '<label>Fecha del Pago al Proveedor</label>'+
-                            '<input type="date" class="form-control" name="fechaapagar" id="fechaapagar" required readonly>'+
+                            '<input type="datetime-local" class="form-control" name="fechaapagar" id="fechaapagar" required readonly>'+
                         '</div>'+
                     '</div>'+
                 '</div>'+
@@ -458,7 +540,7 @@ function desactivar(contrarecibodesactivar){
                 $('#estatusregistro').modal('show');
             }else{
                 $("#contrarecibodesactivar").val(contrarecibodesactivar);
-                $("#textomodaldesactivar").html('Estas seguro de cambiar el estado el registro?');
+                $("#textomodaldesactivar").html('Estas seguro de dar de baja el contrarecibo? No'+ contrarecibodesactivar);
                 $("#divmotivobaja").show();
                 $("#btnbaja").show();
                 $('#estatusregistro').modal('show');
@@ -507,14 +589,14 @@ function obtenerdatos(contrarecibomodificar){
     //formulario modificacion
     var tabs =  '<div class="col-md-12">'+
                     '<div class="row">'+
-                        '<div class="col-md-2">'+
+                        '<div class="col-md-3">'+
                             '<label>Contrarecibo <b style="color:#F44336 !important;" id="serietexto"> Serie:</b></label>'+
                             '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                             '<input type="hidden" class="form-control" name="serie" id="serie" required readonly data-parsley-length="[1, 10]">'+
                             '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
                             '<input type="hidden" class="form-control" name="numerofacturas" id="numerofacturas" required readonly>'+
                         '</div>'+   
-                        '<div class="col-md-4">'+
+                        '<div class="col-md-3">'+
                             '<label>Proveedor <span class="label label-danger" id="textonombreproveedor"></span></label>'+
                             '<table class="col-md-12">'+
                                 '<tr>'+
@@ -523,7 +605,7 @@ function obtenerdatos(contrarecibomodificar){
                                     '</td>'+
                                     '<td>'+
                                         '<div class="form-line">'+
-                                            '<input type="text" class="form-control" name="numeroproveedor" id="numeroproveedor" required readonly data-parsley-type="integer">'+
+                                            '<input type="text" class="form-control" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer">'+
                                             '<input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior"  required data-parsley-type="integer">'+
                                             '<input type="hidden" class="form-control" name="proveedor" id="proveedor" required readonly>'+
                                         '</div>'+
@@ -533,12 +615,12 @@ function obtenerdatos(contrarecibomodificar){
                         '</div>'+
                         '<div class="col-md-3">'+
                             '<label>Fecha Contrarecibo</label>'+
-                            '<input type="date" class="form-control" name="fecha" id="fecha" onchange="validasolomesactual();asignafechapagoproveedor();" required>'+
+                            '<input type="datetime-local" class="form-control" name="fecha" id="fecha" onchange="validasolomesactual();asignafechapagoproveedor();" required>'+
                             '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy">'+
                         '</div>'+
                         '<div class="col-md-3">'+
                             '<label>Fecha del Pago al Proveedor</label>'+
-                            '<input type="date" class="form-control" name="fechaapagar" id="fechaapagar" required readonly>'+
+                            '<input type="datetime-local" class="form-control" name="fechaapagar" id="fechaapagar" required readonly>'+
                         '</div>'+
                     '</div>'+
                 '</div>'+

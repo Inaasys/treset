@@ -615,6 +615,14 @@ function msj_documentoenviadoporemailcorrectamente(){
         "extendedTImeout": "6000"
     });  
 }
+//mensaje este usuario ya cuenta con una serie igual para el documento seleccionado, cambia la serie
+function msj_errorserieexistenteendocumento(){
+    toastr.error( "Aviso, este usuario ya cuenta con una serie igual para el documento seleccionado, cambia la serie o documento", "Mensaje", {
+        "timeOut": "6000",
+        "progressBar": true,
+        "extendedTImeout": "6000"
+    });  
+}
 ///////////////////////////////////FIN MENSAJES TOASTR.JS INAASYS///////////////////////////////////////
 //////////////////////////////FUNCIONES PARA CONFIGURACION DE COLUMNAS DE TABLAS/////////////////////////////////////////
 //ordenar las columnas para vista de tabla

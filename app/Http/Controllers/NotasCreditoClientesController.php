@@ -90,13 +90,27 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $data = VistaNotaCreditoCliente::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
+                        $operaciones = '<div class="dropdown">'.
+                                            '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                                                'OPERACIONES <span class="caret"></span>'.
+                                            '</button>'.
+                                            '<ul class="dropdown-menu">'.
+                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Nota .'\')">Cambios</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Nota .'\')">Bajas</a></li>'.
+                                                '<li><a href="'.route('notas_credito_clientes_generar_pdfs_indiv',$data->Nota).'" target="_blank">Ver Documento PDF</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Nota .'\')">Enviar Documento por Correo</a></li>'.
+                                            '</ul>'.
+                                        '</div>';
+                        /*
                         $botoncambios  =   '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Nota .'\')"><i class="material-icons">mode_edit</i></div> '; 
                         $botonbajas     =   '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Nota .'\')"><i class="material-icons">cancel</i></div>  ';
                         $botondocumentopdf = '<a href="'.route('notas_credito_clientes_generar_pdfs_indiv',$data->Nota).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
                         $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Nota .'\')"><i class="material-icons">email</i></div> ';
                         $operaciones =      $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
+                        */
                         return $operaciones;
                     })
+                    ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
                     ->addColumn('SubTotal', function($data){ return $data->SubTotal; })
                     ->addColumn('Iva', function($data){ return $data->Iva; })
                     ->addColumn('Total', function($data){ return $data->Total; })
@@ -641,7 +655,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
 
     //alta
     public function notas_credito_clientes_guardar(Request $request){ 
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
             //obtener el ultimo id de la tabla
             $folio = Helpers::ultimofolioserietablamodulos('App\NotaCliente', $request->serie);
             //INGRESAR DATOS A TABLA COMPRAS
@@ -682,8 +696,8 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $NotaCliente->EmisorNombre=$request->emisornombre;
             $NotaCliente->ReceptorRfc=$request->receptorrfc;
             $NotaCliente->ReceptorNombre=$request->receptornombre;
-            $NotaCliente->Hora=Helpers::fecha_mas_hora_exacta_accion_datetimestring($request->fecha);
-            $NotaCliente->Periodo=$request->periodohoy;
+            $NotaCliente->Hora=Carbon::parse($request->fecha)->toDateTimeString();
+            $NotaCliente->Periodo=$this->periodohoy;
             $NotaCliente->save();
             //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO NOTAS PROVEEDOR
             $BitacoraDocumento = new BitacoraDocumento;
@@ -693,7 +707,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
             $BitacoraDocumento->Status = "ALTA";
             $BitacoraDocumento->Usuario = Auth::user()->user;
-            $BitacoraDocumento->Periodo = $request->periodohoy;
+            $BitacoraDocumento->Periodo = $this->periodohoy;
             $BitacoraDocumento->save();
             //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO NOTAS PROVEEDOR DOC
             $BitacoraDocumento = new BitacoraDocumento;
@@ -703,7 +717,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
             $BitacoraDocumento->Status = "ALTA";
             $BitacoraDocumento->Usuario = Auth::user()->user;
-            $BitacoraDocumento->Periodo = $request->periodohoy;
+            $BitacoraDocumento->Periodo = $this->periodohoy;
             $BitacoraDocumento->save();
             //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
             $item = 1;
@@ -930,6 +944,10 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                     }
                     $claveproductopartida = ClaveProdServ::where('Clave', $dnc->ClaveProducto)->first();
                     $claveunidadpartida = ClaveUnidad::where('Clave', $dnc->ClaveUnidad)->first();
+                    $claveproducto = $claveproductopartida ? $claveproductopartida->Clave : '';
+                    $nombreclaveproducto = $claveproductopartida ? $claveproductopartida->Nombre : '';
+                    $claveunidad = $claveunidadpartida ? $claveunidadpartida->Clave : '';
+                    $nombreclaveunidad = $claveunidadpartida ? $claveunidadpartida->Nombre : '';
                     //importante porque si se quiere hacer una divison con 0 marca ERROR
                     $porcentajeieps = 0;
                     $porcentajeretencioniva = 0;
@@ -982,22 +1000,22 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                                         '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                     '</div>'.
                                     '<div class="col-xs-10 col-sm-10 col-md-10">'.
-                                        '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproductopartida->Clave.'" readonly data-parsley-length="[1, 20]">'.
+                                        '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly data-parsley-length="[1, 20]">'.
                                     '</div>'.
                                 '</div>'.
                             '</td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$claveproductopartida->Nombre.'" readonly></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$nombreclaveproducto.'" readonly></td>'.
                             '<td class="tdmod">'.
                                 '<div class="row divorinputmodxl">'.
                                     '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                         '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                     '</div>'.
                                     '<div class="col-xs-10 col-sm-10 col-md-10">'.   
-                                        '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidadpartida->Clave.'" readonly data-parsley-length="[1, 5]">'.
+                                        '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
                                     '</div>'.
                                 '</div>'.
                             '</td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$claveunidadpartida->Nombre.'" readonly></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$nombreclaveunidad.'" readonly></td>'.
                         '</tr>';
                         $tipodetalles = 'dppp';
                     }else{
@@ -1039,22 +1057,22 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                                         '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                     '</div>'.
                                     '<div class="col-xs-10 col-sm-10 col-md-10">'.
-                                        '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproductopartida->Clave.'" readonly data-parsley-length="[1, 20]">'.
+                                        '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly data-parsley-length="[1, 20]">'.
                                     '</div>'.
                                 '</div>'.
                             '</td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$claveproductopartida->Nombre.'" readonly></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$nombreclaveproducto.'" readonly></td>'.
                             '<td class="tdmod">'.
                                 '<div class="row divorinputmodxl">'.
                                     '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                         '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                     '</div>'.
                                     '<div class="col-xs-10 col-sm-10 col-md-10">'.   
-                                        '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidadpartida->Clave.'" readonly data-parsley-length="[1, 5]">'.
+                                        '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
                                     '</div>'.
                                 '</div>'.
                             '</td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$claveunidadpartida->Nombre.'" readonly></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$nombreclaveunidad.'" readonly></td>'.
                         '</tr>';
                         $tipodetalles = 'codigos';
                     }
@@ -1137,7 +1155,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             "arrayfacturas" => $arrayfacturas,
             "descuentofacturas" => Helpers::convertirvalorcorrecto($descuentofacturas),
             "diferencia" => Helpers::convertirvalorcorrecto($diferencia),
-            "fecha" => Helpers::formatoinputdate($notacliente->Fecha),
+            "fecha" => Helpers::formatoinputdatetime($notacliente->Fecha),
             "importe" => Helpers::convertirvalorcorrecto($notacliente->Importe),
             "descuento" => Helpers::convertirvalorcorrecto($notacliente->Descuento),
             "ieps" => Helpers::convertirvalorcorrecto($notacliente->Ieps),
@@ -1155,7 +1173,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
 
     //cambios
     public function notas_credito_clientes_guardar_modificacion(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
             $notacliente = $request->notaclientebd;
             $NotaCliente = NotaCliente::where('Nota', $notacliente)->first();
             //array detalles antes de modificacion
@@ -1265,7 +1283,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
             $BitacoraDocumento->Status = $NotaCliente->Status;
             $BitacoraDocumento->Usuario = Auth::user()->user;
-            $BitacoraDocumento->Periodo = $request->periodohoy;
+            $BitacoraDocumento->Periodo = $this->periodohoy;
             $BitacoraDocumento->save();
             //detalles
             foreach ($request->codigopartida as $key => $codigopartida){  
@@ -1350,7 +1368,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                         'IepsRetencion' => $request->retencioniepspesospartida [$key],
                         'Total' => $request->totalpesospartida [$key],
                         'Costo' => $request->costopartida [$key],
-                        'Partida' => $request->partida [$key],
+                        'Partida' => $request->partidapartida [$key],
                         'ClaveProducto' => $request->claveproductopartida [$key],
                         'ClaveUnidad' => $request->claveunidadpartida [$key]
                     ]);

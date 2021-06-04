@@ -13,26 +13,32 @@
             <div class="row clearfix">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="card" id="listadoregistros">
-                        <div class="header bg-red table-responsive button-demo">
-                        	<table>
-                        		<tr>
-                        			<td>
-                        				<h5>&nbsp;&nbsp;&nbsp;&nbsp;Folios Comprobantes Facturas&nbsp;&nbsp;&nbsp;</h5>
-                        			</td>
-                        			<td >
-                            			<div class="btn bg-blue btn-xs waves-effect" onclick="alta()">
-                                    		Altas
-                                		</div>
-                        			</td>
-                        		</tr>
-                        	</table>
+                        <div class="header bg-red">
+                            <div class="row clearfix">
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                    <h5>&nbsp;&nbsp;&nbsp;FOLIOS COMPROBANTES FACTURAS&nbsp;&nbsp;&nbsp;</h5>
+                                </div>
+                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 button-demo">
+                                    <div class="table-responsive">
+                                        <table>
+                                            <tr>
+                                                <td >
+                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="alta()">
+                                                        Altas
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="body">
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover" style="width:100% !important;">
                                     <thead class="customercolor">
                                         <tr>
-                                            <th><div style="width:80px !important;">Operaciones</div></th>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
                                             <th>Número</th>
                                             <th>Serie</th>
                     						<th>Esquema</th>
@@ -96,7 +102,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
-                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Guardar</button>
+                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
                     </div>
                 </form> 
             </div> 
@@ -115,13 +121,13 @@
       		</div>
       		<div class="modal-body">
 		      	<form id="formdesactivar" action="#">
-		        	Esta seguro de dar de baja este registro?
+                  <h5>Esta seguro de dar de baja este registro?</h5>
 		        	<input type="hidden" id="numerofolio" name="numerofolio">
 		        </form>	
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
-	        	<button type="button" class="btn btn-success btn-sm" id="aceptar">Guardar</button>
+	        	<button type="button" class="btn btn-success btn-sm" id="aceptar">Confirmar Baja</button>
 	      	</div>
     	</div>
   	</div>
@@ -164,10 +170,7 @@
         var rfcempresa = '{{$empresa->Rfc}}';
         var telefonosempresa = '{{$empresa->Telefonos}}';
         var textareadomicilio = calleempresa+' '+numeroexteriorempresa+'\n'+coloniaempresa+' C.P.'+cpempresa+'\n'+municipioempresa+', '+estadoempresa+'\n'+'RFC: '+rfcempresa+'\n'+'TELEFONO(S): '+telefonosempresa;
-
         var pagaredefaultuno = 'Por el presente pagaré reconozco(emos) deber y me(nos) obligo(amos) a pagar en esta ciudad o en cualquier otra en que se me(nos) requiera de pago a %beneficiario o a su orden el día de su vencimiento %vence, la cantidad de %total ( %letratotal ). Valor recibido a mi(nuestra) entera satisfacción.'+'\n'+' %br La cantidad que ampara este pagaré es parte de la cantidad mayor, por la cual se otorgan otros pagarés con vencimientos posteriores y queda expresamente convenido que si no es pagado este documento precisamente a su vencimiento, se dará por vencidos anticipadamente los demás pagarés a los que se refiere esta cláusula.'+'\n'+'Este pagaré es mercantil y está regido por la ley general de Títulos y Operaciones de Crédito en su artículo 173 parte final y demás artículos correlativos.De no verificarse el pago de la cantidad que este pagaré expresa el día de su vencimiento, abonaré(mos) el rédito de 6% mensual por todo tiempo que esté insoluto, sin prejuicio al cobro más los gastos que por ellos se originen. Así mismo el otorgante se obliga en los términos del presente pagaré, por la persona que los suscriba, basta que quien lo firme, sea trabajador o dependiente laboral y se tendrá como si lo suscribiera el presente legal o dueño de la empresa otorgante.'+'\n'+' %br Otorgante: %nombre'+'\n'+' %br Domicilio: %direccion'+'\n'+' %br Ciudad: %ciudad %estadobeneficiario a %fecha'+'\n'+' %br _________________________'+'\n'+' %br Firma';
-
-
         var pagaredefaultdos = 'Por el presente pagaré reconozco(emos) deber y me(nos) obligo(amos) a pagar en esta ciudad o en cualquier otra en que se me(nos) requiera de pago a %beneficiario o a su orden el día de su vencimiento %vence, la cantidad de %total (%totalletra). Valor recibido a mi(nuestra) entera satisfacción.'+'\n'+'En caso de incumplimiento la cantidad consignada generará interes moratorios a razón de un 6% mensual.'+'\n'+'Otorgante: %t%nombre%t%tAl %fecha%t%t%t%t%t%tFirma____________________'
         var folios_comprobantes_facturas_obtener = '{!!URL::to('folios_comprobantes_facturas_obtener')!!}';
         var folios_comprobantes_facturas_predeterminar = '{!!URL::to('folios_comprobantes_facturas_predeterminar')!!}';

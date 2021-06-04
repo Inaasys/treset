@@ -1286,6 +1286,42 @@ $("#btnGuardarModificacion").on('click', function (e) {
         msj_verificartodoslosdatos();
     }
 });
+//detectar cuando en el input de buscar por codigo de producto el usuario presione la tecla enter, si es asi se realizara la busqueda con el codigo escrito
+$(document).ready(function(){
+    //activar busqueda de kardex por codigo
+    $('#codigokardex').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obtenerkardexporcodigo();
+        }
+    });
+});
+//obtener kardex al dar click en detalle de la fila
+function obtenerkardex(codigo,almacen){
+    $('.page-loader-wrapper').css('display', 'block');
+    $.get(productos_obtener_kardex,{codigo:codigo,almacen:almacen},function(data){
+        $("#titulomodalmovimientos").html("Kardex: " + codigo);
+        $("#infomovimientos").html("<div class='col-md-4'>Existencias actuales: " + data.existencias + "</div><div class='col-md-4'>Entradas: " + data.entradas + "</div><div class='col-md-4'>Salidas:" + data.salidas + "</div>");
+        $("#codigokardex").val(codigo);
+        $("#almacenkardex").html(data.selectalmacenes);
+        $("#filasmovimientos").html(data.filasmovimientos);
+        $("#modalmovimientos").modal('show');
+        $('.page-loader-wrapper').css('display', 'none');
+    });
+}
+//obtener kardex al dar enter en el input del codigo
+function obtenerkardexporcodigo(){
+    var codigokardex = $("#codigokardex").val();
+    var almacenkardex = $("#almacenkardex").val();
+    obtenerkardex(codigokardex,almacenkardex);
+}
+//obtener kardex al cambiar el almacen
+$("#almacenkardex").on('change', function (e) {
+    var codigokardex = $("#codigokardex").val();
+    var almacenkardex = $("#almacenkardex").val();
+    obtenerkardex(codigokardex,almacenkardex);
+});
 //configurar tabla
 function configurar_tabla(){
         //formulario modificacion

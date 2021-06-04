@@ -23,7 +23,8 @@ class Prestamo_Herramienta extends Model
         'motivo_baja',
         'equipo',
         'usuario',
-        'periodo'
+        'periodo',
+        'folio'
     ];
 
     public function gettotalAttribute($value)

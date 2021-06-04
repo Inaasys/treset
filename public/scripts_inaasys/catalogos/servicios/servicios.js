@@ -533,6 +533,7 @@ function obtenerdatos(codigoservicio){
                     '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
+    console.log(data);
     //boton formulario 
     $("#codigo").val(codigoservicio);
     $("#servicio").val(data.servicio.Servicio);
@@ -540,9 +541,11 @@ function obtenerdatos(codigoservicio){
     $("#cantidad").val(data.cantidad);
     $("#costo").val(data.costo);
     $("#venta").val(data.venta);
-    $("#familia").val(data.familia.Numero);
-    $("#nombrefamilia").val(data.familia.Nombre);
-    $("#nombrefamilia").keyup();
+    if(data.familia != null){
+        $("#familia").val(data.familia.Numero);
+        $("#nombrefamilia").val(data.familia.Nombre);
+        $("#nombrefamilia").keyup();
+    }
     $("#claveproducto").val(data.claveproducto.Clave);
     $("#nombreclaveproducto").val(data.claveproducto.Nombre);
     $("#nombreclaveproducto").keyup();

@@ -48,7 +48,7 @@ class RemisionController extends ConfiguracionSistemaController{
     }
 
     public function remisiones(){
-        $serieusuario = Helpers::obtenerserieusuario(Auth::user()->user, 'Remisiones');
+        $serieusuario = 'A';
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('remisiones_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('remisiones_exportar_excel');
@@ -60,16 +60,30 @@ class RemisionController extends ConfiguracionSistemaController{
     public function remisiones_obtener(Request $request){
         if($request->ajax()){
             $periodo = $request->periodo;
-            $data = VistaRemision::select($this->campos_consulta)->orderBy('Folio', 'DESC')->where('Periodo', $periodo)->get();
+            $data = VistaRemision::select($this->campos_consulta)->orderBy('Fecha', 'DESC')->where('Periodo', $periodo)->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
+                        $operaciones =  '<div class="dropdown">'.
+                                            '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                                                'OPERACIONES <span class="caret"></span>'.
+                                            '</button>'.
+                                            '<ul class="dropdown-menu">'.
+                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Remision .'\')">Cambios</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Remision .'\')">Bajas</a></li>'.
+                                                '<li><a href="'.route('remisiones_generar_pdfs_indiv',$data->Remision).'" target="_blank">Ver Documento PDF</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Remision .'\')">Enviar Documento por Correo</a></li>'.
+                                            '</ul>'.
+                                        '</div>';
+                        /*
                         $botoncambios =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Remision .'\')"><i class="material-icons">mode_edit</i></div> '; 
                         $botonbajas =      '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Remision .'\')"><i class="material-icons">cancel</i></div> ';
                         $botondocumentopdf = '<a href="'.route('remisiones_generar_pdfs_indiv',$data->Remision).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
                         $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Remision .'\')"><i class="material-icons">email</i></div> ';
                         $operaciones =  $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
+                        */
                         return $operaciones;
                     })
+                    ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
                     ->addColumn('subtotal', function($data){ return $data->SubTotal; })
                     ->addColumn('iva', function($data){ return $data->Iva; })
                     ->addColumn('total', function($data){ return $data->Total; })
@@ -88,10 +102,27 @@ class RemisionController extends ConfiguracionSistemaController{
                     ->make(true);
         } 
     }
-
+    //obtener series documento
+    public function remisiones_obtener_series_documento(Request $request){
+        if($request->ajax()){
+            $data = Serie::where('Documento', 'Remisiones')->where('Usuario', Auth::user()->user)->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''.$data->Serie.'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+    //obtener ultimo folio de la serie seleccionada
+    public function remisiones_obtener_ultimo_folio_serie_seleccionada(Request $request){
+        $folio = Helpers::ultimofolioserietablamodulos('App\Remision',$request->Serie);
+        return response()->json($folio);
+    }
     //obtener ultimo folio
-    public function remisiones_obtener_ultimo_folio(){
-        $folio = Helpers::ultimofoliotablamodulos('App\Remision');
+    public function remisiones_obtener_ultimo_folio(Request $request){
+        $folio = Helpers::ultimofolioserietablamodulos('App\Remision',$request->serie);
         return response()->json($folio);
     }
 
@@ -270,9 +301,9 @@ class RemisionController extends ConfiguracionSistemaController{
 
     //guardar
     public function remisiones_guardar(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         //obtener el ultimo folio de la tabla
-        $folio = Helpers::ultimofoliotablamodulos('App\Remision');
+        $folio = Helpers::ultimofolioserietablamodulos('App\Remision',$request->serie);
         //INGRESAR DATOS A TABLA ORDEN COMPRA
         $remision = $folio.'-'.$request->serie;
         $Remision = new Remision;
@@ -563,7 +594,7 @@ class RemisionController extends ConfiguracionSistemaController{
             "numerodetallesremision" => $numerodetallesremision,
             "contadorproductos" => $contadorproductos,
             "contadorfilas" => $contadorfilas,
-            "fecha" => Helpers::formatoinputdate($remision->Fecha),
+            "fecha" => Helpers::formatoinputdatetime($remision->Fecha),
             "importe" => Helpers::convertirvalorcorrecto($remision->Importe),
             "descuento" => Helpers::convertirvalorcorrecto($remision->Descuento),
             "subtotal" => Helpers::convertirvalorcorrecto($remision->SubTotal),
@@ -581,7 +612,7 @@ class RemisionController extends ConfiguracionSistemaController{
 
     //cambios
     public function remisiones_guardar_modificacion(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         $remision = $request->folio.'-'.$request->serie;
         $Remision = Remision::where('Remision', $remision)->first();
         //validar si las partidas en las modiifcacion son las mismas que los detalles de los traspasos

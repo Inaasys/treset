@@ -197,25 +197,35 @@ function obtenerclientes(){
 } 
 //seleccionar cliente
 function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapago, clavemetodopago, metodopago, claveusocfdi, usocfdi, claveresidenciafiscal, residenciafiscal){
-    $("#numerocliente").val(Numero);
-    $("#numeroclienteanterior").val(Numero);
-    $("#cliente").val(Nombre);
-    $("#textonombrecliente").html(Nombre.substring(0, 40));
-    $("#rfccliente").val(Rfc);
-    //datos pestaña receptor o cliente
-    $("#receptorrfc").val(Rfc);
-    $("#receptornombre").val(Nombre);
-    $("#claveformapago").val(claveformapago);
-    $("#claveformapagoanterior").val(claveformapago);
-    $("#formapago").val(formapago);
-    $("#textonombreformapago").html(formapago.substring(0, 40));
-    $("#btnlistarfacturas").show();
-    var tipooperacion = $("#tipooperacion").val();
+    $('.page-loader-wrapper').css('display', 'block');
+    var numeroclienteanterior = $("#numeroclienteanterior").val();
     var numerocliente = Numero;
-    $.get(cuentas_por_cobrar_obtener_facturas_cliente, {numerocliente:numerocliente,tipooperacion:tipooperacion}, function(data){
-        $("#tabladetallesfacturas tbody").html(data.filasfacturas);
-    });
-    mostrarformulario();
+    if(numeroclienteanterior != numerocliente){ 
+        $("#numerocliente").val(Numero);
+        $("#numeroclienteanterior").val(Numero);
+        $("#cliente").val(Nombre);
+        if(Nombre != null){
+            $("#textonombrecliente").html(Nombre.substring(0, 40));
+        }
+        $("#rfccliente").val(Rfc);
+        //datos pestaña receptor o cliente
+        $("#receptorrfc").val(Rfc);
+        $("#receptornombre").val(Nombre);
+        $("#claveformapago").val(claveformapago);
+        $("#claveformapagoanterior").val(claveformapago);
+        $("#formapago").val(formapago);
+        if(formapago != null){
+            $("#textonombreformapago").html(formapago.substring(0, 40));            
+        }
+        $("#btnlistarfacturas").show();
+        var tipooperacion = $("#tipooperacion").val();
+        var numerocliente = Numero;
+        $.get(cuentas_por_cobrar_obtener_facturas_cliente, {numerocliente:numerocliente,tipooperacion:tipooperacion}, function(data){
+            $("#tabladetallesfacturas tbody").html(data.filasfacturas);
+            $('.page-loader-wrapper').css('display', 'none');
+        });
+        mostrarformulario();
+    }
 }
 //obtener registros de almacenes
 function obtenerbancos(){
@@ -278,11 +288,17 @@ function obtenerbancos(){
       }); 
 } 
 function seleccionarbanco(Numero, Nombre){
-    $("#numerobanco").val(Numero);
-    $("#numerobancoanterior").val(Numero);
-    $("#banco").val(Nombre);
-    $("#textonombrebanco").html(Nombre.substring(0, 40));
-    mostrarformulario();
+    var numerobancoanterior = $("#numerobancoanterior").val();
+    var numerobanco = Numero;
+    if(numerobancoanterior != numerobanco){
+        $("#numerobanco").val(Numero);
+        $("#numerobancoanterior").val(Numero);
+        $("#banco").val(Nombre);
+        if(Nombre != null){
+            $("#textonombrebanco").html(Nombre.substring(0, 40));
+        }
+        mostrarformulario();
+    }
 }
 //obtener lugares expedicion
 function obtenerlugaresexpedicion(){
@@ -348,16 +364,22 @@ function obtenerlugaresexpedicion(){
         },
         
     });
-  } 
-  //seleccionar lugar expedicion
-  function seleccionarlugarexpedicion(Clave){
-    $("#lugarexpedicion").val(Clave);
-    $("#lugarexpedicionanterior").val(Clave);
-    $("#textonombrelugarexpedicion").html(Clave.substring(0, 40));
-    mostrarformulario();
-  }
-  //obtener regimenes fiscales
-  function obtenerregimenesfiscales(){
+} 
+//seleccionar lugar expedicion
+function seleccionarlugarexpedicion(Clave){
+    var lugarexpedicionanterior = $("#lugarexpedicionanterior").val();
+    var lugarexpedicion = Clave;
+    if(lugarexpedicionanterior != lugarexpedicion){
+        $("#lugarexpedicion").val(Clave);
+        $("#lugarexpedicionanterior").val(Clave);
+        if(Clave != null){
+            $("#textonombrelugarexpedicion").html(Clave.substring(0, 40));
+        }
+        mostrarformulario();
+    }
+}
+//obtener regimenes fiscales
+function obtenerregimenesfiscales(){
     ocultarformulario();
     var tablaregimenesfiscales ='<div class="modal-header bg-red">'+
                                   '<h4 class="modal-title">Regimenes Fiscales</h4>'+
@@ -419,17 +441,23 @@ function obtenerlugaresexpedicion(){
         },
         
     });
-  } 
-  //seleccionar lugar expedicion
-  function seleccionarregimenfiscal(Clave, Nombre){
-    $("#claveregimenfiscal").val(Clave);
-    $("#claveregimenfiscalanterior").val(Clave);
-    $("#regimenfiscal").val(Nombre);
-    $("#textonombreregimenfiscal").html(Nombre.substring(0, 40));
-    mostrarformulario();
-  }
-  //obtener tipos relacion
-  function obtenertiposrelaciones(){
+} 
+//seleccionar lugar expedicion
+function seleccionarregimenfiscal(Clave, Nombre){
+    var claveregimenfiscalanterior = $("#claveregimenfiscalanterior").val();
+    var claveregimenfiscal = Clave;
+    if(claveregimenfiscalanterior != claveregimenfiscal){
+        $("#claveregimenfiscal").val(Clave);
+        $("#claveregimenfiscalanterior").val(Clave);
+        $("#regimenfiscal").val(Nombre);
+        if(Nombre != null){
+            $("#textonombreregimenfiscal").html(Nombre.substring(0, 40));
+        }
+        mostrarformulario();
+    }
+}
+//obtener tipos relacion
+function obtenertiposrelaciones(){
     ocultarformulario();
     var tablatiposrelaciones ='<div class="modal-header bg-red">'+
                                   '<h4 class="modal-title">Tipos Relación</h4>'+
@@ -487,17 +515,23 @@ function obtenerlugaresexpedicion(){
         },
         
     });
-  } 
-  //seleccionar lugar expedicion
-  function seleccionartiporelacion(Clave, Nombre){
-    $("#clavetiporelacion").val(Clave);
-    $("#clavetiporelacionanterior").val(Clave);
-    $("#tiporelacion").val(Nombre);
-    $("#textonombretiporelacion").html(Nombre.substring(0, 40));
-    mostrarformulario();
-  }
-  //obtener formas de pago
-  function obtenerformaspago(){
+} 
+//seleccionar lugar expedicion
+function seleccionartiporelacion(Clave, Nombre){
+    var clavetiporelacionanterior = $("#clavetiporelacionanterior").val();
+    var clavetiporelacion = Clave;
+    if(clavetiporelacionanterior != clavetiporelacion){
+        $("#clavetiporelacion").val(Clave);
+        $("#clavetiporelacionanterior").val(Clave);
+        $("#tiporelacion").val(Nombre);
+        if(Nombre != null){
+            $("#textonombretiporelacion").html(Nombre.substring(0, 40));
+        }
+        mostrarformulario();
+    }
+}
+//obtener formas de pago
+function obtenerformaspago(){
     ocultarformulario();
     var tablaformaspago ='<div class="modal-header bg-red">'+
                                   '<h4 class="modal-title">Formas Pago</h4>'+
@@ -557,15 +591,21 @@ function obtenerlugaresexpedicion(){
         },
         
     });
-  } 
-  //seleccionar forma pago
-  function seleccionarformapago(Clave, Nombre){
-    $("#claveformapago").val(Clave);
-    $("#claveformapagoanterior").val(Clave);
-    $("#formapago").val(Nombre);
-    $("#textonombreformapago").html(Nombre.substring(0, 40));
-    mostrarformulario();
-  }
+} 
+//seleccionar forma pago
+function seleccionarformapago(Clave, Nombre){
+    var claveformapagoanterior = $("#claveformapagoanterior").val();
+    var claveformapago = Clave;
+    if(claveformapagoanterior != claveformapago){
+        $("#claveformapago").val(Clave);
+        $("#claveformapagoanterior").val(Clave);
+        $("#formapago").val(Nombre);
+        if(Nombre != null){
+            $("#textonombreformapago").html(Nombre.substring(0, 40));
+        }
+        mostrarformulario();
+    }
+}
 //listar metodos pago
 function listarmetodospago(fila){
     ocultarformulario();
@@ -714,26 +754,35 @@ function seleccionarfoliofiscal(Serie, Esquema){
 }
 //obtener por numero
 function obtenerclientepornumero(){
-    if($("#numerocliente").parsley().isValid()){
-        var numerocliente = $("#numerocliente").val();
-        var tipooperacion = $("#tipooperacion").val();
-        $.get(cuentas_por_cobrar_obtener_cliente_por_numero, {numerocliente:numerocliente,tipooperacion:tipooperacion}, function(data){
-            $("#numerocliente").val(data.numero);
-            $("#numeroclienteanterior").val(data.numero);
-            $("#cliente").val(data.nombre);
-            $("#textonombrecliente").html(data.nombre.substring(0, 40));
-            $("#rfccliente").val(data.rfc);
-            //datos pestaña receptor o cliente
-            $("#receptorrfc").val(data.rfc);
-            $("#receptornombre").val(data.nombre);
-            $("#claveformapago").val(data.claveformapago);
-            $("#claveformapagoanterior").val(data.claveformapago);
-            $("#formapago").val(data.formapago);
-            $("#textonombreformapago").html(data.formapago.substring(0, 40));
-            $("#btnlistarfacturas").show();
-            $("#tabladetallesfacturas tbody").html(data.filasfacturas);
-            mostrarformulario(); 
-        }) 
+    $('.page-loader-wrapper').css('display', 'block');
+    var numeroclienteanterior = $("#numeroclienteanterior").val();
+    var numerocliente = $("#numerocliente").val();
+    if(numeroclienteanterior != numerocliente){
+        if($("#numerocliente").parsley().isValid()){
+            var tipooperacion = $("#tipooperacion").val();
+            $.get(cuentas_por_cobrar_obtener_cliente_por_numero, {numerocliente:numerocliente,tipooperacion:tipooperacion}, function(data){
+                $("#numerocliente").val(data.numero);
+                $("#numeroclienteanterior").val(data.numero);
+                $("#cliente").val(data.nombre);
+                if(data.nombre != null){
+                    $("#textonombrecliente").html(data.nombre.substring(0, 40));
+                }
+                $("#rfccliente").val(data.rfc);
+                //datos pestaña receptor o cliente
+                $("#receptorrfc").val(data.rfc);
+                $("#receptornombre").val(data.nombre);
+                $("#claveformapago").val(data.claveformapago);
+                $("#claveformapagoanterior").val(data.claveformapago);
+                $("#formapago").val(data.formapago);
+                if(data.formapago != null){
+                    $("#textonombreformapago").html(data.formapago.substring(0, 40));
+                }
+                $("#btnlistarfacturas").show();
+                $("#tabladetallesfacturas tbody").html(data.filasfacturas);
+                mostrarformulario(); 
+                $('.page-loader-wrapper').css('display', 'none');
+            }) 
+        }
     }
   }
 //regresar numero
@@ -743,15 +792,20 @@ function regresarnumerocliente(){
 }
 //obtener por numero
 function obtenerbancopornumero(){
-    if($("#numerobanco").parsley().isValid()){
-        var numerobanco = $("#numerobanco").val();
-        $.get(cuentas_por_cobrar_obtener_banco_por_numero, {numerobanco:numerobanco}, function(data){
-            $("#numerobanco").val(data.numero);
-            $("#numerobancoanterior").val(data.numero);
-            $("#banco").val(data.nombre);
-            $("#textonombrebanco").html(data.nombre.substring(0, 40));
-            mostrarformulario();
-        }) 
+    var numerobancoanterior = $("#numerobancoanterior").val();
+    var numerobanco = $("#numerobanco").val();
+    if(numerobancoanterior != numerobanco){
+        if($("#numerobanco").parsley().isValid()){
+            $.get(cuentas_por_cobrar_obtener_banco_por_numero, {numerobanco:numerobanco}, function(data){
+                $("#numerobanco").val(data.numero);
+                $("#numerobancoanterior").val(data.numero);
+                $("#banco").val(data.nombre);
+                if(data.nombre != null){
+                    $("#textonombrebanco").html(data.nombre.substring(0, 40));
+                }
+                mostrarformulario();
+            }) 
+        }
     }
 }
 //regresar numero
@@ -761,14 +815,19 @@ function regresarnumerobanco(){
 }
 //obtener por clave
 function obtenerlugarexpedicionporclave(){
-    if($("#lugarexpedicion").parsley().isValid()){
-        var lugarexpedicion = $("#lugarexpedicion").val();
-        $.get(cuentas_por_cobrar_obtener_lugar_expedicion_por_clave, {lugarexpedicion:lugarexpedicion}, function(data){
-          $("#lugarexpedicion").val(data.clave);
-          $("#lugarexpedicionanterior").val(data.clave);
-          $("#textonombrelugarexpedicion").html(data.estado.substring(0, 40));
-          mostrarformulario();
-        }) 
+    var lugarexpedicionanterior = $("#lugarexpedicionanterior").val();
+    var lugarexpedicion = $("#lugarexpedicion").val();
+    if(lugarexpedicionanterior != lugarexpedicion){
+        if($("#lugarexpedicion").parsley().isValid()){
+            $.get(cuentas_por_cobrar_obtener_lugar_expedicion_por_clave, {lugarexpedicion:lugarexpedicion}, function(data){
+            $("#lugarexpedicion").val(data.clave);
+            $("#lugarexpedicionanterior").val(data.clave);
+            if(data.estado != null){
+                $("#textonombrelugarexpedicion").html(data.estado.substring(0, 40));
+            }
+            mostrarformulario();
+            }) 
+        }
     }
 }
 //regresar clave
@@ -778,15 +837,20 @@ function regresarclavelugarexpedicion(){
 }
 //obtener por clave
 function obtenerregimenfiscalporclave(){
-    if($("#claveregimenfiscal").parsley().isValid()){
-        var claveregimenfiscal = $("#claveregimenfiscal").val();
-        $.get(cuentas_por_cobrar_obtener_regimen_fiscal_por_clave, {claveregimenfiscal:claveregimenfiscal}, function(data){
-          $("#claveregimenfiscal").val(data.clave);
-          $("#claveregimenfiscalanterior").val(data.clave);
-          $("#regimenfiscal").val(data.nombre);
-          $("#textonombreregimenfiscal").html(data.nombre.substring(0, 40));
-          mostrarformulario();
-        }) 
+    var claveregimenfiscalanterior = $("#claveregimenfiscalanterior").val();
+    var claveregimenfiscal = $("#claveregimenfiscal").val();
+    if(claveregimenfiscalanterior != claveregimenfiscal){
+        if($("#claveregimenfiscal").parsley().isValid()){
+            $.get(cuentas_por_cobrar_obtener_regimen_fiscal_por_clave, {claveregimenfiscal:claveregimenfiscal}, function(data){
+            $("#claveregimenfiscal").val(data.clave);
+            $("#claveregimenfiscalanterior").val(data.clave);
+            $("#regimenfiscal").val(data.nombre);
+            if(data.nombre != null){
+                $("#textonombreregimenfiscal").html(data.nombre.substring(0, 40));
+            }
+            mostrarformulario();
+            }) 
+        }
     }
 }
 //regresar clave
@@ -796,15 +860,20 @@ function regresarclaveregimenfiscal(){
 }
 //obtener por clave
 function obtenertiporelacionporclave(){
-    if($("#clavetiporelacion").parsley().isValid()){
-        var clavetiporelacion = $("#clavetiporelacion").val();
-        $.get(cuentas_por_cobrar_obtener_tipo_relacion_por_clave, {clavetiporelacion:clavetiporelacion}, function(data){
-          $("#clavetiporelacion").val(data.clave);
-          $("#clavetiporelacionanterior").val(data.clave);  
-          $("#tiporelacion").val(data.nombre);
-          $("#textonombretiporelacion").html(data.nombre.substring(0, 40));
-          mostrarformulario();
-        }) 
+    var clavetiporelacionanterior = $("#clavetiporelacionanterior").val();
+    var clavetiporelacion = $("#clavetiporelacion").val();
+    if(clavetiporelacionanterior != clavetiporelacion){
+        if($("#clavetiporelacion").parsley().isValid()){
+            $.get(cuentas_por_cobrar_obtener_tipo_relacion_por_clave, {clavetiporelacion:clavetiporelacion}, function(data){
+            $("#clavetiporelacion").val(data.clave);
+            $("#clavetiporelacionanterior").val(data.clave);  
+            $("#tiporelacion").val(data.nombre);
+            if(data.nombre != null){
+                $("#textonombretiporelacion").html(data.nombre.substring(0, 40));
+            }
+            mostrarformulario();
+            }) 
+        }
     }
 }
 //regresar clave
@@ -814,15 +883,20 @@ function regresarclavetiporelacion(){
 }
 //obtener por clave
 function obtenerformapagoporclave(){
-    if($("#claveformapago").parsley().isValid()){
-        var claveformapago = $("#claveformapago").val();
-        $.get(cuentas_por_cobrar_obtener_forma_pago_por_clave, {claveformapago:claveformapago}, function(data){
-          $("#claveformapago").val(data.clave);
-          $("#claveformapagoanterior").val(data.clave);
-          $("#formapago").val(data.nombre);
-          $("#textonombreformapago").html(data.nombre.substring(0, 40));
-          mostrarformulario();
-        }) 
+    var claveformapagoanterior = $("#claveformapagoanterior").val();
+    var claveformapago = $("#claveformapago").val();
+    if(claveformapagoanterior != claveformapago){
+        if($("#claveformapago").parsley().isValid()){
+            $.get(cuentas_por_cobrar_obtener_forma_pago_por_clave, {claveformapago:claveformapago}, function(data){
+            $("#claveformapago").val(data.clave);
+            $("#claveformapagoanterior").val(data.clave);
+            $("#formapago").val(data.nombre);
+            if(data.nombre != null){
+                $("#textonombreformapago").html(data.nombre.substring(0, 40));
+            }
+            mostrarformulario();
+            }) 
+        }
     }
 }
 //regresar clave
@@ -1352,10 +1426,11 @@ function alta(){
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
     e.preventDefault();
-    var formData = new FormData($("#formparsley")[0]);
     var form = $("#formparsley");
     if (form.parsley().isValid()){
-            $('.page-loader-wrapper').css('display', 'block');
+        $('.page-loader-wrapper').css('display', 'block');
+        enviarfilasutilizadas().then(resultado=>{
+            var formData = new FormData($("#formparsley")[0]);
             $.ajax({
                 headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                 url:cuentas_por_cobrar_guardar,
@@ -1381,12 +1456,30 @@ $("#btnGuardar").on('click', function (e) {
                     $('.page-loader-wrapper').css('display', 'none');
                 }
             })
+        })
     }else{
         msjfaltandatosporcapturar();
     }
     //validar formulario
     form.parsley().validate();
 });
+//funcion asincrona para buscar existencias de la partida
+function enviarfilasutilizadas(){
+    return new Promise((ejecuta)=>{
+        setTimeout(function(){ 
+            var cuentaFilas = 0;
+            $("tr.filasfacturas").each(function () {
+                var abonopesosfacturapartida = $(".abonopesosfacturapartida", this).val();
+                if(parseFloat(abonocompra) == parseFloat(0) || parseFloat(abonocompra) < parseFloat(0)){
+                    $("#filafactura"+cuentaFilas).remove();
+                }
+                cuentaFilas++;
+            }); 
+            var resultado = true;
+            return ejecuta(resultado);
+        },1000);
+    })
+}
 //verificar si la orden de compra se esta utilzando en alguna orden de compra
 function desactivar(cxcdesactivar){
     $.get(cuentas_por_cobrar_comprobar_baja,{cxcdesactivar:cxcdesactivar}, function(data){
@@ -1406,7 +1499,8 @@ function desactivar(cxcdesactivar){
             }else{
                 $("#cxcdesactivar").val(cxcdesactivar);
                 $("#divmotivobaja").show();
-                $("#textomodaldesactivar").html('Estas seguro de dar de baja el registro?');
+                $("#btnbaja").show();
+                $("#textomodaldesactivar").html('Estas seguro de dar de baja la cuenta por cobrar? No'+ cxcdesactivar);
                 $('#estatusregistro').modal('show');
             }
         }
@@ -1721,12 +1815,16 @@ function obtenerdatos(cxcmodificar){
     $("#fecha").val(data.fecha);
     $("#fechaaplicacionpagos").val(data.fechapago);
     $("#cliente").val(data.cliente.Nombre);
-    $("#textonombrecliente").html(data.cliente.Nombre.substring(0, 40));
-    $("#numerocliente").val(data.cliente.Numero).attr('readonly', 'readonly');
+    if(data.cliente.Nombre != null){
+        $("#textonombrecliente").html(data.cliente.Nombre.substring(0, 40));
+    }
+    $("#numerocliente").val(data.cliente.Numero);
     $("#numeroclienteanterior").val(data.cliente.Numero);
     $("#rfccliente").val(data.cliente.Rfc);
     $("#banco").val(data.banco.Nombre);
-    $("#textonombrebanco").html(data.banco.Nombre.substring(0, 40));
+    if(data.banco.Nombre != null){
+        $("#textonombrebanco").html(data.banco.Nombre.substring(0, 40));
+    }
     $("#numerobanco").val(data.banco.Numero);
     $("#numerobancoanterior").val(data.banco.Numero);
     $("#moneda").val(data.cuentaxcobrar.Moneda).change();
@@ -1736,17 +1834,23 @@ function obtenerdatos(cxcmodificar){
     $("#lugarexpedicion").val(data.cuentaxcobrar.LugarExpedicion);
     $("#lugarexpedicionanterior").val(data.cuentaxcobrar.LugarExpedicion);
     $("#regimenfiscal").val(data.regimenfiscal.Nombre);
-    $("#textonombreregimenfiscal").html(data.regimenfiscal.Nombre);
+    if(data.regimenfiscal.Nombre != null){
+        $("#textonombreregimenfiscal").html(data.regimenfiscal.Nombre.substring(0, 40));
+    }
     $("#claveregimenfiscal").val(data.regimenfiscal.Clave);
     $("#claveregimenfiscalanterior").val(data.regimenfiscal.Clave);
     $("#tiporelacion").val(data.tiporelacion.Nombre);
-    $("#textonombretiporelacion").html(data.tiporelacion.Nombre);
+    if(data.tiporelacion.Nombre != null){
+        $("#textonombretiporelacion").html(data.tiporelacion.Nombre.substring(0, 40));
+    }
     $("#clavetiporelacion").val(data.tiporelacion.Clave);
     $("#clavetiporelacionanterior").val(data.tiporelacion.Clave);
     $("#receptorrfc").val(data.cuentaxcobrar.ReceptorRfc);
     $("#receptornombre").val(data.cuentaxcobrar.ReceptorNombre);
     $("#formapago").val(data.formapago.Nombre);
-    $("#textonombreformapago").html(data.formapago.Nombre);
+    if(data.formapago.Nombre != null){
+        $("#textonombreformapago").html(data.formapago.Nombre.substring(0, 40));
+    }
     $("#claveformapago").val(data.formapago.Clave);
     $("#claveformapagoanterior").val(data.formapago.Clave);
     $("#anotacion").val(data.cuentaxcobrar.Anotacion);
@@ -1761,14 +1865,6 @@ function obtenerdatos(cxcmodificar){
     //reiniciar contadores
     contadorproductos=data.contadorproductos;
     contadorfilas = data.contadorfilas;
-    //activar busqueda para clientes
-    $('#numerocliente').on('keypress', function(e) {
-        //recomentable para mayor compatibilidad entre navegadores.
-        var code = (e.keyCode ? e.keyCode : e.which);
-        if(code==13){
-        obtenerclientepornumero();
-        }
-    });
     //regresar numero cliente
     $('#numerocliente').on('change', function(e) {
         regresarnumerocliente();

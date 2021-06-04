@@ -56,14 +56,25 @@ class ProductoController extends ConfiguracionSistemaController{
             $data = VistaProducto::select($this->campos_consulta)->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        if($data->Status == 'ALTA'){
-                            $boton =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Codigo .'\')"><i class="material-icons">mode_edit</i></div> '. 
-                                        '<div class="btn bg-red btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Codigo .'\')"><i class="material-icons">cancel</i></div>';
+                        $operaciones = '<div class="dropdown">'.
+                                            '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                                                'OPERACIONES <span class="caret"></span>'.
+                                            '</button>'.
+                                            '<ul class="dropdown-menu">'.
+                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Codigo .'\')">Cambios</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Codigo .'\')">Bajas</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="obtenerkardex(\''.$data->Codigo .'\','.$data->Almacen.')">Ver Movimientos</a></li>'.
+                                            '</ul>'.
+                                        '</div>';
+                        /*if($data->Status == 'ALTA'){
+                            $operaciones =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Codigo .'\')"><i class="material-icons">mode_edit</i></div> '. 
+                                        '<div class="btn bg-red btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Codigo .'\')"><i class="material-icons">cancel</i></div> '.
+                                        '<div class="btn bg-light-blue btn-xs waves-effect" data-toggle="tooltip" title="Ver Movimientos" onclick="obtenerkardex(\''.$data->Codigo .'\','.$data->Almacen.')"><i class="material-icons">chrome_reader_mode</i></div> ';
                         }else{
-                            $boton = '';
-                            //$boton =    '<div class="btn bg-green btn-xs waves-effect" onclick="desactivar(\''.$data->Codigo .'\')">Altas</div>';
-                        } 
-                        return $boton;
+                            $operaciones = '';
+                            //$operaciones =    '<div class="btn bg-green btn-xs waves-effect" onclick="desactivar(\''.$data->Codigo .'\')">Altas</div>';
+                        } */
+                        return $operaciones;
                     })
                     ->addColumn('Existencias', function($data){ return $data->Existencias; })
                     ->addColumn('Costo', function($data){ return $data->Costo; })
@@ -570,6 +581,82 @@ class ProductoController extends ConfiguracionSistemaController{
         } 
     	return response()->json($Producto); 
     }
+
+    //obtener kardex
+    public function productos_obtener_kardex(Request $request){
+        $almacenes = Almacen::where('Status', 'ALTA')->get();
+        $selectalmacenes = "<option selected disabled hidden>Selecciona el almacén</option>";
+        foreach($almacenes as $a){
+            if($a->Numero == $request->almacen){
+                $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.' Selected>'.$a->Nombre;
+            }else{
+                $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.'>'.$a->Nombre;
+            }
+        }
+        $kardex = DB::select('exec ObtenerKardex ?,?', array($request->codigo,$request->almacen));
+        $nummovimiento = 1;
+        $entradas = 0;
+        $salidas = 0;
+        $existencias = 0;
+        $numerodecimalesconfigurados = config('app.numerodedecimales');
+
+        $data = array();
+        foreach(array_reverse($kardex) as $k){
+            $entradas = $entradas + $k->Entradas;
+            $salidas = $salidas + $k->Salidas;
+            $existencias = $existencias + $k->Entradas - $k->Salidas;
+            $colorfila = '';
+            if($k->Status == 'BAJA'){
+                $colorfila = 'bg-red';
+            }
+            $data[]=array(
+                "colorfila"=>$colorfila,
+                "nummovimiento"=>$nummovimiento,
+                "documento"=>$k->Documento,
+                "movimiento"=>$k->Movimiento,
+                "fecha"=>Helpers::fecha_espanol($k->Fecha),
+                "almacen" => Helpers::convertirvalorcorrecto($k->Almacen),
+                "entradas"=> Helpers::convertirvalorcorrecto($k->Entradas),
+                "salidas" => Helpers::convertirvalorcorrecto($k->Salidas),
+                "existencias"=> round($existencias, $numerodecimalesconfigurados),
+                "costo"=>Helpers::convertirvalorcorrecto($k->Costo),
+                "status"=>$k->Status
+            );
+            $nummovimiento++;
+        }
+        $filasmovimientos = "";
+        $primerfila = 0;
+        foreach(array_reverse($data) as $d){
+            if($primerfila == 0){
+                $colorfilaex = 'bg-amber font-bold col-pink';
+            }else{
+                $colorfilaex = '';
+            }
+            $filasmovimientos= $filasmovimientos.
+            '<tr class="'.$d['colorfila'].'">'.
+                '<td><b>'.$d['nummovimiento'].'</b></td>'.
+                '<td>'.$d['documento'].'</td>'.
+                '<td>'.$d['movimiento'].'</td>'.
+                '<td>'.$d['fecha'].'</td>'.
+                '<td>'.$d['almacen'].'</td>'.
+                '<td>'.$d['entradas'].'</td>'.
+                '<td>'.$d['salidas'].'</td>'.
+                '<td class="'.$colorfilaex.'">'.$d['existencias'].'</td>'.
+                '<td>'.$d['costo'].'</td>'.
+                '<td>'.$d['status'].'</td>'.
+            '</tr>';
+            $primerfila++;
+        }
+        $data = array(
+            'filasmovimientos' => $filasmovimientos,
+            'entradas' => Helpers::convertirvalorcorrecto($entradas),
+            'salidas' => Helpers::convertirvalorcorrecto($salidas),
+            'existencias' => Helpers::convertirvalorcorrecto($existencias),
+            'selectalmacenes' => $selectalmacenes,
+        );
+        return response()->json($data);
+    }
+
     //exportar a excel
     public function productos_exportar_excel(){
         ini_set('max_execution_time', 300); // 5 minutos

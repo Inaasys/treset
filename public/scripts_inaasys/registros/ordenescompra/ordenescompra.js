@@ -9,15 +9,22 @@ function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1000));
 }
 function asignarfechaactual(){
+    /*
     var fechahoy = new Date();
     var dia = ("0" + fechahoy.getDate()).slice(-2);
     var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
     var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia) ;
     $('#fecha').val(hoy);
+    $('input[type=datetime-local]').val(new Date().toJSON().slice(0,19));
+    */
+  $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechadatetimelocal){
+    $("#fecha").val(fechadatetimelocal);
+  }) 
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
-  $.get(ordenes_compra_obtener_ultimo_folio, function(folio){
+  var serie = $("#serie").val();
+  $.get(ordenes_compra_obtener_ultimo_folio,{serie:serie}, function(folio){
     $("#folio").val(folio);
   })  
 }
@@ -33,16 +40,6 @@ function limpiar(){
   form.parsley().reset();
   //volver a aplicar configuracion a datatable principal para que realize la busqueda con la tecla enter
   regresarbusquedadatatableprincipal();
-}
-//validar si se debe mostrar o no el buscador de productos
-function mostrarbuscadorcodigoproducto(){
-  var almacen = $("#almacen").val();
-  var proveedor = $("#proveedor").val();
-  if(almacen != "" && proveedor != ""){
-    $("#divbuscarcodigoproducto").show();
-  }else{
-    $("#divbuscarcodigoproducto").hide();
-  }
 }
 //mostrar modal formulario
 function mostrarmodalformulario(tipo, modificacionpermitida){
@@ -136,10 +133,80 @@ function listar(){
   });
 }
 //obtener tipos ordenes de compra
-function obtenertiposordenescompra(){
-    $.get(ordenes_compra_obtener_tipos_ordenes_compra, function(select_tipos_ordenes_compra){
-      $("#tipo").html(select_tipos_ordenes_compra);
-    })  
+function obtenertiposordenescompra(tipoalta){
+  $.get(ordenes_compra_obtener_tipos_ordenes_compra, {tipoalta:tipoalta}, function(select_tipos_ordenes_compra){
+    $("#tipo").html(select_tipos_ordenes_compra);
+  })  
+}
+//obtener series documento
+function obtenerseriesdocumento(){
+  ocultarformulario();
+  var seriedefault = 'A';
+  var tablaseriesdocumento= '<div class="modal-header bg-red">'+
+                              '<h4 class="modal-title">Series Documento &nbsp;&nbsp; <div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''+seriedefault+'\')">Asignar Serie Default (A)</div></h4>'+
+                            '</div>'+
+                            '<div class="modal-body">'+
+                              '<div class="row">'+
+                                '<div class="col-md-12">'+
+                                  '<div class="table-responsive">'+
+                                    '<table id="tbllistadoseriedocumento" class="tbllistadoseriedocumento table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                      '<thead class="customercolor">'+
+                                        '<tr>'+
+                                          '<th>Operaciones</th>'+
+                                          '<th>Serie</th>'+
+                                          '<th>Documento</th>'+
+                                          '<th>Nombre</th>'+
+                                        '</tr>'+
+                                      '</thead>'+
+                                      '<tbody></tbody>'+
+                                    '</table>'+
+                                  '</div>'+
+                                '</div>'+   
+                              '</div>'+
+                            '</div>'+
+                            '<div class="modal-footer">'+
+                              '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                            '</div>';  
+  $("#contenidomodaltablas").html(tablaseriesdocumento);
+  var t = $('#tbllistadoseriedocumento').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
+      "sScrollX": "110%",
+      "sScrollY": "370px",
+      "bScrollCollapse": true,  
+      processing: true,
+      'language': {
+        'loadingRecords': '&nbsp;',
+        'processing': '<div class="spinner"></div>'
+      },
+      serverSide: true,
+      ajax: {
+        url: ordenes_compra_obtener_series_documento
+      },
+      columns: [
+          { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+          { data: 'Serie', name: 'Serie' },
+          { data: 'Documento', name: 'Documento' },
+          { data: 'Nombre', name: 'Nombre' }
+      ],
+      "initComplete": function() {
+        var $buscar = $('div.dataTables_filter input');
+        $buscar.unbind();
+        $buscar.bind('keyup change', function(e) {
+            if(e.keyCode == 13 || this.value == "") {
+              $('#tbllistadoseriedocumento').DataTable().search( this.value ).draw();
+            }
+        });
+      },
+  });  
+}
+function seleccionarseriedocumento(Serie){
+    $.get(ordenes_compra_obtener_ultimo_folio_serie_seleccionada, {Serie:Serie}, function(folio){
+      $("#folio").val(folio);
+      $("#serie").val(Serie);
+      $("#serietexto").html("Serie: "+Serie);
+      mostrarformulario();
+    }) 
 }
 //obtener registros de proveedores
 function obtenerproveedores(){
@@ -282,7 +349,6 @@ function seleccionarproveedor(Numero, Nombre, Plazo){
     //colocar el plazo del proveedor
     $("#plazo").val(Plazo);
     mostrarformulario();
-    mostrarbuscadorcodigoproducto();
   }
 }
 function seleccionaralmacen(Numero, Nombre){
@@ -296,20 +362,87 @@ function seleccionaralmacen(Numero, Nombre){
       $("#textonombrealmacen").html(Nombre.substring(0, 60));
     }
     mostrarformulario();
-    mostrarbuscadorcodigoproducto();
   }
 }
-//activar busquedas al presionar enter
-$(document).ready(function(){
-  //activar busqueda de codigos
-  $("#codigoabuscar").keypress(function(e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        listarproductos();
-      }
-  });
-});
+function obtenerordenestrabajo(){
+  ocultarformulario();
+  var tablaordenes = '<div class="modal-header bg-red">'+
+                            '<h4 class="modal-title">Ordenes de Trabajo</h4>'+
+                        '</div>'+
+                        '<div class="modal-body">'+
+                            '<div class="row">'+
+                                '<div class="col-md-12">'+
+                                    '<div class="table-responsive">'+
+                                        '<table id="tbllistadorden" class="tbllistadorden table table-bordered table-striped table-hover" style="width:100% !important">'+
+                                            '<thead class="customercolor">'+
+                                                '<tr>'+
+                                                    '<th>Operaciones</th>'+
+                                                    '<th>Orden</th>'+
+                                                    '<th>Fecha</th>'+
+                                                    '<th>Cliente</th>'+
+                                                    '<th>Tipo</th>'+
+                                                    '<th>Unidad</th>'+
+                                                '</tr>'+
+                                            '</thead>'+
+                                            '<tbody></tbody>'+
+                                        '</table>'+
+                                    '</div>'+
+                                '</div>'+   
+                            '</div>'+
+                        '</div>'+
+                        '<div class="modal-footer">'+
+                            '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                        '</div>';
+    $("#contenidomodaltablas").html(tablaordenes);
+    $('#tbllistadorden').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,
+        processing: true,
+        'language': {
+            'loadingRecords': '&nbsp;',
+            'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+          url: ordenes_compra_obtener_ordenes_trabajo
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Orden', name: 'Orden' },
+            { data: 'Fecha', name: 'Fecha' },
+            { data: 'Cliente', name: 'Cliente' },
+            { data: 'Tipo', name: 'Tipo' },
+            { data: 'Unidad', name: 'Unidad' }
+        ],
+        "initComplete": function() {
+            var $buscar = $('div.dataTables_filter input');
+            $buscar.unbind();
+            $buscar.bind('keyup change', function(e) {
+                if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistadorden').DataTable().search( this.value ).draw();
+                }
+            });
+        },
+        
+    }); 
+} 
+//obtener datos de remision seleccionada
+function seleccionarordentrabajo(Orden, Fecha, Cliente, Tipo, Unidad, StatusOrden){
+  var ordentrabajoanterior = $("#ordentrabajoanterior").val();
+  var ordentrabajo = Orden;
+  if(ordentrabajoanterior != ordentrabajo){
+    //colocar datos de orden y required
+    $("#ordentrabajo").val(Orden).attr('required', 'required');
+    $("#ordentrabajoanterior").val(Orden).attr('required', 'required');
+    if(Orden != null){
+      $("#textonombreordentrabajo").html(Orden.substring(0, 40));
+    }
+    mostrarformulario();
+  }
+}
 //obtener por numero
 function obtenerproveedorpornumero(){
   var numeroproveedoranterior = $("#numeroproveedoranterior").val();
@@ -324,7 +457,6 @@ function obtenerproveedorpornumero(){
           $("#textonombreproveedor").html(data.nombre.substring(0, 60));
         }
         $("#plazo").val(data.plazo);
-        mostrarbuscadorcodigoproducto();
       }) 
     }
   }
@@ -347,7 +479,6 @@ function obteneralmacenpornumero(){
         if(data.nombre != null){
           $("#textonombrealmacen").html(data.nombre.substring(0, 60));
         }
-        mostrarbuscadorcodigoproducto();
       })  
     }
   }
@@ -356,6 +487,30 @@ function obteneralmacenpornumero(){
 function regresarnumeroalmacen(){
   var numeroalmacenanterior = $("#numeroalmacenanterior").val();
   $("#numeroalmacen").val(numeroalmacenanterior);
+}
+//obtener por folio
+function obtenerordenporfolio(){
+  var ordentrabajoanterior = $("#ordentrabajoanterior").val();
+  var ordentrabajo = $("#ordentrabajo").val();
+  if(ordentrabajoanterior != ordentrabajo){
+    if($("#ordentrabajo").parsley().isValid()){
+      $.get(ordenes_compra_obtener_orden_trabajo_por_folio, {ordentrabajo:ordentrabajo}, function(data){
+        console.log(data);
+        //colocar datos de orden y required
+        $("#ordentrabajo").val(data.orden).attr('required', 'required');
+        $("#ordentrabajoanterior").val(data.orden).attr('required', 'required');
+        if(data.orden != null){
+          $("#textonombreordentrabajo").html(data.orden.substring(0, 40));
+        }
+        mostrarformulario();
+      }) 
+    }
+  }
+}
+//regresar folio
+function regresarfolioorden(){
+  var ordentrabajoanterior = $("#ordentrabajoanterior").val();
+  $("#ordentrabajo").val(ordentrabajoanterior);
 }
 //listar productos para tab consumos
 function listarproductos(){
@@ -657,31 +812,36 @@ function renumerarfilasordencompra(){
   }
 }  
 //alta clientes
-function alta(){
-  $("#titulomodal").html('Alta Orden de Compra');
+function alta(tipoalta){
+  $("#titulomodal").html('Alta Orden de Compra ' + tipoalta);
   mostrarmodalformulario('ALTA', 1);
   mostrarformulario();
   //formulario alta
   var tabs ='<div class="col-md-12">'+
               '<div class="row">'+
                 '<div class="col-md-3">'+
-                  '<label>Orden <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
+                  '<label>Orden <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b> &nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
                   '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                   '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" data-parsley-length="[0, 10]" required readonly>'+
                   '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
                   '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
                 '</div>'+  
-                '<div class="col-md-3">'+
+                '<div class="col-md-2">'+
                   '<label>Plazo Días (proveedor)</label>'+
                   '<input type="text" class="form-control" name="plazo" id="plazo"  required>'+
                 '</div>'+
-                '<div class="col-md-3">'+
+                '<div class="col-md-2">'+
                   '<label>Referencia</label>'+
-                  '<input type="text" class="form-control" name="referencia" id="referencia" required data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+
+                  '<input type="text" class="form-control" name="referencia" id="referencia" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+
+                '</div>'+
+                '<div class="col-md-2">'+
+                  '<label>Tipo</label>'+
+                  '<select name="tipo" id="tipo" class="form-control select2" style="width:100% !important;" required>'+ 
+                  '</select>'+
                 '</div>'+
                 '<div class="col-xs-12 col-sm-12 col-md-3">'+
                   '<label>Fecha</label>'+
-                  '<input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" style="min-width:95%;">'+
+                  '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" style="min-width:95%;">'+
                   '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                 '</div>'+
               '</div>'+
@@ -708,7 +868,7 @@ function alta(){
                   '<table class="col-md-12">'+
                     '<tr>'+
                       '<td>'+
-                        '<div class="btn bg-blue waves-effect" onclick="obteneralmacenes()">Seleccionar</div>'+
+                        '<div class="btn bg-blue waves-effect" id="btnobteneralmacenes" onclick="obteneralmacenes()">Seleccionar</div>'+
                       '</td>'+
                       '<td>'+ 
                         '<div class="form-line">'+
@@ -720,16 +880,27 @@ function alta(){
                     '</tr>'+    
                   '</table>'+
                 '</div>'+
-                '<div class="col-md-4">'+
-                  '<label>Tipo</label>'+
-                  '<select name="tipo" id="tipo" class="form-control select2" style="width:100% !important;" required>'+ 
-                  '</select>'+
+                '<div class="col-md-4" id="divbuscarcodigoproducto">'+
+                  '<label>Buscar producto por código</label>'+
+                  '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
                 '</div>'+
               '</div>'+
               '<div class="row">'+
-                '<div class="col-md-4" id="divbuscarcodigoproducto">'+
-                    '<label>Buscar producto por código</label>'+
-                    '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                '<div class="col-md-4" id="busquedaordenestrabajo">'+
+                  '<label>Orden Trabajo <span class="label label-danger" id="textonombreordentrabajo"></span></label>'+
+                  '<table class="col-md-12">'+
+                    '<tr>'+
+                      '<td>'+
+                        '<div class="btn bg-blue waves-effect" id="btnobtenerordenestrabajo" onclick="obtenerordenestrabajo()">Seleccionar</div>'+
+                      '</td>'+
+                      '<td>'+ 
+                        '<div class="form-line">'+
+                          '<input type="text" class="form-control" name="ordentrabajo" id="ordentrabajo" onkeyup="tipoLetra(this);">'+
+                          '<input type="hidden" class="form-control" name="ordentrabajoanterior" id="ordentrabajoanterior">'+
+                        '</div>'+
+                      '</td>'+
+                    '</tr>'+    
+                  '</table>'+
                 '</div>'+
               '</div>'+
             '</div>'+
@@ -802,7 +973,7 @@ function alta(){
             '</div>';
   $("#tabsform").html(tabs);
   obtenultimonumero();
-  obtenertiposordenescompra();
+  obtenertiposordenescompra(tipoalta);
   asignarfechaactual();
   //reiniciar los contadores
   contadorproductos=0;
@@ -810,6 +981,14 @@ function alta(){
   //activar select2
   $("#tipo").select2();
   //busquedas seleccion
+  //activar busqueda de codigos
+  $("#codigoabuscar").keypress(function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      listarproductos();
+    }
+  });
   //activar busqueda
   $('#numeroproveedor').on('keypress', function(e) {
     //recomentable para mayor compatibilidad entre navegadores.
@@ -822,20 +1001,54 @@ function alta(){
   $('#numeroproveedor').on('change', function(e) {
     regresarnumeroproveedor();
   });
-  //activar busqueda
-  $('#numeroalmacen').on('keypress', function(e) {
-    //recomentable para mayor compatibilidad entre navegadores.
-    var code = (e.keyCode ? e.keyCode : e.which);
-    if(code==13){
-      obteneralmacenpornumero();
-    }
-  });
+  //verificar que tipo de alta se realizara y asignaran configuraciones correspondientes
+  switch (tipoalta) {
+    case 'GASTOS':
+      //desabilitar almacen
+      $("#numeroalmacen").val(0).attr('readonly', 'readonly');
+      $("#numeroalmacenanterior").val(0).attr('readonly', 'readonly');
+      $("#almacen").val(0).attr('readonly', 'readonly');
+      $("#btnobteneralmacenes").hide();
+      $("#busquedaordenestrabajo").hide();
+      break;
+    case 'TOT':
+      //activar busqueda para ordenes
+      $('#ordentrabajo').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerordenporfolio();
+        }
+      });
+      //colocar required a campo orden
+      $("#ordentrabajo").attr('required', 'required');
+      $("#ordentrabajoanterior").attr('required', 'required');
+      //desabilitar almacen
+      $("#numeroalmacen").val(0).attr('readonly', 'readonly');
+      $("#numeroalmacenanterior").val(0).attr('readonly', 'readonly');
+      $("#almacen").val(0).attr('readonly', 'readonly');
+      $("#btnobteneralmacenes").hide();
+      $("#busquedaordenestrabajo").show();
+      break;
+    default:
+      //activar busqueda
+      $('#numeroalmacen').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+          obteneralmacenpornumero();
+        }
+      });
+      $("#busquedaordenestrabajo").hide();
+  }
   //regresar numero
   $('#numeroalmacen').on('change', function(e) {
     regresarnumeroalmacen();
   });
-  //se debe motrar el input para buscar los productos
-  mostrarbuscadorcodigoproducto();
+  //regresar folio orden
+  $('#ordentrabajo').on('change', function(e) {
+    regresarfolioorden();
+  });
   $("#ModalAlta").modal('show');
 }
 //guardar el registro
@@ -884,6 +1097,7 @@ $("#btnGuardar").on('click', function (e) {
 //autorizar orden de compra
 function autorizarordencompra(ordenautorizar){
   $("#ordenautorizar").val(ordenautorizar);
+  $("#textomodalautorizar").html("Estas seguro de autorizar la orden de compra? No."+ ordenautorizar);
   $('#autorizarorden').modal('show');
 }
 $("#btnautorizar").on('click', function(e){
@@ -945,7 +1159,7 @@ function desactivar(ordendesactivar){
           $('#estatusregistro').modal('show');
         }else{
           $("#ordendesactivar").val(ordendesactivar);
-          $("#textomodaldesactivar").html('Estas seguro de cambiar el estado el registro?');
+          $("#textomodaldesactivar").html('Estas seguro de dar de baja la orden de compra? No'+ ordendesactivar);
           $("#divmotivobaja").show();
           $("#btnbaja").show();
           $('#estatusregistro').modal('show');
@@ -990,9 +1204,9 @@ $("#btnbaja").on('click', function(e){
   }
 });
 function obtenerdatos(ordenmodificar){
-  $("#titulomodal").html('Modificación Orden Compra');
   $('.page-loader-wrapper').css('display', 'block');
   $.get(ordenes_compra_obtener_orden_compra,{ordenmodificar:ordenmodificar },function(data){
+    $("#titulomodal").html('Modificación Orden Compra ' + data.ordencompra.Tipo);
     //formulario modificacion
     var tabs ='<div class="col-md-12">'+
                 '<div class="row">'+
@@ -1003,17 +1217,22 @@ function obtenerdatos(ordenmodificar){
                     '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion"  readonly>'+
                     '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
                   '</div>'+  
-                  '<div class="col-md-3">'+
+                  '<div class="col-md-2">'+
                     '<label>Plazo Días (proveedor)</label>'+
                     '<input type="text" class="form-control" name="plazo" id="plazo"  required>'+
                   '</div>'+
-                  '<div class="col-md-3">'+
+                  '<div class="col-md-2">'+
                     '<label>Referencia</label>'+
-                    '<input type="text" class="form-control" name="referencia" id="referencia" required data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+
+                    '<input type="text" class="form-control" name="referencia" id="referencia" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+
+                  '</div>'+
+                  '<div class="col-md-2">'+
+                    '<label>Tipo</label>'+
+                    '<select name="tipo" id="tipo" class="form-control select2" style="width:100% !important;" required>'+ 
+                    '</select>'+
                   '</div>'+
                   '<div class="col-xs-12 col-sm-12 col-md-3">'+
                     '<label>Fecha</label>'+
-                    '<input type="date" class="form-control" name="fecha" id="fecha" required onchange="validasolomesactual();" style="min-width:95%;">'+
+                    '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required onchange="validasolomesactual();" style="min-width:95%;">'+
                     '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy">'+
                   '</div>'+
                 '</div>'+
@@ -1040,7 +1259,7 @@ function obtenerdatos(ordenmodificar){
                     '<table class="col-md-12">'+
                       '<tr>'+
                         '<td>'+
-                          '<div class="btn bg-blue waves-effect" onclick="obteneralmacenes()">Seleccionar</div>'+
+                          '<div class="btn bg-blue waves-effect" id="btnobteneralmacenes" onclick="obteneralmacenes()">Seleccionar</div>'+
                         '</td>'+
                         '<td>'+ 
                           '<div class="form-line">'+
@@ -1052,16 +1271,27 @@ function obtenerdatos(ordenmodificar){
                       '</tr>'+    
                     '</table>'+
                   '</div>'+
-                  '<div class="col-md-4">'+
-                    '<label>Tipo</label>'+
-                    '<select name="tipo" id="tipo" class="form-control select2" style="width:100% !important;" required>'+ 
-                    '</select>'+
+                  '<div class="col-md-4" id="divbuscarcodigoproducto">'+
+                    '<label>Buscar producto por código</label>'+
+                    '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
                   '</div>'+
                 '</div>'+
                 '<div class="row">'+
-                  '<div class="col-md-4" id="divbuscarcodigoproducto">'+
-                      '<label>Buscar producto por código</label>'+
-                      '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                  '<div class="col-md-4" id="busquedaordenestrabajo">'+
+                    '<label>Orden Trabajo <span class="label label-danger" id="textonombreordentrabajo"></span></label>'+
+                    '<table class="col-md-12">'+
+                      '<tr>'+
+                        '<td>'+
+                          '<div class="btn bg-blue waves-effect" id="btnobtenerordenestrabajo" onclick="obtenerordenestrabajo()">Seleccionar</div>'+
+                        '</td>'+
+                        '<td>'+ 
+                          '<div class="form-line">'+
+                            '<input type="text" class="form-control" name="ordentrabajo" id="ordentrabajo" onkeyup="tipoLetra(this);">'+
+                            '<input type="hidden" class="form-control" name="ordentrabajoanterior" id="ordentrabajoanterior">'+
+                          '</div>'+
+                        '</td>'+
+                      '</tr>'+    
+                    '</table>'+
                   '</div>'+
                 '</div>'+
               '</div>'+
@@ -1151,11 +1381,54 @@ function obtenerdatos(ordenmodificar){
     if(data.proveedor.Nombre != null){
       $("#textonombreproveedor").html(data.proveedor.Nombre.substring(0, 60));
     }
-    $("#numeroalmacen").val(data.almacen.Numero);
-    $("#numeroalmacenanterior").val(data.almacen.Numero);
-    $("#almacen").val(data.almacen.Nombre);
-    if(data.almacen.Nombre != null){
-      $("#textonombrealmacen").html(data.almacen.Nombre.substring(0, 60));
+    //verificar que tipo de alta se realizara y asignaran configuraciones correspondientes
+    switch (data.ordencompra.Tipo) {
+      case 'GASTOS':
+        //desabilitar almacen
+        $("#numeroalmacen").val(0).attr('readonly', 'readonly');
+        $("#numeroalmacenanterior").val(0).attr('readonly', 'readonly');
+        $("#almacen").val(0).attr('readonly', 'readonly');
+        $("#btnobteneralmacenes").hide();
+        $("#busquedaordenestrabajo").hide();
+        break;
+      case 'TOT':
+        //colocar required a campo orden
+        $("#ordentrabajo").val(data.ordencompra.OrdenTrabajo).attr('required', 'required');
+        $("#ordentrabajoanterior").val(data.ordencompra.OrdenTrabajo).attr('required', 'required');
+        if(data.ordencompra.OrdenTrabajo != null){
+          $("#textonombreordentrabajo").html(data.ordencompra.OrdenTrabajo.substring(0, 60));
+        }
+        //desabilitar almacen
+        $("#numeroalmacen").val(0).attr('readonly', 'readonly');
+        $("#numeroalmacenanterior").val(0).attr('readonly', 'readonly');
+        $("#almacen").val(0).attr('readonly', 'readonly');
+        $("#btnobteneralmacenes").hide();
+        $("#busquedaordenestrabajo").show();
+        //activar busqueda para ordenes
+        $('#ordentrabajo').on('keypress', function(e) {
+          //recomentable para mayor compatibilidad entre navegadores.
+          var code = (e.keyCode ? e.keyCode : e.which);
+          if(code==13){
+          obtenerordenporfolio();
+          }
+        });
+        break;
+      default:
+        $("#numeroalmacen").val(data.almacen.Numero);
+        $("#numeroalmacenanterior").val(data.almacen.Numero);
+        $("#almacen").val(data.almacen.Nombre);
+        if(data.almacen.Nombre != null){
+          $("#textonombrealmacen").html(data.almacen.Nombre.substring(0, 60));
+        }
+        //activar busqueda
+        $('#numeroalmacen').on('keypress', function(e) {
+          //recomentable para mayor compatibilidad entre navegadores.
+          var code = (e.keyCode ? e.keyCode : e.which);
+          if(code==13){
+            obteneralmacenpornumero();
+          }
+        });
+        $("#busquedaordenestrabajo").hide();
     }
     $("#observaciones").val(data.ordencompra.Obs)
     $("#importe").val(data.importe);
@@ -1172,6 +1445,14 @@ function obtenerdatos(ordenmodificar){
     contadorproductos = data.contadorproductos;
     contadorfilas = data.contadorfilas;
     //busquedas seleccion
+    //activar busqueda de codigos
+    $("#codigoabuscar").keypress(function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        listarproductos();
+      }
+    });
     //activar busqueda
     $('#numeroproveedor').on('keypress', function(e) {
       //recomentable para mayor compatibilidad entre navegadores.
@@ -1184,19 +1465,15 @@ function obtenerdatos(ordenmodificar){
     $('#numeroproveedor').on('change', function(e) {
       regresarnumeroproveedor();
     });
-    //activar busqueda
-    $('#numeroalmacen').on('keypress', function(e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        obteneralmacenpornumero();
-      }
-    });
     //regresar numero
     $('#numeroalmacen').on('change', function(e) {
       regresarnumeroalmacen();
     });
-    obtenertiposordenescompra();
+    //regresar folio orden
+    $('#ordentrabajo').on('change', function(e) {
+      regresarfolioorden();
+    });
+    obtenertiposordenescompra(data.ordencompra.Tipo);
     seleccionartipoordencompra(data);
   }).fail( function() {
     msj_errorajax();
@@ -1207,8 +1484,6 @@ async function seleccionartipoordencompra(data){
   await retraso();
   $("#tipo").val(data.ordencompra.Tipo).change();
   $("#tipo").select2();
-  //se debe esconder el input para buscar los productos porque en la modificacion no se permiten agregar productos
-  mostrarbuscadorcodigoproducto();
   mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
   $('.page-loader-wrapper').css('display', 'none');
 }
@@ -1443,6 +1718,10 @@ function configurar_tabla(){
                               '<div class="col-md-4 form-check">'+
                                   '<input type="checkbox" name="MotivoBaja" id="idMotivoBaja" class="filled-in datotabla" value="MotivoBaja" onchange="construirarraydatostabla(this);" />'+
                                   '<label for="idMotivoBaja">MotivoBaja</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="OrdenTrabajo" id="idOrdenTrabajo" class="filled-in datotabla" value="OrdenTrabajo" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idOrdenTrabajo">OrdenTrabajo</label>'+
                               '</div>'+
                               '<input type="hidden" class="form-control" name="string_datos_tabla_true" id="string_datos_tabla_true" required>'+
                               '<input type="hidden" class="form-control" name="string_datos_tabla_false" id="string_datos_tabla_false" required>'+

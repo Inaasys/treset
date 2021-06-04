@@ -52,6 +52,7 @@ class Compra extends Model
         'MotivoBaja',
         'Equipo',
         'Usuario',
-        'Periodo'
+        'Periodo',
+        'OrdenTrabajo'
     ];
 }

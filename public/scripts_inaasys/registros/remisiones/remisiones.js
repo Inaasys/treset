@@ -9,17 +9,23 @@ function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1000));
 }
 function asignarfechaactual(){
+    /*
     var fechahoy = new Date();
     var dia = ("0" + fechahoy.getDate()).slice(-2);
     var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
     var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia);
     $('#fecha').val(hoy);
+    */
+    $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechadatetimelocal){
+        $("#fecha").val(fechadatetimelocal);
+    }) 
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
-  $.get(remisiones_obtener_ultimo_folio, function(folio){
-    $("#folio").val(folio);
-  })  
+    var serie = $("#serie").val();
+    $.get(remisiones_obtener_ultimo_folio,{serie:serie}, function(folio){
+        $("#folio").val(folio);
+    })  
 }
 //cerrar modales
 function limpiarmodales(){
@@ -145,6 +151,77 @@ function obtenertiposcliente(){
 function obtenertiposunidad(){
     $.get(remisiones_obtener_tipos_unidad, function(select_tipos_unidad){
         $("#unidad").html(select_tipos_unidad);
+    }) 
+}
+//obtener series documento
+function obtenerseriesdocumento(){
+    ocultarformulario();
+    var seriedefault = 'A';
+    var tablaseriesdocumento=   '<div class="modal-header bg-red">'+
+                                    '<h4 class="modal-title">Series Documento &nbsp;&nbsp; <div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''+seriedefault+'\')">Asignar Serie Default (A)</div></h4>'+
+                                '</div>'+
+                                '<div class="modal-body">'+
+                                    '<div class="row">'+
+                                    '<div class="col-md-12">'+
+                                        '<div class="table-responsive">'+
+                                        '<table id="tbllistadoseriedocumento" class="tbllistadoseriedocumento table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                            '<thead class="customercolor">'+
+                                            '<tr>'+
+                                                '<th>Operaciones</th>'+
+                                                '<th>Serie</th>'+
+                                                '<th>Documento</th>'+
+                                                '<th>Nombre</th>'+
+                                            '</tr>'+
+                                            '</thead>'+
+                                            '<tbody></tbody>'+
+                                        '</table>'+
+                                        '</div>'+
+                                    '</div>'+   
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="modal-footer">'+
+                                    '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                                '</div>';  
+    $("#contenidomodaltablas").html(tablaseriesdocumento);
+    $('#tbllistadoseriedocumento').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,  
+        processing: true,
+        'language': {
+          'loadingRecords': '&nbsp;',
+          'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+          url: remisiones_obtener_series_documento
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Serie', name: 'Serie' },
+            { data: 'Documento', name: 'Documento' },
+            { data: 'Nombre', name: 'Nombre' }
+        ],
+        "initComplete": function() {
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistadoseriedocumento').DataTable().search( this.value ).draw();
+              }
+          });
+        },
+        
+    });  
+}
+function seleccionarseriedocumento(Serie){
+    $.get(remisiones_obtener_ultimo_folio_serie_seleccionada, {Serie:Serie}, function(folio){
+        $("#folio").val(folio);
+        $("#serie").val(Serie);
+        $("#serietexto").html("Serie: "+Serie);
+        mostrarformulario();
     }) 
 }
 //obtener clientes
@@ -866,7 +943,7 @@ function alta(){
                     '<div role="tabpanel" class="tab-pane fade in active" id="remisiontab">'+
                         '<div class="row">'+
                             '<div class="col-md-3">'+
-                                '<label>Remisión <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
+                                '<label>Remisión <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
                                 '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                                 '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                                 '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
@@ -908,7 +985,7 @@ function alta(){
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Fecha </label>'+
-                                '<input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" >'+
+                                '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" >'+
                                 '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                             '</div>'+
                         '</div>'+
@@ -1227,7 +1304,7 @@ function desactivar(remisiondesactivar){
                     $('#estatusregistro').modal('show');
                 }else{
                     $("#remisiondesactivar").val(remisiondesactivar);
-                    $("#textomodaldesactivar").html('Estas seguro de cambiar el estado el registro?');
+                    $("#textomodaldesactivar").html('Estas seguro de desactivar la remisión? No'+ remisiondesactivar);
                     $("#divmotivobaja").show();
                     $("#btnbaja").show();
                     $('#estatusregistro').modal('show');
@@ -1332,7 +1409,7 @@ function obtenerdatos(remisionmodificar){
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Fecha </label>'+
-                                '<input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" >'+
+                                '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" >'+
                                 '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy">'+
                             '</div>'+
                         '</div>'+
@@ -1376,7 +1453,7 @@ function obtenerdatos(remisionmodificar){
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Pedido</label>'+
-                                '<input type="text" class="form-control" name="pedido" id="pedido" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 50]">'+
+                                '<input type="text" class="form-control" name="pedido" id="pedido" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Solicitado por</label>'+
@@ -1390,19 +1467,19 @@ function obtenerdatos(remisionmodificar){
                         '<div class="row">'+
                             '<div class="col-md-3">'+
                                 '<label>Referencia</label>'+
-                                '<input type="text" class="form-control" name="referencia" id="referencia" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 50]">'+
+                                '<input type="text" class="form-control" name="referencia" id="referencia" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">'+
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Orden Servicio</label>'+
-                                '<input type="text" class="form-control" name="ordenservicio" id="ordenservicio" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control" name="ordenservicio" id="ordenservicio" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Equipo </label>'+
-                                '<input type="text" class="form-control" name="equipo" id="equipo" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control" name="equipo" id="equipo" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Requisición </label>'+
-                                '<input type="text" class="form-control" name="requisicion" id="requisicion"  onkeyup="tipoLetra(this);" required data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control" name="requisicion" id="requisicion"  onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                         '</div>'+
                     '</div>'+

@@ -26,6 +26,7 @@ use App\VistaOrdenTrabajo;
 use App\BitacoraDocumento;
 use Config;
 use Mail;
+use App\Serie;
 
 class OrdenTrabajoController extends ConfiguracionSistemaController
 {
@@ -41,7 +42,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
     }
 
     public function ordenes_trabajo(){
-        $serieusuario = Helpers::obtenerserieusuario(Auth::user()->user, 'Ordenes de Trabajo');
+        $serieusuario = 'A';
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('ordenes_trabajo_guardar_configuracion_tabla');
         $rutacreardocumento = route('ordenes_trabajo_generar_pdfs');
@@ -53,17 +54,32 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         if($request->ajax()){
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = VistaOrdenTrabajo::select($this->campos_consulta)->orderBy('Folio', 'DESC')->where('Periodo', $periodo)->get();
+            $data = VistaOrdenTrabajo::select($this->campos_consulta)->orderBy('Fecha', 'DESC')->where('Periodo', $periodo)->get();
             return DataTables::of($data)
                 ->addColumn('operaciones', function($data){
+                    $operaciones =  '<div class="dropdown">'.
+                                        '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                                            'OPERACIONES <span class="caret"></span>'.
+                                        '</button>'.
+                                        '<ul class="dropdown-menu">'.
+                                            '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Orden .'\')">Cambios</a></li>'.
+                                            '<li><a href="javascript:void(0);" onclick="terminar(\''.$data->Orden .'\')">Terminar OT</a></li>'.
+                                            '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Orden .'\')">Bajas</a></li>'.
+                                            '<li><a href="'.route('ordenes_trabajo_generar_pdfs_indiv',$data->Orden).'" target="_blank">Generar Documento</a></li>'.
+                                            '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Orden .'\')">Enviar Documento por Correo</a></li>'.
+                                        '</ul>'.
+                                    '</div>';
+                    /*
                     $botoncambios   =   '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Orden .'\')"><i class="material-icons">mode_edit</i></div> '; 
                     $botonbajas     =   '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Orden .'\')"><i class="material-icons">cancel</i></div>  ';
                     $botonterminar  =   '<div class="btn bg-green btn-xs waves-effect" data-toggle="tooltip" title="Terminar" onclick="terminar(\''.$data->Orden .'\')"><i class="material-icons">playlist_add_check</i></div> ';
                     $botondocumentopdf = '<a href="'.route('ordenes_trabajo_generar_pdfs_indiv',$data->Orden).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
                     $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Orden .'\')"><i class="material-icons">email</i></div> ';
                     $operaciones = $botoncambios.$botonbajas.$botonterminar.$botondocumentopdf.$botonenviaremail;
+                    */
                     return $operaciones;
                 })
+                ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
                 ->addColumn('Total', function($data){ return $data->Total; })
                 ->addColumn('Kilometros', function($data){ return $data->Kilometros; })
                 ->addColumn('Impuesto', function($data){ return $data->Impuesto; })
@@ -80,6 +96,24 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                 ->rawColumns(['operaciones'])
                 ->make(true);
         } 
+    }
+    //obtener series documento
+    public function ordenes_trabajo_obtener_series_documento(Request $request){
+        if($request->ajax()){
+            $data = Serie::where('Documento', 'Ordenes de Trabajo')->where('Usuario', Auth::user()->user)->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''.$data->Serie.'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+    //obtener ultimo folio de la serie seleccionada
+    public function ordenes_trabajo_obtener_ultimo_folio_serie_seleccionada(Request $request){
+        $folio = Helpers::ultimofolioserietablamodulos('App\OrdenTrabajo',$request->Serie);
+        return response()->json($folio);
     }
     //obtener ultimo folio de la orden de trabajo
     public function ordenes_trabajo_obtener_ultimo_folio(Request $request){
@@ -247,7 +281,9 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         $color = '';
         $existevin = Vine::where('Vin', $request->vin)->where('Cliente', $request->numeroclientefacturaa)->where('Status', 'ALTA')->count();
         if($existevin > 0){
-            $vin = Vine::where('Vin', $request->vin)->where('Cliente', $request->numeroclientefacturaa)->where('Status', 'ALTA')->first();
+            $vin = DB::table('Vines')->where('Vin', $request->vin)->where('Cliente', $request->numeroclientefacturaa)->where('Status', 'ALTA')->first();
+            //dd($vin);
+
             $cliente = $vin->Cliente;
             $economico = $vin->Economico;
             $vin = $vin->Vin;
@@ -309,7 +345,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
 
     //alta/guardar
     public function ordenes_trabajo_guardar(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         $folio = Helpers::ultimofolioserietablamodulos('App\OrdenTrabajo', $request->serie);
         $orden = $folio.'-'.$request->serie;
         $ExisteOrden = OrdenTrabajo::where('Orden', $orden)->first();
@@ -494,7 +530,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                 }else{
                     $tecnico4 = $dot->Tecnico4;
                 }
-                if($dot->Departamento == 'SERVICIO'){
+                if($dot->Departamento == 'SERVICIO' && $dot->Compra == ""){
                     $botonasignartecnicos = '<div class="btn bg-blue btn-xs" data-toggle="tooltip" title="Asignar Técnicos" onclick="asignaciontecnicos('.$contadorservicios.')">Asignar técnicos</div>';
                     $botoneliminarfila = '<div class="btn bg-red btn-xs" data-toggle="tooltip" title="Eliminar Fila" onclick="eliminarfila('.$contadorservicios.')">X</div> ';
                     if($ordentrabajo->Status == 'ABIERTA'){
@@ -540,7 +576,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dot->Utilidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this)" readonly></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxs departamentopartida" name="departamentopartida[]" value="'.$dot->Departamento.'" readonly data-parsley-length="[1, 20]"></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxs cargopartida" name="cargopartida[]" value="'.$dot->Cargo.'" readonly data-parsley-length="[1, 20]"></td>'.
-                    '<td class="tdmod"><input type="date" class="form-control divorinputmodmd fechapartida" name="fechapartida[]" value="'.Helpers::formatoinputdate($dot->Fecha).'" readonly></td>'.
+                    '<td class="tdmod"><input type="datetime-local" class="form-control divorinputmodxl fechapartida" name="fechapartida[]" value="'.Helpers::formatoinputdatetime($dot->Fecha).'" readonly></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxs traspasopartida" name="traspasopartida[]" value="'.$dot->Traspaso.'" readonly></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxs comprapartida" name="comprapartida[]" value="'.$dot->Compra.'" readonly data-parsley-length="[1, 20]"></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxs usuariopartida" name="usuariopartida[]" value="'.$dot->Usuario.'" readonly></td>'.
@@ -604,6 +640,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             "fechaentrega" => Helpers::formatoinputdatetime($ordentrabajo->Entrega),
             "fecharecordatoriocliente" => Helpers::formatoinputdate($ordentrabajo->FechaRecordatorio),
             "kilometros" => Helpers::convertirvalorcorrecto($ordentrabajo->Kilometros),
+            "horasreales" => Helpers::convertirvalorcorrecto($ordentrabajo->HorasReales),
             "kmproximoservicio" => Helpers::convertirvalorcorrecto($ordentrabajo->KmProximoServicio),
             "importe" => Helpers::convertirvalorcorrecto($ordentrabajo->Importe),
             "descuento" => Helpers::convertirvalorcorrecto($ordentrabajo->Descuento),
@@ -615,7 +652,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
     }
     //modificacion
     public function ordenes_trabajo_guardar_modificacion(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         $orden = $request->folio.'-'.$request->serie;
         $OrdenTrabajo = OrdenTrabajo::where('Orden', $orden)->first();
         //modificar orden

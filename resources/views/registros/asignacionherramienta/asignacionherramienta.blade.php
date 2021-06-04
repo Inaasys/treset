@@ -72,7 +72,7 @@
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover">
                                     <thead class="customercolor">
                                         <tr>
-                                            <th><div style="width:80px !important;">Operaciones</div></th>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
                                             <th>{{$co}}</th>
                                             @endforeach
@@ -98,60 +98,6 @@
                 </div>
                 <form id="formparsley" action="#">
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-2">
-                                <label>Asignación <b style="color:#F44336 !important;" id="serietexto"> Serie: {{$serieusuario}}</b></label>
-                                <input type="text" class="form-control" name="id" id="id" required readonly onkeyup="tipoLetra(this);">
-                                <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" required readonly data-parsley-length="[1, 10]">
-                                <input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>
-                                <input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>
-                            </div>   
-                            <div class="col-md-4">
-                                <label>Personal que recibe <span class="label label-danger" id="textonombrepersonalrecibe"></span></label>
-                                <table class="col-md-12">
-                                    <tr>
-                                        <td>
-                                            <div class="btn bg-blue waves-effect" onclick="obtenerpersonalrecibe()">Seleccionar</div>
-                                        </td>
-                                        <td>
-                                            <div class="form-line">
-                                                <input type="text" class="form-control" name="numeropersonalrecibe" id="numeropersonalrecibe" required data-parsley-type="integer">
-                                                <input type="hidden" class="form-control" name="numeropersonalrecibeanterior" id="numeropersonalrecibeanterior" required data-parsley-type="integer">
-                                                <input type="hidden" class="form-control" name="personalrecibe" id="personalrecibe" required readonly>
-                                            </div>
-                                        </td>
-                                    </tr>    
-                                </table>
-                            </div>
-                            <div class="col-md-4">
-                                <label>Personal que entrega <span class="label label-danger" id="textonombrepersonalentrega"></span></label>
-                                <table class="col-md-12">
-                                    <tr>
-                                        <td>
-                                            <div class="btn bg-blue waves-effect" onclick="obtenerpersonalentrega()" id="btnbuscarpersonalqueentrega" style="display:none">Seleccionar</div>
-                                        </td>
-                                        <td>    
-                                            <div class="form-line">
-                                                <input type="text" class="form-control" name="numeropersonalentrega" id="numeropersonalentrega" required data-parsley-type="integer">
-                                                <input type="hidden" class="form-control" name="numeropersonalentregaanterior" id="numeropersonalentregaanterior" required data-parsley-type="integer">
-                                                <input type="hidden" class="form-control" name="personalentrega" id="personalentrega" required readonly>
-                                            </div>
-                                        </td>    
-                                    </tr>    
-                                </table>
-                            </div>   
-                            <div class="col-md-2">
-                                <label>Fecha</label>
-                                <input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" onkeyup="tipoLetra(this);">
-                                <input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="{{$periodohoy}}">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4" id="divbuscarcodigoproducto">
-                                <label>Buscar herramienta por código</label>
-                                <input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código de la herramienta">
-                            </div>
-                        </div>
                         <div class="col-md-12" id="tabsform">
                             <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
                         </div>
@@ -159,7 +105,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
-                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Guardar</button>
+                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
                     </div>
                 </form> 
             </div>
@@ -196,7 +142,7 @@
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
-	        	<button type="button" class="btn btn-success btn-sm" id="btnautorizar">Guardar</button>
+	        	<button type="button" class="btn btn-success btn-sm" id="btnautorizar">Confirmar Autorización</button>
 	      	</div>
     	</div>
   	</div>
@@ -220,7 +166,7 @@
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
-	        	<button type="button" class="btn btn-success btn-sm" id="btnbaja">Guardar</button>
+	        	<button type="button" class="btn btn-success btn-sm" id="btnbaja">Confirmar Baja</button>
 	      	</div>
     	</div>
   	</div>
@@ -281,7 +227,10 @@
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var asignacion_herramienta_obtener = '{!!URL::to('asignacion_herramienta_obtener')!!}';
+        var asignacion_herramienta_obtener_series_documento = '{!!URL::to('asignacion_herramienta_obtener_series_documento')!!}';
+        var asignacion_herramienta_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('asignacion_herramienta_obtener_ultimo_folio_serie_seleccionada')!!}';
         var asignacion_herramienta_obtener_ultimo_id = '{!!URL::to('asignacion_herramienta_obtener_ultimo_id')!!}';
+        var ordenes_compra_obtener_fecha_actual_datetimelocal = '{!!URL::to('ordenes_compra_obtener_fecha_actual_datetimelocal')!!}';
         var asignacion_herramienta_obtener_personal_recibe = '{!!URL::to('asignacion_herramienta_obtener_personal_recibe')!!}';
         var asignacion_herramienta_obtener_personal_recibe_por_numero = '{!!URL::to('asignacion_herramienta_obtener_personal_recibe_por_numero')!!}';
         var asignacion_herramienta_obtener_personal_entrega = '{!!URL::to('asignacion_herramienta_obtener_personal_entrega')!!}';

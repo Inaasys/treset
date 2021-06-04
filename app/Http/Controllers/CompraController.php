@@ -38,6 +38,9 @@ use App\VistaCompra;
 use App\VistaObtenerExistenciaProducto;
 use App\ContraRecibo;
 use App\ContraReciboDetalle;
+use App\OrdenTrabajo;
+use App\OrdenTrabajoDetalle;
+use App\Serie;
 use Config;
 use Mail;
 
@@ -55,7 +58,7 @@ class CompraController extends ConfiguracionSistemaController{
     }
 
     public function compras(){
-        $serieusuario = Helpers::obtenerserieusuario(Auth::user()->user, 'Compras');
+        $serieusuario = 'A';
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('compras_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('compras_exportar_excel');
@@ -68,17 +71,33 @@ class CompraController extends ConfiguracionSistemaController{
             $fechahoy = Carbon::now()->toDateString();
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = VistaCompra::select($this->campos_consulta)->orderBy('Folio', 'DESC')->where('Periodo', $periodo)->get();
+            $data = VistaCompra::select($this->campos_consulta)->orderBy('Fecha', 'DESC')->where('Periodo', $periodo)->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($fechahoy,$tipousuariologueado){
+
+                        $operaciones = '<div class="dropdown">'.
+                                    '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                                        'OPERACIONES <span class="caret"></span>'.
+                                    '</button>'.
+                                    '<ul class="dropdown-menu">'.
+                                        '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Compra.'\')">Cambios</a></li>'.
+                                        '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Compra.'\')">Bajas</a></li>'.
+                                        '<li><a href="javascript:void(0);" onclick="movimientoscompra(\''.$data->Compra.'\')">Movimientos</a></li>'.
+                                        '<li><a href="'.route('compras_generar_pdfs_indiv',$data->Compra).'" target="_blank">Ver Documento PDF</a></li>'.
+                                        '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Compra .'\')">Enviar Documento por Correo</a></li>'.
+                                    '</ul>'.
+                                '</div>';
+                        /*
                         $botoncambios =         '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" data-placement="top" title="Cambios" onclick="obtenerdatos(\''.$data->Compra.'\')"><i class="material-icons">mode_edit</i></div> '; 
                         $botonbajas =           '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Compra.'\')"><i class="material-icons">cancel</i></div> ';
                         $botonmvtos =           '<div class="btn bg-indigo btn-xs waves-effect" data-toggle="tooltip" title="Movimientos" onclick="movimientoscompra(\''.$data->Compra.'\')"><i class="material-icons">list</i></div> ';
                         $botondocumentopdf =    '<a href="'.route('compras_generar_pdfs_indiv',$data->Compra).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
                         $botonenviaremail =     '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Compra .'\')"><i class="material-icons">email</i></div> ';
                         $operaciones =  $botoncambios.$botonbajas.$botonmvtos.$botondocumentopdf.$botonenviaremail;
+                        */
                         return $operaciones;
                     })
+                    ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
                     ->addColumn('SubTotal', function($data){ return $data->SubTotal; })
                     ->addColumn('Iva', function($data){ return $data->Iva; })
                     ->addColumn('Total', function($data){ return $data->Total; })
@@ -98,14 +117,42 @@ class CompraController extends ConfiguracionSistemaController{
                     ->make(true);
         } 
     }
+    //obtener series documento
+    public function compras_obtener_series_documento(Request $request){
+        if($request->ajax()){
+            $data = Serie::where('Documento', 'Compras')->where('Usuario', Auth::user()->user)->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''.$data->Serie.'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+    //obtener ultimo folio de la serie seleccionada
+    public function compras_obtener_ultimo_folio_serie_seleccionada(Request $request){
+        $folio = Helpers::ultimofolioserietablamodulos('App\Compra',$request->Serie);
+        return response()->json($folio);
+    }
     //obtener el ultimo folio de la tabla
-    public function compras_obtener_ultimo_folio(){
-        $folio = Helpers::ultimofoliotablamodulos('App\Compra');
+    public function compras_obtener_ultimo_folio(Request $request){
+        $folio = Helpers::ultimofolioserietablamodulos('App\Compra',$request->serie);
         return response()->json($folio);
     }
     //obtener tipos ordenes de compra
-    public function compras_obtener_tipos_ordenes_compra(){
-        $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->get();
+    public function compras_obtener_tipos_ordenes_compra(Request $request){
+        switch ($request->tipoalta) {
+            case "GASTOS":
+                $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->where('Nombre', 'GASTOS')->get();
+                break;
+            case "TOT":
+                $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->where('Nombre', 'TOT')->get();
+                break;
+            default:
+                $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->where('Nombre', '<>', 'GASTOS')->Where('Nombre', '<>', 'TOT')->get();
+
+        } 
         $select_tipos_ordenes_compra = "<option selected disabled hidden>Selecciona...</option>";
         foreach($tipos_ordenes_compra as $tipo){
             $select_tipos_ordenes_compra = $select_tipos_ordenes_compra."<option value='".$tipo->Nombre."'>".$tipo->Nombre."</option>";
@@ -390,17 +437,45 @@ class CompraController extends ConfiguracionSistemaController{
     //obtener ordenes de compra por proveedor
     public function compras_obtener_ordenes_compra(Request $request){
         if($request->ajax()){
-            $data = OrdenCompra::where('Proveedor', $request->numeroproveedor)
-                                ->where('AutorizadoPor', '<>', '')
-                                ->where(function ($query) {
-                                    $query->where('Status', 'POR SURTIR')
-                                    ->orWhere('Status', 'BACKORDER');
-                                })
-                                ->orderBy('Folio', 'DESC')
-                                ->get();
+            switch ($request->tipocompra) {
+                case "GASTOS":
+                    $data = OrdenCompra::where('Proveedor', $request->numeroproveedor)
+                                        ->where('AutorizadoPor', '<>', '')
+                                        ->where(function ($query) {
+                                            $query->where('Status', 'POR SURTIR')
+                                            ->orWhere('Status', 'BACKORDER');
+                                        })
+                                        ->where('Tipo', 'GASTOS')
+                                        ->orderBy('Folio', 'DESC')
+                                        ->get();
+                    break;
+                case "TOT":
+                    $data = OrdenCompra::where('Proveedor', $request->numeroproveedor)
+                                        ->where('AutorizadoPor', '<>', '')
+                                        ->where(function ($query) {
+                                            $query->where('Status', 'POR SURTIR')
+                                            ->orWhere('Status', 'BACKORDER');
+                                        })
+                                        ->where('Tipo', 'TOT')
+                                        ->orderBy('Folio', 'DESC')
+                                        ->get();
+                    break;
+                default:
+                    $data = OrdenCompra::where('Proveedor', $request->numeroproveedor)
+                                        ->where('AutorizadoPor', '<>', '')
+                                        ->where(function ($query) {
+                                            $query->where('Status', 'POR SURTIR')
+                                            ->orWhere('Status', 'BACKORDER');
+                                        })
+                                        ->where('Tipo', '<>', 'GASTOS')
+                                        ->where('Tipo', '<>', 'TOT')
+                                        ->orderBy('Folio', 'DESC')
+                                        ->get();
+            } 
+            $tipoalta = $request->tipocompra;
             return DataTables::of($data)
-                    ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarordencompra('.$data->Folio.',\''.$data->Orden .'\')">Seleccionar</div>';
+                    ->addColumn('operaciones', function($data) use($tipoalta){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarordencompra('.$data->Folio.',\''.$data->Orden .'\',\''.$tipoalta .'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->addColumn('Fecha', function($data){
@@ -470,6 +545,10 @@ class CompraController extends ConfiguracionSistemaController{
                     $producto = Producto::where('Codigo', $doc->Codigo)->first();
                     $claveproductopartida = ClaveProdServ::where('Clave', $producto->ClaveProducto)->first();
                     $claveunidadpartida = ClaveUnidad::where('Clave', $producto->ClaveUnidad)->first();
+                    $claveproducto = $claveproductopartida ? $claveproductopartida->Clave : '';
+                    $nombreclaveproducto = $claveproductopartida ? $claveproductopartida->Nombre : '';
+                    $claveunidad = $claveunidadpartida ? $claveunidadpartida->Clave : '';
+                    $nombreclaveunidad = $claveunidadpartida ? $claveunidadpartida->Nombre : '';
                     $filasdetallesordencompra= $filasdetallesordencompra.
                     '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                         '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$doc->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
@@ -514,22 +593,22 @@ class CompraController extends ConfiguracionSistemaController{
                                     '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                 '</div>'.
                                 '<div class="col-xs-10 col-sm-10 col-md-10">'.
-                                    '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproductopartida->Clave.'" readonly data-parsley-length="[1, 20]">'.
+                                    '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly data-parsley-length="[1, 20]">'.
                                 '</div>'.
                             '</div>'.
                         '</td>'.
-                        '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$claveproductopartida->Nombre.'" readonly></td>'.
+                        '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$nombreclaveproducto.'" readonly></td>'.
                         '<td class="tdmod">'.
                             '<div class="row divorinputmodxl">'.
                                 '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                     '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                 '</div>'.
                                 '<div class="col-xs-10 col-sm-10 col-md-10">'.   
-                                    '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidadpartida->Clave.'" readonly data-parsley-length="[1, 5]">'.
+                                    '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
                                 '</div>'.
                             '</div>'.
                         '</td>'.
-                        '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$claveunidadpartida->Nombre.'" readonly></td>'.
+                        '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$nombreclaveunidad.'" readonly></td>'.
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodsm costocatalogopartida" name="costocatalogopartida[]" value="'.Helpers::convertirvalorcorrecto($producto->Costo).'"  readonly></td>'.
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodsm costoingresadopartida" name="costoingresadopartida[]" readonly></td>'.
                     '</tr>';
@@ -549,7 +628,7 @@ class CompraController extends ConfiguracionSistemaController{
             "contadorproductos" => $contadorproductos,
             "contadorfilas" => $contadorfilas,
             "almacen" => $almacen,
-            "fecha" => Helpers::formatoinputdate($ordencompra->Fecha),
+            "fecha" => Helpers::formatoinputdatetime($ordencompra->Fecha),
             "importe" => Helpers::convertirvalorcorrecto($ordencompra->Importe),
             "descuento" => Helpers::convertirvalorcorrecto($ordencompra->Descuento),
             "subtotal" => Helpers::convertirvalorcorrecto($ordencompra->SubTotal),
@@ -560,14 +639,14 @@ class CompraController extends ConfiguracionSistemaController{
     }
     //guardar compra
     public function compras_guardar(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         $uuid=$request->uuid;
 	    $ExisteUUID = Compra::where('UUID', $uuid )->where('Status', '<>', 'BAJA')->first();
 	    if($ExisteUUID == true){
 	        $Compra = 1;
 	    }else{  
             //obtener el ultimo id de la tabla
-            $folio = Helpers::ultimofoliotablamodulos('App\Compra');
+            $folio = Helpers::ultimofolioserietablamodulos('App\Compra',$request->serie);
             //INGRESAR DATOS A TABLA COMPRAS
             $compra = $folio.'-'.$request->serie;
             $Compra = new Compra;
@@ -575,7 +654,16 @@ class CompraController extends ConfiguracionSistemaController{
             $Compra->Serie=$request->serie;
             $Compra->Folio=$request->folio;
             $Compra->Proveedor=$request->numeroproveedor;
-            $Compra->Movimiento="ALMACEN".$request->numeroalmacen;
+            switch ($request->tipo){
+                case "TOT":
+                    $Compra->Movimiento="TOT";
+                    break;
+                case "GASTOS";
+                    $Compra->Movimiento="GASTOS";
+                    break;
+                default:
+                    $Compra->Movimiento="ALMACEN".$request->numeroalmacen;
+            }
             $Compra->Remision=$request->remision;
             $Compra->Factura=$request->factura;
             $Compra->UUID=$request->uuid;
@@ -606,7 +694,38 @@ class CompraController extends ConfiguracionSistemaController{
             $Compra->Status="POR PAGAR";
             $Compra->Usuario=Auth::user()->user;
             $Compra->Periodo=$this->periodohoy;
+            $Compra->OrdenTrabajo=$request->ordentrabajo;
             $Compra->save();
+            //si la alta es POR TOT modificar los totales de la orden de trabajo
+            switch ($request->tipo) {
+                case "TOT":
+                    //obtener total costo y utilidad porque en la compra no se calcula
+                    $totalcosto=0;
+                    $totalutilidad=0;
+                    foreach ($request->codigoproductopartida as $key => $codigoproductopartida){  
+                        $producto = Producto::where('Codigo', $codigoproductopartida)->first();
+                        $costopartida = Helpers::convertirvalorcorrecto($producto->Costo);
+                        //costo total
+                        $costototalpartida  = $costopartida * $request->cantidadpartida [$key];
+                        //utilidad de la partida
+                        $utilidadpartida = $request->subtotalpartida [$key] - Helpers::convertirvalorcorrecto($costototalpartida);
+                        $totalcosto = $totalcosto + $costototalpartida;
+                        $totalutilidad = $totalutilidad + $utilidadpartida;
+                    }
+                    $OrdenTrabajoAnterior = OrdenTrabajo::where('Orden', $request->ordentrabajo)->first();
+                    OrdenTrabajo::where('Orden', $request->ordentrabajo)
+                                ->update([
+                                    'Importe' => $OrdenTrabajoAnterior->Importe + $request->importe,
+                                    'Descuento' => $OrdenTrabajoAnterior->Descuento + $request->descuento,
+                                    'SubTotal' => $OrdenTrabajoAnterior->SubTotal + $request->subtotal,
+                                    'Iva' => $OrdenTrabajoAnterior->Iva + $request->iva,
+                                    'Total' => $OrdenTrabajoAnterior->Total + $request->total,
+                                    'Costo' => $OrdenTrabajoAnterior->Costo + Helpers::convertirvalorcorrecto($totalcosto),
+                                    'Utilidad' => $OrdenTrabajoAnterior->Utilidad + Helpers::convertirvalorcorrecto($totalutilidad)
+                                ]);
+
+                    break;
+            } 
             //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
             $BitacoraDocumento = new BitacoraDocumento;
             $BitacoraDocumento->Documento = "COMPRAS";
@@ -660,23 +779,74 @@ class CompraController extends ConfiguracionSistemaController{
                                     ->update([
                                         'Surtir' => Helpers::convertirvalorcorrecto($Surtir)
                                     ]);
-                //sumar existencias al almacen
-                $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
-                if($ContarExistenciaAlmacen > 0){
-                        $ExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
-                        $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias + $request->cantidadpartida [$key];
-                        Existencia::where('Codigo', $codigoproductopartida)
-                                    ->where('Almacen', $request->numeroalmacen)
-                                    ->update([
-                                        'Existencias' => Helpers::convertirvalorcorrecto($ExistenciaNuevaAlmacen)
-                                    ]);
-                }else{
-                        $ExistenciaAlmacen = new Existencia;
-                        $ExistenciaAlmacen->Codigo = $codigoproductopartida;
-                        $ExistenciaAlmacen->Almacen = $request->numeroalmacen;
-                        $ExistenciaAlmacen->Existencias = $request->cantidadpartida [$key];
-                        $ExistenciaAlmacen->save();
-                }
+                //si la alta es por TOT agregar las partidas en la Orden de Trabajo
+                switch ($request->tipo) {
+                    case "TOT":
+                        $producto = Producto::where('Codigo', $codigoproductopartida)->first();
+                        $costopartida = Helpers::convertirvalorcorrecto($producto->Costo);
+                        //costo total
+                        $costototalpartida  = $costopartida * $request->cantidadpartida [$key];
+                        //utilidad de la partida
+                        $utilidadpartida = $request->subtotalpartida [$key] - Helpers::convertirvalorcorrecto($costototalpartida);
+                        $OrdenTrabajo = OrdenTrabajo::where('Orden', $request->ordentrabajo)->first();
+                        $contardetallesordentrabajo = OrdenTrabajoDetalle::where('Orden', $request->ordentrabajo)->count();
+                        if($contardetallesordentrabajo > 0){
+                            $UltimaPartidaOrdenTrabajoDetalle = OrdenTrabajoDetalle::select('Partida')->where('Orden', $request->ordentrabajo)->orderBy('Partida', 'DESC')->take(1)->get();
+                            $UltimaPartida = $UltimaPartidaOrdenTrabajoDetalle[0]->Partida+1;
+                        }else{
+                            $UltimaPartida = 1;
+                        }
+                        $OrdenTrabajoDetalle = new OrdenTrabajoDetalle;
+                        $OrdenTrabajoDetalle->Orden=$request->ordentrabajo;
+                        $OrdenTrabajoDetalle->Cliente=$OrdenTrabajo->Cliente;
+                        $OrdenTrabajoDetalle->Agente=$OrdenTrabajo->Agente;
+                        $OrdenTrabajoDetalle->Fecha=Carbon::parse($request->fecha)->toDateTimeString();
+                        $OrdenTrabajoDetalle->Codigo=$codigoproductopartida;
+                        $OrdenTrabajoDetalle->Descripcion=$request->nombreproductopartida [$key];
+                        $OrdenTrabajoDetalle->Unidad=$request->unidadproductopartida [$key];
+                        $OrdenTrabajoDetalle->Cantidad=$request->cantidadpartida [$key];
+                        $OrdenTrabajoDetalle->Precio=$request->preciopartida [$key];
+                        $OrdenTrabajoDetalle->Importe=$request->importepartida [$key];
+                        $OrdenTrabajoDetalle->Dcto=$request->descuentoporcentajepartida [$key];
+                        $OrdenTrabajoDetalle->Descuento= $request->descuentopesospartida  [$key];
+                        $OrdenTrabajoDetalle->SubTotal=$request->subtotalpartida [$key];
+                        $OrdenTrabajoDetalle->Impuesto=$request->ivaporcentajepartida [$key];
+                        $OrdenTrabajoDetalle->Iva=$request->trasladoivapesospartida [$key];
+                        $OrdenTrabajoDetalle->Total=$request->totalpesospartida [$key];
+                        $OrdenTrabajoDetalle->Costo=$costopartida;
+                        $OrdenTrabajoDetalle->CostoTotal=Helpers::convertirvalorcorrecto($costototalpartida);
+                        $OrdenTrabajoDetalle->Utilidad=Helpers::convertirvalorcorrecto($utilidadpartida);
+                        $OrdenTrabajoDetalle->Departamento="SERVICIO";
+                        $OrdenTrabajoDetalle->Cargo="SERVICIO";
+                        $OrdenTrabajoDetalle->Compra=$compra;
+                        $OrdenTrabajoDetalle->Item=$item;
+                        $OrdenTrabajoDetalle->Usuario=Auth::user()->user;
+                        $OrdenTrabajoDetalle->Almacen=0;
+                        $OrdenTrabajoDetalle->Partida=$UltimaPartida;
+                        $OrdenTrabajoDetalle->save();
+                        $UltimaPartida++;
+                        break;
+                    case "GASTOS":
+                        break;
+                    default:
+                        //sumar existencias al almacen
+                        $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
+                        if($ContarExistenciaAlmacen > 0){
+                                $ExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
+                                $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias + $request->cantidadpartida [$key];
+                                Existencia::where('Codigo', $codigoproductopartida)
+                                            ->where('Almacen', $request->numeroalmacen)
+                                            ->update([
+                                                'Existencias' => Helpers::convertirvalorcorrecto($ExistenciaNuevaAlmacen)
+                                            ]);
+                        }else{
+                                $ExistenciaAlmacen = new Existencia;
+                                $ExistenciaAlmacen->Codigo = $codigoproductopartida;
+                                $ExistenciaAlmacen->Almacen = $request->numeroalmacen;
+                                $ExistenciaAlmacen->Existencias = $request->cantidadpartida [$key];
+                                $ExistenciaAlmacen->save();
+                        }      
+                } 
                 $item++;
             }
             //modificar el status de la orden de compra a SURTIDO o BACKORDER
@@ -709,26 +879,16 @@ class CompraController extends ConfiguracionSistemaController{
             $contadorfilas = 0;
             $tipo="modificacion";
             foreach($detallescompra as $dc){
-                    $nombreclaveproductopartida = '';
-                    $claveproductopartida = '';
-                    $nombreclaveunidadpartida = '';
-                    $claveunidadpartida = '';
                     $producto = Producto::where('Codigo', $dc->Codigo)->first();
                     $Existencia = Existencia::where('Codigo', $dc->Codigo)->where('Almacen', $compra->Almacen)->first();
                     $parsleymax = $dc->Cantidad;
                     $cantidadpartidadetalleordencompra = OrdenCompraDetalle::where('Orden', $compra->Orden)->where('Codigo', $dc->Codigo)->first();
-                    $contarclaveproductopartida = ClaveProdServ::where('Clave', $dc->ClaveProducto)->count();
-                    if($contarclaveproductopartida > 0){
-                        $ClaveProdServ = ClaveProdServ::where('Clave', $dc->ClaveProducto)->first();
-                        $nombreclaveproductopartida = $ClaveProdServ->Nombre;
-                        $claveproductopartida = $ClaveProdServ->Clave;
-                    }
-                    $contarclaveunidadpartida = ClaveUnidad::where('Clave', $dc->ClaveUnidad)->count();
-                    if($contarclaveunidadpartida > 0){
-                        $ClaveUnidad = ClaveUnidad::where('Clave', $dc->ClaveUnidad)->first();
-                        $nombreclaveunidadpartida = $ClaveUnidad->Nombre;
-                        $claveunidadpartida = $ClaveUnidad->Clave;
-                    }
+                    $claveproductopartida = ClaveProdServ::where('Clave', $dc->ClaveProducto)->first();
+                    $claveunidadpartida = ClaveUnidad::where('Clave', $dc->ClaveUnidad)->first();
+                    $claveproducto = $claveproductopartida ? $claveproductopartida->Clave : '';
+                    $nombreclaveproducto = $claveproductopartida ? $claveproductopartida->Nombre : '';
+                    $claveunidad = $claveunidadpartida ? $claveunidadpartida->Clave : '';
+                    $nombreclaveunidad = $claveunidadpartida ? $claveunidadpartida->Nombre : '';
                     $condepartamento = Departamento::where('Numero', $dc->Depto)->count();
                     $numerodepartamento = "";
                     $nombredepartamento = "";
@@ -807,22 +967,22 @@ class CompraController extends ConfiguracionSistemaController{
                                     '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                 '</div>'.
                                 '<div class="col-xs-10 col-sm-10 col-md-10">'.    
-                                    '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproductopartida.'" readonly data-parsley-length="[1, 20]">'.
+                                    '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly data-parsley-length="[1, 20]">'.
                                 '</div>'.
                             '</div>'.
                         '</td>'.
-                        '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$nombreclaveproductopartida.'" readonly></td>'.
+                        '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$nombreclaveproducto.'" readonly></td>'.
                         '<td class="tdmod">'.
                             '<div class="row divorinputmodxl">'.
                                 '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                     '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                 '</div>'.
                                 '<div class="col-xs-10 col-sm-10 col-md-10">'.  
-                                    '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidadpartida.'" readonly data-parsley-length="[1, 5]">'.
+                                    '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
                                 '</div>'.
                             '</div>'.
                         '</td>'.
-                        '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$nombreclaveunidadpartida.'" readonly></td>'.
+                        '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$nombreclaveunidad.'" readonly></td>'.
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodsm costocatalogopartida" name="costocatalogopartida[]" value="'.Helpers::convertirvalorcorrecto($producto->Costo).'"  readonly></td>'.
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodsm costoingresadopartida" name="costoingresadopartida[]" readonly></td>'.
                     '</tr>';
@@ -864,7 +1024,7 @@ class CompraController extends ConfiguracionSistemaController{
             "contadorfilas" => $contadorfilas,
             "almacen" => $almacen,
             "proveedor" => $proveedor,
-            "fecha" => Helpers::formatoinputdate($compra->Fecha),
+            "fecha" => Helpers::formatoinputdatetime($compra->Fecha),
             "fechaemitida" => Helpers::formatoinputdatetime($compra->FechaEmitida),
             "fechatimbrado" => Helpers::formatoinputdatetime($compra->FechaTimbrado),
             "importe" => Helpers::convertirvalorcorrecto($compra->Importe),
@@ -883,15 +1043,25 @@ class CompraController extends ConfiguracionSistemaController{
     }
     //evaluar existencias en almacen
     public function compras_obtener_existencias_partida(Request $request){
-        $existencias = Existencia::select('Existencias')->where('Codigo', $request->codigopartida)->where('Almacen', $request->almacen)->first();
-        $compra = $request->folio.'-'.$request->serie;
-        $detallecompra = CompraDetalle::where('Compra', $compra)->where('Codigo', $request->codigopartida)->count();
-        $nuevaexistencia = 0;
-        if($detallecompra > 0){
-            $detallecompra = CompraDetalle::where('Compra', $compra)->where('Codigo', $request->codigopartida)->first();
-            $nuevaexistencia = $existencias->Existencias + $detallecompra->Cantidad;
-        }else{
-            $nuevaexistencia = $existencias->Existencias;
+        $compra = Compra::where('Compra', $request->compra)->first();
+        switch ($compra->Tipo){
+            case "TOT":
+                $nuevaexistencia = $request->cantidadpartida;
+                break;
+            case "GASTOS":
+                $nuevaexistencia = $request->cantidadpartida;
+                break;
+            default:
+                $existencias = Existencia::select('Existencias')->where('Codigo', $request->codigopartida)->where('Almacen', $request->almacen)->first();
+                $compra = $request->folio.'-'.$request->serie;
+                $detallecompra = CompraDetalle::where('Compra', $compra)->where('Codigo', $request->codigopartida)->count();
+                $nuevaexistencia = 0;
+                if($detallecompra > 0){
+                    $detallecompra = CompraDetalle::where('Compra', $compra)->where('Codigo', $request->codigopartida)->first();
+                    $nuevaexistencia = $existencias->Existencias + $detallecompra->Cantidad;
+                }else{
+                    $nuevaexistencia = $existencias->Existencias;
+                }
         }
         return response()->json(Helpers::convertirvalorcorrecto($nuevaexistencia));
     }
@@ -908,7 +1078,7 @@ class CompraController extends ConfiguracionSistemaController{
     }
     //guardar modificacion compra
     public function compras_guardar_modificacion(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         $uuid=$request->uuid;
         $compra = $request->compra;
 	    $ExisteUUID = Compra::where('Compra', '<>', $compra)->where('UUID', $uuid )->where('Status', '<>', 'BAJA')->first();
@@ -940,14 +1110,44 @@ class CompraController extends ConfiguracionSistemaController{
                 foreach($diferencias_arreglos as $eliminapartida){
                     $explode_d = explode("#",$eliminapartida);
                     $detallecompra = CompraDetalle::where('Compra', $explode_d[0])->where('Codigo', $explode_d[1])->where('Item', $explode_d[2])->first();
-                    //restar existencias a almacen principal
-                    $RestarExistenciaAlmacen = Existencia::where('Codigo', $explode_d[1])->where('Almacen', $request->numeroalmacen)->first();
-                    $RestarExistenciaNuevaAlmacen = $RestarExistenciaAlmacen->Existencias - $detallecompra->Cantidad;
-                    Existencia::where('Codigo', $explode_d[1])
-                                ->where('Almacen', $request->numeroalmacen)
-                                ->update([
-                                    'Existencias' => Helpers::convertirvalorcorrecto($RestarExistenciaNuevaAlmacen)
-                                ]);
+                    switch ($Compra->Tipo){
+                        case "TOT":
+                            //si es TOT restar del total de la orden de trabajo los totales de la partida de la compra y eliminar la partida de la orden de trabajo
+                            //obtener total costo y utilidad porque en la compra no se calcula
+                            $detallescompra = CompraDetalle::where('Compra', $explode_d[0])->where('Codigo', $explode_d[1])->where('Item', $explode_d[2])->get();
+                            foreach ($detallescompra as $detalle){  
+                                $producto = Producto::where('Codigo', $detalle->Codigo)->first();
+                                $costopartida = Helpers::convertirvalorcorrecto($producto->Costo);
+                                //costo total
+                                $costototalpartida  = $costopartida * $detalle->Cantidad;
+                                //utilidad de la partida
+                                $utilidadpartida = $detalle->SubTotal - Helpers::convertirvalorcorrecto($costototalpartida);
+                                $CompraAnterior = Compra::where('Compra', $explode_d[0])->first();
+                                $OrdenTrabajoAnterior = OrdenTrabajo::where('Orden', $CompraAnterior->OrdenTrabajo)->first();
+                                OrdenTrabajo::where('Orden', $CompraAnterior->OrdenTrabajo)
+                                            ->update([
+                                                'Importe' => $OrdenTrabajoAnterior->Importe - $detalle->Importe,
+                                                'Descuento' => $OrdenTrabajoAnterior->Descuento - $detalle->Descuento,
+                                                'SubTotal' => $OrdenTrabajoAnterior->SubTotal - $detalle->SubTotal,
+                                                'Iva' => $OrdenTrabajoAnterior->Iva - $detalle->Iva,
+                                                'Total' => $OrdenTrabajoAnterior->Total - $detalle->Total,
+                                                'Costo' => $OrdenTrabajoAnterior->Costo - Helpers::convertirvalorcorrecto($costototalpartida),
+                                                'Utilidad' => $OrdenTrabajoAnterior->Utilidad - Helpers::convertirvalorcorrecto($utilidadpartida)
+                                            ]);
+                            }
+                            break;
+                        case "GASTOS":
+                            break;
+                        default:
+                            //restar existencias a almacen principal
+                            $RestarExistenciaAlmacen = Existencia::where('Codigo', $explode_d[1])->where('Almacen', $request->numeroalmacen)->first();
+                            $RestarExistenciaNuevaAlmacen = $RestarExistenciaAlmacen->Existencias - $detallecompra->Cantidad;
+                            Existencia::where('Codigo', $explode_d[1])
+                                        ->where('Almacen', $request->numeroalmacen)
+                                        ->update([
+                                            'Existencias' => Helpers::convertirvalorcorrecto($RestarExistenciaNuevaAlmacen)
+                                        ]);
+                    }
                     //modificar faltante por surtir detalle orden de compra
                     $OrdenCompraDetalle = OrdenCompraDetalle::where('Orden', $detallecompra->Orden)->where('Codigo', $explode_d[1])->first();
                     $Surtir = $OrdenCompraDetalle->Surtir+$detallecompra->Cantidad  [$key];
@@ -961,10 +1161,20 @@ class CompraController extends ConfiguracionSistemaController{
                 }
             }
             //modificar compra
+            switch ($request->tipo){
+                case "TOT":
+                    $movimiento="TOT";
+                    break;
+                case "GASTOS";
+                    $movimiento="GASTOS";
+                    break;
+                default:
+                    $movimiento="ALMACEN".$request->numeroalmacen;
+            }
             Compra::where('Compra', $compra)
             ->update([
                 'Proveedor'=>$request->numeroproveedor,
-                'Movimiento'=>"ALMACEN".$request->numeroalmacen,
+                'Movimiento'=>$movimiento,
                 'Remision'=>$request->remision,
                 'Factura'=>$request->factura,
                 'UUID'=>$request->uuid,
@@ -1004,7 +1214,7 @@ class CompraController extends ConfiguracionSistemaController{
             $BitacoraDocumento->save();
             //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
             foreach ($request->codigoproductopartida as $key => $codigoproductopartida){  
-                //if la partida se agrego en la modificacion se agrega en los detalles de traspaso y de orden de trabajo si asi lo requiere
+                //if la partida se agrego en la modificacion se agrega en los detalles
                 if($request->agregadoen [$key] == 'modificacion'){         
                     $item = CompraDetalle::select('Item')->where('Compra', $compra)->orderBy('Item', 'DESC')->take(1)->get();
                     $ultimoitem = $item[0]->Item+1;
@@ -1047,27 +1257,200 @@ class CompraController extends ConfiguracionSistemaController{
                                         ->update([
                                             'Surtir' => Helpers::convertirvalorcorrecto($Surtir)
                                         ]);
-                    //sumar existencias al almacen
-                    $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
-                    if($ContarExistenciaAlmacen > 0){
-                            $ExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
-                            $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias + $request->cantidadpartida [$key];
-                            Existencia::where('Codigo', $codigoproductopartida)
-                                        ->where('Almacen', $request->numeroalmacen)
+                    //si la compra es por TOT agregar las partidas en la Orden de Trabajo
+                    switch ($request->tipo) {
+                        case "TOT":
+                            $producto = Producto::where('Codigo', $codigoproductopartida)->first();
+                            $costopartida = Helpers::convertirvalorcorrecto($producto->Costo);
+                            //costo total
+                            $costototalpartida  = $costopartida * $request->cantidadpartida [$key];
+                            //utilidad de la partida
+                            $utilidadpartida = $request->subtotalpartida [$key] - Helpers::convertirvalorcorrecto($costototalpartida);
+                            $OrdenTrabajo = OrdenTrabajo::where('Orden', $request->ordentrabajo)->first();
+                            $contardetallesordentrabajo = OrdenTrabajoDetalle::where('Orden', $request->ordentrabajo)->count();
+                            if($contardetallesordentrabajo > 0){
+                                $UltimaPartidaOrdenTrabajoDetalle = OrdenTrabajoDetalle::select('Partida')->where('Orden', $request->ordentrabajo)->orderBy('Partida', 'DESC')->take(1)->get();
+                                $UltimaPartida = $UltimaPartidaOrdenTrabajoDetalle[0]->Partida+1;
+                            }else{
+                                $UltimaPartida = 1;
+                            }
+                            $OrdenTrabajoDetalle = new OrdenTrabajoDetalle;
+                            $OrdenTrabajoDetalle->Orden=$request->ordentrabajo;
+                            $OrdenTrabajoDetalle->Cliente=$OrdenTrabajo->Cliente;
+                            $OrdenTrabajoDetalle->Agente=$OrdenTrabajo->Agente;
+                            $OrdenTrabajoDetalle->Fecha=Carbon::parse($request->fecha)->toDateTimeString();
+                            $OrdenTrabajoDetalle->Codigo=$codigoproductopartida;
+                            $OrdenTrabajoDetalle->Descripcion=$request->nombreproductopartida [$key];
+                            $OrdenTrabajoDetalle->Unidad=$request->unidadproductopartida [$key];
+                            $OrdenTrabajoDetalle->Cantidad=$request->cantidadpartida [$key];
+                            $OrdenTrabajoDetalle->Precio=$request->preciopartida [$key];
+                            $OrdenTrabajoDetalle->Importe=$request->importepartida [$key];
+                            $OrdenTrabajoDetalle->Dcto=$request->descuentoporcentajepartida [$key];
+                            $OrdenTrabajoDetalle->Descuento= $request->descuentopesospartida  [$key];
+                            $OrdenTrabajoDetalle->SubTotal=$request->subtotalpartida [$key];
+                            $OrdenTrabajoDetalle->Impuesto=$request->ivaporcentajepartida [$key];
+                            $OrdenTrabajoDetalle->Iva=$request->trasladoivapesospartida [$key];
+                            $OrdenTrabajoDetalle->Total=$request->totalpesospartida [$key];
+                            $OrdenTrabajoDetalle->Costo=$costopartida;
+                            $OrdenTrabajoDetalle->CostoTotal=Helpers::convertirvalorcorrecto($costototalpartida);
+                            $OrdenTrabajoDetalle->Utilidad=Helpers::convertirvalorcorrecto($utilidadpartida);
+                            $OrdenTrabajoDetalle->Departamento="SERVICIO";
+                            $OrdenTrabajoDetalle->Cargo="SERVICIO";
+                            $OrdenTrabajoDetalle->Compra=$compra;
+                            $OrdenTrabajoDetalle->Item=$ultimoitem;
+                            $OrdenTrabajoDetalle->Usuario=Auth::user()->user;
+                            $OrdenTrabajoDetalle->Almacen=0;
+                            $OrdenTrabajoDetalle->Partida=$UltimaPartida;
+                            $OrdenTrabajoDetalle->save();
+                            $UltimaPartida++;
+                            //sumar totales partida agregada compra a orden trabajo
+                            $producto = Producto::where('Codigo', $codigoproductopartida)->first();
+                            $costopartida = Helpers::convertirvalorcorrecto($producto->Costo);
+                            //costo total
+                            $costototalpartida  = $costopartida * $request->cantidadpartida [$key];
+                            //utilidad de la partida
+                            $utilidadpartida = $request->subtotalpartida [$key] - Helpers::convertirvalorcorrecto($costototalpartida);
+                            $CompraAnterior = Compra::where('Compra', $compra)->first();
+                            $OrdenTrabajoAnterior = OrdenTrabajo::where('Orden', $CompraAnterior->OrdenTrabajo)->first();
+                            OrdenTrabajo::where('Orden', $CompraAnterior->OrdenTrabajo)
                                         ->update([
-                                            'Existencias' => Helpers::convertirvalorcorrecto($ExistenciaNuevaAlmacen)
+                                                'Importe' => $OrdenTrabajoAnterior->Importe + $request->importepartida [$key],
+                                                'Descuento' => $OrdenTrabajoAnterior->Descuento + $request->descuentopesospartida  [$key],
+                                                'SubTotal' => $OrdenTrabajoAnterior->SubTotal + $request->subtotalpartida [$key],
+                                                'Iva' => $OrdenTrabajoAnterior->Iva + $request->trasladoivapesospartida [$key],
+                                                'Total' => $OrdenTrabajoAnterior->Total + $request->totalpesospartida [$key],
+                                                'Costo' => $OrdenTrabajoAnterior->Costo + Helpers::convertirvalorcorrecto($costototalpartida),
+                                                'Utilidad' => $OrdenTrabajoAnterior->Utilidad + Helpers::convertirvalorcorrecto($utilidadpartida)
                                         ]);
-                    }else{
-                            $ExistenciaAlmacen = new Existencia;
-                            $ExistenciaAlmacen->Codigo = $codigoproductopartida;
-                            $ExistenciaAlmacen->Almacen = $request->numeroalmacen;
-                            $ExistenciaAlmacen->Existencias = $request->cantidadpartida [$key];
-                            $ExistenciaAlmacen->save();
-                    }
+                            break;
+                        case "GASTOS":
+                            break;
+                        default:
+                            //sumar existencias al almacen
+                            $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
+                            if($ContarExistenciaAlmacen > 0){
+                                    $ExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
+                                    $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias + $request->cantidadpartida [$key];
+                                    Existencia::where('Codigo', $codigoproductopartida)
+                                                ->where('Almacen', $request->numeroalmacen)
+                                                ->update([
+                                                    'Existencias' => Helpers::convertirvalorcorrecto($ExistenciaNuevaAlmacen)
+                                                ]);
+                            }else{
+                                    $ExistenciaAlmacen = new Existencia;
+                                    $ExistenciaAlmacen->Codigo = $codigoproductopartida;
+                                    $ExistenciaAlmacen->Almacen = $request->numeroalmacen;
+                                    $ExistenciaAlmacen->Existencias = $request->cantidadpartida [$key];
+                                    $ExistenciaAlmacen->save();
+                            }   
+                    } 
                     $ultimoitem++;
                 }else{
                     //si la partida no se agrego en la modificacion solo se modifican los datos
-                    //modificar detalle
+                    //modificar faltante por surtir detalle orden de compra
+                    //sumar
+                    $OrdenCompraDetalle = OrdenCompraDetalle::where('Orden', $request->ordenpartida [$key])->where('Codigo', $codigoproductopartida)->first();
+                    $Surtir = $OrdenCompraDetalle->Surtir+$request->cantidadpartidadb  [$key];
+                    OrdenCompraDetalle::where('Orden', $request->ordenpartida [$key])
+                                        ->where('Codigo', $codigoproductopartida)
+                                        ->update([
+                                            'Surtir' => Helpers::convertirvalorcorrecto($Surtir)
+                                        ]);
+                    //restar
+                    $OrdenCompraDetalle = OrdenCompraDetalle::where('Orden', $request->ordenpartida [$key])->where('Codigo', $codigoproductopartida)->first();
+                    $Surtir = $OrdenCompraDetalle->Surtir-$request->cantidadpartida  [$key];
+                    OrdenCompraDetalle::where('Orden', $request->ordenpartida [$key])
+                                        ->where('Codigo', $codigoproductopartida)
+                                        ->update([
+                                            'Surtir' => Helpers::convertirvalorcorrecto($Surtir)
+                                        ]);
+                    //si la compra es por TOT agregar las partidas en la Orden de Trabajo
+                    switch ($request->tipo) {
+                        case "TOT":
+                            //restar totales partida db compra a orden trabajo
+                            //si es TOT restar del total de la orden de trabajo los totales de la partida de la compra y eliminar la partida de la orden de trabajo
+                            //obtener total costo y utilidad porque en la compra no se calcula
+                            $detalle = CompraDetalle::where('Compra', $compra)->where('Codigo', $codigoproductopartida)->where('Item', $request->itempartida [$key])->first();
+                            $producto = Producto::where('Codigo', $detalle->Codigo)->first();
+                            $costopartida = Helpers::convertirvalorcorrecto($producto->Costo);
+                            //costo total
+                            $costototalpartida  = $costopartida * $detalle->Cantidad;
+                            //utilidad de la partida
+                            $utilidadpartida = $detalle->SubTotal - Helpers::convertirvalorcorrecto($costototalpartida);
+                            $OrdenTrabajoAnterior = OrdenTrabajo::where('Orden', $request->ordentrabajo)->first();
+                            OrdenTrabajo::where('Orden', $request->ordentrabajo)
+                                        ->update([
+                                                'Importe' => $OrdenTrabajoAnterior->Importe - $detalle->Importe,
+                                                'Descuento' => $OrdenTrabajoAnterior->Descuento - $detalle->Descuento,
+                                                'SubTotal' => $OrdenTrabajoAnterior->SubTotal - $detalle->SubTotal,
+                                                'Iva' => $OrdenTrabajoAnterior->Iva - $detalle->Iva,
+                                                'Total' => $OrdenTrabajoAnterior->Total - $detalle->Total,
+                                                'Costo' => $OrdenTrabajoAnterior->Costo - Helpers::convertirvalorcorrecto($costototalpartida),
+                                                'Utilidad' => $OrdenTrabajoAnterior->Utilidad - Helpers::convertirvalorcorrecto($utilidadpartida)
+                                        ]);
+                            //sumar totales partida modificada compra a orden trabajo
+                            $producto = Producto::where('Codigo', $codigoproductopartida)->first();
+                            $costopartida = Helpers::convertirvalorcorrecto($producto->Costo);
+                            //costo total
+                            $costototalpartida  = $costopartida * $request->cantidadpartida [$key];
+                            //utilidad de la partida
+                            $utilidadpartida = $request->subtotalpartida [$key] - Helpers::convertirvalorcorrecto($costototalpartida);
+                            $OrdenTrabajoAnterior = OrdenTrabajo::where('Orden', $request->ordentrabajo)->first();
+                            OrdenTrabajo::where('Orden', $request->ordentrabajo)
+                                        ->update([
+                                                'Importe' => $OrdenTrabajoAnterior->Importe + $request->importepartida [$key],
+                                                'Descuento' => $OrdenTrabajoAnterior->Descuento + $request->descuentopesospartida  [$key],
+                                                'SubTotal' => $OrdenTrabajoAnterior->SubTotal + $request->subtotalpartida [$key],
+                                                'Iva' => $OrdenTrabajoAnterior->Iva + $request->trasladoivapesospartida [$key],
+                                                'Total' => $OrdenTrabajoAnterior->Total + $request->totalpesospartida [$key],
+                                                'Costo' => $OrdenTrabajoAnterior->Costo + Helpers::convertirvalorcorrecto($costototalpartida),
+                                                'Utilidad' => $OrdenTrabajoAnterior->Utilidad + Helpers::convertirvalorcorrecto($utilidadpartida)
+                                        ]);
+                            //modificar detalle orden trabajo
+                            OrdenTrabajoDetalle::where('Orden', $request->ordentrabajo)->where('Compra', $compra)->where('Codigo', $codigoproductopartida)
+                                        ->update([
+                                            'Fecha' => Carbon::parse($request->fecha)->toDateTimeString(),
+                                            'Codigo' => $codigoproductopartida,
+                                            'Descripcion' => $request->nombreproductopartida [$key],
+                                            'Unidad' => $request->unidadproductopartida [$key],
+                                            'Cantidad' => $request->cantidadpartida [$key],
+                                            'Precio' => $request->preciopartida [$key],
+                                            'Importe' => $request->importepartida [$key],
+                                            'Dcto' => $request->descuentoporcentajepartida [$key],
+                                            'Descuento' => $request->descuentopesospartida  [$key],
+                                            'SubTotal' => $request->subtotalpartida [$key],
+                                            'Impuesto' => $request->ivaporcentajepartida [$key],
+                                            'Iva' => $request->trasladoivapesospartida [$key],
+                                            'Total' => $request->totalpesospartida [$key],
+                                            'Costo' => $costopartida,
+                                            'CostoTotal' => Helpers::convertirvalorcorrecto($costototalpartida),
+                                            'Utilidad' => Helpers::convertirvalorcorrecto($utilidadpartida)
+                                        ]);
+                            break;
+                        case "GASTOS":
+                            break;
+                        default:
+                            //restar existencias del almacen 
+                            $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
+                            if($ContarExistenciaAlmacen > 0){
+                                $ExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
+                                $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias - $request->cantidadpartidadb [$key];
+                                Existencia::where('Codigo', $codigoproductopartida)
+                                            ->where('Almacen', $request->numeroalmacen)
+                                            ->update([
+                                                'Existencias' => Helpers::convertirvalorcorrecto($ExistenciaNuevaAlmacen)
+                                            ]);
+                            }
+                            //sumar existencias a almacen principal
+                            $SumarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
+                            $SumarExistenciaNuevaAlmacen = $SumarExistenciaAlmacen->Existencias + $request->cantidadpartida [$key];
+                            Existencia::where('Codigo', $codigoproductopartida)
+                                        ->where('Almacen', $request->numeroalmacen)
+                                        ->update([
+                                            'Existencias' => Helpers::convertirvalorcorrecto($SumarExistenciaNuevaAlmacen)
+                                        ]); 
+                    } 
+                    //modificar detalle importante no mover de aqui
                     CompraDetalle::where('Compra', $compra)
                     ->where('Item', $request->itempartida [$key])
                     ->update([
@@ -1094,42 +1477,6 @@ class CompraController extends ConfiguracionSistemaController{
                         'ClaveProducto' => $request->claveproductopartida [$key],
                         'ClaveUnidad' => $request->claveunidadpartida [$key]
                     ]);
-                    //modificar faltante por surtir detalle orden de compra
-                    //sumar
-                    $OrdenCompraDetalle = OrdenCompraDetalle::where('Orden', $request->ordenpartida [$key])->where('Codigo', $codigoproductopartida)->first();
-                    $Surtir = $OrdenCompraDetalle->Surtir+$request->cantidadpartidadb  [$key];
-                    OrdenCompraDetalle::where('Orden', $request->ordenpartida [$key])
-                                        ->where('Codigo', $codigoproductopartida)
-                                        ->update([
-                                            'Surtir' => Helpers::convertirvalorcorrecto($Surtir)
-                                        ]);
-                    //restar
-                    $OrdenCompraDetalle = OrdenCompraDetalle::where('Orden', $request->ordenpartida [$key])->where('Codigo', $codigoproductopartida)->first();
-                    $Surtir = $OrdenCompraDetalle->Surtir-$request->cantidadpartida  [$key];
-                    OrdenCompraDetalle::where('Orden', $request->ordenpartida [$key])
-                                        ->where('Codigo', $codigoproductopartida)
-                                        ->update([
-                                            'Surtir' => Helpers::convertirvalorcorrecto($Surtir)
-                                        ]);
-                    //restar existencias del almacen 
-                    $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
-                    if($ContarExistenciaAlmacen > 0){
-                        $ExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
-                        $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias - $request->cantidadpartidadb [$key];
-                        Existencia::where('Codigo', $codigoproductopartida)
-                                    ->where('Almacen', $request->numeroalmacen)
-                                    ->update([
-                                        'Existencias' => Helpers::convertirvalorcorrecto($ExistenciaNuevaAlmacen)
-                                    ]);
-                    }
-                    //sumar existencias a almacen principal
-                    $SumarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
-                    $SumarExistenciaNuevaAlmacen = $SumarExistenciaAlmacen->Existencias + $request->cantidadpartida [$key];
-                    Existencia::where('Codigo', $codigoproductopartida)
-                                ->where('Almacen', $request->numeroalmacen)
-                                ->update([
-                                    'Existencias' => Helpers::convertirvalorcorrecto($SumarExistenciaNuevaAlmacen)
-                                ]);
                 }    
             }
             //modificar el status de la orden de compra a SURTIDO o BACKORDER
@@ -1151,10 +1498,12 @@ class CompraController extends ConfiguracionSistemaController{
     //verificar si la compra tiene relacion con alguna cuenta por pagar
     public function compras_verificar_uso_en_modulos(Request $request){
         $Compra = Compra::where('Compra', $request->compradesactivar)->first();
-        $numerocuentasporpagar = CuentaXPagarDetalle::where('Compra', $request->compradesactivar)->count();
-        $numerocontrareciboscompra = ContraReciboDetalle::where('Compra', $request->compradesactivar)->count();
+        $numerocuentasporpagar = CuentaXPagarDetalle::where('Compra', $request->compradesactivar)->where('Abono', '>', 0)->count();
+        $numerocontrareciboscompra = ContraReciboDetalle::where('Compra', $request->compradesactivar)->where('Total', '>', 0)->count();
+        $numeronotasproveedor = NotaProveedorDocumento::where('Compra', $request->compradesactivar)->where('Descuento', '>', 0)->count();
         $numerocuentaxpagar = 0;
         $numerocontrarecibo = 0;
+        $numeronotaproveedor = 0;
         $numerodetallesconexistenciasinsuficientes = 0;
         //verificar si hay un contrarecibo ligado
         if($numerocontrareciboscompra > 0){
@@ -1166,14 +1515,33 @@ class CompraController extends ConfiguracionSistemaController{
             $detallecuentaxpagar = CuentaXPagarDetalle::where('Compra', $request->compradesactivar)->first();
             $numerocuentaxpagar = $detallecuentaxpagar->Pago;
         }
+        //verificar si hay una nota proveedor ligada
+        if($numeronotasproveedor > 0){
+            $detallenotaproveedor = NotaProveedorDocumento::where('Compra', $request->compradesactivar)->first();
+            $numeronotaproveedor = $detallenotaproveedor->Nota;
+        }
         //verificar si el almacen cuenta con las existencias
         $comprabaja = Compra::where('Compra', $request->compradesactivar)->first();
         $detallescomprabaja = CompraDetalle::where('Compra', $request->compradesactivar)->get();
         foreach($detallescomprabaja as $detallecomprabaja){
-            $existencias = Existencia::select('Existencias')->where('Codigo', $detallecomprabaja->Codigo)->where('Almacen', $comprabaja->Almacen)->first();
-            if($detallecomprabaja->Cantidad > $existencias->Existencias){
-                $numerodetallesconexistenciasinsuficientes++;
+            switch ($comprabaja->Tipo){
+                case "TOT":
+                    break;
+                case "GASTOS":
+                    break;
+                default:
+                    $ContarExistenciaAlmacen = Existencia::where('Codigo', $detallecomprabaja->Codigo)->where('Almacen', $comprabaja->Almacen)->count();
+                    if($ContarExistenciaAlmacen > 0){
+                        $existencias = Existencia::select('Existencias')->where('Codigo', $detallecomprabaja->Codigo)->where('Almacen', $comprabaja->Almacen)->first();
+                        $existenciascodigo = $existencias->Existencias;
+                    }else{
+                        $existenciascodigo = 0;
+                    }
+                    if($detallecomprabaja->Cantidad > $existenciascodigo){
+                        $numerodetallesconexistenciasinsuficientes++;
+                    }
             }
+
         }
         $resultadofechas = Helpers::compararanoymesfechas($Compra->Fecha);
         $data = array (
@@ -1181,6 +1549,8 @@ class CompraController extends ConfiguracionSistemaController{
             'numerocuentaxpagar' => $numerocuentaxpagar,
             'numerocontrareciboscompra' => $numerocontrareciboscompra,
             'numerocontrarecibo' => $numerocontrarecibo,
+            'numeronotasproveedor' => $numeronotasproveedor,
+            'numeronotaproveedor' => $numeronotaproveedor,
             'numerodetallesconexistenciasinsuficientes' => $numerodetallesconexistenciasinsuficientes,
             'resultadofechas' => $resultadofechas,
             'Status' => $Compra->Status
@@ -1190,6 +1560,37 @@ class CompraController extends ConfiguracionSistemaController{
     //dar de baja compra
     public function compras_alta_o_baja(Request $request){
         $Compra = Compra::where('Compra', $request->compradesactivar)->first();
+        //si la compra es POR TOT modificar los totales de la orden de trabajo
+        switch ($Compra->Tipo) {
+            case "TOT":
+                //obtener total costo y utilidad porque en la compra no se calcula
+                $totalcosto=0;
+                $totalutilidad=0;
+                $detallescompra = CompraDetalle::where('Compra', $request->compradesactivar)->get();
+                foreach ($detallescompra as $detalle){  
+                    $producto = Producto::where('Codigo', $detalle->Codigo)->first();
+                    $costopartida = Helpers::convertirvalorcorrecto($producto->Costo);
+                    //costo total
+                    $costototalpartida  = $costopartida * $detalle->Cantidad;
+                    //utilidad de la partida
+                    $utilidadpartida = $detalle->SubTotal - Helpers::convertirvalorcorrecto($costototalpartida);
+                    $totalcosto = $totalcosto + $costototalpartida;
+                    $totalutilidad = $totalutilidad + $utilidadpartida;
+                }
+                $CompraAnterior = Compra::where('Compra', $request->compradesactivar)->first();
+                $OrdenTrabajoAnterior = OrdenTrabajo::where('Orden', $CompraAnterior->OrdenTrabajo)->first();
+                OrdenTrabajo::where('Orden', $CompraAnterior->OrdenTrabajo)
+                            ->update([
+                                'Importe' => $OrdenTrabajoAnterior->Importe - $CompraAnterior->Importe,
+                                'Descuento' => $OrdenTrabajoAnterior->Descuento - $CompraAnterior->Descuento,
+                                'SubTotal' => $OrdenTrabajoAnterior->SubTotal - $CompraAnterior->SubTotal,
+                                'Iva' => $OrdenTrabajoAnterior->Iva - $CompraAnterior->Iva,
+                                'Total' => $OrdenTrabajoAnterior->Total - $CompraAnterior->Total,
+                                'Costo' => $OrdenTrabajoAnterior->Costo - Helpers::convertirvalorcorrecto($totalcosto),
+                                'Utilidad' => $OrdenTrabajoAnterior->Utilidad - Helpers::convertirvalorcorrecto($totalutilidad)
+                            ]);
+                break;
+        } 
         //cambiar status y colocar valores en 0
         $MotivoBaja = $request->motivobaja.', '.Helpers::fecha_exacta_accion_datetimestring().', '.Auth::user()->user;
         Compra::where('Compra', $request->compradesactivar)
@@ -1213,14 +1614,23 @@ class CompraController extends ConfiguracionSistemaController{
                 ]);
         $detalles = CompraDetalle::where('Compra', $request->compradesactivar)->get();
         foreach($detalles as $detalle){
-            //restar existencias al almacen
-            $ExistenciaAlmacen = Existencia::where('Codigo', $detalle->Codigo)->where('Almacen', $Compra->Almacen)->first();
-            $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias-$detalle->Cantidad;
-            Existencia::where('Codigo', $detalle->Codigo)
-                        ->where('Almacen', $Compra->Almacen)
-                        ->update([
-                            'Existencias' => Helpers::convertirvalorcorrecto($ExistenciaNuevaAlmacen)
-                        ]);
+            //validad el tipo de compra que es
+            switch ($Compra->Tipo){
+                case "TOT":
+                    $eliminarrefacciones = OrdenTrabajoDetalle::where('Compra', $request->compradesactivar)->where('Codigo', $detalle->Codigo)->forceDelete();
+                    break;
+                case "GASTOS":
+                    break;
+                default:
+                    //restar existencias al almacen
+                    $ExistenciaAlmacen = Existencia::where('Codigo', $detalle->Codigo)->where('Almacen', $Compra->Almacen)->first();
+                    $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias-$detalle->Cantidad;
+                    Existencia::where('Codigo', $detalle->Codigo)
+                                ->where('Almacen', $Compra->Almacen)
+                                ->update([
+                                    'Existencias' => Helpers::convertirvalorcorrecto($ExistenciaNuevaAlmacen)
+                                ]);
+            }
             //modificar faltante por surtir detalle orden de compra
             $OrdenCompraDetalle = OrdenCompraDetalle::where('Codigo', $detalle->Codigo)->where('Orden', $Compra->Orden)->first();
             $Surtir = $OrdenCompraDetalle->Surtir+$detalle->Cantidad;

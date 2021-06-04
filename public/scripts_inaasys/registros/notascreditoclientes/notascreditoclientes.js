@@ -10,12 +10,18 @@ function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1500));
 }
 function asignarfechaactual(){
+  /*
     var fechahoy = new Date();
     var dia = ("0" + fechahoy.getDate()).slice(-2);
     var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
     var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia) ;
     $('#fecha').val(hoy);
     $('input[type=datetime-local]').val(new Date().toJSON().slice(0,19));
+  */
+  $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechadatetimelocal){
+    $("#fecha").val(fechadatetimelocal);
+    $('input[type=datetime-local]').val(fechadatetimelocal);
+  }) 
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
@@ -208,27 +214,41 @@ function obtenerclientes(){
 } 
 //seleccionar proveedor
 function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapago, clavemetodopago, metodopago, claveusocfdi, usocfdi, claveresidenciafiscal, residenciafiscal){
-  $("#numerocliente").val(Numero);
-  $("#numeroclienteanterior").val(Numero);
-  $("#cliente").val(Nombre);
-  $("#textonombrecliente").html(Nombre.substring(0, 40));
-  $("#rfccliente").val(Rfc);
-  //datos pestaña receptor o cliente
-  $("#receptorrfc").val(Rfc);
-  $("#receptornombre").val(Nombre);
-  $("#claveformapago").val(claveformapago);
-  $("#formapago").val(formapago);
-  $("#textonombreformapago").html(formapago.substring(0, 40));
-  $("#clavemetodopago").val(clavemetodopago);
-  $("#metodopago").val(metodopago);
-  $("#textonombremetodopago").html(metodopago.substring(0, 40));
-  $("#claveusocfdi").val(claveusocfdi);
-  $("#usocfdi").val(usocfdi);
-  $("#textonombreusocfdi").html(usocfdi.substring(0, 40));
-  $("#claveresidenciafiscal").val(claveresidenciafiscal);
-  $("#residenciafiscal").val(residenciafiscal);
-  $("#textonombreresidenciafiscal").html(residenciafiscal.substring(0, 40));
-  mostrarformulario();
+  var numeroclienteanterior = $("#numeroclienteanterior").val();
+  var numerocliente = Numero;
+  if(numeroclienteanterior != numerocliente){ 
+    $("#numerocliente").val(Numero);
+    $("#numeroclienteanterior").val(Numero);
+    $("#cliente").val(Nombre);
+    if(Nombre != null){
+      $("#textonombrecliente").html(Nombre.substring(0, 40));
+    }
+    $("#rfccliente").val(Rfc);
+    //datos pestaña receptor o cliente
+    $("#receptorrfc").val(Rfc);
+    $("#receptornombre").val(Nombre);
+    $("#claveformapago").val(claveformapago);
+    $("#formapago").val(formapago);
+    if(formapago != null){
+      $("#textonombreformapago").html(formapago.substring(0, 40));
+    }
+    $("#clavemetodopago").val(clavemetodopago);
+    $("#metodopago").val(metodopago);
+    if(metodopago != null){
+      $("#textonombremetodopago").html(metodopago.substring(0, 40));
+    }
+    $("#claveusocfdi").val(claveusocfdi);
+    $("#usocfdi").val(usocfdi);
+    if(usocfdi != null){
+      $("#textonombreusocfdi").html(usocfdi.substring(0, 40));
+    }
+    $("#claveresidenciafiscal").val(claveresidenciafiscal);
+    $("#residenciafiscal").val(residenciafiscal);
+    if(residenciafiscal != null){
+      $("#textonombreresidenciafiscal").html(residenciafiscal.substring(0, 40));
+    }
+    mostrarformulario();
+  }
 }
 //obtener registros de almacenes
 function obteneralmacenes(){
@@ -292,12 +312,18 @@ function obteneralmacenes(){
 } 
 //seleccionar almacen
 function seleccionaralmacen(Numero, Nombre){
+  var numeroalmacenanterior = $("#numeroalmacenanterior").val();
+  var numeroalmacen = Numero;
+  if(numeroalmacenanterior != numeroalmacen){
     $("#numeroalmacen").val(Numero);
     $("#numeroalmacenanterior").val(Numero);
     $("#almacen").val(Nombre);
-    $("#textonombrealmacen").html(Nombre.substring(0, 40));
+    if(Nombre != null){
+      $("#textonombrealmacen").html(Nombre.substring(0, 40));
+    }
     $("#btnlistarfacturas").show();
     mostrarformulario();
+  }
 }
 //obtener lugares expedicion
 function obtenerlugaresexpedicion(){
@@ -366,9 +392,13 @@ function obtenerlugaresexpedicion(){
 } 
 //seleccionar lugar expedicion
 function seleccionarlugarexpedicion(Clave){
-  $("#lugarexpedicion").val(Clave);
-  $("#lugarexpedicionanterior").val(Clave);
-  mostrarformulario();
+  var lugarexpedicionanterior = $("#lugarexpedicionanterior").val();
+  var lugarexpedicion = Clave;
+  if(lugarexpedicionanterior != lugarexpedicion){
+    $("#lugarexpedicion").val(Clave);
+    $("#lugarexpedicionanterior").val(Clave);
+    mostrarformulario();
+  }
 }
 //obtener regimenes fiscales
 function obtenerregimenesfiscales(){
@@ -436,11 +466,17 @@ function obtenerregimenesfiscales(){
 } 
 //seleccionar lugar expedicion
 function seleccionarregimenfiscal(Clave, Nombre){
-  $("#claveregimenfiscal").val(Clave);
-  $("#claveregimenfiscalanterior").val(Clave);
-  $("#regimenfiscal").val(Nombre);
-  $("#textonombreregimenfiscal").html(Nombre.substring(0, 40));
-  mostrarformulario();
+  var claveregimenfiscalanterior = $("#claveregimenfiscalanterior").val();
+  var claveregimenfiscal = Clave;
+  if(claveregimenfiscalanterior != claveregimenfiscal){
+    $("#claveregimenfiscal").val(Clave);
+    $("#claveregimenfiscalanterior").val(Clave);
+    $("#regimenfiscal").val(Nombre);
+    if(Nombre != null){
+      $("#textonombreregimenfiscal").html(Nombre.substring(0, 40));
+    }
+    mostrarformulario();
+  }
 }
 //obtener tipos relacion
 function obtenertiposrelaciones(){
@@ -504,11 +540,17 @@ function obtenertiposrelaciones(){
 } 
 //seleccionar lugar expedicion
 function seleccionartiporelacion(Clave, Nombre){
-  $("#clavetiporelacion").val(Clave);
-  $("#clavetiporelacionanterior").val(Clave);
-  $("#tiporelacion").val(Nombre);
-  $("#textonombretiporelacion").html(Nombre.substring(0, 40));
-  mostrarformulario();
+  var clavetiporelacionanterior = $("#clavetiporelacionanterior").val();
+  var clavetiporelacion = Clave;
+  if(clavetiporelacionanterior != clavetiporelacion){
+    $("#clavetiporelacion").val(Clave);
+    $("#clavetiporelacionanterior").val(Clave);
+    $("#tiporelacion").val(Nombre);
+    if(Nombre != null){
+      $("#textonombretiporelacion").html(Nombre.substring(0, 40));
+    }
+    mostrarformulario();
+  }
 }
 //obtener formas de pago
 function obtenerformaspago(){
@@ -574,11 +616,17 @@ function obtenerformaspago(){
 } 
 //seleccionar forma pago
 function seleccionarformapago(Clave, Nombre){
-  $("#claveformapago").val(Clave);
-  $("#claveformapagoanterior").val(Clave);
-  $("#formapago").val(Nombre);
-  $("#textonombreformapago").html(Nombre.substring(0, 40));
-  mostrarformulario();
+  var claveformapagoanterior = $("#claveformapagoanterior").val();
+  var claveformapago = Clave;
+  if(claveformapagoanterior != claveformapago){
+    $("#claveformapago").val(Clave);
+    $("#claveformapagoanterior").val(Clave);
+    $("#formapago").val(Nombre);
+    if(Nombre != null){
+      $("#textonombreformapago").html(Nombre.substring(0, 40));
+    }
+    mostrarformulario();
+  }
 }
 //obtener metodos de pago
 function obtenermetodospago(){
@@ -642,11 +690,17 @@ function obtenermetodospago(){
 } 
 //seleccionar metodo pago
 function seleccionarmetodopago(Clave, Nombre){
-  $("#clavemetodopago").val(Clave);
-  $("#clavemetodopagoanterior").val(Clave);
-  $("#metodopago").val(Nombre);
-  $("#textonombremetodopago").html(Nombre.substring(0, 40));
-  mostrarformulario();
+  var clavemetodopagoanterior = $("#clavemetodopagoanterior").val();
+  var clavemetodopago = Clave;
+  if(clavemetodopagoanterior != clavemetodopago){
+    $("#clavemetodopago").val(Clave);
+    $("#clavemetodopagoanterior").val(Clave);
+    $("#metodopago").val(Nombre);
+    if(Nombre != null){
+      $("#textonombremetodopago").html(Nombre.substring(0, 40));
+    }
+    mostrarformulario();
+  }
 }
 //obtener usos cfdi
 function obtenerusoscfdi(){
@@ -714,11 +768,17 @@ function obtenerusoscfdi(){
 } 
 //seleccionar uso cfdi
 function seleccionarusocfdi(Clave, Nombre){
-  $("#claveusocfdi").val(Clave);
-  $("#claveusocfdianterior").val(Clave);
-  $("#usocfdi").val(Nombre);
-  $("#textonombreusocfdi").html(Nombre.substring(0, 40));
-  mostrarformulario();
+  var claveusocfdianterior = $("#claveusocfdianterior").val();
+  var claveusocfdi = Clave;
+  if(claveusocfdianterior != claveusocfdi){
+    $("#claveusocfdi").val(Clave);
+    $("#claveusocfdianterior").val(Clave);
+    $("#usocfdi").val(Nombre);
+    if(Nombre != null){
+      $("#textonombreusocfdi").html(Nombre.substring(0, 40));
+    }
+    mostrarformulario();
+  }
 }
 //obtener residencias fiscales
 function obtenerresidenciasfiscales(){
@@ -782,11 +842,17 @@ function obtenerresidenciasfiscales(){
 } 
 //seleccionar residencia fiscal
 function seleccionarresidenciafiscal(Clave, Nombre){
-  $("#claveresidenciafiscal").val(Clave);
-  $("#claveresidenciafiscalanterior").val(Clave);
-  $("#residenciafiscal").val(Nombre);
-  $("#textonombreresidenciafiscal").html(Nombre.substring(0, 40));
-  mostrarformulario();
+  var claveresidenciafiscalanterior = $("#claveresidenciafiscalanterior").val();
+  var claveresidenciafiscal = Clave;
+  if(claveresidenciafiscalanterior != claveresidenciafiscal){
+    $("#claveresidenciafiscal").val(Clave);
+    $("#claveresidenciafiscalanterior").val(Clave);
+    $("#residenciafiscal").val(Nombre);
+    if(Nombre != null){
+      $("#textonombreresidenciafiscal").html(Nombre.substring(0, 40));
+    }
+    mostrarformulario();
+  }
 }
 //obtener folio serie nota
 function obtenerfoliosnotas(){
@@ -1085,13 +1151,17 @@ $(document).ready(function(){
 
 //obtener por numero
 function obtenerclientepornumero(){
-  if($("#numerocliente").parsley().isValid()){
-      var numerocliente = $("#numerocliente").val();
+  var numeroclienteanterior = $("#numeroclienteanterior").val();
+  var numerocliente = $("#numerocliente").val();
+  if(numeroclienteanterior != numerocliente){
+    if($("#numerocliente").parsley().isValid()){
       $.get(notas_credito_clientes_obtener_cliente_por_numero, {numerocliente:numerocliente}, function(data){
         $("#numerocliente").val(data.numero);
         $("#numeroclienteanterior").val(data.numero);
         $("#cliente").val(data.nombre);
-        $("#textonombrecliente").html(data.nombre.substring(0, 40));
+        if(data.nombre != null){
+          $("#textonombrecliente").html(data.nombre.substring(0, 40));
+        }
         $("#rfccliente").val(data.rfc);
         //datos pestaña receptor o cliente
         $("#receptorrfc").val(data.rfc);
@@ -1099,21 +1169,30 @@ function obtenerclientepornumero(){
         $("#claveformapago").val(data.claveformapago);
         $("#claveformapagoanterior").val(data.claveformapago);
         $("#formapago").val(data.formapago);
-        $("#textonombreformapago").html(data.formapago.substring(0, 40));
+        if(data.formapago != null){
+          $("#textonombreformapago").html(data.formapago.substring(0, 40));
+        }
         $("#clavemetodopago").val(data.clavemetodopago);
         $("#clavemetodopagoanterior").val(data.clavemetodopago);
         $("#metodopago").val(data.metodopago);
-        $("#textonombremetodopago").html(data.metodopago.substring(0, 40));
+        if(data.metodopago != null){
+          $("#textonombremetodopago").html(data.metodopago.substring(0, 40));
+        }
         $("#claveusocfdi").val(data.claveusocfdi);
         $("#claveusocfdianterior").val(data.claveusocfdi);
         $("#usocfdi").val(data.usocfdi);
-        $("#textonombreusocfdi").html(data.usocfdi.substring(0, 40));
+        if(data.usocfdi != null){
+          $("#textonombreusocfdi").html(data.usocfdi.substring(0, 40));
+        }
         $("#claveresidenciafiscal").val(data.claveresidenciafiscal);
         $("#claveresidenciafiscalanterior").val(data.claveresidenciafiscal);
         $("#residenciafiscal").val(data.residenciafiscal);
-        $("#textonombreresidenciafiscal").html(data.residenciafiscal.substring(0, 40));
+        if(data.residenciafiscal != null){
+          $("#textonombreresidenciafiscal").html(data.residenciafiscal.substring(0, 40));
+        }
         mostrarformulario();
       }) 
+    }
   }
 }
 //regresar numero
@@ -1123,16 +1202,21 @@ function regresarnumerocliente(){
 }
 //obtener por numero
 function obteneralmacenpornumero(){
-  if($("#numeroalmacen").parsley().isValid()){
-      var numeroalmacen = $("#numeroalmacen").val();
+  var numeroalmacenanterior = $("#numeroalmacenanterior").val();
+  var numeroalmacen = $("#numeroalmacen").val();
+  if(numeroalmacenanterior != numeroalmacen){
+    if($("#numeroalmacen").parsley().isValid()){
       $.get(notas_credito_clientes_obtener_almacen_por_numero, {numeroalmacen:numeroalmacen}, function(data){
           $("#numeroalmacen").val(data.numero);
           $("#numeroalmacenanterior").val(data.numero);
           $("#almacen").val(data.nombre);
-          $("#textonombrealmacen").html(data.nombre.substring(0, 40));
+          if(data.nombre != null){
+            $("#textonombrealmacen").html(data.nombre.substring(0, 40));
+          }
           mostrarbotonlistarfacturas();
           mostrarformulario();
       }) 
+    }
   }
 }
 //regresar numero
@@ -1142,14 +1226,19 @@ function regresarnumeroalmacen(){
 }
 //obtener por clave
 function obtenerlugarexpedicionporclave(){
-  if($("#lugarexpedicion").parsley().isValid()){
-      var lugarexpedicion = $("#lugarexpedicion").val();
+  var lugarexpedicionanterior = $("#lugarexpedicionanterior").val();
+  var lugarexpedicion = $("#lugarexpedicion").val();
+  if(lugarexpedicionanterior != lugarexpedicion){
+    if($("#lugarexpedicion").parsley().isValid()){
       $.get(notas_credito_clientes_obtener_lugar_expedicion_por_clave, {lugarexpedicion:lugarexpedicion}, function(data){
         $("#lugarexpedicion").val(data.clave);
         $("#lugarexpedicionanterior").val(data.clave);
-        $("#textonombrelugarexpedicion").html(data.estado.substring(0, 40));
+        if(data.estado != null){
+          $("#textonombrelugarexpedicion").html(data.estado.substring(0, 40));
+        }
         mostrarformulario();
       }) 
+    }
   }
 }
 //regresar clave
@@ -1159,15 +1248,20 @@ function regresarclavelugarexpedicion(){
 }
 //obtener por clave
 function obtenerregimenfiscalporclave(){
-  if($("#claveregimenfiscal").parsley().isValid()){
-      var claveregimenfiscal = $("#claveregimenfiscal").val();
+  var claveregimenfiscalanterior = $("#claveregimenfiscalanterior").val();
+  var claveregimenfiscal = $("#claveregimenfiscal").val();
+  if(claveregimenfiscalanterior != claveregimenfiscal){
+    if($("#claveregimenfiscal").parsley().isValid()){
       $.get(notas_credito_clientes_obtener_regimen_fiscal_por_clave, {claveregimenfiscal:claveregimenfiscal}, function(data){
         $("#claveregimenfiscal").val(data.clave);
         $("#claveregimenfiscalanterior").val(data.clave);
         $("#regimenfiscal").val(data.nombre);
-        $("#textonombreregimenfiscal").html(data.nombre.substring(0, 40));
+        if(data.nombre != null){
+          $("#textonombreregimenfiscal").html(data.nombre.substring(0, 40));
+        }
         mostrarformulario();
       }) 
+    }
   }
 }
 //regresar clave
@@ -1177,15 +1271,20 @@ function regresarclaveregimenfiscal(){
 }
 //obtener por clave
 function obtenertiporelacionporclave(){
-  if($("#clavetiporelacion").parsley().isValid()){
-      var clavetiporelacion = $("#clavetiporelacion").val();
+  var clavetiporelacionanterior = $("#clavetiporelacionanterior").val();
+  var clavetiporelacion = $("#clavetiporelacion").val();
+  if(clavetiporelacionanterior != clavetiporelacion){
+    if($("#clavetiporelacion").parsley().isValid()){
       $.get(notas_credito_clientes_obtener_tipo_relacion_por_clave, {clavetiporelacion:clavetiporelacion}, function(data){
         $("#clavetiporelacion").val(data.clave);
         $("#clavetiporelacionanterior").val(data.clave);  
         $("#tiporelacion").val(data.nombre);
-        $("#textonombretiporelacion").html(data.nombre.substring(0, 40));
+        if(data.nombre != null){
+          $("#textonombretiporelacion").html(data.nombre.substring(0, 40));
+        }
         mostrarformulario();
       }) 
+    }
   }
 }
 //regresar clave
@@ -1195,15 +1294,20 @@ function regresarclavetiporelacion(){
 }
 //obtener por clave
 function obtenerformapagoporclave(){
-  if($("#claveformapago").parsley().isValid()){
-      var claveformapago = $("#claveformapago").val();
+  var claveformapagoanterior = $("#claveformapagoanterior").val();
+  var claveformapago = $("#claveformapago").val();
+  if(claveformapagoanterior != claveformapago){
+    if($("#claveformapago").parsley().isValid()){
       $.get(notas_credito_clientes_obtener_forma_pago_por_clave, {claveformapago:claveformapago}, function(data){
         $("#claveformapago").val(data.clave);
         $("#claveformapagoanterior").val(data.clave);
         $("#formapago").val(data.nombre);
-        $("#textonombreformapago").html(data.nombre.substring(0, 40));
+        if(data.nombre != null){
+          $("#textonombreformapago").html(data.nombre.substring(0, 40));
+        }
         mostrarformulario();
       }) 
+    }
   }
 }
 //regresar clave
@@ -1213,15 +1317,20 @@ function regresarclaveformapago(){
 }
 //obtener por clave
 function obtenermetodopagoporclave(){
-  if($("#clavemetodopago").parsley().isValid()){
-      var clavemetodopago = $("#clavemetodopago").val();
+  var clavemetodopagoanterior = $("#clavemetodopagoanterior").val();
+  var clavemetodopago = $("#clavemetodopago").val();
+  if(clavemetodopagoanterior != clavemetodopago){
+    if($("#clavemetodopago").parsley().isValid()){
       $.get(notas_credito_clientes_obtener_metodo_pago_por_clave, {clavemetodopago:clavemetodopago}, function(data){
         $("#clavemetodopago").val(data.clave);
         $("#clavemetodopagoanterior").val(data.clave);
         $("#metodopago").val(data.nombre);
-        $("#textonombremetodopago").html(data.nombre.substring(0, 40));
+        if(data.nombre != null){
+          $("#textonombremetodopago").html(data.nombre.substring(0, 40));
+        }
         mostrarformulario();
       }) 
+    }
   }
 }
 //regresar clave
@@ -1231,15 +1340,20 @@ function regresarclavemetodopago(){
 }
 //obtener por clave
 function obtenerusocfdiporclave(){
-  if($("#claveusocfdi").parsley().isValid()){
-      var claveusocfdi = $("#claveusocfdi").val();
+  var claveusocfdianterior = $("#claveusocfdianterior").val();
+  var claveusocfdi = $("#claveusocfdi").val();
+  if(claveusocfdianterior != claveusocfdi){
+    if($("#claveusocfdi").parsley().isValid()){
       $.get(notas_credito_clientes_obtener_uso_cfdi_por_clave, {claveusocfdi:claveusocfdi}, function(data){
         $("#claveusocfdi").val(data.clave);
         $("#claveusocfdianterior").val(data.clave);
         $("#usocfdi").val(data.nombre);
-        $("#textonombreusocfdi").html(data.nombre.substring(0, 40));
+        if(data.nombre != null){
+          $("#textonombreusocfdi").html(data.nombre.substring(0, 40));
+        }
         mostrarformulario();
       }) 
+    }
   }
 }
 //regresar clave
@@ -1249,15 +1363,20 @@ function regresarclaveusocfdi(){
 }
 //obtener por clave
 function obtenerresidenciafiscalporclave(){
-  if($("#claveresidenciafiscal").parsley().isValid()){
-      var claveresidenciafiscal = $("#claveresidenciafiscal").val();
+  var claveresidenciafiscalanterior = $("#claveresidenciafiscalanterior").val();
+  var claveresidenciafiscal = $("#claveresidenciafiscal").val();
+  if(claveresidenciafiscalanterior != claveresidenciafiscal){
+    if($("#claveresidenciafiscal").parsley().isValid()){
       $.get(notas_credito_clientes_obtener_residencia_fiscal_por_clave, {claveresidenciafiscal:claveresidenciafiscal}, function(data){
         $("#claveresidenciafiscal").val(data.clave);
         $("#claveresidenciafiscalanterior").val(data.clave);
         $("#residenciafiscal").val(data.nombre);
-        $("#textonombreresidenciafiscal").html(data.nombre.substring(0, 40));
+        if(data.nombre != null){
+          $("#textonombreresidenciafiscal").html(data.nombre.substring(0, 40));
+        }
         mostrarformulario();
       }) 
+    }
   }
 }
 //regresar clave
@@ -1773,7 +1892,7 @@ function alta(){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Fecha</label>'+
-                                        '<input type="date" class="form-control" name="fecha" id="fecha" required onchange="validasolomesactual();">'+
+                                        '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required onchange="validasolomesactual();">'+
                                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                         '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
                                     '</div>'+   
@@ -2576,7 +2695,7 @@ function obtenerdatos(notamodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required readonly data-parsley-type="integer">'+
+                                                        '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required data-parsley-type="integer">'+
                                                         '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
                                                         '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
                                                         '<input type="hidden" class="form-control" name="rfccliente" id="rfccliente" required readonly>'+
@@ -2604,7 +2723,7 @@ function obtenerdatos(notamodificar){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Fecha</label>'+
-                                        '<input type="date" class="form-control" name="fecha" id="fecha" required onchange="validasolomesactual();">'+
+                                        '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required onchange="validasolomesactual();">'+
                                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                         '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
                                     '</div>'+   
@@ -2933,6 +3052,7 @@ function obtenerdatos(notamodificar){
     $("#btnlistarfacturas").hide();
     $("#btnobteneralmacenes").hide();
     $("#btnobtenerfoliosnotas").hide();
+    $("#periodohoy").val(data.notacliente.Periodo);
     $("#folio").val(data.notacliente.Folio);
     $("#serie").val(data.notacliente.Serie);
     $("#serietexto").html("Serie: "+data.notacliente.Serie);
@@ -2945,7 +3065,9 @@ function obtenerdatos(notamodificar){
     $("#tipodetalles").val(data.tipodetalles);
     $("#fecha").val(data.fecha);
     $("#cliente").val(data.cliente.Nombre);
-    $("#textonombrecliente").html(data.cliente.Nombre.substring(0, 40));
+    if(data.cliente.Nombre != null){
+      $("#textonombrecliente").html(data.cliente.Nombre.substring(0, 40));
+    }
     $("#numerocliente").val(data.cliente.Numero);
     $("#numeroclienteanterior").val(data.cliente.Numero);
     $("#rfccliente").val(data.cliente.Rfc);
@@ -2956,7 +3078,9 @@ function obtenerdatos(notamodificar){
       $("#numeroalmacenanterior").val(0);
     }else{
       $("#almacen").val(data.almacen.Nombre);
-      $("#textonombrealmacen").html(data.almacen.Nombre.substring(0, 40));
+      if(data.almacen.Nombre != null){
+        $("#textonombrealmacen").html(data.almacen.Nombre.substring(0, 40));
+      }
       $("#numeroalmacen").val(data.almacen.Numero);
       $("#numeroalmacenanterior").val(data.almacen.Numero);
     }
@@ -2969,30 +3093,44 @@ function obtenerdatos(notamodificar){
     $("#lugarexpedicion").val(data.notacliente.LugarExpedicion);
     $("#lugarexpedicionanterior").val(data.notacliente.LugarExpedicion);
     $("#regimenfiscal").val(data.regimenfiscal.Nombre);
-    $("#textonombreregimenfiscal").html(data.regimenfiscal.Nombre.substring(0, 40));
+    if(data.regimenfiscal.Nombre != null){
+      $("#textonombreregimenfiscal").html(data.regimenfiscal.Nombre.substring(0, 40));
+    }
     $("#claveregimenfiscal").val(data.regimenfiscal.Clave);
     $("#claveregimenfiscalanterior").val(data.regimenfiscal.Clave);
-    $("#tiporelacion").val(data.tiporelacion.Nombre);
-    $("#textonombretiporelacion").html(data.tiporelacion.Nombre.substring(0, 40));
-    $("#clavetiporelacion").val(data.tiporelacion.Clave);
-    $("#clavetiporelacionanterior").val(data.tiporelacion.Clave);
+    if(data.tiporelacion != null){
+      $("#tiporelacion").val(data.tiporelacion.Nombre);
+      if(data.tiporelacion.Nombre != null){
+        $("#textonombretiporelacion").html(data.tiporelacion.Nombre.substring(0, 40));
+      }
+      $("#clavetiporelacion").val(data.tiporelacion.Clave);
+      $("#clavetiporelacionanterior").val(data.tiporelacion.Clave);
+    }
     $("#receptorrfc").val(data.notacliente.ReceptorRfc);
     $("#receptornombre").val(data.notacliente.ReceptorNombre);
     $("#formapago").val(data.formapago.Nombre);
-    $("#textonombreformapago").html(data.formapago.Nombre.substring(0, 40));
+    if(data.formapago.Nombre != null){
+      $("#textonombreformapago").html(data.formapago.Nombre.substring(0, 40));
+    }
     $("#claveformapago").val(data.formapago.Clave);
     $("#claveformapagoanterior").val(data.formapago.Clave);
     $("#metodopago").val(data.metodopago.Nombre);
-    $("#textonombremetodopago").html(data.metodopago.Nombre.substring(0, 40));
+    if(data.metodopago.Nombre != null){
+      $("#textonombremetodopago").html(data.metodopago.Nombre.substring(0, 40));
+    }
     $("#clavemetodopago").val(data.metodopago.Clave);
     $("#clavemetodopagoanterior").val(data.metodopago.Clave);
     $("#condicionesdepago").val(data.notacliente.CondicionesDePago);
     $("#usocfdi").val(data.usocfdi.Nombre);
-    $("#textonombreusocfdi").html(data.usocfdi.Nombre.substring(0, 40));
+    if(data.usocfdi.Nombre != null){
+      $("#textonombreusocfdi").html(data.usocfdi.Nombre.substring(0, 40));
+    }
     $("#claveusocfdi").val(data.usocfdi.Clave);
     $("#claveusocfdianterior").val(data.usocfdi.Clave);
     $("#residenciafiscal").val(data.residenciafiscal.Nombre);
-    $("#textonombreresidenciafiscal").html(data.residenciafiscal.Nombre.substring(0, 40));
+    if(data.residenciafiscal.Nombre != null){
+      $("#textonombreresidenciafiscal").html(data.residenciafiscal.Nombre.substring(0, 40));
+    }
     $("#claveresidenciafiscal").val(data.residenciafiscal.Clave);
     $("#claveresidenciafiscalanterior").val(data.residenciafiscal.Clave);
     $("#numeroregidtrib").val(data.notacliente.NumRegIdTrib);
@@ -3034,25 +3172,9 @@ function obtenerdatos(notamodificar){
         listarproductos();
       }
     });
-    //activar busqueda para clientes
-    $('#numerocliente').on('keypress', function(e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-      obtenerclientepornumero();
-      }
-    });
     //regresar numero cliente
     $('#numerocliente').on('change', function(e) {
       regresarnumerocliente();
-    });
-    //activar busqueda para almacenes
-    $('#numeroalmacen').on('keypress', function(e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-      obteneralmacenpornumero();
-      }
     });
     //regresar numero almacen
     $('#numeroalmacen').on('change', function(e) {
@@ -3223,7 +3345,7 @@ function desactivar(notadesactivar){
           $('#estatusregistro').modal('show');
         }else{
           $("#notadesactivar").val(notadesactivar);
-          $("#textomodaldesactivar").html('Estas seguro de cambiar el estado el registro?');
+          $("#textomodaldesactivar").html('Estas seguro de dar de baja la nota de crédito cliente? No'+notadesactivar);
           $("#divmotivobaja").show();
           $("#btnbaja").show();
           $('#estatusregistro').modal('show');

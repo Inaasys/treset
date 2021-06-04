@@ -28,6 +28,7 @@ use App\VistaCuentaPorPagar;
 use App\ContraReciboDetalle;
 use Config;
 use Mail;
+use App\Serie;
 
 class CuentasPorPagarController extends ConfiguracionSistemaController{
 
@@ -43,7 +44,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
     }
 
     public function cuentas_por_pagar(){
-        $serieusuario = Helpers::obtenerserieusuario(Auth::user()->user, 'CuentasPorPagar');
+        $serieusuario = 'A';
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('cuentas_por_pagar_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('cuentas_por_pagar_exportar_excel');
@@ -55,24 +56,56 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
         if($request->ajax()){
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = VistaCuentaPorPagar::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Folio', 'DESC')->get();
+            $data = VistaCuentaPorPagar::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->get();
             return DataTables::of($data)
                 ->addColumn('operaciones', function($data){
+                    $operaciones =  '<div class="dropdown">'.
+                                        '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                                            'OPERACIONES <span class="caret"></span>'.
+                                        '</button>'.
+                                        '<ul class="dropdown-menu">'.
+                                            '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Pago .'\')">Cambios</a></li>'.
+                                            '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Pago .'\')">Bajas</a></li>'.
+                                            '<li><a href="'.route('cuentas_por_pagar_generar_pdfs_indiv',$data->Pago).'" target="_blank">Ver Documento PDF</a></li>'.
+                                            '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Pago .'\')">Enviar Documento por Correo</a></li>'.
+                                        '</ul>'.
+                                    '</div>';
+                    /*
                     $botoncambios   =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Pago .'\')"><i class="material-icons">mode_edit</i></div> '; 
                     $botonbajas     =    '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Pago .'\')"><i class="material-icons">cancel</i></div>  ';
                     $botondocumentopdf = '<a href="'.route('cuentas_por_pagar_generar_pdfs_indiv',$data->Pago).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
                     $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Pago .'\')"><i class="material-icons">email</i></div> ';
                     $operaciones =  $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
+                    */
                     return $operaciones;
                 })
+                ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
                 ->addColumn('Abono', function($data){ return $data->Abono; })
                 ->rawColumns(['operaciones'])
                 ->make(true);
         } 
     }
+    //obtener series documento
+    public function cuentas_por_pagar_obtener_series_documento(Request $request){
+        if($request->ajax()){
+            $data = Serie::where('Documento', 'CuentasPorPagar')->where('Usuario', Auth::user()->user)->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''.$data->Serie.'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+    //obtener ultimo folio de la serie seleccionada
+    public function cuentas_por_pagar_obtener_ultimo_folio_serie_seleccionada(Request $request){
+        $folio = Helpers::ultimofolioserietablamodulos('App\CuentaXPagar',$request->Serie);
+        return response()->json($folio);
+    }
     //obtener ultimo folio de cuentas por pagar
-    public function cuentas_por_pagar_obtener_ultimo_folio(){
-        $folio = Helpers::ultimofoliotablamodulos('App\CuentaXPagar');
+    public function cuentas_por_pagar_obtener_ultimo_folio(Request $request){
+        $folio = Helpers::ultimofolioserietablamodulos('App\CuentaXPagar',$request->serie);
         return response()->json($folio);
     }
     //obtener proveedores
@@ -114,7 +147,8 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
             $data = Banco::where('Status', 'ALTA')->orderBy("Numero", "ASC")->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarbanco('.$data->Numero.',\''.$data->Nombre .'\')">Seleccionar</div>';
+                        $ultimatransferencia = VistaCuentaPorPagar::select("Transferencia")->where('Banco', $data->Numero)->orderBy("Transferencia", "DESC")->take(1)->get();
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarbanco('.$data->Numero.',\''.$data->Nombre .'\','.$ultimatransferencia[0]->Transferencia.')">Seleccionar</div>';
                         return $boton;
                     })
                     ->rawColumns(['operaciones'])
@@ -126,15 +160,19 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
     public function cuentas_por_pagar_obtener_banco_por_numero(Request $request){
         $numero = '';
         $nombre = '';
+        $transferencia = 0;
         $existebanco = Banco::where('Numero', $request->numerobanco)->where('Status', 'ALTA')->count();
         if($existebanco > 0){
             $banco = Banco::where('Numero', $request->numerobanco)->where('Status', 'ALTA')->first();
+            $ultimatransferencia = VistaCuentaPorPagar::select("Transferencia")->where('Banco', $request->numerobanco)->orderBy("Transferencia", "DESC")->take(1)->get();
+            $transferencia = $ultimatransferencia[0]->Transferencia;
             $numero = $banco->Numero;
             $nombre = $banco->Nombre;
         }
         $data = array(
             'numero' => $numero,
             'nombre' => $nombre,
+            'transferencia' => $transferencia
         );
         return response()->json($data); 
     }
@@ -192,9 +230,9 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
     }
     //guardar cuenta por pagar
     public function cuentas_por_pagar_guardar(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         //obtener el ultimo id de la tabla
-        $folio = Helpers::ultimofoliotablamodulos('App\CuentaXPagar');
+        $folio = Helpers::ultimofolioserietablamodulos('App\CuentaXPagar', $request->serie);
         //INGRESAR DATOS A TABLA ORDEN COMPRA
         $pago = $folio.'-'.$request->serie;
 		$CuentaXPagar = new CuentaXPagar;
@@ -212,7 +250,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
         $CuentaXPagar->Anotacion=$request->anotacion;
         $CuentaXPagar->Status="ALTA";
         $CuentaXPagar->Usuario=Auth::user()->user;
-        $CuentaXPagar->Periodo=$request->periodohoy;
+        $CuentaXPagar->Periodo=$this->periodohoy;
         $CuentaXPagar->save();
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
@@ -222,7 +260,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
         $BitacoraDocumento->Status = "ALTA";
         $BitacoraDocumento->Usuario = Auth::user()->user;
-        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
         $item = 1;
@@ -368,7 +406,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
         $data = array(
             'CuentaXPagar' => $CuentaXPagar,
             'CuentaXPagarDetalle' => $CuentaXPagarDetalle,
-            'fecha' => Helpers::formatoinputdate($CuentaXPagar->Fecha),
+            'fecha' => Helpers::formatoinputdatetime($CuentaXPagar->Fecha),
             'proveedor' => $Proveedor,
             'banco' => $Banco,
             'filasdetallecuentasporpagar' => $filasdetallecuentasporpagar,
@@ -379,7 +417,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
     }
     //cambios
     public function cuentas_por_pagar_guardar_modificacion(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         //INGRESAR DATOS A TABLA
         $cuentaxpagar = $request->folio.'-'.$request->serie;
 		$CuentaXPagar = CuentaXPagar::where('Pago', $cuentaxpagar)->first();
@@ -402,7 +440,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
         $BitacoraDocumento->Status = $CuentaXPagar->Status;
         $BitacoraDocumento->Usuario = Auth::user()->user;
-        $BitacoraDocumento->Periodo = $request->periodohoy;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
     	return response()->json($CuentaXPagar);
     }

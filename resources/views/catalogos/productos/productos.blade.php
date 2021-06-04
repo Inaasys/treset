@@ -13,38 +13,44 @@
             <div class="row clearfix">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="card" id="listadoregistros">
-                        <div class="header bg-red table-responsive button-demo">
-                        	<table>
-                        		<tr>
-                        			<td>
-                        				<h5>&nbsp;&nbsp;&nbsp;&nbsp;Productos&nbsp;&nbsp;&nbsp;</h5>
-                        			</td>
-                        			<td >
-                            			<div class="btn bg-blue btn-xs waves-effect" onclick="alta()">
-                                    		Altas
-                                		</div>
-                        			</td>
-                                    <td>
-                                        <a class="btn bg-blue btn-xs waves-effect" href="{{route('productos_exportar_excel')}}" target="_blank">
-                                            Excel
-                                        </a>
-                                    </td>
-                                    @if(Auth::user()->role_id == 1)
-                                    <td>
-                                        <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
-                                            Configurar Tabla
-                                        </div>
-                                    </td>
-                                    @endif
-                        		</tr>
-                        	</table>
+                        <div class="header bg-red">
+                            <div class="row clearfix">
+                                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+                                    <h5>&nbsp;&nbsp;&nbsp;PRODUCTOS&nbsp;&nbsp;&nbsp;</h5>
+                                </div>
+                                <div class="col-lg-11 col-md-11 col-sm-11 col-xs-12 button-demo">
+                                    <div class="table-responsive">
+                                        <table>
+                                            <tr>
+                                                <td >
+                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="alta()">
+                                                        Altas
+                                                    </div>
+                                                </td>
+                                                <td >
+                                                    <a class="btn bg-blue btn-xs waves-effect" href="{{route('productos_exportar_excel')}}" target="_blank">
+                                                        Excel
+                                                    </a>
+                                                </td>
+                                                @if(Auth::user()->role_id == 1)
+                                                <td>
+                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
+                                                        Configurar Tabla
+                                                    </div>
+                                                </td>
+                                                @endif
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="body">
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover" style="width:100% !important;">
                                     <thead class="customercolor">
                                         <tr>
-                                            <th><div style="width:80px !important;">Operaciones</div></th>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
                                             @foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
                                             <th>{{$co}}</th>
                                             @endforeach
@@ -123,7 +129,7 @@
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
                             <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
-                            <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Guardar</button>
+                            <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
                         </div>
                     </form> 
                 </div>
@@ -148,7 +154,68 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
-                    <button type="button" class="btn btn-success btn-sm" id="aceptar">Guardar</button>
+                    <button type="button" class="btn btn-success btn-sm" id="aceptar">Confirmar Baja</button>
+                </div>
+            </div>
+        </div>
+    </div> 
+    <!-- Modal Movimientos-->
+    <div class="modal fade" data-keyboard="false" id="modalmovimientos" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-red">
+                    <h5 class="modal-title" >
+                        <div class="row">
+                            <div class="col-xs-10 col-sm-10 col-md-11">
+                                <label id="titulomodalmovimientos"></label>
+                            </div>
+                            <div class="col-xs-2 col-sm-2 col-md-1">
+                                <button type="button" class="btn btn-link waves-effect" data-dismiss="modal">Cerrar</button>
+                            </div>
+                        </div>
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row ">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label >Codigo</label>
+                                    <input type="text" name="codigokardex" id="codigokardex" class="form-control divorinputmodmd" autocomplete="off" onkeyup="tipoLetra(this);">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Almacén</label>
+                                    <select name="almacenkardex" class="form-control divorinputmodmd select2" id="almacenkardex" style="width:100% !important;"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="table-responsive cabecerafija" style="height: 450px;overflow-y: scroll;padding: 0px 0px;">
+                                <table class="table table-bordered table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <td class="customercolortheadth">#</td>
+                                            <td class="customercolortheadth">Documento</td>
+                                            <td class="customercolortheadth">Movimiento</td>
+                                            <td class="customercolortheadth">Fecha</td>
+                                            <td class="customercolortheadth">Almacen</td>
+                                            <td class="customercolortheadth">Entradas</td>
+                                            <td class="customercolortheadth">Salidas</td>
+                                            <td class="customercolortheadth">Existencias</td>
+                                            <td class="customercolortheadth">Costo</td>
+                                            <td class="customercolortheadth">Status</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="filasmovimientos"></tbody>
+                                </table> 
+                            </div>
+                        </div>
+                    </div>    	
+                </div>
+                <div class="modal-footer">
+                    <h5 id="infomovimientos"></h5>
                 </div>
             </div>
         </div>
@@ -177,6 +244,7 @@
         var productos_obtener_existencias_almacenes = '{!!URL::to('productos_obtener_existencias_almacenes')!!}';
         var productos_obtener_clientes = '{!!URL::to('productos_obtener_clientes')!!}';
         var productos_obtener_productos_consumos = '{!!URL::to('productos_obtener_productos_consumos')!!}';
+        var productos_obtener_kardex = '{!!URL::to('productos_obtener_kardex')!!}';
         var productos_guardar = '{!!URL::to('productos_guardar')!!}';
         var productos_alta_o_baja = '{!!URL::to('productos_alta_o_baja')!!}'; 
         var productos_obtener_producto = '{!!URL::to('productos_obtener_producto')!!}'; 

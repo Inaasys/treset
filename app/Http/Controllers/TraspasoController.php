@@ -43,7 +43,7 @@ class TraspasoController extends ConfiguracionSistemaController{
     }
 
     public function traspasos(){
-        $serieusuario = Helpers::obtenerserieusuario(Auth::user()->user, 'Traspasos');
+        $serieusuario = 'A';
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('traspasos_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('traspasos_exportar_excel');
@@ -55,16 +55,30 @@ class TraspasoController extends ConfiguracionSistemaController{
     public function traspasos_obtener(Request $request){
         if($request->ajax()){
             $periodo = $request->periodo;
-            $data = VistaTraspaso::select($this->campos_consulta)->orderBy('Folio', 'DESC')->where('periodo', $periodo)->get();
+            $data = VistaTraspaso::select($this->campos_consulta)->orderBy('Fecha', 'DESC')->where('periodo', $periodo)->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
+                        $operaciones = '<div class="dropdown">'.
+                                    '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                                        'OPERACIONES <span class="caret"></span>'.
+                                    '</button>'.
+                                    '<ul class="dropdown-menu">'.
+                                        '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Traspaso .'\')">Cambios</a></li>'.
+                                        '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Traspaso .'\')">Bajas</a></li>'.
+                                        '<li><a href="'.route('traspasos_generar_pdfs_indiv',$data->Traspaso).'" target="_blank">Ver Documento PDF</a></li>'.
+                                        '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Traspaso .'\')">Enviar Documento por Correo</a></li>'.
+                                    '</ul>'.
+                                '</div>';
+                        /*
                         $botoncambios =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Traspaso .'\')"><i class="material-icons">mode_edit</i></div> '; 
                         $botonbajas =      '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Traspaso .'\')"><i class="material-icons">cancel</i></div> ';
                         $botondocumentopdf = '<a href="'.route('traspasos_generar_pdfs_indiv',$data->Traspaso).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
                         $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Traspaso .'\')"><i class="material-icons">email</i></div> ';
                         $operaciones =  $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
+                        */
                         return $operaciones;
                     })
+                    ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
                     ->addColumn('subtotal', function($data){ return $data->SubTotal; })
                     ->addColumn('iva', function($data){ return $data->Iva; })
                     ->addColumn('total', function($data){ return $data->Total; })
@@ -77,10 +91,27 @@ class TraspasoController extends ConfiguracionSistemaController{
                     ->make(true);
         } 
     }
-
+    //obtener series documento
+    public function traspasos_obtener_series_documento(Request $request){
+        if($request->ajax()){
+            $data = Serie::where('Documento', 'Traspasos')->where('Usuario', Auth::user()->user)->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''.$data->Serie.'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+    //obtener ultimo folio de la serie seleccionada
+    public function traspasos_obtener_ultimo_folio_serie_seleccionada(Request $request){
+        $folio = Helpers::ultimofolioserietablamodulos('App\Traspaso',$request->Serie);
+        return response()->json($folio);
+    }
     //obtener ultimo folio
-    public function traspasos_obtener_ultimo_folio(){
-        $folio = Helpers::ultimofoliotablamodulos('App\Traspaso');
+    public function traspasos_obtener_ultimo_folio(Request $request){
+        $folio = Helpers::ultimofolioserietablamodulos('App\Traspaso',$request->serie);
         return response()->json($folio);
     }
 
@@ -156,7 +187,7 @@ class TraspasoController extends ConfiguracionSistemaController{
                         ->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarordentrabajo(\''.$data->Orden.'\',\''.Helpers::formatoinputdate($data->Fecha).'\',\''.$data->Cliente.'\',\''.$data->Tipo.'\',\''.$data->Unidad.'\',\''.$data->StatusOrden.'\')">Seleccionar</div>';
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarordentrabajo(\''.$data->Orden.'\',\''.Helpers::formatoinputdatetime($data->Fecha).'\',\''.$data->Cliente.'\',\''.$data->Tipo.'\',\''.$data->Unidad.'\',\''.$data->StatusOrden.'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->rawColumns(['operaciones'])
@@ -259,9 +290,9 @@ class TraspasoController extends ConfiguracionSistemaController{
 
     //guardar
     public function traspasos_guardar(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         //obtener el ultimo folio de la tabla
-        $folio = Helpers::ultimofoliotablamodulos('App\Traspaso');
+        $folio = Helpers::ultimofolioserietablamodulos('App\Traspaso',$request->serie);
         //INGRESAR DATOS A TABLA ORDEN COMPRA
         $traspaso = $folio.'-'.$request->serie;
         $Traspaso = new Traspaso;
@@ -539,7 +570,7 @@ class TraspasoController extends ConfiguracionSistemaController{
         }else if($traspaso->Orden != ""){
             $ordentrabajo = OrdenTrabajo::where('Orden', $traspaso->Orden)->first();
             $cliente = Cliente::where('Numero', $ordentrabajo->Cliente)->first();
-            $fechaorden = Helpers::formatoinputdate($ordentrabajo->Fecha);
+            $fechaorden = Helpers::formatoinputdatetime($ordentrabajo->Fecha);
         }
         //detalles
         $detallestraspaso= TraspasoDetalle::where('Traspaso', $request->traspasomodificar)->orderBy('Item', 'ASC')->get();
@@ -612,7 +643,7 @@ class TraspasoController extends ConfiguracionSistemaController{
             "numerodetallestraspaso" => $numerodetallestraspaso,
             "contadorproductos" => $contadorproductos,
             "contadorfilas" => $contadorfilas,
-            "fecha" => Helpers::formatoinputdate($traspaso->Fecha),
+            "fecha" => Helpers::formatoinputdatetime($traspaso->Fecha),
             "fechaorden" => $fechaorden,
             "importe" => Helpers::convertirvalorcorrecto($traspaso->Importe),
             "descuento" => Helpers::convertirvalorcorrecto($traspaso->Descuento),
@@ -628,7 +659,7 @@ class TraspasoController extends ConfiguracionSistemaController{
 
     //guardar modificacion 
     public function traspasos_guardar_modificacion(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         $traspaso = $request->folio.'-'.$request->serie;
         $Traspaso = Traspaso::where('Traspaso', $traspaso)->first();
         //modificar totales orden trabajo IMPORTANTE QUE ESTE AQUI

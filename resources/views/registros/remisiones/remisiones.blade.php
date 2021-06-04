@@ -67,7 +67,7 @@
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover">
                                     <thead class="customercolor">
                                         <tr>
-                                            <th><div style="width:150px !important;">Operaciones</div></th>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
                                             <th>{{$co}}</th>
                                             @endforeach
@@ -102,7 +102,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
                     <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
-                    <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Guardar</button>
+                    <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
                 </div>
             </div>
             <div id="contenidomodaltablas">
@@ -130,7 +130,7 @@
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
-	        	<button type="button" class="btn btn-success btn-sm" id="btnbaja">Guardar</button>
+	        	<button type="button" class="btn btn-success btn-sm" id="btnbaja">Confirmar Baja</button>
 	      	</div>
     	</div>
   	</div>
@@ -160,7 +160,10 @@
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var remisiones_obtener = '{!!URL::to('remisiones_obtener')!!}';
+        var remisiones_obtener_series_documento = '{!!URL::to('remisiones_obtener_series_documento')!!}';
+        var remisiones_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('remisiones_obtener_ultimo_folio_serie_seleccionada')!!}';
         var remisiones_obtener_ultimo_folio = '{!!URL::to('remisiones_obtener_ultimo_folio')!!}';
+        var ordenes_compra_obtener_fecha_actual_datetimelocal = '{!!URL::to('ordenes_compra_obtener_fecha_actual_datetimelocal')!!}';
         var remisiones_obtener_clientes = '{!!URL::to('remisiones_obtener_clientes')!!}';
         var remisiones_obtener_cliente_por_numero = '{!!URL::to('remisiones_obtener_cliente_por_numero')!!}';
         var remisiones_obtener_agente_por_numero = '{!!URL::to('remisiones_obtener_agente_por_numero')!!}';

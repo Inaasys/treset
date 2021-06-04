@@ -24,7 +24,8 @@ class Cotizacion extends Model
         'motivo_baja',
         'equipo',
         'usuario',
-        'periodo'
+        'periodo',
+        'folio'
     ];
 
 

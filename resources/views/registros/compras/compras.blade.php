@@ -15,21 +15,26 @@
                     <div class="card" id="listadoregistros">
                         <div class="header bg-red">
                             <div class="row clearfix">
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
                                     <h5>&nbsp;&nbsp;&nbsp;COMPRAS&nbsp;&nbsp;&nbsp;</h5>
                                 </div>
-                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 button-demo">
+                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 button-demo">
                                     <div class="table-responsive">
                                         <table>
                                             <tr>
                                                 <td >
-                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="alta('PROD')">
+                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="alta('')">
                                                         Altas Prod
                                                     </div>
                                                 </td>
-                                                <td hidden>
+                                                <td >
                                                     <div class="btn bg-blue btn-xs waves-effect" onclick="alta('GASTOS')">
                                                         Altas Gastos
+                                                    </div>
+                                                </td>
+                                                <td >
+                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="alta('TOT')">
+                                                        Altas Tot
                                                     </div>
                                                 </td>
                                                 <td >
@@ -72,7 +77,7 @@
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover">
                                     <thead class="customercolor">
                                         <tr>
-                                            <th><div style="width:150px !important;">Operaciones</div></th>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
                                             <th>{{$co}}</th>
                                             @endforeach
@@ -132,7 +137,7 @@
                     <div class="col-md-4">
                         <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
-                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Guardar</button>
+                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
                     </div> 
                 </div>
             </div>
@@ -142,26 +147,6 @@
         </div>
     </div>
 </div>
-<!-- Modal Autorizar Orden de Compra-->
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="autorizarorden" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  	<div class="modal-dialog" role="document">
-    	<div class="modal-content">
-      		<div class="modal-header bg-red">
-        		<h5 class="modal-title" id="exampleModalLabel">Aviso</h5>
-      		</div>
-      		<div class="modal-body">
-		      	<form id="formautorizar" action="#">
-		        	Estas seguro de autorizar la orden de compra?
-		        	<input type="hidden" id="ordenautorizar" name="ordenautorizar">
-		        </form>	
-      		</div>
-	      	<div class="modal-footer">
-	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
-	        	<button type="button" class="btn btn-success btn-sm" id="btnautorizar">Guardar</button>
-	      	</div>
-    	</div>
-  	</div>
-</div> 
 <!-- Modal Baja o Alta-->
 <div class="modal fade" data-backdrop="static" data-keyboard="false" id="estatusregistro" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   	<div class="modal-dialog" role="document">
@@ -181,7 +166,7 @@
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
-	        	<button type="button" class="btn btn-success btn-sm" id="btnbaja">Guardar</button>
+	        	<button type="button" class="btn btn-success btn-sm" id="btnbaja">Confirmar Baja</button>
 	      	</div>
     	</div>
   	</div>
@@ -241,7 +226,10 @@
         var nombrereceptor = '{{$empresa->Nombre}}';
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var compras_obtener = '{!!URL::to('compras_obtener')!!}';
+        var compras_obtener_series_documento = '{!!URL::to('compras_obtener_series_documento')!!}';
+        var compras_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('compras_obtener_ultimo_folio_serie_seleccionada')!!}';
         var compras_obtener_ultimo_folio = '{!!URL::to('compras_obtener_ultimo_folio')!!}';
+        var ordenes_compra_obtener_fecha_actual_datetimelocal = '{!!URL::to('ordenes_compra_obtener_fecha_actual_datetimelocal')!!}';
         var compras_obtener_tipos_ordenes_compra = '{!!URL::to('compras_obtener_tipos_ordenes_compra')!!}';
         var compras_cargar_xml_alta = '{!!URL::to('compras_cargar_xml_alta')!!}';
         var compras_obtener_proveedores = '{!!URL::to('compras_obtener_proveedores')!!}';

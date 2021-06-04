@@ -31,6 +31,7 @@ class OrdenCompra extends Model
         'MotivoBaja',
         'Equipo',
         'Usuario',
-        'Periodo'
+        'Periodo',
+        'OrdenTrabajo'
     ];
 }

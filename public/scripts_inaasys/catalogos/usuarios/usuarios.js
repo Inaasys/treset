@@ -5,6 +5,9 @@ var form;
 function init(){
    listar();
 }
+function retraso(){
+    return new Promise(resolve => setTimeout(resolve, 500));
+}
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
   $.get(usuarios_obtener_ultimo_numero, function(numero){
@@ -112,7 +115,7 @@ function alta(){
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Usuario <b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="text" class="form-control" name="user" id="user" required onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="user" id="user" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Correo Electrónico <b style="color:#F44336 !important;">*</b></label>'+
@@ -245,7 +248,7 @@ function obtenerdatos(id){
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Usuario <b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="text" class="form-control" name="user" id="user" required readonly onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="user" id="user" required readonly onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Correo Electrónico <b style="color:#F44336 !important;">*</b></label>'+
@@ -323,7 +326,7 @@ $("#btnGuardarModificacion").on('click', function (e) {
         form.parsley().validate();
     }
 });
-
+//permisos del usuario
 function permisos(id){
     $('.page-loader-wrapper').css('display', 'block');
     $.get(usuarios_obtener_permisos,{id:id},function(data){
@@ -1057,8 +1060,6 @@ function marcarcrudentodosloscatalogos(){
     construirarraysubmenus();
     construirarraypermisoscrud();
 }
-
-
 //marcador todos los accesos de los reportes
 function marcaraccesosentodoslosreportes(){
     if( $('#idaccesotodoslosreportesenmenu').prop('checked') ) {
@@ -1069,8 +1070,6 @@ function marcaraccesosentodoslosreportes(){
     construirarraysubmenus();
     construirarraypermisoscrud();
 }
-
-
 //permitir o reestringir acceso al menu
 function construirarraysubmenus(){
     var string_submenus = "";
@@ -1133,6 +1132,279 @@ $("#btnGuardarPermisos").on('click', function (e) {
         })
     }else{
       form.parsley().validate();
+    }
+});
+//series documentos
+function seriesusuariodocumentos(id,usuario){
+    $("#ModalSeriesDocumentos").modal('show');
+    $("#formularioserie").hide();
+    $("#tablasmodalserie").show();
+    var tablaseries =   '<div class="modal-header bg-red">'+
+                            '<div class="row clearfix">'+
+                                '<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">'+
+                                    '<h5>Series Documentos</h5>'+
+                                '</div>'+
+                                '<div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 button-demo">'+
+                                    '<div class="table-responsive">'+
+                                        '<table>'+
+                                            '<tr>'+
+                                                '<td >'+
+                                                    '<div class="btn bg-blue btn-xs waves-effect" onclick="altaserie(\''+usuario+'\')">'+
+                                                        'Nueva Serie'+
+                                                    '</div>'+
+                                                '</td>'+
+                                            '</tr>'+
+                                        '</table>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
+                        '<div class="modal-body">'+
+                            '<div class="row">'+
+                                '<div class="col-md-12">'+
+                                    '<div class="table-responsive">'+
+                                        '<table id="tbllistadoseriedocumento" class="tbllistadoseriedocumento table table-bordered table-striped table-hover" style="width:100% !important">'+
+                                            '<thead class="customercolor">'+
+                                                '<tr>'+
+                                                '<th>Operaciones</th>'+
+                                                '<th>Documento</th>'+
+                                                '<th>Serie</th>'+
+                                                '<th>Nombre</th>'+
+                                                '<th>Usuario</th>'+
+                                                '<th>Item</th>'+
+                                                '</tr>'+
+                                            '</thead>'+
+                                            '<tbody></tbody>'+
+                                        '</table>'+
+                                    '</div>'+
+                                '</div>'+  
+                            '</div>'+
+                        '</div>'+
+                        '<div class="modal-footer">'+
+                          '<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Cerrar</button>'+
+                        '</div>';
+    $("#tablasmodalserie").html(tablaseries);
+    $('#tbllistadoseriedocumento').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,
+        processing: true,
+            'language': {
+                'loadingRecords': '&nbsp;',
+                'processing': '<div class="spinner"></div>'
+            },
+        serverSide: true,
+        ajax: {
+            url: usuarios_obtener_series_documentos_usuario,
+            data: function (d) {
+                d.id = id;
+            }
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false  },
+            { data: 'Documento', name: 'Documento' },
+            { data: 'Serie', name: 'Serie', orderable: false, searchable: false  },
+            { data: 'Nombre', name: 'Nombre', orderable: false, searchable: false  },
+            { data: 'Usuario', name: 'Usuario', orderable: false, searchable: false  },
+            { data: 'Item', name: 'Item', orderable: false, searchable: false  }
+        ],
+        "initComplete": function() {
+            var $buscar = $('div.dataTables_filter input');
+            $buscar.unbind();
+            $buscar.bind('keyup change', function(e) {
+                if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistadoseriedocumento').DataTable().search( this.value ).draw();
+                }
+            });
+        },
+    });
+}
+//obtener tipos documentos
+function obtenerdocumentos(){
+    $.get(usuarios_obtener_tipos_documentos, function(select_tipos_documentos){
+      $("#documento").html(select_tipos_documentos);
+    })  
+}
+//alta de serie
+function altaserie(usuario){
+    $("#titulomodalserie").html('Alta Serie Documento');
+    $("#formularioserie").show();
+    $("#tablasmodalserie").hide();
+    $("#btnGuardarSerie").show();
+    $("#btnGuardarModificacionSerie").hide();
+    //formulario alta
+    var tabs =  '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                    '<li role="presentation" class="active">'+
+                    '<a href="#datos" data-toggle="tab">Datos</a>'+
+                    '</li>'+
+                '</ul>'+
+                '<div class="tab-content">'+
+                    '<div role="tabpanel" class="tab-pane fade in active" id="datos">'+
+                        '<div class="row">'+
+                            '<div class="col-md-3">'+
+                                '<label>Documento</label>'+
+                                '<select class="form-control select2" name="documento" id="documento" required style="width::100% !important;" data-parsley-length="[1, 30]">'+
+                                '</select>'+
+                            '</div>'+
+                            '<div class="col-md-3">'+
+                                '<label>Serie</label>'+
+                                '<input type="text" class="form-control" name="serie" id="serie" required data-parsley-pattern="^[A-Z]+$" data-parsley-length="[1, 10]" onkeyup="tipoLetra(this);">'+
+                            '</div>'+
+                            '<div class="col-md-3">'+
+                                '<label>Nombre</label>'+
+                                '<input type="text" class="form-control" name="nombre" id="nombre" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]">'+
+                            '</div>'+
+                            '<div class="col-md-3">'+
+                                '<label>Usuario</label>'+
+                                '<input type="text" class="form-control" name="usuario" id="usuario" value="'+usuario+'" required readonly data-parsley-length="[1, 20]">'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>'+ 
+                '</div>';
+    $("#tabsformserie").html(tabs);  
+    obtenerdocumentos();
+    $("#documento").select2();
+}
+//mostrar lsitado series
+function mostrarlistadoseriesdocumentos(){
+    $("#ModalSeriesDocumentos").modal('show');
+    $("#formularioserie").hide();
+    $("#tablasmodalserie").show();
+}
+//guardar el registro
+$("#btnGuardarSerie").on('click', function (e) {
+    e.preventDefault();
+    var formData = new FormData($("#formparsleyserie")[0]);
+    var form = $("#formparsleyserie");
+    if (form.parsley().isValid()){
+        $('.page-loader-wrapper').css('display', 'block');
+        $.ajax({
+            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+            url:usuarios_guardar_serie_documento,
+            type: "post",
+            dataType: "html",
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success:function(data){
+                if(data == 1){
+                    msj_errorserieexistenteendocumento();
+                }else{
+                    msj_datosguardadoscorrectamente();
+                    $("#formularioserie").hide();
+                    $("#tablasmodalserie").show();
+                    var tabla = $('#tbllistadoseriedocumento').DataTable();
+                    tabla.ajax.reload();
+                    $('.page-loader-wrapper').css('display', 'block');
+                }
+                $('.page-loader-wrapper').css('display', 'none');
+            },
+            error:function(data){
+                if(data.status == 403){
+                    msj_errorenpermisos();
+                }else{
+                    msj_errorajax();
+                }
+                $('.page-loader-wrapper').css('display', 'none');
+            }
+        })
+    }else{
+        form.parsley().validate();
+    }
+});
+//obtener serie documento
+function obtenerdatosserie(documento, serie, usuario, nombre){
+    $('.page-loader-wrapper').css('display', 'block');
+    $("#titulomodalserie").html('Modificación Serie Documento');
+    $("#formularioserie").show();
+    $("#tablasmodalserie").hide();
+    $("#btnGuardarSerie").hide();
+    $("#btnGuardarModificacionSerie").show();
+        //formulario modificacion
+        var tabs =  '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                        '<li role="presentation" class="active">'+
+                        '<a href="#datos" data-toggle="tab">Datos</a>'+
+                        '</li>'+
+                    '</ul>'+
+                    '<div class="tab-content">'+
+                        '<div role="tabpanel" class="tab-pane fade in active" id="datos">'+
+                            '<div class="row">'+
+                                '<div class="col-md-3">'+
+                                    '<label>Documento</label>'+
+                                    '<select class="form-control select2" name="documento" id="documento" required style="width::100% !important;" data-parsley-length="[1, 30]">'+
+                                    '</select>'+
+                                '</div>'+
+                                '<div class="col-md-3">'+
+                                    '<label>Serie</label>'+
+                                    '<input type="text" class="form-control" name="serie" id="serie" required readonly data-parsley-pattern="^[A-Z]+$" data-parsley-length="[1, 10]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                                '<div class="col-md-3">'+
+                                    '<label>Nombre</label>'+
+                                    '<input type="text" class="form-control" name="nombre" id="nombre" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]">'+
+                                '</div>'+
+                                '<div class="col-md-3">'+
+                                    '<label>Usuario</label>'+
+                                    '<input type="text" class="form-control" name="usuario" id="usuario" value="'+usuario+'" required readonly data-parsley-length="[1, 20]">'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+ 
+                    '</div>';
+        $("#tabsformserie").html(tabs);  
+        $("#serie").val(serie);
+        $("#nombre").val(nombre);
+        $("#usuario").val(usuario);
+        obtenerdocumentos();
+        seleccionartipodocumento(documento);
+}
+async function seleccionartipodocumento(documento){
+    await retraso();
+    $("#documento").val(documento).change();
+    $("#documento").select2();
+    $('.page-loader-wrapper').css('display', 'none');
+}
+//cambios
+$("#btnGuardarModificacionSerie").on('click', function (e) {
+    e.preventDefault();
+    var formData = new FormData($("#formparsleyserie")[0]);
+    var form = $("#formparsleyserie");
+    if (form.parsley().isValid()){
+        $('.page-loader-wrapper').css('display', 'block');
+        $.ajax({
+            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+            url:usuarios_guardar_modificacion_serie_documento,
+            type: "post",
+            dataType: "html",
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success:function(data){
+                if(data == 1){
+                    msj_errorserieexistenteendocumento();
+                }else{
+                    msj_datosguardadoscorrectamente();
+                    $("#formularioserie").hide();
+                    $("#tablasmodalserie").show();
+                    var tabla = $('#tbllistadoseriedocumento').DataTable();
+                    tabla.ajax.reload();
+                    $('.page-loader-wrapper').css('display', 'block');
+                }
+                $('.page-loader-wrapper').css('display', 'none');
+            },
+            error:function(data){
+                if(data.status == 403){
+                    msj_errorenpermisos();
+                }else{
+                    msj_errorajax();
+                }
+                $('.page-loader-wrapper').css('display', 'none');
+            }
+        })
+    }else{
+        form.parsley().validate();
     }
 });
 init();

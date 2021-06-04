@@ -8,7 +8,8 @@ class Vine extends Model
 {
     public $timestamps = false;
     protected $table = 'Vines';
-    protected $primaryKey = 'Vin';
+    //protected $primaryKey = null;
+    //public $incrementing = false;
     protected $fillable = [
         'Vin', 
         'Cliente', 

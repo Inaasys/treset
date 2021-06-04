@@ -62,7 +62,7 @@
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover">
                                     <thead class="customercolor">
                                         <tr>
-                                            <th><div style="width:80px !important;">Operaciones</div></th>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
                                             <th>{{$co}}</th>
                                             @endforeach
@@ -88,57 +88,6 @@
                 </div>
                 <form id="formparsley" action="#">
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-2">
-                                <label>Asignación <b style="color:#F44336 !important;" id="serietexto"> Serie: {{$serieusuario}}</b></label>
-                                <input type="text" class="form-control" name="id" id="id" required readonly onkeyup="tipoLetra(this);">
-                                <input type="hidden" class="form-control" name="serie" id="serie" value="{{$serieusuario}}" required readonly>
-                            </div>   
-                            <div class="col-md-4">
-                                <label>Selecciona el personal que entrega:</label>
-                                <div class="col-md-12">
-                                    <select name="personalherramientacomun" id="personalherramientacomun" class="form-control select2" onchange="herramientaasignadapersonal()" style="width:100% !important;" required>
-                                    </select>
-                                    <input type="hidden" class="form-control" name="numeropersonalentrega" id="numeropersonalentrega" required readonly onkeyup="tipoLetra(this)">
-                                    <input type="hidden" class="form-control" name="personalentrega" id="personalentrega" required readonly>
-                                </div>
-                            </div>  
-                            <div class="col-md-4">
-                                <label>Personal que recibe</label>
-                                <table class="col-md-12">
-                                    <tr>
-                                        <td>
-                                            <div class="btn bg-blue waves-effect" onclick="obtenerpersonalrecibe()" id="btnobtenerpersonalrecibe" style="display:none">Seleccionar</div>
-                                        </td>
-                                        <td>
-                                            <div class="form-line">
-                                                <input type="hidden" class="form-control" name="numeropersonalrecibe" id="numeropersonalrecibe" required readonly onkeyup="tipoLetra(this)">
-                                                <input type="text" class="form-control" name="personalrecibe" id="personalrecibe" required readonly>
-                                            </div>
-                                        </td>
-                                    </tr>    
-                                </table>
-                            </div>
-                            <div class="col-md-2">
-                                <label>Fecha</label>
-                                <input type="date" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" onkeyup="tipoLetra(this);">
-                                <input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="{{$periodohoy}}">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <label>Inicio Prestamo</label>
-                                <input type="datetime-local" class="form-control inicioprestamo" name="inicioprestamo" id="inicioprestamo" onchange="compararterminoprestamo()" required>
-                            </div>
-                            <div class="col-md-3">
-                                <label>Termino Prestamo</label>
-                                <input type="datetime-local" class="form-control terminoprestamo" name="terminoprestamo" id="terminoprestamo" onchange="compararterminoprestamo()" required >
-                            </div>
-                            <div class="col-md-4">
-                                <label >correo notificaciones</label>
-                                <input type="email" class="form-control" name="correo" id="correo" data-parsley-type="email" required>
-                            </div>
-                        </div>
                         <div class="col-md-12" id="tabsform">
                             <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
                         </div>
@@ -146,7 +95,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
-                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Guardar</button>
+                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
                     </div>
                 </form> 
             </div>
@@ -195,7 +144,7 @@
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
-	        	<button type="button" class="btn btn-success btn-sm" id="btnbaja">Guardar</button>
+	        	<button type="button" class="btn btn-success btn-sm" id="btnbaja">Confirmar Baja</button>
 	      	</div>
     	</div>
   	</div>
@@ -215,7 +164,7 @@
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
-	        	<button type="button" class="btn btn-success btn-sm" id="btnterminarprestamo">Guardar</button>
+	        	<button type="button" class="btn btn-success btn-sm" id="btnterminarprestamo">Terminar Prestamo</button>
 	      	</div>
     	</div>
   	</div>
@@ -223,7 +172,6 @@
 <!-- modal para configuraciones de tablas-->
 @include('secciones.modalconfiguraciontablas')
 <!-- fin modal para configuraciones de tablas-->
-
 @endsection
 @section('additionals_js')
     <script>
@@ -232,6 +180,7 @@
         var numerodecimales = '{{$numerodecimales}}';
         var numerocerosconfigurados = '{{$numerocerosconfigurados}}';
         var numerocerosconfiguradosinputnumberstep = '{{$numerocerosconfiguradosinputnumberstep}}';
+        var serieusuario = '{{$serieusuario}}';
         var meshoy = '{{$meshoy}}';
         var periodohoy = '{{$periodohoy}}';
         var campos_activados = '{{$configuracion_tabla->campos_activados}}';
@@ -239,12 +188,15 @@
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var prestamo_herramienta_obtener = '{!!URL::to('prestamo_herramienta_obtener')!!}';
+        var prestamo_herramienta_obtener_series_documento = '{!!URL::to('prestamo_herramienta_obtener_series_documento')!!}';
+        var prestamo_herramienta_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('prestamo_herramienta_obtener_ultimo_folio_serie_seleccionada')!!}';
         var prestamo_herramienta_obtener_ultimo_id = '{!!URL::to('prestamo_herramienta_obtener_ultimo_id')!!}';
         var prestamo_herramienta_obtener_detalle_asignacion_seleccionada = '{!!URL::to('prestamo_herramienta_obtener_detalle_asignacion_seleccionada')!!}';
         var prestamo_herramienta_obtener_fecha_datetimelocal = '{!!URL::to('prestamo_herramienta_obtener_fecha_datetimelocal')!!}';
         var prestamo_herramienta_obtener_personal = '{!!URL::to('prestamo_herramienta_obtener_personal')!!}';
         var prestamo_herramienta_obtener_herramienta_personal = '{!!URL::to('prestamo_herramienta_obtener_herramienta_personal')!!}';
         var prestamo_herramienta_obtener_personal_recibe = '{!!URL::to('prestamo_herramienta_obtener_personal_recibe')!!}';
+        var prestamo_herramienta_obtener_personal_recibe_por_numero = '{!!URL::to('prestamo_herramienta_obtener_personal_recibe_por_numero')!!}';
         var prestamo_herramienta_guardar = '{!!URL::to('prestamo_herramienta_guardar')!!}';
         var prestamo_herramienta_terminar_prestamo = '{!!URL::to('prestamo_herramienta_terminar_prestamo')!!}';
         var prestamo_herramienta_alta_o_baja = '{!!URL::to('prestamo_herramienta_alta_o_baja')!!}'; 
@@ -254,6 +206,3 @@
     @include('secciones.libreriasregistrosycatalogos')
     <script src="scripts_inaasys/registros/prestamoherramienta/prestamoherramienta.js"></script>
 @endsection
-
-
-

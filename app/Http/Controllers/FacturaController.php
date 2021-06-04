@@ -46,6 +46,9 @@ use App\FolioComprobanteFactura;
 use App\TipoOrdenCompra;
 use App\TipoUnidad;
 use App\CuentaXCobrarDetalle;
+use App\NotaCliente;
+use App\NotaClienteDetalle;
+use App\NotaClienteDocumento;
 use Config;
 use Mail;
 
@@ -100,13 +103,27 @@ class FacturaController extends ConfiguracionSistemaController{
             $data = VistaFactura::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
+                        $operaciones = '<div class="dropdown">'.
+                                            '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                                                'OPERACIONES <span class="caret"></span>'.
+                                            '</button>'.
+                                            '<ul class="dropdown-menu">'.
+                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Factura .'\')">Cambios</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Factura .'\')">Bajas</a></li>'.
+                                                '<li><a href="'.route('facturas_generar_pdfs_indiv',$data->Factura).'" target="_blank">Ver Documento PDF</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Factura .'\')">Enviar Documento por Correo</a></li>'.
+                                            '</ul>'.
+                                        '</div>';
+                        /*
                         $botoncambios =     '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Factura .'\')"><i class="material-icons">mode_edit</i></div> '; 
                         $botonbajas   =     '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Factura .'\')"><i class="material-icons">cancel</i></div>  ';
                         $botondocumentopdf = '<a href="'.route('facturas_generar_pdfs_indiv',$data->Factura).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
                         $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Factura .'\')"><i class="material-icons">email</i></div> ';
-                        $boton =   $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
-                        return $boton;
+                        $operaciones =   $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
+                        */
+                        return $operaciones;
                     })
+                    ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
                     ->addColumn('SubTotal', function($data){ return $data->SubTotal; })
                     ->addColumn('Iva', function($data){ return $data->Iva; })
                     ->addColumn('Total', function($data){ return $data->Total; })
@@ -584,8 +601,12 @@ class FacturaController extends ConfiguracionSistemaController{
         foreach($detallesremision as $detalle){
             $ImporteDescuento = $detalle->Importe - $detalle->Descuento;
             $producto = Producto::where('Codigo', $detalle->Codigo)->first();
-            $claveproductopartida = ClaveProdServ::where('Clave', $producto->ClaveProducto)->first();
-            $claveunidadpartida = ClaveUnidad::where('Clave', $producto->ClaveUnidad)->first();
+            $claveproductopartida = ClaveProdServ::where('Clave', $detalle->ClaveProducto)->first();
+            $claveunidadpartida = ClaveUnidad::where('Clave', $detalle->ClaveUnidad)->first();
+            $claveproducto = $claveproductopartida ? $claveproductopartida->Clave : '';
+            $nombreclaveproducto = $claveproductopartida ? $claveproductopartida->Nombre : '';
+            $claveunidad = $claveunidadpartida ? $claveunidadpartida->Clave : '';
+            $nombreclaveunidad = $claveunidadpartida ? $claveunidadpartida->Nombre : '';
             $filasremisiones= $filasremisiones.
             '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                 '<td class="tdmod"><div class="numeropartida">'.$partida.'</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
@@ -634,22 +655,22 @@ class FacturaController extends ConfiguracionSistemaController{
                             '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                         '</div>'.
                         '<div class="col-xs-10 col-sm-10 col-md-10">'.
-                            '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproductopartida->Clave.'" readonly data-parsley-length="[1, 20]">'.
+                            '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly data-parsley-length="[1, 20]">'.
                         '</div>'.
                     '</div>'.
                 '</td>'.
-                '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$claveproductopartida->Nombre.'" readonly></td>'.
+                '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$nombreclaveproducto.'" readonly></td>'.
                 '<td class="tdmod">'.
                     '<div class="row divorinputmodxl">'.
                         '<div class="col-xs-2 col-sm-2 col-md-2">'.
                             '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                         '</div>'.
                         '<div class="col-xs-10 col-sm-10 col-md-10">'.   
-                            '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidadpartida->Clave.'" readonly data-parsley-length="[1, 5]">'.
+                            '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
                         '</div>'.
                     '</div>'.
                 '</td>'.
-                '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$claveunidadpartida->Nombre.'" readonly></td>'.
+                '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$nombreclaveunidad.'" readonly></td>'.
             '</tr>';
             $contadorfilas++;
             $partida++;
@@ -715,8 +736,12 @@ class FacturaController extends ConfiguracionSistemaController{
         foreach($detallesorden as $detalle){
             $ImporteDescuento = $detalle->Importe - $detalle->Descuento;
             $servicio = Servicio::where('Codigo', $detalle->Codigo)->first();
-            $claveproductopartida = ClaveProdServ::where('Clave', $servicio->ClaveProducto)->first();
-            $claveunidadpartida = ClaveUnidad::where('Clave', $servicio->ClaveUnidad)->first();
+            $claveproductopartida = ClaveProdServ::where('Clave', $detalle->ClaveProducto)->first();
+            $claveunidadpartida = ClaveUnidad::where('Clave', $detalle->ClaveUnidad)->first();
+            $claveproducto = $claveproductopartida ? $claveproductopartida->Clave : '';
+            $nombreclaveproducto = $claveproductopartida ? $claveproductopartida->Nombre : '';
+            $claveunidad = $claveunidadpartida ? $claveunidadpartida->Clave : '';
+            $nombreclaveunidad = $claveunidadpartida ? $claveunidadpartida->Nombre : '';
             $filasordenes= $filasordenes.
             '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                 '<td class="tdmod"><div class="numeropartida">'.$partida.'</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
@@ -765,22 +790,22 @@ class FacturaController extends ConfiguracionSistemaController{
                             '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                         '</div>'.
                         '<div class="col-xs-10 col-sm-10 col-md-10">'.
-                            '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproductopartida->Clave.'" readonly data-parsley-length="[1, 20]">'.
+                            '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly data-parsley-length="[1, 20]">'.
                         '</div>'.
                     '</div>'.
                 '</td>'.
-                '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$claveproductopartida->Nombre.'" readonly></td>'.
+                '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$nombreclaveproducto.'" readonly></td>'.
                 '<td class="tdmod">'.
                     '<div class="row divorinputmodxl">'.
                         '<div class="col-xs-2 col-sm-2 col-md-2">'.
                             '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                         '</div>'.
                         '<div class="col-xs-10 col-sm-10 col-md-10">'.   
-                            '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidadpartida->Clave.'" readonly data-parsley-length="[1, 5]">'.
+                            '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
                         '</div>'.
                     '</div>'.
                 '</td>'.
-                '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$claveunidadpartida->Nombre.'" readonly></td>'.
+                '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$nombreclaveunidad.'" readonly></td>'.
             '</tr>';
             $contadorfilas++;
             $partida++;
@@ -885,7 +910,7 @@ class FacturaController extends ConfiguracionSistemaController{
 
     //alta
     public function facturas_guardar(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         //obtener el ultimo id de la tabla
         $folio = Helpers::ultimofolioserietablamodulos('App\Factura', $request->serie);
         //INGRESAR DATOS A TABLA
@@ -932,7 +957,7 @@ class FacturaController extends ConfiguracionSistemaController{
         $Factura->EmisorNombre=$request->emisornombre;
         $Factura->ReceptorRfc=$request->receptorrfc;
         $Factura->ReceptorNombre=$request->receptornombre;
-        $Factura->Hora=Helpers::fecha_mas_hora_exacta_accion_datetimestring($request->fecha);
+        $Factura->Hora=Carbon::parse($request->fecha)->toDateTimeString();
         $Factura->Periodo=$this->periodohoy;
         $Factura->save();
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
@@ -1046,7 +1071,12 @@ class FacturaController extends ConfiguracionSistemaController{
             $partida = 1;
             $tipo="modificacion";
             foreach($detallesfactura as $df){
-                $claves = VistaObtenerExistenciaProducto::where('Codigo', $df->Codigo)->first();
+                $claveproductopartida = ClaveProdServ::where('Clave', $df->ClaveProducto)->first();
+                $claveunidadpartida = ClaveUnidad::where('Clave', $df->ClaveUnidad)->first();
+                $claveproducto = $claveproductopartida ? $claveproductopartida->Clave : '';
+                $nombreclaveproducto = $claveproductopartida ? $claveproductopartida->Nombre : '';
+                $claveunidad = $claveunidadpartida ? $claveunidadpartida->Clave : '';
+                $nombreclaveunidad = $claveunidadpartida ? $claveunidadpartida->Nombre : '';
                 $filasdetallesfactura= $filasdetallesfactura.
                 '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                     '<td class="tdmod"><div class="numeropartida">'.$partida.'</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$df->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
@@ -1095,22 +1125,22 @@ class FacturaController extends ConfiguracionSistemaController{
                                 '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
                             '<div class="col-xs-10 col-sm-10 col-md-10">'.
-                                '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claves->ClaveProducto.'" readonly data-parsley-length="[1, 20]">'.
+                                '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly data-parsley-length="[1, 20]">'.
                             '</div>'.
                         '</div>'.
                     '</td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$claves->NombreClaveProducto.'" readonly></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$nombreclaveproducto.'" readonly></td>'.
                     '<td class="tdmod">'.
                         '<div class="row divorinputmodxl">'.
                             '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                 '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
                             '<div class="col-xs-10 col-sm-10 col-md-10">'.   
-                                '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claves->ClaveUnidad.'" readonly data-parsley-length="[1, 5]">'.
+                                '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
                             '</div>'.
                         '</div>'.
                     '</td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$claves->NombreClaveUnidad.'" readonly></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$nombreclaveunidad.'" readonly></td>'.
                 '</tr>';
                 if($df->Remision != null){
                     array_push($consarrayremisiones, $df->Remision);
@@ -1188,7 +1218,7 @@ class FacturaController extends ConfiguracionSistemaController{
             "residenciafiscal" => $residenciafiscal,
             "filasdocumentosfactura" => $filasdocumentosfactura,
             "numerodocumentosfactura" => $numerodocumentosfactura,
-            "fecha" => Helpers::formatoinputdate($factura->Fecha),
+            "fecha" => Helpers::formatoinputdatetime($factura->Fecha),
             "importe" => Helpers::convertirvalorcorrecto($factura->Importe),
             "descuento" => Helpers::convertirvalorcorrecto($factura->Descuento),
             "subtotal" => Helpers::convertirvalorcorrecto($factura->SubTotal),
@@ -1206,7 +1236,7 @@ class FacturaController extends ConfiguracionSistemaController{
 
     //cambios
     public function facturas_guardar_modificacion(Request $request){
-        ini_set('max_input_vars','10000' );
+        ini_set('max_input_vars','20000' );
         $factura = $request->facturabd;
         $Factura = Factura::where('Factura', $factura)->first();
         //array detalles documentos antes de modificacion
@@ -1297,16 +1327,25 @@ class FacturaController extends ConfiguracionSistemaController{
         $errores = '';
         $Factura = Factura::where('Factura', $request->facturadesactivar)->first(); 
         $numerocuentasporcobrar = CuentaXCobrarDetalle::where('Factura', $request->facturadesactivar)->Where('Abono', '>', 0)->count();
+        $numeronotascliente = NotaClienteDocumento::where('Factura', $request->facturadesactivar)->where('Descuento', '>', 0)->count();
         $numerocuentaxcobrar = 0;
+        $numeronotacliente = 0;
         //verificar si hay una cuenta por cobrar ligada
         if($numerocuentasporcobrar > 0){
             $detallecuentaxcobrar = CuentaXCobrarDetalle::where('Factura', $request->facturadesactivar)->first();
             $numerocuentaxcobrar = $detallecuentaxcobrar->Pago;
         }
+        //verificar si hay una nota de credito cliente ligada
+        if($numeronotascliente > 0){
+            $detallenotacliente = NotaClienteDocumento::where('Factura', $request->facturadesactivar)->first();
+            $numeronotacliente = $detallenotacliente->Nota;
+        }
         $resultadofechas = Helpers::compararanoymesfechas($Factura->Fecha);
         $data = array(
             'numerocuentasporcobrar' => $numerocuentasporcobrar,
             'numerocuentaxcobrar' => $numerocuentaxcobrar,
+            'numeronotascliente' => $numeronotascliente,
+            'numeronotacliente' => $numeronotacliente,
             'resultadofechas' => $resultadofechas,
             'errores' => $errores,
             'Status' => $Factura->Status

@@ -9,16 +9,22 @@ function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1000));
 }
 function asignarfechaactual(){
+  /*
     var fechahoy = new Date();
     var dia = ("0" + fechahoy.getDate()).slice(-2);
     var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
     var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia) ;
     $('#fecha').val(hoy);
+    */
+    $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechadatetimelocal){
+      $("#fecha").val(fechadatetimelocal);
+    })
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
-  $.get(asignacion_herramienta_obtener_ultimo_id, function(id){
-    $("#id").val(id);
+  var serie = $("#serie").val();
+  $.get(asignacion_herramienta_obtener_ultimo_id,{serie:serie}, function(folio){
+    $("#folio").val(folio);
   })  
 }
 //cerrar modales
@@ -125,6 +131,77 @@ function listar(){
     }
   });
 }
+//obtener series documento
+function obtenerseriesdocumento(){
+  ocultarformulario();
+  var seriedefault = 'A';
+  var tablaseriesdocumento= '<div class="modal-header bg-red">'+
+                              '<h4 class="modal-title">Series Documento &nbsp;&nbsp; <div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''+seriedefault+'\')">Asignar Serie Default (A)</div></h4>'+
+                            '</div>'+
+                            '<div class="modal-body">'+
+                              '<div class="row">'+
+                                '<div class="col-md-12">'+
+                                  '<div class="table-responsive">'+
+                                    '<table id="tbllistadoseriedocumento" class="tbllistadoseriedocumento table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                      '<thead class="customercolor">'+
+                                        '<tr>'+
+                                          '<th>Operaciones</th>'+
+                                          '<th>Serie</th>'+
+                                          '<th>Documento</th>'+
+                                          '<th>Nombre</th>'+
+                                        '</tr>'+
+                                      '</thead>'+
+                                      '<tbody></tbody>'+
+                                    '</table>'+
+                                  '</div>'+
+                                '</div>'+   
+                              '</div>'+
+                            '</div>'+
+                            '<div class="modal-footer">'+
+                              '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                            '</div>';  
+  $("#contenidomodaltablas").html(tablaseriesdocumento);
+  $('#tbllistadoseriedocumento').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
+      "sScrollX": "110%",
+      "sScrollY": "370px",
+      "bScrollCollapse": true,  
+      processing: true,
+      'language': {
+        'loadingRecords': '&nbsp;',
+        'processing': '<div class="spinner"></div>'
+      },
+      serverSide: true,
+      ajax: {
+        url: asignacion_herramienta_obtener_series_documento
+      },
+      columns: [
+          { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+          { data: 'Serie', name: 'Serie' },
+          { data: 'Documento', name: 'Documento' },
+          { data: 'Nombre', name: 'Nombre' }
+      ],
+      "initComplete": function() {
+        var $buscar = $('div.dataTables_filter input');
+        $buscar.unbind();
+        $buscar.bind('keyup change', function(e) {
+            if(e.keyCode == 13 || this.value == "") {
+              $('#tbllistadoseriedocumento').DataTable().search( this.value ).draw();
+            }
+        });
+      },
+      
+  });  
+}
+function seleccionarseriedocumento(serie){
+  $.get(asignacion_herramienta_obtener_ultimo_folio_serie_seleccionada, {serie:serie}, function(folio){
+      $("#folio").val(folio);
+      $("#serie").val(serie);
+      $("#serietexto").html("Serie: "+serie);
+      mostrarformulario();
+  }) 
+}
 //obtener registros de proveedores
 function obtenerpersonalrecibe(){
   ocultarformulario();
@@ -170,6 +247,9 @@ function obtenerpersonalrecibe(){
         serverSide: true,
         ajax: {
             url: asignacion_herramienta_obtener_personal_recibe,
+            data: function (d) {
+              d.numeropersonalentrega = $("#numeropersonalentrega").val();
+            }
         },
         columns: [
             { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
@@ -261,45 +341,50 @@ function obtenerpersonalentrega(){
       }); 
   } 
 function seleccionarpersonalrecibe(id, nombre){
+  var numeropersonalrecibeanterior = $("#numeropersonalrecibeanterior").val();
+  var numeropersonalrecibe = id;
+  if(numeropersonalrecibeanterior != numeropersonalrecibe){
     $("#numeropersonalrecibe").val(id);
     $("#numeropersonalrecibeanterior").val(id);
     $("#personalrecibe").val(nombre);
-    $("#textonombrepersonalrecibe").html(nombre.substring(0, 40));
+    if(nombre != null){
+      $("#textonombrepersonalrecibe").html(nombre.substring(0, 40));
+    }
     $("#btnbuscarpersonalqueentrega").show();
     mostrarformulario();
+  }
 }
 function seleccionarpersonalentrega(id, nombre){
+  var numeropersonalentregaanterior = $("#numeropersonalentregaanterior").val();
+  var numeropersonalentrega = id;
+  if(numeropersonalentregaanterior != numeropersonalentrega){
     $("#numeropersonalentrega").val(id);
     $("#numeropersonalentregaanterior").val(id);
     $("#personalentrega").val(nombre);
-    $("#textonombrepersonalentrega").html(nombre.substring(0, 40));
+    if(nombre != null){
+      $("#textonombrepersonalentrega").html(nombre.substring(0, 40));
+    }
     mostrarformulario();
+  }
 }
-//detectar cuando en el input de buscar por codigo de producto el usuario presione la tecla enter, si es asi se realizara la busqueda con el codigo escrito
-$(document).ready(function(){
-  $("#codigoabuscar").keypress(function(e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        listarherramientas();
-      }
-  });
-});
 //obtener por numero
 function obtenerpersonalrecibepornumero(){
-  if($("#numeropersonalrecibe").parsley().isValid()){
-      var numeropersonalrecibe = $("#numeropersonalrecibe").val();
-      $.get(asignacion_herramienta_obtener_personal_recibe_por_numero, {numeropersonalrecibe:numeropersonalrecibe}, function(data){
-
-          $("#numeropersonalrecibe").val(data.numero);
-          $("#numeropersonalrecibeanterior").val(data.numero);
-          $("#personalrecibe").val(data.nombre);
+  var numeropersonalrecibeanterior = $("#numeropersonalrecibeanterior").val();
+  var numeropersonalrecibe = $("#numeropersonalrecibe").val();
+  if(numeropersonalrecibeanterior != numeropersonalrecibe){
+    if($("#numeropersonalrecibe").parsley().isValid()){
+      var numeropersonalentrega = $("#numeropersonalentrega").val();
+      $.get(asignacion_herramienta_obtener_personal_recibe_por_numero, {numeropersonalrecibe:numeropersonalrecibe,numeropersonalentrega:numeropersonalentrega}, function(data){
+        $("#numeropersonalrecibe").val(data.numero);
+        $("#numeropersonalrecibeanterior").val(data.numero);
+        $("#personalrecibe").val(data.nombre);
+        if(data.nombre != null){
           $("#textonombrepersonalrecibe").html(data.nombre.substring(0, 40));
-          $("#btnbuscarpersonalqueentrega").show();
-          mostrarformulario();
-
-
+        }
+        $("#btnbuscarpersonalqueentrega").show();
+        mostrarformulario();
       }) 
+    }
   }
 }
 //regresar numero
@@ -309,15 +394,21 @@ function regresarnumeropersonalrecibe(){
 }
 //obtener por numero
 function obtenerpersonalentregapornumero(){
-  if($("#numeropersonalentrega").parsley().isValid()){
-      var numeropersonalentrega = $("#numeropersonalentrega").val();
-      $.get(asignacion_herramienta_obtener_personal_entrega_por_numero, {numeropersonalentrega:numeropersonalentrega}, function(data){
-          $("#numeropersonalentrega").val(data.numero);
-          $("#numeropersonalentregaanterior").val(data.numero);
-          $("#personalentrega").val(data.nombre);
+  var numeropersonalentregaanterior = $("#numeropersonalentregaanterior").val();
+  var numeropersonalentrega = $("#numeropersonalentrega").val();
+  if(numeropersonalentregaanterior != numeropersonalentrega){
+    if($("#numeropersonalentrega").parsley().isValid()){
+      var numeropersonalrecibe = $("#numeropersonalrecibe").val();
+      $.get(asignacion_herramienta_obtener_personal_entrega_por_numero, {numeropersonalentrega:numeropersonalentrega,numeropersonalrecibe:numeropersonalrecibe}, function(data){
+        $("#numeropersonalentrega").val(data.numero);
+        $("#numeropersonalentregaanterior").val(data.numero);
+        $("#personalentrega").val(data.nombre);
+        if(data.nombre != null){
           $("#textonombrepersonalentrega").html(data.nombre.substring(0, 40));
-          mostrarformulario();
+        }
+        mostrarformulario();
       }) 
+    }
   }
 }
 //regresar numero
@@ -482,11 +573,17 @@ function agregarfilaherramienta(Codigo, Producto, Unidad, Costo, Existencias, se
     contadorproductos++;
     contadorfilas++;
     $("#tablaherramientasasignadas").append(fila);
+    comprobarfilas();
     mostrarformulario();
     calculartotalordencompra();
   }else{
     msj_errorproductoyaagregado();
   }  
+}
+//comprobar numero filas de la tabla precios clientes
+function comprobarfilas(){
+  var numerofilas = $("#tablaherramientasasignadas tbody tr").length;
+  $("#numerofilas").val(numerofilas);
 }
 //obtener las existencias actuales del almacen seleccionado
 function obtenerexistenciasalmacen(fila){
@@ -532,6 +629,7 @@ function eliminarfilapreciosproductos(numerofila){
   if (confirmacion == true) { 
     $("#filaproducto"+numerofila).remove();
     contadorfilas--; //importante para todos los calculo en el modulo de orden de compra se debe restar al contadorfilas la fila que se acaba de eliminar
+    contadorproductos--;
     renumerarfilasordencompra();//importante para todos los calculo en el modulo de orden de compra 
     calculartotalordencompra();
   }
@@ -556,51 +654,109 @@ function alta(){
   mostrarmodalformulario('ALTA', 1);
   mostrarformulario();
   //formulario alta
-  var tabs =    '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
-                    '<li role="presentation" class="active">'+
-                        '<a href="#herramientastab" data-toggle="tab">Herramientas</a>'+
-                    '</li>'+
-                '</ul>'+
-                '<div class="tab-content">'+
-                    '<div role="tabpanel" class="tab-pane fade in active" id="herramientastab">'+
-                        '<div class="row">'+
-                            '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
-                                '<table id="tablaherramientasasignadas" class="table table-bordered tablaherramientasasignadas">'+
-                                    '<thead class="customercolor">'+
-                                        '<tr>'+
-                                            '<th class="customercolor">#</th>'+
-                                            '<th class="customercolor">Herramienta</th>'+
-                                            '<th class="customercolor"><div style="width:200px !important;">Descripción</div></th>'+
-                                            '<th class="customercolortheadth">Unidad</th>'+
-                                            '<th class="customercolortheadth">Almacén</th>'+
-                                            '<th class="customercolortheadth">Existencias Almacén</th>'+
-                                            '<th class="customercolortheadth">Cantidad</th>'+
-                                            '<th class="customercolortheadth">Precio $</th>'+
-                                            '<th class="customercolor">Total $</th>'+
-                                            '<th class="customercolor">Estado Herramienta</th>'+
-                                        '</tr>'+
-                                    '</thead>'+
-                                    '<tbody>'+           
-                                    '</tbody>'+
-                                '</table>'+
-                            '</div>'+
-                        '</div>'+ 
-                        '<div class="row">'+
-                            '<div class="col-md-6">'+   
-                            '<label>Observaciones</label>'+
-                            '<textarea class="form-control" name="observaciones" id="observaciones" rows="2" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
-                            '</div>'+ 
-                            '<div class="col-md-3 col-md-offset-3">'+
-                                '<table class="table table-striped table-hover">'+
-                                    '<tr>'+
-                                        '<td class="tdmod">Total</td>'+
-                                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                    '</tr>'+
-                                '</table>'+
-                            '</div>'+
-                        '</div>'+   
+  var tabs ='<div class="col-md-12">'+
+              '<div class="row">'+
+                '<div class="col-md-3">'+
+                  '<label>Asignación <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
+                  '<input type="text" class="form-control" name="folio" id="folio" required readonly>'+
+                  '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
+                  '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
+                  '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
+                '</div>'+ 
+                '<div class="col-md-3">'+
+                  '<label>Personal que recibe <span class="label label-danger" id="textonombrepersonalrecibe"></span></label>'+
+                  '<table class="col-md-12">'+
+                    '<tr>'+
+                      '<td>'+
+                        '<div class="btn bg-blue waves-effect" onclick="obtenerpersonalrecibe()">Seleccionar</div>'+
+                      '</td>'+
+                      '<td>'+
+                        '<div class="form-line">'+
+                          '<input type="text" class="form-control" name="numeropersonalrecibe" id="numeropersonalrecibe" required data-parsley-type="integer">'+
+                          '<input type="hidden" class="form-control" name="numeropersonalrecibeanterior" id="numeropersonalrecibeanterior" required data-parsley-type="integer">'+
+                          '<input type="hidden" class="form-control" name="personalrecibe" id="personalrecibe" required readonly>'+
+                        '</div>'+
+                      '</td>'+
+                    '</tr>'+    
+                  '</table>'+
+                '</div>'+
+                '<div class="col-md-3">'+
+                  '<label>Personal que entrega <span class="label label-danger" id="textonombrepersonalentrega"></span></label>'+
+                  '<table class="col-md-12">'+
+                    '<tr>'+
+                      '<td>'+
+                        '<div class="btn bg-blue waves-effect" onclick="obtenerpersonalentrega()" id="btnbuscarpersonalqueentrega">Seleccionar</div>'+
+                      '</td>'+
+                      '<td>'+    
+                        '<div class="form-line">'+
+                          '<input type="text" class="form-control" name="numeropersonalentrega" id="numeropersonalentrega" required data-parsley-type="integer">'+
+                          '<input type="hidden" class="form-control" name="numeropersonalentregaanterior" id="numeropersonalentregaanterior" required data-parsley-type="integer">'+
+                          '<input type="hidden" class="form-control" name="personalentrega" id="personalentrega" required readonly>'+
+                        '</div>'+
+                      '</td>'+    
+                    '</tr>'+    
+                  '</table>'+
+                '</div>'+   
+                '<div class="col-md-3">'+
+                  '<label>Fecha</label>'+
+                  '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" >'+
+                  '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
+                '</div>'+
+              '</div>'+
+              '<div class="row">'+
+                '<div class="col-md-4" id="divbuscarcodigoproducto">'+
+                  '<label>Buscar herramienta por código</label>'+
+                  '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código de la herramienta" autocomplete="off">'+
+                '</div>'+
+              '</div>'+
+            '</div>'+
+            '<div class="col-md-12">'+
+              '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                '<li role="presentation" class="active">'+
+                  '<a href="#herramientastab" data-toggle="tab">Herramientas</a>'+
+                '</li>'+
+              '</ul>'+
+              '<div class="tab-content">'+
+                '<div role="tabpanel" class="tab-pane fade in active" id="herramientastab">'+
+                  '<div class="row">'+
+                    '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
+                      '<table id="tablaherramientasasignadas" class="table table-bordered tablaherramientasasignadas">'+
+                        '<thead class="customercolor">'+
+                          '<tr>'+
+                            '<th class="customercolor">#</th>'+
+                            '<th class="customercolor">Herramienta</th>'+
+                            '<th class="customercolor"><div style="width:200px !important;">Descripción</div></th>'+
+                            '<th class="customercolortheadth">Unidad</th>'+
+                            '<th class="customercolortheadth">Almacén</th>'+
+                            '<th class="customercolortheadth">Existencias Almacén</th>'+
+                            '<th class="customercolortheadth">Cantidad</th>'+
+                            '<th class="customercolortheadth">Precio $</th>'+
+                            '<th class="customercolor">Total $</th>'+
+                            '<th class="customercolor">Estado Herramienta</th>'+
+                          '</tr>'+
+                        '</thead>'+
+                        '<tbody>'+           
+                        '</tbody>'+
+                      '</table>'+
+                    '</div>'+
+                  '</div>'+ 
+                  '<div class="row">'+
+                    '<div class="col-md-6">'+   
+                      '<label>Observaciones</label>'+
+                      '<textarea class="form-control" name="observaciones" id="observaciones" rows="2" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
                     '</div>'+ 
-                '</div>';
+                    '<div class="col-md-3 col-md-offset-3">'+
+                      '<table class="table table-striped table-hover">'+
+                        '<tr>'+
+                          '<td class="tdmod">Total</td>'+
+                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                        '</tr>'+
+                      '</table>'+
+                    '</div>'+
+                  '</div>'+   
+                '</div>'+ 
+              '</div>'+ 
+            '</div>';
   $("#tabsform").html(tabs);
   $("#serie").val(serieusuario);
   $("#serietexto").html("Serie: "+serieusuario);
@@ -614,6 +770,14 @@ function alta(){
   $("#numerofilas").val("0");
   //se debe motrar el input para buscar los productos
   $("#divbuscarcodigoproducto").show();
+  //busquedas seleccion
+  $("#codigoabuscar").keypress(function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      listarherramientas();
+    }
+  });
   //activar busqueda
   $('#numeropersonalrecibe').on('keypress', function(e) {
     //recomentable para mayor compatibilidad entre navegadores.
@@ -747,7 +911,7 @@ function desactivar(asignaciondesactivar){
       }else{
         $("#motivobaja").val("");
         $("#asignaciondesactivar").val(asignaciondesactivar);
-        $("#textomodaldesactivar").html('Estas seguro de dar de baja el registro?');
+        $("#textomodaldesactivar").html('Estas seguro de dar de baja la asignación de herramienta? No'+asignaciondesactivar);
         $("#divmotivobaja").show();
         $("#btnbaja").show();
         $('#estatusregistro').modal('show');
@@ -795,63 +959,126 @@ function obtenerdatos(asignacionmodificar){
   $('.page-loader-wrapper').css('display', 'block');
   $.get(asignacion_herramienta_obtener_asignacion_herramienta,{asignacionmodificar:asignacionmodificar },function(data){
     //formulario modificacion
-    var tabs =    '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
-                      '<li role="presentation" class="active">'+
-                          '<a href="#herramientastab" data-toggle="tab">Herramientas</a>'+
-                      '</li>'+
-                  '</ul>'+
-                  '<div class="tab-content">'+
-                      '<div role="tabpanel" class="tab-pane fade in active" id="herramientastab">'+
-                          '<div class="row">'+
-                              '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
-                                  '<table id="tablaherramientasasignadas" class="table table-bordered tablaherramientasasignadas">'+
-                                      '<thead class="customercolor">'+
-                                          '<tr>'+
-                                              '<th class="customercolor">#</th>'+
-                                              '<th class="customercolor">Herramienta</th>'+
-                                              '<th class="customercolor"><div style="width:200px !important;">Descripción</div></th>'+
-                                              '<th class="customercolortheadth">Unidad</th>'+
-                                              '<th class="customercolortheadth">Almacén</th>'+
-                                              '<th class="customercolortheadth">Existencias Almacén</th>'+
-                                              '<th class="customercolortheadth">Cantidad</th>'+
-                                              '<th class="customercolortheadth">Precio $</th>'+
-                                              '<th class="customercolor">Total $</th>'+
-                                              '<th class="customercolor">Estado Herramienta</th>'+
-                                          '</tr>'+
-                                      '</thead>'+
-                                      '<tbody>'+           
-                                      '</tbody>'+
-                                  '</table>'+
-                              '</div>'+
-                          '</div>'+ 
-                          '<div class="row">'+
-                              '<div class="col-md-6">'+   
-                              '<label>Observaciones</label>'+
-                              '<textarea class="form-control" name="observaciones" id="observaciones" rows="2" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
-                              '</div>'+ 
-                              '<div class="col-md-3 col-md-offset-3">'+
-                                  '<table class="table table-striped table-hover">'+
-                                      '<tr>'+
-                                          '<td class="tdmod">Total</td>'+
-                                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                      '</tr>'+
-                                  '</table>'+
-                              '</div>'+
-                          '</div>'+   
+    var tabs ='<div class="col-md-12">'+
+                '<div class="row">'+
+                  '<div class="col-md-3">'+
+                    '<label>Asignación <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
+                    '<input type="text" class="form-control" name="folio" id="folio" required readonly>'+
+                    '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
+                    '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
+                    '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
+                  '</div>'+ 
+                  '<div class="col-md-3">'+
+                    '<label>Personal que recibe <span class="label label-danger" id="textonombrepersonalrecibe"></span></label>'+
+                    '<table class="col-md-12">'+
+                      '<tr>'+
+                        '<td hidden>'+
+                          '<div class="btn bg-blue waves-effect" onclick="obtenerpersonalrecibe()">Seleccionar</div>'+
+                        '</td>'+
+                        '<td>'+
+                          '<div class="form-line">'+
+                            '<input type="text" class="form-control" name="numeropersonalrecibe" id="numeropersonalrecibe" required data-parsley-type="integer">'+
+                            '<input type="hidden" class="form-control" name="numeropersonalrecibeanterior" id="numeropersonalrecibeanterior" required data-parsley-type="integer">'+
+                            '<input type="hidden" class="form-control" name="personalrecibe" id="personalrecibe" required readonly>'+
+                          '</div>'+
+                        '</td>'+
+                      '</tr>'+    
+                    '</table>'+
+                  '</div>'+
+                  '<div class="col-md-3">'+
+                    '<label>Personal que entrega <span class="label label-danger" id="textonombrepersonalentrega"></span></label>'+
+                    '<table class="col-md-12">'+
+                      '<tr>'+
+                        '<td hidden>'+
+                          '<div class="btn bg-blue waves-effect" onclick="obtenerpersonalentrega()" id="btnbuscarpersonalqueentrega">Seleccionar</div>'+
+                        '</td>'+
+                        '<td>'+    
+                          '<div class="form-line">'+
+                            '<input type="text" class="form-control" name="numeropersonalentrega" id="numeropersonalentrega" required data-parsley-type="integer">'+
+                            '<input type="hidden" class="form-control" name="numeropersonalentregaanterior" id="numeropersonalentregaanterior" required data-parsley-type="integer">'+
+                            '<input type="hidden" class="form-control" name="personalentrega" id="personalentrega" required readonly>'+
+                          '</div>'+
+                        '</td>'+    
+                      '</tr>'+    
+                    '</table>'+
+                  '</div>'+   
+                  '<div class="col-md-3">'+
+                    '<label>Fecha</label>'+
+                    '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" >'+
+                    '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
+                  '</div>'+
+                '</div>'+
+                '<div class="row">'+
+                  '<div class="col-md-4" id="divbuscarcodigoproducto">'+
+                    '<label>Buscar herramienta por código</label>'+
+                    '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código de la herramienta" autocomplete="off">'+
+                  '</div>'+
+                '</div>'+
+              '</div>'+
+              '<div class="col-md-12">'+  
+                '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                  '<li role="presentation" class="active">'+
+                    '<a href="#herramientastab" data-toggle="tab">Herramientas</a>'+
+                  '</li>'+
+                '</ul>'+
+                '<div class="tab-content">'+
+                  '<div role="tabpanel" class="tab-pane fade in active" id="herramientastab">'+
+                    '<div class="row">'+
+                      '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
+                        '<table id="tablaherramientasasignadas" class="table table-bordered tablaherramientasasignadas">'+
+                          '<thead class="customercolor">'+
+                            '<tr>'+
+                              '<th class="customercolor">#</th>'+
+                              '<th class="customercolor">Herramienta</th>'+
+                              '<th class="customercolor"><div style="width:200px !important;">Descripción</div></th>'+
+                              '<th class="customercolortheadth">Unidad</th>'+
+                              '<th class="customercolortheadth">Almacén</th>'+
+                              '<th class="customercolortheadth">Existencias Almacén</th>'+
+                              '<th class="customercolortheadth">Cantidad</th>'+
+                              '<th class="customercolortheadth">Precio $</th>'+
+                              '<th class="customercolor">Total $</th>'+
+                              '<th class="customercolor">Estado Herramienta</th>'+
+                            '</tr>'+
+                          '</thead>'+
+                          '<tbody>'+           
+                          '</tbody>'+
+                        '</table>'+
+                      '</div>'+
+                    '</div>'+ 
+                    '<div class="row">'+
+                      '<div class="col-md-6">'+   
+                        '<label>Observaciones</label>'+
+                        '<textarea class="form-control" name="observaciones" id="observaciones" rows="2" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
                       '</div>'+ 
-                  '</div>';
+                      '<div class="col-md-3 col-md-offset-3">'+
+                        '<table class="table table-striped table-hover">'+
+                          '<tr>'+
+                            '<td class="tdmod">Total</td>'+
+                            '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                          '</tr>'+
+                        '</table>'+
+                      '</div>'+
+                    '</div>'+   
+                  '</div>'+ 
+                '</div>'+ 
+              '</div>';
     $("#tabsform").html(tabs);
-    $("#id").val(data.Asignacion_Herramienta.id);
+    $("#periodohoy").val(data.Asignacion_Herramienta.periodo);
+    $("#folio").val(data.Asignacion_Herramienta.folio);
     $("#serie").val(data.Asignacion_Herramienta.serie);
     $("#serietexto").html("Serie: "+data.Asignacion_Herramienta.serie);
     $("#numeropersonalrecibe").val(data.personalrecibe.id);
     $("#numeropersonalrecibeanterior").val(data.personalrecibe.id);
     $("#personalrecibe").val(data.personalrecibe.nombre);
-    $("#textonombrepersonalrecibe").html(data.personalrecibe.nombre.substring(0, 40));
+    if(data.personalrecibe.nombre != null){
+      $("#textonombrepersonalrecibe").html(data.personalrecibe.nombre.substring(0, 40));
+    }
     $("#numeropersonalentrega").val(data.personalentrega.id);
     $("#numeropersonalentregaanterior").val(data.personalentrega.id);
     $("#personalentrega").val(data.personalentrega.nombre);
-    $("#textonombrepersonalentrega").html(data.personalentrega.nombre.substring(0, 40));
+    if(data.personalentrega.nombre != null){
+      $("#textonombrepersonalentrega").html(data.personalentrega.nombre.substring(0, 40));
+    }
     $("#fecha").val(data.fecha);
     $("#observaciones").val(data.Asignacion_Herramienta.observaciones);
     $("#total").val(data.total);
@@ -863,6 +1090,14 @@ function obtenerdatos(asignacionmodificar){
     //se deben asignar los valores a los contadores para que las sumas resulten correctas
     contadorproductos = data.contadorproductos;
     contadorfilas = data.contadorfilas;
+    //busquedas seleccion
+    $("#codigoabuscar").keypress(function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        listarherramientas();
+      }
+    });
     //regresar numero
     $('#numeropersonalrecibe').on('change', function(e) {
       regresarnumeropersonalrecibe();
@@ -977,7 +1212,7 @@ function configurar_tabla(){
                                   '<label>DATOS ASIGNACIÓN HERRAMIENTA</label>'+
                               '</div>'+
                               '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="id" id="idid" class="filled-in datotabla" value="id" readonly onchange="construirarraydatostabla(this);" onclick="javascript: return false;"/>'+
+                                  '<input type="checkbox" name="id" id="idid" class="filled-in datotabla" value="id" readonly onchange="construirarraydatostabla(this);" />'+
                                   '<label for="idid">id</label>'+
                               '</div>'+
                               '<div class="col-md-4 form-check">'+
@@ -1009,7 +1244,7 @@ function configurar_tabla(){
                                   '<label for="idobservaciones">observaciones</label>'+
                               '</div>'+
                               '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="autorizado_por" id="idautorizado_por" class="filled-in datotabla" value="autorizado_por" onchange="construirarraydatostabla(this);" onclick="javascript: return false;"/>'+
+                                  '<input type="checkbox" name="autorizado_por" id="idautorizado_por" class="filled-in datotabla" value="autorizado_por" onchange="construirarraydatostabla(this);"/>'+
                                   '<label for="idautorizado_por">autorizado_por</label>'+
                               '</div>'+
                               '<div class="col-md-4 form-check">'+    
@@ -1035,6 +1270,10 @@ function configurar_tabla(){
                               '<div class="col-md-4 form-check">'+
                                   '<input type="checkbox" name="periodo" id="idperiodo" class="filled-in datotabla" value="periodo" onchange="construirarraydatostabla(this);" />'+
                                   '<label for="idperiodo">periodo</label>'+
+                              '</div>'+
+                              '<div class="col-md-4 form-check">'+
+                                  '<input type="checkbox" name="folio" id="idfolio" class="filled-in datotabla" value="folio" onchange="construirarraydatostabla(this);" />'+
+                                  '<label for="idfolio">folio</label>'+
                               '</div>'+
                               '<input type="hidden" class="form-control" name="string_datos_tabla_true" id="string_datos_tabla_true" required>'+
                               '<input type="hidden" class="form-control" name="string_datos_tabla_false" id="string_datos_tabla_false" required>'+
