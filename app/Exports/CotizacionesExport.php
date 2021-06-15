@@ -17,21 +17,23 @@ class CotizacionesExport implements FromCollection,WithHeadings,WithTitle
     */
     use Exportable;
     private $campos_consulta;
+    private $periodo;
 
-    public function __construct($campos_consulta){
+    public function __construct($campos_consulta,$periodo){
         $this->campos_consulta = $campos_consulta;
+        $this->periodo = $periodo;
     }
 
     //titulo de la hoja de excel
     public function title(): string{
-        return 'Cotizaciones';
+        return 'Cotizaciones-'.$this->periodo;
     }
     
     public function headings(): array{
         return $this->campos_consulta;
     }
     public function collection(){
-        $cotizaciones = \App\VistaCotizacion::select($this->campos_consulta)->orderBy('id','DESC')->get();
+        $cotizaciones = \App\VistaCotizacion::select($this->campos_consulta)->where('Periodo', $this->periodo)->orderBy('fecha', 'DESC')->orderBy('serie', 'ASC')->orderBy('folio', 'DESC')->get();
         return $cotizaciones;
         
     }

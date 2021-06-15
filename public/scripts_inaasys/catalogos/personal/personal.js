@@ -48,7 +48,6 @@ function listar(){
     tabla=$('#tbllistado').DataTable({
         "sScrollX": "110%",
         "sScrollY": "350px",
-        "bScrollCollapse": true,  
         processing: true,
         'language': {
           'loadingRecords': '&nbsp;',
@@ -82,7 +81,7 @@ function cargarusuariosytecnicos(){
     var tabs =  '<div class="row">'+
                     '<div class="col-md-12 table-responsive">'+
                         '<table id="tablausuariosytecnicos" class="table table-bordered tablausuariosytecnicos">'+
-                            '<thead class="customercolor">'+
+                            '<thead class="'+background_tables+'">'+
                                 '<tr>'+
                                     '<th>Operaciones</th>'+
                                     '<th >Nombre</th>'+

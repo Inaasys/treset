@@ -12,26 +12,49 @@ use App\TipoDeCambio;
 class ConfiguracionSistemaController extends Controller
 {
     public function __construct() {
-
+        //DATOS EMPRESA
+        $this->empresa = Empresa::where('Numero', 1)->first();
+        //actualizar datos de configuracion global
+        config(['app.periodoincialmodulos' => $this->empresa->Periodo_Inicial_Modulos]);
+        config(['app.numerodedecimales' => $this->empresa->Numero_Decimales]);
+        config(['app.numerodecimalesendocumentos' => $this->empresa->Numero_Decimales_En_Documentos]);
+        config(['app.mayusculas_sistema' => $this->empresa->Mayusculas_Sistema]);
+        config(['app.calleempresa' => $this->empresa->Calle]);
+        config(['app.noexteriorempresa' => $this->empresa->NoExterior]);
+        config(['app.nointeriorempresa' => $this->empresa->NoInterior]);
+        config(['app.coloniaempresa' => $this->empresa->Colonia]);
+        config(['app.localidadempresa' => $this->empresa->Localidad]);
+        config(['app.referenciaempresa' => $this->empresa->Referencia]);
+        config(['app.cpempresa' => $this->empresa->LugarExpedicion]);
+        config(['app.municipioempresa' => $this->empresa->Municipio]);
+        config(['app.estadoempresa' => $this->empresa->Estado]);
+        config(['app.telefonosempresa' => $this->empresa->Telefonos]);
+        config(['app.paisempresa' => $this->empresa->Pais]);
+        config(['app.emailempresa' => $this->empresa->Email]);
+        config(['app.lugarexpedicion' => $this->empresa->LugarExpedicion]);
+        config(['app.regimenfiscal' => $this->empresa->RegimenFiscal]);
         ////////////OBTENER CONFIGURACIONES DEL SISTEMA////////////////
-        $this->mayusculas_sistema = config('app.mayusculas_sistema');//obtiene si el sistema utilizara mayusculas o no
-        $this->numerodecimales = config('app.numerodedecimales');// obtiene el numero de decimales condigurados para el sistema
-        $this->numerodecimalesendocumentos = config('app.numerodecimalesendocumentos');//obtiene el numero de decimales configurados para los documentos pdf del sistema
         $this->numerocerosconfigurados = Helpers::numerocerosconfiguracion(); //obtienes los ceros que se deben colocar con base a los decimales configurados en el sistemas ejemplo decimales para el sistema = 3 numero de ceros = 000
         $this->numerocerosconfiguradosinputnumberstep = Helpers::numerocerosconfiguracioninputnumberstep(); //obtienes los ceros que se deben colocar en los input type number con base a los decimales configurados en el sistemas ejemplo decimales para el sistema = 3 numero de ceros = 001
-        $this->periodoinicial = config('app.periodoincialmodulos');//obtiene el año incial en las vistas principales de los modulo ejemplo 2014
         $this->periodohoy = Carbon::now()->format('Y'); //obtiene el año actual ejemplo 2020
         $this->meshoy = Carbon::now()->format('m'); //obtiene el mes actual ejemplo 09
-        // datos empresa
-        $this->empresa = Empresa::where('Numero', 1)->first();
+        $this->periodoinicial = config('app.periodoincialmodulos');//obtiene el año incial en las vistas principales de los modulo ejemplo 2014
+        $this->numerodecimales = config('app.numerodedecimales');// obtiene el numero de decimales condigurados para el sistema
+        $this->numerodecimalesendocumentos = config('app.numerodecimalesendocumentos');//obtiene el numero de decimales configurados para los documentos pdf del sistema
+        $this->mayusculas_sistema = config('app.mayusculas_sistema');//obtiene si el sistema utilizara mayusculas o no
         //datos empresa para pdfs
         $this->calleempresa = config('app.calleempresa');// obtiene la calle de la empresa
         $this->noexteriorempresa = config('app.noexteriorempresa');//obtiene el numero exterior de la empresa
+        $this->nointeriorempresa = config('app.nointeriorempresa');//obtiene el numero interior de la empresa
         $this->coloniaempresa = config('app.coloniaempresa');//obtiene la colonia de la empresa
+        $this->localidadempresa = config('app.localidadempresa');//obtiene la localidad de la empresa
+        $this->referenciaempresa = config('app.referenciaempresa');//obtiene la refenrecia de la empresa
         $this->cpempresa = config('app.cpempresa');//obtiene el cp de la empresa
         $this->municipioempresa = config('app.municipioempresa');//obtiene el municipio de la empresa
         $this->estadoempresa = config('app.estadoempresa');//obtiene el estado de la empresa
         $this->telefonosempresa = config('app.telefonosempresa');//obtiene el telefono de la empresa
+        $this->paisempresa = config('app.paisempresa');//obtiene pais de la empresa
+        $this->emailempresa = config('app.emailempresa');//obtiene pais de la empresa
         //Para Emisor Documentos
         $this->lugarexpedicion = config('app.lugarexpedicion');//obtiene el lugar expedicion
         $this->regimenfiscal = config('app.regimenfiscal');//obtiene el regimen fiscal
@@ -79,6 +102,7 @@ class ConfiguracionSistemaController extends Controller
         ///////////COMPARTIR CONFIGURACIONES EN TODAS LAS VISTAS ///////////
         View::share ( 'mayusculas_sistema', $this->mayusculas_sistema );
         View::share ( 'numerodecimales', $this->numerodecimales );
+        View::share ( 'numerodecimalesendocumentos', $this->numerodecimalesendocumentos );
         View::share ( 'numerocerosconfigurados', $this->numerocerosconfigurados);
         View::share ( 'numerocerosconfiguradosinputnumberstep', $this->numerocerosconfiguradosinputnumberstep);
         View::share ( 'periodoinicial', $this->periodoinicial);
@@ -86,14 +110,20 @@ class ConfiguracionSistemaController extends Controller
         View::share ( 'empresa', $this->empresa);
         View::share ( 'meshoy', $this->meshoy);
         View::share ( 'valor_dolar_hoy', $this->valor_dolar_hoy);
-        //para pdfs
         View::share ( 'calleempresa', $this->calleempresa);
         View::share ( 'noexteriorempresa', $this->noexteriorempresa);
+        View::share ( 'nointeriorempresa', $this->nointeriorempresa);
         View::share ( 'coloniaempresa', $this->coloniaempresa);
+        View::share ( 'localidadempresa', $this->localidadempresa);
+        View::share ( 'referenciaempresa', $this->referenciaempresa);
         View::share ( 'cpempresa', $this->cpempresa);
         View::share ( 'municipioempresa', $this->municipioempresa);
         View::share ( 'estadoempresa', $this->estadoempresa);
         View::share ( 'telefonosempresa', $this->telefonosempresa);
-        //View::share ( 'variable4', ['name'=>'Franky','address'=>'Mars'] );
+        View::share ( 'paisempresa', $this->paisempresa);
+        View::share ( 'emailempresa', $this->emailempresa);
+        View::share ( 'lugarexpedicion', $this->lugarexpedicion);
+        View::share ( 'regimenfiscal', $this->regimenfiscal);
+        //View::share ( 'array', ['name'=>'Franky','address'=>'Mars'] );
     } 
 }

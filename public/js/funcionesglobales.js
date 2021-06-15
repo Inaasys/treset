@@ -623,6 +623,14 @@ function msj_errorserieexistenteendocumento(){
         "extendedTImeout": "6000"
     });  
 }
+//mensaje factura timbrada correctamente
+function msj_facturatimbradacorrectamente(){
+    toastr.success( "Correcto, la factura se timbro correctamente", "Mensaje", {
+        "timeOut": "6000",
+        "progressBar": true,
+        "extendedTImeout": "6000"
+    });  
+}
 ///////////////////////////////////FIN MENSAJES TOASTR.JS INAASYS///////////////////////////////////////
 //////////////////////////////FUNCIONES PARA CONFIGURACION DE COLUMNAS DE TABLAS/////////////////////////////////////////
 //ordenar las columnas para vista de tabla

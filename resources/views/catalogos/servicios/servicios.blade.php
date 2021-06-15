@@ -13,7 +13,7 @@
             <div class="row clearfix">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="card" id="listadoregistros">
-                        <div class="header bg-red">
+                        <div class="header {{$empresa->background_forms_and_modals}}">
                             <div class="row clearfix">
                                 <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
                                     <h5>&nbsp;&nbsp;&nbsp;SERVICIOS&nbsp;&nbsp;&nbsp;</h5>
@@ -41,7 +41,7 @@
                         <div class="body">
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover" style="width:100% !important;">
-                                    <thead class="customercolor">
+                                    <thead class="{{$empresa->background_tables}}">
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
                                             <th>Código</th>
@@ -72,7 +72,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div id="formulario">
-                <div class="modal-header bg-red">
+                <div class="modal-header {{$empresa->background_forms_and_modals}}">
                     <h4 class="modal-title" id="titulomodal"></h4>
                 </div>
                 <form id="formparsley" action="#">
@@ -104,7 +104,7 @@
 <div class="modal fade" data-backdrop="static" data-keyboard="false" id="estatusregistro" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   	<div class="modal-dialog" role="document">
     	<div class="modal-content">
-      		<div class="modal-header bg-red">
+      		<div class="modal-header {{$empresa->background_forms_and_modals}}">
         		<h5 class="modal-title" id="exampleModalLabel">Aviso</h5>
       		</div>
       		<div class="modal-body">
@@ -128,6 +128,9 @@
         var numerodecimales = '{{$numerodecimales}}';
         var numerocerosconfigurados = '{{$numerocerosconfigurados}}';
         var numerocerosconfiguradosinputnumberstep = '{{$numerocerosconfiguradosinputnumberstep}}';
+        var background_navbar = '{{$empresa->background_navbar}}';
+        var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
+        var background_tables = '{{$empresa->background_tables}}';
         var servicios_obtener = '{!!URL::to('servicios_obtener')!!}';
         var servicios_obtener_familias = '{!!URL::to('servicios_obtener_familias')!!}';
         var servicios_obtener_claves_productos = '{!!URL::to('servicios_obtener_claves_productos')!!}';

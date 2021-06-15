@@ -50,7 +50,6 @@ function listar(){
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "350px",
-        "bScrollCollapse": true,  
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -85,7 +84,7 @@ function listar(){
 }
 function listarfamilias(){
     ocultarformulario();
-    var tablafamilias = '<div class="modal-header bg-red">'+
+    var tablafamilias = '<div class="modal-header '+background_forms_and_modals+'">'+
                             '<h4 class="modal-title">Familias</h4>'+
                         '</div>'+
                         '<div class="modal-body">'+
@@ -93,7 +92,7 @@ function listarfamilias(){
                                 '<div class="col-md-12">'+
                                     '<div class="table-responsive">'+
                                         '<table id="tbllistadofamilia" class="tbllistadofamilia table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                            '<thead class="customercolor">'+
+                                            '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
                                                     '<th>Operaciones</th>'+
                                                     '<th>Número</th>'+
@@ -141,7 +140,7 @@ function listarfamilias(){
 //listar claves productos
 function listarclavesproductos(){
     ocultarformulario();
-    var tablaclavesproductos =  '<div class="modal-header bg-red">'+
+    var tablaclavesproductos =  '<div class="modal-header '+background_forms_and_modals+'">'+
                                     '<h4 class="modal-title">Claves Productos</h4>'+
                                 '</div>'+
                                 '<div class="modal-body">'+
@@ -149,7 +148,7 @@ function listarclavesproductos(){
                                         '<div class="col-md-12">'+
                                             '<div class="table-responsive">'+
                                                 '<table id="tbllistadoclaveproducto" class="tbllistadoclaveproducto table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                                    '<thead class="customercolor">'+
+                                                    '<thead class="'+background_tables+'">'+
                                                         '<tr>'+
                                                             '<th>Operaciones</th>'+
                                                             '<th>Clave</th>'+
@@ -199,7 +198,7 @@ function listarclavesproductos(){
 //listar claves unidades
 function listarclavesunidades(){
     ocultarformulario();
-    var tablaclavesunidades =   '<div class="modal-header bg-red">'+
+    var tablaclavesunidades =   '<div class="modal-header '+background_forms_and_modals+'">'+
                                     '<h4 class="modal-title">Claves Unidades</h4>'+
                                 '</div>'+
                                 '<div class="modal-body">'+
@@ -207,7 +206,7 @@ function listarclavesunidades(){
                                         '<div class="col-md-12">'+
                                             '<div class="table-responsive">'+
                                                 '<table id="tbllistadoclaveunidad" class="tbllistadoclaveunidad table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                                    '<thead class="customercolor">'+
+                                                    '<thead class="'+background_tables+'">'+
                                                         '<tr>'+
                                                             '<th>Operaciones</th>'+
                                                             '<th>Clave</th>'+

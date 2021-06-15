@@ -101,7 +101,6 @@ function listar(){
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "350px",
-        "bScrollCollapse": true,
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -134,7 +133,7 @@ function listar(){
 function obtenerseriesdocumento(){
     ocultarformulario();
     var seriedefault = 'A';
-    var tablaseriesdocumento=   '<div class="modal-header bg-red">'+
+    var tablaseriesdocumento=   '<div class="modal-header '+background_forms_and_modals+'">'+
                                     '<h4 class="modal-title">Series Documento &nbsp;&nbsp; <div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''+seriedefault+'\')">Asignar Serie Default (A)</div></h4>'+
                                 '</div>'+
                                 '<div class="modal-body">'+
@@ -142,7 +141,7 @@ function obtenerseriesdocumento(){
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
                                         '<table id="tbllistadoseriedocumento" class="tbllistadoseriedocumento table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                            '<thead class="customercolor">'+
+                                            '<thead class="'+background_tables+'">'+
                                             '<tr>'+
                                                 '<th>Operaciones</th>'+
                                                 '<th>Serie</th>'+
@@ -204,7 +203,7 @@ function seleccionarseriedocumento(Serie){
 //obtener registros de proveedores
 function obtenerproveedores(){
   ocultarformulario();
-  var tablaproveedores = '<div class="modal-header bg-red">'+
+  var tablaproveedores = '<div class="modal-header '+background_forms_and_modals+'">'+
                       '<h4 class="modal-title">Proveedores</h4>'+
                     '</div>'+
                     '<div class="modal-body">'+
@@ -212,7 +211,7 @@ function obtenerproveedores(){
                           '<div class="col-md-12">'+
                               '<div class="table-responsive" >'+
                                   '<table id="tbllistadoproveedor" class="tbllistadoproveedor table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                      '<thead class="customercolor">'+
+                                      '<thead class="'+background_tables+'">'+
                                           '<tr>'+
                                               '<th>Operaciones</th>'+
                                               '<th>Numero</th>'+
@@ -272,7 +271,7 @@ function obtenerproveedores(){
 //obtener registros de almacenes
 function obtenerbancos(){
     ocultarformulario();
-    var tablabancos = '<div class="modal-header bg-red">'+
+    var tablabancos = '<div class="modal-header '+background_forms_and_modals+'">'+
                             '<h4 class="modal-title">Bancos</h4>'+
                         '</div>'+
                         '<div class="modal-body">'+
@@ -280,7 +279,7 @@ function obtenerbancos(){
                                 '<div class="col-md-12">'+
                                     '<div class="table-responsive">'+
                                         '<table id="tbllistadobanco" class="tbllistadobanco table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                            '<thead class="customercolor">'+
+                                            '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
                                                     '<th>Operaciones</th>'+
                                                     '<th>Numero</th>'+
@@ -416,6 +415,16 @@ function regresarnumerobanco(){
     var numerobancoanterior = $("#numerobancoanterior").val();
     $("#numerobanco").val(numerobancoanterior);
 }
+
+//saldar compra
+function saldarcompra(fila){
+    var abonocompra = $("#filacompra"+fila+" .abonocompra").val();
+    var saldocompra = $("#filacompra"+fila+" .saldocompra").val();
+    var nuevosaldo = new Decimal(abonocompra).plus(saldocompra);
+    $("#filacompra"+fila+" .abonocompra").val(number_format(round(nuevosaldo, numerodecimales), numerodecimales, '.', ''));
+    calcularnuevosaldo(fila);
+}
+
 //alta clientes
 function alta(){
   $("#titulomodal").html('Alta Cuentas por Pagar');
@@ -505,20 +514,20 @@ function alta(){
                         '<div class="row">'+
                             '<div class="col-md-12 table-responsive cabecerafija" style="height: 225px; overflow-y: scroll;padding: 0px 0px;">'+
                                 '<table class="table  table-bordered">'+
-                                    '<thead class="customercolor">'+
+                                    '<thead class="'+background_tables+'">'+
                                         '<tr>'+
-                                          '<th class="customercolor">#</th>'+
-                                          '<th class="customercolor">Compra</th>'+
-                                          '<th class="customercolor">Factura</th>'+
-                                          '<th class="customercolor">Fecha</th>'+
-                                          '<th class="customercolor">Plazo</th>'+
-                                          '<th class="customercolor">Vence</th>'+
-                                          '<th class="customercolor">Total $</th>'+
-                                          '<th class="customercolor">Abonos $</th>'+
-                                          '<th class="customercolor">Notas Crédito $</th>'+
+                                          '<th class="'+background_tables+'">#</th>'+
+                                          '<th class="'+background_tables+'">Compra</th>'+
+                                          '<th class="'+background_tables+'">Factura</th>'+
+                                          '<th class="'+background_tables+'">Fecha</th>'+
+                                          '<th class="'+background_tables+'">Plazo</th>'+
+                                          '<th class="'+background_tables+'">Vence</th>'+
+                                          '<th class="'+background_tables+'">Total $</th>'+
+                                          '<th class="'+background_tables+'">Abonos $</th>'+
+                                          '<th class="'+background_tables+'">Notas Crédito $</th>'+
                                           '<th class="customercolortheadth">Abono</th>'+
-                                          '<th class="customercolor">Saldo $</th>'+
-                                          '<th class="customercolor">Contrarecibo</th>'+
+                                          '<th class="'+background_tables+'">Saldo $ (DOBLE CLICK)</th>'+
+                                          '<th class="'+background_tables+'">Contrarecibo</th>'+
                                         '</tr>'+
                                     '</thead>'+
                                     '<tbody id="tabladetallecuentasporpagar">'+           
@@ -806,19 +815,19 @@ function obtenerdatos(cxpmodificar){
                             '<div class="row">'+
                                 '<div class="col-md-12 table-responsive cabecerafija" style="height: 225px;overflow-y: scroll;padding: 0px 0px;">'+
                                     '<table class="table table-bordered">'+
-                                        '<thead class="customercolor">'+
+                                        '<thead class="'+background_tables+'">'+
                                             '<tr>'+
-                                            '<th class="customercolor">#</th>'+
-                                            '<th class="customercolor">Compra</th>'+
-                                            '<th class="customercolor">Factura</th>'+
-                                            '<th class="customercolor">Fecha</th>'+
-                                            '<th class="customercolor">Plazo</th>'+
-                                            '<th class="customercolor">Vence</th>'+
-                                            '<th class="customercolor">Total $</th>'+
-                                            '<th class="customercolor">Abonos $</th>'+
-                                            '<th class="customercolor">Notas Crédito $</th>'+
+                                            '<th class="'+background_tables+'">#</th>'+
+                                            '<th class="'+background_tables+'">Compra</th>'+
+                                            '<th class="'+background_tables+'">Factura</th>'+
+                                            '<th class="'+background_tables+'">Fecha</th>'+
+                                            '<th class="'+background_tables+'">Plazo</th>'+
+                                            '<th class="'+background_tables+'">Vence</th>'+
+                                            '<th class="'+background_tables+'">Total $</th>'+
+                                            '<th class="'+background_tables+'">Abonos $</th>'+
+                                            '<th class="'+background_tables+'">Notas Crédito $</th>'+
                                             '<th class="customercolortheadth">Abono</th>'+
-                                            '<th class="customercolor">Saldo $</th>'+
+                                            '<th class="'+background_tables+'">Saldo $ (DOBLE CLICK)</th>'+
                                             '</tr>'+
                                         '</thead>'+
                                         '<tbody id="tabladetallecuentasporpagar">'+           

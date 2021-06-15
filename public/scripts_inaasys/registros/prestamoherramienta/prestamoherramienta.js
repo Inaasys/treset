@@ -111,7 +111,6 @@ function listar(){
     "pageLength": 250,
     "sScrollX": "110%",
     "sScrollY": "350px",
-    "bScrollCollapse": true,
     processing: true,
     'language': {
         'loadingRecords': '&nbsp;',
@@ -144,7 +143,7 @@ function listar(){
 function obtenerseriesdocumento(){
   ocultarformulario();
   var seriedefault = 'A';
-  var tablaseriesdocumento= '<div class="modal-header bg-red">'+
+  var tablaseriesdocumento= '<div class="modal-header '+background_forms_and_modals+'">'+
                               '<h4 class="modal-title">Series Documento &nbsp;&nbsp; <div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''+seriedefault+'\')">Asignar Serie Default (A)</div></h4>'+
                             '</div>'+
                             '<div class="modal-body">'+
@@ -152,7 +151,7 @@ function obtenerseriesdocumento(){
                                 '<div class="col-md-12">'+
                                   '<div class="table-responsive">'+
                                     '<table id="tbllistadoseriedocumento" class="tbllistadoseriedocumento table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                      '<thead class="customercolor">'+
+                                      '<thead class="'+background_tables+'">'+
                                         '<tr>'+
                                           '<th>Operaciones</th>'+
                                           '<th>Serie</th>'+
@@ -214,7 +213,7 @@ function seleccionarseriedocumento(serie){
 //obtener registros
 function obtenerpersonalrecibe(){
   ocultarformulario();
-  var tablapersonalrecibe = '<div class="modal-header bg-red">'+
+  var tablapersonalrecibe = '<div class="modal-header '+background_forms_and_modals+'">'+
                       '<h4 class="modal-title">Personal que recibe</h4>'+
                     '</div>'+
                     '<div class="modal-body">'+
@@ -222,7 +221,7 @@ function obtenerpersonalrecibe(){
                           '<div class="col-md-12">'+
                               '<div class="table-responsive">'+
                                   '<table id="tbllistadopersonalrecibe" class="tbllistadopersonalrecibe table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                      '<thead class="customercolor">'+
+                                      '<thead class="'+background_tables+'">'+
                                           '<tr>'+
                                               '<th>Operaciones</th>'+
                                               '<th>Numero</th>'+
@@ -386,7 +385,7 @@ function herramientaasignadapersonal(){
     $("#tablaherramientasprestadas tbody").html("");
     contadorproductos=0;
     contadorfilas = 0;
-    var tablaherramientasasignadaspersonalseleccionado =    '<div class="modal-header bg-red">'+
+    var tablaherramientasasignadaspersonalseleccionado =    '<div class="modal-header '+background_forms_and_modals+'">'+
                                                               '<h4 class="modal-title">Herramienta Asignada a Personal Seleccionado</h4>'+
                                                           '</div>'+
                                                           '<div class="modal-body">'+
@@ -394,7 +393,7 @@ function herramientaasignadapersonal(){
                                                                   '<div class="col-md-12">'+
                                                                       '<div class="table-responsive ">'+
                                                                           '<table id="tablaherramientasasignadaspersonalseleccionado" class="table table-bordered tablaherramientasasignadaspersonalseleccionado" style="width:100% !important;">'+
-                                                                              '<thead class="customercolor">'+
+                                                                              '<thead class="'+background_tables+'">'+
                                                                                   '<tr>'+
                                                                                       '<th>Operaciones</th>'+    
                                                                                       '<th>Asignación</th>'+
@@ -595,16 +594,16 @@ function alta(){
                   '<div class="row">'+
                     '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
                       '<table id="tablaherramientasprestadas" class="table table-bordered tablaherramientasprestadas">'+
-                        '<thead class="customercolor">'+
+                        '<thead class="'+background_tables+'">'+
                           '<tr>'+
-                            '<th class="customercolor">#</th>'+
-                            '<th class="customercolor">Herramienta</th>'+
-                            '<th class="customercolor"><div style="width:200px !important;">Descripción</div></th>'+
+                            '<th class="'+background_tables+'">#</th>'+
+                            '<th class="'+background_tables+'">Herramienta</th>'+
+                            '<th class="'+background_tables+'"><div style="width:200px !important;">Descripción</div></th>'+
                             '<th class="customercolortheadth">Unidad</th>'+
                             '<th class="customercolortheadth">Cantidad</th>'+
                             '<th class="customercolortheadth">Precio $</th>'+
-                            '<th class="customercolor">Total $</th>'+
-                            '<th class="customercolor">Estado Herramienta</th>'+
+                            '<th class="'+background_tables+'">Total $</th>'+
+                            '<th class="'+background_tables+'">Estado Herramienta</th>'+
                           '</tr>'+
                         '</thead>'+
                         '<tbody>'+           
@@ -861,16 +860,16 @@ function obtenerdatos(prestamomodificar){
                     '<div class="row">'+
                       '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
                         '<table id="tablaherramientasprestadas" class="table table-bordered tablaherramientasprestadas">'+
-                          '<thead class="customercolor">'+
+                          '<thead class="'+background_tables+'">'+
                             '<tr>'+
-                              '<th class="customercolor">#</th>'+
-                              '<th class="customercolor">Herramienta</th>'+
-                              '<th class="customercolor"><div style="width:200px !important;">Descripción</div></th>'+
+                              '<th class="'+background_tables+'">#</th>'+
+                              '<th class="'+background_tables+'">Herramienta</th>'+
+                              '<th class="'+background_tables+'"><div style="width:200px !important;">Descripción</div></th>'+
                               '<th class="customercolortheadth">Unidad</th>'+
                               '<th class="customercolortheadth">Cantidad</th>'+
                               '<th class="customercolortheadth">Precio $</th>'+
-                              '<th class="customercolor">Total $</th>'+
-                              '<th class="customercolor">Estado Herramienta</th>'+
+                              '<th class="'+background_tables+'">Total $</th>'+
+                              '<th class="'+background_tables+'">Estado Herramienta</th>'+
                             '</tr>'+
                           '</thead>'+
                           '<tbody>'+           

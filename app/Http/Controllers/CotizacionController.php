@@ -46,14 +46,15 @@ class CotizacionController extends ConfiguracionSistemaController{
         $serieusuario = 'A';
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('cotizaciones_guardar_configuracion_tabla');
-        return view('registros.cotizaciones.cotizaciones', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla'));
+        $urlgenerarformatoexcel = route('cotizaciones_exportar_excel');
+        return view('registros.cotizaciones.cotizaciones', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel'));
     }
 
     //obtener las asignaciones de herramienta
     public function cotizaciones_obtener(Request $request){
         if($request->ajax()){
             $periodo = $request->periodo;
-            $data = VistaCotizacion::select($this->campos_consulta)->orderBy('fecha', 'DESC')->where('periodo', $periodo)->get();
+            $data = VistaCotizacion::select($this->campos_consulta)->where('periodo', $periodo)->orderBy('fecha', 'DESC')->orderBy('serie', 'ASC')->orderBy('folio', 'DESC')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
                         $operaciones = '<div class="dropdown">'.
@@ -74,7 +75,9 @@ class CotizacionController extends ConfiguracionSistemaController{
                         */
                         return $operaciones;
                     })
-                    ->addColumn('fecha', function($data){ return Carbon::parse($data->fecha)->toDateTimeString(); })
+                    ->addColumn('fecha', function($data){ return Carbon::parse($data->fecha)->toDateString(); })
+                    ->addColumn('subtotal', function($data){ return $data->subtotal; })
+                    ->addColumn('iva', function($data){ return $data->iva; })
                     ->addColumn('total', function($data){ return $data->total; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
@@ -465,10 +468,10 @@ class CotizacionController extends ConfiguracionSistemaController{
     }
 
     //exportar excel
-    public function cotizaciones_exportar_excel(){
+    public function cotizaciones_exportar_excel(Request $request){
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
-        return Excel::download(new CotizacionesExport($this->campos_consulta), "cotizaciones.xlsx");   
+        return Excel::download(new CotizacionesExport($this->campos_consulta,$request->periodo), "cotizaciones-".$request->periodo.".xlsx");   
     }
 
     //guardar configuracion tabla

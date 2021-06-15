@@ -56,7 +56,6 @@ function listar(){
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "350px",
-        "bScrollCollapse": true,  
         processing: true,
         'language': {
           'loadingRecords': '&nbsp;',

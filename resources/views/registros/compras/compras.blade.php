@@ -13,7 +13,7 @@
             <div class="row clearfix">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="card" id="listadoregistros">
-                        <div class="header bg-red">
+                        <div class="header {{$empresa->background_forms_and_modals}}">
                             <div class="row clearfix">
                                 <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
                                     <h5>&nbsp;&nbsp;&nbsp;COMPRAS&nbsp;&nbsp;&nbsp;</h5>
@@ -74,8 +74,8 @@
                         </div>
                         <div class="body">
                             <div class="table-responsive">
-                                <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover">
-                                    <thead class="customercolor">
+                                <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover" >
+                                    <thead class="{{$empresa->background_tables}}">
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
@@ -98,7 +98,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div id="formulario">
-                <div class="modal-header bg-red">
+                <div class="modal-header {{$empresa->background_forms_and_modals}}">
                     <h4 class="modal-title" id="titulomodal"></h4>
                 </div>
                 <div class="modal-body">
@@ -151,7 +151,7 @@
 <div class="modal fade" data-backdrop="static" data-keyboard="false" id="estatusregistro" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   	<div class="modal-dialog" role="document">
     	<div class="modal-content">
-      		<div class="modal-header bg-red">
+      		<div class="modal-header {{$empresa->background_forms_and_modals}}">
         		<h5 class="modal-title" id="exampleModalLabel">Aviso</h5>
       		</div>
       		<div class="modal-body">
@@ -175,20 +175,20 @@
 <div class="modal fade" data-keyboard="false" id="modalmovimientoscompra" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   	<div class="modal-dialog" role="document">
     	<div class="modal-content">
-      		<div class="modal-header bg-red">
+      		<div class="modal-header {{$empresa->background_forms_and_modals}}">
         		<h5 class="modal-title" id="exampleModalLabel">Movimientos</h5>
       		</div>
       		<div class="modal-body">
                 <div class="row">
                     <div class="col-md-12">
                         <table class="table table-bordered table-striped table-hover">
-                            <thead>
+                            <thead class="{{$empresa->background_tables}}">
                                 <tr>
-                                    <td class="customercolortheadth">Movimiento</td>
-                                    <td class="customercolortheadth">Número</td>
-                                    <td class="customercolortheadth">Fecha</td>
-                                    <td class="customercolortheadth">Abono $</td>
-                                    <td class="customercolortheadth">Status</td>
+                                    <td >Movimiento</td>
+                                    <td >Número</td>
+                                    <td >Fecha</td>
+                                    <td >Abono $</td>
+                                    <td >Status</td>
                                 </tr>
                             </thead>
                             <tbody id="filasmovimientos"></tbody>
@@ -225,6 +225,9 @@
         var rfcreceptor = '{{$empresa->Rfc}}';
         var nombrereceptor = '{{$empresa->Nombre}}';
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
+        var background_navbar = '{{$empresa->background_navbar}}';
+        var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
+        var background_tables = '{{$empresa->background_tables}}';
         var compras_obtener = '{!!URL::to('compras_obtener')!!}';
         var compras_obtener_series_documento = '{!!URL::to('compras_obtener_series_documento')!!}';
         var compras_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('compras_obtener_ultimo_folio_serie_seleccionada')!!}';

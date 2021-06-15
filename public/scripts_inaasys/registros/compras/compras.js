@@ -113,8 +113,7 @@ function listar(){
     "lengthMenu": [ 10, 50, 100, 250, 500 ],
     "pageLength": 250,
     "sScrollX": "110%",
-    "sScrollY": "350px",
-    "bScrollCollapse": true,  
+    "sScrollY": "350px", 
     processing: true,
     'language': {
         'loadingRecords': '&nbsp;',
@@ -152,7 +151,7 @@ function obtenertiposordenescompra(tipoalta){
 function obtenerseriesdocumento(){
   ocultarformulario();
   var seriedefault = 'A';
-  var tablaseriesdocumento= '<div class="modal-header bg-red">'+
+  var tablaseriesdocumento= '<div class="modal-header '+background_forms_and_modals+'">'+
                               '<h4 class="modal-title">Series Documento &nbsp;&nbsp; <div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''+seriedefault+'\')">Asignar Serie Default (A)</div></h4>'+
                             '</div>'+
                             '<div class="modal-body">'+
@@ -160,7 +159,7 @@ function obtenerseriesdocumento(){
                                 '<div class="col-md-12">'+
                                   '<div class="table-responsive">'+
                                     '<table id="tbllistadoseriedocumento" class="tbllistadoseriedocumento table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                      '<thead class="customercolor">'+
+                                      '<thead class="'+background_tables+'">'+
                                         '<tr>'+
                                           '<th>Operaciones</th>'+
                                           '<th>Serie</th>'+
@@ -222,7 +221,7 @@ function seleccionarseriedocumento(Serie){
 //obtener registros de proveedores
 function obtenerproveedores(){
   ocultarformulario();
-  var tablaproveedores = '<div class="modal-header bg-red">'+
+  var tablaproveedores = '<div class="modal-header '+background_forms_and_modals+'">'+
                       '<h4 class="modal-title">Proveedores</h4>'+
                     '</div>'+
                     '<div class="modal-body">'+
@@ -230,7 +229,7 @@ function obtenerproveedores(){
                           '<div class="col-md-12">'+
                               '<div class="table-responsive">'+
                                   '<table id="tbllistadoproveedor" class="tbllistadoproveedor table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                      '<thead class="customercolor">'+
+                                      '<thead class="'+background_tables+'">'+
                                           '<tr>'+
                                               '<th>Operaciones</th>'+
                                               '<th>Numero</th>'+
@@ -325,7 +324,7 @@ function seleccionarproveedor(Numero, Nombre, Plazo, Rfc){
 //obtener registros de almacenes
 function obteneralmacenes(){
     ocultarformulario();
-    var tablaalmacenes = '<div class="modal-header bg-red">'+
+    var tablaalmacenes = '<div class="modal-header '+background_forms_and_modals+'">'+
                             '<h4 class="modal-title">Almacenes</h4>'+
                         '</div>'+
                         '<div class="modal-body">'+
@@ -333,7 +332,7 @@ function obteneralmacenes(){
                                 '<div class="col-md-12">'+
                                     '<div class="table-responsive">'+
                                         '<table id="tbllistadoalmacen" class="tbllistadoalmacen table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                            '<thead class="customercolor">'+
+                                            '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
                                                     '<th>Operaciones</th>'+
                                                     '<th>Numero</th>'+
@@ -399,7 +398,7 @@ function seleccionaralmacen(Numero, Nombre){
 //listar departamentos
 function listardepartamentos(fila){
   ocultarformulario();
-  var tabladepartamentos =  '<div class="modal-header bg-red">'+
+  var tabladepartamentos =  '<div class="modal-header '+background_forms_and_modals+'">'+
                                 '<h4 class="modal-title">Departamentos</h4>'+
                             '</div>'+
                             '<div class="modal-body">'+
@@ -407,7 +406,7 @@ function listardepartamentos(fila){
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
                                             '<table id="tbllistadodepartamento" class="tbllistadodepartamento table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                                '<thead class="customercolor">'+
+                                                '<thead class="'+background_tables+'">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
                                                         '<th>Numero</th>'+
@@ -468,7 +467,7 @@ function seleccionardepartamento(numerodepartamento, departamento, fila){
 //listar claves productos
 function listarclavesproductos(fila){
   ocultarformulario();
-  var tablaclavesproducto = '<div class="modal-header bg-red">'+
+  var tablaclavesproducto = '<div class="modal-header '+background_forms_and_modals+'">'+
                                 '<h4 class="modal-title">Claves Productos</h4>'+
                             '</div>'+
                             '<div class="modal-body">'+
@@ -476,7 +475,7 @@ function listarclavesproductos(fila){
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
                                             '<table id="tbllistadoclaveproducto" class="tbllistadoclaveproducto table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                                '<thead class="customercolor">'+
+                                                '<thead class="'+background_tables+'">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
                                                         '<th>Clave</th>'+
@@ -537,7 +536,7 @@ function seleccionarclaveproducto(clave, nombre, fila){
 //listar claves unidades
 function listarclavesunidades(fila){
   ocultarformulario();
-  var tablaclavesunidades = '<div class="modal-header bg-red">'+
+  var tablaclavesunidades = '<div class="modal-header '+background_forms_and_modals+'">'+
                                 '<h4 class="modal-title">Claves Unidades</h4>'+
                             '</div>'+
                             '<div class="modal-body">'+
@@ -545,7 +544,7 @@ function listarclavesunidades(fila){
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
                                             '<table id="tbllistadoclaveunidad" class="tbllistadoclaveunidad table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                                '<thead class="customercolor">'+
+                                                '<thead class="'+background_tables+'">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
                                                         '<th>Clave</th>'+
@@ -606,7 +605,7 @@ function seleccionarclaveunidad(clave, nombre, fila){
 //listar todas las ordenes de compra
 function listarordenesdecompra (){
   ocultarformulario();
-  var tablaordenescompra =  '<div class="modal-header bg-red">'+
+  var tablaordenescompra =  '<div class="modal-header '+background_forms_and_modals+'">'+
                               '<h4 class="modal-title">Ordenes de Compra</h4>'+
                             '</div>'+
                             '<div class="modal-body">'+
@@ -614,7 +613,7 @@ function listarordenesdecompra (){
                                   '<div class="col-md-12">'+
                                       '<div class="table-responsive">'+
                                           '<table id="tbllistadoordencompra" class="tbllistadoordencompra table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                              '<thead class="customercolor">'+
+                                              '<thead class="'+background_tables+'">'+
                                                   '<tr>'+
                                                       '<th>Operaciones</th>'+
                                                       '<th>Orden</th>'+
@@ -879,7 +878,7 @@ function regresarnumeroalmacen(){
 //listar productos para tab consumos
 function listarproductos(){
   ocultarformulario();
-  var tablaproductos = '<div class="modal-header bg-red">'+
+  var tablaproductos = '<div class="modal-header '+background_forms_and_modals+'">'+
                           '<h4 class="modal-title">Productos</h4>'+
                         '</div>'+
                         '<div class="modal-body">'+
@@ -887,7 +886,7 @@ function listarproductos(){
                             '<div class="col-md-12">'+
                               '<div class="table-responsive">'+
                                 '<table id="tbllistadoproducto" class="tbllistadoproducto table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                  '<thead class="customercolor">'+
+                                  '<thead class="'+background_tables+'">'+
                                     '<tr>'+
                                       '<th>Operaciones</th>'+
                                       '<th>Código</th>'+
@@ -1276,6 +1275,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
         mostrarformulario();      
         comprobarfilas();
         calculartotal();
+        $("#codigoabuscar").val("");
         $('.page-loader-wrapper').css('display', 'none');
     }else{
         msj_errorproductoyaagregado();
@@ -1497,8 +1497,8 @@ function alta(tipoalta){
                                       '</table>'+
                                     '</div>'+
                                     '<div class="col-md-3" id="divbuscarcodigoproducto" hidden>'+
-                                        '<label>Buscar producto por código</label>'+
-                                        '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                                      '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
+                                      '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'+   
@@ -1541,41 +1541,41 @@ function alta(tipoalta){
                                 '<div class="row">'+
                                     '<div class="col-md-12 table-responsive cabecerafija" style="height: 200px;overflow-y: scroll;padding: 0px 0px;">'+
                                         '<table id="tablaproductoscompras" class="table table-bordered tablaproductoscompras">'+
-                                            '<thead class="customercolor">'+
+                                            '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
-                                                '<th class="customercolor">#</th>'+
+                                                '<th class="'+background_tables+'">#</th>'+
                                                 '<th class="customercolortheadth">Código</th>'+
                                                 '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
                                                 '<th class="customercolortheadth">Unidad</th>'+
-                                                '<th class="customercolor">Por Surtir</th>'+
+                                                '<th class="'+background_tables+'">Por Surtir</th>'+
                                                 '<th class="customercolortheadth">Cantidad</th>'+
                                                 '<th class="customercolortheadth">Precio $</th>'+
-                                                '<th class="customercolor">Importe $</th>'+
+                                                '<th class="'+background_tables+'">Importe $</th>'+
                                                 '<th class="customercolortheadth">Dcto %</th>'+
                                                 '<th class="customercolortheadth">Dcto $</th>'+
-                                                '<th class="customercolor">Importe Descuento $</th>'+
+                                                '<th class="'+background_tables+'">Importe Descuento $</th>'+
                                                 '<th class="customercolortheadth">Ieps %</th>'+
-                                                '<th class="customercolor">Traslado Ieps $</th>'+
-                                                '<th class="customercolor">SubTotal $</th>'+
+                                                '<th class="'+background_tables+'">Traslado Ieps $</th>'+
+                                                '<th class="'+background_tables+'">SubTotal $</th>'+
                                                 '<th class="customercolortheadth">Iva %</th>'+
-                                                '<th class="customercolor">Traslado Iva $</th>'+
+                                                '<th class="'+background_tables+'">Traslado Iva $</th>'+
                                                 '<th class="customercolortheadth">Retención Iva %</th>'+
-                                                '<th class="customercolor">Retención Iva $</th>'+
+                                                '<th class="'+background_tables+'">Retención Iva $</th>'+
                                                 '<th class="customercolortheadth">Retención Isr %</th>'+
-                                                '<th class="customercolor">Retención Isr $</th>'+
+                                                '<th class="'+background_tables+'">Retención Isr $</th>'+
                                                 '<th class="customercolortheadth">Retención Ieps %</th>'+
-                                                '<th class="customercolor">Retención Ieps $</th>'+
-                                                '<th class="customercolor">Total $</th>'+
+                                                '<th class="'+background_tables+'">Retención Ieps $</th>'+
+                                                '<th class="'+background_tables+'">Total $</th>'+
                                                 '<th class="customercolortheadth">Orden</th>'+
                                                 '<th class="customercolortheadth">Depto</th>'+
                                                 '<th class="customercolortheadth" hidden>Precio Moneda $</th>'+
                                                 '<th class="customercolortheadth" hidden>Descuento $</th>'+
                                                 '<th class="customercolortheadth">ClaveProducto</th>'+
-                                                '<th class="customercolor">Nombre ClaveProducto</th>'+
+                                                '<th class="'+background_tables+'">Nombre ClaveProducto</th>'+
                                                 '<th class="customercolortheadth">ClaveUnidad</th>'+
-                                                '<th class="customercolor">Nombre ClaveUnidad</th>'+
-                                                '<th class="customercolor">Costo Catálogo</th>'+
-                                                '<th class="customercolor">Costo Ingresado</th>'+
+                                                '<th class="'+background_tables+'">Nombre ClaveUnidad</th>'+
+                                                '<th class="'+background_tables+'">Costo Catálogo</th>'+
+                                                '<th class="'+background_tables+'">Costo Ingresado</th>'+
                                                 '</tr>'+
                                             '</thead>'+
                                             '<tbody>'+           
@@ -1900,7 +1900,6 @@ function obtenerdatos(compramodificar){
                                         '<div class="btn bg-blue waves-effect" id="btnlistarordenesdecompra" onclick="listarordenesdecompra()" style="display:none">Ver Ordenes de Compra</div>'+
                                         '<input type="hidden" class="form-control" name="orden" id="orden" required readonly>'+
                                     '</div>'+
-
                                     '<div class="col-md-3" id="busquedaordenestrabajo">'+
                                       '<label>Orden Trabajo <span class="label label-danger" id="textonombreordentrabajo"></span></label>'+
                                       '<table class="col-md-12">'+
@@ -1914,11 +1913,9 @@ function obtenerdatos(compramodificar){
                                         '</tr>'+    
                                       '</table>'+
                                     '</div>'+
-
-
                                     '<div class="col-md-3" id="divbuscarcodigoproducto" hidden>'+
-                                        '<label>Buscar producto por código</label>'+
-                                        '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                                      '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
+                                      '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'+   
@@ -1961,41 +1958,41 @@ function obtenerdatos(compramodificar){
                                 '<div class="row">'+
                                     '<div class="col-md-12 table-responsive cabecerafija" style="height: 200px;overflow-y: scroll;padding: 0px 0px;">'+
                                         '<table id="tablaproductoscompras" class="table table-bordered tablaproductoscompras">'+
-                                            '<thead class="customercolor">'+
+                                            '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
-                                                '<th class="customercolor">#</th>'+
+                                                '<th class="'+background_tables+'">#</th>'+
                                                 '<th class="customercolortheadth">Código</th>'+
                                                 '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
                                                 '<th class="customercolortheadth">Unidad</th>'+
-                                                '<th class="customercolor" hidden>Por Surtir</th>'+
+                                                '<th class="'+background_tables+'" hidden>Por Surtir</th>'+
                                                 '<th class="customercolortheadth">Cantidad</th>'+
                                                 '<th class="customercolortheadth">Precio $</th>'+
-                                                '<th class="customercolor">Importe $</th>'+
+                                                '<th class="'+background_tables+'">Importe $</th>'+
                                                 '<th class="customercolortheadth">Dcto %</th>'+
                                                 '<th class="customercolortheadth">Dcto $</th>'+
-                                                '<th class="customercolor">Importe Descuento $</th>'+
+                                                '<th class="'+background_tables+'">Importe Descuento $</th>'+
                                                 '<th class="customercolortheadth">Ieps %</th>'+
-                                                '<th class="customercolor">Traslado Ieps $</th>'+
-                                                '<th class="customercolor">SubTotal $</th>'+
+                                                '<th class="'+background_tables+'">Traslado Ieps $</th>'+
+                                                '<th class="'+background_tables+'">SubTotal $</th>'+
                                                 '<th class="customercolortheadth">Iva %</th>'+
-                                                '<th class="customercolor">Traslado Iva $</th>'+
+                                                '<th class="'+background_tables+'">Traslado Iva $</th>'+
                                                 '<th class="customercolortheadth">Retención Iva %</th>'+
-                                                '<th class="customercolor">Retención Iva $</th>'+
+                                                '<th class="'+background_tables+'">Retención Iva $</th>'+
                                                 '<th class="customercolortheadth">Retención Isr %</th>'+
-                                                '<th class="customercolor">Retención Isr $</th>'+
+                                                '<th class="'+background_tables+'">Retención Isr $</th>'+
                                                 '<th class="customercolortheadth">Retención Ieps %</th>'+
-                                                '<th class="customercolor">Retención Ieps $</th>'+
-                                                '<th class="customercolor">Total $</th>'+
+                                                '<th class="'+background_tables+'">Retención Ieps $</th>'+
+                                                '<th class="'+background_tables+'">Total $</th>'+
                                                 '<th class="customercolortheadth">Orden</th>'+
                                                 '<th class="customercolortheadth">Depto</th>'+
                                                 '<th class="customercolortheadth" hidden>Precio Moneda $</th>'+
                                                 '<th class="customercolortheadth" hidden>Descuento $</th>'+
                                                 '<th class="customercolortheadth">ClaveProducto</th>'+
-                                                '<th class="customercolor">Nombre ClaveProducto</th>'+
+                                                '<th class="'+background_tables+'">Nombre ClaveProducto</th>'+
                                                 '<th class="customercolortheadth">ClaveUnidad</th>'+
-                                                '<th class="customercolor">Nombre ClaveUnidad</th>'+
-                                                '<th class="customercolor">Costo Catálogo</th>'+
-                                                '<th class="customercolor">Costo Ingresado</th>'+
+                                                '<th class="'+background_tables+'">Nombre ClaveUnidad</th>'+
+                                                '<th class="'+background_tables+'">Costo Catálogo</th>'+
+                                                '<th class="'+background_tables+'">Costo Ingresado</th>'+
                                                 '</tr>'+
                                             '</thead>'+
                                             '<tbody>'+           

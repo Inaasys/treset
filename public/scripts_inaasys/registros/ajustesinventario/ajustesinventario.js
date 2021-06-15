@@ -101,7 +101,6 @@ function listar(){
     "pageLength": 250,
     "sScrollX": "110%",
     "sScrollY": "350px",
-    "bScrollCollapse": true,
     processing: true,
     'language': {
         'loadingRecords': '&nbsp;',
@@ -133,7 +132,7 @@ function listar(){
 function obtenerseriesdocumento(){
   ocultarformulario();
   var seriedefault = 'A';
-  var tablaseriesdocumento= '<div class="modal-header bg-red">'+
+  var tablaseriesdocumento= '<div class="modal-header '+background_forms_and_modals+'">'+
                               '<h4 class="modal-title">Series Documento &nbsp;&nbsp; <div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''+seriedefault+'\')">Asignar Serie Default (A)</div></h4>'+
                             '</div>'+
                             '<div class="modal-body">'+
@@ -141,7 +140,7 @@ function obtenerseriesdocumento(){
                                 '<div class="col-md-12">'+
                                   '<div class="table-responsive">'+
                                     '<table id="tbllistadoseriedocumento" class="tbllistadoseriedocumento table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                      '<thead class="customercolor">'+
+                                      '<thead class="'+background_tables+'">'+
                                         '<tr>'+
                                           '<th>Operaciones</th>'+
                                           '<th>Serie</th>'+
@@ -203,7 +202,7 @@ function seleccionarseriedocumento(Serie){
 //obtener registros de remisiones
 function obteneralmacenes(){
   ocultarformulario();
-  var tablaalmacenes = '<div class="modal-header bg-red">'+
+  var tablaalmacenes = '<div class="modal-header '+background_forms_and_modals+'">'+
                             '<h4 class="modal-title">Almacenes</h4>'+
                         '</div>'+
                         '<div class="modal-body">'+
@@ -211,7 +210,7 @@ function obteneralmacenes(){
                                 '<div class="col-md-12">'+
                                     '<div class="table-responsive">'+
                                         '<table id="tbllistadoalmacen" class="tbllistadoalmacen table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                            '<thead class="customercolor">'+
+                                            '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
                                                     '<th>Operaciones</th>'+
                                                     '<th>Numero</th>'+
@@ -352,7 +351,7 @@ function regresarnumeroalmacen(){
 //listar productos para tab consumos
 function listarproductos(){
     ocultarformulario();
-    var tablaproductos = '<div class="modal-header bg-red">'+
+    var tablaproductos = '<div class="modal-header '+background_forms_and_modals+'">'+
                             '<h4 class="modal-title">Productos</h4>'+
                           '</div>'+
                           '<div class="modal-body">'+
@@ -360,7 +359,7 @@ function listarproductos(){
                               '<div class="col-md-12">'+
                                 '<div class="table-responsive">'+
                                   '<table id="tbllistadoproducto" class="tbllistadoproducto table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                    '<thead class="customercolor">'+
+                                    '<thead class="'+background_tables+'">'+
                                       '<tr>'+
                                         '<th>Operaciones</th>'+
                                         '<th>Código</th>'+
@@ -684,7 +683,7 @@ function alta(){
               '</div>'+
               '<div class="row">'+
                 '<div class="col-md-4" id="divbuscarcodigoproducto" hidden>'+
-                  '<label>Buscar producto por código</label>'+
+                  '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
                   '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
                 '</div>'+
               '</div>'+
@@ -700,17 +699,17 @@ function alta(){
                   '<div class="row">'+
                     '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
                       '<table id="tablaproductosajuste" class="table table-bordered tablaproductosajuste">'+
-                        '<thead class="customercolor">'+
+                        '<thead class="'+background_tables+'">'+
                           '<tr>'+
-                            '<th class="customercolor">#</th>'+
-                            '<th class="customercolor">Código</th>'+
-                            '<th class="customercolor"><div style="width:200px !important;">Producto</div></th>'+
-                            '<th class="customercolor">Unidad</th>'+
-                            '<th class="customercolor">Existencia Actual</th>'+
+                            '<th class="'+background_tables+'">#</th>'+
+                            '<th class="'+background_tables+'">Código</th>'+
+                            '<th class="'+background_tables+'"><div style="width:200px !important;">Producto</div></th>'+
+                            '<th class="'+background_tables+'">Unidad</th>'+
+                            '<th class="'+background_tables+'">Existencia Actual</th>'+
                             '<th class="customercolortheadth">Entradas</th>'+
                             '<th class="customercolortheadth">Salidas</th>'+
-                            '<th class="customercolor">Existencia Nueva</th>'+
-                            '<th class="customercolor">Costo $</th>'+
+                            '<th class="'+background_tables+'">Existencia Nueva</th>'+
+                            '<th class="'+background_tables+'">Costo $</th>'+
                           '</tr>'+
                         '</thead>'+
                         '<tbody>'+           
@@ -924,7 +923,7 @@ function obtenerdatos(ajustemodificar){
                 '</div>'+
                 '<div class="row">'+
                   '<div class="col-md-4" id="divbuscarcodigoproducto" hidden>'+
-                    '<label>Buscar producto por código</label>'+
+                    '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
                     '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
                   '</div>'+
                 '</div>'+
@@ -940,17 +939,17 @@ function obtenerdatos(ajustemodificar){
                     '<div class="row">'+
                       '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
                         '<table id="tablaproductosajuste" class="table table-bordered tablaproductosajuste">'+
-                          '<thead class="customercolor">'+
+                          '<thead class="'+background_tables+'">'+
                             '<tr>'+
-                              '<th class="customercolor">#</th>'+
-                              '<th class="customercolor">Código</th>'+
-                              '<th class="customercolor"><div style="width:200px !important;">Producto</div></th>'+
-                              '<th class="customercolor">Unidad</th>'+
-                              '<th class="customercolor">Existencia Actual</th>'+
+                              '<th class="'+background_tables+'">#</th>'+
+                              '<th class="'+background_tables+'">Código</th>'+
+                              '<th class="'+background_tables+'"><div style="width:200px !important;">Producto</div></th>'+
+                              '<th class="'+background_tables+'">Unidad</th>'+
+                              '<th class="'+background_tables+'">Existencia Actual</th>'+
                               '<th class="customercolortheadth">Entradas</th>'+
                               '<th class="customercolortheadth">Salidas</th>'+
-                              '<th class="customercolor">Existencia Nueva</th>'+
-                              '<th class="customercolor">Costo $</th>'+
+                              '<th class="'+background_tables+'">Existencia Nueva</th>'+
+                              '<th class="'+background_tables+'">Costo $</th>'+
                             '</tr>'+
                           '</thead>'+
                           '<tbody>'+           

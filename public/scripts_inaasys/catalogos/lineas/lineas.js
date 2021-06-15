@@ -55,8 +55,7 @@ function listar(){
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
-        "sScrollY": "350px",
-        "bScrollCollapse": true,  
+        "sScrollY": "350px",  
         processing: true,
         'language': {
           'loadingRecords': '&nbsp;',

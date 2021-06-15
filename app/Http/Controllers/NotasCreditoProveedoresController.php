@@ -60,7 +60,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             $fechahoy = Carbon::now()->toDateString();
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = VistaNotaCreditoProveedor::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->get();
+            $data = VistaNotaCreditoProveedor::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->orderBy('Serie', 'ASC')->orderBy('Folio', 'DESC')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
                         $operaciones = '<div class="dropdown">'.

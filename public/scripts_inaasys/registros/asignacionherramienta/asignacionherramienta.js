@@ -103,7 +103,6 @@ function listar(){
     "pageLength": 250,
     "sScrollX": "110%",
     "sScrollY": "350px",
-    "bScrollCollapse": true,
     processing: true,
     'language': {
         'loadingRecords': '&nbsp;',
@@ -135,7 +134,7 @@ function listar(){
 function obtenerseriesdocumento(){
   ocultarformulario();
   var seriedefault = 'A';
-  var tablaseriesdocumento= '<div class="modal-header bg-red">'+
+  var tablaseriesdocumento= '<div class="modal-header '+background_forms_and_modals+'">'+
                               '<h4 class="modal-title">Series Documento &nbsp;&nbsp; <div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''+seriedefault+'\')">Asignar Serie Default (A)</div></h4>'+
                             '</div>'+
                             '<div class="modal-body">'+
@@ -143,7 +142,7 @@ function obtenerseriesdocumento(){
                                 '<div class="col-md-12">'+
                                   '<div class="table-responsive">'+
                                     '<table id="tbllistadoseriedocumento" class="tbllistadoseriedocumento table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                      '<thead class="customercolor">'+
+                                      '<thead class="'+background_tables+'">'+
                                         '<tr>'+
                                           '<th>Operaciones</th>'+
                                           '<th>Serie</th>'+
@@ -205,7 +204,7 @@ function seleccionarseriedocumento(serie){
 //obtener registros de proveedores
 function obtenerpersonalrecibe(){
   ocultarformulario();
-  var tablapersonalrecibe = '<div class="modal-header bg-red">'+
+  var tablapersonalrecibe = '<div class="modal-header '+background_forms_and_modals+'">'+
                       '<h4 class="modal-title">Personal que recibe</h4>'+
                     '</div>'+
                     '<div class="modal-body">'+
@@ -213,7 +212,7 @@ function obtenerpersonalrecibe(){
                           '<div class="col-md-12">'+
                               '<div class="table-responsive">'+
                                   '<table id="tbllistadopersonalrecibe" class="tbllistadopersonalrecibe table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                      '<thead class="customercolor">'+
+                                      '<thead class="'+background_tables+'">'+
                                           '<tr>'+
                                               '<th>Operaciones</th>'+
                                               '<th>Numero</th>'+
@@ -274,7 +273,7 @@ function obtenerpersonalrecibe(){
 //obtener registros de almacenes
 function obtenerpersonalentrega(){
     ocultarformulario();
-    var tablapersonalentrega = '<div class="modal-header bg-red">'+
+    var tablapersonalentrega = '<div class="modal-header '+background_forms_and_modals+'">'+
                             '<h4 class="modal-title">Personal que entrega</h4>'+
                         '</div>'+
                         '<div class="modal-body">'+
@@ -282,7 +281,7 @@ function obtenerpersonalentrega(){
                                 '<div class="col-md-12">'+
                                     '<div class="table-responsive ">'+
                                         '<table id="tbllistadopersonalentrega" class="tbllistadopersonalentrega table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                            '<thead class="customercolor">'+
+                                            '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
                                                     '<th>Operaciones</th>'+
                                                     '<th>Numero</th>'+
@@ -419,7 +418,7 @@ function regresarnumeropersonalentrega(){
 //listar productos para tab consumos
 function listarherramientas(){
   ocultarformulario();
-  var tablaherramientas = '<div class="modal-header bg-red">'+
+  var tablaherramientas = '<div class="modal-header '+background_forms_and_modals+'">'+
                           '<h4 class="modal-title">Productos</h4>'+
                         '</div>'+
                         '<div class="modal-body">'+
@@ -427,7 +426,7 @@ function listarherramientas(){
                             '<div class="col-md-12">'+
                               '<div class="table-responsive">'+
                                 '<table id="tbllistadoherramienta" class="tbllistadoherramienta table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                  '<thead class="customercolor">'+
+                                  '<thead class="'+background_tables+'">'+
                                     '<tr>'+
                                       '<th>Operaciones</th>'+
                                       '<th>Código</th>'+
@@ -576,6 +575,7 @@ function agregarfilaherramienta(Codigo, Producto, Unidad, Costo, Existencias, se
     comprobarfilas();
     mostrarformulario();
     calculartotalordencompra();
+    $("#codigoabuscar").val("");
   }else{
     msj_errorproductoyaagregado();
   }  
@@ -705,7 +705,7 @@ function alta(){
               '</div>'+
               '<div class="row">'+
                 '<div class="col-md-4" id="divbuscarcodigoproducto">'+
-                  '<label>Buscar herramienta por código</label>'+
+                  '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
                   '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código de la herramienta" autocomplete="off">'+
                 '</div>'+
               '</div>'+
@@ -721,18 +721,18 @@ function alta(){
                   '<div class="row">'+
                     '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
                       '<table id="tablaherramientasasignadas" class="table table-bordered tablaherramientasasignadas">'+
-                        '<thead class="customercolor">'+
+                        '<thead class="'+background_tables+'">'+
                           '<tr>'+
-                            '<th class="customercolor">#</th>'+
-                            '<th class="customercolor">Herramienta</th>'+
-                            '<th class="customercolor"><div style="width:200px !important;">Descripción</div></th>'+
+                            '<th class="'+background_tables+'">#</th>'+
+                            '<th class="'+background_tables+'">Herramienta</th>'+
+                            '<th class="'+background_tables+'"><div style="width:200px !important;">Descripción</div></th>'+
                             '<th class="customercolortheadth">Unidad</th>'+
                             '<th class="customercolortheadth">Almacén</th>'+
                             '<th class="customercolortheadth">Existencias Almacén</th>'+
                             '<th class="customercolortheadth">Cantidad</th>'+
                             '<th class="customercolortheadth">Precio $</th>'+
-                            '<th class="customercolor">Total $</th>'+
-                            '<th class="customercolor">Estado Herramienta</th>'+
+                            '<th class="'+background_tables+'">Total $</th>'+
+                            '<th class="'+background_tables+'">Estado Herramienta</th>'+
                           '</tr>'+
                         '</thead>'+
                         '<tbody>'+           
@@ -1010,7 +1010,7 @@ function obtenerdatos(asignacionmodificar){
                 '</div>'+
                 '<div class="row">'+
                   '<div class="col-md-4" id="divbuscarcodigoproducto">'+
-                    '<label>Buscar herramienta por código</label>'+
+                    '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
                     '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código de la herramienta" autocomplete="off">'+
                   '</div>'+
                 '</div>'+
@@ -1026,18 +1026,18 @@ function obtenerdatos(asignacionmodificar){
                     '<div class="row">'+
                       '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
                         '<table id="tablaherramientasasignadas" class="table table-bordered tablaherramientasasignadas">'+
-                          '<thead class="customercolor">'+
+                          '<thead class="'+background_tables+'">'+
                             '<tr>'+
-                              '<th class="customercolor">#</th>'+
-                              '<th class="customercolor">Herramienta</th>'+
-                              '<th class="customercolor"><div style="width:200px !important;">Descripción</div></th>'+
+                              '<th class="'+background_tables+'">#</th>'+
+                              '<th class="'+background_tables+'">Herramienta</th>'+
+                              '<th class="'+background_tables+'"><div style="width:200px !important;">Descripción</div></th>'+
                               '<th class="customercolortheadth">Unidad</th>'+
                               '<th class="customercolortheadth">Almacén</th>'+
                               '<th class="customercolortheadth">Existencias Almacén</th>'+
                               '<th class="customercolortheadth">Cantidad</th>'+
                               '<th class="customercolortheadth">Precio $</th>'+
-                              '<th class="customercolor">Total $</th>'+
-                              '<th class="customercolor">Estado Herramienta</th>'+
+                              '<th class="'+background_tables+'">Total $</th>'+
+                              '<th class="'+background_tables+'">Estado Herramienta</th>'+
                             '</tr>'+
                           '</thead>'+
                           '<tbody>'+           
@@ -1370,15 +1370,15 @@ function mostrarmodalgenerarexcelpersonal(){
                           '<div class="row">'+
                               '<div class="col-md-12 table-responsive">'+
                                   '<table id="tablaherramientasasignadas" class="table table-bordered tablaherramientasasignadas">'+
-                                      '<thead class="customercolor">'+
+                                      '<thead class="'+background_tables+'">'+
                                           '<tr>'+
-                                              '<th class="customercolor">Asignación</th>'+
-                                              '<th class="customercolor">Herramienta</th>'+
-                                              '<th class="customercolor"><div style="width:200px !important;">Descripción</div></th>'+
-                                              '<th class="customercolor" >Unidad</th>'+
-                                              '<th class="customercolor" >Cantidad Asignada</th>'+
-                                              '<th class="customercolor" >Precio $</th>'+
-                                              '<th class="customercolor">Total $</th>'+
+                                              '<th class="'+background_tables+'">Asignación</th>'+
+                                              '<th class="'+background_tables+'">Herramienta</th>'+
+                                              '<th class="'+background_tables+'"><div style="width:200px !important;">Descripción</div></th>'+
+                                              '<th class="'+background_tables+'" >Unidad</th>'+
+                                              '<th class="'+background_tables+'" >Cantidad Asignada</th>'+
+                                              '<th class="'+background_tables+'" >Precio $</th>'+
+                                              '<th class="'+background_tables+'">Total $</th>'+
                                               '<th class="customercolortheadth">Estado Auditoria</th>'+
                                               '<th class="customercolortheadth">Cantidad Actual Auditoria</th>'+
                                           '</tr>'+

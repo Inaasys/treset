@@ -70,12 +70,20 @@ function ocultarformulario(){
   $("#formulario").hide();
   $("#contenidomodaltablas").show();
 }
+//cambiar url para exportar excel
+function cambiarurlexportarexcel(){
+  //colocar el periodo seleccionado como parametro para exportar a excel
+  var periodo = $("#periodo").val();
+  $("#btnGenerarFormatoExcel").attr("href", urlgenerarformatoexcel+'?periodo='+periodo);
+}
 function relistar(){
+  cambiarurlexportarexcel();
     var tabla = $('.tbllistado').DataTable();
     tabla.ajax.reload();
 }
 //listar todos los registros de la tabla
 function listar(){
+  cambiarurlexportarexcel();
   //Campos ordenados a mostras
   var campos = columnas_ordenadas.split(",");
   var campos_tabla  = [];
@@ -93,7 +101,6 @@ function listar(){
     "pageLength": 250,
     "sScrollX": "110%",
     "sScrollY": "350px",
-    "bScrollCollapse": true,
     processing: true,
     'language': {
         'loadingRecords': '&nbsp;',
@@ -125,7 +132,7 @@ function listar(){
 function obtenerseriesdocumento(){
   ocultarformulario();
   var seriedefault = 'A';
-  var tablaseriesdocumento= '<div class="modal-header bg-red">'+
+  var tablaseriesdocumento= '<div class="modal-header '+background_forms_and_modals+'">'+
                               '<h4 class="modal-title">Series Documento &nbsp;&nbsp; <div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''+seriedefault+'\')">Asignar Serie Default (A)</div></h4>'+
                             '</div>'+
                             '<div class="modal-body">'+
@@ -133,7 +140,7 @@ function obtenerseriesdocumento(){
                                 '<div class="col-md-12">'+
                                   '<div class="table-responsive">'+
                                     '<table id="tbllistadoseriedocumento" class="tbllistadoseriedocumento table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                      '<thead class="customercolor">'+
+                                      '<thead class="'+background_tables+'">'+
                                         '<tr>'+
                                           '<th>Operaciones</th>'+
                                           '<th>Serie</th>'+
@@ -195,7 +202,7 @@ function seleccionarseriedocumento(serie){
 //obtener registros de remisiones
 function obtenerremisiones(){
   ocultarformulario();
-  var tablaremisiones = '<div class="modal-header bg-red">'+
+  var tablaremisiones = '<div class="modal-header '+background_forms_and_modals+'">'+
                             '<h4 class="modal-title">Remisiones</h4>'+
                         '</div>'+
                         '<div class="modal-body">'+
@@ -203,7 +210,7 @@ function obtenerremisiones(){
                                 '<div class="col-md-12">'+
                                     '<div class="table-responsive">'+
                                         '<table id="tbllistadoremision" class="tbllistadoremision table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                            '<thead class="customercolor">'+
+                                            '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
                                                     '<th>Operaciones</th>'+
                                                     '<th>Remisión</th>'+
@@ -421,17 +428,17 @@ function alta(){
                   '<div class="row">'+
                     '<div class="col-md-12 table-responsive cabecerafija" style="height: 275px;overflow-y: scroll;padding: 0px 0px;">'+
                       '<table id="tablaproductocotizacion" class="table table-bordered tablaproductocotizacion">'+
-                        '<thead class="customercolor">'+
+                        '<thead class="'+background_tables+'">'+
                           '<tr>'+
-                            '<th class="customercolor">#</th>'+
+                            '<th class="'+background_tables+'">#</th>'+
                             '<th class="customercolortheadth">numero_parte</th>'+
                             '<th class="customercolortheadth"><div style="width:200px !important;">descripcion</div></th>'+
                             '<th class="customercolortheadth">unidad</th>'+
-                            '<th class="customercolor">insumo</th>'+
+                            '<th class="'+background_tables+'">insumo</th>'+
                             '<th class="customercolortheadth">status_refaccion</th>'+
                             '<th class="customercolortheadth">precio $</th>'+
                             '<th class="customercolortheadth">cantidad</th>'+
-                            '<th class="customercolor">importe $</th>'+
+                            '<th class="'+background_tables+'">importe $</th>'+
                           '</tr>'+
                         '</thead>'+
                         '<tbody>'+           
@@ -637,17 +644,17 @@ function obtenerdatos(cotizacionmodificar){
                     '<div class="row">'+
                       '<div class="col-md-12 table-responsive cabecerafija" style="height: 275px;overflow-y: scroll;padding: 0px 0px;">'+
                         '<table id="tablaproductocotizacion" class="table table-bordered tablaproductocotizacion">'+
-                          '<thead class="customercolor">'+
+                          '<thead class="'+background_tables+'">'+
                             '<tr>'+
-                              '<th class="customercolor">#</th>'+
+                              '<th class="'+background_tables+'">#</th>'+
                               '<th class="customercolortheadth">numero_parte</th>'+
                               '<th class="customercolortheadth"><div style="width:200px !important;">descripcion</div></th>'+
                               '<th class="customercolortheadth">unidad</th>'+
-                              '<th class="customercolor">insumo</th>'+
+                              '<th class="'+background_tables+'">insumo</th>'+
                               '<th class="customercolortheadth">status_refaccion</th>'+
                               '<th class="customercolortheadth">precio $</th>'+
                               '<th class="customercolortheadth">cantidad</th>'+
-                              '<th class="customercolor">importe $</th>'+
+                              '<th class="'+background_tables+'">importe $</th>'+
                             '</tr>'+
                           '</thead>'+
                           '<tbody>'+           

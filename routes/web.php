@@ -119,9 +119,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/productos_obtener_existencias_almacenes', 'ProductoController@productos_obtener_existencias_almacenes')->name('productos_obtener_existencias_almacenes')->middleware('revisaraccesomenu:menucatalogoproductos');
     Route::get('/productos_obtener_clientes', 'ProductoController@productos_obtener_clientes')->name('productos_obtener_clientes')->middleware('revisaraccesomenu:menucatalogoproductos');
     Route::get('/productos_obtener_productos_consumos', 'ProductoController@productos_obtener_productos_consumos')->name('productos_obtener_productos_consumos')->middleware('revisaraccesomenu:menucatalogoproductos');
-    
     Route::get('/productos_obtener_kardex', 'ProductoController@productos_obtener_kardex')->name('productos_obtener_kardex')->middleware('revisaraccesomenu:menucatalogoproductos');
-    
     Route::post('/productos_guardar', 'ProductoController@productos_guardar')->name('productos_guardar')->middleware('revisarpermisos:catalogos.productos.altas');
     Route::post('/productos_alta_o_baja', 'ProductoController@productos_alta_o_baja')->name('productos_alta_o_baja')->middleware('revisarpermisos:catalogos.productos.bajas');
     Route::get('/productos_obtener_producto', 'ProductoController@productos_obtener_producto')->name('productos_obtener_producto')->middleware('revisaraccesomenu:menucatalogoproductos');
@@ -663,6 +661,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/facturas_generar_pdfs_indiv/{documento}', 'FacturaController@facturas_generar_pdfs_indiv')->name('facturas_generar_pdfs_indiv')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_exportar_excel', 'FacturaController@facturas_exportar_excel')->name('facturas_exportar_excel')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::post('/facturas_guardar_configuracion_tabla', 'FacturaController@facturas_guardar_configuracion_tabla')->name('facturas_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    //---///---///---///---///---/// INTEGRACION FACTURAPI ////----/////----/////----/////_----/////-----/////
+    Route::post('/facturas_timbrar_factura', 'FacturaController@facturas_timbrar_factura')->name('facturas_timbrar_factura')->middleware('revisaraccesomenu:menuregistrosfacturas');
+
     /* -----------------------------------||||||||||||||||||||FIN REGISTROS||||||||||||||||||||||-------------------------------------*/
     /* -----------------------------------||||||||||||||||||||REPORTES||||||||||||||||||||||-------------------------------------*/
     //reporte diario de ventas
@@ -681,7 +682,18 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/reporte_horas_tecnico_generar_formato_excel', 'ReportesOrdenesTrabajoController@reporte_horas_tecnico_generar_formato_excel')->name('reporte_horas_tecnico_generar_formato_excel')->middleware('revisaraccesomenu:menureportesordenestrabajohorastecnico');
     /* -----------------------------------||||||||||||||||||||FIN REPORTES||||||||||||||||||||||-------------------------------------*/
     /* -----------------------------------||||||||||||||||||||EMPRESA||||||||||||||||||||||-------------------------------------*/
+    Route::get('/empresa', 'EmpresaController@empresa')->name('empresa');
+    Route::get('/empresa_obtener_paises', 'EmpresaController@empresa_obtener_paises')->name('empresa_obtener_paises');
+    Route::get('/empresa_obtener_estados', 'EmpresaController@empresa_obtener_estados')->name('empresa_obtener_estados');
+    Route::get('/empresa_obtener_municipios', 'EmpresaController@empresa_obtener_municipios')->name('empresa_obtener_municipios');
+    Route::get('/empresa_obtener_lugares_expedicion', 'EmpresaController@empresa_obtener_lugares_expedicion')->name('empresa_obtener_lugares_expedicion');
+    Route::get('/empresa_obtener_regimenes_fiscales', 'EmpresaController@empresa_obtener_regimenes_fiscales')->name('empresa_obtener_regimenes_fiscales');
+    Route::get('/empresa_obtener_monedas', 'EmpresaController@empresa_obtener_monedas')->name('empresa_obtener_monedas');
     Route::post('/utilerias_empresa_guardar_modificacion', 'EmpresaController@utilerias_empresa_guardar_modificacion')->name('utilerias_empresa_guardar_modificacion');
+    Route::post('/empresa_guardar_modificacion_domicilio_fiscal', 'EmpresaController@empresa_guardar_modificacion_domicilio_fiscal')->name('empresa_guardar_modificacion_domicilio_fiscal');
+    Route::post('/empresa_guardar_modificacion_lugar_expedicion', 'EmpresaController@empresa_guardar_modificacion_lugar_expedicion')->name('empresa_guardar_modificacion_lugar_expedicion');
+    Route::post('/empresa_guardar_modificacion_configurar', 'EmpresaController@empresa_guardar_modificacion_configurar')->name('empresa_guardar_modificacion_configurar');
+    Route::post('/empresa_guardar_modificacion_logo_y_tema', 'EmpresaController@empresa_guardar_modificacion_logo_y_tema')->name('empresa_guardar_modificacion_logo_y_tema');
     /* -----------------------------------||||||||||||||||||||FIN EMPRESA||||||||||||||||||||||-------------------------------------*/
 });
 

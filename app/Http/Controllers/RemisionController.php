@@ -60,7 +60,7 @@ class RemisionController extends ConfiguracionSistemaController{
     public function remisiones_obtener(Request $request){
         if($request->ajax()){
             $periodo = $request->periodo;
-            $data = VistaRemision::select($this->campos_consulta)->orderBy('Fecha', 'DESC')->where('Periodo', $periodo)->get();
+            $data = VistaRemision::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->orderBy('Serie', 'ASC')->orderBy('Folio', 'DESC')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
                         $operaciones =  '<div class="dropdown">'.

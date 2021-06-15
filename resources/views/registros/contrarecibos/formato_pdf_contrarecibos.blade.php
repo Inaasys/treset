@@ -111,7 +111,7 @@
                     </div>
                     <div style="width:45%; float:right; text-align: center;">
                         <b style="font-size:11px;"><hr></hr></b>
-                        <p style="font-size:11px;">{{\Auth::user()->user}}</p>
+                        <p style="font-size:11px;">{{$d['contrarecibo']->Usuario}}</p>
                         <p style="font-size:11px;"></p>
                     </div>
                 </div>

@@ -57,7 +57,6 @@ function listar(){
   tabla=$('#tbllistado').DataTable({
     "sScrollX": "110%",
     "sScrollY": "350px",
-    "bScrollCollapse": true,
     processing: true,
     'language': {
       'loadingRecords': '&nbsp;',
@@ -1139,7 +1138,7 @@ function seriesusuariodocumentos(id,usuario){
     $("#ModalSeriesDocumentos").modal('show');
     $("#formularioserie").hide();
     $("#tablasmodalserie").show();
-    var tablaseries =   '<div class="modal-header bg-red">'+
+    var tablaseries =   '<div class="modal-header '+background_forms_and_modals+'">'+
                             '<div class="row clearfix">'+
                                 '<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">'+
                                     '<h5>Series Documentos</h5>'+
@@ -1164,7 +1163,7 @@ function seriesusuariodocumentos(id,usuario){
                                 '<div class="col-md-12">'+
                                     '<div class="table-responsive">'+
                                         '<table id="tbllistadoseriedocumento" class="tbllistadoseriedocumento table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                            '<thead class="customercolor">'+
+                                            '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
                                                 '<th>Operaciones</th>'+
                                                 '<th>Documento</th>'+

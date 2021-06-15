@@ -135,20 +135,25 @@ return [
     //DOCUMENTACION API CURRENCY LAYER https://currencylayer.com/documentation
     'endpointapicurrencylayer' => 'live',
     'keyapicurrencylayer' => '6e2993559ed8ce04ef56d47f792e5a52',
-    'periodoincialmodulos' => '2010', //aqui se asigna el periodo inicial de los select de los modulos
-    'numerodedecimales' => '6', //aqui se asignan el numero de decimales que se utilizaran en todas las cantidades utilizadas en el sistema
-    'numerodecimalesendocumentos' => '2', //numero de decimales que se ocuparan en documentos PDF
-    'mayusculas_sistema' => 'S', //aqui se aisgna si el sistema utilizara solo mayusculas o no
-    'calleempresa' => 'BLVD. MIGUEL ALEMAN', //calle de la empresa
-    'noexteriorempresa' => '122', //no exterior de la empresa
-    'coloniaempresa' => 'ALVARO OBREGON', //colonia de la empresa
-    'cpempresa' => '52105', //cp de la empresa
-    'municipioempresa' => 'SAN MATEO ATENCO',//municipio de la empresa
-    'estadoempresa' => 'EDO DE MEXICO MEXICO',//estado de la empresa
-    'telefonosempresa' => '7226490843, 7222716890',//telefonos de la empresa
+    'periodoincialmodulos' => '', //aqui se asigna el periodo inicial de los select de los modulos
+    'numerodedecimales' => '', //aqui se asignan el numero de decimales que se utilizaran en todas las cantidades utilizadas en el sistema
+    'numerodecimalesendocumentos' => '', //numero de decimales que se ocuparan en documentos PDF
+    'mayusculas_sistema' => '', //aqui se aisgna si el sistema utilizara solo mayusculas o no
+    'calleempresa' => '', //calle de la empresa
+    'noexteriorempresa' => '', //no exterior de la empresa
+    'nointeriorempresa' => '',//no interior de la empresa
+    'coloniaempresa' => '', //colonia de la empresa
+    'localidadempresa' => '',//localidad de la empresa
+    'referenciaempresa' => '',//referencia de la empresa
+    'cpempresa' => '', //cp de la empresa
+    'municipioempresa' => '',//municipio de la empresa
+    'estadoempresa' => '',//estado de la empresa
+    'telefonosempresa' => '',//telefonos de la empresa
+    'paisempresa' => '',//pais de la empresa
+    'emailempresa' => '',//email de la empresa
     //para emisor documentos
-    'lugarexpedicion' => '52105',//lugar expedicion
-    'regimenfiscal' => '601',//regimen fiscal
+    'lugarexpedicion' => '',//lugar expedicion
+    'regimenfiscal' => '',//regimen fiscal
 
     /*
     |--------------------------------------------------------------------------
@@ -194,6 +199,7 @@ return [
         Jenssegers\Date\DateServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
         SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,
+        NikKanetiya\LaravelColorPalette\ColorPaletteServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -265,6 +271,7 @@ return [
         'Date' => Jenssegers\Date\Date::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class,
+        'ColorPalette' => NikKanetiya\LaravelColorPalette\ColorPaletteFacade::class,
 
     ],
 

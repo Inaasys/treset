@@ -1,10 +1,10 @@
 <!--MUY IMPORTANTE NO QUITAR LOS ID A LOS HREF DE LOS MENU-->
-<nav class="navbar">
+<nav class="navbar {{$empresa->background_navbar}}" id="colornavbar">
   <div class="container-fluid">
     <div class="navbar-header">
       <a href="javascript:void(0);" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false"></a>
       <a href="javascript:void(0);" class="bars"></a>
-      <a class="navbar-brand" href="{{ route('inicio') }}"><img src="logotipo_empresa/{{$empresa->Logo}}" width="125" height="50"></a>
+      <a class="navbar-brand" href="{{ route('empresa') }}"><img id="navbarlogotipoempresa" src="logotipo_empresa/{{$empresa->Logo}}" width="125" height="50"></a>
     </div>
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="navbar-collapse">
@@ -58,13 +58,13 @@
             <li><a href="{{ route('tecnicos') }}" id="menucatalogotecnicos">Técnicos</a></li>
             <li><a href="{{ route('servicios') }}" id="menucatalogoservicios">Servicios</a></li>
             <li><a href="{{ route('vines') }}" id="menucatalogovines">Vines</a></li>
-            <li class="dropdown-submenu">
+            <!--<li class="dropdown-submenu">
               <a class="test" href="#">Encuestas <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a href="#"  id="menucatalogoencuentascrearencuesta">Crear Encuesta</a></li>
-                <!--<li><a href="#">Realizar Encuesta</a></li>-->
+                <li><a href="#">Realizar Encuesta</a></li>
               </ul>
-            </li>                
+            </li>  -->              
             <li class="dropdown-submenu">
               <a class="test" href="#">Folios Fiscales<span class="caret"></span></a>
               <ul class="dropdown-menu">
@@ -347,7 +347,7 @@
               </ul>
             </li>                 
             <li><a href="#">Generar Pólizas</a></li>-->
-            <li><a href="#" data-toggle="modal" onclick="datosutileriasempresa()">Empresa</a></li>
+            <li><a href="{{ route('empresa') }}">Empresa</a></li>
             <li class="bg-deep-orange">
               <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                 <b>CERRAR SESIÓN</b>
@@ -383,7 +383,7 @@
           <div class="btn-group user-helper-dropdown">
             <i class="material-icons" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">keyboard_arrow_down</i>
             <ul class="dropdown-menu pull-right">
-              <li><a href="javascript:void(0);"><i class="material-icons">person</i>Perfil</a></li>
+              <li><a href="{{ route('empresa') }}"><i class="material-icons">person</i>Perfil Empresa</a></li>
               <li>
                 <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                   <i class="material-icons">input</i>Cerrar Sesión

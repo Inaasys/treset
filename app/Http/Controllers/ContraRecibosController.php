@@ -49,7 +49,7 @@ class ContraRecibosController extends ConfiguracionSistemaController{
         if($request->ajax()){
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = VistaContraRecibo::select($this->campos_consulta)->orderBy('Fecha', 'DESC')->where('Periodo', $periodo)->get();
+            $data = VistaContraRecibo::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->orderBy('Serie', 'ASC')->orderBy('Folio', 'DESC')->get();
             return DataTables::of($data)
                 ->addColumn('operaciones', function($data){
                         $operaciones =  '<div class="dropdown">'.

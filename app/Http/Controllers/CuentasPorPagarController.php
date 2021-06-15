@@ -56,7 +56,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
         if($request->ajax()){
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = VistaCuentaPorPagar::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->get();
+            $data = VistaCuentaPorPagar::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->orderBy('Serie', 'ASC')->orderBy('Folio', 'DESC')->get();
             return DataTables::of($data)
                 ->addColumn('operaciones', function($data){
                     $operaciones =  '<div class="dropdown">'.
@@ -212,9 +212,9 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                         '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm abonoscompra" name="abonoscompra[]" value="'.Helpers::convertirvalorcorrecto($c->Abonos).'" readonly>'.Helpers::convertirvalorcorrecto($c->Abonos).'</td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm notascreditocompra" name="notascreditocompra[]" value="'.Helpers::convertirvalorcorrecto($detallenotacredito).'" readonly>'.Helpers::convertirvalorcorrecto($detallenotacredito).'</td>'.
                         '<td class="tdmod">'.
-                            '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm abonocompra"  name="abonocompra[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularnuevosaldo('.$contadorfilas.');" >'.
+                            '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm abonocompra"  name="abonocompra[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularnuevosaldo('.$contadorfilas.');">'.
                         '</td>'.
-                        '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm saldocomprainicial" name="saldocomprainicial[]" value="'.Helpers::convertirvalorcorrecto($c->Saldo).'" readonly><input type="text" class="form-control divorinputmodsm saldocompra" name="saldocompra[]" value="'.Helpers::convertirvalorcorrecto($c->Saldo).'" readonly></td>'.
+                        '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm saldocomprainicial" name="saldocomprainicial[]" value="'.Helpers::convertirvalorcorrecto($c->Saldo).'" readonly><input type="text" class="form-control divorinputmodsm saldocompra" name="saldocompra[]" value="'.Helpers::convertirvalorcorrecto($c->Saldo).'"  ondblclick="saldarcompra('.$contadorfilas.')" readonly></td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control contrarecibocompra" name="contrarecibocompra[]" value="'.$contrarecibo.'" readonly>'.$contrarecibo.'</td>'.
                     '</tr>';
                     $contadorfilas++;

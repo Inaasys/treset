@@ -365,11 +365,18 @@ class ProductoController extends ConfiguracionSistemaController{
     }
     //guardar en catalogo
     public function productos_guardar(Request $request){
-	    $codigo=$request->codigo;
+        $codigo=$request->codigo;
 	    $ExisteProducto = Producto::where('Codigo', $codigo )->first();
 	    if($ExisteProducto == true){
 	        $Producto = 1;
 	    }else{        
+            $costodeventa = $request->costo;
+            $marca = Marca::where('Numero', $request->marca)->first();
+            $utilidadrestante = Helpers::convertirvalorcorrecto(100) - $marca->Utilidad1;
+            $subtotalpesos = $request->costo / ($utilidadrestante/100);
+            $utilidadpesos = $subtotalpesos - $request->costo;
+            $ivapesos = $subtotalpesos * ($request->impuesto/100);
+            $totalpesos = $subtotalpesos + $ivapesos;
             $Producto = new Producto;
             $Producto->Codigo=$request->codigo;
             $Producto->ClaveProducto=$request->claveproducto;
@@ -381,6 +388,11 @@ class ProductoController extends ConfiguracionSistemaController{
             $Producto->Impuesto=$request->impuesto;
             $Producto->Costo=$request->costo;
             $Producto->Precio=$request->precio;
+            $Producto->CostoDeVenta=$costodeventa;
+            $Producto->Utilidad=$marca->Utilidad1;
+            $Producto->SubTotal=$subtotalpesos;
+            $Producto->Iva=$ivapesos;
+            $Producto->Total=$totalpesos;
             $Producto->Ubicacion=$request->ubicacion;
             $Producto->Codigo1=$request->codigo1;
             $Producto->Codigo2=$request->codigo2;
@@ -498,6 +510,13 @@ class ProductoController extends ConfiguracionSistemaController{
     //modificar en catalogo
     public function productos_guardar_modificacion(Request $request){
         $codigo= $request->codigo;
+        $costodeventa = $request->costo;
+        $marca = Marca::where('Numero', $request->marca)->first();
+        $utilidadrestante = Helpers::convertirvalorcorrecto(100) - $marca->Utilidad1;
+        $subtotalpesos = $request->costo / ($utilidadrestante/100);
+        $utilidadpesos = $subtotalpesos - $request->costo;
+        $ivapesos = $subtotalpesos * ($request->impuesto/100);
+        $totalpesos = $subtotalpesos + $ivapesos;
         //modificar registro Tabla Productos
         $Producto = Producto::where('Codigo', $codigo )->first();
         //datos producto
@@ -510,6 +529,11 @@ class ProductoController extends ConfiguracionSistemaController{
         $Producto->Linea=$request->linea;
         $Producto->Impuesto=$request->impuesto;
         $Producto->Costo=$request->costo;
+        $Producto->CostoDeVenta=$costodeventa;
+        $Producto->Utilidad=$marca->Utilidad1;
+        $Producto->SubTotal=$subtotalpesos;
+        $Producto->Iva=$ivapesos;
+        $Producto->Total=$totalpesos;
         $Producto->Ubicacion=$request->ubicacion;
         $Producto->CostoDeLista=$request->costodelista;
         $Producto->Moneda=$request->moneda;

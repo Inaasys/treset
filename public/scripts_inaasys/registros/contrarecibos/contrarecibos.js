@@ -104,7 +104,6 @@ function listar(){
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "350px",
-        "bScrollCollapse": true,
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -137,7 +136,7 @@ function listar(){
 function obtenerseriesdocumento(){
     ocultarformulario();
     var seriedefault = 'A';
-    var tablaseriesdocumento=   '<div class="modal-header bg-red">'+
+    var tablaseriesdocumento=   '<div class="modal-header '+background_forms_and_modals+'">'+
                                     '<h4 class="modal-title">Series Documento &nbsp;&nbsp; <div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''+seriedefault+'\')">Asignar Serie Default (A)</div></h4>'+
                                 '</div>'+
                                 '<div class="modal-body">'+
@@ -145,7 +144,7 @@ function obtenerseriesdocumento(){
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
                                         '<table id="tbllistadoseriedocumento" class="tbllistadoseriedocumento table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                            '<thead class="customercolor">'+
+                                            '<thead class="'+background_tables+'">'+
                                             '<tr>'+
                                                 '<th>Operaciones</th>'+
                                                 '<th>Serie</th>'+
@@ -207,7 +206,7 @@ function seleccionarseriedocumento(Serie){
 //obtener registros de proveedores
 function obtenerproveedores(){
     ocultarformulario();
-    var tablaproveedores =  '<div class="modal-header bg-red">'+
+    var tablaproveedores =  '<div class="modal-header '+background_forms_and_modals+'">'+
                                 '<h4 class="modal-title">Proveedores</h4>'+
                             '</div>'+
                             '<div class="modal-body">'+
@@ -215,7 +214,7 @@ function obtenerproveedores(){
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
                                             '<table id="tbllistadoproveedor" class="tbllistadoproveedor table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                                '<thead class="customercolor">'+
+                                                '<thead class="'+background_tables+'">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
                                                         '<th>Numero</th>'+
@@ -390,16 +389,16 @@ function alta(){
                             '<div class="row">'+
                                 '<div class="col-md-12 table-responsive cabecerafija" style="height: 350px;overflow-y: scroll;padding: 0px 0px;">'+
                                     '<table class="table table-bordered">'+
-                                        '<thead class="customercolor">'+
+                                        '<thead class="'+background_tables+'">'+
                                             '<tr>'+
-                                            '<th class="customercolor">#</th>'+
-                                            '<th class="customercolor">Compra</th>'+
-                                            '<th class="customercolor">Factura</th>'+
-                                            '<th class="customercolor">Remisión</th>'+
-                                            '<th class="customercolor">Fecha Factura</th>'+
-                                            '<th class="customercolor">Plazo</th>'+
-                                            '<th class="customercolor">Fecha a Pagar</th>'+
-                                            '<th class="customercolor">Total $</th>'+
+                                            '<th class="'+background_tables+'">#</th>'+
+                                            '<th class="'+background_tables+'">Compra</th>'+
+                                            '<th class="'+background_tables+'">Factura</th>'+
+                                            '<th class="'+background_tables+'">Remisión</th>'+
+                                            '<th class="'+background_tables+'">Fecha Factura</th>'+
+                                            '<th class="'+background_tables+'">Plazo</th>'+
+                                            '<th class="'+background_tables+'">Fecha a Pagar</th>'+
+                                            '<th class="'+background_tables+'">Total $</th>'+
                                             '<th class="customercolortheadth">ContraRecibo </th>'+
                                             '</tr>'+
                                         '</thead>'+
@@ -635,16 +634,16 @@ function obtenerdatos(contrarecibomodificar){
                             '<div class="row">'+
                                 '<div class="col-md-12 table-responsive cabecerafija" style="height: 350px;overflow-y: scroll;padding: 0px 0px;">'+
                                     '<table class="table table-bordered">'+
-                                        '<thead class="customercolor">'+
+                                        '<thead class="'+background_tables+'">'+
                                             '<tr>'+
-                                            '<th class="customercolor">#</th>'+
-                                            '<th class="customercolor">Compra</th>'+
-                                            '<th class="customercolor">Factura</th>'+
-                                            '<th class="customercolor">Remisión</th>'+
-                                            '<th class="customercolor">Fecha Factura</th>'+
-                                            '<th class="customercolor">Plazo</th>'+
-                                            '<th class="customercolor">Fecha a Pagar</th>'+
-                                            '<th class="customercolor">Total $</th>'+
+                                            '<th class="'+background_tables+'">#</th>'+
+                                            '<th class="'+background_tables+'">Compra</th>'+
+                                            '<th class="'+background_tables+'">Factura</th>'+
+                                            '<th class="'+background_tables+'">Remisión</th>'+
+                                            '<th class="'+background_tables+'">Fecha Factura</th>'+
+                                            '<th class="'+background_tables+'">Plazo</th>'+
+                                            '<th class="'+background_tables+'">Fecha a Pagar</th>'+
+                                            '<th class="'+background_tables+'">Total $</th>'+
                                             '<th class="customercolortheadth">ContraRecibo </th>'+
                                             '</tr>'+
                                         '</thead>'+

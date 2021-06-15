@@ -13,7 +13,7 @@
             <div class="row clearfix">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="card" id="listadoregistros">
-                        <div class="header bg-red">
+                        <div class="header {{$empresa->background_forms_and_modals}}">
                             <div class="row clearfix">
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
                                     <h5>&nbsp;&nbsp;&nbsp;COTIZACIONES&nbsp;&nbsp;&nbsp;</h5>
@@ -28,7 +28,7 @@
                                                     </div>
                                                 </td>
                                                 <td >
-                                                    <a class="btn bg-blue btn-xs waves-effect" href="{{route('cotizaciones_exportar_excel')}}" target="_blank">
+                                                    <a class="btn bg-blue btn-xs waves-effect" id="btnGenerarFormatoExcel" href="{{route('cotizaciones_exportar_excel')}}" target="_blank">
                                                         Excel
                                                     </a>
                                                 </td>
@@ -60,7 +60,7 @@
                         <div class="body">
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover" >
-                                    <thead class="customercolor">
+                                    <thead class="{{$empresa->background_tables}}">
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
@@ -83,7 +83,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div id="formulario">
-                <div class="modal-header bg-red">
+                <div class="modal-header {{$empresa->background_forms_and_modals}}">
                     <h4 class="modal-title" id="titulomodal"></h4>
                 </div>
                 <form id="formparsley" action="#">
@@ -109,7 +109,7 @@
 <div class="modal fade" data-backdrop="static" data-keyboard="false" id="estatusregistro" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   	<div class="modal-dialog" role="document">
     	<div class="modal-content">
-      		<div class="modal-header bg-red">
+      		<div class="modal-header {{$empresa->background_forms_and_modals}}">
         		<h5 class="modal-title" id="exampleModalLabel">Aviso</h5>
       		</div>
       		<div class="modal-body">
@@ -146,6 +146,10 @@
         var campos_activados = '{{$configuracion_tabla->campos_activados}}';
         var campos_desactivados = '{{$configuracion_tabla->campos_desactivados}}';
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
+        var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
+        var background_navbar = '{{$empresa->background_navbar}}';
+        var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
+        var background_tables = '{{$empresa->background_tables}}';
         var cotizaciones_obtener = '{!!URL::to('cotizaciones_obtener')!!}';
         var cotizaciones_obtener_series_documento = '{!!URL::to('cotizaciones_obtener_series_documento')!!}';
         var cotizaciones_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('cotizaciones_obtener_ultimo_folio_serie_seleccionada')!!}';

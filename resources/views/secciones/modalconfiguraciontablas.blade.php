@@ -3,7 +3,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div id="formulariopermisos">
-                    <div class="modal-header bg-red">
+                    <div class="modal-header {{$empresa->background_forms_and_modals}}">
                         <h4 class="modal-title" id="titulomodalconfiguraciontabla"></h4>
                     </div>
                     <form id="formconfigurartabla" action="{{$rutaconfiguraciontabla}}" method="post" data-parsley-validate="">

@@ -67,8 +67,7 @@ function listar(){
     "lengthMenu": [ 10, 50, 100, 250, 500 ],
     "pageLength": 250,
     "sScrollX": "110%",
-    "sScrollY": "350px",
-    "bScrollCollapse": true,  
+    "sScrollY": "350px", 
     processing: true,
     'language': {
       'loadingRecords': '&nbsp;',
@@ -91,7 +90,7 @@ function listar(){
 //obtener registros de paises
 function obtenerpaises(){
   ocultarformulario();
-  var tablapaises = '<div class="modal-header bg-red">'+
+  var tablapaises = '<div class="modal-header '+background_forms_and_modals+'">'+
                       '<h4 class="modal-title">Paises</h4>'+
                     '</div>'+
                     '<div class="modal-body">'+
@@ -99,7 +98,7 @@ function obtenerpaises(){
                           '<div class="col-md-12">'+
                               '<div class="table-responsive">'+
                                   '<table id="tbllistadopais" class="tbllistadopais table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                      '<thead class="customercolor">'+
+                                      '<thead class="'+background_tables+'">'+
                                           '<tr>'+
                                               '<th>Operaciones</th>'+
                                               '<th>Clave</th>'+
@@ -149,7 +148,7 @@ function obtenerpaises(){
 //obtener registros de estados
 function obtenerestados() {
   ocultarformulario();
-  var tablaestados = '<div class="modal-header bg-red">'+
+  var tablaestados = '<div class="modal-header '+background_forms_and_modals+'">'+
                       '<h4 class="modal-title">Estados</h4>'+
                     '</div>'+
                     '<div class="modal-body">'+
@@ -157,7 +156,7 @@ function obtenerestados() {
                           '<div class="col-md-12">'+
                               '<div class="table-responsive">'+
                                   '<table id="tbllistadoestado" class="tbllistadoestado table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                      '<thead class="customercolor">'+
+                                      '<thead class="'+background_tables+'">'+
                                           '<tr>'+
                                               '<th>Operaciones</th>'+
                                               '<th>Número</th>'+
@@ -214,7 +213,7 @@ function obtenerestados() {
 //obtener registros de codigos postales
 function obtenercodigospostales() {
   ocultarformulario();
-  var tablacodigospostales =  '<div class="modal-header bg-red">'+
+  var tablacodigospostales =  '<div class="modal-header '+background_forms_and_modals+'">'+
                                 '<h4 class="modal-title">Códigos Postales</h4>'+
                               '</div>'+
                               '<div class="modal-body">'+
@@ -222,7 +221,7 @@ function obtenercodigospostales() {
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
                                             '<table id="tbllistadocodigopostal" class="tbllistadocodigopostal table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                                '<thead class="customercolor">'+
+                                                '<thead class="'+background_tables+'">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
                                                         '<th>Clave</th>'+
@@ -277,7 +276,7 @@ function obtenercodigospostales() {
 //obtener registros de municipios
 function obtenermunicipios() {
   ocultarformulario();
-  var tablamunicipios = '<div class="modal-header bg-red">'+
+  var tablamunicipios = '<div class="modal-header '+background_forms_and_modals+'">'+
                           '<h4 class="modal-title">Municipios</h4>'+
                         '</div>'+
                         '<div class="modal-body">'+
@@ -285,7 +284,7 @@ function obtenermunicipios() {
                               '<div class="col-md-12">'+
                                   '<div class="table-responsive">'+
                                       '<table id="tbllistadomunicipio" class="tbllistadomunicipio table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                          '<thead class="customercolor">'+
+                                          '<thead class="'+background_tables+'">'+
                                               '<tr>'+
                                                   '<th>Operaciones</th>'+
                                                   '<th>Clave</th>'+
@@ -340,7 +339,7 @@ function obtenermunicipios() {
 //obtener registros de agentes
 function obteneragentes(){
   ocultarformulario();
-  var tablaagentes =  '<div class="modal-header bg-red">'+
+  var tablaagentes =  '<div class="modal-header '+background_forms_and_modals+'">'+
                         '<h4 class="modal-title">Agentes</h4>'+
                       '</div>'+
                       '<div class="modal-body">'+
@@ -348,7 +347,7 @@ function obteneragentes(){
                             '<div class="col-md-12">'+
                                 '<div class="table-responsive">'+
                                     '<table id="tbllistadoagente" class="tbllistadoagente table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                        '<thead class="customercolor">'+
+                                        '<thead class="'+background_tables+'">'+
                                             '<tr>'+
                                                 '<th>Operaciones</th>'+
                                                 '<th>Número</th>'+
@@ -400,7 +399,7 @@ function obteneragentes(){
 //obtener registros de formas de pago
 function obtenerformaspago(){
   ocultarformulario();
-  var tablaformaspago = '<div class="modal-header bg-red">'+
+  var tablaformaspago = '<div class="modal-header '+background_forms_and_modals+'">'+
                           '<h4 class="modal-title">Formas Pago</h4>'+
                         '</div>'+
                         '<div class="modal-body">'+
@@ -408,7 +407,7 @@ function obtenerformaspago(){
                               '<div class="col-md-12">'+
                                   '<div class="table-responsive">'+
                                       '<table id="tbllistadoformapago" class="tbllistadoformapago table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                          '<thead class="customercolor">'+
+                                          '<thead class="'+background_tables+'">'+
                                               '<tr>'+
                                                   '<th>Operaciones</th>'+
                                                   '<th>Clave</th>'+
@@ -458,7 +457,7 @@ function obtenerformaspago(){
 //obtener registros de formas de pago
 function obtenermetodospago(){
   ocultarformulario();
-  var tablasmetodospago = '<div class="modal-header bg-red">'+
+  var tablasmetodospago = '<div class="modal-header '+background_forms_and_modals+'">'+
                             '<h4 class="modal-title">Métodos Pago</h4>'+
                           '</div>'+
                           '<div class="modal-body">'+
@@ -466,7 +465,7 @@ function obtenermetodospago(){
                                 '<div class="col-md-12">'+
                                     '<div class="table-responsive">'+
                                         '<table id="tbllistadometodopago" class="tbllistadometodopago table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                            '<thead class="customercolor">'+
+                                            '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
                                                     '<th>Operaciones</th>'+
                                                     '<th>Clave</th>'+
@@ -516,7 +515,7 @@ function obtenermetodospago(){
 //obtener registros de formas de pago
 function obtenerusoscfdi(){
   ocultarformulario();
-  var tablasusoscfdi =  '<div class="modal-header bg-red">'+
+  var tablasusoscfdi =  '<div class="modal-header '+background_forms_and_modals+'">'+
                           '<h4 class="modal-title">Métodos Pago</h4>'+
                         '</div>'+
                         '<div class="modal-body">'+
@@ -524,7 +523,7 @@ function obtenerusoscfdi(){
                               '<div class="col-md-12">'+
                                   '<div class="table-responsive">'+
                                       '<table id="tbllistadousocfdi" class="tbllistadousocfdi table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                          '<thead class="customercolor">'+
+                                          '<thead class="'+background_tables+'">'+
                                               '<tr>'+
                                                   '<th>Operaciones</th>'+
                                                   '<th>Clave</th>'+
@@ -967,7 +966,7 @@ function activarbusquedaproducto(){
 //listar productos para tab consumos
 function listarproductos(){
   ocultarformulario();
-  var tablaproductos = '<div class="modal-header bg-red">'+
+  var tablaproductos = '<div class="modal-header '+background_forms_and_modals+'">'+
                           '<h4 class="modal-title">Productos</h4>'+
                       '</div>'+
                       '<div class="modal-body">'+
@@ -975,7 +974,7 @@ function listarproductos(){
                               '<div class="col-md-12">'+
                                   '<div class="table-responsive">'+
                                       '<table id="tbllistadoproducto" class="tbllistadoproducto table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                          '<thead class="customercolor">'+
+                                          '<thead class="'+background_tables+'">'+
                                               '<tr>'+
                                                   '<th>Operaciones</th>'+
                                                   '<th>Código</th>'+
@@ -1309,7 +1308,7 @@ function obtenerdatos(numerocliente){
                         '<h5>UTILIDADES POR MARCAS PARA ESTE CLIENTE&nbsp;&nbsp;&nbsp;</h5>'+
                         '<div class="table-container">'+
                           '<table id="tablautilidadesmarcas" class="scroll tablautilidadesmarcas">'+
-                              '<thead class="customercolor">'+
+                              '<thead class="'+background_tables+'">'+
                                   '<tr>'+
                                     '<th>#</th>'+
                                     '<th>Marca</th>'+
@@ -1345,7 +1344,7 @@ function obtenerdatos(numerocliente){
                       '<div class="col-md-12">'+  
                           '<div class="table-container">'+
                             '<table id="tablapreciosproductos" class="scroll tablapreciosproductos">'+
-                                '<thead class="customercolor">'+
+                                '<thead class="'+background_tables+'">'+
                                     '<tr>'+
                                       '<th>Operaciones</th>'+    
                                       '<th>Código</th>'+

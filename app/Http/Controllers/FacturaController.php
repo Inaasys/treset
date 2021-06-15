@@ -51,7 +51,7 @@ use App\NotaClienteDetalle;
 use App\NotaClienteDocumento;
 use Config;
 use Mail;
-
+use Facturapi\Facturapi;
 
 class FacturaController extends ConfiguracionSistemaController{
 
@@ -100,7 +100,7 @@ class FacturaController extends ConfiguracionSistemaController{
             $fechahoy = Carbon::now()->toDateString();
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = VistaFactura::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->get();
+            $data = VistaFactura::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->OrderBy('Serie', 'ASC')->OrderBy('Folio', 'DESC')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
                         $operaciones = '<div class="dropdown">'.
@@ -112,6 +112,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                                 '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Factura .'\')">Bajas</a></li>'.
                                                 '<li><a href="'.route('facturas_generar_pdfs_indiv',$data->Factura).'" target="_blank">Ver Documento PDF</a></li>'.
                                                 '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Factura .'\')">Enviar Documento por Correo</a></li>'.
+                                                //'<li><a href="javascript:void(0);" onclick="timbrarfactura(\''.$data->Factura .'\')">Timbrar Factura</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         /*
@@ -2021,5 +2022,106 @@ class FacturaController extends ConfiguracionSistemaController{
         $Configuracion_Tabla->usuario = Auth::user()->user;
         $Configuracion_Tabla->save();
         return redirect()->route('facturas');
+    }
+
+    public function facturas_timbrar_factura(Request $request){
+        $facturapi = new Facturapi( "sk_test_q0wO7LaZBv9V1wMejJ5aQ6dGYAXlb8kz" ); //
+        $factura = Factura::where('Factura', $request->facturatimbrado)->first();
+        $detallesfactura = FacturaDetalle::where('Factura', $request->facturatimbrado)->orderBy('Item','ASC')->get();
+        $cliente = Cliente::where('Numero', $factura->Cliente)->first();
+        $arraytest = array();
+        foreach($detallesfactura as $df){
+            array_push($arraytest, array(
+                "quantity" => $df->Cantidad,
+                "product" => 
+                    array(
+                        "description" => $df->Descripcion,
+                        "product_key" => $df->ClaveProducto,
+                        "price" => $df->Precio,
+                        "tax_included" => false,
+                        "discount" => $df->Descuento,
+                        "sku" => $df->Codigo
+                    )
+                )
+            );
+        }
+        //FACTURA
+        // Crea una nueva factura
+        $invoice = array(
+            "customer" => array(
+                "legal_name" => $cliente->Nombre,
+                "tax_id" => $cliente->Rfc
+            ),
+            "items" => $arraytest,
+            "payment_form" => $factura->FormaPago,
+            "payment_method" => $factura->MetodoPago,
+            "folio_number" => $factura->Folio,
+            "series" => $factura->Serie,
+            "currency" => $factura->Moneda,
+            "exchange" => $factura->TipoCambio,
+            "conditions" => $factura->CondicionesDePago
+        );
+        $new_invoice = $facturapi->Invoices->create( $invoice );
+        //dd($new_invoice);
+
+        /*
+        //CUENTA POR COBRAR
+        $invoice = array(
+            "type" => \Facturapi\InvoiceType::PAGO,
+            //"customer" => "YOUR_CUSTOMER_ID",
+            "customer" => array(
+                "legal_name" => "Kim Wexler",
+                "tax_id" => "WXKE800401B12"
+            ),
+            "payments" => array(
+                array(
+                    "payment_form" => \Facturapi\PaymentForm::EFECTIVO,
+                    "related" => array(
+                        array(
+                            "uuid" => "6EB912DB-08DF-4F1C-A6D3-E1578E2E3F35", // UUID_de_factura_relacionada
+                            "installment" => 1,
+                            "last_balance" => 1000,
+                            "amount" => 100
+                        )
+                    )
+                )
+            )
+        );
+        $new_invoice = $facturapi->Invoices->create( $invoice );
+        */
+    
+        /*
+        //NOTAS DE CREDITO PROVEEDOR
+        $invoice = array(
+            "type" => \Facturapi\InvoiceType::EGRESO,
+            //"customer" => "YOUR_CUSTOMER_ID",
+            "customer" => array(
+                "legal_name" => "Kim Wexler",
+                "tax_id" => "WXKE800401B12"
+            ),
+            "payment_form" => \Facturapi\PaymentForm::EFECTIVO,
+            "relation" => \Facturapi\InvoiceRelation::DEVOLUCION,
+            "related" => array("6EB912DB-08DF-4F1C-A6D3-E1578E2E3F35"), // UUID_de_factura_relacionada
+            "products" => array(
+                array(
+                "description" => "Devolución de Impresora HP G3700",
+                "price" => 499.50
+                )
+            )
+        );
+        $new_invoice = $facturapi->Invoices->create( $invoice );
+        */        
+
+        // Enviar a más de un correo (máx 10)
+        $facturapi->Invoices->send_by_email(
+            $new_invoice->id,
+            array(
+                "osbaldo.anzaldo@utpcamiones.com.mx",
+                //"marco.baltazar@utpcamiones.com.mx",
+                "al221410832@gmail.com"
+            )
+        );
+        
+
     }
 }

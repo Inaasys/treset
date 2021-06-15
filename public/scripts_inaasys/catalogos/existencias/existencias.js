@@ -11,11 +11,17 @@ function listar(){
     var campos = columnas_ordenadas.split(",");
     var campos_tabla  = [];
     for (var i = 0; i < campos.length; i++) {
+        var orderable = false;
+        var searchable = false;
+        if(campos[i] == 'Codigo'){
+            orderable = true;
+            searchable = true;
+        }
         campos_tabla.push({ 
             'data'    : campos[i],
             'name'  : campos[i],
-            'orderable': true,
-            'searchable': true
+            'orderable': orderable,
+            'searchable': searchable
         });
     }
     tabla=$('#tbllistado').DataTable({
@@ -23,7 +29,6 @@ function listar(){
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "350px",
-        "bScrollCollapse": true,  
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',

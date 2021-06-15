@@ -117,7 +117,6 @@ function listar(){
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "350px",
-        "bScrollCollapse": true,
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -164,7 +163,7 @@ function obtenertiposunidades(){
 function obtenerseriesdocumento(){
   ocultarformulario();
   var seriedefault = 'A';
-  var tablaseriesdocumento= '<div class="modal-header bg-red">'+
+  var tablaseriesdocumento= '<div class="modal-header '+background_forms_and_modals+'">'+
                               '<h4 class="modal-title">Series Documento &nbsp;&nbsp; <div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''+seriedefault+'\')">Asignar Serie Default (A)</div></h4>'+
                             '</div>'+
                             '<div class="modal-body">'+
@@ -172,7 +171,7 @@ function obtenerseriesdocumento(){
                                 '<div class="col-md-12">'+
                                   '<div class="table-responsive">'+
                                     '<table id="tbllistadoseriedocumento" class="tbllistadoseriedocumento table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                      '<thead class="customercolor">'+
+                                      '<thead class="'+background_tables+'">'+
                                         '<tr>'+
                                           '<th>Operaciones</th>'+
                                           '<th>Serie</th>'+
@@ -234,7 +233,7 @@ function seleccionarseriedocumento(Serie){
 //obtener registros de clientes
 function listarclientesfacturaa(){
   ocultarformulario();
-  var tablaclientesfacturaa = '<div class="modal-header bg-red">'+
+  var tablaclientesfacturaa = '<div class="modal-header '+background_forms_and_modals+'">'+
                                 '<h4 class="modal-title">Factura a</h4>'+
                               '</div>'+
                               '<div class="modal-body">'+
@@ -242,7 +241,7 @@ function listarclientesfacturaa(){
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
                                             '<table id="tbllistadoclientesfacturaa" class="tbllistadoclientesfacturaa table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                                '<thead class="customercolor">'+
+                                                '<thead class="'+background_tables+'">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
                                                         '<th>Numero</th>'+
@@ -320,7 +319,7 @@ function seleccionarclientefacturaa(Numero, Nombre, Plazo, NumeroAgente, Agente)
 //obtener registros de clientes
 function listarclientesdelcliente(){
   ocultarformulario();
-  var tablaclientesdelcliente = '<div class="modal-header bg-red">'+
+  var tablaclientesdelcliente = '<div class="modal-header '+background_forms_and_modals+'">'+
                                 '<h4 class="modal-title">Del cliente</h4>'+
                               '</div>'+
                               '<div class="modal-body">'+
@@ -328,7 +327,7 @@ function listarclientesdelcliente(){
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
                                             '<table id="tbllistadoclientesdelcliente" class="tbllistadoclientesdelcliente table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                                '<thead class="customercolor">'+
+                                                '<thead class="'+background_tables+'">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
                                                         '<th>Numero</th>'+
@@ -400,7 +399,7 @@ function seleccionarclientedelcliente(Numero, Nombre, Plazo){
 //obtener registros de agentes
 function listaragentes(){
   ocultarformulario();
-  var tablaagentes = '<div class="modal-header bg-red">'+
+  var tablaagentes = '<div class="modal-header '+background_forms_and_modals+'">'+
                                 '<h4 class="modal-title">Agentes</h4>'+
                               '</div>'+
                               '<div class="modal-body">'+
@@ -408,7 +407,7 @@ function listaragentes(){
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive" >'+
                                             '<table id="tbllistadoagentes" class="tbllistadoagentes table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                                '<thead class="customercolor">'+
+                                                '<thead class="'+background_tables+'">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
                                                         '<th>Numero</th>'+
@@ -473,7 +472,7 @@ function seleccionaragente(Numero, Nombre){
 function listartecnicos(){
   if(parseInt(contadortecnicos) < 5){  
     asignaciontecnicosocultarformulario();
-    var tablatecnicos = '<div class="modal-header bg-red">'+
+    var tablatecnicos = '<div class="modal-header '+background_forms_and_modals+'">'+
                                 '<h4 class="modal-title">Técnicos</h4>'+
                               '</div>'+
                               '<div class="modal-body">'+
@@ -481,7 +480,7 @@ function listartecnicos(){
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
                                             '<table id="tbllistadotecnicos" class="tbllistadotecnicos table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                                '<thead class="customercolor">'+
+                                                '<thead class="'+background_tables+'">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
                                                         '<th>Numero</th>'+
@@ -535,7 +534,7 @@ function listartecnicos(){
 //obtener registros de vines
 function listarvines(){
   ocultarformulario();
-  var tablavines = '<div class="modal-header bg-red">'+
+  var tablavines = '<div class="modal-header '+background_forms_and_modals+'">'+
                                 '<h4 class="modal-title">Vines</h4>'+
                               '</div>'+
                               '<div class="modal-body">'+
@@ -543,7 +542,7 @@ function listarvines(){
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
                                             '<table id="tbllistadovines" class="tbllistadovines table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                                '<thead class="customercolor">'+
+                                                '<thead class="'+background_tables+'">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
                                                         '<th>Economico</th>'+
@@ -723,7 +722,7 @@ function regresarnumerovin(){
 //listar productos para tab consumos
 function listarservicios(){
   ocultarformulario();
-  var tablaservicios = '<div class="modal-header bg-red">'+
+  var tablaservicios = '<div class="modal-header '+background_forms_and_modals+'">'+
                           '<h4 class="modal-title">Servicios</h4>'+
                         '</div>'+
                         '<div class="modal-body">'+
@@ -731,7 +730,7 @@ function listarservicios(){
                             '<div class="col-md-12">'+
                               '<div class="table-responsive">'+
                                 '<table id="tbllistadoservicio" class="tbllistadoservicio table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                  '<thead class="customercolor">'+
+                                  '<thead class="'+background_tables+'">'+
                                     '<tr>'+
                                       '<th>Operaciones</th>'+
                                       '<th>Código</th>'+
@@ -954,6 +953,7 @@ function agregarfilaservicio(Codigo, Servicio, Unidad, Costo, Venta, Cantidad, C
     $("#numerofilas").val(contadorservicios);
     mostrarformulario();
     calculartotalordentrabajo(); 
+    $("#codigoabuscar").val("");
 }
 //asignacion de tecnicos para el servicio seleccionado
 function asignaciontecnicos(fila){
@@ -1011,7 +1011,7 @@ function asignaciontecnicos(fila){
                                                   '</tr>';
     contadortecnicos++;
   });
-  var formasignaciontecnicos =  '<div class="modal-header bg-blue">'+
+  var formasignaciontecnicos =  '<div class="modal-header '+background_forms_and_modals+'">'+
                                   '<h5 class="modal-title" id="exampleModalLabel">Asignación tiempo(s) tecnico(s)</h5>'+
                                 '</div>'+
                                 '<form id="formasignaciontecnicos" action="#">'+
@@ -1355,7 +1355,7 @@ function alta(){
                   '</div>'+
                     '<div class="row">'+
                       '<div class="col-md-4" id="divbuscarcodigoservicio">'+
-                        '<label>Buscar servicio por código (Carga Mano de Obra)</label>'+
+                        '<label>Escribe el código a buscar y presiona la tecla ENTER (Carga Mano de Obra)</label>'+
                         '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" autocomplete="off" placeholder="Escribe el código del servicio y da enter">'+
                       '</div>'+
                     '</div>'+
@@ -1482,47 +1482,47 @@ function alta(){
                   '<div class="row">'+
                     '<div class="col-md-12 table-responsive cabecerafija" style="height: 150px;overflow-y: scroll;padding: 0px 0px;">'+
                       '<table id="tablaserviciosordentrabajo" class="table table-bordered tablaserviciosordentrabajo">'+
-                        '<thead class="customercolor">'+
+                        '<thead class="'+background_tables+'">'+
                           '<tr>'+
-                            '<th class="customercolor">#</th>'+
-                            '<th class="customercolor">Código</th>'+
-                            '<th class="customercolor"><div style="width:200px !important;">Descripción</div></th>'+
-                            '<th class="customercolor">Unidad</th>'+
+                            '<th class="'+background_tables+'">#</th>'+
+                            '<th class="'+background_tables+'">Código</th>'+
+                            '<th class="'+background_tables+'"><div style="width:200px !important;">Descripción</div></th>'+
+                            '<th class="'+background_tables+'">Unidad</th>'+
                             '<th class="customercolortheadth">Cantidad</th>'+
                             '<th class="customercolortheadth">Precio $</th>'+
-                            '<th class="customercolor">Importe $</th>'+
+                            '<th class="'+background_tables+'">Importe $</th>'+
                             '<th class="customercolortheadth">Dcto %</th>'+
                             '<th class="customercolortheadth">Dcto $</th>'+
-                            '<th class="customercolor">SubTotal $</th>'+
+                            '<th class="'+background_tables+'">SubTotal $</th>'+
                             '<th class="customercolortheadth">Iva %</th>'+
-                            '<th class="customercolor">Iva $</th>'+
-                            '<th class="customercolor">Total $</th>'+
-                            '<th class="customercolor">Costo $</th>'+
-                            '<th class="customercolor">Costo Total $</th>'+
+                            '<th class="'+background_tables+'">Iva $</th>'+
+                            '<th class="'+background_tables+'">Total $</th>'+
+                            '<th class="'+background_tables+'">Costo $</th>'+
+                            '<th class="'+background_tables+'">Costo Total $</th>'+
                             '<th class="customercolortheadth">Comisión %</th>'+
-                            '<th class="customercolor">Comisión $</th>'+
+                            '<th class="'+background_tables+'">Comisión $</th>'+
                             '<th class="bg-amber">Utilidad $</th>'+
-                            '<th class="customercolor">Departamento</th>'+
-                            '<th class="customercolor">Cargo</th>'+
-                            '<th class="customercolor">Fecha</th>'+
-                            '<th class="customercolor">Traspaso</th>'+
-                            '<th class="customercolor">Compra</th>'+
-                            '<th class="customercolor">Usuario</th>'+
+                            '<th class="'+background_tables+'">Departamento</th>'+
+                            '<th class="'+background_tables+'">Cargo</th>'+
+                            '<th class="'+background_tables+'">Fecha</th>'+
+                            '<th class="'+background_tables+'">Traspaso</th>'+
+                            '<th class="'+background_tables+'">Compra</th>'+
+                            '<th class="'+background_tables+'">Usuario</th>'+
                             '<th class="customercolortheadth">Anotaciones</th>'+
-                            '<th class="customercolor">Status</th>'+
-                            '<th class="customercolor">Item</th>'+
-                            '<th class="customercolor">Técnico 1</th>'+
-                            '<th class="customercolor">Técnico 2</th>'+
-                            '<th class="customercolor">Técnico 3</th>'+
-                            '<th class="customercolor">Técnico 4</th>'+
-                            '<th class="customercolor">Horas 1</th>'+
-                            '<th class="customercolor">Horas 2</th>'+
-                            '<th class="customercolor">Horas 3</th>'+
-                            '<th class="customercolor">Horas 4</th>'+
+                            '<th class="'+background_tables+'">Status</th>'+
+                            '<th class="'+background_tables+'">Item</th>'+
+                            '<th class="'+background_tables+'">Técnico 1</th>'+
+                            '<th class="'+background_tables+'">Técnico 2</th>'+
+                            '<th class="'+background_tables+'">Técnico 3</th>'+
+                            '<th class="'+background_tables+'">Técnico 4</th>'+
+                            '<th class="'+background_tables+'">Horas 1</th>'+
+                            '<th class="'+background_tables+'">Horas 2</th>'+
+                            '<th class="'+background_tables+'">Horas 3</th>'+
+                            '<th class="'+background_tables+'">Horas 4</th>'+
                             '<th class="customercolortheadth">Promoción</th>'+
-                            '<th class="customercolor">Partida</th>'+
-                            '<th class="customercolor">Almacén</th>'+
-                            '<th class="customercolor">Cotización</th>'+
+                            '<th class="'+background_tables+'">Partida</th>'+
+                            '<th class="'+background_tables+'">Almacén</th>'+
+                            '<th class="'+background_tables+'">Cotización</th>'+
                           '</tr>'+
                         '</thead>'+
                         '<tbody>'+           
@@ -1944,7 +1944,7 @@ function obtenerdatos(ordenmodificar){
                     '</div>'+
                       '<div class="row">'+
                         '<div class="col-md-4" id="divbuscarcodigoservicio">'+
-                          '<label>Buscar servicio por código (Carga Mano de Obra)</label>'+
+                          '<label>Escribe el código a buscar y presiona la tecla ENTER (Carga Mano de Obra)</label>'+
                           '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" autocomplete="off" placeholder="Escribe el código del servicio y da enter">'+
                         '</div>'+
                       '</div>'+
@@ -2071,47 +2071,47 @@ function obtenerdatos(ordenmodificar){
                     '<div class="row">'+
                       '<div class="col-md-12 table-responsive cabecerafija" style="height: 150px;overflow-y: scroll;padding: 0px 0px;">'+
                         '<table id="tablaserviciosordentrabajo" class="table table-bordered tablaserviciosordentrabajo">'+
-                          '<thead class="customercolor">'+
+                          '<thead class="'+background_tables+'">'+
                             '<tr>'+
-                              '<th class="customercolor">#</th>'+
-                              '<th class="customercolor">Código</th>'+
-                              '<th class="customercolor"><div style="width:200px !important;">Descripción</div></th>'+
-                              '<th class="customercolor">Unidad</th>'+
+                              '<th class="'+background_tables+'">#</th>'+
+                              '<th class="'+background_tables+'">Código</th>'+
+                              '<th class="'+background_tables+'"><div style="width:200px !important;">Descripción</div></th>'+
+                              '<th class="'+background_tables+'">Unidad</th>'+
                               '<th class="customercolortheadth">Cantidad</th>'+
                               '<th class="customercolortheadth">Precio $</th>'+
-                              '<th class="customercolor">Importe $</th>'+
+                              '<th class="'+background_tables+'">Importe $</th>'+
                               '<th class="customercolortheadth">Dcto %</th>'+
                               '<th class="customercolortheadth">Dcto $</th>'+
-                              '<th class="customercolor">SubTotal $</th>'+
+                              '<th class="'+background_tables+'">SubTotal $</th>'+
                               '<th class="customercolortheadth">Iva %</th>'+
-                              '<th class="customercolor">Iva $</th>'+
-                              '<th class="customercolor">Total $</th>'+
-                              '<th class="customercolor">Costo $</th>'+
-                              '<th class="customercolor">Costo Total $</th>'+
+                              '<th class="'+background_tables+'">Iva $</th>'+
+                              '<th class="'+background_tables+'">Total $</th>'+
+                              '<th class="'+background_tables+'">Costo $</th>'+
+                              '<th class="'+background_tables+'">Costo Total $</th>'+
                               '<th class="customercolortheadth">Comisión %</th>'+
-                              '<th class="customercolor">Comisión $</th>'+
+                              '<th class="'+background_tables+'">Comisión $</th>'+
                               '<th class="bg-amber">Utilidad $</th>'+
-                              '<th class="customercolor">Departamento</th>'+
-                              '<th class="customercolor">Cargo</th>'+
-                              '<th class="customercolor">Fecha</th>'+
-                              '<th class="customercolor">Traspaso</th>'+
-                              '<th class="customercolor">Compra</th>'+
-                              '<th class="customercolor">Usuario</th>'+
+                              '<th class="'+background_tables+'">Departamento</th>'+
+                              '<th class="'+background_tables+'">Cargo</th>'+
+                              '<th class="'+background_tables+'">Fecha</th>'+
+                              '<th class="'+background_tables+'">Traspaso</th>'+
+                              '<th class="'+background_tables+'">Compra</th>'+
+                              '<th class="'+background_tables+'">Usuario</th>'+
                               '<th class="customercolortheadth">Anotaciones</th>'+
-                              '<th class="customercolor">Status</th>'+
-                              '<th class="customercolor">Item</th>'+
-                              '<th class="customercolor">Técnico 1</th>'+
-                              '<th class="customercolor">Técnico 2</th>'+
-                              '<th class="customercolor">Técnico 3</th>'+
-                              '<th class="customercolor">Técnico 4</th>'+
-                              '<th class="customercolor">Horas 1</th>'+
-                              '<th class="customercolor">Horas 2</th>'+
-                              '<th class="customercolor">Horas 3</th>'+
-                              '<th class="customercolor">Horas 4</th>'+
+                              '<th class="'+background_tables+'">Status</th>'+
+                              '<th class="'+background_tables+'">Item</th>'+
+                              '<th class="'+background_tables+'">Técnico 1</th>'+
+                              '<th class="'+background_tables+'">Técnico 2</th>'+
+                              '<th class="'+background_tables+'">Técnico 3</th>'+
+                              '<th class="'+background_tables+'">Técnico 4</th>'+
+                              '<th class="'+background_tables+'">Horas 1</th>'+
+                              '<th class="'+background_tables+'">Horas 2</th>'+
+                              '<th class="'+background_tables+'">Horas 3</th>'+
+                              '<th class="'+background_tables+'">Horas 4</th>'+
                               '<th class="customercolortheadth">Promoción</th>'+
-                              '<th class="customercolor">Partida</th>'+
-                              '<th class="customercolor">Almacén</th>'+
-                              '<th class="customercolor">Cotización</th>'+
+                              '<th class="'+background_tables+'">Partida</th>'+
+                              '<th class="'+background_tables+'">Almacén</th>'+
+                              '<th class="'+background_tables+'">Cotización</th>'+
                             '</tr>'+
                           '</thead>'+
                           '<tbody>'+           

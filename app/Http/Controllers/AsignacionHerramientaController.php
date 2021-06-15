@@ -50,7 +50,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
         if($request->ajax()){
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = VistaAsignacionHerramienta::select($this->campos_consulta)->orderBy('fecha', 'DESC')->where('periodo', $periodo)->get();
+            $data = VistaAsignacionHerramienta::select($this->campos_consulta)->where('periodo', $periodo)->orderBy('fecha', 'DESC')->orderBy('serie', 'ASC')->orderBy('folio', 'DESC')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($tipousuariologueado){
                         $operaciones = '<div class="dropdown">'.

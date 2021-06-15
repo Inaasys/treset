@@ -50,19 +50,24 @@ function listar(){
     var campos_tabla  = [];
     campos_tabla.push({ 'data':'operaciones', 'name':'operaciones', 'orderable':false, 'searchable':false});
     for (var i = 0; i < campos.length; i++) {
+        var orderable = false;
+        var searchable = false;
+        if(campos[i] == 'Codigo'){
+            orderable = true;
+            searchable = true;
+        }
         campos_tabla.push({ 
             'data'    : campos[i],
             'name'  : campos[i],
-            'orderable': true,
-            'searchable': true
+            'orderable': orderable,
+            'searchable': searchable
         });
     }
     tabla=$('#tbllistado').DataTable({
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
-        "sScrollY": "350px",
-        "bScrollCollapse": true,  
+        "sScrollY": "350px", 
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -85,7 +90,7 @@ function listar(){
 //listar claves productos
 function listarclavesproductos(){
     ocultarformulario();
-    var tablaclavesproductos =  '<div class="modal-header bg-red">'+
+    var tablaclavesproductos =  '<div class="modal-header '+background_forms_and_modals+'">'+
                                     '<h4 class="modal-title">Claves Productos</h4>'+
                                 '</div>'+
                                 '<div class="modal-body">'+
@@ -93,7 +98,7 @@ function listarclavesproductos(){
                                         '<div class="col-md-12">'+
                                             '<div class="table-responsive">'+
                                                 '<table id="tbllistadoclaveproducto" class="tbllistadoclaveproducto table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                                    '<thead class="customercolor">'+
+                                                    '<thead class="'+background_tables+'">'+
                                                         '<tr>'+
                                                             '<th>Operaciones</th>'+
                                                             '<th>Clave</th>'+
@@ -143,7 +148,7 @@ function listarclavesproductos(){
 //listar claves unidades
 function listarclavesunidades(){
     ocultarformulario();
-    var tablaclavesunidades =   '<div class="modal-header bg-red">'+
+    var tablaclavesunidades =   '<div class="modal-header '+background_forms_and_modals+'">'+
                                     '<h4 class="modal-title">Claves Unidades</h4>'+
                                 '</div>'+
                                 '<div class="modal-body">'+
@@ -151,7 +156,7 @@ function listarclavesunidades(){
                                         '<div class="col-md-12">'+
                                             '<div class="table-responsive">'+
                                                 '<table id="tbllistadoclaveunidad" class="tbllistadoclaveunidad table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                                    '<thead class="customercolor">'+
+                                                    '<thead class="'+background_tables+'">'+
                                                         '<tr>'+
                                                             '<th>Operaciones</th>'+
                                                             '<th>Clave</th>'+
@@ -203,7 +208,7 @@ function listarclavesunidades(){
 //listar marcas
 function listarmarcas(){
     ocultarformulario();
-    var tablamarcas =   '<div class="modal-header bg-red">'+
+    var tablamarcas =   '<div class="modal-header '+background_forms_and_modals+'">'+
                             '<h4 class="modal-title">Marcas</h4>'+
                         '</div>'+
                         '<div class="modal-body">'+
@@ -211,7 +216,7 @@ function listarmarcas(){
                                 '<div class="col-md-12">'+
                                     '<div class="table-responsive">'+
                                         '<table id="tbllistadomarca" class="tbllistadomarca table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                            '<thead class="customercolor">'+
+                                            '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
                                                     '<th>Operaciones</th>'+
                                                     '<th>Número</th>'+
@@ -269,7 +274,7 @@ function listarmarcas(){
 //listar lineas
 function listarlineas(){
     ocultarformulario();
-    var tablalineas =   '<div class="modal-header bg-red">'+
+    var tablalineas =   '<div class="modal-header '+background_forms_and_modals+'">'+
                             '<h4 class="modal-title">Lineas</h4>'+
                         '</div>'+
                         '<div class="modal-body">'+
@@ -277,7 +282,7 @@ function listarlineas(){
                                 '<div class="col-md-12">'+
                                     '<div class="table-responsive">'+
                                         '<table id="tbllistadolinea" class="tbllistadolinea table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                            '<thead class="customercolor">'+
+                                            '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
                                                     '<th>Operaciones</th>'+
                                                     '<th>Número</th>'+
@@ -325,7 +330,7 @@ function listarlineas(){
 //listar monedas
 function listarmonedas(){
     ocultarformulario();
-    var tablalineas =   '<div class="modal-header bg-red">'+
+    var tablalineas =   '<div class="modal-header '+background_forms_and_modals+'">'+
                             '<h4 class="modal-title">Monedas</h4>'+
                         '</div>'+
                         '<div class="modal-body">'+
@@ -333,7 +338,7 @@ function listarmonedas(){
                                 '<div class="col-md-12">'+
                                     '<div class="table-responsive">'+
                                         '<table id="tbllistadomoneda" class="tbllistadomoneda table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                            '<thead class="customercolor">'+
+                                            '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
                                                     '<th>Operaciones</th>'+
                                                     '<th>Clave</th>'+
@@ -414,7 +419,7 @@ function activarbusquedacliente(){
 //listar clientes para pestana precio clientes
 function listarclientes(){
     ocultarformulario();
-    var tablaclientes = '<div class="modal-header bg-red">'+
+    var tablaclientes = '<div class="modal-header '+background_forms_and_modals+'">'+
                             '<h4 class="modal-title">Clientes</h4>'+
                         '</div>'+
                         '<div class="modal-body">'+
@@ -422,7 +427,7 @@ function listarclientes(){
                                 '<div class="col-md-12">'+
                                     '<div class="table-responsive">'+
                                         '<table id="tbllistadocliente" class="tbllistadocliente table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                            '<thead class="customercolor">'+
+                                            '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
                                                     '<th>Operaciones</th>'+
                                                     '<th>Numero</th>'+
@@ -490,7 +495,7 @@ function activarbusquedaproducto(){
 //listar productos para tab consumos
 function listarproductos(){
     ocultarformulario();
-    var tablaconsumos = '<div class="modal-header bg-red">'+
+    var tablaconsumos = '<div class="modal-header '+background_forms_and_modals+'">'+
                             '<h4 class="modal-title">Productos</h4>'+
                         '</div>'+
                         '<div class="modal-body">'+
@@ -498,7 +503,7 @@ function listarproductos(){
                                 '<div class="col-md-12">'+
                                     '<div class="table-responsive">'+
                                         '<table id="tbllistadoconsumoproducto" class="tbllistadoconsumoproducto table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                            '<thead class="customercolor">'+
+                                            '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
                                                     '<th>Operaciones</th>'+
                                                     '<th>Código</th>'+
@@ -915,7 +920,7 @@ function obtenerdatos(codigoproducto){
                                 '<label>UTILIDADES</label>'+   
                                 '<div class="table-container" style="height: 14em !important;">'+
                                     '<table id="tbllistadoutilidades" class="scroll tbllistadoutilidades">'+
-                                        '<thead class="customercolor">'+
+                                        '<thead class="'+background_tables+'">'+
                                             '<tr>'+
                                                 '<th>Costo de Venta</th>'+
                                                 '<th>Utilidad%</th>'+
@@ -934,7 +939,7 @@ function obtenerdatos(codigoproducto){
                                 '<label>EXISTENCIAS</label>'+  
                                 '<div class="table-container" style="height: 14em !important;">'+
                                     '<table id="tbllistadoexistenciaalmacen" class="scroll tbllistadoexistenciaalmacen">'+
-                                        '<thead class="customercolor">'+
+                                        '<thead class="'+background_tables+'">'+
                                             '<tr>'+
                                                 '<th>Almacén</th>'+
                                                 '<th>Nombre</th>'+
@@ -964,7 +969,7 @@ function obtenerdatos(codigoproducto){
                             '<div class="col-md-12">'+   
                                 '<div class="table-container">'+
                                     '<table id="tablapreciosclientes" class="scroll tablapreciosclientes">'+
-                                        '<thead class="customercolor">'+
+                                        '<thead class="'+background_tables+'">'+
                                             '<tr>'+
                                             '<th>Operaciones</th>'+    
                                             '<th>Cliente</th>'+
@@ -1002,7 +1007,7 @@ function obtenerdatos(codigoproducto){
                             '<div class="col-md-12">'+
                                 '<div class="table-container">'+
                                     '<table id="tablaconsumosproductoterminado" class="scroll tablaconsumosproductoterminado">'+
-                                        '<thead class="customercolor">'+
+                                        '<thead class="'+background_tables+'">'+
                                             '<tr>'+
                                                 '<th>Operaciones</th>'+
                                                 '<th>Código</th>'+

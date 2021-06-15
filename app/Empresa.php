@@ -122,6 +122,9 @@ class Empresa extends Model
         'Licencia',
         'ClaveCiec',
         'Sistema',
-        'Logo'
+        'Logo',
+        'background_navbar',
+        'background_forms_and_modals',
+        'background_tables'
     ];
 }

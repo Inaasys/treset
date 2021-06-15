@@ -54,7 +54,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         if($request->ajax()){
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = VistaOrdenTrabajo::select($this->campos_consulta)->orderBy('Fecha', 'DESC')->where('Periodo', $periodo)->get();
+            $data = VistaOrdenTrabajo::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->orderBy('Serie', 'ASC')->orderBy('Folio', 'DESC')->get();
             return DataTables::of($data)
                 ->addColumn('operaciones', function($data){
                     $operaciones =  '<div class="dropdown">'.

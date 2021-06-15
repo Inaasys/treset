@@ -71,7 +71,7 @@ class CompraController extends ConfiguracionSistemaController{
             $fechahoy = Carbon::now()->toDateString();
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = VistaCompra::select($this->campos_consulta)->orderBy('Fecha', 'DESC')->where('Periodo', $periodo)->get();
+            $data = VistaCompra::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->orderBy('Serie', 'ASC')->orderBy('Folio', 'DESC')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($fechahoy,$tipousuariologueado){
 

@@ -113,8 +113,7 @@ function listar(){
     "lengthMenu": [ 10, 50, 100, 250, 500 ],
     "pageLength": 250,
     "sScrollX": "110%",
-    "sScrollY": "350px",
-    "bScrollCollapse": true,  
+    "sScrollY": "350px",  
     processing: true,
     'language': {
         'loadingRecords': '&nbsp;',
@@ -145,7 +144,7 @@ function listar(){
 //obtener registros de proveedores
 function obtenerclientes(){
   ocultarformulario();
-  var tablaclientes = '<div class="modal-header bg-red">'+
+  var tablaclientes = '<div class="modal-header '+background_forms_and_modals+'">'+
                       '<h4 class="modal-title">Clientes</h4>'+
                     '</div>'+
                     '<div class="modal-body">'+
@@ -153,7 +152,7 @@ function obtenerclientes(){
                           '<div class="col-md-12">'+
                               '<div class="table-responsive">'+
                                   '<table id="tbllistadocliente" class="tbllistadocliente table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                      '<thead class="customercolor">'+
+                                      '<thead class="'+background_tables+'">'+
                                           '<tr>'+
                                               '<th>Operaciones</th>'+
                                               '<th>Numero</th>'+
@@ -253,7 +252,7 @@ function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapag
 //obtener registros de almacenes
 function obteneralmacenes(){
     ocultarformulario();
-    var tablaalmacenes = '<div class="modal-header bg-red">'+
+    var tablaalmacenes = '<div class="modal-header '+background_forms_and_modals+'">'+
                             '<h4 class="modal-title">Almacenes</h4>'+
                         '</div>'+
                         '<div class="modal-body">'+
@@ -261,7 +260,7 @@ function obteneralmacenes(){
                                 '<div class="col-md-12">'+
                                     '<div class="table-responsive">'+
                                         '<table id="tbllistadoalmacen" class="tbllistadoalmacen table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                            '<thead class="customercolor">'+
+                                            '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
                                                     '<th>Operaciones</th>'+
                                                     '<th>Numero</th>'+
@@ -328,7 +327,7 @@ function seleccionaralmacen(Numero, Nombre){
 //obtener lugares expedicion
 function obtenerlugaresexpedicion(){
   ocultarformulario();
-  var tablacodigospostales =  '<div class="modal-header bg-red">'+
+  var tablacodigospostales =  '<div class="modal-header '+background_forms_and_modals+'">'+
                                 '<h4 class="modal-title">Códigos Postales</h4>'+
                               '</div>'+
                               '<div class="modal-body">'+
@@ -336,7 +335,7 @@ function obtenerlugaresexpedicion(){
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
                                             '<table id="tbllistadocodigopostal" class="tbllistadocodigopostal table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                                '<thead class="customercolor">'+
+                                                '<thead class="'+background_tables+'">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
                                                         '<th>Clave</th>'+
@@ -403,7 +402,7 @@ function seleccionarlugarexpedicion(Clave){
 //obtener regimenes fiscales
 function obtenerregimenesfiscales(){
   ocultarformulario();
-  var tablaregimenesfiscales ='<div class="modal-header bg-red">'+
+  var tablaregimenesfiscales ='<div class="modal-header '+background_forms_and_modals+'">'+
                                 '<h4 class="modal-title">Regimenes Fiscales</h4>'+
                               '</div>'+
                               '<div class="modal-body">'+
@@ -411,7 +410,7 @@ function obtenerregimenesfiscales(){
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
                                             '<table id="tbllistadoregimenfiscal" class="tbllistadoregimenfiscal table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                                '<thead class="customercolor">'+
+                                                '<thead class="'+background_tables+'">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
                                                         '<th>Clave</th>'+
@@ -481,7 +480,7 @@ function seleccionarregimenfiscal(Clave, Nombre){
 //obtener tipos relacion
 function obtenertiposrelaciones(){
   ocultarformulario();
-  var tablatiposrelaciones ='<div class="modal-header bg-red">'+
+  var tablatiposrelaciones ='<div class="modal-header '+background_forms_and_modals+'">'+
                                 '<h4 class="modal-title">Tipos Relación</h4>'+
                               '</div>'+
                               '<div class="modal-body">'+
@@ -489,7 +488,7 @@ function obtenertiposrelaciones(){
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
                                             '<table id="tbllistadotiporelacion" class="tbllistadotiporelacion table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                                '<thead class="customercolor">'+
+                                                '<thead class="'+background_tables+'">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
                                                         '<th>Clave</th>'+
@@ -555,7 +554,7 @@ function seleccionartiporelacion(Clave, Nombre){
 //obtener formas de pago
 function obtenerformaspago(){
   ocultarformulario();
-  var tablaformaspago ='<div class="modal-header bg-red">'+
+  var tablaformaspago ='<div class="modal-header '+background_forms_and_modals+'">'+
                                 '<h4 class="modal-title">Formas Pago</h4>'+
                               '</div>'+
                               '<div class="modal-body">'+
@@ -563,7 +562,7 @@ function obtenerformaspago(){
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
                                             '<table id="tbllistadoformapago" class="tbllistadoformapago table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                                '<thead class="customercolor">'+
+                                                '<thead class="'+background_tables+'">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
                                                         '<th>Clave</th>'+
@@ -631,7 +630,7 @@ function seleccionarformapago(Clave, Nombre){
 //obtener metodos de pago
 function obtenermetodospago(){
   ocultarformulario();
-  var tablametodospago='<div class="modal-header bg-red">'+
+  var tablametodospago='<div class="modal-header '+background_forms_and_modals+'">'+
                                 '<h4 class="modal-title">Métodos Pago</h4>'+
                               '</div>'+
                               '<div class="modal-body">'+
@@ -639,7 +638,7 @@ function obtenermetodospago(){
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
                                             '<table id="tbllistadometodopago" class="tbllistadometodopago table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                                '<thead class="customercolor">'+
+                                                '<thead class="'+background_tables+'">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
                                                         '<th>Clave</th>'+
@@ -705,7 +704,7 @@ function seleccionarmetodopago(Clave, Nombre){
 //obtener usos cfdi
 function obtenerusoscfdi(){
   ocultarformulario();
-  var tablausoscfdi='<div class="modal-header bg-red">'+
+  var tablausoscfdi='<div class="modal-header '+background_forms_and_modals+'">'+
                                 '<h4 class="modal-title">Usos CFDI</h4>'+
                               '</div>'+
                               '<div class="modal-body">'+
@@ -713,7 +712,7 @@ function obtenerusoscfdi(){
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
                                             '<table id="tbllistadousocfdi" class="tbllistadousocfdi table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                                '<thead class="customercolor">'+
+                                                '<thead class="'+background_tables+'">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
                                                         '<th>Clave</th>'+
@@ -783,7 +782,7 @@ function seleccionarusocfdi(Clave, Nombre){
 //obtener residencias fiscales
 function obtenerresidenciasfiscales(){
   ocultarformulario();
-  var tablaresidenciasfiscales='<div class="modal-header bg-red">'+
+  var tablaresidenciasfiscales='<div class="modal-header '+background_forms_and_modals+'">'+
                                 '<h4 class="modal-title">Residencias Fiscales</h4>'+
                               '</div>'+
                               '<div class="modal-body">'+
@@ -791,7 +790,7 @@ function obtenerresidenciasfiscales(){
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
                                             '<table id="tbllistadoresidencialfiscal" class="tbllistadoresidencialfiscal table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                                '<thead class="customercolor">'+
+                                                '<thead class="'+background_tables+'">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
                                                         '<th>Clave</th>'+
@@ -857,7 +856,7 @@ function seleccionarresidenciafiscal(Clave, Nombre){
 //obtener folio serie nota
 function obtenerfoliosnotas(){
   ocultarformulario();
-  var tablafoliosfiscales='<div class="modal-header bg-red">'+
+  var tablafoliosfiscales='<div class="modal-header '+background_forms_and_modals+'">'+
                                 '<h4 class="modal-title">Folios Fiscales</h4>'+
                               '</div>'+
                               '<div class="modal-body">'+
@@ -865,7 +864,7 @@ function obtenerfoliosnotas(){
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
                                             '<table id="tbllistadofoliofiscal" class="tbllistadofoliofiscal table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                                '<thead class="customercolor">'+
+                                                '<thead class="'+background_tables+'">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
                                                         '<th>Serie</th>'+
@@ -935,7 +934,7 @@ function seleccionarfoliofiscal(Serie, Esquema){
 //listar todas las facturas
 function listarfacturas (){
   ocultarformulario();
-  var tablafacturas ='<div class="modal-header bg-red">'+
+  var tablafacturas ='<div class="modal-header '+background_forms_and_modals+'">'+
                           '<h4 class="modal-title">Facturas</h4>'+
                       '</div>'+
                       '<div class="modal-body">'+
@@ -943,7 +942,7 @@ function listarfacturas (){
                           '<div class="col-md-12">'+
                             '<div class="table-responsive">'+
                               '<table id="tbllistadofactura" class="tbllistadofactura table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                '<thead class="customercolor">'+
+                                '<thead class="'+background_tables+'">'+
                                   '<tr>'+
                                     '<th>Operaciones</th>'+
                                     '<th>Factura</th>'+
@@ -1398,7 +1397,7 @@ function listarproductos(){
       msj_erroreligeunalmacen();
     }else{
       ocultarformulario();
-      var tablaproductos = '<div class="modal-header bg-red">'+
+      var tablaproductos = '<div class="modal-header '+background_forms_and_modals+'">'+
                               '<h4 class="modal-title">Productos</h4>'+
                             '</div>'+
                             '<div class="modal-body">'+
@@ -1406,7 +1405,7 @@ function listarproductos(){
                                 '<div class="col-md-12">'+
                                   '<div class="table-responsive">'+
                                     '<table id="tbllistadoproducto" class="tbllistadoproducto table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                      '<thead class="customercolor">'+
+                                      '<thead class="'+background_tables+'">'+
                                         '<tr>'+
                                           '<th>Operaciones</th>'+
                                           '<th>Código</th>'+
@@ -1478,7 +1477,7 @@ function listarproductos(){
 //listar claves productos
 function listarclavesproductos(fila){
   ocultarformulario();
-  var tablaclavesproducto = '<div class="modal-header bg-red">'+
+  var tablaclavesproducto = '<div class="modal-header '+background_forms_and_modals+'">'+
                                 '<h4 class="modal-title">Claves Productos</h4>'+
                             '</div>'+
                             '<div class="modal-body">'+
@@ -1486,7 +1485,7 @@ function listarclavesproductos(fila){
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
                                             '<table id="tbllistadoclaveproducto" class="tbllistadoclaveproducto table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                                '<thead class="customercolor">'+
+                                                '<thead class="'+background_tables+'">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
                                                         '<th>Clave</th>'+
@@ -1547,7 +1546,7 @@ function seleccionarclaveproducto(clave, nombre, fila){
 //listar claves unidades
 function listarclavesunidades(fila){
   ocultarformulario();
-  var tablaclavesunidades = '<div class="modal-header bg-red">'+
+  var tablaclavesunidades = '<div class="modal-header '+background_forms_and_modals+'">'+
                                 '<h4 class="modal-title">Claves Unidades</h4>'+
                             '</div>'+
                             '<div class="modal-body">'+
@@ -1555,7 +1554,7 @@ function listarclavesunidades(fila){
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
                                             '<table id="tbllistadoclaveunidad" class="tbllistadoclaveunidad table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                                '<thead class="customercolor">'+
+                                                '<thead class="'+background_tables+'">'+
                                                     '<tr>'+
                                                         '<th>Operaciones</th>'+
                                                         '<th>Clave</th>'+
@@ -1735,6 +1734,7 @@ function agregarfiladppp(){
     $("#tipodetalles").val("dppp");
     //colocar almacen 0
     comprobarfilasfacturanotacliente();
+    $("#codigoabuscar").val("");
     $('.page-loader-wrapper').css('display', 'none');
   }else{
     msj_errorproductoyaagregado();
@@ -1815,6 +1815,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
         $("#tipodetalles").val("codigos");
         //colocar almacen 0
         comprobarfilasfacturanotacliente();
+        $("#codigoabuscar").val("");
         $('.page-loader-wrapper').css('display', 'none');
     }else{
         msj_errorproductoyaagregado();
@@ -1921,7 +1922,7 @@ function alta(){
                                         '<div class="btn btn-block bg-blue waves-effect" id="btnlistarfacturas" onclick="listarfacturas()" style="display:none">Agregar Factura</div>'+
                                     '</div>'+  
                                     '<div class="col-md-3">'+
-                                      '<label>Cargar DPPP ó Código</label>'+
+                                      '<label>Escribe DPPP ó Código y presiona la tecla ENTER</label>'+
                                       '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe DPPP ó el código del producto" autocomplete="off" readonly>'+
                                     '</div>'+                                  
                                 '</div>'+
@@ -2101,35 +2102,35 @@ function alta(){
                                 '<div class="row">'+
                                     '<div class="col-md-12 table-responsive cabecerafija" style="height: 200px;overflow-y: scroll;padding: 0px 0px;">'+
                                         '<table id="tabladetallesnotacliente" class="table table-bordered tabladetallesnotacliente">'+
-                                            '<thead class="customercolor">'+
+                                            '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
-                                                  '<th class="customercolor">#</th>'+
+                                                  '<th class="'+background_tables+'">#</th>'+
                                                   '<th class="customercolortheadth">Código</th>'+
                                                   '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
                                                   '<th class="customercolortheadth">Uda</th>'+
                                                   '<th class="customercolortheadth">Cantidad</th>'+
                                                   '<th class="customercolortheadth">Precio $</th>'+
-                                                  '<th class="customercolor">Importe $</th>'+
+                                                  '<th class="'+background_tables+'">Importe $</th>'+
                                                   '<th class="customercolortheadth">Dcto %</th>'+
                                                   '<th class="customercolortheadth">Dcto $</th>'+
-                                                  '<th class="customercolor">Importe Descuento $</th>'+
+                                                  '<th class="'+background_tables+'">Importe Descuento $</th>'+
                                                   '<th class="customercolortheadth" hidden>Ieps %</th>'+
-                                                  '<th class="customercolor" hidden>Traslado Ieps $</th>'+
-                                                  '<th class="customercolor">SubTotal $</th>'+
+                                                  '<th class="'+background_tables+'" hidden>Traslado Ieps $</th>'+
+                                                  '<th class="'+background_tables+'">SubTotal $</th>'+
                                                   '<th class="customercolortheadth">Iva %</th>'+
-                                                  '<th class="customercolor">Traslado Iva $</th>'+
+                                                  '<th class="'+background_tables+'">Traslado Iva $</th>'+
                                                   '<th class="customercolortheadth" hidden>Retención Iva %</th>'+
-                                                  '<th class="customercolor" hidden>Retención Iva $</th>'+
+                                                  '<th class="'+background_tables+'" hidden>Retención Iva $</th>'+
                                                   '<th class="customercolortheadth" hidden>Retención Isr %</th>'+
-                                                  '<th class="customercolor" hidden>Retención Isr $</th>'+
+                                                  '<th class="'+background_tables+'" hidden>Retención Isr $</th>'+
                                                   '<th class="customercolortheadth" hidden>Retención Ieps %</th>'+
-                                                  '<th class="customercolor" hidden>Retención Ieps $</th>'+
-                                                  '<th class="customercolor">Total $</th>'+
+                                                  '<th class="'+background_tables+'" hidden>Retención Ieps $</th>'+
+                                                  '<th class="'+background_tables+'">Total $</th>'+
                                                   '<th class="customercolortheadth">Partida</th>'+
                                                   '<th class="customercolortheadth">ClaveProducto</th>'+
-                                                  '<th class="customercolor">Nombre ClaveProducto</th>'+
+                                                  '<th class="'+background_tables+'">Nombre ClaveProducto</th>'+
                                                   '<th class="customercolortheadth">ClaveUnidad</th>'+
-                                                  '<th class="customercolor">Nombre ClaveUnidad</th>'+
+                                                  '<th class="'+background_tables+'">Nombre ClaveUnidad</th>'+
                                                 '</tr>'+
                                             '</thead>'+
                                             '<tbody>'+           
@@ -2142,17 +2143,17 @@ function alta(){
                                 '<div class="row">'+
                                   '<div class="col-md-12 table-responsive cabecerafija" style="height: 200px;overflow-y: scroll;padding: 0px 0px;">'+
                                     '<table id="tabladetallesfacturasnotascliente" class="table table-bordered tabladetallesfacturasnotascliente">'+
-                                        '<thead class="customercolor">'+
+                                        '<thead class="'+background_tables+'">'+
                                             '<tr>'+
-                                            '<th class="customercolor">#</th>'+
+                                            '<th class="'+background_tables+'">#</th>'+
                                             '<th class="customercolortheadth">Factura</th>'+
-                                            '<th class="customercolor">Fecha</th>'+
-                                            '<th class="customercolor">UUID</th>'+
-                                            '<th class="customercolor">Total $</th>'+
-                                            '<th class="customercolor">Abonos $</th>'+
-                                            '<th class="customercolor">Notas Crédito $</th>'+
+                                            '<th class="'+background_tables+'">Fecha</th>'+
+                                            '<th class="'+background_tables+'">UUID</th>'+
+                                            '<th class="'+background_tables+'">Total $</th>'+
+                                            '<th class="'+background_tables+'">Abonos $</th>'+
+                                            '<th class="'+background_tables+'">Notas Crédito $</th>'+
                                             '<th class="customercolortheadth">Descuento $</th>'+
-                                            '<th class="customercolor">Saldo $</th>'+
+                                            '<th class="'+background_tables+'">Saldo $</th>'+
                                             '</tr>'+
                                         '</thead>'+
                                         '<tbody>'+           
@@ -2752,7 +2753,7 @@ function obtenerdatos(notamodificar){
                                         '<div class="btn btn-block bg-blue waves-effect" id="btnlistarfacturas" onclick="listarfacturas()" style="display:none">Agregar Factura</div>'+
                                     '</div>'+  
                                     '<div class="col-md-3">'+
-                                      '<label>Cargar DPPP ó Código</label>'+
+                                      '<label>Escribe DPPP ó Código y presiona la tecla ENTER</label>'+
                                       '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe DPPP ó el código del producto" autocomplete="off" readonly>'+
                                     '</div>'+                                  
                                 '</div>'+
@@ -2932,35 +2933,35 @@ function obtenerdatos(notamodificar){
                                 '<div class="row">'+
                                     '<div class="col-md-12 table-responsive cabecerafija" style="height: 200px;overflow-y: scroll;padding: 0px 0px;">'+
                                         '<table id="tabladetallesnotacliente" class="table table-bordered tabladetallesnotacliente">'+
-                                            '<thead class="customercolor">'+
+                                            '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
-                                                  '<th class="customercolor">#</th>'+
+                                                  '<th class="'+background_tables+'">#</th>'+
                                                   '<th class="customercolortheadth">Código</th>'+
                                                   '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
                                                   '<th class="customercolortheadth">Uda</th>'+
                                                   '<th class="customercolortheadth">Cantidad</th>'+
                                                   '<th class="customercolortheadth">Precio $</th>'+
-                                                  '<th class="customercolor">Importe $</th>'+
+                                                  '<th class="'+background_tables+'">Importe $</th>'+
                                                   '<th class="customercolortheadth">Dcto %</th>'+
                                                   '<th class="customercolortheadth">Dcto $</th>'+
-                                                  '<th class="customercolor">Importe Descuento $</th>'+
+                                                  '<th class="'+background_tables+'">Importe Descuento $</th>'+
                                                   '<th class="customercolortheadth" hidden>Ieps %</th>'+
-                                                  '<th class="customercolor" hidden>Traslado Ieps $</th>'+
-                                                  '<th class="customercolor">SubTotal $</th>'+
+                                                  '<th class="'+background_tables+'" hidden>Traslado Ieps $</th>'+
+                                                  '<th class="'+background_tables+'">SubTotal $</th>'+
                                                   '<th class="customercolortheadth">Iva %</th>'+
-                                                  '<th class="customercolor">Traslado Iva $</th>'+
+                                                  '<th class="'+background_tables+'">Traslado Iva $</th>'+
                                                   '<th class="customercolortheadth" hidden>Retención Iva %</th>'+
-                                                  '<th class="customercolor" hidden>Retención Iva $</th>'+
+                                                  '<th class="'+background_tables+'" hidden>Retención Iva $</th>'+
                                                   '<th class="customercolortheadth" hidden>Retención Isr %</th>'+
-                                                  '<th class="customercolor" hidden>Retención Isr $</th>'+
+                                                  '<th class="'+background_tables+'" hidden>Retención Isr $</th>'+
                                                   '<th class="customercolortheadth" hidden>Retención Ieps %</th>'+
-                                                  '<th class="customercolor" hidden>Retención Ieps $</th>'+
-                                                  '<th class="customercolor">Total $</th>'+
+                                                  '<th class="'+background_tables+'" hidden>Retención Ieps $</th>'+
+                                                  '<th class="'+background_tables+'">Total $</th>'+
                                                   '<th class="customercolortheadth">Partida</th>'+
                                                   '<th class="customercolortheadth">ClaveProducto</th>'+
-                                                  '<th class="customercolor">Nombre ClaveProducto</th>'+
+                                                  '<th class="'+background_tables+'">Nombre ClaveProducto</th>'+
                                                   '<th class="customercolortheadth">ClaveUnidad</th>'+
-                                                  '<th class="customercolor">Nombre ClaveUnidad</th>'+
+                                                  '<th class="'+background_tables+'">Nombre ClaveUnidad</th>'+
                                                 '</tr>'+
                                             '</thead>'+
                                             '<tbody>'+           
@@ -2973,17 +2974,17 @@ function obtenerdatos(notamodificar){
                                 '<div class="row">'+
                                   '<div class="col-md-12 table-responsive cabecerafija" style="height: 200px;overflow-y: scroll;padding: 0px 0px;">'+
                                     '<table id="tabladetallesfacturasnotascliente" class="table table-bordered tabladetallesfacturasnotascliente">'+
-                                        '<thead class="customercolor">'+
+                                        '<thead class="'+background_tables+'">'+
                                             '<tr>'+
-                                            '<th class="customercolor">#</th>'+
+                                            '<th class="'+background_tables+'">#</th>'+
                                             '<th class="customercolortheadth">Factura</th>'+
-                                            '<th class="customercolor">Fecha</th>'+
-                                            '<th class="customercolor">UUID</th>'+
-                                            '<th class="customercolor">Total $</th>'+
-                                            '<th class="customercolor">Abonos $</th>'+
-                                            '<th class="customercolor">Notas Crédito $</th>'+
+                                            '<th class="'+background_tables+'">Fecha</th>'+
+                                            '<th class="'+background_tables+'">UUID</th>'+
+                                            '<th class="'+background_tables+'">Total $</th>'+
+                                            '<th class="'+background_tables+'">Abonos $</th>'+
+                                            '<th class="'+background_tables+'">Notas Crédito $</th>'+
                                             '<th class="customercolortheadth">Descuento $</th>'+
-                                            '<th class="customercolor">Saldo $</th>'+
+                                            '<th class="'+background_tables+'">Saldo $</th>'+
                                             '</tr>'+
                                         '</thead>'+
                                         '<tbody>'+           

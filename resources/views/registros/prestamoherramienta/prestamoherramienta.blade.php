@@ -13,7 +13,7 @@
             <div class="row clearfix">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="card" id="listadoregistros">
-                        <div class="header bg-red">
+                        <div class="header {{$empresa->background_forms_and_modals}}">
                             <div class="row clearfix">
                                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                                     <h5>&nbsp;&nbsp;&nbsp;PRESTAMO DE HERRAMIENTA&nbsp;&nbsp;&nbsp;</h5>
@@ -59,8 +59,8 @@
                         </div>
                         <div class="body">
                             <div class="table-responsive">
-                                <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover">
-                                    <thead class="customercolor">
+                                <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover" >
+                                    <thead class="{{$empresa->background_tables}}">
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
@@ -83,7 +83,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div id="formulario">
-                <div class="modal-header bg-red">
+                <div class="modal-header {{$empresa->background_forms_and_modals}}">
                     <h4 class="modal-title" id="titulomodal"></h4>
                 </div>
                 <form id="formparsley" action="#">
@@ -109,7 +109,7 @@
 <div class="modal fade" data-backdrop="static" data-keyboard="false" id="autorizarasignacion" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   	<div class="modal-dialog" role="document">
     	<div class="modal-content">
-      		<div class="modal-header bg-red">
+      		<div class="modal-header {{$empresa->background_forms_and_modals}}">
         		<h5 class="modal-title" id="exampleModalLabel">Aviso</h5>
       		</div>
       		<div class="modal-body">
@@ -129,7 +129,7 @@
 <div class="modal fade" data-backdrop="static" data-keyboard="false" id="estatusregistro" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   	<div class="modal-dialog" role="document">
     	<div class="modal-content">
-      		<div class="modal-header bg-red">
+      		<div class="modal-header {{$empresa->background_forms_and_modals}}">
         		<h5 class="modal-title" id="exampleModalLabel">Aviso</h5>
       		</div>
       		<div class="modal-body">
@@ -153,7 +153,7 @@
 <div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalterminarprestamo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   	<div class="modal-dialog" role="document">
     	<div class="modal-content">
-      		<div class="modal-header bg-red">
+      		<div class="modal-header {{$empresa->background_forms_and_modals}}">
         		<h5 class="modal-title" >Aviso</h5>
       		</div>
       		<div class="modal-body">
@@ -187,6 +187,9 @@
         var campos_desactivados = '{{$configuracion_tabla->campos_desactivados}}';
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
+        var background_navbar = '{{$empresa->background_navbar}}';
+        var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
+        var background_tables = '{{$empresa->background_tables}}';
         var prestamo_herramienta_obtener = '{!!URL::to('prestamo_herramienta_obtener')!!}';
         var prestamo_herramienta_obtener_series_documento = '{!!URL::to('prestamo_herramienta_obtener_series_documento')!!}';
         var prestamo_herramienta_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('prestamo_herramienta_obtener_ultimo_folio_serie_seleccionada')!!}';

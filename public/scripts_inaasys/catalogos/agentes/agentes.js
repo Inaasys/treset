@@ -55,8 +55,7 @@ function listar(){
     "lengthMenu": [ 10, 50, 100, 250, 500 ],
     "pageLength": 250,
     "sScrollX": "110%",
-    "sScrollY": "350px",
-    "bScrollCollapse": true,  
+    "sScrollY": "350px", 
     processing: true,
     'language': {
       'loadingRecords': '&nbsp;',
@@ -84,7 +83,7 @@ function listar(){
 }
 function listaralmacenes(){
   ocultarformulario();
-  var tablaalmacenes =  '<div class="modal-header bg-red">'+
+  var tablaalmacenes =  '<div class="modal-header '+background_forms_and_modals+'">'+
                           '<h4 class="modal-title">Almacenes</h4>'+
                         '</div>'+
                         '<div class="modal-body">'+
@@ -92,7 +91,7 @@ function listaralmacenes(){
                               '<div class="col-md-12">'+
                                   '<div class="table-responsive">'+
                                       '<table id="tbllistadoalmacen" class="tbllistadoalmacen table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                          '<thead class="customercolor">'+
+                                          '<thead class="'+background_tables+'">'+
                                               '<tr>'+
                                                   '<th>Operaciones</th>'+
                                                   '<th>Número</th>'+

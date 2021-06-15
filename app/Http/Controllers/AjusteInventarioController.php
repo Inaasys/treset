@@ -51,7 +51,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
     public function ajustesinventario_obtener(Request $request){
         if($request->ajax()){
             $periodo = $request->periodo;
-            $data = VistaAjusteInventario::select($this->campos_consulta)->orderBy('Fecha', 'DESC')->where('periodo', $periodo)->get();
+            $data = VistaAjusteInventario::select($this->campos_consulta)->where('periodo', $periodo)->orderBy('Fecha', 'DESC')->orderBy('Serie', 'ASC')->orderBy('Folio', 'DESC')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
                         $operaciones = '<div class="dropdown">'.

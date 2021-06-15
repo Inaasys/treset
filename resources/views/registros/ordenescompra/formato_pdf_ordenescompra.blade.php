@@ -122,7 +122,7 @@
                     <div style="width:45%; float:left; text-align: center;">
                         <b style="font-size:11px;"><hr></hr></b>
                         <p style="font-size:11px;">Solicitó Mercancia</p>
-                        <p style="font-size:11px;">{{\Auth::user()->user}}</p>
+                        <p style="font-size:11px;">{{$d['ordencompra']->Usuario}}</p>
                     </div>
                     <div style="width:5%; float:left;">
                     </div>

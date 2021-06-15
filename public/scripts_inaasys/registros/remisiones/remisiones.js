@@ -112,7 +112,6 @@ function listar(){
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "350px",
-        "bScrollCollapse": true,
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -157,7 +156,7 @@ function obtenertiposunidad(){
 function obtenerseriesdocumento(){
     ocultarformulario();
     var seriedefault = 'A';
-    var tablaseriesdocumento=   '<div class="modal-header bg-red">'+
+    var tablaseriesdocumento=   '<div class="modal-header '+background_forms_and_modals+'">'+
                                     '<h4 class="modal-title">Series Documento &nbsp;&nbsp; <div class="btn bg-green btn-xs waves-effect" onclick="seleccionarseriedocumento(\''+seriedefault+'\')">Asignar Serie Default (A)</div></h4>'+
                                 '</div>'+
                                 '<div class="modal-body">'+
@@ -165,7 +164,7 @@ function obtenerseriesdocumento(){
                                     '<div class="col-md-12">'+
                                         '<div class="table-responsive">'+
                                         '<table id="tbllistadoseriedocumento" class="tbllistadoseriedocumento table table-bordered table-striped table-hover" style="width:100% !important;">'+
-                                            '<thead class="customercolor">'+
+                                            '<thead class="'+background_tables+'">'+
                                             '<tr>'+
                                                 '<th>Operaciones</th>'+
                                                 '<th>Serie</th>'+
@@ -227,7 +226,7 @@ function seleccionarseriedocumento(Serie){
 //obtener clientes
 function obtenerclientes(){
     ocultarformulario();
-    var tablaclientes = '<div class="modal-header bg-red">'+
+    var tablaclientes = '<div class="modal-header '+background_forms_and_modals+'">'+
                               '<h4 class="modal-title">Clientes</h4>'+
                           '</div>'+
                           '<div class="modal-body">'+
@@ -235,7 +234,7 @@ function obtenerclientes(){
                                   '<div class="col-md-12">'+
                                       '<div class="table-responsive">'+
                                           '<table id="tbllistadocliente" class="tbllistadocliente table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                              '<thead class="customercolor">'+
+                                              '<thead class="'+background_tables+'">'+
                                                   '<tr>'+
                                                       '<th>Operaciones</th>'+
                                                       '<th>Numero</th>'+
@@ -311,7 +310,7 @@ function seleccionarcliente(Numero, Nombre, Credito, Saldo, NumeroAgente, Agente
 //obtener agentes
 function obteneragentes(){
     ocultarformulario();
-    var tablaagentes = '<div class="modal-header bg-red">'+
+    var tablaagentes = '<div class="modal-header '+background_forms_and_modals+'">'+
                               '<h4 class="modal-title">Agentes</h4>'+
                           '</div>'+
                           '<div class="modal-body">'+
@@ -319,7 +318,7 @@ function obteneragentes(){
                                   '<div class="col-md-12">'+
                                       '<div class="table-responsive">'+
                                           '<table id="tbllistadoagente" class="tbllistadoagente table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                              '<thead class="customercolor">'+
+                                              '<thead class="'+background_tables+'">'+
                                                   '<tr>'+
                                                       '<th>Operaciones</th>'+
                                                       '<th>Numero</th>'+
@@ -386,7 +385,7 @@ function seleccionaragente(Numero, Nombre){
 //obtener almacenes
 function obteneralmacenes(){
     ocultarformulario();
-    var tablaalmacenes ='<div class="modal-header bg-red">'+
+    var tablaalmacenes ='<div class="modal-header '+background_forms_and_modals+'">'+
                             '<h4 class="modal-title">Almacenes</h4>'+
                         '</div>'+
                         '<div class="modal-body">'+
@@ -394,7 +393,7 @@ function obteneralmacenes(){
                                 '<div class="col-md-12">'+
                                     '<div class="table-responsive">'+
                                         '<table id="tbllistadoalmacen" class="tbllistadoalmacen table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                            '<thead class="customercolor">'+
+                                            '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
                                                     '<th>Operaciones</th>'+
                                                     '<th>Numero</th>'+
@@ -564,7 +563,7 @@ function regresarnumeroalmacen(){
 //listar productos para tab consumos
 function listarproductos(){
     ocultarformulario();
-    var tablaproductos = '<div class="modal-header bg-red">'+
+    var tablaproductos = '<div class="modal-header '+background_forms_and_modals+'">'+
                             '<h4 class="modal-title">Productos</h4>'+
                           '</div>'+
                           '<div class="modal-body">'+
@@ -572,7 +571,7 @@ function listarproductos(){
                               '<div class="col-md-12">'+
                                 '<div class="table-responsive">'+
                                   '<table id="tbllistadoproducto" class="tbllistadoproducto table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                    '<thead class="customercolor">'+
+                                    '<thead class="'+background_tables+'">'+
                                       '<tr>'+
                                         '<th>Operaciones</th>'+
                                         '<th>Código</th>'+
@@ -866,6 +865,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
         mostrarformulario();      
         comprobarfilas();
         calculartotal();
+        $("#codigoabuscar").val("");
         $('.page-loader-wrapper').css('display', 'none');
     }else{
         msj_errorproductoyaagregado();
@@ -1020,7 +1020,7 @@ function alta(){
                                 '<input type="text" class="form-control" name="plazo" id="plazo" value="5" onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-3" id="divbuscarcodigoproducto" hidden>'+
-                                '<label>Buscar producto por código</label>'+
+                                '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
                                 '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
                             '</div>'+
                         '</div>'+
@@ -1072,34 +1072,34 @@ function alta(){
                         '<div class="row">'+
                             '<div class="col-md-12 table-responsive cabecerafija" style="height: 200px;overflow-y: scroll;padding: 0px 0px;">'+
                                 '<table id="tablaproductosremisiones" class="table table-bordered tablaproductosremisiones">'+
-                                    '<thead class="customercolor">'+
+                                    '<thead class="'+background_tables+'">'+
                                         '<tr>'+
-                                          '<th  class="customercolor">#</th>'+
-                                          '<th class="customercolor">Código</th>'+
-                                          '<th class="customercolor"><div style="width:200px !important;">Descripción</div></th>'+
-                                          '<th class="customercolor">Unidad</th>'+
+                                          '<th class="'+background_tables+'">#</th>'+
+                                          '<th class="'+background_tables+'">Código</th>'+
+                                          '<th class="'+background_tables+'"><div style="width:200px !important;">Descripción</div></th>'+
+                                          '<th class="'+background_tables+'">Unidad</th>'+
                                           '<th class="customercolortheadth">Cantidad</th>'+
                                           '<th class="customercolortheadth">Precio $</th>'+
-                                          '<th class="customercolor">Importe $</th>'+
+                                          '<th class="'+background_tables+'">Importe $</th>'+
                                           '<th class="customercolortheadth">Descuento %</th>'+
                                           '<th class="customercolortheadth">Descuento $</th>'+
-                                          '<th class="customercolor">SubTotal $</th>'+
+                                          '<th class="'+background_tables+'">SubTotal $</th>'+
                                           '<th class="customercolortheadth">Iva %</th>'+
-                                          '<th class="customercolor">Iva $</th>'+
-                                          '<th class="customercolor">Total $</th>'+
-                                          '<th class="customercolor">Costo $</th>'+
-                                          '<th class="customercolor">Costo Total</th>'+
+                                          '<th class="'+background_tables+'">Iva $</th>'+
+                                          '<th class="'+background_tables+'">Total $</th>'+
+                                          '<th class="'+background_tables+'">Costo $</th>'+
+                                          '<th class="'+background_tables+'">Costo Total</th>'+
                                           '<th class="customercolortheadth">Comisión %</th>'+
-                                          '<th class="customercolor">Comisión $</th>'+
+                                          '<th class="'+background_tables+'">Comisión $</th>'+
                                           '<th class="bg-amber">Utilidad $</th>'+
-                                          '<th class="customercolor">Moneda</th>'+
-                                          '<th class="customercolor">Costo de Lista</th>'+
-                                          '<th class="customercolor">Insumo</th>'+
-                                          '<th class="customercolor">ClaveProducto</th>'+
-                                          '<th class="customercolor">ClaveUnidad</th>'+
-                                          '<th class="customercolor">Meses</th>'+
-                                          '<th class="customercolor">TasaInteres</th>'+
-                                          '<th class="customercolor">MontoInteres</th>'+
+                                          '<th class="'+background_tables+'">Moneda</th>'+
+                                          '<th class="'+background_tables+'">Costo de Lista</th>'+
+                                          '<th class="'+background_tables+'">Insumo</th>'+
+                                          '<th class="'+background_tables+'">ClaveProducto</th>'+
+                                          '<th class="'+background_tables+'">ClaveUnidad</th>'+
+                                          '<th class="'+background_tables+'">Meses</th>'+
+                                          '<th class="'+background_tables+'">TasaInteres</th>'+
+                                          '<th class="'+background_tables+'">MontoInteres</th>'+
                                         '</tr>'+
                                     '</thead>'+
                                     '<tbody>'+           
@@ -1444,7 +1444,7 @@ function obtenerdatos(remisionmodificar){
                                 '<input type="text" class="form-control" name="plazo" id="plazo" onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-3" id="divbuscarcodigoproducto" hidden>'+
-                                '<label>Buscar producto por código</label>'+
+                                '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
                                 '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
                             '</div>'+
                         '</div>'+
@@ -1496,34 +1496,34 @@ function obtenerdatos(remisionmodificar){
                         '<div class="row">'+
                             '<div class="col-md-12 table-responsive cabecerafija" style="height: 200px;overflow-y: scroll;padding: 0px 0px;">'+
                                 '<table id="tablaproductosremisiones" class="table table-bordered tablaproductosremisiones">'+
-                                    '<thead class="customercolor">'+
+                                    '<thead class="'+background_tables+'">'+
                                         '<tr>'+
-                                          '<th class="customercolor">#</th>'+
-                                          '<th class="customercolor">Código</th>'+
-                                          '<th class="customercolor"><div style="width:200px !important;">Descripción</div></th>'+
-                                          '<th class="customercolor">Unidad</th>'+
+                                          '<th class="'+background_tables+'">#</th>'+
+                                          '<th class="'+background_tables+'">Código</th>'+
+                                          '<th class="'+background_tables+'"><div style="width:200px !important;">Descripción</div></th>'+
+                                          '<th class="'+background_tables+'">Unidad</th>'+
                                           '<th class="customercolortheadth">Cantidad</th>'+
                                           '<th class="customercolortheadth">Precio $</th>'+
-                                          '<th class="customercolor">Importe $</th>'+
+                                          '<th class="'+background_tables+'">Importe $</th>'+
                                           '<th class="customercolortheadth">Descuento %</th>'+
                                           '<th class="customercolortheadth">Descuento $</th>'+
-                                          '<th class="customercolor">SubTotal $</th>'+
+                                          '<th class="'+background_tables+'">SubTotal $</th>'+
                                           '<th class="customercolortheadth">Iva %</th>'+
-                                          '<th class="customercolor">Iva $</th>'+
-                                          '<th class="customercolor">Total $</th>'+
-                                          '<th class="customercolor">Costo $</th>'+
-                                          '<th class="customercolor">Costo Total</th>'+
+                                          '<th class="'+background_tables+'">Iva $</th>'+
+                                          '<th class="'+background_tables+'">Total $</th>'+
+                                          '<th class="'+background_tables+'">Costo $</th>'+
+                                          '<th class="'+background_tables+'">Costo Total</th>'+
                                           '<th class="customercolortheadth">Comisión %</th>'+
-                                          '<th class="customercolor">Comisión $</th>'+
+                                          '<th class="'+background_tables+'">Comisión $</th>'+
                                           '<th class="bg-amber">Utilidad $</th>'+
-                                          '<th class="customercolor">Moneda</th>'+
-                                          '<th class="customercolor">Costo de Lista</th>'+
-                                          '<th class="customercolor">Insumo</th>'+
-                                          '<th class="customercolor">ClaveProducto</th>'+
-                                          '<th class="customercolor">ClaveUnidad</th>'+
-                                          '<th class="customercolor">Meses</th>'+
-                                          '<th class="customercolor">TasaInteres</th>'+
-                                          '<th class="customercolor">MontoInteres</th>'+
+                                          '<th class="'+background_tables+'">Moneda</th>'+
+                                          '<th class="'+background_tables+'">Costo de Lista</th>'+
+                                          '<th class="'+background_tables+'">Insumo</th>'+
+                                          '<th class="'+background_tables+'">ClaveProducto</th>'+
+                                          '<th class="'+background_tables+'">ClaveUnidad</th>'+
+                                          '<th class="'+background_tables+'">Meses</th>'+
+                                          '<th class="'+background_tables+'">TasaInteres</th>'+
+                                          '<th class="'+background_tables+'">MontoInteres</th>'+
                                         '</tr>'+
                                     '</thead>'+
                                     '<tbody>'+           

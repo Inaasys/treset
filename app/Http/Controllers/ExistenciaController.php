@@ -44,7 +44,7 @@ class ExistenciaController extends ConfiguracionSistemaController{
     //obtener todos los registros
     public function existencias_obtener(Request $request){
         if($request->ajax()){
-            $data = VistaExistencia::select($this->campos_consulta)->get();
+            $data = VistaExistencia::select($this->campos_consulta)->where('Almacen', 1)->get();
             return DataTables::of($data)
                     ->addColumn('Existencias', function($data){ return $data->Existencias; })
                     ->addColumn('Costo', function($data){ return $data->Costo; })
