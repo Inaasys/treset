@@ -11,10 +11,10 @@
             <div class="row clearfix">
                 <div class="col-xs-12 col-sm-3">
                     <div class="card profile-card">
-                        <div class="profile-header {{$empresa->background_forms_and_modals}}" id="infoprofile">&nbsp;</div>
+                        <div class="profile-header {{$empresa->background_forms_and_modals}}" id="infoprofile"></div>
                         <div class="profile-body">
                             <div class="image-area text-center">
-                                <img id="perfillogotipoempresa" src="logotipo_empresa/{{$empresa->Logo}}" alt="Perfil Empresa" class="text-center"/>
+                                <img id="perfillogotipoempresa" src="logotipo_empresa/{{$empresa->Logo}}" alt="Perfil Empresa" height="100%" class="text-center"/>
                             </div>
                             <div class="content-area text-center">
                                 <h4>{{$empresa->Empresa}}</h4>
@@ -26,7 +26,7 @@
                     </div>
                     <div class="card card-about-me">
                         <div class="header text-center {{$empresa->background_forms_and_modals}}" id="infoprofile1">
-                            <h2>INFORMACIÓN</h2>
+                            <h5>INFORMACIÓN</h5>
                         </div>
                         <div class="body">
                             <ul>
@@ -58,7 +58,7 @@
                     </div>
                     <div class="card card-about-me">
                         <div class="header text-center {{$empresa->background_forms_and_modals}}" id="infoprofile2">
-                            <h2>USUARIO LOGUEADO</h2>
+                            <h5>USUARIO LOGUEADO</h5>
                         </div>
                         <div class="body">
                             <ul>
@@ -655,6 +655,86 @@
                                                         <option value="bg-brown" class="bg-brown">bg-brown</option>
                                                         <option value="bg-grey" class="bg-grey">bg-grey</option>
                                                         <option value="bg-blue-grey" class="bg-blue-grey">bg-blue-grey</option>
+                                                        <option value="bg-IndianRed" class="bg-IndianRed">bg-IndianRed</option>
+                                                        <option value="bg-LightCoral" class="bg-LightCoral">bg-LightCoral</option>
+                                                        <option value="bg-DarkSalmon" class="bg-DarkSalmon">bg-DarkSalmon</option>
+                                                        <option value="bg-Crimson" class="bg-Crimson">bg-Crimson</option>
+                                                        <option value="bg-FireBrick" class="bg-FireBrick">bg-FireBrick</option>
+                                                        <option value="bg-DarkRed" class="bg-DarkRed">bg-DarkRed</option>
+                                                        <option value="bg-LightPink" class="bg-LightPink">bg-LightPink</option>
+                                                        <option value="bg-HotPink" class="bg-HotPink">bg-HotPink</option>
+                                                        <option value="bg-DeepPink" class="bg-DeepPink">bg-DeepPink</option>
+                                                        <option value="bg-MediumVioletRed" class="bg-MediumVioletRed">bg-MediumVioletRed</option>
+                                                        <option value="bg-PaleVioletRed" class="bg-PaleVioletRed">bg-PaleVioletRed</option>
+                                                        <option value="bg-Coral" class="bg-Coral">bg-Coral</option>
+                                                        <option value="bg-Tomato" class="bg-Tomato">bg-Tomato</option>
+                                                        <option value="bg-OrangeRed" class="bg-OrangeRed">bg-OrangeRed</option>
+                                                        <option value="bg-DarkOrange" class="bg-DarkOrange">bg-DarkOrange</option>
+                                                        <option value="bg-Gold" class="bg-Gold">bg-Gold</option>
+                                                        <option value="bg-Moccasin" class="bg-Moccasin">bg-Moccasin</option>
+                                                        <option value="bg-Khaki" class="bg-Khaki">bg-Khaki</option>
+                                                        <option value="bg-DarkKhaki" class="bg-DarkKhaki">bg-DarkKhaki</option>
+                                                        <option value="bg-Lavender" class="bg-Lavender">bg-Lavender</option>
+                                                        <option value="bg-Thistle" class="bg-Thistle">bg-Thistle</option>
+                                                        <option value="bg-Violet" class="bg-Violet">bg-Violet</option>
+                                                        <option value="bg-Orchid" class="bg-Orchid">bg-Orchid</option>
+                                                        <option value="bg-Magenta" class="bg-Magenta">bg-Magenta</option>
+                                                        <option value="bg-MediumOrchid" class="bg-MediumOrchid">bg-MediumOrchid</option>
+                                                        <option value="bg-MediumPurple" class="bg-MediumPurple">bg-MediumPurple</option>
+                                                        <option value="bg-RebeccaPurple" class="bg-RebeccaPurple">bg-RebeccaPurple</option>
+                                                        <option value="bg-DarkViolet" class="bg-DarkViolet">bg-DarkViolet</option>
+                                                        <option value="bg-DarkMagenta" class="bg-DarkMagenta">bg-DarkMagenta</option>
+                                                        <option value="bg-Purple" class="bg-Purple">bg-Purple</option>
+                                                        <option value="bg-SlateBlue" class="bg-SlateBlue">bg-SlateBlue</option>
+                                                        <option value="bg-DarkSlateBlue" class="bg-DarkSlateBlue">bg-DarkSlateBlue</option>
+                                                        <option value="bg-GreenYellow" class="bg-GreenYellow">bg-GreenYellow</option>
+                                                        <option value="bg-LawnGreen" class="bg-LawnGreen">bg-LawnGreen</option>
+                                                        <option value="bg-Lime" class="bg-Lime">bg-Lime</option>
+                                                        <option value="bg-LimeGreen" class="bg-LimeGreen">bg-LimeGreen</option>
+                                                        <option value="bg-LightGreen" class="bg-LightGreen">bg-LightGreen</option>
+                                                        <option value="bg-MediumSpringGreen" class="bg-MediumSpringGreen">bg-MediumSpringGreen</option>
+                                                        <option value="bg-MediumSeaGreen" class="bg-MediumSeaGreen">bg-MediumSeaGreen</option>
+                                                        <option value="bg-SeaGreen" class="bg-SeaGreen">bg-SeaGreen</option>
+                                                        <option value="bg-ForestGreen" class="bg-ForestGreen">bg-ForestGreen</option>
+                                                        <option value="bg-DarkGreen" class="bg-DarkGreen">bg-DarkGreen</option>
+                                                        <option value="bg-Olive" class="bg-Olive">bg-Olive</option>
+                                                        <option value="bg-DarkOliveGreen" class="bg-DarkOliveGreen">bg-DarkOliveGreen</option>
+                                                        <option value="bg-MediumAquamarine" class="bg-MediumAquamarine">bg-MediumAquamarine</option>
+                                                        <option value="bg-LightSeaGreen" class="bg-LightSeaGreen">bg-LightSeaGreen</option>
+                                                        <option value="bg-DarkCyan" class="bg-DarkCyan">bg-DarkCyan</option>
+                                                        <option value="bg-PaleTurquoise" class="bg-PaleTurquoise">bg-PaleTurquoise</option>
+                                                        <option value="bg-Aquamarine" class="bg-Aquamarine">bg-Aquamarine</option>
+                                                        <option value="bg-Turquoise" class="bg-Turquoise">bg-Turquoise</option>
+                                                        <option value="bg-DarkTurquoise" class="bg-DarkTurquoise">bg-DarkTurquoise</option>
+                                                        <option value="bg-CadetBlue" class="bg-CadetBlue">bg-CadetBlue</option>
+                                                        <option value="bg-SteelBlue" class="bg-SteelBlue">bg-SteelBlue</option>
+                                                        <option value="bg-LightSteelBlue" class="bg-LightSteelBlue">bg-LightSteelBlue</option>
+                                                        <option value="bg-PowderBlue" class="bg-PowderBlue">bg-PowderBlue</option>
+                                                        <option value="bg-SkyBlue" class="bg-SkyBlue">bg-SkyBlue</option>
+                                                        <option value="bg-DeepSkyBlue" class="bg-DeepSkyBlue">bg-DeepSkyBlue</option>
+                                                        <option value="bg-DodgerBlue" class="bg-DodgerBlue">bg-DodgerBlue</option>
+                                                        <option value="bg-CornflowerBlue" class="bg-CornflowerBlue">bg-CornflowerBlue</option>
+                                                        <option value="bg-RoyalBlue" class="bg-RoyalBlue">bg-RoyalBlue</option>
+                                                        <option value="bg-DarkBlue" class="bg-DarkBlue">bg-DarkBlue</option>
+                                                        <option value="bg-MidnightBlue" class="bg-MidnightBlue">bg-MidnightBlue</option>
+                                                        <option value="bg-NavajoWhite" class="bg-NavajoWhite">bg-NavajoWhite</option>
+                                                        <option value="bg-BurlyWood" class="bg-BurlyWood">bg-BurlyWood</option>
+                                                        <option value="bg-Tan" class="bg-Tan">bg-Tan</option>
+                                                        <option value="bg-RosyBrown" class="bg-RosyBrown">bg-RosyBrown</option>
+                                                        <option value="bg-SandyBrown" class="bg-SandyBrown">bg-SandyBrown</option>
+                                                        <option value="bg-Goldenrod" class="bg-Goldenrod">bg-Goldenrod</option>
+                                                        <option value="bg-DarkGoldenrod" class="bg-DarkGoldenrod">bg-DarkGoldenrod</option>
+                                                        <option value="bg-Chocolate" class="bg-Chocolate">bg-Chocolate</option>
+                                                        <option value="bg-SaddleBrown" class="bg-SaddleBrown">bg-SaddleBrown</option>
+                                                        <option value="bg-Brown" class="bg-Brown">bg-Brown</option>
+                                                        <option value="bg-Maroon" class="bg-Maroon">bg-Maroon</option>
+                                                        <option value="bg-Silver" class="bg-Silver">bg-Silver</option>
+                                                        <option value="bg-DarkGray" class="bg-DarkGray">bg-DarkGray</option>
+                                                        <option value="bg-Gray" class="bg-Gray">bg-Gray</option>
+                                                        <option value="bg-DimGray" class="bg-DimGray">bg-DimGray</option>
+                                                        <option value="bg-LightSlateGray" class="bg-LightSlateGray">bg-LightSlateGray</option>
+                                                        <option value="bg-SlateGray" class="bg-SlateGray">bg-SlateGray</option>
+                                                        <option value="bg-DarkSlateGray" class="bg-DarkSlateGray">bg-DarkSlateGray</option>
                                                         <option value="bg-black" class="bg-black">bg-black</option>
                                                     </select>
                                                 </div>
@@ -663,7 +743,7 @@
                                                 <div class="col-md-12">
                                                     <label>Selecciona el color para encabezados formularios y ventanas emergentes</label><br>
                                                     <select name="selectcolorformsandmodals" id="selectcolorformsandmodals" class="form-control" onchange="setcolorformsandmodals()">
-                                                        <option value="bg-red" class="bg-red">bg-red</option>
+                                                    <option value="bg-red" class="bg-red">bg-red</option>
                                                         <option value="bg-pink" class="bg-pink">bg-pink</option>
                                                         <option value="bg-purple" class="bg-purple">bg-purple</option>
                                                         <option value="bg-deep-purple" class="bg-deep-purple">bg-deep-purple</option>
@@ -682,6 +762,86 @@
                                                         <option value="bg-brown" class="bg-brown">bg-brown</option>
                                                         <option value="bg-grey" class="bg-grey">bg-grey</option>
                                                         <option value="bg-blue-grey" class="bg-blue-grey">bg-blue-grey</option>
+                                                        <option value="bg-IndianRed" class="bg-IndianRed">bg-IndianRed</option>
+                                                        <option value="bg-LightCoral" class="bg-LightCoral">bg-LightCoral</option>
+                                                        <option value="bg-DarkSalmon" class="bg-DarkSalmon">bg-DarkSalmon</option>
+                                                        <option value="bg-Crimson" class="bg-Crimson">bg-Crimson</option>
+                                                        <option value="bg-FireBrick" class="bg-FireBrick">bg-FireBrick</option>
+                                                        <option value="bg-DarkRed" class="bg-DarkRed">bg-DarkRed</option>
+                                                        <option value="bg-LightPink" class="bg-LightPink">bg-LightPink</option>
+                                                        <option value="bg-HotPink" class="bg-HotPink">bg-HotPink</option>
+                                                        <option value="bg-DeepPink" class="bg-DeepPink">bg-DeepPink</option>
+                                                        <option value="bg-MediumVioletRed" class="bg-MediumVioletRed">bg-MediumVioletRed</option>
+                                                        <option value="bg-PaleVioletRed" class="bg-PaleVioletRed">bg-PaleVioletRed</option>
+                                                        <option value="bg-Coral" class="bg-Coral">bg-Coral</option>
+                                                        <option value="bg-Tomato" class="bg-Tomato">bg-Tomato</option>
+                                                        <option value="bg-OrangeRed" class="bg-OrangeRed">bg-OrangeRed</option>
+                                                        <option value="bg-DarkOrange" class="bg-DarkOrange">bg-DarkOrange</option>
+                                                        <option value="bg-Gold" class="bg-Gold">bg-Gold</option>
+                                                        <option value="bg-Moccasin" class="bg-Moccasin">bg-Moccasin</option>
+                                                        <option value="bg-Khaki" class="bg-Khaki">bg-Khaki</option>
+                                                        <option value="bg-DarkKhaki" class="bg-DarkKhaki">bg-DarkKhaki</option>
+                                                        <option value="bg-Lavender" class="bg-Lavender">bg-Lavender</option>
+                                                        <option value="bg-Thistle" class="bg-Thistle">bg-Thistle</option>
+                                                        <option value="bg-Violet" class="bg-Violet">bg-Violet</option>
+                                                        <option value="bg-Orchid" class="bg-Orchid">bg-Orchid</option>
+                                                        <option value="bg-Magenta" class="bg-Magenta">bg-Magenta</option>
+                                                        <option value="bg-MediumOrchid" class="bg-MediumOrchid">bg-MediumOrchid</option>
+                                                        <option value="bg-MediumPurple" class="bg-MediumPurple">bg-MediumPurple</option>
+                                                        <option value="bg-RebeccaPurple" class="bg-RebeccaPurple">bg-RebeccaPurple</option>
+                                                        <option value="bg-DarkViolet" class="bg-DarkViolet">bg-DarkViolet</option>
+                                                        <option value="bg-DarkMagenta" class="bg-DarkMagenta">bg-DarkMagenta</option>
+                                                        <option value="bg-Purple" class="bg-Purple">bg-Purple</option>
+                                                        <option value="bg-SlateBlue" class="bg-SlateBlue">bg-SlateBlue</option>
+                                                        <option value="bg-DarkSlateBlue" class="bg-DarkSlateBlue">bg-DarkSlateBlue</option>
+                                                        <option value="bg-GreenYellow" class="bg-GreenYellow">bg-GreenYellow</option>
+                                                        <option value="bg-LawnGreen" class="bg-LawnGreen">bg-LawnGreen</option>
+                                                        <option value="bg-Lime" class="bg-Lime">bg-Lime</option>
+                                                        <option value="bg-LimeGreen" class="bg-LimeGreen">bg-LimeGreen</option>
+                                                        <option value="bg-LightGreen" class="bg-LightGreen">bg-LightGreen</option>
+                                                        <option value="bg-MediumSpringGreen" class="bg-MediumSpringGreen">bg-MediumSpringGreen</option>
+                                                        <option value="bg-MediumSeaGreen" class="bg-MediumSeaGreen">bg-MediumSeaGreen</option>
+                                                        <option value="bg-SeaGreen" class="bg-SeaGreen">bg-SeaGreen</option>
+                                                        <option value="bg-ForestGreen" class="bg-ForestGreen">bg-ForestGreen</option>
+                                                        <option value="bg-DarkGreen" class="bg-DarkGreen">bg-DarkGreen</option>
+                                                        <option value="bg-Olive" class="bg-Olive">bg-Olive</option>
+                                                        <option value="bg-DarkOliveGreen" class="bg-DarkOliveGreen">bg-DarkOliveGreen</option>
+                                                        <option value="bg-MediumAquamarine" class="bg-MediumAquamarine">bg-MediumAquamarine</option>
+                                                        <option value="bg-LightSeaGreen" class="bg-LightSeaGreen">bg-LightSeaGreen</option>
+                                                        <option value="bg-DarkCyan" class="bg-DarkCyan">bg-DarkCyan</option>
+                                                        <option value="bg-PaleTurquoise" class="bg-PaleTurquoise">bg-PaleTurquoise</option>
+                                                        <option value="bg-Aquamarine" class="bg-Aquamarine">bg-Aquamarine</option>
+                                                        <option value="bg-Turquoise" class="bg-Turquoise">bg-Turquoise</option>
+                                                        <option value="bg-DarkTurquoise" class="bg-DarkTurquoise">bg-DarkTurquoise</option>
+                                                        <option value="bg-CadetBlue" class="bg-CadetBlue">bg-CadetBlue</option>
+                                                        <option value="bg-SteelBlue" class="bg-SteelBlue">bg-SteelBlue</option>
+                                                        <option value="bg-LightSteelBlue" class="bg-LightSteelBlue">bg-LightSteelBlue</option>
+                                                        <option value="bg-PowderBlue" class="bg-PowderBlue">bg-PowderBlue</option>
+                                                        <option value="bg-SkyBlue" class="bg-SkyBlue">bg-SkyBlue</option>
+                                                        <option value="bg-DeepSkyBlue" class="bg-DeepSkyBlue">bg-DeepSkyBlue</option>
+                                                        <option value="bg-DodgerBlue" class="bg-DodgerBlue">bg-DodgerBlue</option>
+                                                        <option value="bg-CornflowerBlue" class="bg-CornflowerBlue">bg-CornflowerBlue</option>
+                                                        <option value="bg-RoyalBlue" class="bg-RoyalBlue">bg-RoyalBlue</option>
+                                                        <option value="bg-DarkBlue" class="bg-DarkBlue">bg-DarkBlue</option>
+                                                        <option value="bg-MidnightBlue" class="bg-MidnightBlue">bg-MidnightBlue</option>
+                                                        <option value="bg-NavajoWhite" class="bg-NavajoWhite">bg-NavajoWhite</option>
+                                                        <option value="bg-BurlyWood" class="bg-BurlyWood">bg-BurlyWood</option>
+                                                        <option value="bg-Tan" class="bg-Tan">bg-Tan</option>
+                                                        <option value="bg-RosyBrown" class="bg-RosyBrown">bg-RosyBrown</option>
+                                                        <option value="bg-SandyBrown" class="bg-SandyBrown">bg-SandyBrown</option>
+                                                        <option value="bg-Goldenrod" class="bg-Goldenrod">bg-Goldenrod</option>
+                                                        <option value="bg-DarkGoldenrod" class="bg-DarkGoldenrod">bg-DarkGoldenrod</option>
+                                                        <option value="bg-Chocolate" class="bg-Chocolate">bg-Chocolate</option>
+                                                        <option value="bg-SaddleBrown" class="bg-SaddleBrown">bg-SaddleBrown</option>
+                                                        <option value="bg-Brown" class="bg-Brown">bg-Brown</option>
+                                                        <option value="bg-Maroon" class="bg-Maroon">bg-Maroon</option>
+                                                        <option value="bg-Silver" class="bg-Silver">bg-Silver</option>
+                                                        <option value="bg-DarkGray" class="bg-DarkGray">bg-DarkGray</option>
+                                                        <option value="bg-Gray" class="bg-Gray">bg-Gray</option>
+                                                        <option value="bg-DimGray" class="bg-DimGray">bg-DimGray</option>
+                                                        <option value="bg-LightSlateGray" class="bg-LightSlateGray">bg-LightSlateGray</option>
+                                                        <option value="bg-SlateGray" class="bg-SlateGray">bg-SlateGray</option>
+                                                        <option value="bg-DarkSlateGray" class="bg-DarkSlateGray">bg-DarkSlateGray</option>
                                                         <option value="bg-black" class="bg-black">bg-black</option>
                                                     </select>
                                                 </div>
@@ -690,7 +850,7 @@
                                                 <div class="col-md-12">
                                                     <label>Selecciona el color para encabezados tablas</label><br>
                                                     <select name="selectcolortables" id="selectcolortables" class="form-control">
-                                                        <option value="bg-red" class="bg-red">bg-red</option>
+                                                    <option value="bg-red" class="bg-red">bg-red</option>
                                                         <option value="bg-pink" class="bg-pink">bg-pink</option>
                                                         <option value="bg-purple" class="bg-purple">bg-purple</option>
                                                         <option value="bg-deep-purple" class="bg-deep-purple">bg-deep-purple</option>
@@ -709,6 +869,86 @@
                                                         <option value="bg-brown" class="bg-brown">bg-brown</option>
                                                         <option value="bg-grey" class="bg-grey">bg-grey</option>
                                                         <option value="bg-blue-grey" class="bg-blue-grey">bg-blue-grey</option>
+                                                        <option value="bg-IndianRed" class="bg-IndianRed">bg-IndianRed</option>
+                                                        <option value="bg-LightCoral" class="bg-LightCoral">bg-LightCoral</option>
+                                                        <option value="bg-DarkSalmon" class="bg-DarkSalmon">bg-DarkSalmon</option>
+                                                        <option value="bg-Crimson" class="bg-Crimson">bg-Crimson</option>
+                                                        <option value="bg-FireBrick" class="bg-FireBrick">bg-FireBrick</option>
+                                                        <option value="bg-DarkRed" class="bg-DarkRed">bg-DarkRed</option>
+                                                        <option value="bg-LightPink" class="bg-LightPink">bg-LightPink</option>
+                                                        <option value="bg-HotPink" class="bg-HotPink">bg-HotPink</option>
+                                                        <option value="bg-DeepPink" class="bg-DeepPink">bg-DeepPink</option>
+                                                        <option value="bg-MediumVioletRed" class="bg-MediumVioletRed">bg-MediumVioletRed</option>
+                                                        <option value="bg-PaleVioletRed" class="bg-PaleVioletRed">bg-PaleVioletRed</option>
+                                                        <option value="bg-Coral" class="bg-Coral">bg-Coral</option>
+                                                        <option value="bg-Tomato" class="bg-Tomato">bg-Tomato</option>
+                                                        <option value="bg-OrangeRed" class="bg-OrangeRed">bg-OrangeRed</option>
+                                                        <option value="bg-DarkOrange" class="bg-DarkOrange">bg-DarkOrange</option>
+                                                        <option value="bg-Gold" class="bg-Gold">bg-Gold</option>
+                                                        <option value="bg-Moccasin" class="bg-Moccasin">bg-Moccasin</option>
+                                                        <option value="bg-Khaki" class="bg-Khaki">bg-Khaki</option>
+                                                        <option value="bg-DarkKhaki" class="bg-DarkKhaki">bg-DarkKhaki</option>
+                                                        <option value="bg-Lavender" class="bg-Lavender">bg-Lavender</option>
+                                                        <option value="bg-Thistle" class="bg-Thistle">bg-Thistle</option>
+                                                        <option value="bg-Violet" class="bg-Violet">bg-Violet</option>
+                                                        <option value="bg-Orchid" class="bg-Orchid">bg-Orchid</option>
+                                                        <option value="bg-Magenta" class="bg-Magenta">bg-Magenta</option>
+                                                        <option value="bg-MediumOrchid" class="bg-MediumOrchid">bg-MediumOrchid</option>
+                                                        <option value="bg-MediumPurple" class="bg-MediumPurple">bg-MediumPurple</option>
+                                                        <option value="bg-RebeccaPurple" class="bg-RebeccaPurple">bg-RebeccaPurple</option>
+                                                        <option value="bg-DarkViolet" class="bg-DarkViolet">bg-DarkViolet</option>
+                                                        <option value="bg-DarkMagenta" class="bg-DarkMagenta">bg-DarkMagenta</option>
+                                                        <option value="bg-Purple" class="bg-Purple">bg-Purple</option>
+                                                        <option value="bg-SlateBlue" class="bg-SlateBlue">bg-SlateBlue</option>
+                                                        <option value="bg-DarkSlateBlue" class="bg-DarkSlateBlue">bg-DarkSlateBlue</option>
+                                                        <option value="bg-GreenYellow" class="bg-GreenYellow">bg-GreenYellow</option>
+                                                        <option value="bg-LawnGreen" class="bg-LawnGreen">bg-LawnGreen</option>
+                                                        <option value="bg-Lime" class="bg-Lime">bg-Lime</option>
+                                                        <option value="bg-LimeGreen" class="bg-LimeGreen">bg-LimeGreen</option>
+                                                        <option value="bg-LightGreen" class="bg-LightGreen">bg-LightGreen</option>
+                                                        <option value="bg-MediumSpringGreen" class="bg-MediumSpringGreen">bg-MediumSpringGreen</option>
+                                                        <option value="bg-MediumSeaGreen" class="bg-MediumSeaGreen">bg-MediumSeaGreen</option>
+                                                        <option value="bg-SeaGreen" class="bg-SeaGreen">bg-SeaGreen</option>
+                                                        <option value="bg-ForestGreen" class="bg-ForestGreen">bg-ForestGreen</option>
+                                                        <option value="bg-DarkGreen" class="bg-DarkGreen">bg-DarkGreen</option>
+                                                        <option value="bg-Olive" class="bg-Olive">bg-Olive</option>
+                                                        <option value="bg-DarkOliveGreen" class="bg-DarkOliveGreen">bg-DarkOliveGreen</option>
+                                                        <option value="bg-MediumAquamarine" class="bg-MediumAquamarine">bg-MediumAquamarine</option>
+                                                        <option value="bg-LightSeaGreen" class="bg-LightSeaGreen">bg-LightSeaGreen</option>
+                                                        <option value="bg-DarkCyan" class="bg-DarkCyan">bg-DarkCyan</option>
+                                                        <option value="bg-PaleTurquoise" class="bg-PaleTurquoise">bg-PaleTurquoise</option>
+                                                        <option value="bg-Aquamarine" class="bg-Aquamarine">bg-Aquamarine</option>
+                                                        <option value="bg-Turquoise" class="bg-Turquoise">bg-Turquoise</option>
+                                                        <option value="bg-DarkTurquoise" class="bg-DarkTurquoise">bg-DarkTurquoise</option>
+                                                        <option value="bg-CadetBlue" class="bg-CadetBlue">bg-CadetBlue</option>
+                                                        <option value="bg-SteelBlue" class="bg-SteelBlue">bg-SteelBlue</option>
+                                                        <option value="bg-LightSteelBlue" class="bg-LightSteelBlue">bg-LightSteelBlue</option>
+                                                        <option value="bg-PowderBlue" class="bg-PowderBlue">bg-PowderBlue</option>
+                                                        <option value="bg-SkyBlue" class="bg-SkyBlue">bg-SkyBlue</option>
+                                                        <option value="bg-DeepSkyBlue" class="bg-DeepSkyBlue">bg-DeepSkyBlue</option>
+                                                        <option value="bg-DodgerBlue" class="bg-DodgerBlue">bg-DodgerBlue</option>
+                                                        <option value="bg-CornflowerBlue" class="bg-CornflowerBlue">bg-CornflowerBlue</option>
+                                                        <option value="bg-RoyalBlue" class="bg-RoyalBlue">bg-RoyalBlue</option>
+                                                        <option value="bg-DarkBlue" class="bg-DarkBlue">bg-DarkBlue</option>
+                                                        <option value="bg-MidnightBlue" class="bg-MidnightBlue">bg-MidnightBlue</option>
+                                                        <option value="bg-NavajoWhite" class="bg-NavajoWhite">bg-NavajoWhite</option>
+                                                        <option value="bg-BurlyWood" class="bg-BurlyWood">bg-BurlyWood</option>
+                                                        <option value="bg-Tan" class="bg-Tan">bg-Tan</option>
+                                                        <option value="bg-RosyBrown" class="bg-RosyBrown">bg-RosyBrown</option>
+                                                        <option value="bg-SandyBrown" class="bg-SandyBrown">bg-SandyBrown</option>
+                                                        <option value="bg-Goldenrod" class="bg-Goldenrod">bg-Goldenrod</option>
+                                                        <option value="bg-DarkGoldenrod" class="bg-DarkGoldenrod">bg-DarkGoldenrod</option>
+                                                        <option value="bg-Chocolate" class="bg-Chocolate">bg-Chocolate</option>
+                                                        <option value="bg-SaddleBrown" class="bg-SaddleBrown">bg-SaddleBrown</option>
+                                                        <option value="bg-Brown" class="bg-Brown">bg-Brown</option>
+                                                        <option value="bg-Maroon" class="bg-Maroon">bg-Maroon</option>
+                                                        <option value="bg-Silver" class="bg-Silver">bg-Silver</option>
+                                                        <option value="bg-DarkGray" class="bg-DarkGray">bg-DarkGray</option>
+                                                        <option value="bg-Gray" class="bg-Gray">bg-Gray</option>
+                                                        <option value="bg-DimGray" class="bg-DimGray">bg-DimGray</option>
+                                                        <option value="bg-LightSlateGray" class="bg-LightSlateGray">bg-LightSlateGray</option>
+                                                        <option value="bg-SlateGray" class="bg-SlateGray">bg-SlateGray</option>
+                                                        <option value="bg-DarkSlateGray" class="bg-DarkSlateGray">bg-DarkSlateGray</option>
                                                         <option value="bg-black" class="bg-black">bg-black</option>
                                                     </select>
                                                 </div>

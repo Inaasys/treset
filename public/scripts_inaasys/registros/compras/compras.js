@@ -933,7 +933,7 @@ function listarproductos(){
       { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false  },
       { data: 'Codigo', name: 'Codigo' },
       { data: 'Marca', name: 'Marca', orderable: false, searchable: false  },
-      { data: 'Producto', name: 'Producto', orderable: false, searchable: false  },
+      { data: 'Producto', name: 'Producto' },
       { data: 'Ubicacion', name: 'Ubicacion', orderable: false, searchable: false  },
       { data: 'Existencias', name: 'Existencias', orderable: false, searchable: false  },
       { data: 'Almacen', name: 'Almacen', orderable: false, searchable: false  },

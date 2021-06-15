@@ -1993,6 +1993,726 @@
   .bg-white .content .number {
     color: #fff !important; }
 
+.bg-IndianRed {
+  background-color: #CD5C5C !important;
+  color: #fff; 
+}
+.bg-IndianRed .content .text,
+.bg-IndianRed .content .number {
+  color: #fff !important; 
+}
+
+.bg-LightCoral {
+  background-color: #F08080 !important;
+  color: #fff; 
+}
+.bg-LightCoral .content .text,
+.bg-LightCoral .content .number {
+  color: #fff !important; 
+}
+
+.bg-DarkSalmon {
+  background-color: #E9967A !important;
+  color: #fff; 
+}
+.bg-DarkSalmon .content .text,
+.bg-DarkSalmon .content .number {
+  color: #fff !important; 
+}
+
+.bg-Crimson {
+  background-color: #DC143C !important;
+  color: #fff; 
+}
+.bg-Crimson .content .text,
+.bg-Crimson .content .number {
+  color: #fff !important; 
+}
+
+.bg-FireBrick {
+  background-color: #B22222 !important;
+  color: #fff; 
+}
+.bg-FireBrick .content .text,
+.bg-FireBrick .content .number {
+  color: #fff !important; 
+}
+
+.bg-DarkRed {
+  background-color: #8B0000 !important;
+  color: #fff; 
+}
+.bg-DarkRed .content .text,
+.bg-DarkRed .content .number {
+  color: #fff !important; 
+}
+
+.bg-LightPink {
+  background-color: #FFB6C1 !important;
+  color: #fff; 
+}
+.bg-LightPink .content .text,
+.bg-LightPink .content .number {
+  color: #fff !important; 
+}
+
+.bg-HotPink {
+  background-color: #FF69B4 !important;
+  color: #fff; 
+}
+.bg-HotPink .content .text,
+.bg-HotPink .content .number {
+  color: #fff !important; 
+}
+
+.bg-DeepPink {
+  background-color: #FF1493 !important;
+  color: #fff; 
+}
+.bg-DeepPink .content .text,
+.bg-DeepPink .content .number {
+  color: #fff !important; 
+}
+
+.bg-MediumVioletRed {
+  background-color: #C71585 !important;
+  color: #fff; 
+}
+.bg-MediumVioletRed .content .text,
+.bg-MediumVioletRed .content .number {
+  color: #fff !important; 
+}
+
+.bg-PaleVioletRed {
+  background-color: #DB7093 !important;
+  color: #fff; 
+}
+.bg-PaleVioletRed .content .text,
+.bg-PaleVioletRed .content .number {
+  color: #fff !important; 
+}
+
+.bg-Coral {
+  background-color: #FF7F50 !important;
+  color: #fff; 
+}
+.bg-Coral .content .text,
+.bg-Coral .content .number {
+  color: #fff !important; 
+}
+
+.bg-Tomato {
+  background-color: #FF6347 !important;
+  color: #fff; 
+}
+.bg-Tomato .content .text,
+.bg-Tomato .content .number {
+  color: #fff !important; 
+}
+
+.bg-OrangeRed {
+  background-color: #FF4500 !important;
+  color: #fff; 
+}
+.bg-OrangeRed .content .text,
+.bg-OrangeRed .content .number {
+  color: #fff !important; 
+}
+
+.bg-DarkOrange {
+  background-color: #FF8C00 !important;
+  color: #fff; 
+}
+.bg-DarkOrange .content .text,
+.bg-DarkOrange .content .number {
+  color: #fff !important; 
+}
+
+.bg-Gold {
+  background-color: #FFD700 !important;
+  color: #fff; 
+}
+.bg-Gold .content .text,
+.bg-Gold .content .number {
+  color: #fff !important; 
+}
+
+.bg-Moccasin {
+  background-color: #FFE4B5 !important;
+  color: #fff; 
+}
+.bg-Moccasin .content .text,
+.bg-Moccasin .content .number {
+  color: #fff !important; 
+}
+
+.bg-Khaki {
+  background-color: #F0E68C !important;
+  color: #fff; 
+}
+.bg-Khaki .content .text,
+.bg-Khaki .content .number {
+  color: #fff !important; 
+}
+
+.bg-DarkKhaki {
+  background-color: #BDB76B !important;
+  color: #fff; 
+}
+.bg-DarkKhaki .content .text,
+.bg-DarkKhaki .content .number {
+  color: #fff !important; 
+}
+
+.bg-Lavender {
+  background-color: #E6E6FA !important;
+  color: #fff; 
+}
+.bg-Lavender .content .text,
+.bg-Lavender .content .number {
+  color: #fff !important; 
+}
+
+.bg-Thistle {
+  background-color: #D8BFD8 !important;
+  color: #fff; 
+}
+.bg-Thistle .content .text,
+.bg-Thistle .content .number {
+  color: #fff !important; 
+}
+
+.bg-Violet {
+  background-color: #EE82EE !important;
+  color: #fff; 
+}
+.bg-Violet .content .text,
+.bg-Violet .content .number {
+  color: #fff !important; 
+}
+
+.bg-Orchid {
+  background-color: #DA70D6 !important;
+  color: #fff; 
+}
+.bg-Orchid .content .text,
+.bg-Orchid .content .number {
+  color: #fff !important; 
+}
+
+.bg-Magenta {
+  background-color: #FF00FF !important;
+  color: #fff; 
+}
+.bg-Magenta .content .text,
+.bg-Magenta .content .number {
+  color: #fff !important; 
+}
+
+.bg-MediumOrchid {
+  background-color: #BA55D3 !important;
+  color: #fff; 
+}
+.bg-MediumOrchid .content .text,
+.bg-MediumOrchid .content .number {
+  color: #fff !important; 
+}
+
+.bg-MediumPurple {
+  background-color: #9370DB !important;
+  color: #fff; 
+}
+.bg-MediumPurple .content .text,
+.bg-MediumPurple .content .number {
+  color: #fff !important; 
+}
+
+.bg-RebeccaPurple {
+  background-color: #663399 !important;
+  color: #fff; 
+}
+.bg-RebeccaPurple .content .text,
+.bg-RebeccaPurple .content .number {
+  color: #fff !important; 
+}
+
+.bg-DarkViolet {
+  background-color: #9400D3 !important;
+  color: #fff; 
+}
+.bg-DarkViolet .content .text,
+.bg-DarkViolet .content .number {
+  color: #fff !important; 
+}
+
+.bg-DarkMagenta {
+  background-color: #8B008B !important;
+  color: #fff; 
+}
+.bg-DarkMagenta .content .text,
+.bg-DarkMagenta .content .number {
+  color: #fff !important; 
+}
+
+.bg-Purple {
+  background-color: #800080 !important;
+  color: #fff; 
+}
+.bg-Purple .content .text,
+.bg-Purple .content .number {
+  color: #fff !important; 
+}
+
+.bg-SlateBlue {
+  background-color: #6A5ACD !important;
+  color: #fff; 
+}
+.bg-SlateBlue .content .text,
+.bg-SlateBlue .content .number {
+  color: #fff !important; 
+}
+
+.bg-DarkSlateBlue {
+  background-color: #483D8B !important;
+  color: #fff; 
+}
+.bg-DarkSlateBlue .content .text,
+.bg-DarkSlateBlue .content .number {
+  color: #fff !important; 
+}
+
+.bg-GreenYellow {
+  background-color: #ADFF2F !important;
+  color: #fff; 
+}
+.bg-GreenYellow .content .text,
+.bg-GreenYellow .content .number {
+  color: #fff !important; 
+}
+
+.bg-LawnGreen {
+  background-color: #7CFC00 !important;
+  color: #fff; 
+}
+.bg-LawnGreen .content .text,
+.bg-LawnGreen .content .number {
+  color: #fff !important; 
+}
+
+.bg-Lime {
+  background-color: #00FF00 !important;
+  color: #fff; 
+}
+.bg-Lime .content .text,
+.bg-Lime .content .number {
+  color: #fff !important; 
+}
+
+.bg-LimeGreen {
+  background-color: #32CD32 !important;
+  color: #fff; 
+}
+.bg-LimeGreen .content .text,
+.bg-LimeGreen .content .number {
+  color: #fff !important; 
+}
+
+.bg-LightGreen {
+  background-color: #90EE90 !important;
+  color: #fff; 
+}
+.bg-LightGreen .content .text,
+.bg-LightGreen .content .number {
+  color: #fff !important; 
+}
+
+.bg-MediumSpringGreen {
+  background-color: #00FA9A !important;
+  color: #fff; 
+}
+.bg-MediumSpringGreen .content .text,
+.bg-MediumSpringGreen .content .number {
+  color: #fff !important; 
+}
+
+.bg-MediumSeaGreen {
+  background-color: #3CB371 !important;
+  color: #fff; 
+}
+.bg-MediumSeaGreen .content .text,
+.bg-MediumSeaGreen .content .number {
+  color: #fff !important; 
+}
+
+.bg-SeaGreen {
+  background-color: #2E8B57 !important;
+  color: #fff; 
+}
+.bg-SeaGreen .content .text,
+.bg-SeaGreen .content .number {
+  color: #fff !important; 
+}
+
+.bg-ForestGreen {
+  background-color: #228B22 !important;
+  color: #fff; 
+}
+.bg-ForestGreen .content .text,
+.bg-ForestGreen .content .number {
+  color: #fff !important; 
+}
+
+.bg-DarkGreen {
+  background-color: #006400 !important;
+  color: #fff; 
+}
+.bg-DarkGreen .content .text,
+.bg-DarkGreen .content .number {
+  color: #fff !important; 
+}
+
+.bg-Olive {
+  background-color: #808000 !important;
+  color: #fff; 
+}
+.bg-Olive .content .text,
+.bg-Olive .content .number {
+  color: #fff !important; 
+}
+
+.bg-DarkOliveGreen {
+  background-color: #556B2F !important;
+  color: #fff; 
+}
+.bg-DarkOliveGreen .content .text,
+.bg-DarkOliveGreen .content .number {
+  color: #fff !important; 
+}
+
+.bg-MediumAquamarine {
+  background-color: #66CDAA !important;
+  color: #fff; 
+}
+.bg-MediumAquamarine .content .text,
+.bg-MediumAquamarine .content .number {
+  color: #fff !important; 
+}
+
+.bg-LightSeaGreen {
+  background-color: #20B2AA !important;
+  color: #fff; 
+}
+.bg-LightSeaGreen .content .text,
+.bg-LightSeaGreen .content .number {
+  color: #fff !important; 
+}
+
+.bg-DarkCyan {
+  background-color: #008B8B !important;
+  color: #fff; 
+}
+.bg-DarkCyan .content .text,
+.bg-DarkCyan .content .number {
+  color: #fff !important; 
+}
+
+.bg-PaleTurquoise {
+  background-color: #AFEEEE !important;
+  color: #fff; 
+}
+.bg-PaleTurquoise .content .text,
+.bg-PaleTurquoise .content .number {
+  color: #fff !important; 
+}
+
+.bg-Aquamarine {
+  background-color: #7FFFD4 !important;
+  color: #fff; 
+}
+.bg-Aquamarine .content .text,
+.bg-Aquamarine .content .number {
+  color: #fff !important; 
+}
+
+.bg-Turquoise {
+  background-color: #40E0D0 !important;
+  color: #fff; 
+}
+.bg-Turquoise .content .text,
+.bg-Turquoise .content .number {
+  color: #fff !important; 
+}
+
+.bg-DarkTurquoise {
+  background-color: #00CED1 !important;
+  color: #fff; 
+}
+.bg-DarkTurquoise .content .text,
+.bg-DarkTurquoise .content .number {
+  color: #fff !important; 
+}
+
+.bg-CadetBlue {
+  background-color: #5F9EA0 !important;
+  color: #fff; 
+}
+.bg-CadetBlue .content .text,
+.bg-CadetBlue .content .number {
+  color: #fff !important; 
+}
+
+.bg-SteelBlue {
+  background-color: #4682B4 !important;
+  color: #fff; 
+}
+.bg-SteelBlue .content .text,
+.bg-SteelBlue .content .number {
+  color: #fff !important; 
+}
+
+.bg-LightSteelBlue {
+  background-color: #B0C4DE !important;
+  color: #fff; 
+}
+.bg-LightSteelBlue .content .text,
+.bg-LightSteelBlue .content .number {
+  color: #fff !important; 
+}
+
+.bg-PowderBlue {
+  background-color: #B0E0E6 !important;
+  color: #fff; 
+}
+.bg-PowderBlue .content .text,
+.bg-PowderBlue .content .number {
+  color: #fff !important; 
+}
+
+.bg-SkyBlue {
+  background-color: #87CEEB !important;
+  color: #fff; 
+}
+.bg-SkyBlue .content .text,
+.bg-SkyBlue .content .number {
+  color: #fff !important; 
+}
+
+.bg-DeepSkyBlue {
+  background-color: #00BFFF !important;
+  color: #fff; 
+}
+.bg-DeepSkyBlue .content .text,
+.bg-DeepSkyBlue .content .number {
+  color: #fff !important; 
+}
+
+.bg-DodgerBlue {
+  background-color: #1E90FF !important;
+  color: #fff; 
+}
+.bg-DodgerBlue .content .text,
+.bg-DodgerBlue .content .number {
+  color: #fff !important; 
+}
+
+.bg-CornflowerBlue {
+  background-color: #6495ED !important;
+  color: #fff; 
+}
+.bg-CornflowerBlue .content .text,
+.bg-CornflowerBlue .content .number {
+  color: #fff !important; 
+}
+
+.bg-RoyalBlue {
+  background-color: #4169E1 !important;
+  color: #fff; 
+}
+.bg-RoyalBlue .content .text,
+.bg-RoyalBlue .content .number {
+  color: #fff !important; 
+}
+
+.bg-DarkBlue {
+  background-color: #00008B !important;
+  color: #fff; 
+}
+.bg-DarkBlue .content .text,
+.bg-DarkBlue .content .number {
+  color: #fff !important; 
+}
+
+.bg-MidnightBlue {
+  background-color: #191970 !important;
+  color: #fff; 
+}
+.bg-MidnightBlue .content .text,
+.bg-MidnightBlue .content .number {
+  color: #fff !important; 
+}
+
+.bg-NavajoWhite {
+  background-color: #FFDEAD !important;
+  color: #fff; 
+}
+.bg-NavajoWhite .content .text,
+.bg-NavajoWhite .content .number {
+  color: #fff !important; 
+}
+
+.bg-BurlyWood {
+  background-color: #DEB887 !important;
+  color: #fff; 
+}
+.bg-BurlyWood .content .text,
+.bg-BurlyWood .content .number {
+  color: #fff !important; 
+}
+
+.bg-Tan {
+  background-color: #D2B48C !important;
+  color: #fff; 
+}
+.bg-Tan .content .text,
+.bg-Tan .content .number {
+  color: #fff !important; 
+}
+
+.bg-RosyBrown {
+  background-color: #BC8F8F !important;
+  color: #fff; 
+}
+.bg-RosyBrown .content .text,
+.bg-RosyBrown .content .number {
+  color: #fff !important; 
+}
+
+.bg-SandyBrown {
+  background-color: #F4A460 !important;
+  color: #fff; 
+}
+.bg-SandyBrown .content .text,
+.bg-SandyBrown .content .number {
+  color: #fff !important; 
+}
+
+.bg-Goldenrod {
+  background-color: #DAA520 !important;
+  color: #fff; 
+}
+.bg-Goldenrod .content .text,
+.bg-Goldenrod .content .number {
+  color: #fff !important; 
+}
+
+.bg-DarkGoldenrod {
+  background-color: #B8860B !important;
+  color: #fff; 
+}
+.bg-DarkGoldenrod .content .text,
+.bg-DarkGoldenrod .content .number {
+  color: #fff !important; 
+}
+
+.bg-Chocolate {
+  background-color: #D2691E !important;
+  color: #fff; 
+}
+.bg-Chocolate .content .text,
+.bg-Chocolate .content .number {
+  color: #fff !important; 
+}
+
+.bg-SaddleBrown {
+  background-color: #8B4513 !important;
+  color: #fff; 
+}
+.bg-SaddleBrown .content .text,
+.bg-SaddleBrown .content .number {
+  color: #fff !important; 
+}
+
+.bg-Brown {
+  background-color: #A52A2A !important;
+  color: #fff; 
+}
+.bg-Brown .content .text,
+.bg-Brown .content .number {
+  color: #fff !important; 
+}
+
+.bg-Maroon {
+  background-color: #800000 !important;
+  color: #fff; 
+}
+.bg-Maroon .content .text,
+.bg-Maroon .content .number {
+  color: #fff !important; 
+}
+
+.bg-Silver {
+  background-color: #C0C0C0 !important;
+  color: #fff; 
+}
+.bg-Silver .content .text,
+.bg-Silver .content .number {
+  color: #fff !important; 
+}
+
+.bg-DarkGray {
+  background-color: #A9A9A9 !important;
+  color: #fff; 
+}
+.bg-DarkGray .content .text,
+.bg-DarkGray .content .number {
+  color: #fff !important; 
+}
+
+.bg-Gray {
+  background-color: #808080 !important;
+  color: #fff; 
+}
+.bg-Gray .content .text,
+.bg-Gray .content .number {
+  color: #fff !important; 
+}
+
+.bg-DimGray {
+  background-color: #696969 !important;
+  color: #fff; 
+}
+.bg-DimGray .content .text,
+.bg-DimGray .content .number {
+  color: #fff !important; 
+}
+
+.bg-LightSlateGray {
+  background-color: #778899 !important;
+  color: #fff; 
+}
+.bg-LightSlateGray .content .text,
+.bg-LightSlateGray .content .number {
+  color: #fff !important; 
+}
+
+.bg-SlateGray {
+  background-color: #708090 !important;
+  color: #fff; 
+}
+.bg-SlateGray .content .text,
+.bg-SlateGray .content .number {
+  color: #fff !important; 
+}
+
+.bg-DarkSlateGray {
+  background-color: #2F4F4F !important;
+  color: #fff; 
+}
+.bg-DarkSlateGray .content .text,
+.bg-DarkSlateGray .content .number {
+  color: #fff !important; 
+}
+
 .col-red {
   color: #F44336 !important; }
 
@@ -2882,6 +3602,86 @@ section.content {
   .card .bg-deep-orange,
   .card .bg-brown,
   .card .bg-grey,
+  .card .bg-IndianRed,
+  .card .bg-LightCoral,
+  .card .bg-DarkSalmon,
+  .card .bg-Crimson,
+  .card .bg-FireBrick,
+  .card .bg-DarkRed,
+  .card .bg-LightPink,
+  .card .bg-HotPink,
+  .card .bg-DeepPink,
+  .card .bg-MediumVioletRed,
+  .card .bg-PaleVioletRed,
+  .card .bg-Coral,
+  .card .bg-Tomato,
+  .card .bg-OrangeRed,
+  .card .bg-DarkOrange,
+  .card .bg-Gold,
+  .card .bg-Moccasin,
+  .card .bg-Khaki,
+  .card .bg-DarkKhaki,
+  .card .bg-Lavender,
+  .card .bg-Thistle,
+  .card .bg-Violet,
+  .card .bg-Orchid,
+  .card .bg-Magenta,
+  .card .bg-MediumOrchid,
+  .card .bg-MediumPurple,
+  .card .bg-RebeccaPurple,
+  .card .bg-DarkViolet,
+  .card .bg-DarkMagenta,
+  .card .bg-Purple,
+  .card .bg-SlateBlue,
+  .card .bg-DarkSlateBlue,
+  .card .bg-GreenYellow,
+  .card .bg-LawnGreen,
+  .card .bg-Lime,
+  .card .bg-LimeGreen,
+  .card .bg-LightGreen,
+  .card .bg-MediumSpringGreen,
+  .card .bg-MediumSeaGreen,
+  .card .bg-SeaGreen,
+  .card .bg-ForestGreen,
+  .card .bg-DarkGreen,
+  .card .bg-Olive,
+  .card .bg-DarkOliveGreen,
+  .card .bg-MediumAquamarine,
+  .card .bg-LightSeaGreen,
+  .card .bg-DarkCyan,
+  .card .bg-PaleTurquoise,
+  .card .bg-Aquamarine,
+  .card .bg-Turquoise,
+  .card .bg-DarkTurquoise,
+  .card .bg-CadetBlue,
+  .card .bg-SteelBlue,
+  .card .bg-LightSteelBlue,
+  .card .bg-PowderBlue,
+  .card .bg-SkyBlue,
+  .card .bg-DeepSkyBlue,
+  .card .bg-DodgerBlue,
+  .card .bg-CornflowerBlue,
+  .card .bg-RoyalBlue,
+  .card .bg-DarkBlue,
+  .card .bg-MidnightBlue,
+  .card .bg-NavajoWhite,
+  .card .bg-BurlyWood,
+  .card .bg-Tan,
+  .card .bg-RosyBrown,
+  .card .bg-SandyBrown,
+  .card .bg-Goldenrod,
+  .card .bg-DarkGoldenrod,
+  .card .bg-Chocolate,
+  .card .bg-SaddleBrown,
+  .card .bg-Brown,
+  .card .bg-Maroon,
+  .card .bg-Silver,
+  .card .bg-DarkGray,
+  .card .bg-Gray,
+  .card .bg-DimGray,
+  .card .bg-LightSlateGray,
+  .card .bg-SlateGray,
+  .card .bg-DarkSlateGray,
   .card .bg-blue-grey,
   .card .bg-black {
     border-bottom: none !important;
@@ -2938,6 +3738,246 @@ section.content {
     .card .bg-grey h2,
     .card .bg-grey small,
     .card .bg-grey .material-icons,
+    .card .bg-IndianRed h2,
+    .card .bg-IndianRed small,
+    .card .bg-IndianRed .material-icons,
+	.card .bg-LightCoral h2,
+    .card .bg-LightCoral small,
+    .card .bg-LightCoral .material-icons,
+	.card .bg-DarkSalmon h2,
+    .card .bg-DarkSalmon small,
+    .card .bg-DarkSalmon .material-icons,
+	.card .bg-Crimson h2,
+    .card .bg-Crimson small,
+    .card .bg-Crimson .material-icons,
+	.card .bg-FireBrick h2,
+    .card .bg-FireBrick small,
+    .card .bg-FireBrick .material-icons,
+	.card .bg-DarkRed h2,
+    .card .bg-DarkRed small,
+    .card .bg-DarkRed .material-icons,
+	.card .bg-LightPink h2,
+    .card .bg-LightPink small,
+    .card .bg-LightPink .material-icons,
+	.card .bg-HotPink h2,
+    .card .bg-HotPink small,
+    .card .bg-HotPink .material-icons,
+	.card .bg-DeepPink h2,
+    .card .bg-DeepPink small,
+    .card .bg-DeepPink .material-icons,
+	.card .bg-MediumVioletRed h2,
+    .card .bg-MediumVioletRed small,
+    .card .bg-MediumVioletRed .material-icons,
+	.card .bg-PaleVioletRed h2,
+    .card .bg-PaleVioletRed small,
+    .card .bg-PaleVioletRed .material-icons,
+	.card .bg-Coral h2,
+    .card .bg-Coral small,
+    .card .bg-Coral .material-icons,
+	.card .bg-Tomato h2,
+    .card .bg-Tomato small,
+    .card .bg-Tomato .material-icons,
+	.card .bg-OrangeRed h2,
+    .card .bg-OrangeRed small,
+    .card .bg-OrangeRed .material-icons,
+	.card .bg-DarkOrange h2,
+    .card .bg-DarkOrange small,
+    .card .bg-DarkOrange .material-icons,
+	.card .bg-Gold h2,
+    .card .bg-Gold small,
+    .card .bg-Gold .material-icons,
+	.card .bg-Moccasin h2,
+    .card .bg-Moccasin small,
+    .card .bg-Moccasin .material-icons,
+	.card .bg-Khaki h2,
+    .card .bg-Khaki small,
+    .card .bg-Khaki .material-icons,
+	.card .bg-DarkKhaki h2,
+    .card .bg-DarkKhaki small,
+    .card .bg-DarkKhaki .material-icons,
+	.card .bg-Lavender h2,
+    .card .bg-Lavender small,
+    .card .bg-Lavender .material-icons,
+	.card .bg-Thistle h2,
+    .card .bg-Thistle small,
+    .card .bg-Thistle .material-icons,
+	.card .bg-Violet h2,
+    .card .bg-Violet small,
+    .card .bg-Violet .material-icons,
+	.card .bg-Orchid h2,
+    .card .bg-Orchid small,
+    .card .bg-Orchid .material-icons,
+	.card .bg-Magenta h2,
+    .card .bg-Magenta small,
+    .card .bg-Magenta .material-icons,
+	.card .bg-MediumOrchid h2,
+    .card .bg-MediumOrchid small,
+    .card .bg-MediumOrchid .material-icons,
+	.card .bg-MediumPurple h2,
+    .card .bg-MediumPurple small,
+    .card .bg-MediumPurple .material-icons,
+	.card .bg-RebeccaPurple h2,
+    .card .bg-RebeccaPurple small,
+    .card .bg-RebeccaPurple .material-icons,
+	.card .bg-DarkViolet h2,
+    .card .bg-DarkViolet small,
+    .card .bg-DarkViolet .material-icons,
+	.card .bg-DarkMagenta h2,
+    .card .bg-DarkMagenta small,
+    .card .bg-DarkMagenta .material-icons,
+	.card .bg-Purple h2,
+    .card .bg-Purple small,
+    .card .bg-Purple .material-icons,
+	.card .bg-SlateBlue h2,
+    .card .bg-SlateBlue small,
+    .card .bg-SlateBlue .material-icons,
+	.card .bg-DarkSlateBlue h2,
+    .card .bg-DarkSlateBlue small,
+    .card .bg-DarkSlateBlue .material-icons,
+	.card .bg-GreenYellow h2,
+    .card .bg-GreenYellow small,
+    .card .bg-GreenYellow .material-icons,
+	.card .bg-LawnGreen h2,
+    .card .bg-LawnGreen small,
+    .card .bg-LawnGreen .material-icons,
+	.card .bg-Lime h2,
+    .card .bg-Lime small,
+    .card .bg-Lime .material-icons,
+	.card .bg-LimeGreen h2,
+    .card .bg-LimeGreen small,
+    .card .bg-LimeGreen .material-icons,
+	.card .bg-LightGreen h2,
+    .card .bg-LightGreen small,
+    .card .bg-LightGreen .material-icons,
+	.card .bg-MediumSpringGreen h2,
+    .card .bg-MediumSpringGreen small,
+    .card .bg-MediumSpringGreen .material-icons,
+	.card .bg-MediumSeaGreen h2,
+    .card .bg-MediumSeaGreen small,
+    .card .bg-MediumSeaGreen .material-icons,
+	.card .bg-SeaGreen h2,
+    .card .bg-SeaGreen small,
+    .card .bg-SeaGreen .material-icons,
+	.card .bg-ForestGreen h2,
+    .card .bg-ForestGreen small,
+    .card .bg-ForestGreen .material-icons,
+	.card .bg-DarkGreen h2,
+    .card .bg-DarkGreen small,
+    .card .bg-DarkGreen .material-icons,
+	.card .bg-Olive h2,
+    .card .bg-Olive small,
+    .card .bg-Olive .material-icons,
+	.card .bg-DarkOliveGreen h2,
+    .card .bg-DarkOliveGreen small,
+    .card .bg-DarkOliveGreen .material-icons,
+	.card .bg-MediumAquamarine h2,
+    .card .bg-MediumAquamarine small,
+    .card .bg-MediumAquamarine .material-icons,
+	.card .bg-LightSeaGreen h2,
+    .card .bg-LightSeaGreen small,
+    .card .bg-LightSeaGreen .material-icons,
+	.card .bg-DarkCyan h2,
+    .card .bg-DarkCyan small,
+    .card .bg-DarkCyan .material-icons,
+	.card .bg-PaleTurquoise h2,
+    .card .bg-PaleTurquoise small,
+    .card .bg-PaleTurquoise .material-icons,
+	.card .bg-Aquamarine h2,
+    .card .bg-Aquamarine small,
+    .card .bg-Aquamarine .material-icons,
+	.card .bg-Turquoise h2,
+    .card .bg-Turquoise small,
+    .card .bg-Turquoise .material-icons,
+	.card .bg-DarkTurquoise h2,
+    .card .bg-DarkTurquoise small,
+    .card .bg-DarkTurquoise .material-icons,
+	.card .bg-CadetBlue h2,
+    .card .bg-CadetBlue small,
+    .card .bg-CadetBlue .material-icons,
+	.card .bg-SteelBlue h2,
+    .card .bg-SteelBlue small,
+    .card .bg-SteelBlue .material-icons,
+	.card .bg-LightSteelBlue h2,
+    .card .bg-LightSteelBlue small,
+    .card .bg-LightSteelBlue .material-icons,
+	.card .bg-PowderBlue h2,
+    .card .bg-PowderBlue small,
+    .card .bg-PowderBlue .material-icons,
+	.card .bg-SkyBlue h2,
+    .card .bg-SkyBlue small,
+    .card .bg-SkyBlue .material-icons,
+	.card .bg-DeepSkyBlue h2,
+    .card .bg-DeepSkyBlue small,
+    .card .bg-DeepSkyBlue .material-icons,
+	.card .bg-DodgerBlue h2,
+    .card .bg-DodgerBlue small,
+    .card .bg-DodgerBlue .material-icons,
+	.card .bg-CornflowerBlue h2,
+    .card .bg-CornflowerBlue small,
+    .card .bg-CornflowerBlue .material-icons,
+	.card .bg-RoyalBlue h2,
+    .card .bg-RoyalBlue small,
+    .card .bg-RoyalBlue .material-icons,
+	.card .bg-DarkBlue h2,
+    .card .bg-DarkBlue small,
+    .card .bg-DarkBlue .material-icons,
+	.card .bg-MidnightBlue h2,
+    .card .bg-MidnightBlue small,
+    .card .bg-MidnightBlue .material-icons,
+	.card .bg-NavajoWhite h2,
+    .card .bg-NavajoWhite small,
+    .card .bg-NavajoWhite .material-icons,
+	.card .bg-BurlyWood h2,
+    .card .bg-BurlyWood small,
+    .card .bg-BurlyWood .material-icons,
+	.card .bg-Tan h2,
+    .card .bg-Tan small,
+    .card .bg-Tan .material-icons,
+	.card .bg-RosyBrown h2,
+    .card .bg-RosyBrown small,
+    .card .bg-RosyBrown .material-icons,
+	.card .bg-SandyBrown h2,
+    .card .bg-SandyBrown small,
+    .card .bg-SandyBrown .material-icons,
+	.card .bg-Goldenrod h2,
+    .card .bg-Goldenrod small,
+    .card .bg-Goldenrod .material-icons,
+	.card .bg-DarkGoldenrod h2,
+    .card .bg-DarkGoldenrod small,
+    .card .bg-DarkGoldenrod .material-icons,
+	.card .bg-Chocolate h2,
+    .card .bg-Chocolate small,
+    .card .bg-Chocolate .material-icons,
+	.card .bg-SaddleBrown h2,
+    .card .bg-SaddleBrown small,
+    .card .bg-SaddleBrown .material-icons,
+	.card .bg-Brown h2,
+    .card .bg-Brown small,
+    .card .bg-Brown .material-icons,
+	.card .bg-Maroon h2,
+    .card .bg-Maroon small,
+    .card .bg-Maroon .material-icons,
+	.card .bg-Silver h2,
+    .card .bg-Silver small,
+    .card .bg-Silver .material-icons,
+	.card .bg-DarkGray h2,
+    .card .bg-DarkGray small,
+    .card .bg-DarkGray .material-icons,
+	.card .bg-Gray h2,
+    .card .bg-Gray small,
+    .card .bg-Gray .material-icons,
+	.card .bg-DimGray h2,
+    .card .bg-DimGray small,
+    .card .bg-DimGray .material-icons,
+	.card .bg-LightSlateGray h2,
+    .card .bg-LightSlateGray small,
+    .card .bg-LightSlateGray .material-icons,
+	.card .bg-SlateGray h2,
+    .card .bg-SlateGray small,
+    .card .bg-SlateGray .material-icons,
+	.card .bg-DarkSlateGray h2,
+    .card .bg-DarkSlateGray small,
+    .card .bg-DarkSlateGray .material-icons,
     .card .bg-blue-grey h2,
     .card .bg-blue-grey small,
     .card .bg-blue-grey .material-icons,
@@ -2963,6 +4003,86 @@ section.content {
     .card .bg-deep-orange .badge,
     .card .bg-brown .badge,
     .card .bg-grey .badge,
+    .card .bg-IndianRed .badge,
+    .card .bg-LightCoral .badge .badge,
+    .card .bg-DarkSalmon .badge,
+    .card .bg-Crimson .badge,
+    .card .bg-FireBrick .badge,
+    .card .bg-DarkRed .badge,
+    .card .bg-LightPink .badge,
+    .card .bg-HotPink .badge,
+    .card .bg-DeepPink .badge,
+    .card .bg-MediumVioletRed .badge,
+    .card .bg-PaleVioletRed .badge,
+    .card .bg-Coral .badge,
+    .card .bg-Tomato .badge,
+    .card .bg-OrangeRed .badge,
+    .card .bg-DarkOrange .badge,
+    .card .bg-Gold .badge,
+    .card .bg-Moccasin .badge,
+    .card .bg-Khaki .badge,
+    .card .bg-DarkKhaki .badge,
+    .card .bg-Lavender .badge,
+    .card .bg-Thistle .badge,
+    .card .bg-Violet .badge,
+    .card .bg-Orchid .badge,
+    .card .bg-Magenta .badge,
+    .card .bg-MediumOrchid .badge,
+    .card .bg-MediumPurple .badge,
+    .card .bg-RebeccaPurple .badge,
+    .card .bg-DarkViolet .badge,
+    .card .bg-DarkMagenta .badge,
+    .card .bg-Purple .badge,
+    .card .bg-SlateBlue .badge,
+    .card .bg-DarkSlateBlue .badge,
+    .card .bg-GreenYellow .badge,
+    .card .bg-LawnGreen .badge,
+    .card .bg-Lime .badge,
+    .card .bg-LimeGreen .badge,
+    .card .bg-LightGreen .badge,
+    .card .bg-MediumSpringGreen .badge,
+    .card .bg-MediumSeaGreen .badge,
+    .card .bg-SeaGreen .badge,
+    .card .bg-ForestGreen .badge,
+    .card .bg-DarkGreen .badge,
+    .card .bg-Olive .badge,
+    .card .bg-DarkOliveGreen .badge,
+    .card .bg-MediumAquamarine .badge,
+    .card .bg-LightSeaGreen .badge,
+    .card .bg-DarkCyan .badge,
+    .card .bg-PaleTurquoise .badge,
+    .card .bg-Aquamarine .badge,
+    .card .bg-Turquoise .badge,
+    .card .bg-DarkTurquoise .badge,
+    .card .bg-CadetBlue .badge,
+    .card .bg-SteelBlue .badge,
+    .card .bg-LightSteelBlue .badge,
+    .card .bg-PowderBlue .badge,
+    .card .bg-SkyBlue .badge,
+    .card .bg-DeepSkyBlue .badge,
+    .card .bg-DodgerBlue .badge,
+    .card .bg-CornflowerBlue .badge,
+    .card .bg-RoyalBlue .badge,
+    .card .bg-DarkBlue .badge,
+    .card .bg-MidnightBlue .badge,
+    .card .bg-NavajoWhite .badge,
+    .card .bg-BurlyWood .badge,
+    .card .bg-Tan .badge,
+    .card .bg-RosyBrown .badge,
+    .card .bg-SandyBrown .badge,
+    .card .bg-Goldenrod .badge,
+    .card .bg-DarkGoldenrod .badge,
+    .card .bg-Chocolate .badge,
+    .card .bg-SaddleBrown .badge,
+    .card .bg-Brown .badge,
+    .card .bg-Maroon .badge,
+    .card .bg-Silver .badge,
+    .card .bg-DarkGray .badge,
+    .card .bg-Gray .badge,
+    .card .bg-DimGray .badge,
+    .card .bg-LightSlateGray .badge,
+    .card .bg-SlateGray .badge,
+    .card .bg-DarkSlateGray .badge,
     .card .bg-blue-grey .badge,
     .card .bg-black .badge {
       background-color: #fff;
