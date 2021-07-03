@@ -19,7 +19,7 @@
                                     <h5>&nbsp;&nbsp;&nbsp;PERSONAL&nbsp;&nbsp;&nbsp;</h5>
                                 </div>
                                 <div class="col-lg-11 col-md-11 col-sm-11 col-xs-12 button-demo">
-                                    <div class="table-responsive">
+                                    <div class="table-responsive navbar-right">
                                         <table>
                                             <tr>
                                                 <td >
@@ -46,11 +46,11 @@
                                     <thead class="{{$empresa->background_tables}}">
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
-                                            <th>id</th>
-                    						<th>nombre</th>
+                                            <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">id</th>
+                    						<th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">nombre</th>
                                             <th>fecha_ingreso</th>
                                             <th>tipo_personal</th>
-                                            <th>status</th>
+                                            <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">status</th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>

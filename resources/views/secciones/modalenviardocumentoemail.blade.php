@@ -29,6 +29,12 @@
                                 <textarea class="form-control" name="emailasunto" id="emailasunto"  required rows="4" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>
                             </div>
                         </div>
+                        <div class="col-md-12" id="divincluirxml" hidden>
+                            <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Incluir XML:</label><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <input type="hidden" name="incluir_xml" class="filled-in" value="0"/>
+                            <input type="checkbox" name="incluir_xml" id="incluir_xml" class="filled-in" value="1"/>
+                            <label for="incluir_xml"></label>
+                        </div>
                     </div>
                     <div class="modal-footer">
 	        	        <div class="btn btn-danger btn-sm" data-dismiss="modal">Salir</div>

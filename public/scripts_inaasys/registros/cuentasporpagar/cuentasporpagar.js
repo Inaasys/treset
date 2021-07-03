@@ -89,16 +89,20 @@ function listar(){
     var campos_tabla  = [];
     campos_tabla.push({ 'data':'operaciones', 'name':'operaciones', 'orderable':false, 'searchable':false});
     for (var i = 0; i < campos.length; i++) {
+        var searchable = false;
+        if(campos[i] == 'Pago' || campos[i] == 'Status' || campos[i] == 'NombreProveedor'){
+            searchable = true;
+        }
         campos_tabla.push({ 
             'data'    : campos[i],
             'name'  : campos[i],
-            'orderable': true,
-            'searchable': true
+            'orderable': false,
+            'searchable': searchable
         });
     }
     tabla=$('#tbllistado').DataTable({
-        "lengthMenu": [ 10, 50, 100, 250, 500 ],
-        "pageLength": 250,
+        "lengthMenu": [ 100, 250, 500, 1000 ],
+        "pageLength": 100,
         "sScrollX": "110%",
         "sScrollY": "350px",
         processing: true,
@@ -947,7 +951,7 @@ function enviardocumentoemail(documento){
       $("#emaildocumento").val(documento);
       $("#emailde").val(data.emailde);
       $("#emailpara").val(data.emailpara);
-      $("#emailasunto").val("CUENTA POR PAGAR NO. " + documento +" DE USADOS TRACTOCAMIONES Y PARTES REFACCIONARIAS SA DE CV");
+      $("#emailasunto").val("CUENTA POR PAGAR NO. " + documento +" DE "+ nombreempresa);
       $("#modalenviarpdfemail").modal('show');
     })   
 }

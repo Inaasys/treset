@@ -71,9 +71,9 @@
                             <li style="font-size:9px; margin-left: 5px;">Emitida: {{$d['factura']->Hora}}</li>
                             <li style="font-size:9px; margin-left: 5px;">Vence: {{$d['fechavence']}}</li>
                             <li style="font-size:9px; margin-left: 5px;">Pedido: {{$d['factura']->Pedido}}</li>
-                            <li style="font-size:9px; margin-left: 5px;">UsoCfdi: {{$d['usocfdi']->Clave}} {{$d['usocfdi']->Nombre}}</li>
-                            <li style="font-size:9px; margin-left: 5px;">Forma de Pago: {{$d['formapago']->Clave}} {{$d['formapago']->Nombre}}</li>
-                            <li style="font-size:9px; margin-left: 5px;">Método de Pago: {{$d['metodopago']->Clave}} {{$d['metodopago']->Nombre}}</li>
+                            <li style="font-size:9px; margin-left: 5px;">UsoCfdi: @if($d['usocfdi'] != null) {{$d['usocfdi']->Clave}} {{$d['usocfdi']->Nombre}} @endif</li>
+                            <li style="font-size:9px; margin-left: 5px;">Forma de Pago: @if($d['formapago'] != null) {{$d['formapago']->Clave}} {{$d['formapago']->Nombre}} @endif</li>
+                            <li style="font-size:9px; margin-left: 5px;">Método de Pago: @if($d['metodopago'] != null) {{$d['metodopago']->Clave}} {{$d['metodopago']->Nombre}} @endif</li>
                         </ul>
                     </div>
                 </div>
@@ -105,8 +105,8 @@
                                             <td>{{ number_format($detalle['subtotaldetalle'], $d['numerodecimalesdocumento']) }}</td>
                                         </tr>
                                         <tr style="font-size:8px; text-align: justify;">
-                                            <td colspan="2">Clave Producto:{{$detalle['claveproducto']->Clave}} {{$detalle['claveproducto']->Nombre}}</td>
-                                            <td>Clave Unidad:{{$detalle['claveunidad']->Clave}} {{$detalle['claveunidad']->Nombre}}</td>
+                                            <td colspan="2">Clave Producto: @if($detalle['claveproducto'] != null) {{$detalle['claveproducto']->Clave}} {{$detalle['claveproducto']->Nombre}} @endif</td>
+                                            <td>Clave Unidad: @if($detalle['claveunidad'] != null) {{$detalle['claveunidad']->Clave}} {{$detalle['claveunidad']->Nombre}} @endif</td>
                                             <td colspan="3"><b>Traslado:</b>Tasa002 Iva{{ number_format($detalle['impuestodetalle'], $d['numerodecimalesdocumento']) }}% = {{ number_format($detalle['ivadetalle'], $d['numerodecimalesdocumento']) }} Base {{ number_format($detalle['subtotaldetalle'], $d['numerodecimalesdocumento']) }}</td>
                                         </tr>
                                     @endforeach
@@ -133,8 +133,8 @@
                                             <td>{{ number_format($detalle['subtotaldetalle'], $d['numerodecimalesdocumento']) }}</td>
                                         </tr>
                                         <tr style="font-size:8px; text-align: justify;">
-                                            <td colspan="2">Clave Producto:{{$detalle['claveproducto']->Clave}} {{$detalle['claveproducto']->Nombre}}</td>
-                                            <td>Clave Unidad:{{$detalle['claveunidad']->Clave}} {{$detalle['claveunidad']->Nombre}}</td>
+                                            <td colspan="2">Clave Producto: @if($detalle['claveproducto'] != null) {{$detalle['claveproducto']->Clave}} {{$detalle['claveproducto']->Nombre}} @endif</td>
+                                            <td>Clave Unidad: @if($detalle['claveunidad'] != null) {{$detalle['claveunidad']->Clave}} {{$detalle['claveunidad']->Nombre}} @endif</td>
                                             <td colspan="3"><b>Traslado:</b>Tasa002 Iva{{ number_format($detalle['impuestodetalle'], $d['numerodecimalesdocumento']) }}% = {{ number_format($detalle['ivadetalle'], $d['numerodecimalesdocumento']) }} Base {{ number_format($detalle['subtotaldetalle'], $d['numerodecimalesdocumento']) }}</td>
                                         </tr>
                                     @endforeach
@@ -156,8 +156,8 @@
                                             <td>{{ number_format($detalle['subtotaldetalle'], $d['numerodecimalesdocumento']) }}</td>
                                         </tr>
                                         <tr style="font-size:8px; text-align: justify;">
-                                            <td colspan="2">Clave Producto:{{$detalle['claveproducto']->Clave}} {{$detalle['claveproducto']->Nombre}}</td>
-                                            <td>Clave Unidad:{{$detalle['claveunidad']->Clave}} {{$detalle['claveunidad']->Nombre}}</td>
+                                            <td colspan="2">Clave Producto: @if($detalle['claveproducto'] != null) {{$detalle['claveproducto']->Clave}} {{$detalle['claveproducto']->Nombre}} @endif</td>
+                                            <td>Clave Unidad: @if($detalle['claveunidad'] != null) {{$detalle['claveunidad']->Clave}} {{$detalle['claveunidad']->Nombre}} @endif</td>
                                             <td colspan="3"><b>Traslado:</b>Tasa002 Iva{{ number_format($detalle['impuestodetalle'], $d['numerodecimalesdocumento']) }}% = {{ number_format($detalle['ivadetalle'], $d['numerodecimalesdocumento']) }} Base {{ number_format($detalle['subtotaldetalle'], $d['numerodecimalesdocumento']) }}</td>
                                         </tr>
                                     @endforeach
@@ -197,7 +197,7 @@
                 <div id ="contenedor" style="margin-top:10px;">
                     <div style="width:100%;">
                         <table style="width: 100%;max-width: 100%;">
-                            <tr><td style="font-size:9px;">Regimen Fiscal : {{$d['regimenfiscal']->Nombre}} ({{$d['regimenfiscal']->Clave}})</td></tr>
+                            <tr><td style="font-size:9px;">Regimen Fiscal : @if($d['regimenfiscal'] != null) {{$d['regimenfiscal']->Nombre}} ({{$d['regimenfiscal']->Clave}}) @endif</td></tr>
                         </table>
                     </div>
                 </div>
@@ -229,7 +229,11 @@
                                     <td style="font-size:9px;">Sello Digital CFD:</td>
                                     @if($d['comprobantetimbrado'] > 0)
                                         <td rowspan="4">
-                                            {!!QrCode::size(150)->margin(0)->generate("https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx") !!}
+                                            @if($d['comprobante']->UrlVerificarCfdi != "")
+                                                {!!QrCode::size(150)->margin(0)->generate($d['comprobante']->UrlVerificarCfdi) !!}
+                                            @else
+                                                {!!QrCode::size(150)->margin(0)->generate("https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx") !!}
+                                            @endif
                                         </td>
                                     @endif
                                 </tr>

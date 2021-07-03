@@ -29,8 +29,11 @@ class PersonalController extends ConfiguracionSistemaController{
     //obtener todos los registros
     public function personal_obtener(Request $request){
         if($request->ajax()){
-            $data = Personal::orderBy('id', 'DESC')->get();
+            $data = Personal::query();
             return DataTables::of($data)
+                    ->order(function ($query) {
+                        $query->orderBy('id', 'DESC');
+                    })
                     ->addColumn('operaciones', function($data){
                         $operaciones = '<div class="dropdown">'.
                                             '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
@@ -41,13 +44,6 @@ class PersonalController extends ConfiguracionSistemaController{
                                                 '<li><a href="javascript:void(0);" onclick="desactivar('.$data->id.')">Bajas</a></li>'.
                                             '</ul>'.
                                         '</div>';
-                        /*if($data->status == 'ALTA'){
-                            $operaciones = '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos('.$data->id.')"><i class="material-icons">mode_edit</i></div> '. 
-                            '<div class="btn bg-red btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar('.$data->id.')"><i class="material-icons">cancel</i></div>';
-                        }else{
-                            $operaciones = '';
-                            //$operaciones = '<div class="btn bg-green btn-xs waves-effect" onclick="desactivar('.$data->id.')">Altas</div>';
-                        } */
                         return $operaciones;
                     })
                     ->setRowClass(function ($data) {

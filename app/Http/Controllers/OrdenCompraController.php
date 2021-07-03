@@ -28,7 +28,7 @@ use App\VistaOrdenCompra;
 use App\VistaObtenerExistenciaProducto;
 use Config;
 use Mail;
-
+use Schema;
 
 class OrdenCompraController extends ConfiguracionSistemaController{
 
@@ -36,14 +36,28 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
         //CONFIGURACIONES DE LA TABLA DEL CATALOGO O MODULO//
         $this->configuracion_tabla = Configuracion_Tabla::where('tabla', 'OrdenesDeCompra')->first();
+        //consultas ordenadas
         $this->campos_consulta = [];
         foreach (explode(",", $this->configuracion_tabla->columnas_ordenadas) as $campo){
             array_push($this->campos_consulta, $campo);
+        }
+        //campos vista
+        $this->camposvista = [];
+        foreach (explode(",", $this->configuracion_tabla->campos_activados) as $campo){
+            array_push($this->camposvista, $campo);
+        }
+        foreach (explode(",", $this->configuracion_tabla->campos_desactivados) as $campo){
+            array_push($this->camposvista, $campo);
         }
         //FIN CONFIGURACIONES DE LA TABLA//
     }
 
     public function ordenes_compra(){
+
+
+       //dd($this->camposvista);
+
+
         $serieusuario = 'A';
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('ordenes_compra_guardar_configuracion_tabla');
@@ -56,8 +70,14 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         if($request->ajax()){
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = VistaOrdenCompra::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->orderBy('Serie', 'ASC')->orderBy('Folio', 'DESC')->get();
+            //$data = VistaOrdenCompra::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->orderBy('Serie', 'ASC')->orderBy('Folio', 'DESC')->get();
+            $data = VistaOrdenCompra::select($this->campos_consulta)->where('Periodo', $periodo);
             return DataTables::of($data)
+                    ->order(function ($query) {
+                        $query->orderBy('Fecha', 'DESC');
+                        $query->orderBy('Serie', 'ASC');
+                        $query->orderBy('Folio', 'DESC');
+                    })
                     ->addColumn('operaciones', function($data) use ($tipousuariologueado){
                         $operaciones = '<div class="dropdown">'.
                                             '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
@@ -71,14 +91,6 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                                                 '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Orden .'\')">Enviar Documento por Correo</a></li>'.
                                             '</ul>'.
                                         '</div>';
-                        /*
-                        $botoncambios = '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Orden .'\')"><i class="material-icons">mode_edit</i></div> ';
-                        $botonautorizar = '<div class="btn bg-green btn-xs waves-effect" data-toggle="tooltip" title="Autorizar" onclick="autorizarordencompra(\''.$data->Orden .'\')"><i class="material-icons">check</i></div> ';
-                        $botonbajas = '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Orden .'\')"><i class="material-icons">cancel</i></div> ';
-                        $botondocumentopdf = '<a href="'.route('ordenes_compra_generar_pdfs_indiv',$data->Orden).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
-                        $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Orden .'\')"><i class="material-icons">email</i></div> ';
-                        $operaciones = $botoncambios.$botonautorizar.$botonbajas.$botondocumentopdf.$botonenviaremail;
-                        */
                         return $operaciones;
                     })
                     ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })

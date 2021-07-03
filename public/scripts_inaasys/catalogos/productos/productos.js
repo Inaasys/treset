@@ -50,22 +50,20 @@ function listar(){
     var campos_tabla  = [];
     campos_tabla.push({ 'data':'operaciones', 'name':'operaciones', 'orderable':false, 'searchable':false});
     for (var i = 0; i < campos.length; i++) {
-        var orderable = false;
         var searchable = false;
-        if(campos[i] == 'Codigo'){
-            orderable = true;
+        if(campos[i] == 'Codigo' || campos[i] == 'Producto'){
             searchable = true;
         }
         campos_tabla.push({ 
             'data'    : campos[i],
             'name'  : campos[i],
-            'orderable': orderable,
+            'orderable': false,
             'searchable': searchable
         });
     }
     tabla=$('#tbllistado').DataTable({
-        "lengthMenu": [ 10, 50, 100, 250, 500 ],
-        "pageLength": 250,
+        "lengthMenu": [ 100, 250, 500, 1000 ],
+        "pageLength": 500,
         "sScrollX": "110%",
         "sScrollY": "350px", 
         processing: true,

@@ -23,8 +23,11 @@ class FolioComprobanteFacturaController extends ConfiguracionSistemaController{
     }
     public function folios_comprobantes_facturas_obtener(Request $request){
         if($request->ajax()){
-            $data = FolioComprobanteFactura::orderBy('Numero', 'DESC')->get();
+            $data = FolioComprobanteFactura::query();
             return DataTables::of($data)
+                    ->order(function ($query) {
+                        $query->orderBy('Numero', 'DESC');
+                    })
                     ->addColumn('operaciones', function($data){
                         $operaciones = '<div class="dropdown">'.
                                             '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
@@ -36,15 +39,6 @@ class FolioComprobanteFacturaController extends ConfiguracionSistemaController{
                                                 '<li><a href="javascript:void(0);" onclick="predeterminarfolio('.$data->Numero.')">Predeterminar Folio</a></li>'.
                                             '</ul>'.
                                         '</div>';
-                        /*$botoncambios =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos('.$data->Numero.')"><i class="material-icons">mode_edit</i></div> '; 
-                        $botonbajas =      '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar('.$data->Numero.')"><i class="material-icons">cancel</i></div> ';
-                        $botonpredeterminar = '<div class="btn bg-green btn-xs waves-effect" data-toggle="tooltip" title="Predeterminar Folio" onclick="predeterminarfolio('.$data->Numero.')"><i class="material-icons">check</i></div> ';
-                        if($data->Status == 'ALTA'){
-                            $operaciones =    $botonpredeterminar.$botoncambios.$botonbajas;
-                        }else{
-                            $operaciones = '';
-                            //$operaciones =    '<div class="btn bg-green btn-xs waves-effect" onclick="desactivar(\''.$data->Numero .'\')">Altas</div>';
-                        } */
                         return $operaciones;
                     })
                     ->setRowClass(function ($data) {

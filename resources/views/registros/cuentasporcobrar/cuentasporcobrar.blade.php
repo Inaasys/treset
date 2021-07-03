@@ -18,8 +18,8 @@
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
                                     <h5>&nbsp;&nbsp;&nbsp;CUENTAS POR COBRAR&nbsp;&nbsp;&nbsp;</h5>
                                 </div>
-                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 button-demo">
-                                    <div class="table-responsive">
+                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 button-demo">
+                                    <div class="table-responsive navbar-right">
                                         <table>
                                             <tr>
                                                 <td >
@@ -48,10 +48,10 @@
                                         </table>
                                     </div>
                                 </div>
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
                                     <div class="row">
-                                        <div class="col-md-7 col-md-offset-4">
-                                            <select class="select2 form-control" name="periodo" id="periodo" onchange="relistar()" style="width75% !important;">
+                                        <div class="col-md-12">
+                                            <select class="select2 form-control" name="periodo" id="periodo" onchange="relistar()" style="width:100% !important;">
                                                 @for ($i = $periodoinicial; $i < $periodohoy; $i++)
                                                     <option value="{{$i}}">{{$i}}</option>
                                                 @endfor
@@ -69,7 +69,13 @@
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
-                                            <th>{{$co}}</th>
+                                                @if($co == 'Pago' || $co == 'UUID' || $co == 'Status' || $co == 'NombreCliente' || $co == 'RfcCliente')
+                                                    <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">
+                                                        {{$co}}
+                                                    </th>
+                                                @else
+                                                    <th>{{$co}}</th>
+                                                @endif
                                             @endforeach
                                         </tr>
                                     </thead>
@@ -136,6 +142,47 @@
     	</div>
   	</div>
 </div> 
+<!-- Modal Timbrado-->
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modaltimbrado" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  	<div class="modal-dialog" role="document">
+    	<div class="modal-content">
+      		<div class="modal-header {{$empresa->background_forms_and_modals}}">
+        		<h5 class="modal-title" id="exampleModalLabel">Aviso</h5>
+      		</div>
+      		<div class="modal-body">
+		      	<form id="formtimbrado" action="#">
+		        	<h5 id="textomodaltimbrado"> </h5>
+                    <input type="hidden" class="form-control" id="pagotimbrado" name="pagotimbrado">
+		        </form>	
+      		</div>
+	      	<div class="modal-footer">
+	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
+	        	<button type="button" class="btn btn-success btn-sm" id="btntimbrarpago">Timbrar Pago</button>
+	      	</div>
+    	</div>
+  	</div>
+</div>
+<!-- Modal Baja Timbre-->
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalbajatimbre" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  	<div class="modal-dialog" role="document">
+    	<div class="modal-content">
+      		<div class="modal-header {{$empresa->background_forms_and_modals}}">
+        		<h5 class="modal-title" >Aviso</h5>
+      		</div>
+      		<div class="modal-body">
+		      	<form id="formbajatimbre" action="#">
+		        	<h5 id="textomodalbajatimbre"> </h5>
+                    <input type="hidden" class="form-control" id="iddocumentofacturapi" name="iddocumentofacturapi" readonly>
+                    <input type="hidden" class="form-control" id="facturabajatimbre" name="facturabajatimbre" readonly>
+		        </form>	
+      		</div>
+	      	<div class="modal-footer">
+	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
+	        	<button type="button" class="btn btn-success btn-sm" id="btnbajatimbre">Confirmar Baja Timbre</button>
+	      	</div>
+    	</div>
+  	</div>
+</div>
 <!-- modal para crear documento en PDF-->
 @include('secciones.modalcreardocumento')
 <!-- fin modal para crear documento en PDF-->
@@ -198,6 +245,10 @@
         var cuentas_por_cobrar_obtener_datos_envio_email = '{!!URL::to('cuentas_por_cobrar_obtener_datos_envio_email')!!}';
         var cuentas_por_cobrar_enviar_pdfs_email = '{!!URL::to('cuentas_por_cobrar_enviar_pdfs_email')!!}';
         var cuentas_por_cobrar_buscar_folio_string_like =  '{!!URL::to('cuentas_por_cobrar_buscar_folio_string_like')!!}';
+        var cuentas_por_cobrar_verificar_si_continua_timbrado=  '{!!URL::to('cuentas_por_cobrar_verificar_si_continua_timbrado')!!}';
+        var cuentas_por_cobrar_timbrar_pago=  '{!!URL::to('cuentas_por_cobrar_timbrar_pago')!!}';
+        var cuentas_por_cobrar_verificar_si_continua_baja_timbre=  '{!!URL::to('cuentas_por_cobrar_verificar_si_continua_baja_timbre')!!}';
+        var cuentas_por_cobrar_baja_timbre=  '{!!URL::to('cuentas_por_cobrar_baja_timbre')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="scripts_inaasys/registros/cuentasporcobrar/cuentasporcobrar.js"></script>

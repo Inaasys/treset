@@ -43,31 +43,21 @@ class ServicioController extends ConfiguracionSistemaController{
                                                 '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Codigo .'\')">Bajas</a></li>'.
                                             '</ul>'.
                                         '</div>';
-                        /*if($data->Status == 'ALTA'){
-                            $operaciones =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Codigo .'\')"><i class="material-icons">mode_edit</i></div> '. 
-                                        '<div class="btn bg-red btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Codigo .'\')"><i class="material-icons">cancel</i></div>';
-                        }else{
-                            $operaciones = '';
-                            //$operaciones =    '<div class="btn bg-green btn-xs waves-effect" onclick="desactivar(\''.$data->Codigo .'\')">Altas</div>';
-                        } */
                         return $operaciones;
                     })
                     ->addColumn('Costo', function($data){
-                        $costo = Helpers::convertirvalorcorrecto($data->Costo);
-                        return $costo;
+                        return Helpers::convertirvalorcorrecto($data->Costo);
                     })
                     ->addColumn('Venta', function($data){
-                        $venta = Helpers::convertirvalorcorrecto($data->Venta);
-                        return $venta;
+                        return Helpers::convertirvalorcorrecto($data->Venta);
                     })
                     ->addColumn('Cantidad', function($data){
-                        $cantidad = Helpers::convertirvalorcorrecto($data->Cantidad);
-                        return $cantidad;
+                        return Helpers::convertirvalorcorrecto($data->Cantidad);
                     })
                     ->setRowClass(function ($data) {
                         return $data->Status == 'ALTA' ? '' : 'bg-orange';
                     })
-                    ->rawColumns(['operaciones','Costo','Venta','Cantidad'])
+                    ->rawColumns(['operaciones'])
                     ->make(true);
         } 
     }  

@@ -19,7 +19,7 @@
                                     <h5>&nbsp;&nbsp;&nbsp;FOLIOS COMPROBANTES FACTURAS&nbsp;&nbsp;&nbsp;</h5>
                                 </div>
                                 <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 button-demo">
-                                    <div class="table-responsive">
+                                    <div class="table-responsive navbar-right">
                                         <table>
                                             <tr>
                                                 <td >
@@ -39,9 +39,9 @@
                                     <thead class="{{$empresa->background_tables}}">
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
-                                            <th>Número</th>
-                                            <th>Serie</th>
-                    						<th>Esquema</th>
+                                            <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Número</th>
+                                            <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Serie</th>
+                    						<th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Esquema</th>
                                             <th>FolioInicial</th>
                                             <th>Titulo</th>
                                             <th>Depto</th>
@@ -49,7 +49,7 @@
                                             <th>ValidoHasta</th>
                                             <th>Empresa</th>
                                             <th>Predeterminar</th>
-                                            <th>Status</th>
+                                            <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>

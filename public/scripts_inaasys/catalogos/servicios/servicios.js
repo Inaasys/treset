@@ -46,8 +46,8 @@ function ocultarformulario(){
 //listar todos los registros de la tabla
 function listar(){
     tabla=$('#tbllistado').DataTable({
-        "lengthMenu": [ 10, 50, 100, 250, 500 ],
-        "pageLength": 250,
+        "lengthMenu": [ 100, 250, 500, 1000 ],
+        "pageLength": 1000,
         "sScrollX": "110%",
         "sScrollY": "350px",
         processing: true,
@@ -59,8 +59,8 @@ function listar(){
         ajax: servicios_obtener,
         columns: [
             { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
-            { data: 'Codigo', name: 'Codigo' },
-            { data: 'Servicio', name: 'Servicio' },
+            { data: 'Codigo', name: 'Codigo', orderable: false, searchable: true },
+            { data: 'Servicio', name: 'Servicio', orderable: false, searchable: true },
             { data: 'Unidad', name: 'Unidad', orderable: false, searchable: false },
             { data: 'NumeroFamilia', name: 'NumeroFamilia', orderable: false, searchable: false },
             { data: 'Familia', name: 'Familia', orderable: false, searchable: false },
@@ -69,7 +69,7 @@ function listar(){
             { data: 'Cantidad', name: 'Cantidad', orderable: false, searchable: false },
             { data: 'ClaveProducto', name: 'ClaveProducto', orderable: false, searchable: false },
             { data: 'ClaveUnidad', name: 'ClaveUnidad', orderable: false, searchable: false },
-            { data: 'Status', name: 'Status', orderable: false, searchable: false }
+            { data: 'Status', name: 'Status', orderable: false, searchable: true }
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');

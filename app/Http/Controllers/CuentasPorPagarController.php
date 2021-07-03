@@ -56,8 +56,14 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
         if($request->ajax()){
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = VistaCuentaPorPagar::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->orderBy('Serie', 'ASC')->orderBy('Folio', 'DESC')->get();
+            //$data = VistaCuentaPorPagar::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->orderBy('Serie', 'ASC')->orderBy('Folio', 'DESC')->get();
+            $data = VistaCuentaPorPagar::select($this->campos_consulta)->where('Periodo', $periodo);
             return DataTables::of($data)
+                ->order(function ($query){
+                    $query->orderBy('Fecha', 'DESC');
+                    $query->orderBy('Serie', 'ASC');
+                    $query->orderBy('Folio', 'DESC');
+                })
                 ->addColumn('operaciones', function($data){
                     $operaciones =  '<div class="dropdown">'.
                                         '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
@@ -70,13 +76,6 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                                             '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Pago .'\')">Enviar Documento por Correo</a></li>'.
                                         '</ul>'.
                                     '</div>';
-                    /*
-                    $botoncambios   =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Pago .'\')"><i class="material-icons">mode_edit</i></div> '; 
-                    $botonbajas     =    '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Pago .'\')"><i class="material-icons">cancel</i></div>  ';
-                    $botondocumentopdf = '<a href="'.route('cuentas_por_pagar_generar_pdfs_indiv',$data->Pago).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
-                    $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Pago .'\')"><i class="material-icons">email</i></div> ';
-                    $operaciones =  $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
-                    */
                     return $operaciones;
                 })
                 ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })

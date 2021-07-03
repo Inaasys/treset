@@ -38,6 +38,8 @@ use App\FolioComprobantePago;
 use App\Comprobante;
 use Config;
 use Mail;
+use Facturapi\Facturapi;
+use Storage;
 
 class CuentasPorCobrarController extends ConfiguracionSistemaController{
 
@@ -50,6 +52,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             array_push($this->campos_consulta, $campo);
         }
         //FIN CONFIGURACIONES DE LA TABLA//
+        //API FACTURAPI 
+        $this->facturapi = new Facturapi( config('app.keyfacturapi') ); //
     }
 
     public function cuentas_por_cobrar(){
@@ -83,8 +87,14 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         if($request->ajax()){
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = VistaCuentaPorCobrar::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->orderBy('Serie', 'ASC')->orderBy('Folio', 'DESC')->get();
+            //$data = VistaCuentaPorCobrar::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->orderBy('Serie', 'ASC')->orderBy('Folio', 'DESC')->get();
+            $data = VistaCuentaPorCobrar::select($this->campos_consulta)->where('Periodo', $periodo);
             return DataTables::of($data)
+                ->order(function ($query) {
+                    $query->orderBy('Fecha', 'DESC');
+                    $query->orderBy('Serie', 'ASC');
+                    $query->orderBy('Folio', 'DESC');
+                })
                 ->addColumn('operaciones', function($data){
                     $operaciones = '<div class="dropdown">'.
                                         '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
@@ -95,15 +105,10 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                                             '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Pago .'\')">Bajas</a></li>'.
                                             '<li><a href="'.route('cuentas_por_cobrar_generar_pdfs_indiv',$data->Pago).'" target="_blank">Ver Documento PDF</a></li>'.
                                             '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Pago .'\')">Enviar Documento por Correo</a></li>'.
+                                            //'<li><a href="javascript:void(0);" onclick="timbrarpago(\''.$data->Pago .'\')">Timbrar Pago</a></li>'.
+                                            //'<li><a href="javascript:void(0);" onclick="cancelartimbre(\''.$data->Pago .'\')">Cancelar Timbre</a></li>'.
                                         '</ul>'.
                                     '</div>';
-                    /*
-                    $botoncambios   =   '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Pago .'\')"><i class="material-icons">mode_edit</i></div> '; 
-                    $botonbajas     =   '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Pago .'\')"><i class="material-icons">cancel</i></div>  ';
-                    $botondocumentopdf = '<a href="'.route('cuentas_por_cobrar_generar_pdfs_indiv',$data->Pago).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
-                    $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Pago .'\')"><i class="material-icons">email</i></div> ';
-                    $operaciones    = $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
-                    */
                     return $operaciones;
                 })
                 ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
@@ -906,8 +911,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $estadocliente = Estado::where('Clave', $cliente->Estado)->first();
             $formapago = FormaPago::where('Clave', $cxc->FormaPago)->first();
             $regimenfiscal = c_RegimenFiscal::where('Clave', $cxc->RegimenFiscal)->first();
-            $comprobantetimbrado = Comprobante::where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->count();
-            $comprobante = Comprobante::where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->first();
+            $comprobantetimbrado = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->count();
+            $comprobante = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->first();
             $formatter = new NumeroALetras;
             $totalletras = $formatter->toInvoice($cxc->Abono, 2, 'M.N.');
             $data[]=array(
@@ -981,8 +986,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $estadocliente = Estado::where('Clave', $cliente->Estado)->first();
             $formapago = FormaPago::where('Clave', $cxc->FormaPago)->first();
             $regimenfiscal = c_RegimenFiscal::where('Clave', $cxc->RegimenFiscal)->first();
-            $comprobantetimbrado = Comprobante::where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->count();
-            $comprobante = Comprobante::where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->first();
+            $comprobantetimbrado = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->count();
+            $comprobante = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->first();
             $formatter = new NumeroALetras;
             $totalletras = $formatter->toInvoice($cxc->Abono, 2, 'M.N.');
             $data[]=array(
@@ -1069,8 +1074,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $estadocliente = Estado::where('Clave', $cliente->Estado)->first();
             $formapago = FormaPago::where('Clave', $cxc->FormaPago)->first();
             $regimenfiscal = c_RegimenFiscal::where('Clave', $cxc->RegimenFiscal)->first();
-            $comprobantetimbrado = Comprobante::where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->count();
-            $comprobante = Comprobante::where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->first();
+            $comprobantetimbrado = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->count();
+            $comprobante = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->first();
             $formatter = new NumeroALetras;
             $totalletras = $formatter->toInvoice($cxc->Abono, 2, 'M.N.');
             $data[]=array(
@@ -1102,6 +1107,17 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         ->setOption('margin-left', 2)
         ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
+        //obtener XML
+        if($request->incluir_xml == 1){
+            $cxc = CuentaXCobrar::where('Pago', $request->emaildocumento)->first(); 
+            $comprobante = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->first();
+            $descargar_xml = $this->facturapi->Invoices->download_xml($comprobante->IdFacturapi); // stream containing the XML file or
+            $nombre_xml = "CuentaPorCobrarNo".$cxc->Pago.'##'.$cxc->UUID.'.xml';
+            Storage::disk('local')->put($nombre_xml, $descargar_xml);
+            $url_xml = Storage::disk('local')->getAdapter()->applyPathPrefix($nombre_xml);
+        }else{
+            $url_xml = "";
+        }
         try{
             //enviar correo electrónico	
             $nombre = 'Receptor envio de correos';
@@ -1113,12 +1129,24 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $body = $request->emailasunto;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
-            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
-                $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
-                        ->cc($correos)
-                        ->subject($asunto)
-                        ->attachData($pdf->output(), "CuentaPorCobrarNo".$emaildocumento.".pdf");
-            });
+            if (file_exists($url_xml) != false) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento,$url_xml) {
+                    $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento,$url_xml)
+                            ->cc($correos)
+                            ->subject($asunto)
+                            ->attachData($pdf->output(), "CuentaPorCobrarNo".$emaildocumento.".pdf")
+                            ->attach($url_xml);
+                });
+                //eliminar xml de storage/xml_cargados
+                unlink($url_xml);
+            }else{
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
+                    $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                            ->cc($correos)
+                            ->subject($asunto)
+                            ->attachData($pdf->output(), "CuentaPorCobrarNo".$emaildocumento.".pdf");
+                });
+            }
         } catch(\Exception $e) {
             $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
             $correos = ['osbaldo.anzaldo@utpcamiones.com.mx'];
@@ -1152,6 +1180,162 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         $Configuracion_Tabla->usuario = Auth::user()->user;
         $Configuracion_Tabla->save();
         return redirect()->route('cuentas_por_cobrar');
+    }
+
+    //verificar si se puede timbrar la factura
+    public function cuentas_por_cobrar_verificar_si_continua_timbrado(Request $request){
+        $CXC = CuentaXCobrar::where('Pago', $request->pago)->first();
+        $data = array(
+            'Status' => $CXC->Status,
+            'UUID' => $CXC->UUID
+        );
+        return response()->json($data);
+    }
+    //timbrar factura
+    public function cuentas_por_cobrar_timbrar_pago(Request $request){
+        $CXC = CuentaXCobrar::where('Pago', $request->pagotimbrado)->first();
+        $detallescxc = CuentaXCobrarDetalle::where('Pago', $request->pagotimbrado)->get();
+        $cliente = Cliente::where('Numero', $CXC->Cliente)->first();
+        $arraydet = array();
+        foreach($detallescxc as $dp){
+            array_push($arraydet,   array(
+                                        "uuid" => $dp->idDocumento, // UUID_de_factura_relacionada
+                                        "installment" => Helpers::convertirvalorcorrecto($dp->NumParcialidad),
+                                        "last_balance" => Helpers::convertirvalorcorrecto($dp->ImpSaldoAnt),
+                                        "amount" => Helpers::convertirvalorcorrecto($dp->Abono),
+                                        "currency" => $dp->MonedaDR,
+                                        "folio_number" => $dp->Folio,
+                                        "series" => $dp->Serie
+                                    )
+            );
+        }        
+        //CUENTA POR COBRAR
+        $invoice = array(
+            "type" => \Facturapi\InvoiceType::PAGO,
+            "customer" => array(
+                "legal_name" => $cliente->Nombre,
+                "tax_id" => $cliente->Rfc
+            ),
+            "payments" => array(
+                array(
+                    "payment_form" => $CXC->FormaPago,
+                    "currency" => $CXC->Moneda,
+                    "exchange" => Helpers::convertirvalorcorrecto($CXC->TipoCambio),
+                    "date" => Helpers::formatoinputdatetime($CXC->FechaPago),
+                    "related" => $arraydet
+                )
+            ),
+            "date" => Helpers::formatoinputdatetime($CXC->Fecha),
+            "folio_number" => $CXC->Folio,
+            "series" => $CXC->Serie,
+        );
+        $new_invoice = $this->facturapi->Invoices->create( $invoice );
+        $result = json_encode($new_invoice);
+        $result2 = json_decode($result, true);
+        if(array_key_exists('ok', $result2) == true){
+            $mensaje = $new_invoice->message;
+            $tipomensaje = "error";
+            $data = array(
+                        'mensaje' => "Error, ".$mensaje,
+                        'tipomensaje' => $tipomensaje 
+                    );
+            return response()->json($data);
+        }else{
+            //obtener datos del xml del documento timbrado para guardarlo en la tabla comprobantes
+            $descargar_xml = $this->facturapi->Invoices->download_xml($new_invoice->id); // stream containing the XML file or
+            $xml = simplexml_load_string($descargar_xml);  
+            $comprobante = $xml->attributes(); 
+            $CertificadoCFD = $comprobante['NoCertificado'];
+            //obtener datos generales del xml nodo Emisor
+            $activar_namespaces = $xml->getNameSpaces(true);
+            $namespaces = $xml->children($activar_namespaces['cfdi']);
+            //obtener UUID del xml timbrado digital
+            $activar_namespaces = $namespaces->Complemento->getNameSpaces(true);
+            $namespaces_uuid = $namespaces->Complemento->children($activar_namespaces['tfd']);
+            $atributos_complemento = $namespaces_uuid->TimbreFiscalDigital->attributes();
+            $NoCertificadoSAT = $atributos_complemento['NoCertificadoSAT'];
+            $SelloCFD = $atributos_complemento['SelloCFD'];
+            $SelloSAT = $atributos_complemento['SelloSAT'];
+            $fechatimbrado = $atributos_complemento['FechaTimbrado'];
+            $cadenaoriginal = "||".$atributos_complemento['Version']."|".$new_invoice->uuid."|".$atributos_complemento['FechaTimbrado']."|".$atributos_complemento['SelloCFD']."|".$atributos_complemento['NoCertificadoSAT']."||";
+            //guardar en tabla comprobante
+            $Comprobante = new Comprobante;
+            $Comprobante->Comprobante = 'Pago';
+            $Comprobante->Tipo = $new_invoice->type;
+            $Comprobante->Version = '3.3';
+            $Comprobante->Serie = $new_invoice->series;
+            $Comprobante->Folio = $new_invoice->folio_number;
+            $Comprobante->UUID = $new_invoice->uuid;
+            $Comprobante->Fecha = Helpers::fecha_exacta_accion_datetimestring();
+            $Comprobante->SubTotal = Helpers::convertirvalorcorrecto(0);
+            $Comprobante->Descuento = Helpers::convertirvalorcorrecto(0);
+            $Comprobante->Total = Helpers::convertirvalorcorrecto(0);
+            $Comprobante->EmisorRfc = $CXC->EmisorRfc;
+            $Comprobante->ReceptorRfc = $CXC->ReceptorRfc;
+            $Comprobante->UsoCfdi = 'P01';
+            $Comprobante->Moneda = 'XXX';
+            $Comprobante->TipoCambio = Helpers::convertirvalorcorrecto(0);
+            $Comprobante->CertificadoSAT = $NoCertificadoSAT;
+            $Comprobante->CertificadoCFD = $CertificadoCFD;
+            $Comprobante->FechaTimbrado = $fechatimbrado;
+            $Comprobante->CadenaOriginal = $cadenaoriginal;
+            $Comprobante->selloSAT = $SelloSAT;
+            $Comprobante->selloCFD = $SelloCFD;
+            //$Comprobante->CfdiTimbrado = $new_invoice->type;
+            $Comprobante->Periodo = $this->periodohoy;
+            $Comprobante->IdFacturapi = $new_invoice->id;
+            $Comprobante->UrlVerificarCfdi = $new_invoice->verification_url;
+            $Comprobante->save();
+            //Colocar UUID en cxc
+            CuentaXCobrar::where('Pago', $request->pagotimbrado)
+                            ->update([
+                                'UUID' => $new_invoice->uuid
+                            ]);  
+            // Enviar a más de un correo (máx 10)
+            $this->facturapi->Invoices->send_by_email(
+                $new_invoice->id,
+                array(
+                    "osbaldo.anzaldo@utpcamiones.com.mx",
+                    //"marco.baltazar@utpcamiones.com.mx",
+                )
+            );
+            $mensaje = "Correcto, el documento se timbro correctamente";
+            $tipomensaje = "success";
+            $data = array(
+                        'mensaje' => $mensaje,
+                        'tipomensaje' => $tipomensaje 
+                    );
+            return response()->json($data);
+        }
+    }
+    //verificar cancelacion timbre
+    public function cuentas_por_cobrar_verificar_si_continua_baja_timbre(Request $request){
+        $obtener_factura = '';
+        $comprobante = '';
+        $factura = CuentaXCobrar::where('Pago', $request->facturabajatimbre)->first();
+        $existe_comprobante = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $factura->Folio . '')->where('Serie', '' . $factura->Serie . '')->count();
+        if($existe_comprobante > 0){
+            $comprobante = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $factura->Folio . '')->where('Serie', '' . $factura->Serie . '')->first();
+            $obtener_factura = $this->facturapi->Invoices->retrieve($comprobante->IdFacturapi); // obtener factura
+        }
+        $data = array(
+            'obtener_factura' => $obtener_factura,
+            'factura' => $factura,
+            'comprobante' => $comprobante
+        );
+        return response()->json($data);
+    }
+    //cancelar timbre
+    public function cuentas_por_cobrar_baja_timbre(Request $request){
+        //colocar fecha de cancelacion en tabla comprobante
+        $factura = CuentaXCobrar::where('Pago', $request->facturabajatimbre)->first();
+        Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $factura->Folio . '')->where('Serie', '' . $factura->Serie . '')
+        ->update([
+            'FechaCancelacion' => Helpers::fecha_exacta_accion_datetimestring()
+        ]);
+        //cancelar timbre facturapi
+        $timbrecancelado = $this->facturapi->Invoices->cancel($request->iddocumentofacturapi);
+        return response()->json($timbrecancelado);
     }
 
 }

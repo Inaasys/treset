@@ -66,4 +66,8 @@ class VistaOrdenCompra extends Model
     public function setFechaAttribute($value){
         $this->attributes['first_name'] = strtolower($value);
     }*/
+
+    public function getTableColumns(){
+        return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
+    }
 }

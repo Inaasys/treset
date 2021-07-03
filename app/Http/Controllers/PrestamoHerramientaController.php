@@ -49,8 +49,14 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
         if($request->ajax()){
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = VistaPrestamoHerramienta::select($this->campos_consulta)->where('periodo', $periodo)->orderBy('fecha', 'DESC')->orderBy('serie', 'ASC')->orderBy('folio', 'DESC')->get();
+            //$data = VistaPrestamoHerramienta::select($this->campos_consulta)->where('periodo', $periodo)->orderBy('fecha', 'DESC')->orderBy('serie', 'ASC')->orderBy('folio', 'DESC')->get();
+            $data = VistaPrestamoHerramienta::select($this->campos_consulta)->where('periodo', $periodo);
             return DataTables::of($data)
+                    ->order(function ($query){
+                        $query->orderBy('fecha', 'DESC');
+                        $query->orderBy('serie', 'ASC');
+                        $query->orderBy('folio', 'DESC');
+                    })
                     ->addColumn('operaciones', function($data) use ($tipousuariologueado){
                         $operaciones = '<div class="dropdown">'.
                                             '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
@@ -62,12 +68,6 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
                                                 '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->prestamo .'\')">Bajas</a></li>'.
                                             '</ul>'.
                                         '</div>';
-                        /*
-                        $botoncambios =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->prestamo .'\')"><i class="material-icons">mode_edit</i></div> '; 
-                        $botonterminarprestamo=      '<div class="btn bg-green btn-xs waves-effect" data-toggle="tooltip" title="Terminar Prestamo" onclick="terminarprestamo(\''.$data->prestamo .'\')"><i class="material-icons">check</i></div> ';
-                        $botonbajas =      '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->prestamo .'\')"><i class="material-icons">cancel</i></div> ';
-                        $operaciones =  $botoncambios.$botonbajas.$botonterminarprestamo;
-                        */
                         return $operaciones;
                     })
                     ->addColumn('fecha', function($data){ return Carbon::parse($data->fecha)->toDateTimeString(); })

@@ -52,8 +52,8 @@ function ocultarformulario(){
 //listar todos los registros de la tabla
 function listar(){
     tabla=$('#tbllistado').DataTable({
-        "lengthMenu": [ 10, 50, 100, 250, 500 ],
-        "pageLength": 250,
+        "lengthMenu": [ 100, 250, 500, 1000 ],
+        "pageLength": 1000,
         "sScrollX": "110%",
         "sScrollY": "350px", 
         processing: true,
@@ -65,16 +65,16 @@ function listar(){
         ajax: folios_comprobantes_notas_obtener,
         columns: [
             { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
-            { data: 'Numero', name: 'Numero', orderable: false, searchable: false },
-            { data: 'Serie', name: 'Serie' },
-            { data: 'Esquema', name: 'Esquema' },
+            { data: 'Numero', name: 'Numero', orderable: false, searchable: true },
+            { data: 'Serie', name: 'Serie', orderable: false, searchable: true },
+            { data: 'Esquema', name: 'Esquema', orderable: false, searchable: true },
             { data: 'FolioInicial', name: 'FolioInicial', orderable: false, searchable: false },
             { data: 'Titulo', name: 'Titulo', orderable: false, searchable: false },
             { data: 'ValidoDesde', name: 'ValidoDesde', orderable: false, searchable: false },
             { data: 'ValidoHasta', name: 'ValidoHasta', orderable: false, searchable: false },
             { data: 'Empresa', name: 'Empresa', orderable: false, searchable: false },
             { data: 'Predeterminar', name: 'Predeterminar', orderable: false, searchable: false },
-            { data: 'Status', name: 'Status', orderable: false, searchable: false }
+            { data: 'Status', name: 'Status', orderable: false, searchable: true }
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');

@@ -97,7 +97,7 @@ class VistaFactura extends Model
         return Helpers::convertirvalorcorrecto($value);
     }
     //Descuentos
-    public function getDescuentoslAttribute($value){
+    public function getDescuentosAttribute($value){
         return Helpers::convertirvalorcorrecto($value);
     }
     //Saldo

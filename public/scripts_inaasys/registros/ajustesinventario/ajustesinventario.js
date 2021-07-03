@@ -89,16 +89,20 @@ function listar(){
   var campos_tabla  = [];
   campos_tabla.push({ 'data':'operaciones', 'name':'operaciones', 'orderable':false, 'searchable':false});
   for (var i = 0; i < campos.length; i++) {
+    var searchable = false;
+    if(campos[i] == 'Ajuste' || campos[i] == 'Status' || campos[i] == 'NombreAlmacen'){
+        searchable = true;
+    }
       campos_tabla.push({ 
           'data'    : campos[i],
           'name'  : campos[i],
-          'orderable': true,
-          'searchable': true
+          'orderable': false,
+          'searchable': searchable
       });
   }
   tabla=$('#tbllistado').DataTable({
-    "lengthMenu": [ 10, 50, 100, 250, 500 ],
-    "pageLength": 250,
+    "lengthMenu": [ 100, 250, 500, 1000 ],
+    "pageLength": 100,
     "sScrollX": "110%",
     "sScrollY": "350px",
     processing: true,
@@ -886,6 +890,7 @@ function obtenerdatos(ajustemodificar){
   $("#titulomodal").html('Modificación Ajuste Inventario');
   $('.page-loader-wrapper').css('display', 'block');
   $.get(ajustesinventario_obtener_ajuste,{ajustemodificar:ajustemodificar },function(data){
+    console.log(data);
     //formulario modificacion
     var tabs ='<div class="col-md-12">'+  
                 '<div class="row">'+
@@ -1072,7 +1077,7 @@ function enviardocumentoemail(documento){
     $("#textomodalenviarpdfemail").html("Enviar email Ajuste de Inventario No." + documento);
     $("#emaildocumento").val(documento);
     $("#emailde").val(data.emailde);
-    $("#emailasunto").val("AJUSTE DE INVENTARIO NO. " + documento +" DE USADOS TRACTOCAMIONES Y PARTES REFACCIONARIAS SA DE CV");
+    $("#emailasunto").val("AJUSTE DE INVENTARIO NO. " + documento +" DE "+ nombreempresa);
     $("#modalenviarpdfemail").modal('show');
   })   
 }

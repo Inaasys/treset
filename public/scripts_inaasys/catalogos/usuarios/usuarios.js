@@ -55,6 +55,8 @@ function ocultarformulario(){
 //listar todos los registros de la tabla
 function listar(){
   tabla=$('#tbllistado').DataTable({
+    "lengthMenu": [ 100, 250, 500, 1000 ],
+    "pageLength": 1000,
     "sScrollX": "110%",
     "sScrollY": "350px",
     processing: true,
@@ -66,9 +68,9 @@ function listar(){
     ajax: usuarios_obtener,
     columns: [
         { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
-        { data: 'id', name: 'id' },
-        { data: 'name', name: 'name' },
-        { data: 'email', name: 'email', orderable: false  },
+        { data: 'id', name: 'id', orderable: false, searchable: true },
+        { data: 'name', name: 'name', orderable: false, searchable: true },
+        { data: 'email', name: 'email', orderable: false, searchable: true },
         { data: 'user', name: 'user', orderable: false, searchable: false  },
         { data: 'role_id', name: 'role_id', orderable: false, searchable: false  }
     ],
@@ -330,6 +332,7 @@ function permisos(id){
     $('.page-loader-wrapper').css('display', 'block');
     $.get(usuarios_obtener_permisos,{id:id},function(data){
         //formulario modificacion
+        $("#titulomodalpermisos").html("Permisos: "+data.name);
         var tabs =  '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
                         '<li role="presentation" class="active">'+
                             '<a href="#tabregistros" data-toggle="tab">Registros</a>'+
@@ -341,13 +344,13 @@ function permisos(id){
                             '<a href="#tabreportes" data-toggle="tab">Reportes</a>'+
                         '</li>'+
                         '<li role="presentation">'+
+                            '<a href="#tabtimbrar" data-toggle="tab">Timbrar</a>'+
+                        '</li>'+
+                        '<li role="presentation">'+
                             '<a href="#tabliberar" data-toggle="tab">Liberar</a>'+
                         '</li>'+
                         '<li role="presentation">'+
                             '<a href="#tabsat" data-toggle="tab">Sat</a>'+
-                        '</li>'+
-                        '<li role="presentation">'+
-                            '<a href="#tabseries" data-toggle="tab">Series</a>'+
                         '</li>'+
                         '<li role="presentation">'+
                             '<a href="#tabalmacenes" data-toggle="tab">Almacenes</a>'+
@@ -666,14 +669,14 @@ function permisos(id){
                             '</div>'+
                             '<div class="row">'+
                                 '<div class="col-md-6">'+
-                                    '<label>Acceso a todos los registros en menu</label>'+
+                                    '<label class="col-red">Acceso a todos los registros en menu</label>'+
                                     '<div class="col-md-12 form-check">'+ 
                                         '<input type="checkbox" name="accesotodoslosregistrosenmenu" id="idaccesotodoslosregistrosenmenu" class="filled-in" value="1" onchange="marcaraccesosentodoslosregistros()"/>'+
                                         '<label for="idaccesotodoslosregistrosenmenu">Marcar</label>'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="col-md-6">'+
-                                    '<label>Altas,Bajas,Cambios en todos los registros</label>'+
+                                    '<label class="col-red">Altas,Bajas,Cambios en todos los registros</label>'+
                                     '<div class="col-md-12 form-check">'+ 
                                         '<input type="checkbox" name="crudentodoslosregistros" id="idcrudentodoslosregistros" class="filled-in" value="1" onchange="marcarcrudentodoslosregistros()"/>'+
                                         '<label for="idcrudentodoslosregistros">Marcar</label>'+
@@ -920,14 +923,14 @@ function permisos(id){
                             '</div>'+
                             '<div class="row">'+
                                 '<div class="col-md-6">'+
-                                    '<label>Acceso a todos los catálogos en menu</label>'+
+                                    '<label class="col-red">Acceso a todos los catálogos en menu</label>'+
                                     '<div class="col-md-12 form-check">'+ 
                                         '<input type="checkbox" name="accesotodosloscatalogosenmenu" id="idaccesotodosloscatalogosenmenu" class="filled-in" value="1" onchange="marcaraccesosentodosloscatalogos()"/>'+
                                         '<label for="idaccesotodosloscatalogosenmenu">Marcar</label>'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="col-md-6">'+
-                                    '<label>Altas,Bajas,Cambios en todos los catálogos</label>'+
+                                    '<label class="col-red">Altas,Bajas,Cambios en todos los catálogos</label>'+
                                     '<div class="col-md-12 form-check">'+ 
                                         '<input type="checkbox" name="crudentodosloscatalogos" id="idcrudentodosloscatalogos" class="filled-in" value="1" onchange="marcarcrudentodosloscatalogos()"/>'+
                                         '<label for="idcrudentodosloscatalogos">Marcar</label>'+
@@ -961,10 +964,72 @@ function permisos(id){
                             '</div>'+
                             '<div class="row">'+
                                 '<div class="col-md-6">'+
-                                    '<label>Acceso a todos los reportes en menu</label>'+
+                                    '<label class="col-red">Acceso a todos los reportes en menu</label>'+
                                     '<div class="col-md-12 form-check">'+ 
                                         '<input type="checkbox" name="accesotodoslosreportesenmenu" id="idaccesotodoslosreportesenmenu" class="filled-in" value="1" onchange="marcaraccesosentodoslosreportes()"/>'+
                                         '<label for="idaccesotodoslosreportesenmenu">Marcar</label>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+ 
+                        '<div role="tabtimbrar" class="tab-pane fade" id="tabtimbrar">'+
+                            '<div class="row">'+
+                                '<div class="col-md-6">'+
+                                    '<label>Timbrar Facturas</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="registros.facturas.timbrar" id="idregistros.facturas.timbrar" class="filled-in permisoscrud timbrardocumentos" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idregistros.facturas.timbrar"></label>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label>Cancelar Timbres Facturas</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="registros.facturas.cancelartimbres" id="idregistros.facturas.cancelartimbres" class="filled-in permisoscrud cancelartimbresdocumentos" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idregistros.facturas.cancelartimbres"></label>'+                                     
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label>Timbrar Notas</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="registros.notas.credito.clientes.timbrar" id="idregistros.notas.credito.clientes.timbrar" class="filled-in permisoscrud timbrardocumentos" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idregistros.notas.credito.clientes.timbrar"></label>'+                                     
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label>Cancelar Timbres Notas</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="registros.notas.credito.clientes.cancelartimbres" id="idregistros.notas.credito.clientes.cancelartimbres" class="filled-in permisoscrud cancelartimbresdocumentos" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idregistros.notas.credito.clientes.cancelartimbres"></label>'+                                     
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label>Timbrar Pagos</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="registros.cuentas.x.cobrar.timbrar" id="idregistros.cuentas.x.cobrar.timbrar" class="filled-in permisoscrud timbrardocumentos" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idregistros.cuentas.x.cobrar.timbrar"></label>'+                                     
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label>Cancelar Timbres Pagos</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="registros.cuentas.x.cobrar.cancelartimbres" id="idregistros.cuentas.x.cobrar.cancelartimbres" class="filled-in permisoscrud cancelartimbresdocumentos" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idregistros.cuentas.x.cobrar.cancelartimbres"></label>'+                                     
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                            '<div class="row">'+
+                                '<div class="col-md-6">'+
+                                    '<label class="col-red">Timbrar todos los documentos (Facturas, Notas y Pagos)</label>'+
+                                    '<div class="col-md-12 form-check">'+ 
+                                        '<input type="checkbox" name="timbrartodoslosdocumentos" id="idtimbrartodoslosdocumentos" class="filled-in" value="1" onchange="marcartimbradoentodoslosdocumentos()"/>'+
+                                        '<label for="idtimbrartodoslosdocumentos">Marcar</label>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label class="col-red">Cancelar timbres en todos los documentos (Facturas, Notas y Pagos)</label>'+
+                                    '<div class="col-md-12 form-check">'+ 
+                                        '<input type="checkbox" name="cancelartimbresentodoslosdocumentos" id="idcancelartimbresentodoslosdocumentos" class="filled-in" value="1" onchange="marcarcancelartimbresentodoslosdocumentos()"/>'+
+                                        '<label for="idcancelartimbresentodoslosdocumentos">Marcar</label>'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
@@ -980,13 +1045,6 @@ function permisos(id){
                             '<div class="row">'+
                                 '<div class="col-md-12">'+
                                     '<small><b style="color:#F44336 !important;">*</b> Sat</small>'+
-                                '</div>'+
-                            '</div>'+
-                        '</div>'+ 
-                        '<div role="tabpanel" class="tab-pane fade" id="tabseries">'+
-                            '<div class="row">'+
-                                '<div class="col-md-12">'+
-                                    '<small><b style="color:#F44336 !important;">*</b> Series</small>'+
                                 '</div>'+
                             '</div>'+
                         '</div>'+ 
@@ -1014,6 +1072,8 @@ function permisos(id){
                $("input[name='"+registro[0]+"']").prop('checked', true);
             } 
         });
+        construirarraysubmenus();
+        construirarraypermisoscrud();
     }).fail( function() {
         msj_errorajax();
         $('.page-loader-wrapper').css('display', 'none');
@@ -1069,6 +1129,32 @@ function marcaraccesosentodoslosreportes(){
     construirarraysubmenus();
     construirarraypermisoscrud();
 }
+
+
+
+//marcar timbrar en todos los documentos
+function marcartimbradoentodoslosdocumentos(){
+    if( $('#idtimbrartodoslosdocumentos').prop('checked') ) {
+        $(".timbrardocumentos").prop('checked', true);
+    }else{
+        $(".timbrardocumentos").prop('checked', false);
+    }
+    construirarraysubmenus();
+    construirarraypermisoscrud();
+}
+//marcr cancelar timbres en todos los documentos
+function marcarcancelartimbresentodoslosdocumentos(){
+    if( $('#idcancelartimbresentodoslosdocumentos').prop('checked') ) {
+        $(".cancelartimbresdocumentos").prop('checked', true);
+    }else{
+        $(".cancelartimbresdocumentos").prop('checked', false);
+    }
+    construirarraysubmenus();
+    construirarraypermisoscrud();
+}
+
+
+
 //permitir o reestringir acceso al menu
 function construirarraysubmenus(){
     var string_submenus = "";
@@ -1135,6 +1221,7 @@ $("#btnGuardarPermisos").on('click', function (e) {
 });
 //series documentos
 function seriesusuariodocumentos(id,usuario){
+    $("#titulomodalserie").html("Series Documentos: "+usuario);
     $("#ModalSeriesDocumentos").modal('show');
     $("#formularioserie").hide();
     $("#tablasmodalserie").show();

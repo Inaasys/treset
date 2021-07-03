@@ -53,7 +53,8 @@ class ProductoController extends ConfiguracionSistemaController{
     //obtener todos los registros
     public function productos_obtener(Request $request){
         if($request->ajax()){
-            $data = VistaProducto::select($this->campos_consulta)->get();
+            //$data = VistaProducto::select($this->campos_consulta)->get();
+            $data = VistaProducto::select($this->campos_consulta);
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
                         $operaciones = '<div class="dropdown">'.
@@ -66,14 +67,6 @@ class ProductoController extends ConfiguracionSistemaController{
                                                 '<li><a href="javascript:void(0);" onclick="obtenerkardex(\''.$data->Codigo .'\','.$data->Almacen.')">Ver Movimientos</a></li>'.
                                             '</ul>'.
                                         '</div>';
-                        /*if($data->Status == 'ALTA'){
-                            $operaciones =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Codigo .'\')"><i class="material-icons">mode_edit</i></div> '. 
-                                        '<div class="btn bg-red btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Codigo .'\')"><i class="material-icons">cancel</i></div> '.
-                                        '<div class="btn bg-light-blue btn-xs waves-effect" data-toggle="tooltip" title="Ver Movimientos" onclick="obtenerkardex(\''.$data->Codigo .'\','.$data->Almacen.')"><i class="material-icons">chrome_reader_mode</i></div> ';
-                        }else{
-                            $operaciones = '';
-                            //$operaciones =    '<div class="btn bg-green btn-xs waves-effect" onclick="desactivar(\''.$data->Codigo .'\')">Altas</div>';
-                        } */
                         return $operaciones;
                     })
                     ->addColumn('Existencias', function($data){ return $data->Existencias; })

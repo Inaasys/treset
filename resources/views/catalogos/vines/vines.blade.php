@@ -19,7 +19,7 @@
                                     <h5>&nbsp;&nbsp;&nbsp;VINES&nbsp;&nbsp;&nbsp;</h5>
                                 </div>
                                 <div class="col-lg-11 col-md-11 col-sm-11 col-xs-12 button-demo">
-                                    <div class="table-responsive">
+                                    <div class="table-responsive navbar-right">
                                         <table>
                                             <tr>
                                                 <td >
@@ -44,16 +44,16 @@
                                     <thead class="{{$empresa->background_tables}}">
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
-                                            <th>Cliente</th>
-                    						<th>Economico</th>
-                                            <th>Vin</th>
+                                            <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Cliente</th>
+                    						<th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Economico</th>
+                                            <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Vin</th>
                                             <th>Placas</th>
                                             <th>Motor</th>
                                             <th>Marca</th>
                                             <th>Modelo</th>
                                             <th>Año</th>
                                             <th>Color</th>
-                                            <th>Status</th>
+                                            <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>

@@ -46,6 +46,8 @@ function ocultarformulario(){
 //listar todos los registros de la tabla
 function listar(){
     tabla=$('#tbllistado').DataTable({
+      "lengthMenu": [ 100, 250, 500, 1000 ],
+      "pageLength": 1000,
         "sScrollX": "110%",
         "sScrollY": "350px",
         processing: true,
@@ -57,11 +59,11 @@ function listar(){
         ajax: personal_obtener,
         columns: [
             { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
-            { data: 'id', name: 'id' },
-            { data: 'nombre', name: 'nombre' },
+            { data: 'id', name: 'id', orderable: false, searchable: true },
+            { data: 'nombre', name: 'nombre', orderable: false, searchable: true },
             { data: 'fecha_ingreso', name: 'fecha_ingreso', orderable: false, searchable: false },
             { data: 'tipo_personal', name: 'tipo_personal', orderable: false, searchable: false },
-            { data: 'status', name: 'status', orderable: false, searchable: false }
+            { data: 'status', name: 'status', orderable: false, searchable: true }
         ],
         "initComplete": function() {
           var $buscar = $('div.dataTables_filter input');

@@ -19,7 +19,7 @@
                                     <h5>&nbsp;&nbsp;&nbsp;SERVICIOS&nbsp;&nbsp;&nbsp;</h5>
                                 </div>
                                 <div class="col-lg-11 col-md-11 col-sm-11 col-xs-12 button-demo">
-                                    <div class="table-responsive">
+                                    <div class="table-responsive navbar-right">
                                         <table>
                                             <tr>
                                                 <td >
@@ -44,8 +44,8 @@
                                     <thead class="{{$empresa->background_tables}}">
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
-                                            <th>Código</th>
-                    						<th>Servicio</th>
+                                            <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Código</th>
+                    						<th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Servicio</th>
                                             <th>Unidad</th>
                                             <th>NúmeroFamilia</th>
                                             <th>Familia</th>
@@ -54,7 +54,7 @@
                                             <th>Cantidad</th>
                                             <th>ClaveProducto</th>
                                             <th>ClaveUnidad</th>
-                                            <th>Status</th>
+                                            <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>

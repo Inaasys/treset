@@ -104,16 +104,20 @@ function listar(){
   var campos_tabla  = [];
   campos_tabla.push({ 'data':'operaciones', 'name':'operaciones', 'orderable':false, 'searchable':false});
   for (var i = 0; i < campos.length; i++) {
+      var searchable = false;
+      if(campos[i] == 'Factura' || campos[i] == 'Status' || campos[i] == 'UUID' || campos[i] == 'NombreCliente' || campos[i] == 'RfcCliente'){
+          searchable = true;
+      }
       campos_tabla.push({ 
           'data'    : campos[i],
           'name'  : campos[i],
-          'orderable': true,
-          'searchable': true
+          'orderable': false,
+          'searchable': searchable
       });
   }
   tabla=$('#tbllistado').DataTable({
-    "lengthMenu": [ 10, 50, 100, 250, 500 ],
-    "pageLength": 250,
+    "lengthMenu": [ 100, 250, 500, 1000 ],
+    "pageLength": 100,
     "sScrollX": "110%",
     "sScrollY": "350px", 
     processing: true,
@@ -3338,12 +3342,12 @@ function obtenerdatos(facturamodificar){
     $("#confirmacion").val(data.factura.Confirmacion);
     $("#lugarexpedicion").val(data.factura.LugarExpedicion);
     $("#lugarexpedicionanterior").val(data.factura.LugarExpedicion);
-    $("#regimenfiscal").val(data.regimenfiscal.Nombre);
-    if(data.regimenfiscal.Nombre != null){
+    if(data.regimenfiscal != null){
+      $("#regimenfiscal").val(data.regimenfiscal.Nombre);
       $("#textonombreregimenfiscal").html(data.regimenfiscal.Nombre.substring(0, 40));
+      $("#claveregimenfiscal").val(data.regimenfiscal.Clave);
+      $("#claveregimenfiscalanterior").val(data.regimenfiscal.Clave);
     }
-    $("#claveregimenfiscal").val(data.regimenfiscal.Clave);
-    $("#claveregimenfiscalanterior").val(data.regimenfiscal.Clave);
     $("#tiporelacion").val(data.nombretiporelacion);
     if(data.nombretiporelacion != null){
       $("#textonombretiporelacion").html(data.nombretiporelacion.substring(0, 40));
@@ -3352,31 +3356,31 @@ function obtenerdatos(facturamodificar){
     $("#clavetiporelacionanterior").val(data.clavetiporelacion);
     $("#receptorrfc").val(data.factura.ReceptorRfc);
     $("#receptornombre").val(data.factura.ReceptorNombre);
-    $("#formapago").val(data.formapago.Nombre);
-    if(data.formapago.Nombre != null){
+    if(data.formapago != null){
+      $("#formapago").val(data.formapago.Nombre);
       $("#textonombreformapago").html(data.formapago.Nombre.substring(0, 40));
+      $("#claveformapago").val(data.formapago.Clave);
+      $("#claveformapagoanterior").val(data.formapago.Clave);
     }
-    $("#claveformapago").val(data.formapago.Clave);
-    $("#claveformapagoanterior").val(data.formapago.Clave);
-    $("#metodopago").val(data.metodopago.Nombre);
-    if(data.metodopago.Nombre != null){
+    if(data.metodopago != null){
+      $("#metodopago").val(data.metodopago.Nombre);
       $("#textonombremetodopago").html(data.metodopago.Nombre.substring(0, 40));
+      $("#clavemetodopago").val(data.metodopago.Clave);
+      $("#clavemetodopagoanterior").val(data.metodopago.Clave);
     }
-    $("#clavemetodopago").val(data.metodopago.Clave);
-    $("#clavemetodopagoanterior").val(data.metodopago.Clave);
     $("#condicionesdepago").val(data.factura.CondicionesDePago);
-    $("#usocfdi").val(data.usocfdi.Nombre);
-    if(data.usocfdi.Nombre != null){
+    if(data.usocfdi != null){
+      $("#usocfdi").val(data.usocfdi.Nombre);
       $("#textonombreusocfdi").html(data.usocfdi.Nombre.substring(0, 40));
+      $("#claveusocfdi").val(data.usocfdi.Clave);
+      $("#claveusocfdianterior").val(data.usocfdi.Clave);
     }
-    $("#claveusocfdi").val(data.usocfdi.Clave);
-    $("#claveusocfdianterior").val(data.usocfdi.Clave);
-    $("#residenciafiscal").val(data.residenciafiscal.Nombre);
-    if(data.residenciafiscal.Nombre != null){
+    if(data.residenciafiscal != null){
+      $("#residenciafiscal").val(data.residenciafiscal.Nombre);
       $("#textonombreresidenciafiscal").html(data.residenciafiscal.Nombre.substring(0, 40));
+      $("#claveresidenciafiscal").val(data.residenciafiscal.Clave);
+      $("#claveresidenciafiscalanterior").val(data.residenciafiscal.Clave);
     }
-    $("#claveresidenciafiscal").val(data.residenciafiscal.Clave);
-    $("#claveresidenciafiscalanterior").val(data.residenciafiscal.Clave);
     $("#numeroregidtrib").val(data.factura.NumRegIdTrib);
     $("#descripcion").val(data.factura.Descripcion);
     //cargar todos los detalles
@@ -3603,6 +3607,7 @@ function desactivar(facturadesactivar){
     }
   }) 
 }
+//bajas
 $("#btnbaja").on('click', function(e){
   e.preventDefault();
   var formData = new FormData($("#formdesactivar")[0]);
@@ -3638,6 +3643,7 @@ $("#btnbaja").on('click', function(e){
     form.parsley().validate();
   }
 });
+//fin bajas
 //obtener datos para el envio del documento por email
 function enviardocumentoemail(documento){
   $.get(facturas_obtener_datos_envio_email,{documento:documento}, function(data){
@@ -3645,7 +3651,13 @@ function enviardocumentoemail(documento){
     $("#emaildocumento").val(documento);
     $("#emailde").val(data.emailde);
     $("#emailpara").val(data.emailpara);
-    $("#emailasunto").val("FACTURA NO. " + documento +" DE USADOS TRACTOCAMIONES Y PARTES REFACCIONARIAS SA DE CV");
+    $("#emailasunto").val("FACTURA NO. " + documento +" DE "+ nombreempresa);
+    if(data.factura.UUID != ""){
+      $("#incluir_xml").removeAttr('onclick');
+    }else{
+      $("#incluir_xml").attr('onclick','javascript: return false;');
+    }
+    $("#divincluirxml").show();
     $("#modalenviarpdfemail").modal('show');
   })   
 }
@@ -3684,13 +3696,29 @@ $("#btnenviarpdfemail").on('click', function (e) {
     form.parsley().validate();
   }
 });
-
-
+//fin enviar documento pdf por email
 //timbrar factura
 function timbrarfactura(factura){
-  $("#modaltimbrado").modal("show");
-  $("#textomodaltimbrado").html("Esta seguro de timbrar la factura?");
-  $("#facturatimbrado").val(factura);
+  $.get(facturas_verificar_si_continua_timbrado,{factura:factura}, function(data){
+    if(data.Status == 'BAJA'){
+      $("#facturatimbrado").val(0);
+      $("#textomodaltimbrado").html('Aviso, esta Factura se encuentra dada de baja');
+      $('#modaltimbrado').modal('show');
+      $("#btntimbrarfactura").hide();
+    }else{ 
+      if(data.UUID != ""){
+        $("#facturatimbrado").val(0);
+        $("#textomodaltimbrado").html('Aviso, esta Factura ya se timbro');
+        $('#modaltimbrado').modal('show');
+        $("#btntimbrarfactura").hide();
+      }else{
+        $("#modaltimbrado").modal("show");
+        $("#textomodaltimbrado").html("Esta seguro de timbrar la factura? No"+factura);
+        $("#facturatimbrado").val(factura);
+        $("#btntimbrarfactura").show();
+      }
+    }
+  }) 
 }
 $("#btntimbrarfactura").on('click', function(e){
   e.preventDefault();
@@ -3709,7 +3737,8 @@ $("#btntimbrarfactura").on('click', function(e){
       processData: false,
       success:function(data){
         $('#modaltimbrado').modal('hide');
-        msj_facturatimbradacorrectamente();
+        var results = JSON.parse(data);
+        msj_documentotimbradocorrectamente(results.mensaje, results.tipomensaje);
         $('.page-loader-wrapper').css('display', 'none');
       },
       error:function(data){
@@ -3726,7 +3755,75 @@ $("#btntimbrarfactura").on('click', function(e){
     form.parsley().validate();
   }
 });
-
+// fin timbrar factura
+//cancelar timbre
+function cancelartimbre(facturabajatimbre){
+  $.get(facturas_verificar_si_continua_baja_timbre,{facturabajatimbre:facturabajatimbre}, function(data){
+    if(data.comprobante != ''){
+      if(data.comprobante.IdFacturapi != null){
+          if(data.obtener_factura.cancellation_status == "none" || data.obtener_factura.cancellation_status == "pending"){
+            $("#facturabajatimbre").val(facturabajatimbre);
+            $("#iddocumentofacturapi").val(data.obtener_factura.id);
+            $("#textomodalbajatimbre").html('Esta seguro de dar de baja el timbre de la factura No.'+ facturabajatimbre);
+            $("#btnbajatimbre").show();
+            $('#modalbajatimbre').modal('show');
+          }else if(data.obtener_factura.cancellation_status == "accepted"){
+            $("#facturabajatimbre").val(0);
+            $("#iddocumentofacturapi").val(0);
+            $("#textomodalbajatimbre").html('Aviso, el timbre de la factura No.' + facturabajatimbre +' ya esta cancelado');
+            $("#btnbajatimbre").hide();
+            $('#modalbajatimbre').modal('show');
+          }
+      }else{
+        $("#facturabajatimbre").val(0);
+        $("#iddocumentofacturapi").val(0);
+        $("#textomodalbajatimbre").html('Aviso, la factura No.'+ facturabajatimbre +' no esta timbrada en el nuevo sistema');
+        $("#btnbajatimbre").hide();
+        $('#modalbajatimbre').modal('show');
+      }
+    }else{ 
+      $("#facturabajatimbre").val(0);
+      $("#iddocumentofacturapi").val(0);
+      $("#textomodalbajatimbre").html('Aviso, la factura No.'+ facturabajatimbre +' no esta timbrada');
+      $("#btnbajatimbre").hide();
+      $('#modalbajatimbre').modal('show');
+    }
+  })   
+}
+$("#btnbajatimbre").on('click', function(e){
+  e.preventDefault();
+  var formData = new FormData($("#formbajatimbre")[0]);
+  var form = $("#formbajatimbre");
+  if (form.parsley().isValid()){
+    $('.page-loader-wrapper').css('display', 'block');
+    $.ajax({
+      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+      url:facturas_baja_timbre,
+      type: "post",
+      dataType: "html",
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false,
+      success:function(data){
+        $('#modalbajatimbre').modal('hide');
+        msj_timbrecanceladocorrectamente();
+        $('.page-loader-wrapper').css('display', 'none');
+      },
+      error:function(data){
+        if(data.status == 403){
+          msj_errorenpermisos();
+        }else{
+          msj_errorajax();
+        }
+        $('#modalbajatimbre').modal('hide');
+        $('.page-loader-wrapper').css('display', 'none');
+      }
+    })
+  }else{
+    form.parsley().validate();
+  }
+});
 //hacer busqueda de folio para exportacion en pdf
 function relistarbuscarstringlike(){
   var tabla = $('#tablafoliosencontrados').DataTable();

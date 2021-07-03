@@ -52,8 +52,8 @@ function ocultarformulario(){
 //listar todos los registros de la tabla
 function listar(){
     tabla=$('#tbllistado').DataTable({
-        "lengthMenu": [ 10, 50, 100, 250, 500 ],
-        "pageLength": 250,
+      "lengthMenu": [ 100, 250, 500, 1000 ],
+      "pageLength": 1000,
         "sScrollX": "110%",
         "sScrollY": "350px",
         processing: true,
@@ -65,9 +65,9 @@ function listar(){
         ajax: almacenes_obtener,
         columns: [
             { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
-            { data: 'Numero', name: 'Numero' },
-            { data: 'Nombre', name: 'Nombre' },
-            { data: 'Status', name: 'Status', orderable: false, searchable: false }
+            { data: 'Numero', name: 'Numero', orderable: false, searchable: true },
+            { data: 'Nombre', name: 'Nombre', orderable: false, searchable: true },
+            { data: 'Status', name: 'Status', orderable: false, searchable: true }
         ],
         "initComplete": function() {
           var $buscar = $('div.dataTables_filter input');

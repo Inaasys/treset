@@ -46,8 +46,8 @@ function ocultarformulario(){
 //listar todos los registros de la tabla
 function listar(){
     tabla=$('#tbllistado').DataTable({
-        "lengthMenu": [ 10, 50, 100, 250, 500 ],
-        "pageLength": 250,
+        "lengthMenu": [ 100, 250, 500, 1000 ],
+        "pageLength": 1000,
         "sScrollX": "110%",
         "sScrollY": "350px", 
         processing: true,
@@ -59,16 +59,16 @@ function listar(){
         ajax: vines_obtener,
         columns: [
             { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
-            { data: 'Cliente', name: 'Cliente' },
-            { data: 'Economico', name: 'Economico' },
-            { data: 'Vin', name: 'Vin' },
+            { data: 'Cliente', name: 'Cliente', orderable: false, searchable: true },
+            { data: 'Economico', name: 'Economico', orderable: false, searchable: true },
+            { data: 'Vin', name: 'Vin', orderable: false, searchable: true },
             { data: 'Placas', name: 'Placas', orderable: false, searchable: false },
             { data: 'Motor', name: 'Motor', orderable: false, searchable: false },
             { data: 'Marca', name: 'Marca', orderable: false, searchable: false },
             { data: 'Modelo', name: 'Modelo', orderable: false, searchable: false },
             { data: 'Año', name: 'Año', orderable: false, searchable: false },
             { data: 'Color', name: 'Color', orderable: false, searchable: false },
-            { data: 'Status', name: 'Status', orderable: false, searchable: false }
+            { data: 'Status', name: 'Status', orderable: false, searchable: true }
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');

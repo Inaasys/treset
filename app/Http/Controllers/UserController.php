@@ -35,8 +35,11 @@ class UserController extends ConfiguracionSistemaController
     //Listar registros
     public function usuarios_obtener(Request $request){
         if($request->ajax()){
-            $data = User::orderBy("id", "DESC")->get();
+            $data = User::query();
             return DataTables::of($data)
+                    ->order(function ($query) {
+                        $query->orderBy('id', 'DESC');
+                    })
                     ->addColumn('operaciones', function($data){
                         $operaciones = '<div class="dropdown">'.
                                             '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
@@ -49,14 +52,6 @@ class UserController extends ConfiguracionSistemaController
                                                 '<li><a href="javascript:void(0);" onclick="seriesusuariodocumentos('.$data->id.',\''.$data->user.'\')">Ver Series Documentos</a></li>'.
                                             '</ul>'.
                                         '</div>';
-                        /*if($data->status == 'ALTA'){
-                            $operaciones =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos('.$data->id.')"><i class="material-icons">mode_edit</i></div> '. 
-                                        '<div class="btn bg-red btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar('.$data->id.')"><i class="material-icons">cancel</i></div>  '. 
-                                        '<div class="btn bg-blue btn-xs waves-effect" data-toggle="tooltip" title="Permisos" onclick="permisos('.$data->id.')"><i class="material-icons">vpn_key</i></div>';
-                        }else{
-                            $operaciones = '';
-                            //$operaciones =    '<div class="btn bg-green btn-xs waves-effect" onclick="desactivar('.$data->id.')">Altas</div>';
-                        } */
                         return $operaciones;
                     })
                     ->rawColumns(['operaciones'])
@@ -204,6 +199,7 @@ class UserController extends ConfiguracionSistemaController
     }
     //obtener todos los permisos y accesos al menu del usuario seleccionado
     public function usuarios_obtener_permisos(Request $request){
+        $user = User::where('id', $request->id)->first();
         //accesos al menu
         $submenus_activos = User_Rel_Menu::where('user_id', $request->id)->get();
         $array_submenus = array();
@@ -228,7 +224,8 @@ class UserController extends ConfiguracionSistemaController
         }
         $data = array(
             "array_submenus" => $array_submenus,
-            "array_permisos_crud" => $array_permisos_crud
+            "array_permisos_crud" => $array_permisos_crud,
+            "name" => $user->name
         );
         return response()->json($data);
     }

@@ -102,16 +102,20 @@ function listar(){
   var campos_tabla  = [];
   campos_tabla.push({ 'data':'operaciones', 'name':'operaciones', 'orderable':false, 'searchable':false});
   for (var i = 0; i < campos.length; i++) {
+      var searchable = false;
+      if(campos[i] == 'Nota' || campos[i] == 'Status' || campos[i] == 'UUID' || campos[i] == 'NombreCliente' || campos[i] == 'RfcCliente'){
+          searchable = true;
+      }
       campos_tabla.push({ 
           'data'    : campos[i],
           'name'  : campos[i],
-          'orderable': true,
-          'searchable': true
+          'orderable': false,
+          'searchable': searchable
       });
   }
   tabla=$('#tbllistado').DataTable({
-    "lengthMenu": [ 10, 50, 100, 250, 500 ],
-    "pageLength": 250,
+    "lengthMenu": [ 100, 250, 500, 1000 ],
+    "pageLength": 100,
     "sScrollX": "110%",
     "sScrollY": "350px",  
     processing: true,
@@ -1985,7 +1989,7 @@ function alta(){
                                               '</td>'+
                                               '<td>'+
                                                   '<div class="form-line">'+
-                                                      '<input type="text" class="form-control" name="clavetiporelacion" id="clavetiporelacion" onkeyup="tipoLetra(this)">'+
+                                                      '<input type="text" class="form-control" name="clavetiporelacion" id="clavetiporelacion" onkeyup="tipoLetra(this)" required>'+
                                                       '<input type="hidden" class="form-control" name="clavetiporelacionanterior" id="clavetiporelacionanterior" onkeyup="tipoLetra(this)">'+
                                                       '<input type="hidden" class="form-control" name="tiporelacion" id="tiporelacion" readonly>'+
                                                   '</div>'+
@@ -2816,7 +2820,7 @@ function obtenerdatos(notamodificar){
                                               '</td>'+
                                               '<td>'+
                                                   '<div class="form-line">'+
-                                                      '<input type="text" class="form-control" name="clavetiporelacion" id="clavetiporelacion"  onkeyup="tipoLetra(this)">'+
+                                                      '<input type="text" class="form-control" name="clavetiporelacion" id="clavetiporelacion"  onkeyup="tipoLetra(this)" required>'+
                                                       '<input type="hidden" class="form-control" name="clavetiporelacionanterior" id="clavetiporelacionanterior"  readonly onkeyup="tipoLetra(this)">'+
                                                       '<input type="hidden" class="form-control" name="tiporelacion" id="tiporelacion" readonly>'+
                                                   '</div>'+
@@ -3397,7 +3401,13 @@ function enviardocumentoemail(documento){
     $("#emaildocumento").val(documento);
     $("#emailde").val(data.emailde);
     $("#emailpara").val(data.emailpara);
-    $("#emailasunto").val("NOTA DE CRÉDITO CLIENTE NO. " + documento +" DE USADOS TRACTOCAMIONES Y PARTES REFACCIONARIAS SA DE CV");
+    $("#emailasunto").val("NOTA DE CRÉDITO CLIENTE NO. " + documento +" DE "+ nombreempresa);
+    if(data.notacliente.UUID != ""){
+      $("#incluir_xml").removeAttr('onclick');
+    }else{
+      $("#incluir_xml").attr('onclick','javascript: return false;');
+    }
+    $("#divincluirxml").show();
     $("#modalenviarpdfemail").modal('show');
   })   
 }
@@ -3436,6 +3446,135 @@ $("#btnenviarpdfemail").on('click', function (e) {
     form.parsley().validate();
   }
 });
+//timbrar pago
+function timbrarnota(nota){
+  $.get(notas_credito_clientes_verificar_si_continua_timbrado,{nota:nota}, function(data){
+      if(data.Status == 'BAJA'){
+          $("#notatimbrado").val(0);
+          $("#textomodaltimbrado").html('Aviso, esta Nota se encuentra dada de baja');
+          $('#modaltimbrado').modal('show');
+          $("#btntimbrarnota").hide();
+      }else{ 
+          if(data.UUID != ""){
+              $("#notatimbrado").val(0);
+              $("#textomodaltimbrado").html('Aviso, esta Nota ya se timbro');
+              $('#modaltimbrado').modal('show');
+              $("#btntimbrarnota").hide();
+          }else{
+              $("#modaltimbrado").modal("show");
+              $("#textomodaltimbrado").html("Esta seguro de timbrar la Nota? No"+nota);
+              $("#notatimbrado").val(nota);
+              $("#btntimbrarnota").show();
+          }
+      }
+  }) 
+}
+$("#btntimbrarnota").on('click', function(e){
+  e.preventDefault();
+  var formData = new FormData($("#formtimbrado")[0]);
+  var form = $("#formtimbrado");
+  if (form.parsley().isValid()){
+    $('.page-loader-wrapper').css('display', 'block');
+    $.ajax({
+      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+      url:notas_credito_clientes_timbrar_nota,
+      type: "post",
+      dataType: "html",
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false,
+      success:function(data){
+        $('#modaltimbrado').modal('hide');
+        var results = JSON.parse(data);
+        msj_documentotimbradocorrectamente(results.mensaje, results.tipomensaje);
+        $('.page-loader-wrapper').css('display', 'none');
+      },
+      error:function(data){
+        if(data.status == 403){
+          msj_errorenpermisos();
+        }else{
+          msj_errorajax();
+        }
+        $('#modaltimbrado').modal('hide');
+        $('.page-loader-wrapper').css('display', 'none');
+      }
+    })
+  }else{
+    form.parsley().validate();
+  }
+});  
+
+//cancelar timbre
+function cancelartimbre(facturabajatimbre){
+  $.get(notas_credito_clientes_verificar_si_continua_baja_timbre,{facturabajatimbre:facturabajatimbre}, function(data){
+    if(data.comprobante != ''){
+      if(data.comprobante.IdFacturapi != null){
+          if(data.obtener_factura.cancellation_status == "none" || data.obtener_factura.cancellation_status == "pending"){
+            $("#facturabajatimbre").val(facturabajatimbre);
+            $("#iddocumentofacturapi").val(data.obtener_factura.id);
+            $("#textomodalbajatimbre").html('Esta seguro de dar de baja el timbre de la factura No.'+ facturabajatimbre);
+            $("#btnbajatimbre").show();
+            $('#modalbajatimbre').modal('show');
+          }else if(data.obtener_factura.cancellation_status == "accepted"){
+            $("#facturabajatimbre").val(0);
+            $("#iddocumentofacturapi").val(0);
+            $("#textomodalbajatimbre").html('Aviso, el timbre de la factura No.' + facturabajatimbre +' ya esta cancelado');
+            $("#btnbajatimbre").hide();
+            $('#modalbajatimbre').modal('show');
+          }
+      }else{
+        $("#facturabajatimbre").val(0);
+        $("#iddocumentofacturapi").val(0);
+        $("#textomodalbajatimbre").html('Aviso, la factura No.'+ facturabajatimbre +' no esta timbrada en el nuevo sistema');
+        $("#btnbajatimbre").hide();
+        $('#modalbajatimbre').modal('show');
+      }
+    }else{ 
+      $("#facturabajatimbre").val(0);
+      $("#iddocumentofacturapi").val(0);
+      $("#textomodalbajatimbre").html('Aviso, la factura No.'+ facturabajatimbre +' no esta timbrada');
+      $("#btnbajatimbre").hide();
+      $('#modalbajatimbre').modal('show');
+    }
+  })   
+}
+$("#btnbajatimbre").on('click', function(e){
+  e.preventDefault();
+  var formData = new FormData($("#formbajatimbre")[0]);
+  var form = $("#formbajatimbre");
+  if (form.parsley().isValid()){
+    $('.page-loader-wrapper').css('display', 'block');
+    $.ajax({
+      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+      url:notas_credito_clientes_baja_timbre,
+      type: "post",
+      dataType: "html",
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false,
+      success:function(data){
+        $('#modalbajatimbre').modal('hide');
+        msj_timbrecanceladocorrectamente();
+        $('.page-loader-wrapper').css('display', 'none');
+      },
+      error:function(data){
+        if(data.status == 403){
+          msj_errorenpermisos();
+        }else{
+          msj_errorajax();
+        }
+        $('#modalbajatimbre').modal('hide');
+        $('.page-loader-wrapper').css('display', 'none');
+      }
+    })
+  }else{
+    form.parsley().validate();
+  }
+});
+
+
 //hacer busqueda de folio para exportacion en pdf
 function relistarbuscarstringlike(){
   var tabla = $('#tablafoliosencontrados').DataTable();

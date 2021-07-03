@@ -55,8 +55,14 @@ class TraspasoController extends ConfiguracionSistemaController{
     public function traspasos_obtener(Request $request){
         if($request->ajax()){
             $periodo = $request->periodo;
-            $data = VistaTraspaso::select($this->campos_consulta)->where('periodo', $periodo)->orderBy('Fecha', 'DESC')->orderBy('Serie', 'ASC')->orderBy('Folio', 'DESC')->get();
+            //$data = VistaTraspaso::select($this->campos_consulta)->where('periodo', $periodo)->orderBy('Fecha', 'DESC')->orderBy('Serie', 'ASC')->orderBy('Folio', 'DESC')->get();
+            $data = VistaTraspaso::select($this->campos_consulta)->where('periodo', $periodo);
             return DataTables::of($data)
+                    ->order(function ($query){
+                        $query->orderBy('fecha', 'DESC');
+                        $query->orderBy('serie', 'ASC');
+                        $query->orderBy('folio', 'DESC');
+                    })
                     ->addColumn('operaciones', function($data){
                         $operaciones = '<div class="dropdown">'.
                                     '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
@@ -69,13 +75,6 @@ class TraspasoController extends ConfiguracionSistemaController{
                                         '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Traspaso .'\')">Enviar Documento por Correo</a></li>'.
                                     '</ul>'.
                                 '</div>';
-                        /*
-                        $botoncambios =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Traspaso .'\')"><i class="material-icons">mode_edit</i></div> '; 
-                        $botonbajas =      '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Traspaso .'\')"><i class="material-icons">cancel</i></div> ';
-                        $botondocumentopdf = '<a href="'.route('traspasos_generar_pdfs_indiv',$data->Traspaso).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
-                        $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Traspaso .'\')"><i class="material-icons">email</i></div> ';
-                        $operaciones =  $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
-                        */
                         return $operaciones;
                     })
                     ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })

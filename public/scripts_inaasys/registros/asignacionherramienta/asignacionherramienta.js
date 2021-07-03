@@ -91,16 +91,20 @@ function listar(){
   var campos_tabla  = [];
   campos_tabla.push({ 'data':'operaciones', 'name':'operaciones', 'orderable':false, 'searchable':false});
   for (var i = 0; i < campos.length; i++) {
+    var searchable = false;
+    if(campos[i] == 'asignacion' || campos[i] == 'status' || campos[i] == 'nombre_recibe_herramienta' || campos[i] == 'nombre_entrega_herramienta'){
+        searchable = true;
+    }
       campos_tabla.push({ 
           'data'    : campos[i],
           'name'  : campos[i],
-          'orderable': true,
-          'searchable': true
+          'orderable': false,
+          'searchable': searchable
       });
   }
   tabla=$('#tbllistado').DataTable({
-    "lengthMenu": [ 10, 50, 100, 250, 500 ],
-    "pageLength": 250,
+    "lengthMenu": [ 100, 250, 500, 1000 ],
+    "pageLength": 100,
     "sScrollX": "110%",
     "sScrollY": "350px",
     processing: true,

@@ -41,13 +41,6 @@ class VineController extends ConfiguracionSistemaController{
                                                 '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Vin .'\')">Bajas</a></li>'.
                                             '</ul>'.
                                         '</div>';
-                        /*if($data->Status == 'ALTA'){
-                            $operaciones =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos('.$data->Vin.')"><i class="material-icons">mode_edit</i></div> '. 
-                                        '<div class="btn bg-red btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar('.$data->Vin.')"><i class="material-icons">cancel</i></div>';
-                        }else{
-                            $operaciones = '';
-                            //$operaciones =    '<div class="btn bg-green btn-xs waves-effect" onclick="desactivar('.$data->Vin.')">Altas</div>';
-                        } */
                         return $operaciones;
                     })
                     ->setRowClass(function ($data) {

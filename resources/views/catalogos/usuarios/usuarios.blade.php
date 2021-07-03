@@ -19,7 +19,7 @@
                                     <h5>&nbsp;&nbsp;&nbsp;USUARIOS&nbsp;&nbsp;&nbsp;</h5>
                                 </div>
                                 <div class="col-lg-11 col-md-11 col-sm-11 col-xs-12 button-demo">
-                                    <div class="table-responsive">
+                                    <div class="table-responsive navbar-right">
                                         <table>
                                             <tr>
                                                 <td >
@@ -39,9 +39,9 @@
                                     <thead class="{{$empresa->background_tables}}">
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
-                                            <th>Número</th>
-                                            <th>Nombre</th>
-                    						<th>Correo</th>
+                                            <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Número</th>
+                                            <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Nombre</th>
+                    						<th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Correo</th>
                     						<th>Usuario</th>
                     						<th>Rol</th>
                                         </tr>
@@ -95,7 +95,7 @@
         <div class="modal-content">
             <div id="formulariopermisos">
                 <div class="modal-header {{$empresa->background_forms_and_modals}}">
-                    <h4 class="modal-title" >Permisos</h4>
+                    <h4 class="modal-title" id="titulomodalpermisos">Permisos</h4>
                 </div>
                 <form id="formpermisos" action="#">
                     <div class="modal-body">

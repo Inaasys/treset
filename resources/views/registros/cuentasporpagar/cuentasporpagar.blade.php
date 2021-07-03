@@ -19,8 +19,8 @@
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
                                     <h5>&nbsp;&nbsp;&nbsp;CUENTAS POR PAGAR&nbsp;&nbsp;&nbsp;</h5>
                                 </div>
-                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 button-demo">
-                                    <div class="table-responsive">
+                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 button-demo">
+                                    <div class="table-responsive navbar-right">
                                         <table>
                                             <tr>
                                                 <td >
@@ -49,10 +49,10 @@
                                         </table>
                                     </div>
                                 </div>
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
                                     <div class="row">
-                                        <div class="col-md-7 col-md-offset-4">
-                                            <select class="select2 form-control" name="periodo" id="periodo" onchange="relistar()" style="width75% !important;">
+                                        <div class="col-md-12">
+                                            <select class="select2 form-control" name="periodo" id="periodo" onchange="relistar()" style="width100% !important;">
                                                 @for ($i = $periodoinicial; $i < $periodohoy; $i++)
                                                     <option value="{{$i}}">{{$i}}</option>
                                                 @endfor
@@ -70,7 +70,13 @@
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
-                                            <th>{{$co}}</th>
+                                                @if($co == 'Pago' || $co == 'Status' || $co == 'NombreProveedor')
+                                                    <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">
+                                                        {{$co}}
+                                                    </th>
+                                                @else
+                                                    <th>{{$co}}</th>
+                                                @endif
                                             @endforeach
                                         </tr>
                                     </thead>
@@ -158,6 +164,7 @@
         var campos_activados = '{{$configuracion_tabla->campos_activados}}';
         var campos_desactivados = '{{$configuracion_tabla->campos_desactivados}}';
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
+        var nombreempresa = '{{$empresa->Nombre}}';
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';

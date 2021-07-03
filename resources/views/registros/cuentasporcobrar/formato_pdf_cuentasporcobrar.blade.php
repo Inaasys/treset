@@ -164,7 +164,11 @@
                                     <td style="font-size:9px;">Sello Digital CFD:</td>
                                     @if($d['comprobantetimbrado'] > 0)
                                         <td rowspan="4">
-                                            {!!QrCode::size(150)->margin(0)->generate("https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx") !!}
+                                            @if($d['comprobante']->UrlVerificarCfdi != "")
+                                                {!!QrCode::size(150)->margin(0)->generate($d['comprobante']->UrlVerificarCfdi) !!}
+                                            @else
+                                                {!!QrCode::size(150)->margin(0)->generate("https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx") !!}
+                                            @endif
                                         </td>
                                     @endif
                                 </tr>

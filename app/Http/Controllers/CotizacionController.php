@@ -54,8 +54,14 @@ class CotizacionController extends ConfiguracionSistemaController{
     public function cotizaciones_obtener(Request $request){
         if($request->ajax()){
             $periodo = $request->periodo;
-            $data = VistaCotizacion::select($this->campos_consulta)->where('periodo', $periodo)->orderBy('fecha', 'DESC')->orderBy('serie', 'ASC')->orderBy('folio', 'DESC')->get();
+            //$data = VistaCotizacion::select($this->campos_consulta)->where('periodo', $periodo)->orderBy('fecha', 'DESC')->orderBy('serie', 'ASC')->orderBy('folio', 'DESC')->get();
+            $data = VistaCotizacion::select($this->campos_consulta)->where('periodo', $periodo);
             return DataTables::of($data)
+                    ->order(function ($query){
+                        $query->orderBy('fecha', 'DESC');
+                        $query->orderBy('serie', 'ASC');
+                        $query->orderBy('folio', 'DESC');
+                    })
                     ->addColumn('operaciones', function($data){
                         $operaciones = '<div class="dropdown">'.
                                             '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
@@ -67,12 +73,6 @@ class CotizacionController extends ConfiguracionSistemaController{
                                                 '<li><a href="'.route('cotizaciones_crear_formato_excel',$data->cotizacion).'" target="_blank">Crear Formato Excel</a></li>'.
                                             '</ul>'.
                                         '</div>';
-                        /*
-                        $botoncambios =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->cotizacion .'\')"><i class="material-icons">mode_edit</i></div> '; 
-                        $botonbajas =      '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->cotizacion .'\')"><i class="material-icons">cancel</i></div> ';
-                        $botonexcel =      '<a href="'.route('cotizaciones_crear_formato_excel',$data->cotizacion).'"><div class="btn bg-green btn-xs waves-effect" data-toggle="tooltip" title="Crear formato excel"><i class="material-icons">format_indent_increase</i></div></a> ';
-                        $operaciones =  $botoncambios.$botonbajas.$botonexcel;
-                        */
                         return $operaciones;
                     })
                     ->addColumn('fecha', function($data){ return Carbon::parse($data->fecha)->toDateString(); })

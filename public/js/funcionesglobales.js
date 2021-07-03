@@ -623,14 +623,34 @@ function msj_errorserieexistenteendocumento(){
         "extendedTImeout": "6000"
     });  
 }
+//|||||MENSAJES API FACTURAPI |||||||
 //mensaje factura timbrada correctamente
-function msj_facturatimbradacorrectamente(){
-    toastr.success( "Correcto, la factura se timbro correctamente", "Mensaje", {
+function msj_documentotimbradocorrectamente(mensaje, tipomensaje){
+    if(tipomensaje == "error"){
+        toastr.error( mensaje, "Mensaje", {
+            "timeOut": "6000",
+            "progressBar": true,
+            "extendedTImeout": "6000"
+        });  
+    }else{
+        toastr.success( mensaje, "Mensaje", {
+            "timeOut": "6000",
+            "progressBar": true,
+            "extendedTImeout": "6000"
+        });  
+        var tabla = $('.tbllistado').DataTable();
+        tabla.ajax.reload();
+    }
+}
+//mensaje timbre cancelado correctamente
+function msj_timbrecanceladocorrectamente(){
+    toastr.success( "Correcto, se cancelo correctamente el timbre del documento", "Mensaje", {
         "timeOut": "6000",
         "progressBar": true,
         "extendedTImeout": "6000"
     });  
 }
+//|||||FIN MENSAJES API FACTURAPI |||||||
 ///////////////////////////////////FIN MENSAJES TOASTR.JS INAASYS///////////////////////////////////////
 //////////////////////////////FUNCIONES PARA CONFIGURACION DE COLUMNAS DE TABLAS/////////////////////////////////////////
 //ordenar las columnas para vista de tabla

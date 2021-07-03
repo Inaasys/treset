@@ -377,6 +377,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/cuentas_por_cobrar_generar_pdfs_indiv/{documento}', 'CuentasPorCobrarController@cuentas_por_cobrar_generar_pdfs_indiv')->name('cuentas_por_cobrar_generar_pdfs_indiv')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');    
     Route::get('/cuentas_por_cobrar_exportar_excel', 'CuentasPorCobrarController@cuentas_por_cobrar_exportar_excel')->name('cuentas_por_cobrar_exportar_excel')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
     Route::post('/cuentas_por_cobrar_guardar_configuracion_tabla', 'CuentasPorCobrarController@cuentas_por_cobrar_guardar_configuracion_tabla')->name('cuentas_por_cobrar_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    //---///---///---///---///---/// INTEGRACION FACTURAPI ////----/////----/////----/////_----/////-----/////
+    Route::get('/cuentas_por_cobrar_verificar_si_continua_timbrado', 'CuentasPorCobrarController@cuentas_por_cobrar_verificar_si_continua_timbrado')->name('cuentas_por_cobrar_verificar_si_continua_timbrado')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::post('/cuentas_por_cobrar_timbrar_pago', 'CuentasPorCobrarController@cuentas_por_cobrar_timbrar_pago')->name('cuentas_por_cobrar_timbrar_pago')->middleware('revisarpermisos:registros.cuentas.x.cobrar.timbrar');
+    Route::get('/cuentas_por_cobrar_verificar_si_continua_baja_timbre', 'CuentasPorCobrarController@cuentas_por_cobrar_verificar_si_continua_baja_timbre')->name('cuentas_por_cobrar_verificar_si_continua_baja_timbre')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::post('/cuentas_por_cobrar_baja_timbre', 'CuentasPorCobrarController@cuentas_por_cobrar_baja_timbre')->name('cuentas_por_cobrar_baja_timbre')->middleware('revisarpermisos:registros.cuentas.x.cobrar.cancelartimbres');
     //Contrarecibos
     Route::get('/contrarecibos', 'ContraRecibosController@contrarecibos')->name('contrarecibos')->middleware('revisaraccesomenu:menuregistroscontrarecibos');
     Route::get('/contrarecibos_obtener', 'ContraRecibosController@contrarecibos_obtener')->name('contrarecibos_obtener')->middleware('revisaraccesomenu:menuregistroscontrarecibos');
@@ -473,6 +478,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/notas_credito_clientes_generar_pdfs_indiv/{documento}', 'NotasCreditoClientesController@notas_credito_clientes_generar_pdfs_indiv')->name('notas_credito_clientes_generar_pdfs_indiv')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');    
     Route::get('/notas_credito_clientes_exportar_excel', 'NotasCreditoClientesController@notas_credito_clientes_exportar_excel')->name('notas_credito_clientes_exportar_excel')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
     Route::post('/notas_credito_clientes_guardar_configuracion_tabla', 'NotasCreditoClientesController@notas_credito_clientes_guardar_configuracion_tabla')->name('notas_credito_clientes_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    //---///---///---///---///---/// INTEGRACION FACTURAPI ////----/////----/////----/////_----/////-----/////
+    Route::get('/notas_credito_clientes_verificar_si_continua_timbrado', 'NotasCreditoClientesController@notas_credito_clientes_verificar_si_continua_timbrado')->name('notas_credito_clientes_verificar_si_continua_timbrado')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::post('/notas_credito_clientes_timbrar_nota', 'NotasCreditoClientesController@notas_credito_clientes_timbrar_nota')->name('notas_credito_clientes_timbrar_nota')->middleware('revisarpermisos:registros.notas.credito.clientes.timbrar');
+    Route::get('/notas_credito_clientes_verificar_si_continua_baja_timbre', 'NotasCreditoClientesController@notas_credito_clientes_verificar_si_continua_baja_timbre')->name('notas_credito_clientes_verificar_si_continua_baja_timbre')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::post('/notas_credito_clientes_baja_timbre', 'NotasCreditoClientesController@notas_credito_clientes_baja_timbre')->name('notas_credito_clientes_baja_timbre')->middleware('revisarpermisos:registros.notas.credito.clientes.cancelartimbres');
     //Asignación de herramienta
     Route::get('/asignacionherramienta', 'AsignacionHerramientaController@asignacionherramienta')->name('asignacionherramienta')->middleware('revisaraccesomenu:menuregistrosasignacionherramienta');
     Route::get('/asignacion_herramienta_obtener', 'AsignacionHerramientaController@asignacion_herramienta_obtener')->name('asignacion_herramienta_obtener')->middleware('revisaraccesomenu:menuregistrosasignacionherramienta');
@@ -662,8 +672,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/facturas_exportar_excel', 'FacturaController@facturas_exportar_excel')->name('facturas_exportar_excel')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::post('/facturas_guardar_configuracion_tabla', 'FacturaController@facturas_guardar_configuracion_tabla')->name('facturas_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrosfacturas');
     //---///---///---///---///---/// INTEGRACION FACTURAPI ////----/////----/////----/////_----/////-----/////
-    Route::post('/facturas_timbrar_factura', 'FacturaController@facturas_timbrar_factura')->name('facturas_timbrar_factura')->middleware('revisaraccesomenu:menuregistrosfacturas');
-
+    Route::get('/facturas_verificar_si_continua_timbrado', 'FacturaController@facturas_verificar_si_continua_timbrado')->name('facturas_verificar_si_continua_timbrado')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::post('/facturas_timbrar_factura', 'FacturaController@facturas_timbrar_factura')->name('facturas_timbrar_factura')->middleware('revisarpermisos:registros.facturas.timbrar');
+    Route::get('/facturas_verificar_si_continua_baja_timbre', 'FacturaController@facturas_verificar_si_continua_baja_timbre')->name('facturas_verificar_si_continua_baja_timbre')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::post('/facturas_baja_timbre', 'FacturaController@facturas_baja_timbre')->name('facturas_baja_timbre')->middleware('revisarpermisos:registros.facturas.cancelartimbres');
     /* -----------------------------------||||||||||||||||||||FIN REGISTROS||||||||||||||||||||||-------------------------------------*/
     /* -----------------------------------||||||||||||||||||||REPORTES||||||||||||||||||||||-------------------------------------*/
     //reporte diario de ventas

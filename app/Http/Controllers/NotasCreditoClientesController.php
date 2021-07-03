@@ -42,6 +42,8 @@ use App\FolioComprobanteNota;
 use App\Comprobante;
 use Config;
 use Mail;
+use Facturapi\Facturapi;
+use Storage;
 
 class NotasCreditoClientesController extends ConfiguracionSistemaController{
 
@@ -54,6 +56,8 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             array_push($this->campos_consulta, $campo);
         }
         //FIN CONFIGURACIONES DE LA TABLA//
+        //API FACTURAPI 
+        $this->facturapi = new Facturapi( config('app.keyfacturapi') ); //
     }
     
     public function notas_credito_clientes(){
@@ -87,8 +91,14 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $fechahoy = Carbon::now()->toDateString();
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = VistaNotaCreditoCliente::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->orderBy('Serie', 'ASC')->orderBy('Folio', 'DESC')->get();
+            //$data = VistaNotaCreditoCliente::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->orderBy('Serie', 'ASC')->orderBy('Folio', 'DESC')->get();
+            $data = VistaNotaCreditoCliente::select($this->campos_consulta)->where('Periodo', $periodo);
             return DataTables::of($data)
+                    ->order(function ($query) {
+                        $query->orderBy('Fecha', 'DESC');
+                        $query->orderBy('Serie', 'ASC');
+                        $query->orderBy('Folio', 'DESC');
+                    })
                     ->addColumn('operaciones', function($data){
                         $operaciones = '<div class="dropdown">'.
                                             '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
@@ -99,15 +109,10 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                                                 '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Nota .'\')">Bajas</a></li>'.
                                                 '<li><a href="'.route('notas_credito_clientes_generar_pdfs_indiv',$data->Nota).'" target="_blank">Ver Documento PDF</a></li>'.
                                                 '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Nota .'\')">Enviar Documento por Correo</a></li>'.
+                                                //'<li><a href="javascript:void(0);" onclick="timbrarnota(\''.$data->Nota .'\')">Timbrar Nota</a></li>'.
+                                                //'<li><a href="javascript:void(0);" onclick="cancelartimbre(\''.$data->Nota .'\')">Cancelar Timbre</a></li>'.
                                             '</ul>'.
                                         '</div>';
-                        /*
-                        $botoncambios  =   '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Nota .'\')"><i class="material-icons">mode_edit</i></div> '; 
-                        $botonbajas     =   '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Nota .'\')"><i class="material-icons">cancel</i></div>  ';
-                        $botondocumentopdf = '<a href="'.route('notas_credito_clientes_generar_pdfs_indiv',$data->Nota).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
-                        $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Nota .'\')"><i class="material-icons">email</i></div> ';
-                        $operaciones =      $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
-                        */
                         return $operaciones;
                     })
                     ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
@@ -1515,11 +1520,14 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                 );
             } 
             $cliente = Cliente::where('Numero', $ncc->Cliente)->first();
+            $formapago = FormaPago::where('Clave', $ncc->FormaPago)->first();
+            $metodopago = MetodoPago::where('Clave', $ncc->MetodoPago)->first();
+            $usocfdi = UsoCFDI::where('Clave', $ncc->UsoCfdi)->first();
             $formatter = new NumeroALetras;
             $totalletras = $formatter->toInvoice($ncc->Total, 2, 'M.N.');
             $notaclientedocumento = NotaClienteDocumento::where('Nota', $ncc->Nota)->first();
-            $comprobantetimbrado = Comprobante::where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->count();
-            $comprobante = Comprobante::where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->first();
+            $comprobantetimbrado = Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->count();
+            $comprobante = Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->first();
             $regimenfiscal = c_RegimenFiscal::where('Clave', $ncc->RegimenFiscal)->first();
             $data[]=array(
                 "notacreditocliente"=>$ncc,
@@ -1531,6 +1539,9 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                 "ivanotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->Iva),
                 "totalnotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->Total),
                 "cliente" => $cliente,
+                "formapago" => $formapago,
+                "metodopago" => $metodopago,
+                "usocfdi" => $usocfdi,
                 "datadetalle" => $datadetalle,
                 "tipocambiofactura"=>Helpers::convertirvalorcorrecto($ncc->TipoCambio),
                 "totalletras"=>$totalletras,
@@ -1576,11 +1587,14 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                 );
             } 
             $cliente = Cliente::where('Numero', $ncc->Cliente)->first();
+            $formapago = FormaPago::where('Clave', $ncc->FormaPago)->first();
+            $metodopago = MetodoPago::where('Clave', $ncc->MetodoPago)->first();
+            $usocfdi = UsoCFDI::where('Clave', $ncc->UsoCfdi)->first();
             $formatter = new NumeroALetras;
             $totalletras = $formatter->toInvoice($ncc->Total, 2, 'M.N.');
             $notaclientedocumento = NotaClienteDocumento::where('Nota', $ncc->Nota)->first();
-            $comprobantetimbrado = Comprobante::where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->count();
-            $comprobante = Comprobante::where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->first();
+            $comprobantetimbrado = Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->count();
+            $comprobante = Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->first();
             $regimenfiscal = c_RegimenFiscal::where('Clave', $ncc->RegimenFiscal)->first();
             $data[]=array(
                 "notacreditocliente"=>$ncc,
@@ -1592,6 +1606,9 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                 "ivanotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->Iva),
                 "totalnotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->Total),
                 "cliente" => $cliente,
+                "formapago" => $formapago,
+                "metodopago" => $metodopago,
+                "usocfdi" => $usocfdi,
                 "datadetalle" => $datadetalle,
                 "tipocambiofactura"=>Helpers::convertirvalorcorrecto($ncc->TipoCambio),
                 "totalletras"=>$totalletras,
@@ -1650,11 +1667,14 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                 );
             } 
             $cliente = Cliente::where('Numero', $ncc->Cliente)->first();
+            $formapago = FormaPago::where('Clave', $ncc->FormaPago)->first();
+            $metodopago = MetodoPago::where('Clave', $ncc->MetodoPago)->first();
+            $usocfdi = UsoCFDI::where('Clave', $ncc->UsoCfdi)->first();
             $formatter = new NumeroALetras;
             $totalletras = $formatter->toInvoice($ncc->Total, 2, 'M.N.');
             $notaclientedocumento = NotaClienteDocumento::where('Nota', $ncc->Nota)->first();
-            $comprobantetimbrado = Comprobante::where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->count();
-            $comprobante = Comprobante::where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->first();
+            $comprobantetimbrado = Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->count();
+            $comprobante = Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->first();
             $regimenfiscal = c_RegimenFiscal::where('Clave', $ncc->RegimenFiscal)->first();
             $data[]=array(
                 "notacreditocliente"=>$ncc,
@@ -1666,6 +1686,9 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                 "ivanotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->Iva),
                 "totalnotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->Total),
                 "cliente" => $cliente,
+                "formapago" => $formapago,
+                "metodopago" => $metodopago,
+                "usocfdi" => $usocfdi,
                 "datadetalle" => $datadetalle,
                 "tipocambiofactura"=>Helpers::convertirvalorcorrecto($ncc->TipoCambio),
                 "totalletras"=>$totalletras,
@@ -1682,6 +1705,17 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
         ->setOption('margin-left', 2)
         ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
+        //obtener XML
+        if($request->incluir_xml == 1){
+            $nota = NotaCliente::where('Nota', $request->emaildocumento)->first(); 
+            $comprobante = Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $nota->Folio . '')->where('Serie', '' . $nota->Serie . '')->first();
+            $descargar_xml = $this->facturapi->Invoices->download_xml($comprobante->IdFacturapi); // stream containing the XML file or
+            $nombre_xml = "NotaCreditoClienteNo".$nota->Nota.'##'.$nota->UUID.'.xml';
+            Storage::disk('local')->put($nombre_xml, $descargar_xml);
+            $url_xml = Storage::disk('local')->getAdapter()->applyPathPrefix($nombre_xml);
+        }else{
+            $url_xml = "";
+        }
         try{
             //enviar correo electrónico	
             $nombre = 'Receptor envio de correos';
@@ -1693,12 +1727,24 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $body = $request->emailasunto;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
-            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
-                $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
-                        ->cc($correos)
-                        ->subject($asunto)
-                        ->attachData($pdf->output(), "NotaCreditoClienteNo".$emaildocumento.".pdf");
-            });
+            if (file_exists($url_xml) != false) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento,$url_xml) {
+                    $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento,$url_xml)
+                            ->cc($correos)
+                            ->subject($asunto)
+                            ->attachData($pdf->output(), "NotaCreditoClienteNo".$emaildocumento.".pdf")
+                            ->attach($url_xml);
+                });
+                //eliminar xml de storage/xml_cargados
+                unlink($url_xml);
+            }else{
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
+                    $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                            ->cc($correos)
+                            ->subject($asunto)
+                            ->attachData($pdf->output(), "NotaCreditoClienteNo".$emaildocumento.".pdf");
+                });
+            }
         } catch(\Exception $e) {
             $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
             $correos = ['osbaldo.anzaldo@utpcamiones.com.mx'];
@@ -1732,4 +1778,164 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
         $Configuracion_Tabla->save();
         return redirect()->route('notas_credito_clientes');
     }
+    //verificar si se puede timbrar la factura
+    public function notas_credito_clientes_verificar_si_continua_timbrado(Request $request){
+        $nota = NotaCliente::where('Nota', $request->nota)->first();
+        $data = array(
+            'Status' => $nota->Status,
+            'UUID' => $nota->UUID
+        );
+        return response()->json($data);
+    }
+    //timbrar factura
+    public function notas_credito_clientes_timbrar_nota(Request $request){
+        $nota = NotaCliente::where('Nota', $request->notatimbrado)->first();
+        $detallesnota = NotaClienteDetalle::where('Nota', $request->notatimbrado)->get();
+        $detallesdocumentosnota = NotaClienteDocumento::where('Nota', $request->notatimbrado)->where('Descuento', '>', 0)->get();
+        $cliente = Cliente::where('Numero', $nota->Cliente)->first();
+        $arraydet = array();
+        foreach($detallesnota as $dn){
+            array_push($arraydet,   array(
+                                        "description" => $dn->Descripcion,
+                                        "product_key" => $dn->ClaveProducto,
+                                        "price" => Helpers::convertirvalorcorrecto($dn->Precio),
+                                        "tax_included" => false,
+                                        "sku" => $dn->Codigo
+                                    )                    
+            );
+        }  
+        $arraydoc = array();
+        foreach($detallesdocumentosnota as $ddn){
+            array_push($arraydoc, $ddn->UUID);
+        }  
+        //NOTAS DE CREDITO PROVEEDOR
+        $invoice = array(
+            "type" => \Facturapi\InvoiceType::EGRESO,
+            "customer" => array(
+                "legal_name" => $cliente->Nombre,
+                "tax_id" => $cliente->Rfc
+            ),
+            "payment_form" => $nota->FormaPago,
+            "payment_method" => $nota->MetodoPago,
+            "relation" => $nota->TipoRelacion,
+            "related" => $arraydoc,
+            "products" => $arraydet,
+            "folio_number" => $nota->Folio,
+            "series" => $nota->Serie,
+            "currency" => $nota->Moneda,
+            "exchange" => Helpers::convertirvalorcorrecto($nota->TipoCambio),
+            "conditions" => $nota->CondicionesDePago
+        );
+        $new_invoice = $this->facturapi->Invoices->create( $invoice );
+        $result = json_encode($new_invoice);
+        $result2 = json_decode($result, true);
+        if(array_key_exists('ok', $result2) == true){
+            $mensaje = $new_invoice->message;
+            $tipomensaje = "error";
+            $data = array(
+                        'mensaje' => "Error, ".$mensaje,
+                        'tipomensaje' => $tipomensaje 
+                    );
+            return response()->json($data);
+        }else{
+            //obtener datos del xml del documento timbrado para guardarlo en la tabla comprobantes
+            $descargar_xml = $this->facturapi->Invoices->download_xml($new_invoice->id); // stream containing the XML file or
+            $xml = simplexml_load_string($descargar_xml);  
+            $comprobante = $xml->attributes(); 
+            $CertificadoCFD = $comprobante['NoCertificado'];
+            //obtener datos generales del xml nodo Emisor
+            $activar_namespaces = $xml->getNameSpaces(true);
+            $namespaces = $xml->children($activar_namespaces['cfdi']);
+            //obtener UUID del xml timbrado digital
+            $activar_namespaces = $namespaces->Complemento->getNameSpaces(true);
+            $namespaces_uuid = $namespaces->Complemento->children($activar_namespaces['tfd']);
+            $atributos_complemento = $namespaces_uuid->TimbreFiscalDigital->attributes();
+            $NoCertificadoSAT = $atributos_complemento['NoCertificadoSAT'];
+            $SelloCFD = $atributos_complemento['SelloCFD'];
+            $SelloSAT = $atributos_complemento['SelloSAT'];
+            $fechatimbrado = $atributos_complemento['FechaTimbrado'];
+            $cadenaoriginal = "||".$atributos_complemento['Version']."|".$new_invoice->uuid."|".$atributos_complemento['FechaTimbrado']."|".$atributos_complemento['SelloCFD']."|".$atributos_complemento['NoCertificadoSAT']."||";
+            //guardar en tabla comprobante
+            $Comprobante = new Comprobante;
+            $Comprobante->Comprobante = 'Nota';
+            $Comprobante->Tipo = $new_invoice->type;
+            $Comprobante->Version = '3.3';
+            $Comprobante->Serie = $new_invoice->series;
+            $Comprobante->Folio = $new_invoice->folio_number;
+            $Comprobante->UUID = $new_invoice->uuid;
+            $Comprobante->Fecha = Helpers::fecha_exacta_accion_datetimestring();
+            $Comprobante->SubTotal = $nota->SubTotal;
+            $Comprobante->Descuento = $nota->Descuento;
+            $Comprobante->Total = $nota->Total;
+            $Comprobante->EmisorRfc = $nota->EmisorRfc;
+            $Comprobante->ReceptorRfc = $nota->ReceptorRfc;
+            $Comprobante->FormaPago = $new_invoice->payment_form;
+            $Comprobante->MetodoPago = $new_invoice->payment_method;
+            $Comprobante->UsoCfdi = $nota->UsoCfdi;
+            $Comprobante->Moneda = $new_invoice->currency;
+            $Comprobante->TipoCambio = Helpers::convertirvalorcorrecto($new_invoice->exchange);
+            $Comprobante->CertificadoSAT = $NoCertificadoSAT;
+            $Comprobante->CertificadoCFD = $CertificadoCFD;
+            $Comprobante->FechaTimbrado = $fechatimbrado;
+            $Comprobante->CadenaOriginal = $cadenaoriginal;
+            $Comprobante->selloSAT = $SelloSAT;
+            $Comprobante->selloCFD = $SelloCFD;
+            //$Comprobante->CfdiTimbrado = $new_invoice->type;
+            $Comprobante->Periodo = $this->periodohoy;
+            $Comprobante->IdFacturapi = $new_invoice->id;
+            $Comprobante->UrlVerificarCfdi = $new_invoice->verification_url;
+            $Comprobante->save();
+            //Colocar UUID en documento
+            NotaCliente::where('Nota', $request->notatimbrado)
+                            ->update([
+                                'FechaTimbrado' => $fechatimbrado,
+                                'UUID' => $new_invoice->uuid
+                            ]);  
+            // Enviar a más de un correo (máx 10)
+            $this->facturapi->Invoices->send_by_email(
+                $new_invoice->id,
+                array(
+                    "osbaldo.anzaldo@utpcamiones.com.mx",
+                    //"marco.baltazar@utpcamiones.com.mx",
+                )
+            );
+            $mensaje = "Correcto, el documento se timbro correctamente";
+            $tipomensaje = "success";
+            $data = array(
+                        'mensaje' => $mensaje,
+                        'tipomensaje' => $tipomensaje 
+                    );
+            return response()->json($data);
+        }
+    }
+    //verificar cancelacion timbre
+    public function notas_credito_clientes_verificar_si_continua_baja_timbre(Request $request){
+        $obtener_factura = '';
+        $comprobante = '';
+        $factura = NotaCliente::where('Nota', $request->facturabajatimbre)->first();
+        $existe_comprobante = Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $factura->Folio . '')->where('Serie', '' . $factura->Serie . '')->count();
+        if($existe_comprobante > 0){
+            $comprobante = Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $factura->Folio . '')->where('Serie', '' . $factura->Serie . '')->first();
+            $obtener_factura = $this->facturapi->Invoices->retrieve($comprobante->IdFacturapi); // obtener factura
+        }
+        $data = array(
+            'obtener_factura' => $obtener_factura,
+            'factura' => $factura,
+            'comprobante' => $comprobante
+        );
+        return response()->json($data);
+    }
+    //cancelar timbre
+    public function notas_credito_clientes_baja_timbre(Request $request){
+        //colocar fecha de cancelacion en tabla comprobante
+        $factura = NotaCliente::where('Nota', $request->facturabajatimbre)->first();
+        Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $factura->Folio . '')->where('Serie', '' . $factura->Serie . '')
+        ->update([
+            'FechaCancelacion' => Helpers::fecha_exacta_accion_datetimestring()
+        ]);
+        //cancelar timbre facturapi
+        $timbrecancelado = $this->facturapi->Invoices->cancel($request->iddocumentofacturapi);
+        return response()->json($timbrecancelado);
+    }
+
 }

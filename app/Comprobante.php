@@ -37,6 +37,8 @@ class Comprobante extends Model
         'selloCFD',
         'CfdiTimbrado',
         'CfdiTimbrado1',
-        'Periodo'
+        'Periodo',
+        'IdFacturapi',
+        'UrlVerificarCfdi'
     ];
 }

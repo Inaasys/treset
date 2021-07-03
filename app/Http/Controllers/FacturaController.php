@@ -52,6 +52,7 @@ use App\NotaClienteDocumento;
 use Config;
 use Mail;
 use Facturapi\Facturapi;
+use Storage;
 
 class FacturaController extends ConfiguracionSistemaController{
 
@@ -64,6 +65,9 @@ class FacturaController extends ConfiguracionSistemaController{
             array_push($this->campos_consulta, $campo);
         }
         //FIN CONFIGURACIONES DE LA TABLA//
+        //API FACTURAPI 
+        $this->facturapi = new Facturapi( config('app.keyfacturapi') ); //
+
     }
     
     public function facturas(){
@@ -100,8 +104,14 @@ class FacturaController extends ConfiguracionSistemaController{
             $fechahoy = Carbon::now()->toDateString();
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            $data = VistaFactura::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->OrderBy('Serie', 'ASC')->OrderBy('Folio', 'DESC')->get();
+            //$data = VistaFactura::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->OrderBy('Serie', 'ASC')->OrderBy('Folio', 'DESC')->get();
+            $data = VistaFactura::select($this->campos_consulta)->where('Periodo', $periodo);//la consulta es dos veces mas rapido
             return DataTables::of($data)
+                    ->order(function ($query) {
+                        $query->orderBy('Fecha', 'DESC');
+                        $query->orderBy('Serie', 'ASC');
+                        $query->orderBy('Folio', 'DESC');
+                    })
                     ->addColumn('operaciones', function($data){
                         $operaciones = '<div class="dropdown">'.
                                             '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
@@ -113,15 +123,9 @@ class FacturaController extends ConfiguracionSistemaController{
                                                 '<li><a href="'.route('facturas_generar_pdfs_indiv',$data->Factura).'" target="_blank">Ver Documento PDF</a></li>'.
                                                 '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Factura .'\')">Enviar Documento por Correo</a></li>'.
                                                 //'<li><a href="javascript:void(0);" onclick="timbrarfactura(\''.$data->Factura .'\')">Timbrar Factura</a></li>'.
+                                                //'<li><a href="javascript:void(0);" onclick="cancelartimbre(\''.$data->Factura .'\')">Cancelar Timbre</a></li>'.
                                             '</ul>'.
                                         '</div>';
-                        /*
-                        $botoncambios =     '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Cambios" onclick="obtenerdatos(\''.$data->Factura .'\')"><i class="material-icons">mode_edit</i></div> '; 
-                        $botonbajas   =     '<div class="btn bg-deep-orange btn-xs waves-effect" data-toggle="tooltip" title="Bajas" onclick="desactivar(\''.$data->Factura .'\')"><i class="material-icons">cancel</i></div>  ';
-                        $botondocumentopdf = '<a href="'.route('facturas_generar_pdfs_indiv',$data->Factura).'" target="_blank"><div class="btn bg-blue-grey btn-xs waves-effect" data-toggle="tooltip" title="Generar Documento"><i class="material-icons">archive</i></div></a> ';
-                        $botonenviaremail = '<div class="btn bg-brown btn-xs waves-effect" data-toggle="tooltip" title="Enviar Documento por Correo" onclick="enviardocumentoemail(\''.$data->Factura .'\')"><i class="material-icons">email</i></div> ';
-                        $operaciones =   $botoncambios.$botonbajas.$botondocumentopdf.$botonenviaremail;
-                        */
                         return $operaciones;
                     })
                     ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
@@ -144,7 +148,7 @@ class FacturaController extends ConfiguracionSistemaController{
                     ->addColumn('Comision', function($data){ return $data->Comision; })
                     ->addColumn('Utilidad', function($data){ return $data->Utilidad; })
                     ->rawColumns(['operaciones'])
-                    ->make(true);
+                    ->make();
         } 
     }
 
@@ -736,9 +740,15 @@ class FacturaController extends ConfiguracionSistemaController{
         $detallesorden = OrdenTrabajoDetalle::where('Orden', $request->Orden)->OrderBy('Item', 'ASC')->get();
         foreach($detallesorden as $detalle){
             $ImporteDescuento = $detalle->Importe - $detalle->Descuento;
-            $servicio = Servicio::where('Codigo', $detalle->Codigo)->first();
-            $claveproductopartida = ClaveProdServ::where('Clave', $detalle->ClaveProducto)->first();
-            $claveunidadpartida = ClaveUnidad::where('Clave', $detalle->ClaveUnidad)->first();
+            if($detalle->Departamento == 'REFACCIONES' || $detalle->Departamento == 'Compra'){
+                $departamento = Producto::where('Codigo', $detalle->Codigo)->first();
+            }else if($detalle->Departamento == 'SERVICIO'){
+                $departamento = Servicio::where('Codigo', $detalle->Codigo)->first();
+            }
+            
+            
+            $claveproductopartida = ClaveProdServ::where('Clave', $departamento->ClaveProducto)->first();
+            $claveunidadpartida = ClaveUnidad::where('Clave', $departamento->ClaveUnidad)->first();
             $claveproducto = $claveproductopartida ? $claveproductopartida->Clave : '';
             $nombreclaveproducto = $claveproductopartida ? $claveproductopartida->Nombre : '';
             $claveunidad = $claveunidadpartida ? $claveunidadpartida->Clave : '';
@@ -1578,8 +1588,8 @@ class FacturaController extends ConfiguracionSistemaController{
             $formapago = FormaPago::where('Clave', $f->FormaPago)->first();
             $metodopago = MetodoPago::where('Clave', $f->MetodoPago)->first();
             $usocfdi = UsoCFDI::where('Clave', $f->UsoCfdi)->first();
-            $comprobantetimbrado = Comprobante::where('Folio', '' . $f->Folio . '')->where('Serie', '' . $f->Serie . '')->count();
-            $comprobante = Comprobante::where('Folio', '' . $f->Folio . '')->where('Serie', '' . $f->Serie . '')->first();
+            $comprobantetimbrado = Comprobante::where('Comprobante', 'Factura')->where('Folio', '' . $f->Folio . '')->where('Serie', '' . $f->Serie . '')->count();
+            $comprobante = Comprobante::where('Comprobante', 'Factura')->where('Folio', '' . $f->Folio . '')->where('Serie', '' . $f->Serie . '')->first();
             $regimenfiscal = c_RegimenFiscal::where('Clave', $f->RegimenFiscal)->first();
             $formatter = new NumeroALetras;
             $totalletras = $formatter->toInvoice($f->Total, 2, 'M.N.');
@@ -1744,8 +1754,8 @@ class FacturaController extends ConfiguracionSistemaController{
             $formapago = FormaPago::where('Clave', $f->FormaPago)->first();
             $metodopago = MetodoPago::where('Clave', $f->MetodoPago)->first();
             $usocfdi = UsoCFDI::where('Clave', $f->UsoCfdi)->first();
-            $comprobantetimbrado = Comprobante::where('Folio', '' . $f->Folio . '')->where('Serie', '' . $f->Serie . '')->count();
-            $comprobante = Comprobante::where('Folio', '' . $f->Folio . '')->where('Serie', '' . $f->Serie . '')->first();
+            $comprobantetimbrado = Comprobante::where('Comprobante', 'Factura')->where('Folio', '' . $f->Folio . '')->where('Serie', '' . $f->Serie . '')->count();
+            $comprobante = Comprobante::where('Comprobante', 'Factura')->where('Folio', '' . $f->Folio . '')->where('Serie', '' . $f->Serie . '')->first();
             $regimenfiscal = c_RegimenFiscal::where('Clave', $f->RegimenFiscal)->first();
             $formatter = new NumeroALetras;
             $totalletras = $formatter->toInvoice($f->Total, 2, 'M.N.');
@@ -1922,8 +1932,8 @@ class FacturaController extends ConfiguracionSistemaController{
             $formapago = FormaPago::where('Clave', $f->FormaPago)->first();
             $metodopago = MetodoPago::where('Clave', $f->MetodoPago)->first();
             $usocfdi = UsoCFDI::where('Clave', $f->UsoCfdi)->first();
-            $comprobantetimbrado = Comprobante::where('Folio', '' . $f->Folio . '')->where('Serie', '' . $f->Serie . '')->count();
-            $comprobante = Comprobante::where('Folio', '' . $f->Folio . '')->where('Serie', '' . $f->Serie . '')->first();
+            $comprobantetimbrado = Comprobante::where('Comprobante', 'Factura')->where('Folio', '' . $f->Folio . '')->where('Serie', '' . $f->Serie . '')->count();
+            $comprobante = Comprobante::where('Comprobante', 'Factura')->where('Folio', '' . $f->Folio . '')->where('Serie', '' . $f->Serie . '')->first();
             $regimenfiscal = c_RegimenFiscal::where('Clave', $f->RegimenFiscal)->first();
             $formatter = new NumeroALetras;
             $totalletras = $formatter->toInvoice($f->Total, 2, 'M.N.');
@@ -1972,6 +1982,17 @@ class FacturaController extends ConfiguracionSistemaController{
         ->setOption('margin-left', 2)
         ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
+        //obtener XML
+        if($request->incluir_xml == 1){
+            $factura = Factura::where('Factura', $request->emaildocumento)->first();
+            $comprobante = Comprobante::where('Comprobante', 'Factura')->where('Folio', '' . $factura->Folio . '')->where('Serie', '' . $factura->Serie . '')->first();
+            $descargar_xml = $this->facturapi->Invoices->download_xml($comprobante->IdFacturapi); // stream containing the XML file or
+            $nombre_xml = "FacturaNo".$factura->Factura.'##'.$factura->UUID.'.xml';
+            Storage::disk('local')->put($nombre_xml, $descargar_xml);
+            $url_xml = Storage::disk('local')->getAdapter()->applyPathPrefix($nombre_xml);
+        }else{
+            $url_xml = "";
+        }
         try{
             //enviar correo electrónico	
             $nombre = 'Receptor envio de correos';
@@ -1983,12 +2004,24 @@ class FacturaController extends ConfiguracionSistemaController{
             $body = $request->emailasunto;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
-            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
-                $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
-                        ->cc($correos)
-                        ->subject($asunto)
-                        ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf");
-            });
+            if (file_exists($url_xml) != false) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento,$url_xml) {
+                    $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento,$url_xml)
+                            ->cc($correos)
+                            ->subject($asunto)
+                            ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf")
+                            ->attach($url_xml);
+                });
+                //eliminar xml de storage/xml_cargados
+                unlink($url_xml);
+            }else{
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
+                    $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                            ->cc($correos)
+                            ->subject($asunto)
+                            ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf");
+                });
+            }
         } catch(\Exception $e) {
             $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
             $correos = ['osbaldo.anzaldo@utpcamiones.com.mx'];
@@ -2000,7 +2033,6 @@ class FacturaController extends ConfiguracionSistemaController{
             });
         }
     }
-
 
     //exportar a excel
     public function facturas_exportar_excel(Request $request){
@@ -2023,26 +2055,34 @@ class FacturaController extends ConfiguracionSistemaController{
         $Configuracion_Tabla->save();
         return redirect()->route('facturas');
     }
-
+    //verificar si se puede timbrar la factura
+    public function facturas_verificar_si_continua_timbrado(Request $request){
+        $Factura = Factura::where('factura', $request->factura)->first();
+        $data = array(
+            'Status' => $Factura->Status,
+            'UUID' => $Factura->UUID
+        );
+        return response()->json($data);
+    }
+    //timbrar factura
     public function facturas_timbrar_factura(Request $request){
-        $facturapi = new Facturapi( "sk_test_q0wO7LaZBv9V1wMejJ5aQ6dGYAXlb8kz" ); //
         $factura = Factura::where('Factura', $request->facturatimbrado)->first();
         $detallesfactura = FacturaDetalle::where('Factura', $request->facturatimbrado)->orderBy('Item','ASC')->get();
         $cliente = Cliente::where('Numero', $factura->Cliente)->first();
         $arraytest = array();
         foreach($detallesfactura as $df){
-            array_push($arraytest, array(
-                "quantity" => $df->Cantidad,
-                "product" => 
-                    array(
-                        "description" => $df->Descripcion,
-                        "product_key" => $df->ClaveProducto,
-                        "price" => $df->Precio,
-                        "tax_included" => false,
-                        "discount" => $df->Descuento,
-                        "sku" => $df->Codigo
-                    )
-                )
+            array_push($arraytest,  array(
+                                        "quantity" => Helpers::convertirvalorcorrecto($df->Cantidad),
+                                        "discount" => Helpers::convertirvalorcorrecto($df->Descuento),
+                                        "product" => 
+                                            array(
+                                                "description" => $df->Descripcion,
+                                                "product_key" => $df->ClaveProducto,
+                                                "price" => Helpers::convertirvalorcorrecto($df->Precio),
+                                                "tax_included" => false,
+                                                "sku" => $df->Codigo
+                                            )
+                                    )
             );
         }
         //FACTURA
@@ -2058,70 +2098,118 @@ class FacturaController extends ConfiguracionSistemaController{
             "folio_number" => $factura->Folio,
             "series" => $factura->Serie,
             "currency" => $factura->Moneda,
-            "exchange" => $factura->TipoCambio,
+            "exchange" => Helpers::convertirvalorcorrecto($factura->TipoCambio),
             "conditions" => $factura->CondicionesDePago
         );
-        $new_invoice = $facturapi->Invoices->create( $invoice );
-        //dd($new_invoice);
-
-        /*
-        //CUENTA POR COBRAR
-        $invoice = array(
-            "type" => \Facturapi\InvoiceType::PAGO,
-            //"customer" => "YOUR_CUSTOMER_ID",
-            "customer" => array(
-                "legal_name" => "Kim Wexler",
-                "tax_id" => "WXKE800401B12"
-            ),
-            "payments" => array(
+        $new_invoice = $this->facturapi->Invoices->create( $invoice );
+        $result = json_encode($new_invoice);
+        $result2 = json_decode($result, true);
+        if(array_key_exists('ok', $result2) == true){
+            $mensaje = $new_invoice->message;
+            $tipomensaje = "error";
+            $data = array(
+                        'mensaje' => "Error, ".$mensaje,
+                        'tipomensaje' => $tipomensaje 
+                    );
+            return response()->json($data);
+        }else{
+            //obtener datos del xml del documento timbrado para guardarlo en la tabla comprobantes
+            $descargar_xml = $this->facturapi->Invoices->download_xml($new_invoice->id); // stream containing the XML file or
+            $xml = simplexml_load_string($descargar_xml);  
+            $comprobante = $xml->attributes(); 
+            $CertificadoCFD = $comprobante['NoCertificado'];
+            //obtener datos generales del xml nodo Emisor
+            $activar_namespaces = $xml->getNameSpaces(true);
+            $namespaces = $xml->children($activar_namespaces['cfdi']);
+            //obtener UUID del xml timbrado digital
+            $activar_namespaces = $namespaces->Complemento->getNameSpaces(true);
+            $namespaces_uuid = $namespaces->Complemento->children($activar_namespaces['tfd']);
+            $atributos_complemento = $namespaces_uuid->TimbreFiscalDigital->attributes();
+            $NoCertificadoSAT = $atributos_complemento['NoCertificadoSAT'];
+            $SelloCFD = $atributos_complemento['SelloCFD'];
+            $SelloSAT = $atributos_complemento['SelloSAT'];
+            $fechatimbrado = $atributos_complemento['FechaTimbrado'];
+            $cadenaoriginal = "||".$atributos_complemento['Version']."|".$new_invoice->uuid."|".$atributos_complemento['FechaTimbrado']."|".$atributos_complemento['SelloCFD']."|".$atributos_complemento['NoCertificadoSAT']."||";
+            //guardar en tabla comprobante
+            $Comprobante = new Comprobante;
+            $Comprobante->Comprobante = 'Factura';
+            $Comprobante->Tipo = $new_invoice->type;
+            $Comprobante->Version = '3.3';
+            $Comprobante->Serie = $new_invoice->series;
+            $Comprobante->Folio = $new_invoice->folio_number;
+            $Comprobante->UUID = $new_invoice->uuid;
+            $Comprobante->Fecha = Helpers::fecha_exacta_accion_datetimestring();
+            $Comprobante->SubTotal = $factura->SubTotal;
+            $Comprobante->Descuento = $factura->Descuento;
+            $Comprobante->Total = $factura->Total;
+            $Comprobante->EmisorRfc = $factura->EmisorRfc;
+            $Comprobante->ReceptorRfc = $factura->ReceptorRfc;
+            $Comprobante->FormaPago = $new_invoice->payment_form;
+            $Comprobante->MetodoPago = $new_invoice->payment_method;
+            $Comprobante->UsoCfdi = $new_invoice->use;
+            $Comprobante->Moneda = $new_invoice->currency;
+            $Comprobante->TipoCambio = Helpers::convertirvalorcorrecto($new_invoice->exchange);
+            $Comprobante->CertificadoSAT = $NoCertificadoSAT;
+            $Comprobante->CertificadoCFD = $CertificadoCFD;
+            $Comprobante->FechaTimbrado = $fechatimbrado;
+            $Comprobante->CadenaOriginal = $cadenaoriginal;
+            $Comprobante->selloSAT = $SelloSAT;
+            $Comprobante->selloCFD = $SelloCFD;
+            //$Comprobante->CfdiTimbrado = $new_invoice->type;
+            $Comprobante->Periodo = $this->periodohoy;
+            $Comprobante->IdFacturapi = $new_invoice->id;
+            $Comprobante->UrlVerificarCfdi = $new_invoice->verification_url;
+            $Comprobante->save();
+            //Colocar UUID en factura
+            Factura::where('Factura', $request->facturatimbrado)
+                            ->update([
+                                'FechaTimbrado' => $fechatimbrado,
+                                'UUID' => $new_invoice->uuid
+                            ]);  
+            // Enviar a más de un correo (máx 10)
+            $this->facturapi->Invoices->send_by_email(
+                $new_invoice->id,
                 array(
-                    "payment_form" => \Facturapi\PaymentForm::EFECTIVO,
-                    "related" => array(
-                        array(
-                            "uuid" => "6EB912DB-08DF-4F1C-A6D3-E1578E2E3F35", // UUID_de_factura_relacionada
-                            "installment" => 1,
-                            "last_balance" => 1000,
-                            "amount" => 100
-                        )
-                    )
+                    "osbaldo.anzaldo@utpcamiones.com.mx",
+                    //"marco.baltazar@utpcamiones.com.mx",
                 )
-            )
+            );
+            $mensaje = "Correcto, el documento se timbro correctamente";
+            $tipomensaje = "success";
+            $data = array(
+                        'mensaje' => $mensaje,
+                        'tipomensaje' => $tipomensaje 
+                    );
+            return response()->json($data);
+        }
+    }
+    //verificar cancelacion timbre
+    public function facturas_verificar_si_continua_baja_timbre(Request $request){
+        $obtener_factura = '';
+        $comprobante = '';
+        $factura = Factura::where('Factura', $request->facturabajatimbre)->first();
+        $existe_comprobante = Comprobante::where('Comprobante', 'Factura')->where('Folio', '' . $factura->Folio . '')->where('Serie', '' . $factura->Serie . '')->count();
+        if($existe_comprobante > 0){
+            $comprobante = Comprobante::where('Comprobante', 'Factura')->where('Folio', '' . $factura->Folio . '')->where('Serie', '' . $factura->Serie . '')->first();
+            $obtener_factura = $this->facturapi->Invoices->retrieve($comprobante->IdFacturapi); // obtener factura
+        }
+        $data = array(
+            'obtener_factura' => $obtener_factura,
+            'factura' => $factura,
+            'comprobante' => $comprobante
         );
-        $new_invoice = $facturapi->Invoices->create( $invoice );
-        */
-    
-        /*
-        //NOTAS DE CREDITO PROVEEDOR
-        $invoice = array(
-            "type" => \Facturapi\InvoiceType::EGRESO,
-            //"customer" => "YOUR_CUSTOMER_ID",
-            "customer" => array(
-                "legal_name" => "Kim Wexler",
-                "tax_id" => "WXKE800401B12"
-            ),
-            "payment_form" => \Facturapi\PaymentForm::EFECTIVO,
-            "relation" => \Facturapi\InvoiceRelation::DEVOLUCION,
-            "related" => array("6EB912DB-08DF-4F1C-A6D3-E1578E2E3F35"), // UUID_de_factura_relacionada
-            "products" => array(
-                array(
-                "description" => "Devolución de Impresora HP G3700",
-                "price" => 499.50
-                )
-            )
-        );
-        $new_invoice = $facturapi->Invoices->create( $invoice );
-        */        
-
-        // Enviar a más de un correo (máx 10)
-        $facturapi->Invoices->send_by_email(
-            $new_invoice->id,
-            array(
-                "osbaldo.anzaldo@utpcamiones.com.mx",
-                //"marco.baltazar@utpcamiones.com.mx",
-                "al221410832@gmail.com"
-            )
-        );
-        
-
+        return response()->json($data);
+    }
+    //cancelar timbre
+    public function facturas_baja_timbre(Request $request){
+        //colocar fecha de cancelacion en tabla comprobante
+        $factura = Factura::where('Factura', $request->facturabajatimbre)->first();
+        Comprobante::where('Comprobante', 'Factura')->where('Folio', '' . $factura->Folio . '')->where('Serie', '' . $factura->Serie . '')
+        ->update([
+            'FechaCancelacion' => Helpers::fecha_exacta_accion_datetimestring()
+        ]);
+        //cancelar timbre facturapi
+        $timbrecancelado = $this->facturapi->Invoices->cancel($request->iddocumentofacturapi);
+        return response()->json($timbrecancelado);
     }
 }

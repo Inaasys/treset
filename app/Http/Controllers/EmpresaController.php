@@ -187,7 +187,9 @@ class EmpresaController extends ConfiguracionSistemaController{
             $Empresa = Empresa::where('Numero', 1)->first();
             //eliminar logotipo anterior
             $eliminar_logotipo_anterior = public_path().'/logotipo_empresa/'.$Empresa->Logo;
-            unlink($eliminar_logotipo_anterior);
+            if (file_exists($eliminar_logotipo_anterior)) {
+                unlink($eliminar_logotipo_anterior);
+            }
         }else{
             $Empresa = Empresa::where('Numero', 1)->first();
             $nuevo_nombre_archivo = $Empresa->Logo;
