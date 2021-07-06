@@ -3,7 +3,8 @@ var tabla;
 var form;
 //funcion que se ejecuta al inicio
 function init(){
-   listar();
+  campos_a_filtrar_en_busquedas();
+  listar();
 }
 function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1000));
@@ -88,20 +89,9 @@ function listar(){
   cambiarurlexportarexcel();
   //Campos ordenados a mostras
   var campos = columnas_ordenadas.split(",");
-  var campos_tabla  = [];
-  campos_tabla.push({ 'data':'operaciones', 'name':'operaciones', 'orderable':false, 'searchable':false});
-  for (var i = 0; i < campos.length; i++) {
-    var searchable = false;
-    if(campos[i] == 'asignacion' || campos[i] == 'status' || campos[i] == 'nombre_recibe_herramienta' || campos[i] == 'nombre_entrega_herramienta'){
-        searchable = true;
-    }
-      campos_tabla.push({ 
-          'data'    : campos[i],
-          'name'  : campos[i],
-          'orderable': false,
-          'searchable': searchable
-      });
-  }
+  var campos_busqueda = campos_busquedas.split(",");
+  // armar columas para datatable se arma desde funcionesglobales.js
+  var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
   tabla=$('#tbllistado').DataTable({
     "lengthMenu": [ 100, 250, 500, 1000 ],
     "pageLength": 100,
@@ -1199,139 +1189,30 @@ function buscarstringlike(){
 }
 //configurar tabla
 function configurar_tabla(){
-  //formulario modificacion
-  var tabs =  '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
-                  '<li role="presentation" class="active">'+
-                      '<a href="#tabcamposamostrar" data-toggle="tab">Campos a mostrar</a>'+
-                  '</li>'+
-                  '<li role="presentation">'+
-                      '<a href="#tabordenarcolumnas" data-toggle="tab">Ordenar Columnas</a>'+
-                  '</li>'+
-              '</ul>'+
-              '<div class="tab-content">'+
-                  '<div role="tabpanel" class="tab-pane fade in active" id="tabcamposamostrar">'+
-                      '<div class="row">'+
-                          '<div class="col-md-6">'+
-                              '<div class="col-md-12 form-check">'+
-                                  '<label>DATOS ASIGNACIÓN HERRAMIENTA</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="id" id="idid" class="filled-in datotabla" value="id" readonly onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idid">id</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="asignacion" id="idasignacion" class="filled-in datotabla" value="asignacion" readonly onchange="construirarraydatostabla(this);" onclick="javascript: return false;"/>'+
-                                  '<label for="idasignacion">asignacion</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="serie" id="idserie" class="filled-in datotabla" value="serie" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idserie">serie</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="fecha" id="idfecha" class="filled-in datotabla" value="fecha" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idfecha">fecha</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="recibe_herramienta" id="idrecibe_herramienta" class="filled-in datotabla" value="recibe_herramienta" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idrecibe_herramienta">recibe_herramienta</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="entrega_herramienta" id="identrega_herramienta" class="filled-in datotabla" value="entrega_herramienta" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="identrega_herramienta">entrega_herramienta</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="total" id="idtotal" class="filled-in datotabla" value="total" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idtotal">total</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="observaciones" id="idobservaciones" class="filled-in datotabla" value="observaciones" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idobservaciones">observaciones</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="autorizado_por" id="idautorizado_por" class="filled-in datotabla" value="autorizado_por" onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idautorizado_por">autorizado_por</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+    
-                                  '<input type="checkbox" name="fecha_autorizacion" id="idfecha_autorizacion" class="filled-in datotabla" value="fecha_autorizacion" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idfecha_autorizacion">fecha_autorizacion</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="status" id="idstatus" class="filled-in datotabla" value="status" onchange="construirarraydatostabla(this);" onclick="javascript: return false;"/>'+
-                                  '<label for="idstatus">status</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="motivo_baja" id="idmotivo_baja" class="filled-in datotabla" value="motivo_baja" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idmotivo_baja">motivo_baja</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="equipo" id="idequipo" class="filled-in datotabla" value="equipo" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idequipo">equipo</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="usuario" id="idusuario" class="filled-in datotabla" value="usuario" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idusuario">usuario</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="periodo" id="idperiodo" class="filled-in datotabla" value="periodo" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idperiodo">periodo</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="folio" id="idfolio" class="filled-in datotabla" value="folio" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idfolio">folio</label>'+
-                              '</div>'+
-                              '<input type="hidden" class="form-control" name="string_datos_tabla_true" id="string_datos_tabla_true" required>'+
-                              '<input type="hidden" class="form-control" name="string_datos_tabla_false" id="string_datos_tabla_false" required>'+
-                          '</div>'+
-                          '<div class="col-md-6">'+
-                              '<div class="col-md-12 form-check">'+
-                                  '<label>DATOS PERSONAL RECIBE</label>'+
-                              '</div>'+
-                              '<div class="col-md-6 form-check">'+
-                                  '<input type="checkbox" name="nombre_recibe_herramienta" id="idnombre_recibe_herramienta" class="filled-in datotabla" value="nombre_recibe_herramienta"  onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idnombre_recibe_herramienta">nombre_recibe_herramienta</label>'+  
-                              '</div>'+
-                              '<div class="col-md-6 form-check">'+  
-                                  '<input type="checkbox" name="tipo_recibe_herramienta" id="idtipo_recibe_herramienta" class="filled-in datotabla" value="tipo_recibe_herramienta"  onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idtipo_recibe_herramienta">tipo_recibe_herramienta</label>'+ 
-                              '</div>'+
-                              '<div class="col-md-12 form-check">'+
-                                  '<label>DATOS PERSONAL ENTREGA</label>'+
-                              '</div>'+
-                              '<div class="col-md-6 form-check">'+
-                                  '<input type="checkbox" name="nombre_entrega_herramienta" id="idnombre_entrega_herramienta" class="filled-in datotabla" value="nombre_entrega_herramienta"  onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idnombre_entrega_herramienta">nombre_entrega_herramienta</label>'+ 
-                              '</div>'+
-                              '<div class="col-md-6 form-check">'+
-                                  '<input type="checkbox" name="tipo_entrega_herramienta" id="idtipo_entrega_herramienta" class="filled-in datotabla" value="tipo_entrega_herramienta"  onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idtipo_entrega_herramienta">tipo_entrega_herramienta</label>'+ 
-                              '</div>'+
-                          '</div>'+
-                      '</div>'+
-                  '</div>'+ 
-                  '<div role="tabpanel" class="tab-pane fade" id="tabordenarcolumnas">'+
-                      '<div class="row">'+
-                          '<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">'+
-                              '<div class="card">'+
-                                  '<div class="header">'+
-                                      '<h2>'+
-                                          'Ordenar Columnas'+
-                                          '<small>Ordena las columnas arrastrándolas hacia arriba o hacia abajo. </small>'+
-                                      '</h2>'+
-                                  '</div>'+
-                                  '<div class="body">'+
-                                      '<div class="clearfix m-b-20">'+
-                                          '<div class="dd" onchange="ordenarcolumnas()">'+
-                                              '<ol class="dd-list" id="columnasnestable">'+
-                                              '</ol>'+
-                                          '</div>'+
-                                      '</div>'+
-                                      '<input type="hidden" id="string_datos_ordenamiento_columnas" name="string_datos_ordenamiento_columnas" class="form-control" required>'+
-                                  '</div>'+
-                              '</div>'+
-                          '</div>'+
-                      '</div>'+      
-                  '</div>'+
-              '</div>';
+  var checkboxscolumnas = '';
+  var optionsselectbusquedas = '';
+  var campos = campos_activados.split(",");
+  for (var i = 0; i < campos.length; i++) {
+    var returncheckboxfalse = '';
+    if(campos[i] == 'id' || campos[i] == 'asignacion' || campos[i] == 'status' || campos[i] == 'periodo'){
+      returncheckboxfalse = 'onclick="javascript: return false;"';
+    }
+    checkboxscolumnas = checkboxscolumnas + '<div class="col-md-2 form-check">'+
+                                              '<input type="checkbox" name="'+campos[i]+'" id="id'+campos[i]+'" class="filled-in datotabla" value="'+campos[i]+'" readonly onchange="construirarraydatostabla(this);" '+returncheckboxfalse+'/>'+
+                                              '<label for="id'+campos[i]+'">'+campos[i]+'</label>'+
+                                            '</div>';
+    optionsselectbusquedas = optionsselectbusquedas + '<option value="'+campos[i]+'">'+campos[i]+'</option>';
+  }
+  var campos = campos_desactivados.split(",");
+  for (var i = 0; i < campos.length; i++) {
+    checkboxscolumnas = checkboxscolumnas + '<div class="col-md-2 form-check">'+
+                                              '<input type="checkbox" name="'+campos[i]+'" id="id'+campos[i]+'" class="filled-in datotabla" value="'+campos[i]+'" readonly onchange="construirarraydatostabla(this);"/>'+
+                                              '<label for="id'+campos[i]+'">'+campos[i]+'</label>'+
+                                            '</div>';
+    optionsselectbusquedas = optionsselectbusquedas + '<option value="'+campos[i]+'">'+campos[i]+'</option>';
+  }
+  //formulario configuracion tablas se arma desde funcionesglobales.js
+  var tabs = armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbusquedas);
   $("#tabsconfigurartabla").html(tabs);
   $("#string_datos_ordenamiento_columnas").val(columnas_ordenadas);
   $("#string_datos_tabla_true").val(campos_activados);
@@ -1339,7 +1220,17 @@ function configurar_tabla(){
   $("#modalconfigurartabla").modal('show');
   $("#titulomodalconfiguraciontabla").html("Configuración de la tabla");
   $('.dd').nestable();
-  //campos activados
+  $("#selectorderby1").val(primerordenamiento).select2();
+  $("#deorderby1").val(formaprimerordenamiento).select2();
+  $("#selectorderby2").val(segundoordenamiento).select2();
+  $("#deorderby2").val(formasegundoordenamiento).select2();
+  $("#selectorderby3").val(tercerordenamiento).select2();
+  $("#deorderby3").val(formatercerordenamiento).select2();
+  $.each(campos_busquedas.split(","), function(i,e){
+    $("#selectfiltrosbusquedas option[value='" + e + "']").prop("selected", true);
+  });
+  $("#selectfiltrosbusquedas").select2();
+  //colocar checked a campos activados
   var campos = campos_activados.split(",");
   for (var i = 0; i < campos.length; i++) {
       $("input[name='"+campos[i]+"']").prop('checked', true);

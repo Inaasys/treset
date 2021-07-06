@@ -55,6 +55,14 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
         foreach (explode(",", $this->configuracion_tabla->columnas_ordenadas) as $campo){
             array_push($this->campos_consulta, $campo);
         }
+        //campos vista
+        $this->camposvista = [];
+        foreach (explode(",", $this->configuracion_tabla->campos_activados) as $campo){
+            array_push($this->camposvista, $campo);
+        }
+        foreach (explode(",", $this->configuracion_tabla->campos_desactivados) as $campo){
+            array_push($this->camposvista, $campo);
+        }
         //FIN CONFIGURACIONES DE LA TABLA//
         //API FACTURAPI 
         $this->facturapi = new Facturapi( config('app.keyfacturapi') ); //
@@ -95,9 +103,15 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $data = VistaNotaCreditoCliente::select($this->campos_consulta)->where('Periodo', $periodo);
             return DataTables::of($data)
                     ->order(function ($query) {
-                        $query->orderBy('Fecha', 'DESC');
-                        $query->orderBy('Serie', 'ASC');
-                        $query->orderBy('Folio', 'DESC');
+                        if($this->configuracion_tabla->primerordenamiento != 'omitir'){
+                            $query->orderBy($this->configuracion_tabla->primerordenamiento, '' . $this->configuracion_tabla->formaprimerordenamiento . '');
+                        }
+                        if($this->configuracion_tabla->segundoordenamiento != 'omitir'){
+                            $query->orderBy($this->configuracion_tabla->segundoordenamiento, '' . $this->configuracion_tabla->formasegundoordenamiento . '');
+                        }
+                        if($this->configuracion_tabla->tercerordenamiento != 'omitir'){
+                            $query->orderBy($this->configuracion_tabla->tercerordenamiento, '' . $this->configuracion_tabla->formatercerordenamiento . '');
+                        }
                     })
                     ->addColumn('operaciones', function($data){
                         $operaciones = '<div class="dropdown">'.
@@ -1770,12 +1784,24 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
         }else{
             $string_datos_tabla_false = $request->string_datos_tabla_false;
         }
-        $Configuracion_Tabla = Configuracion_Tabla::where('tabla', 'NotasCreditoCliente')->first();
-        $Configuracion_Tabla->campos_activados = $request->string_datos_tabla_true;
-        $Configuracion_Tabla->campos_desactivados = $string_datos_tabla_false;
-        $Configuracion_Tabla->columnas_ordenadas = $request->string_datos_ordenamiento_columnas;
-        $Configuracion_Tabla->usuario = Auth::user()->user;
-        $Configuracion_Tabla->save();
+        $selectmultiple = '';
+        foreach($request->selectfiltrosbusquedas as $campofiltro){
+            $selectmultiple = $selectmultiple.",".$campofiltro;
+        }
+        Configuracion_Tabla::where('tabla', 'NotasCreditoCliente')
+        ->update([
+            'campos_activados' => $request->string_datos_tabla_true,
+            'campos_desactivados' => $string_datos_tabla_false,
+            'columnas_ordenadas' => $request->string_datos_ordenamiento_columnas,
+            'usuario' => Auth::user()->user,
+            'primerordenamiento' => $request->selectorderby1,
+            'formaprimerordenamiento' => $request->deorderby1,
+            'segundoordenamiento' => $request->selectorderby2,
+            'formasegundoordenamiento' => $request->deorderby2,
+            'tercerordenamiento' => $request->selectorderby3,
+            'formatercerordenamiento' => $request->deorderby3,
+            'campos_busquedas' => substr($selectmultiple, 1),
+        ]);
         return redirect()->route('notas_credito_clientes');
     }
     //verificar si se puede timbrar la factura

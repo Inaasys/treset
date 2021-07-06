@@ -45,14 +45,9 @@
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover" style="width:100% !important;">
                                     <thead class="{{$empresa->background_tables}}">
                                         <tr>
+                                            <th></th>
                                             @foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
-                                                @if($co == 'Codigo' || $co == 'Producto')
-                                                    <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">
-                                                        {{$co}}
-                                                    </th>
-                                                @else
-                                                    <th>{{$co}}</th>
-                                                @endif
+                                                <th id="th{{$co}}">{{$co}}</th>
                                             @endforeach
                                         </tr>
                                     </thead>
@@ -80,6 +75,13 @@
         var campos_activados = '{{$configuracion_tabla->campos_activados}}';
         var campos_desactivados = '{{$configuracion_tabla->campos_desactivados}}';
         var columnas_ordenadas = '{{$configuracion_tabla->columnas_ordenadas}}';
+        var primerordenamiento = '{{$configuracion_tabla->primerordenamiento}}';
+        var formaprimerordenamiento = '{{$configuracion_tabla->formaprimerordenamiento}}';
+        var segundoordenamiento = '{{$configuracion_tabla->segundoordenamiento}}';
+        var formasegundoordenamiento= '{{$configuracion_tabla->formasegundoordenamiento}}';
+        var tercerordenamiento = '{{$configuracion_tabla->tercerordenamiento}}';
+        var formatercerordenamiento = '{{$configuracion_tabla->formatercerordenamiento}}';
+        var campos_busquedas = '{{$configuracion_tabla->campos_busquedas}}';
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';

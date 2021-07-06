@@ -3,7 +3,8 @@ var tabla;
 var form;
 //funcion que se ejecuta al inicio
 function init(){
-   listar();
+  campos_a_filtrar_en_busquedas();
+  listar();
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
@@ -53,20 +54,9 @@ function ocultarformulario(){
 function listar(){
   //Campos ordenados a mostras
   var campos = columnas_ordenadas.split(",");
-  var campos_tabla  = [];
-  campos_tabla.push({ 'data':'operaciones', 'name':'operaciones', 'orderable':false, 'searchable':false});
-  for (var i = 0; i < campos.length; i++) {
-      var searchable = false;
-      if(campos[i] == 'Numero' || campos[i] == 'Nombre' || campos[i] == 'Status'){
-        searchable = true;
-      }
-      campos_tabla.push({ 
-          'data'    : campos[i],
-          'name'  : campos[i],
-          'orderable': false,
-          'searchable': searchable
-      });
-  }
+  var campos_busqueda = campos_busquedas.split(",");
+  // armar columas para datatable se arma desde funcionesglobales.js
+  var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
     tabla=$('#tbllistado').DataTable({
       "lengthMenu": [ 100, 250, 500, 1000 ],
       "pageLength": 1000,
@@ -388,83 +378,30 @@ $("#btnGuardarModificacion").on('click', function (e) {
 });
 //configurar tabla
 function configurar_tabla(){
-  //formulario modificacion
-  var tabs =  '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
-                  '<li role="presentation" class="active">'+
-                      '<a href="#tabcamposamostrar" data-toggle="tab">Campos a mostrar</a>'+
-                  '</li>'+
-                  '<li role="presentation">'+
-                      '<a href="#tabordenarcolumnas" data-toggle="tab">Ordenar Columnas</a>'+
-                  '</li>'+
-              '</ul>'+
-              '<div class="tab-content">'+
-                  '<div role="tabpanel" class="tab-pane fade in active" id="tabcamposamostrar">'+
-                      '<div class="row">'+
-                          '<div class="col-md-12">'+
-                              '<div class="col-md-12 form-check">'+
-                                  '<label>DATOS PROVEEDOR</label>'+
-                              '</div>'+
-                              '<div class="col-md-3 form-check">'+
-                                  '<input type="checkbox" name="Numero" id="idNumero" class="filled-in datotabla" value="Numero" readonly onchange="construirarraydatostabla(this);" onclick="javascript: return false;"/>'+
-                                  '<label for="idNumero">Numero</label>'+
-                              '</div>'+
-                              '<div class="col-md-3 form-check">'+
-                                  '<input type="checkbox" name="Status" id="idStatus" class="filled-in datotabla" value="Status" readonly onchange="construirarraydatostabla(this);" onclick="javascript: return false;"/>'+
-                                  '<label for="idStatus">Status</label>'+
-                              '</div>'+
-                              '<div class="col-md-3 form-check">'+
-                                  '<input type="checkbox" name="Rfc" id="idRfc" class="filled-in datotabla" value="Rfc" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idRfc">Rfc</label>'+
-                              '</div>'+
-                              '<div class="col-md-3 form-check">'+
-                                  '<input type="checkbox" name="Nombre" id="idNombre" class="filled-in datotabla" value="Nombre" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idNombre">Nombre</label>'+
-                              '</div>'+
-                              '<div class="col-md-3 form-check">'+
-                                  '<input type="checkbox" name="CodigoPostal" id="idCodigoPostal" class="filled-in datotabla" value="CodigoPostal" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idCodigoPostal">CodigoPostal</label>'+
-                              '</div>'+
-                              '<div class="col-md-3 form-check">'+
-                                  '<input type="checkbox" name="Email1" id="idEmail1" class="filled-in datotabla" value="Email1" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idEmail1">Email1</label>'+
-                              '</div>'+
-                              '<div class="col-md-3 form-check">'+
-                                  '<input type="checkbox" name="Plazo" id="idPlazo" class="filled-in datotabla" value="Plazo" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idPlazo">Plazo</label>'+
-                              '</div>'+
-                              '<div class="col-md-3 form-check">'+
-                                  '<input type="checkbox" name="Telefonos" id="idTelefonos" class="filled-in datotabla" value="Telefonos" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idTelefonos">Telefonos</label>'+
-                              '</div>'+
-                              '<input type="hidden" class="form-control" name="string_datos_tabla_true" id="string_datos_tabla_true" required>'+
-                              '<input type="hidden" class="form-control" name="string_datos_tabla_false" id="string_datos_tabla_false" required>'+
-                          '</div>'+
-                      '</div>'+
-                  '</div>'+ 
-                  '<div role="tabpanel" class="tab-pane fade" id="tabordenarcolumnas">'+
-                      '<div class="row">'+
-                          '<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">'+
-                              '<div class="card">'+
-                                  '<div class="header">'+
-                                      '<h2>'+
-                                          'Ordenar Columnas'+
-                                          '<small>Ordena las columnas arrastrándolas hacia arriba o hacia abajo. </small>'+
-                                      '</h2>'+
-                                  '</div>'+
-                                  '<div class="body">'+
-                                      '<div class="clearfix m-b-20">'+
-                                          '<div class="dd" onchange="ordenarcolumnas()">'+
-                                              '<ol class="dd-list" id="columnasnestable">'+
-                                              '</ol>'+
-                                          '</div>'+
-                                      '</div>'+
-                                      '<input type="hidden" id="string_datos_ordenamiento_columnas" name="string_datos_ordenamiento_columnas" class="form-control" required>'+
-                                  '</div>'+
-                              '</div>'+
-                          '</div>'+
-                      '</div>'+      
-                  '</div>'+
-              '</div>';
+  var checkboxscolumnas = '';
+  var optionsselectbusquedas = '';
+  var campos = campos_activados.split(",");
+  for (var i = 0; i < campos.length; i++) {
+    var returncheckboxfalse = '';
+    if(campos[i] == 'Numero' || campos[i] == 'Status'){
+      returncheckboxfalse = 'onclick="javascript: return false;"';
+    }
+    checkboxscolumnas = checkboxscolumnas + '<div class="col-md-2 form-check">'+
+                                              '<input type="checkbox" name="'+campos[i]+'" id="id'+campos[i]+'" class="filled-in datotabla" value="'+campos[i]+'" readonly onchange="construirarraydatostabla(this);" '+returncheckboxfalse+'/>'+
+                                              '<label for="id'+campos[i]+'">'+campos[i]+'</label>'+
+                                            '</div>';
+    optionsselectbusquedas = optionsselectbusquedas + '<option value="'+campos[i]+'">'+campos[i]+'</option>';
+  }
+  var campos = campos_desactivados.split(",");
+  for (var i = 0; i < campos.length; i++) {
+    checkboxscolumnas = checkboxscolumnas + '<div class="col-md-2 form-check">'+
+                                              '<input type="checkbox" name="'+campos[i]+'" id="id'+campos[i]+'" class="filled-in datotabla" value="'+campos[i]+'" readonly onchange="construirarraydatostabla(this);"/>'+
+                                              '<label for="id'+campos[i]+'">'+campos[i]+'</label>'+
+                                            '</div>';
+    optionsselectbusquedas = optionsselectbusquedas + '<option value="'+campos[i]+'">'+campos[i]+'</option>';
+  }
+  //formulario configuracion tablas se arma desde funcionesglobales.js
+  var tabs = armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbusquedas);
   $("#tabsconfigurartabla").html(tabs);
   $("#string_datos_ordenamiento_columnas").val(columnas_ordenadas);
   $("#string_datos_tabla_true").val(campos_activados);
@@ -472,7 +409,17 @@ function configurar_tabla(){
   $("#modalconfigurartabla").modal('show');
   $("#titulomodalconfiguraciontabla").html("Configuración de la tabla");
   $('.dd').nestable();
-  //campos activados
+  $("#selectorderby1").val(primerordenamiento).select2();
+  $("#deorderby1").val(formaprimerordenamiento).select2();
+  $("#selectorderby2").val(segundoordenamiento).select2();
+  $("#deorderby2").val(formasegundoordenamiento).select2();
+  $("#selectorderby3").val(tercerordenamiento).select2();
+  $("#deorderby3").val(formatercerordenamiento).select2();
+  $.each(campos_busquedas.split(","), function(i,e){
+    $("#selectfiltrosbusquedas option[value='" + e + "']").prop("selected", true);
+  });
+  $("#selectfiltrosbusquedas").select2();
+  //colocar checked a campos activados
   var campos = campos_activados.split(",");
   for (var i = 0; i < campos.length; i++) {
       $("input[name='"+campos[i]+"']").prop('checked', true);

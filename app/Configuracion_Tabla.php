@@ -12,7 +12,15 @@ class Configuracion_Tabla extends Model
         'tabla', 
         'campos_activados',
         'campos_desactivados',
+        'columnas_ordenadas',
         'ordenar',
-        'usuario'
+        'usuario',
+        'campos_busquedas',
+        'primerordenamiento',
+        'formaprimerordenamiento',
+        'segundorordenamiento',
+        'formasegundoordenamiento',
+        'tercerordenamiento',
+        'formatercerordenamiento',
     ];
 }

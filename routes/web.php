@@ -707,6 +707,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/empresa_guardar_modificacion_configurar', 'EmpresaController@empresa_guardar_modificacion_configurar')->name('empresa_guardar_modificacion_configurar');
     Route::post('/empresa_guardar_modificacion_logo_y_tema', 'EmpresaController@empresa_guardar_modificacion_logo_y_tema')->name('empresa_guardar_modificacion_logo_y_tema');
     /* -----------------------------------||||||||||||||||||||FIN EMPRESA||||||||||||||||||||||-------------------------------------*/
+    /* -----------------------------------||||||||||||||||||||CONFIGURACIONES Y PRUEBAS||||||||||||||||||||||-------------------------------------*/
+    Route::get('/asignar_valores_por_defecto_busquedas_y_ordenamiento', 'PruebaController@asignar_valores_por_defecto_busquedas_y_ordenamiento')->name('asignar_valores_por_defecto_busquedas_y_ordenamiento');
+    /* -----------------------------------||||||||||||||||||||FIN CONFIGURACIONES Y PRUEBAS||||||||||||||||||||||-------------------------------------*/
+
 });
 
 

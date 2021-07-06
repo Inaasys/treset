@@ -22,6 +22,7 @@ use App\CuentaXPagarDetalle;
 use App\OrdenCompraDetalle;
 use Mail;
 use ColorPalette;
+use App\Configuracion_Tabla;
 
 class PruebaController extends ConfiguracionSistemaController{
 
@@ -146,6 +147,219 @@ class PruebaController extends ConfiguracionSistemaController{
         }
         
 
+    }
+
+
+    public function asignar_valores_por_defecto_busquedas_y_ordenamiento(){
+        //tabla ordenes compra
+        Configuracion_Tabla::where('tabla', 'OrdenesDeCompra')
+        ->update([
+            'primerordenamiento'=>'Fecha',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'Serie',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'Folio',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'Orden,Status,NombreProveedor'
+        ]);
+        //tabla Compras
+        Configuracion_Tabla::where('tabla', 'Compras')
+        ->update([
+            'primerordenamiento'=>'Fecha',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'Serie',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'Folio',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'Compra,Status,NombreProveedor'
+        ]);
+        //tabla ContraRecibos
+        Configuracion_Tabla::where('tabla', 'ContraRecibos')
+        ->update([
+            'primerordenamiento'=>'Fecha',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'Serie',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'Folio',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'ContraRecibo,Status,NombreProveedor'
+        ]);
+        //tabla OrdenesDeTrabajo
+        Configuracion_Tabla::where('tabla', 'OrdenesDeTrabajo')
+        ->update([
+            'primerordenamiento'=>'Fecha',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'Serie',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'Folio',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'Orden,Status,Vin,Pedido,Marca,Economico,Placas'
+        ]);
+        //tabla CuentasPorPagar
+        Configuracion_Tabla::where('tabla', 'CuentasPorPagar')
+        ->update([
+            'primerordenamiento'=>'Fecha',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'Serie',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'Folio',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'Pago,Status,NombreProveedor'
+        ]);
+        //tabla NotasCreditoProveedor
+        Configuracion_Tabla::where('tabla', 'NotasCreditoProveedor')
+        ->update([
+            'primerordenamiento'=>'Fecha',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'Serie',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'Folio',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'Nota,Status,NombreProveedor,UUID'
+        ]);
+        //tabla asignacion_herramientas
+        Configuracion_Tabla::where('tabla', 'asignacion_herramientas')
+        ->update([
+            'primerordenamiento'=>'fecha',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'serie',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'folio',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'asignacion,status,nombre_recibe_herramienta,nombre_entrega_herramienta'
+        ]);
+        //tabla prestamo_herramientas
+        Configuracion_Tabla::where('tabla', 'prestamo_herramientas')
+        ->update([
+            'primerordenamiento'=>'fecha',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'serie',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'folio',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'prestamo,status,nombre_recibe_herramienta,nombre_entrega_herramienta'
+        ]);
+        //tabla cotizaciones_t
+        Configuracion_Tabla::where('tabla', 'cotizaciones_t')
+        ->update([
+            'primerordenamiento'=>'fecha',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'serie',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'folio',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'cotizacion,status,ot_tecnodiesel,ot_tyt'
+        ]);
+        //tabla AjustesInventario
+        Configuracion_Tabla::where('tabla', 'AjustesInventario')
+        ->update([
+            'primerordenamiento'=>'Fecha',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'Serie',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'Folio',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'Ajuste,Status,NombreAlmacen'
+        ]);
+        //tabla Traspasos
+        Configuracion_Tabla::where('tabla', 'Traspasos')
+        ->update([
+            'primerordenamiento'=>'Fecha',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'Serie',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'Folio',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'Traspaso,Orden,Nombre'
+        ]);
+        //tabla Remisiones
+        Configuracion_Tabla::where('tabla', 'Remisiones')
+        ->update([
+            'primerordenamiento'=>'Fecha',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'Serie',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'Folio',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'Remision,Status,NombreCliente,Os,Eq,Rq'
+        ]);
+        //tabla NotasCreditoCliente
+        Configuracion_Tabla::where('tabla', 'NotasCreditoCliente')
+        ->update([
+            'primerordenamiento'=>'Fecha',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'Serie',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'Folio',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'Nota,Status,UUID,NombreCliente,RfcCliente'
+        ]);
+        //tabla CuentasPorCobrar
+        Configuracion_Tabla::where('tabla', 'CuentasPorCobrar')
+        ->update([
+            'primerordenamiento'=>'Fecha',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'Serie',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'Folio',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'Pago,UUID,Status,NombreCliente,RfcCliente'
+        ]);
+        //tabla Facturas
+        Configuracion_Tabla::where('tabla', 'Facturas')
+        ->update([
+            'primerordenamiento'=>'Fecha',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'Serie',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'Folio',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'Factura,Status,UUID,NombreCliente,RfcCliente'
+        ]);
+        //tabla Existencias
+        Configuracion_Tabla::where('tabla', 'Existencias')
+        ->update([
+            'primerordenamiento'=>'omitir',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'omitir',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'omitir',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'Codigo,Producto'
+        ]);
+        //tabla Productos
+        Configuracion_Tabla::where('tabla', 'Productos')
+        ->update([
+            'primerordenamiento'=>'omitir',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'omitir',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'omitir',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'Codigo,Producto'
+        ]);
+        //tabla Clientes
+        Configuracion_Tabla::where('tabla', 'Clientes')
+        ->update([
+            'primerordenamiento'=>'Numero',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'omitir',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'omitir',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'Numero,Nombre'
+        ]);
+        //tabla Proveedores
+        Configuracion_Tabla::where('tabla', 'Proveedores')
+        ->update([
+            'primerordenamiento'=>'Numero',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'omitir',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'omitir',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'Numero,Status,Nombre'
+        ]);
     }
 
 }

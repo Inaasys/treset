@@ -3,7 +3,8 @@ var tabla;
 var form;
 //funcion que se ejecuta al inicio
 function init(){
-   listar();
+  campos_a_filtrar_en_busquedas();
+  listar();
 }
 function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1000));
@@ -102,20 +103,9 @@ function listar(){
   cambiarurlexportarexcel();
   //Campos ordenados a mostras
   var campos = columnas_ordenadas.split(",");
-  var campos_tabla  = [];
-  campos_tabla.push({ 'data':'operaciones', 'name':'operaciones', 'orderable':false, 'searchable':false});
-  for (var i = 0; i < campos.length; i++) {
-    var searchable = false;
-    if(campos[i] == 'Orden' || campos[i] == 'Status' || campos[i] == 'Vin' || campos[i] == 'Pedido' || campos[i] == 'Marca' || campos[i] == 'Economico' || campos[i] == 'Placas'){
-        searchable = true;
-    }
-      campos_tabla.push({ 
-          'data'    : campos[i],
-          'name'  : campos[i],
-          'orderable': false,
-          'searchable': searchable
-      });
-  }
+  var campos_busqueda = campos_busquedas.split(",");
+  // armar columas para datatable se arma desde funcionesglobales.js
+  var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
     tabla=$('#tbllistado').DataTable({
       "lengthMenu": [ 100, 250, 500, 1000 ],
       "pageLength": 100,
@@ -2481,396 +2471,30 @@ function buscarstringlike(){
 }
 //configurar tabla
 function configurar_tabla(){
-  //formulario configuracion tabla
-  var tabs =  '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
-                  '<li role="presentation" class="active">'+
-                      '<a href="#tabcamposamostrar" data-toggle="tab">Campos a mostrar</a>'+
-                  '</li>'+
-                  '<li role="presentation">'+
-                      '<a href="#tabordenarcolumnas" data-toggle="tab">Ordenar Columnas</a>'+
-                  '</li>'+
-              '</ul>'+
-              '<div class="tab-content">'+
-                  '<div role="tabpanel" class="tab-pane fade in active" id="tabcamposamostrar">'+
-                      '<div class="row">'+
-                          '<div class="col-md-6">'+
-                              '<div class="col-md-12 form-check">'+
-                                  '<label>DATOS ORDEN TRABAJO</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Orden" id="idOrden" class="filled-in datotabla" value="Orden" readonly onchange="construirarraydatostabla(this);" onclick="javascript: return false;"/>'+
-                                  '<label for="idOrden">Orden</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Status" id="idStatus" class="filled-in datotabla" value="Status" readonly onchange="construirarraydatostabla(this);" onclick="javascript: return false;"/>'+
-                                  '<label for="idStatus">Status</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Caso" id="idCaso" class="filled-in datotabla" value="Caso" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idCaso">Caso</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Fecha" id="idFecha" class="filled-in datotabla" value="Fecha" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idFecha">Fecha</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Tipo" id="idTipo" class="filled-in datotabla" value="Tipo" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idTipo">Tipo</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Unidad" id="idUnidad" class="filled-in datotabla" value="Unidad" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idUnidad">Unidad</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Cliente" id="idCliente" class="filled-in datotabla" value="Cliente" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idCliente">Cliente</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Total" id="idTotal" class="filled-in datotabla" value="Total" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idTotal">Total</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Vin" id="idVin" class="filled-in datotabla" value="Vin" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idVin">Vin</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+    
-                                  '<input type="checkbox" name="Pedido" id="idPedido" class="filled-in datotabla" value="Pedido" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idPedido">Pedido</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Marca" id="idMarca" class="filled-in datotabla" value="Marca" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idMarca">Marca</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Economico" id="idEconomico" class="filled-in datotabla" value="Economico" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idEconomico">Economico</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Placas" id="idPlacas" class="filled-in datotabla" value="Placas" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idPlacas">Placas</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Año" id="idAño" class="filled-in datotabla" value="Año" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idAño">Año</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Kilometros" id="idKilometros" class="filled-in datotabla" value="Kilometros" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idKilometros">Kilometros</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Reclamo" id="idReclamo" class="filled-in datotabla" value="Reclamo" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idReclamo">Reclamo</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Motor" id="idMotor" class="filled-in datotabla" value="Motor" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idMotor">Motor</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="MotivoBaja" id="idMotivoBaja" class="filled-in datotabla" value="MotivoBaja" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idMotivoBaja">MotivoBaja</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Usuario" id="idUsuario" class="filled-in datotabla" value="Usuario" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idUsuario">Usuario</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Equipo" id="idEquipo" class="filled-in datotabla" value="Equipo" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idEquipo">Equipo</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Periodo" id="idPeriodo" class="filled-in datotabla" value="Periodo" onchange="construirarraydatostabla(this);" onclick="javascript: return false;"/>'+
-                                  '<label for="idPeriodo">Periodo</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Folio" id="idFolio" class="filled-in datotabla" value="Folio" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idFolio">Folio</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Serie" id="idSerie" class="filled-in datotabla" value="Serie" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idSerie">Serie</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="DelCliente" id="idDelCliente" class="filled-in datotabla" value="DelCliente" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idDelCliente">DelCliente</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Agente" id="idAgente" class="filled-in datotabla" value="Agente" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idAgente">Agente</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Plazo" id="idPlazo" class="filled-in datotabla" value="Plazo" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idPlazo">Plazo</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Entrega" id="idEntrega" class="filled-in datotabla" value="Entrega" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idEntrega">Entrega</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Laminado" id="idLaminado" class="filled-in datotabla" value="Laminado" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idLaminado">Laminado</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="ServicioEnAgencia" id="idServicioEnAgencia" class="filled-in datotabla" value="ServicioEnAgencia" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idServicioEnAgencia">ServicioEnAgencia</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="RetrabajoOrden" id="idRetrabajoOrden" class="filled-in datotabla" value="RetrabajoOrden" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idRetrabajoOrden">RetrabajoOrden</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Impuesto" id="idImpuesto" class="filled-in datotabla" value="Impuesto" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idImpuesto">Impuesto</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Importe" id="idImporte" class="filled-in datotabla" value="Importe" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idImporte">Importe</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Descuento" id="idDescuento" class="filled-in datotabla" value="Descuento" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idDescuento">Descuento</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="SubTotal" id="idSubTotal" class="filled-in datotabla" value="SubTotal" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idSubTotal">SubTotal</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Iva" id="idIva" class="filled-in datotabla" value="Iva" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idIva">Iva</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Facturado" id="idFacturado" class="filled-in datotabla" value="Facturado" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idFacturado">Facturado</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Costo" id="idCosto" class="filled-in datotabla" value="Costo" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idCosto">Costo</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Comision" id="idComision" class="filled-in datotabla" value="Comision" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idComision">Comision</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Utilidad" id="idUtilidad" class="filled-in datotabla" value="Utilidad" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idUtilidad">Utilidad</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Operador" id="idOperador" class="filled-in datotabla" value="Operador" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idOperador">Operador</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="OperadorCelular" id="idOperadorCelular" class="filled-in datotabla" value="OperadorCelular" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idOperadorCelular">OperadorCelular</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Modelo" id="idModelo" class="filled-in datotabla" value="Modelo" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idModelo">Modelo</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Color" id="idColor" class="filled-in datotabla" value="Color" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idColor">Color</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Combustible" id="idCombustible" class="filled-in datotabla" value="Combustible" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idCombustible">Combustible</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Bahia" id="idBahia" class="filled-in datotabla" value="Bahia" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idBahia">Bahia</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Forma" id="idForma" class="filled-in datotabla" value="Forma" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idForma">Forma</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="ObsOrden" id="idObsOrden" class="filled-in datotabla" value="ObsOrden" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idObsOrden">ObsOrden</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="ObsUnidad" id="idObsUnidad" class="filled-in datotabla" value="ObsUnidad" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idObsUnidad">ObsUnidad</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Campaña" id="idCampaña" class="filled-in datotabla" value="Campaña" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idCampaña">Campaña</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Falla" id="idFalla" class="filled-in datotabla" value="Falla" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idFalla">Falla</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Causa" id="idCausa" class="filled-in datotabla" value="Causa" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idCausa">Causa</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Correccion" id="idCorreccion" class="filled-in datotabla" value="Correccion" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idCorreccion">Correccion</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Rodar" id="idRodar" class="filled-in datotabla" value="Rodar" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idRodar">Rodar</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Terminada" id="idTerminada" class="filled-in datotabla" value="Terminada" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idTerminada">Terminada</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Facturada" id="idFacturada" class="filled-in datotabla" value="Facturada" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idFacturada">Facturada</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="HoraEntrada" id="idHoraEntrada" class="filled-in datotabla" value="HoraEntrada" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idHoraEntrada">HoraEntrada</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="HoraEntrega" id="idHoraEntrega" class="filled-in datotabla" value="HoraEntrega" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idHoraEntrega">HoraEntrega</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="HorasReales" id="idHorasReales" class="filled-in datotabla" value="HorasReales" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idHorasReales">HorasReales</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Promocion" id="idPromocion" class="filled-in datotabla" value="Promocion" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idPromocion">Promocion</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="TipoServicio" id="idTipoServicio" class="filled-in datotabla" value="TipoServicio" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idTipoServicio">TipoServicio</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="KmProximoServicio" id="idKmProximoServicio" class="filled-in datotabla" value="KmProximoServicio" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idKmProximoServicio">KmProximoServicio</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="FechaRecordatorio" id="idFechaRecordatorio" class="filled-in datotabla" value="FechaRecordatorio" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idFechaRecordatorio">FechaRecordatorio</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="FechaIngresoUnidad" id="idFechaIngresoUnidad" class="filled-in datotabla" value="FechaIngresoUnidad" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idFechaIngresoUnidad">FechaIngresoUnidad</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="FechaAsignacionUnidad" id="idFechaAsignacionUnidad" class="filled-in datotabla" value="FechaAsignacionUnidad" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idFechaAsignacionUnidad">FechaAsignacionUnidad</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="FechaTerminoUnidad" id="idFechaTerminoUnidad" class="filled-in datotabla" value="FechaTerminoUnidad" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idFechaTerminoUnidad">FechaTerminoUnidad</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="EstadoServicio" id="idEstadoServicio" class="filled-in datotabla" value="EstadoServicio" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idEstadoServicio">EstadoServicio</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Refactura" id="idRefactura" class="filled-in datotabla" value="Refactura" onchange="construirarraydatostabla(this);" />'+
-                                  '<label for="idRefactura">Refactura</label>'+
-                              '</div>'+
-                              '<input type="hidden" class="form-control" name="string_datos_tabla_true" id="string_datos_tabla_true" required>'+
-                              '<input type="hidden" class="form-control" name="string_datos_tabla_false" id="string_datos_tabla_false" required>'+
-                          '</div>'+
-                          '<div class="col-md-6">'+
-                              '<div class="col-md-12 form-check">'+
-                                  '<label>DATOS CLIENTE</label>'+
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="NumeroCliente" id="idNumeroCliente" class="filled-in datotabla" value="NumeroCliente"  onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idNumeroCliente">NumeroCliente</label>'+  
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+  
-                                  '<input type="checkbox" name="NombreCliente" id="idNombreCliente" class="filled-in datotabla" value="NombreCliente"  onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idNombreCliente">NombreCliente</label>'+ 
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="RfcCliente" id="idRfcCliente" class="filled-in datotabla" value="RfcCliente"  onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idRfcCliente">RfcCliente</label>'+ 
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="CalleCliente" id="idCalleCliente" class="filled-in datotabla" value="CalleCliente"  onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idCalleCliente">CalleCliente</label>'+ 
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="noExteriorCliente" id="idnoExteriorCliente" class="filled-in datotabla" value="noExteriorCliente"  onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idnoExteriorCliente">noExteriorCliente</label>'+ 
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="ColoniaCliente" id="idColoniaCliente" class="filled-in datotabla" value="ColoniaCliente"  onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idColoniaCliente">ColoniaCliente</label>'+ 
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="LocalidadCliente" id="idLocalidadCliente" class="filled-in datotabla" value="LocalidadCliente"  onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idLocalidadCliente">LocalidadCliente</label>'+                                     
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="MunicipioCliente" id="idMunicipioCliente" class="filled-in datotabla" value="MunicipioCliente"  onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idMunicipioCliente">MunicipioCliente</label>'+                                     
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="EstadoCliente" id="idEstadoCliente" class="filled-in datotabla" value="EstadoCliente"  onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idEstadoCliente">EstadoCliente</label>'+                                     
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="PaisCliente" id="idPaisCliente" class="filled-in datotabla" value="PaisCliente"  onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idPaisCliente">PaisCliente</label>'+                                     
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="CodigoPostalCliente" id="idCodigoPostalCliente" class="filled-in datotabla" value="CodigoPostalCliente"  onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idCodigoPostalCliente">CodigoPostalCliente</label>'+                                     
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="ReferenciaCliente" id="idReferenciaCliente" class="filled-in datotabla" value="ReferenciaCliente"  onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idReferenciaCliente">ReferenciaCliente</label>'+                                     
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="TelefonosCliente" id="idTelefonosCliente" class="filled-in datotabla" value="TelefonosCliente"  onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idTelefonosCliente">TelefonosCliente</label>'+                                     
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="Email1Cliente" id="idEmail1Cliente" class="filled-in datotabla" value="Email1Cliente"  onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idEmail1Cliente">Email1Cliente</label>'+                                     
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="AnotacionesCliente" id="idAnotacionesCliente" class="filled-in datotabla" value="AnotacionesCliente"  onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idAnotacionesCliente">AnotacionesCliente</label>'+                                     
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="FormaPagoCliente" id="idFormaPagoCliente" class="filled-in datotabla" value="FormaPagoCliente"  onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idFormaPagoCliente">FormaPagoCliente</label>'+                                     
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="MetodoPagoCliente" id="idMetodoPagoCliente" class="filled-in datotabla" value="MetodoPagoCliente"  onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idMetodoPagoCliente">MetodoPagoCliente</label>'+                                     
-                              '</div>'+
-                              '<div class="col-md-4 form-check">'+
-                                  '<input type="checkbox" name="UsoCfdiCliente" id="idUsoCfdiCliente" class="filled-in datotabla" value="UsoCfdiCliente"  onchange="construirarraydatostabla(this);"/>'+
-                                  '<label for="idUsoCfdiCliente">UsoCfdiCliente</label>'+                                     
-                              '</div>'+
-                          '</div>'+
-                      '</div>'+
-                  '</div>'+ 
-                  '<div role="tabpanel" class="tab-pane fade" id="tabordenarcolumnas">'+
-                      '<div class="row">'+
-                          '<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">'+
-                              '<div class="card">'+
-                                  '<div class="header">'+
-                                      '<h2>'+
-                                          'Ordenar Columnas'+
-                                          '<small>Ordena las columnas arrastrándolas hacia arriba o hacia abajo. </small>'+
-                                      '</h2>'+
-                                  '</div>'+
-                                  '<div class="body">'+
-                                      '<div class="clearfix m-b-20">'+
-                                          '<div class="dd" onchange="ordenarcolumnas()">'+
-                                              '<ol class="dd-list" id="columnasnestable">'+
-                                              '</ol>'+
-                                          '</div>'+
-                                      '</div>'+
-                                      '<input type="hidden" id="string_datos_ordenamiento_columnas" name="string_datos_ordenamiento_columnas" class="form-control" required>'+
-                                  '</div>'+
-                              '</div>'+
-                          '</div>'+
-                      '</div>'+      
-                  '</div>'+
-              '</div>';
+  var checkboxscolumnas = '';
+  var optionsselectbusquedas = '';
+  var campos = campos_activados.split(",");
+  for (var i = 0; i < campos.length; i++) {
+    var returncheckboxfalse = '';
+    if(campos[i] == 'Orden' || campos[i] == 'Status' || campos[i] == 'Periodo'){
+      returncheckboxfalse = 'onclick="javascript: return false;"';
+    }
+    checkboxscolumnas = checkboxscolumnas + '<div class="col-md-2 form-check">'+
+                                              '<input type="checkbox" name="'+campos[i]+'" id="id'+campos[i]+'" class="filled-in datotabla" value="'+campos[i]+'" readonly onchange="construirarraydatostabla(this);" '+returncheckboxfalse+'/>'+
+                                              '<label for="id'+campos[i]+'">'+campos[i]+'</label>'+
+                                            '</div>';
+    optionsselectbusquedas = optionsselectbusquedas + '<option value="'+campos[i]+'">'+campos[i]+'</option>';
+  }
+  var campos = campos_desactivados.split(",");
+  for (var i = 0; i < campos.length; i++) {
+    checkboxscolumnas = checkboxscolumnas + '<div class="col-md-2 form-check">'+
+                                              '<input type="checkbox" name="'+campos[i]+'" id="id'+campos[i]+'" class="filled-in datotabla" value="'+campos[i]+'" readonly onchange="construirarraydatostabla(this);"/>'+
+                                              '<label for="id'+campos[i]+'">'+campos[i]+'</label>'+
+                                            '</div>';
+    optionsselectbusquedas = optionsselectbusquedas + '<option value="'+campos[i]+'">'+campos[i]+'</option>';
+  }
+  //formulario configuracion tablas se arma desde funcionesglobales.js
+  var tabs = armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbusquedas);
   $("#tabsconfigurartabla").html(tabs);
   $("#string_datos_ordenamiento_columnas").val(columnas_ordenadas);
   $("#string_datos_tabla_true").val(campos_activados);
@@ -2878,7 +2502,17 @@ function configurar_tabla(){
   $("#modalconfigurartabla").modal('show');
   $("#titulomodalconfiguraciontabla").html("Configuración de la tabla");
   $('.dd').nestable();
-  //campos activados
+  $("#selectorderby1").val(primerordenamiento).select2();
+  $("#deorderby1").val(formaprimerordenamiento).select2();
+  $("#selectorderby2").val(segundoordenamiento).select2();
+  $("#deorderby2").val(formasegundoordenamiento).select2();
+  $("#selectorderby3").val(tercerordenamiento).select2();
+  $("#deorderby3").val(formatercerordenamiento).select2();
+  $.each(campos_busquedas.split(","), function(i,e){
+    $("#selectfiltrosbusquedas option[value='" + e + "']").prop("selected", true);
+  });
+  $("#selectfiltrosbusquedas").select2();
+  //colocar checked a campos activados
   var campos = campos_activados.split(",");
   for (var i = 0; i < campos.length; i++) {
       $("input[name='"+campos[i]+"']").prop('checked', true);

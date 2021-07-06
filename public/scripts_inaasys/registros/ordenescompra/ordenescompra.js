@@ -3,7 +3,8 @@ var tabla;
 var form;
 //funcion que se ejecuta al inicio
 function init(){
-   listar();
+  campos_a_filtrar_en_busquedas();
+  listar();
 }
 function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1000));
@@ -87,20 +88,9 @@ function listar(){
   cambiarurlexportarexcel();
   //Campos ordenados a mostras
   var campos = columnas_ordenadas.split(",");
-  var campos_tabla  = [];
-  campos_tabla.push({ 'data':'operaciones', 'name':'operaciones', 'orderable':false, 'searchable':false});
-  for (var i = 0; i < campos.length; i++) {
-      var searchable = false;
-      if(campos[i] == 'Orden' || campos[i] == 'Status' || campos[i] == 'NombreProveedor'){
-        searchable = true;
-      }
-      campos_tabla.push({ 
-          'data'    : campos[i],
-          'name'  : campos[i],
-          'orderable': false,
-          'searchable': searchable
-      });
-  }
+  var campos_busqueda = campos_busquedas.split(",");
+  // armar columas para datatable se arma desde funcionesglobales.js
+  var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
   tabla=$('#tbllistado').DataTable({
     "lengthMenu": [ 100, 250, 500, 1000 ],
     "pageLength": 100,
@@ -1620,10 +1610,10 @@ function buscarstringlike(){
 //configurar tabla
 function configurar_tabla(){
   var checkboxscolumnas = '';
-  var returncheckboxfalse = '';
   var optionsselectbusquedas = '';
   var campos = campos_activados.split(",");
   for (var i = 0; i < campos.length; i++) {
+    var returncheckboxfalse = '';
     if(campos[i] == 'Orden' || campos[i] == 'Status'){
       returncheckboxfalse = 'onclick="javascript: return false;"';
     }
@@ -1639,139 +1629,10 @@ function configurar_tabla(){
                                               '<input type="checkbox" name="'+campos[i]+'" id="id'+campos[i]+'" class="filled-in datotabla" value="'+campos[i]+'" readonly onchange="construirarraydatostabla(this);"/>'+
                                               '<label for="id'+campos[i]+'">'+campos[i]+'</label>'+
                                             '</div>';
+    optionsselectbusquedas = optionsselectbusquedas + '<option value="'+campos[i]+'">'+campos[i]+'</option>';
   }
-  //formulario modificacion
-  var tabs =  '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
-                '<li role="presentation" class="active">'+
-                  '<a href="#tabcamposamostrar" data-toggle="tab">Campos a mostrar</a>'+
-                '</li>'+
-                '<li role="presentation">'+
-                  '<a href="#tabordenarcolumnas" data-toggle="tab">Ordenar Columnas</a>'+
-                '</li>'+
-                '<li role="presentation">'+
-                  '<a href="#tabbusquedayordenamiento" data-toggle="tab">Búsqueda y Ordenamiento</a>'+
-                '</li>'+
-              '</ul>'+
-              '<div class="tab-content">'+
-                '<div role="tabpanel" class="tab-pane fade in active" id="tabcamposamostrar">'+
-                  '<div class="row">'+
-                    '<div class="col-md-12">'+
-                      '<div class="col-md-12 form-check">'+
-                        '<label>DATOS ORDEN COMPRA</label>'+
-                      '</div>'+
-                      checkboxscolumnas+
-                      '<input type="hidden" class="form-control" name="string_datos_tabla_true" id="string_datos_tabla_true" required>'+
-                      '<input type="hidden" class="form-control" name="string_datos_tabla_false" id="string_datos_tabla_false" required>'+
-                    '</div>'+
-                  '</div>'+
-                '</div>'+ 
-                '<div role="tabpanel" class="tab-pane fade" id="tabordenarcolumnas">'+
-                  '<div class="row">'+
-                    '<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">'+
-                      '<div class="card">'+
-                        '<div class="header">'+
-                          '<h2>'+
-                            'Ordenar Columnas'+
-                            '<small>Ordena como quieres que se muestren las columnas en la tabla, arrastrándolas hacia arriba o hacia abajo. </small>'+
-                          '</h2>'+
-                        '</div>'+
-                        '<div class="body">'+
-                          '<div class="clearfix m-b-20">'+
-                            '<div class="dd" onchange="ordenarcolumnas()">'+
-                              '<ol class="dd-list" id="columnasnestable">'+
-                              '</ol>'+
-                            '</div>'+
-                          '</div>'+
-                          '<input type="hidden" id="string_datos_ordenamiento_columnas" name="string_datos_ordenamiento_columnas" class="form-control" required>'+
-                        '</div>'+
-                      '</div>'+
-                    '</div>'+
-                  '</div>'+      
-                '</div>'+
-                '<div role="tabpanel" class="tab-pane fade" id="tabbusquedayordenamiento">'+
-                  '<div class="row">'+
-                    '<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">'+
-                      '<div class="card">'+
-                        '<div class="header">'+
-                          '<h2>'+
-                            'Busquedas'+
-                          '</h2>'+
-                        '</div>'+
-                        '<div class="body">'+
-                          '<div class="clearfix m-b-20">'+
-                            '<label>Selecciona las columnas por las cuales quieres que se filtren las búsquedas. </label>'+
-                            '<select name="selectfiltrosbusquedas[]" id="selectfiltrosbusquedas" class="form-control select2" multiple style="width:100% !important;">'+
-                              optionsselectbusquedas+
-                            '</select>'+
-                          '</div>'+
-                          '<input type="hidden" id="string_datos_busquedas_columnas" name="string_datos_busquedas_columnas" class="form-control" required>'+
-                        '</div>'+
-                      '</div>'+
-                    '</div>'+
-                    '<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">'+
-                      '<div class="card">'+
-                        '<div class="header">'+
-                          '<h2>'+
-                            'Ordenamiento Tabla'+
-                          '</h2>'+
-                        '</div>'+
-                        '<div class="body">'+
-                          '<div class="clearfix m-b-20">'+
-                            '<div class="row">'+
-                              '<div class="col-md-12">'+
-                                '<label>Selecciona como quieres que se ordenen los resultados.</label>'+
-                              '</div>'+
-                              '<div class="col-md-6">'+
-                                '<label>Primer Ordenamiento Por</label>'+
-                                '<select name="selectorderby1[]" id="selectorderby1" class="form-control select2" style="width:100% !important;">'+
-                                  '<option value="omitir" selected>No Ordenar</option>'+
-                                  optionsselectbusquedas+
-                                '</select>'+
-                              '</div>'+
-                              '<div class="col-md-6">'+
-                                '<label>De Forma</label>'+
-                                '<select name="deorderby1[]" id="deorderby1" class="form-control select2" style="width:100% !important;">'+
-                                  '<option value="ASC" selected>ASC</option>'+
-                                  '<option value="DESC">DESC</option>'+
-                                '</select>'+
-                              '</div>'+
-                              '<div class="col-md-6">'+
-                                '<label>Segundo Ordenamiento Por</label>'+
-                                '<select name="selectorderby2[]" id="selectorderby2" class="form-control select2" style="width:100% !important;">'+
-                                  '<option value="omitir" selected>No Ordenar</option>'+
-                                  optionsselectbusquedas+
-                                '</select>'+
-                              '</div>'+
-                              '<div class="col-md-6">'+
-                                '<label>De Forma</label>'+
-                                '<select name="deorderby2[]" id="deorderby2" class="form-control select2" style="width:100% !important;">'+
-                                  '<option value="ASC" selected>ASC</option>'+
-                                  '<option value="DESC">DESC</option>'+
-                                '</select>'+
-                              '</div>'+
-                              '<div class="col-md-6">'+
-                                '<label>Tercer Ordenamiento Por</label>'+
-                                '<select name="selectorderby3[]" id="selectorderby3" class="form-control select2" style="width:100% !important;">'+
-                                  '<option value="omitir" selected>No Ordenar</option>'+
-                                  optionsselectbusquedas+
-                                '</select>'+
-                              '</div>'+
-                              '<div class="col-md-6">'+
-                                '<label>De Forma</label>'+
-                                '<select name="deorderby3[]" id="deorderby3" class="form-control select2" style="width:100% !important;">'+
-                                  '<option value="ASC" selected>ASC</option>'+
-                                  '<option value="DESC">DESC</option>'+
-                                '</select>'+
-                              '</div>'+
-                            '</div>'+
-                          '</div>'+
-                          '<input type="hidden" id="string_datos_busquedas_columnas" name="string_datos_busquedas_columnas" class="form-control" required>'+
-                        '</div>'+
-                      '</div>'+      
-                    '</div>'+
-                  '</div>'+
-                '</div>'+
-              '</div>';
+  //formulario configuracion tablas se arma desde funcionesglobales.js
+  var tabs = armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbusquedas);
   $("#tabsconfigurartabla").html(tabs);
   $("#string_datos_ordenamiento_columnas").val(columnas_ordenadas);
   $("#string_datos_tabla_true").val(campos_activados);
@@ -1779,14 +1640,17 @@ function configurar_tabla(){
   $("#modalconfigurartabla").modal('show');
   $("#titulomodalconfiguraciontabla").html("Configuración de la tabla");
   $('.dd').nestable();
+  $("#selectorderby1").val(primerordenamiento).select2();
+  $("#deorderby1").val(formaprimerordenamiento).select2();
+  $("#selectorderby2").val(segundoordenamiento).select2();
+  $("#deorderby2").val(formasegundoordenamiento).select2();
+  $("#selectorderby3").val(tercerordenamiento).select2();
+  $("#deorderby3").val(formatercerordenamiento).select2();
+  $.each(campos_busquedas.split(","), function(i,e){
+    $("#selectfiltrosbusquedas option[value='" + e + "']").prop("selected", true);
+  });
   $("#selectfiltrosbusquedas").select2();
-  $("#selectorderby1").select2();
-  $("#deorderby1").select2();
-  $("#selectorderby2").select2();
-  $("#deorderby2").select2();
-  $("#selectorderby3").select2();
-  $("#deorderby3").select2();
-  //campos activados
+  //colocar checked a campos activados
   var campos = campos_activados.split(",");
   for (var i = 0; i < campos.length; i++) {
       $("input[name='"+campos[i]+"']").prop('checked', true);
