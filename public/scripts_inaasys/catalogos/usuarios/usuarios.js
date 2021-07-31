@@ -421,6 +421,34 @@ function permisos(id){
                             '</div>'+
                             '<div class="row">'+
                                 '<div class="col-md-6">'+
+                                    '<label>Cotizaciones Productos</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="menuregistroscotizacionesproductos" id="idmenuregistroscotizacionesproductos" class="filled-in submenu accesoregistros" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenuregistroscotizacionesproductos">Acceso</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="registros.cotizaciones.productos.altas" id="idregistros.cotizaciones.productos.altas" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
+                                        '<label for="idregistros.cotizaciones.productos.altas">Altas</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="registros.cotizaciones.productos.bajas" id="idregistros.cotizaciones.productos.bajas" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
+                                        '<label for="idregistros.cotizaciones.productos.bajas">Bajas</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="registros.cotizaciones.productos.cambios" id="idregistros.cotizaciones.productos.cambios" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
+                                        '<label for="idregistros.cotizaciones.productos.cambios">Cambios</label>'+ 
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label>Cotizaciones Servicios</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="menuregistroscotizacionesservicios" id="idmenuregistroscotizacionesservicios" class="filled-in submenu accesoregistros" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenuregistroscotizacionesservicios">Acceso</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="registros.cotizaciones.servicios.altas" id="idregistros.cotizaciones.servicios.altas" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
+                                        '<label for="idregistros.cotizaciones.servicios.altas">Altas</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="registros.cotizaciones.servicios.bajas" id="idregistros.cotizaciones.servicios.bajas" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
+                                        '<label for="idregistros.cotizaciones.servicios.bajas">Bajas</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="registros.cotizaciones.servicios.cambios" id="idregistros.cotizaciones.servicios.cambios" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
+                                        '<label for="idregistros.cotizaciones.servicios.cambios">Cambios</label>'+ 
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                            '<div class="row">'+
+                                '<div class="col-md-6">'+
                                     '<label>Pedidos</label>'+
                                     '<div class="col-md-12 form-check">'+
                                         '<input type="checkbox" name="menuregistrospedidos" id="idmenuregistrospedidos" class="filled-in submenu accesoregistros" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+

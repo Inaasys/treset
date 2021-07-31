@@ -48,8 +48,10 @@ function mostrarbuscadorcodigoproducto(){
   var almacen = $("#almacen").val();
   if(cliente != "" && agente != "" && almacen != ""){
     $("#divbuscarcodigoproducto").show();
+    $("#divlistarcotizaciones").show();
   }else{
     $("#divbuscarcodigoproducto").hide();
+    $("#divlistarcotizaciones").hide();
   }
 }
 //mostrar modal formulario
@@ -516,7 +518,6 @@ function obteneragentepornumero(){
                 }
                 mostrarformulario();
                 mostrarbuscadorcodigoproducto();
-
             }) 
         }
     }
@@ -554,6 +555,107 @@ function regresarnumeroalmacen(){
     var numeroalmacenanterior = $("#numeroalmacenanterior").val();
     $("#numeroalmacen").val(numeroalmacenanterior);
 }
+//listar todas las cotizaciones
+function listarcotizaciones (){
+    ocultarformulario();
+    var tablacotizaciones = '<div class="modal-header '+background_forms_and_modals+'">'+
+                                '<h4 class="modal-title">Cotizaciones</h4>'+
+                            '</div>'+
+                            '<div class="modal-body">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-12">'+
+                                        '<div class="table-responsive">'+
+                                            '<table id="tbllistadocotizacion" class="tbllistadocotizacion table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                                '<thead class="'+background_tables+'">'+
+                                                    '<tr>'+
+                                                        '<th>Operaciones</th>'+
+                                                        '<th>Cotización</th>'+
+                                                        '<th>Fecha</th>'+
+                                                        '<th>Cliente</th>'+
+                                                        '<th>Nombre</th>'+
+                                                        '<th>Tipo</th>'+
+                                                        '<th>Total</th>'+
+                                                    '</tr>'+
+                                                '</thead>'+
+                                                '<tbody></tbody>'+
+                                            '</table>'+
+                                        '</div>'+
+                                    '</div>'+   
+                                '</div>'+
+                            '</div>'+
+                            '<div class="modal-footer">'+
+                                '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                            '</div>';
+    $("#contenidomodaltablas").html(tablacotizaciones);
+    $('#tbllistadocotizacion').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,  
+        processing: true,
+        'language': {
+            'loadingRecords': '&nbsp;',
+            'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+            url: remisiones_obtener_cotizaciones,
+            data: function (d) {
+                d.numerocliente = $("#numerocliente").val();
+            }
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Cotizacion', name: 'Cotizacion' },
+            { data: 'Fecha', name: 'Fecha' },
+            { data: 'Cliente', name: 'Cliente', orderable: false, searchable: false },
+            { data: 'Nombre', name: 'Nombre', orderable: false, searchable: false },
+            { data: 'Tipo', name: 'Tipo', orderable: false, searchable: false },
+            { data: 'Total', name: 'Total', orderable: false, searchable: false }
+        ],
+        "initComplete": function() {
+            var $buscar = $('div.dataTables_filter input');
+            $buscar.unbind();
+            $buscar.bind('keyup change', function(e) {
+                if(e.keyCode == 13 || this.value == "") {
+                    $('#tbllistadocotizacion').DataTable().search( this.value ).draw();
+                }
+            });
+        },
+    });  
+} 
+//obtener todos los datos de la cotizacion seleccionada
+function seleccionarcotizacion(Folio, Cotizacion){
+    $('.page-loader-wrapper').css('display', 'block');
+    $("#tablaproductosremisiones tbody").html("");
+    var numeroalmacen = $("#numeroalmacen").val();
+    $.get(remisiones_obtener_cotizacion, {Folio:Folio, Cotizacion:Cotizacion, numeroalmacen:numeroalmacen}, function(data){
+        $("#observaciones").val(data.cotizacion.Obs);
+        $("#plazo").val(data.cotizacion.Plazo);
+        $("#tablaproductosremisiones tbody").html(data.filasdetallescotizacion);
+        $("#importe").val(data.importe);
+        $("#descuento").val(data.descuento);
+        $("#subtotal").val(data.subtotal);
+        $("#iva").val(data.iva);
+        $("#total").val(data.total);
+        //detalles
+        $("#numerofilas").val(data.numerodetallescotizacion);
+        //colocar valores a contadores
+        contadorproductos = data.contadorproductos;
+        contadorfilas = data.contadorfilas;
+        seleccionartipocotizacion(data);
+        console.log(data);
+    })  
+}
+async function seleccionartipocotizacion(data){
+    await retraso();
+    $("#tipo").val(data.cotizacion.Tipo).change();
+    calculartotal();
+    mostrarbuscadorcodigoproducto();
+    mostrarformulario();
+    $('.page-loader-wrapper').css('display', 'none');
+} 
 //listar productos para tab consumos
 function listarproductos(){
     ocultarformulario();
@@ -631,6 +733,18 @@ function listarproductos(){
         
     });
 }
+function obtenerproductoporcodigo(){
+  var codigoabuscar = $("#codigoabuscar").val();
+  var numeroalmacen = $("#numeroalmacen").val();
+  var tipooperacion = $("#tipooperacion").val();
+  $.get(remisiones_obtener_producto_por_codigo,{codigoabuscar:codigoabuscar,numeroalmacen:numeroalmacen}, function(data){
+    if(parseInt(data.contarproductos) > 0){
+      agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, data.SubTotal, data.Existencias, tipooperacion, data.Insumo, data.ClaveProducto, data.ClaveUnidad, data.CostoDeLista);
+    }else{
+      msjnoseencontroningunproducto();
+    }
+  }) 
+}
 //función que evalua si la partida que quieren ingresar ya existe o no en el detalle de la orden de compra
 function evaluarproductoexistente(Codigo){
     var sumaiguales=0;
@@ -703,18 +817,10 @@ function calculartotalesfilas(fila){
   });
 }
 //dejar en 0 los descuentos cuando el precio de la partida se cambie
-function cambiodecantidadopreciopartida(fila,tipo){
+function cambiodecantidadpartida(fila,tipo){
   var cuentaFilas = 0;
   $("tr.filasproductos").each(function () {
     if(fila === cuentaFilas){  
-        //validar si se capturara precio neto
-        if( $('#idcapturaprecioneto').prop('checked') ) {
-            var preciopartida = $('.preciopartida', this).val();
-            var ivaporcentajepartida = $('.ivaporcentajepartida', this).val();
-            var nuevoiva = new Decimal(ivaporcentajepartida).dividedBy(100).plus(1);
-            var precioneto = new Decimal(preciopartida).dividedBy(nuevoiva);
-            $(".preciopartida", this).val(number_format(round(precioneto, numerodecimales), numerodecimales, '.', ''));
-        }
         $('.descuentopesospartida', this).val('0.'+numerocerosconfigurados); 
         $('.descuentoporcentajepartida',this).val('0.'+numerocerosconfigurados);
         calculartotalesfilas(fila);
@@ -735,20 +841,38 @@ function cambiodecantidadopreciopartida(fila,tipo){
     cuentaFilas++;
   });  
 }
+//dejar en 0 los descuentos cuando el precio de la partida se cambie
+function cambiodepreciopartida(fila,tipo){
+    var cuentaFilas = 0;
+    $("tr.filasproductos").each(function () {
+      if(fila === cuentaFilas){  
+          //validar si se capturara precio neto
+          if( $('#idcapturaprecioneto').prop('checked') ) {
+              var preciopartida = $('.preciopartida', this).val();
+              var ivaporcentajepartida = $('.ivaporcentajepartida', this).val();
+              var nuevoiva = new Decimal(ivaporcentajepartida).dividedBy(100).plus(1);
+              var precioneto = new Decimal(preciopartida).dividedBy(nuevoiva);
+              $(".preciopartida", this).val(number_format(round(precioneto, numerodecimales), numerodecimales, '.', ''));
+          }
+          $('.descuentopesospartida', this).val('0.'+numerocerosconfigurados); 
+          $('.descuentoporcentajepartida',this).val('0.'+numerocerosconfigurados);
+          calculartotalesfilas(fila);
+      }  
+      cuentaFilas++;
+    });  
+  }
 //calcular el porcentaje de descuento cuando el descuento en pesos se modifique
 function calculardescuentoporcentajepartida(fila){
   var cuentaFilas = 0;
   $("tr.filasproductos").each(function () {
     if(fila === cuentaFilas){  
-      //descuento en porcentaje de la partida
-      var importepartida = $('.importepartida', this).val(); 
-      var descuentopesospartida = $('.descuentopesospartida', this).val(); 
-      var multiplicaciondescuentoporcentajepartida  =  new Decimal(descuentopesospartida).times(100);
-      //if(multiplicaciondescuentoporcentajepartida.d[0] > parseInt(0)){
+        //descuento en porcentaje de la partida
+        var importepartida = $('.importepartida', this).val(); 
+        var descuentopesospartida = $('.descuentopesospartida', this).val(); 
+        var multiplicaciondescuentoporcentajepartida  =  new Decimal(descuentopesospartida).times(100);
         var descuentoporcentajepartida = new Decimal(multiplicaciondescuentoporcentajepartida/importepartida);
         $('.descuentoporcentajepartida', this).val(number_format(round(descuentoporcentajepartida, numerodecimales), numerodecimales, '.', ''));
         calculartotalesfilas(fila);
-      //}
     }  
     cuentaFilas++;
   });    
@@ -758,47 +882,51 @@ function calculardescuentopesospartida(fila){
   var cuentaFilas = 0;
   $("tr.filasproductos").each(function () {
     if(fila === cuentaFilas){   
-      //descuento en pesos de la partida
-      var importepartida = $('.importepartida', this).val();
-      var descuentoporcentajepartida = $('.descuentoporcentajepartida', this).val();
-      var multiplicaciondescuentopesospartida  =  new Decimal(importepartida).times(descuentoporcentajepartida);
-      //if(multiplicaciondescuentopesospartida.d[0] > parseInt(0)){
+        //descuento en pesos de la partida
+        var importepartida = $('.importepartida', this).val();
+        var descuentoporcentajepartida = $('.descuentoporcentajepartida', this).val();
+        var multiplicaciondescuentopesospartida  =  new Decimal(importepartida).times(descuentoporcentajepartida);
         var descuentopesospartida = new Decimal(multiplicaciondescuentopesospartida/100);
         $('.descuentopesospartida', this).val(number_format(round(descuentopesospartida, numerodecimales), numerodecimales, '.', ''));
         calculartotalesfilas(fila);
-     // }
     }  
     cuentaFilas++;
   }); 
 }      
 //calcular totales de orden de compra
 function calculartotal(){
-  var importe = 0;
-  var descuento = 0;
-  var subtotal= 0;
-  var iva = 0;
-  var total = 0;
-  var costo = 0;
-  var utilidad = 0;
-  var comision = 0;
-  $("tr.filasproductos").each(function(){
-    importe= new Decimal(importe).plus($(".importepartida", this).val());
-    descuento = new Decimal(descuento).plus($(".descuentopesospartida", this).val());
-    subtotal= new Decimal(subtotal).plus($(".subtotalpartida", this).val());
-    iva = new Decimal(iva).plus($(".ivapesospartida", this).val());
-    total = new Decimal(total).plus($(".totalpesospartida", this).val());
-    costo = new Decimal(costo).plus($(".costototalpartida ", this).val());
-    utilidad = new Decimal(utilidad).plus($(".utilidadpartida", this).val());
-    comision = new Decimal(comision).plus($(".comisionespesospartida", this).val());
-  }); 
-  $("#importe").val(number_format(round(importe, numerodecimales), numerodecimales, '.', ''));
-  $("#descuento").val(number_format(round(descuento, numerodecimales), numerodecimales, '.', ''));
-  $("#subtotal").val(number_format(round(subtotal, numerodecimales), numerodecimales, '.', ''));
-  $("#iva").val(number_format(round(iva, numerodecimales), numerodecimales, '.', ''));
-  $("#total").val(number_format(round(total, numerodecimales), numerodecimales, '.', ''));
-  $("#costo").val(number_format(round(costo, numerodecimales), numerodecimales, '.', ''));
-  $("#utilidad").val(number_format(round(utilidad, numerodecimales), numerodecimales, '.', ''));
-  $("#comision").val(number_format(round(comision, numerodecimales), numerodecimales, '.', ''));
+    var importe = 0;
+    var descuento = 0;
+    var subtotal= 0;
+    var iva = 0;
+    var total = 0;
+    var costo = 0;
+    var utilidad = 0;
+    var comision = 0;
+    $("tr.filasproductos").each(function(){
+        importe= new Decimal(importe).plus($(".importepartida", this).val());
+        descuento = new Decimal(descuento).plus($(".descuentopesospartida", this).val());
+        subtotal= new Decimal(subtotal).plus($(".subtotalpartida", this).val());
+        iva = new Decimal(iva).plus($(".ivapesospartida", this).val());
+        total = new Decimal(total).plus($(".totalpesospartida", this).val());
+        costo = new Decimal(costo).plus($(".costototalpartida ", this).val());
+        utilidad = new Decimal(utilidad).plus($(".utilidadpartida", this).val());
+        comision = new Decimal(comision).plus($(".comisionespesospartida", this).val());
+    }); 
+    $("#importe").val(number_format(round(importe, numerodecimales), numerodecimales, '.', ''));
+    $("#descuento").val(number_format(round(descuento, numerodecimales), numerodecimales, '.', ''));
+    $("#subtotal").val(number_format(round(subtotal, numerodecimales), numerodecimales, '.', ''));
+    $("#iva").val(number_format(round(iva, numerodecimales), numerodecimales, '.', ''));
+    $("#total").val(number_format(round(total, numerodecimales), numerodecimales, '.', ''));
+    $("#costo").val(number_format(round(costo, numerodecimales), numerodecimales, '.', ''));
+    $("#utilidad").val(number_format(round(utilidad, numerodecimales), numerodecimales, '.', ''));
+    $("#comision").val(number_format(round(comision, numerodecimales), numerodecimales, '.', ''));
+    //nuevo saldo
+    var numerocliente = $("#numerocliente").val();
+    $.get(remisiones_obtener_nuevo_saldo_cliente,{numerocliente:numerocliente}, function(saldo){
+        var nuevosaldo = new Decimal(saldo).plus(total);
+        $("#saldo").val(number_format(round(nuevosaldo, numerodecimales), numerodecimales, '.', ''));
+    })  
 }
 //funcion asincrona para buscar existencias de la partida
 function comprobarexistenciasenbd(fila, tipo, numeroalmacen, codigo){
@@ -821,17 +949,20 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
         var ivapesos = new Decimal(multiplicacioncostoimpuesto/100);
         var total = new Decimal(SubTotal).plus(ivapesos);
         var preciopartida = SubTotal;
+        var comisionporcentaje = new Decimal(SubTotal).times(0);
+        var comisionespesos= new Decimal(comisionporcentaje/100);
+        var utilidad = new Decimal(SubTotal).minus(Costo).minus(comisionespesos);
         var tipo = "alta";
         var fila=   '<tr class="filasproductos" id="filaproducto'+contadorproductos+'">'+
                           '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('+contadorproductos+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
                           '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+
-                          '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'+
+                          '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
                           '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'+Unidad+'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'+Unidad+'</td>'+
                             '<td class="tdmod">'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.'+numerocerosconfiguradosinputnumberstep+'" data-parsley-existencias="'+Existencias+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');cambiodecantidadopreciopartida('+contadorfilas+',\''+tipo +'\');">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.'+numerocerosconfiguradosinputnumberstep+'" data-parsley-existencias="'+Existencias+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');cambiodecantidadpartida('+contadorfilas+',\''+tipo +'\');">'+
                                 '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'+                           
                             '</td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');cambiodecantidadopreciopartida('+contadorfilas+',\''+tipo +'\');"></td>'+
+                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');cambiodepreciopartida('+contadorfilas+',\''+tipo +'\');"></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('+contadorfilas+');"></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentoporcentajepartida('+contadorfilas+');"></td>'+
@@ -843,9 +974,11 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="'+Costo+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm comisionporcentajepartida" name="comisionporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('+contadorfilas+');" required></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm comisionespesospartida" name="comisionespesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                          '<td class="tdmod"><input type="text" class="form-control divorinputmodsm monedapartida" name="monedapartida[]" value="MXN" readonly data-parsley-length="[1, 3]"></td>'+
+                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'+number_format(round(utilidad, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                          '<td class="tdmod"><input type="text" class="form-control divorinputmodsm monedapartida" name="monedapartida[]" value="MXN" readonly data-parsley-length="[1, 3]" autocomplete="off"></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costolistapartida" name="costolistapartida[]" value="'+CostoDeLista+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'+
+                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm tipocambiopartida" name="tipocambiopartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                          '<td class="tdmod"><input type="text" class="form-control divorinputmodsm cotizacionpartida" name="cotizacionpartida[]" value="" readonly data-parsley-length="[1, 20]"></td>'+
                           '<td class="tdmod"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'+Insumo+'" readonly data-parsley-length="[1, 20]"></td>'+
                           '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveprodutopartida" name="claveprodutopartida[]" value="'+ClaveProducto+'" readonly required></td>'+
                           '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]" value="'+ClaveUnidad+'" readonly required></td>'+
@@ -890,12 +1023,12 @@ function renumerarfilas(){
   //renumerar la cantidad de la partida
   lista = document.getElementsByClassName("cantidadpartida");
   for (var i = 0; i < lista.length; i++) {
-    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+');cambiodecantidadopreciopartida('+i+',\''+tipo +'\')');
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+');cambiodecantidadpartida('+i+',\''+tipo +'\')');
   }
   //renumero el precio de la partida
   lista = document.getElementsByClassName("preciopartida");
   for (var i = 0; i < lista.length; i++) {
-    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+');cambiodecantidadopreciopartida('+i+',\''+tipo +'\')');
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+');cambiodepreciopartida('+i+',\''+tipo +'\')');
   }
   //renumerar descuento en pesos
   lista = document.getElementsByClassName("descuentoporcentajepartida");
@@ -952,7 +1085,7 @@ function alta(){
                                         '</td>'+
                                         '<td>'+
                                             '<div class="form-line">'+
-                                                '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required data-parsley-type="integer">'+
+                                                '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
                                                 '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
                                                 '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
                                             '</div>'+
@@ -969,7 +1102,7 @@ function alta(){
                                         '</td>'+
                                         '<td>'+
                                             '<div class="form-line">'+
-                                                '<input type="text" class="form-control" name="numeroagente" id="numeroagente"  required data-parsley-type="integer">'+
+                                                '<input type="text" class="form-control" name="numeroagente" id="numeroagente"  required data-parsley-type="integer" autocomplete="off">'+
                                                 '<input type="hidden" class="form-control" name="numeroagenteanterior" id="numeroagenteanterior"  required data-parsley-type="integer">'+
                                                 '<input type="hidden" class="form-control" name="agente" id="agente" required readonly>'+
                                             '</div>'+
@@ -984,7 +1117,7 @@ function alta(){
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
-                            '<div class="col-md-3">'+
+                            '<div class="col-md-2">'+
                                 '<label>Almacén <span class="label label-danger" id="textonombrealmacen"></span></label>'+
                                 '<table class="col-md-12">'+
                                     '<tr>'+
@@ -993,7 +1126,7 @@ function alta(){
                                         '</td>'+
                                         '<td>'+
                                             '<div class="form-line">'+
-                                                '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer">'+
+                                                '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer" autocomplete="off">'+
                                                 '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required data-parsley-type="integer">'+
                                                 '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
                                             '</div>'+
@@ -1009,47 +1142,62 @@ function alta(){
                                 '<label>Unidad</label>'+
                                 '<select name="unidad" id="unidad" class="form-control select2" style="width:100% !important;" required readonly></select>'+
                             '</div>'+
-                            '<div class="col-md-2">'+
+                            '<div class="col-md-1">'+
                                 '<label>Plazo Días </label>'+
-                                '<input type="text" class="form-control" name="plazo" id="plazo" value="5" onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="plazo" id="plazo" value="5" onkeyup="tipoLetra(this);" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-3" id="divbuscarcodigoproducto" hidden>'+
-                                '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
-                                '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                              '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
+                              '<table class="col-md-12">'+
+                                '<tr>'+
+                                  '<td>'+
+                                    '<div class="btn bg-blue waves-effect" id="btnobtenerproductos" onclick="listarproductos()">Ver Productos</div>'+
+                                  '</td>'+
+                                  '<td>'+ 
+                                    '<div class="form-line">'+
+                                      '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                                    '</div>'+
+                                  '</td>'+
+                                '</tr>'+    
+                              '</table>'+
                             '</div>'+
+                            '<div class="col-md-2" id="divlistarcotizaciones">'+
+                              '<label>Cotizaciones</label>'+
+                              '<div class="btn btn-block bg-blue waves-effect" id="btnlistarcotizaciones" onclick="listarcotizaciones()">Ver Cotizaciones</div>'+
+                            '</div>'+ 
                         '</div>'+
                     '</div>'+
                     '<div role="tabpanel" class="tab-pane fade" id="pedidotab">'+
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Pedido</label>'+
-                                '<input type="text" class="form-control" name="pedido" id="pedido" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">'+
+                                '<input type="text" class="form-control" name="pedido" id="pedido" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Solicitado por</label>'+
-                                '<input type="text" class="form-control" name="solicitadopor" id="solicitadopor" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">'+
+                                '<input type="text" class="form-control" name="solicitadopor" id="solicitadopor" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Destino del Pedido </label>'+
-                                '<input type="text" class="form-control" name="destinodelpedido" id="destinodelpedido" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]">'+
+                                '<input type="text" class="form-control" name="destinodelpedido" id="destinodelpedido" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]" autocomplete="off">'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-3">'+
                                 '<label>Referencia</label>'+
-                                '<input type="text" class="form-control" name="referencia" id="referencia" onkeyup="tipoLetra(this);"  data-parsley-length="[1, 50]">'+
+                                '<input type="text" class="form-control" name="referencia" id="referencia" onkeyup="tipoLetra(this);"  data-parsley-length="[1, 50]" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Orden Servicio</label>'+
-                                '<input type="text" class="form-control" name="ordenservicio" id="ordenservicio" onkeyup="tipoLetra(this);"  data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control" name="ordenservicio" id="ordenservicio" onkeyup="tipoLetra(this);"  data-parsley-length="[1, 20]" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Equipo </label>'+
-                                '<input type="text" class="form-control" name="equipo" id="equipo" onkeyup="tipoLetra(this);"  data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control" name="equipo" id="equipo" onkeyup="tipoLetra(this);"  data-parsley-length="[1, 20]" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Requisición </label>'+
-                                '<input type="text" class="form-control" name="requisicion" id="requisicion"  onkeyup="tipoLetra(this);"  data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control" name="requisicion" id="requisicion"  onkeyup="tipoLetra(this);"  data-parsley-length="[1, 20]" autocomplete="off">'+
                             '</div>'+
                         '</div>'+
                     '</div>'+
@@ -1088,6 +1236,10 @@ function alta(){
                                           '<th class="bg-amber">Utilidad $</th>'+
                                           '<th class="'+background_tables+'">Moneda</th>'+
                                           '<th class="'+background_tables+'">Costo de Lista</th>'+
+                                          
+                                          '<th class="'+background_tables+'">Tipo de Cambio</th>'+
+                                          '<th class="'+background_tables+'">Cotización</th>'+
+
                                           '<th class="'+background_tables+'">Insumo</th>'+
                                           '<th class="'+background_tables+'">ClaveProducto</th>'+
                                           '<th class="'+background_tables+'">ClaveUnidad</th>'+
@@ -1182,7 +1334,7 @@ function alta(){
         //recomentable para mayor compatibilidad entre navegadores.
         var code = (e.keyCode ? e.keyCode : e.which);
         if(code==13){
-          listarproductos();
+            obtenerproductoporcodigo();
         }
     });
     //activar busqueda para clientes
@@ -1190,7 +1342,7 @@ function alta(){
         //recomentable para mayor compatibilidad entre navegadores.
         var code = (e.keyCode ? e.keyCode : e.which);
         if(code==13){
-        obtenerclientepornumero();
+            obtenerclientepornumero();
         }
     });
     //regresar numero cliente
@@ -1202,7 +1354,7 @@ function alta(){
         //recomentable para mayor compatibilidad entre navegadores.
         var code = (e.keyCode ? e.keyCode : e.which);
         if(code==13){
-        obteneragentepornumero();
+            obteneragentepornumero();
         }
     });
     //regresar numero agente
@@ -1214,7 +1366,7 @@ function alta(){
         //recomentable para mayor compatibilidad entre navegadores.
         var code = (e.keyCode ? e.keyCode : e.which);
         if(code==13){
-        obteneralmacenpornumero();
+            obteneralmacenpornumero();
         }
     });
     //regresar numero almacen
@@ -1344,9 +1496,9 @@ $("#btnbaja").on('click', function(e){
 });
 //modificacion
 function obtenerdatos(remisionmodificar){
-  $("#titulomodal").html('Modificación Remisión');
   $('.page-loader-wrapper').css('display', 'block');
   $.get(remisiones_obtener_remision,{remisionmodificar:remisionmodificar },function(data){
+    $("#titulomodal").html('Modificación Remisión --- STATUS : ' + data.remision.Status);
     //formulario modificacion
     var tabs ='<div class="col-md-12">'+
                 '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
@@ -1376,7 +1528,7 @@ function obtenerdatos(remisionmodificar){
                                         '</td>'+
                                         '<td>'+
                                             '<div class="form-line">'+
-                                                '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required data-parsley-type="integer">'+
+                                                '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
                                                 '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
                                                 '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
                                             '</div>'+
@@ -1393,7 +1545,7 @@ function obtenerdatos(remisionmodificar){
                                         '</td>'+
                                         '<td>'+
                                             '<div class="form-line">'+
-                                                '<input type="text" class="form-control" name="numeroagente" id="numeroagente"  required data-parsley-type="integer">'+
+                                                '<input type="text" class="form-control" name="numeroagente" id="numeroagente"  required data-parsley-type="integer" autocomplete="off">'+
                                                 '<input type="hidden" class="form-control" name="numeroagenteanterior" id="numeroagenteanterior"  required data-parsley-type="integer">'+
                                                 '<input type="hidden" class="form-control" name="agente" id="agente"  readonly>'+
                                             '</div>'+
@@ -1417,7 +1569,7 @@ function obtenerdatos(remisionmodificar){
                                         '</td>'+
                                         '<td>'+
                                             '<div class="form-line">'+
-                                                '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required readonly data-parsley-type="integer">'+
+                                                '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required readonly data-parsley-type="integer" autocomplete="off">'+
                                                 '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required data-parsley-type="integer">'+
                                                 '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
                                             '</div>'+
@@ -1435,11 +1587,22 @@ function obtenerdatos(remisionmodificar){
                             '</div>'+
                             '<div class="col-md-2">'+
                                 '<label>Plazo Días </label>'+
-                                '<input type="text" class="form-control" name="plazo" id="plazo" onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="plazo" id="plazo" onkeyup="tipoLetra(this);" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-3" id="divbuscarcodigoproducto" hidden>'+
-                                '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
-                                '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                              '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
+                              '<table class="col-md-12">'+
+                                '<tr>'+
+                                  '<td>'+
+                                    '<div class="btn bg-blue waves-effect" id="btnobtenerproductos" onclick="listarproductos()">Ver Productos</div>'+
+                                  '</td>'+
+                                  '<td>'+ 
+                                    '<div class="form-line">'+
+                                      '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                                    '</div>'+
+                                  '</td>'+
+                                '</tr>'+    
+                              '</table>'+
                             '</div>'+
                         '</div>'+
                     '</div>'+
@@ -1447,33 +1610,33 @@ function obtenerdatos(remisionmodificar){
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Pedido</label>'+
-                                '<input type="text" class="form-control" name="pedido" id="pedido" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">'+
+                                '<input type="text" class="form-control" name="pedido" id="pedido" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Solicitado por</label>'+
-                                '<input type="text" class="form-control" name="solicitadopor" id="solicitadopor" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">'+
+                                '<input type="text" class="form-control" name="solicitadopor" id="solicitadopor" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Destino del Pedido </label>'+
-                                '<input type="text" class="form-control" name="destinodelpedido" id="destinodelpedido" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]">'+
+                                '<input type="text" class="form-control" name="destinodelpedido" id="destinodelpedido" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]" autocomplete="off">'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-3">'+
                                 '<label>Referencia</label>'+
-                                '<input type="text" class="form-control" name="referencia" id="referencia" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">'+
+                                '<input type="text" class="form-control" name="referencia" id="referencia" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Orden Servicio</label>'+
-                                '<input type="text" class="form-control" name="ordenservicio" id="ordenservicio" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control" name="ordenservicio" id="ordenservicio" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Equipo </label>'+
-                                '<input type="text" class="form-control" name="equipo" id="equipo" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control" name="equipo" id="equipo" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Requisición </label>'+
-                                '<input type="text" class="form-control" name="requisicion" id="requisicion"  onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control" name="requisicion" id="requisicion"  onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]" autocomplete="off">'+
                             '</div>'+
                         '</div>'+
                     '</div>'+
@@ -1512,6 +1675,10 @@ function obtenerdatos(remisionmodificar){
                                           '<th class="bg-amber">Utilidad $</th>'+
                                           '<th class="'+background_tables+'">Moneda</th>'+
                                           '<th class="'+background_tables+'">Costo de Lista</th>'+
+                                          
+                                          '<th class="'+background_tables+'">Tipo de Cambio</th>'+
+                                          '<th class="'+background_tables+'">Cotización</th>'+
+
                                           '<th class="'+background_tables+'">Insumo</th>'+
                                           '<th class="'+background_tables+'">ClaveProducto</th>'+
                                           '<th class="'+background_tables+'">ClaveUnidad</th>'+
@@ -1646,15 +1813,18 @@ function obtenerdatos(remisionmodificar){
     //mostrar el buscador de productos
     mostrarbuscadorcodigoproducto();
     //activar seelct2
-    //$(".select2").select2();
-    $("#tipo").select2();
+    obtenertiposcliente();
+    obtenertiposunidad();
+    $("#unidad").val(data.remision.Unidad).change();
     $("#unidad").select2();
+    $("#tipo").val(data.remision.Tipo).change();
+    $("#tipo").select2();
     //activar busqueda de codigos
     $("#codigoabuscar").keypress(function(e) {
         //recomentable para mayor compatibilidad entre navegadores.
         var code = (e.keyCode ? e.keyCode : e.which);
         if(code==13){
-          listarproductos();
+            obtenerproductoporcodigo();
         }
     });
     //activar busqueda para clientes
@@ -1662,7 +1832,7 @@ function obtenerdatos(remisionmodificar){
         //recomentable para mayor compatibilidad entre navegadores.
         var code = (e.keyCode ? e.keyCode : e.which);
         if(code==13){
-        obtenerclientepornumero();
+            obtenerclientepornumero();
         }
     });
     //regresar numero cliente
@@ -1674,7 +1844,7 @@ function obtenerdatos(remisionmodificar){
         //recomentable para mayor compatibilidad entre navegadores.
         var code = (e.keyCode ? e.keyCode : e.which);
         if(code==13){
-        obteneragentepornumero();
+            obteneragentepornumero();
         }
     });
     //regresar numero agente

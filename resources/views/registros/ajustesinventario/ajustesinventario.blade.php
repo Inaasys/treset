@@ -177,6 +177,7 @@
         var ajustesinventario_obtener_almacenes = '{!!URL::to('ajustesinventario_obtener_almacenes')!!}';
         var ajustesinventario_obtener_almacen_por_numero = '{!!URL::to('ajustesinventario_obtener_almacen_por_numero')!!}';
         var ajustesinventario_obtener_productos = '{!!URL::to('ajustesinventario_obtener_productos')!!}';
+        var ajustesinventario_obtener_producto_por_codigo = '{!!URL::to('ajustesinventario_obtener_producto_por_codigo')!!}';
         var ajustesinventario_obtener_existencias_partida = '{!!URL::to('ajustesinventario_obtener_existencias_partida')!!}';
         var ajustesinventario_guardar = '{!!URL::to('ajustesinventario_guardar')!!}';
         var ajustesinventario_verificar_baja = '{!!URL::to('ajustesinventario_verificar_baja')!!}';

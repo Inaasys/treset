@@ -14,17 +14,17 @@
           <ul class="dropdown-menu">
             <li><a href="{{ route('ordenes_compra') }}" id="menuregistrosordenescompra">Ordenes de Compra</a></li>
             <li><a href="{{ route('compras') }}" id="menuregistroscompras">Compras</a></li>
-            <li><a href="{{ route('contrarecibos') }}"  id="menuregistroscontrarecibos">ContraRecibos</a></li>                   
-            <!--<li class="dropdown-submenu">
-              <a class="test"  href="#"  id="menuregistroscotizaciones">Cotizaciones <span class="caret"></span></a>
+            <li><a href="{{ route('contrarecibos') }}"  id="menuregistroscontrarecibos">ContraRecibos</a></li> 
+            <li class="dropdown-submenu">
+              <a class="test" href="#">Cotizaciones <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a  href="#">Cotizaciones Productos</a></li>
-                <li><a  href="#">Cotizaciones Servicios</a></li>
+                <li><a  href="{{ route('cotizaciones_productos') }}" id="menuregistroscotizacionesproductos">Cotizaciones Productos</a></li>
+                <li><a  href="{{ route('cotizaciones_servicios') }}" id="menuregistroscotizacionesservicios">Cotizaciones Servicios</a></li>
+                <li><a href="{{ route('cotizaciones') }}" id="menuregistroscotizaciones">Cotizaciones</a></li>
               </ul>
-            </li>
-            <li><a href="#" id="menuregistrospedidos">Pedidos</a></li>-->
+            </li>  
+            <!--<li><a href="#" id="menuregistrospedidos">Pedidos</a></li>-->
             <li><a href="{{ route('remisiones') }}" id="menuregistrosremisiones">Remisiones</a></li>
-            <li><a href="{{ route('cotizaciones') }}" id="menuregistroscotizaciones">Cotizaciones</a></li>
             <li><a href="{{ route('facturas') }}" id="menuregistrosfacturas">Facturas</a></li>                         
             <li><a href="{{ route('traspasos') }}" id="menuregistrostraspasos">Traspasos</a></li>                    
             <li><a href="{{ route('ordenes_trabajo') }}" id="menuregistrosordenestrabajo">Ordenes de Trabajo</a></li>

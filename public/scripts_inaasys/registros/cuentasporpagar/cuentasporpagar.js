@@ -441,7 +441,7 @@ function alta(){
                                 '</td>'+ 
                                 '<td>'+ 
                                     '<div class="form-line">'+ 
-                                        '<input type="text" class="form-control" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer">'+ 
+                                        '<input type="text" class="form-control" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer" autocomplete="off">'+ 
                                         '<input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior" required data-parsley-type="integer">'+ 
                                         '<input type="hidden" class="form-control" name="proveedor" id="proveedor" required readonly>'+ 
                                     '</div>'+ 
@@ -458,7 +458,7 @@ function alta(){
                                 '</td>'+ 
                                 '<td>'+    
                                     '<div class="form-line">'+ 
-                                        '<input type="text" class="form-control" name="numerobanco" id="numerobanco" required data-parsley-type="integer">'+ 
+                                        '<input type="text" class="form-control" name="numerobanco" id="numerobanco" required data-parsley-type="integer" autocomplete="off">'+ 
                                         '<input type="hidden" class="form-control" name="numerobancoanterior" id="numerobancoanterior" required data-parsley-type="integer">'+ 
                                         '<input type="hidden" class="form-control" name="banco" id="banco" required readonly>'+ 
                                     '</div>'+ 
@@ -475,21 +475,21 @@ function alta(){
                     '<div class="row">'+ 
                     '<div class="col-md-4">'+ 
                         '<label>Transferencia</label>'+ 
-                        '<input type="text" class="form-control" name="transferencia" id="transferencia" value="0" required data-parsley-type="integer">'+ 
+                        '<input type="text" class="form-control" name="transferencia" id="transferencia" value="0" required data-parsley-type="integer" autocomplete="off">'+ 
                     '</div>'+ 
                     '<div class="col-md-4">'+ 
                         '<label>Cheque</label>'+ 
-                        '<input type="text" class="form-control" name="cheque" id="cheque" value="0" required data-parsley-type="integer">'+ 
+                        '<input type="text" class="form-control" name="cheque" id="cheque" value="0" required data-parsley-type="integer" autocomplete="off">'+ 
                     '</div>'+ 
                     '<div class="col-md-4">'+ 
                         '<label>Beneficiario</label>'+ 
-                        '<input type="text" class="form-control" name="beneficiario" id="beneficiario"  required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+ 
+                        '<input type="text" class="form-control" name="beneficiario" id="beneficiario"  required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);" autocomplete="off">'+ 
                     '</div>'+ 
                     '</div>'+ 
                     '<div class="row">'+ 
                     '<div class="col-md-6">'+ 
                         '<label>Cuenta a la que se Depositó</label>'+ 
-                        '<input type="text" class="form-control" name="cuentadeposito" id="cuentadeposito" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+ 
+                        '<input type="text" class="form-control" name="cuentadeposito" id="cuentadeposito" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+ 
                     '</div>'+ 
                     '<div class="col-md-6">'+ 
                         '<label>Anotación</label>'+ 
@@ -532,7 +532,7 @@ function alta(){
                         '<div class="row">'+
                           '<div class="col-md-6">'+   
                             '<label>Contrarecibo</label>'+
-                            '<input type="text" class="form-control" name="contrarecibo" id="contrarecibo" onkeyup="tipoLetra(this);" >'+
+                            '<input type="text" class="form-control" name="contrarecibo" id="contrarecibo" onkeyup="tipoLetra(this);" autocomplete="off" >'+
                           '</div>'+ 
                           '<div class="col-md-3 col-md-offset-3">'+
                                 '<table class="table table-striped table-hover">'+
@@ -722,9 +722,9 @@ $("#btnbaja").on('click', function(e){
   }
 });
 function obtenerdatos(cxpmodificar){
-  $("#titulomodal").html('Modificación Cuenta por Pagar');
   $('.page-loader-wrapper').css('display', 'block');
   $.get(cuentas_por_pagar_obtener_cuenta_por_pagar,{cxpmodificar:cxpmodificar },function(data){
+    $("#titulomodal").html('Modificación Cuenta por Pagar --- STATUS : ' + data.CuentaXPagar.Status);
     //formulario modificacion
     var tabs =  '<div class="col-md-12">'+    
                     '<div class="row">'+ 
@@ -742,7 +742,7 @@ function obtenerdatos(cxpmodificar){
                                     '</td>'+ 
                                     '<td>'+ 
                                         '<div class="form-line">'+ 
-                                            '<input type="text" class="form-control" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer">'+ 
+                                            '<input type="text" class="form-control" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer" autocomplete="off">'+ 
                                             '<input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior" required data-parsley-type="integer">'+ 
                                             '<input type="hidden" class="form-control" name="proveedor" id="proveedor" required readonly>'+ 
                                         '</div>'+ 
@@ -759,7 +759,7 @@ function obtenerdatos(cxpmodificar){
                                     '</td>'+ 
                                     '<td>'+    
                                         '<div class="form-line">'+ 
-                                            '<input type="text" class="form-control" name="numerobanco" id="numerobanco" required data-parsley-type="integer">'+ 
+                                            '<input type="text" class="form-control" name="numerobanco" id="numerobanco" required data-parsley-type="integer" autocomplete="off">'+ 
                                             '<input type="hidden" class="form-control" name="numerobancoanterior" id="numerobancoanterior" required data-parsley-type="integer">'+ 
                                             '<input type="hidden" class="form-control" name="banco" id="banco" required readonly>'+ 
                                         '</div>'+ 
@@ -776,21 +776,21 @@ function obtenerdatos(cxpmodificar){
                         '<div class="row">'+ 
                         '<div class="col-md-4">'+ 
                             '<label>Transferencia</label>'+ 
-                            '<input type="text" class="form-control" name="transferencia" id="transferencia" value="0" required data-parsley-type="integer">'+ 
+                            '<input type="text" class="form-control" name="transferencia" id="transferencia" value="0" required data-parsley-type="integer" autocomplete="off">'+ 
                         '</div>'+ 
                         '<div class="col-md-4">'+ 
                             '<label>Cheque</label>'+ 
-                            '<input type="text" class="form-control" name="cheque" id="cheque" value="0" required data-parsley-type="integer">'+ 
+                            '<input type="text" class="form-control" name="cheque" id="cheque" value="0" required data-parsley-type="integer" autocomplete="off">'+ 
                         '</div>'+ 
                         '<div class="col-md-4">'+ 
                             '<label>Beneficiario</label>'+ 
-                            '<input type="text" class="form-control" name="beneficiario" id="beneficiario"  required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+ 
+                            '<input type="text" class="form-control" name="beneficiario" id="beneficiario"  required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);" autocomplete="off">'+ 
                         '</div>'+ 
                         '</div>'+ 
                         '<div class="row">'+ 
                         '<div class="col-md-6">'+ 
                             '<label>Cuenta a la que se Depositó</label>'+ 
-                            '<input type="text" class="form-control" name="cuentadeposito" id="cuentadeposito" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+ 
+                            '<input type="text" class="form-control" name="cuentadeposito" id="cuentadeposito" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+ 
                         '</div>'+ 
                         '<div class="col-md-6">'+ 
                             '<label>Anotación</label>'+ 
@@ -832,7 +832,7 @@ function obtenerdatos(cxpmodificar){
                             '<div class="row">'+
                             '<div class="col-md-6">'+   
                                 '<label>Contrarecibo</label>'+
-                                '<input type="text" class="form-control" name="contrarecibo" id="contrarecibo" onkeyup="tipoLetra(this);" >'+
+                                '<input type="text" class="form-control" name="contrarecibo" id="contrarecibo" onkeyup="tipoLetra(this);"  autocomplete="off">'+
                             '</div>'+ 
                             '<div class="col-md-3 col-md-offset-3">'+
                                     '<table class="table table-striped table-hover">'+

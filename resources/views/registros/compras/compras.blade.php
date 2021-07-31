@@ -247,6 +247,7 @@
         var compras_obtener_almacenes = '{!!URL::to('compras_obtener_almacenes')!!}';
         var compras_obtener_almacen_por_numero = '{!!URL::to('compras_obtener_almacen_por_numero')!!}';
         var compras_obtener_productos = '{!!URL::to('compras_obtener_productos')!!}';
+        var compras_obtener_producto_por_codigo = '{!!URL::to('compras_obtener_producto_por_codigo')!!}';
         var compras_obtener_proveedor_por_numero = '{!!URL::to('compras_obtener_proveedor_por_numero')!!}';
         var compras_obtener_ordenes_compra = '{!!URL::to('compras_obtener_ordenes_compra')!!}';
         var compras_obtener_orden_compra = '{!!URL::to('compras_obtener_orden_compra')!!}'; 

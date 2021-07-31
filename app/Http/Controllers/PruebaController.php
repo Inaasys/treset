@@ -362,4 +362,29 @@ class PruebaController extends ConfiguracionSistemaController{
         ]);
     }
 
+    public function modificar_valores_en_bd_para_actualizacion_rama20210706correciones(){
+        //tabla Cotizaciones Productos
+        Configuracion_Tabla::where('tabla', 'CotizacionesProductos')
+        ->update([
+            'primerordenamiento'=>'Folio',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'omitir',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'omitir',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'Cotizacion,Status,NombreCliente'
+        ]);
+        //tabla Cotizaciones Servicios
+        Configuracion_Tabla::where('tabla', 'CotizacionesServicio')
+        ->update([
+            'primerordenamiento'=>'Folio',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'omitir',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'omitir',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'Cotizacion,Status,NombreCliente'
+        ]);
+    }
+
 }

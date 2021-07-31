@@ -623,6 +623,14 @@ function msj_errorserieexistenteendocumento(){
         "extendedTImeout": "6000"
     });  
 }
+//mensaje no se encontro ningun producto con el codigo especificado
+function msjnoseencontroningunproducto(){
+    toastr.error( "Aviso, no se encontro ningun resultado con el código especificado", "Mensaje", {
+        "timeOut": "6000",
+        "progressBar": true,
+        "extendedTImeout": "6000"
+    });  
+}
 //|||||MENSAJES API FACTURAPI |||||||
 //mensaje factura timbrada correctamente
 function msj_documentotimbradocorrectamente(mensaje, tipomensaje){

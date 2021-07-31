@@ -485,6 +485,17 @@ function listarherramientas(){
     
   });
 }
+function obtenerproductoporcodigo(){
+  var codigoabuscar = $("#codigoabuscar").val();
+  var tipooperacion = $("#tipooperacion").val();
+  $.get(asignacion_herramienta_obtener_herramienta_por_codigo,{codigoabuscar:codigoabuscar}, function(data){
+    if(parseInt(data.contarproductos) > 0){
+      agregarfilaherramienta(data.Codigo, data.Producto, data.Unidad, data.Costo, data.Existencias, data.selectalmacenes, tipooperacion);
+    }else{
+      msjnoseencontroningunproducto();
+    }
+  }) 
+}
 //función que evalua si la partida que quieren ingresar ya existe o no en el detalle de la orden de compra
 function evaluarproductoexistente(Codigo){
   var sumaiguales=0;
@@ -544,7 +555,7 @@ function agregarfilaherramienta(Codigo, Producto, Unidad, Costo, Existencias, se
     var fila=   '<tr class="filasproductos" id="filaproducto'+contadorproductos+'">'+
                         '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('+contadorproductos+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
                         '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+
-                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'+
+                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
                         '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'+Unidad+'" readonly data-parsley-length="[1, 5]">'+Unidad+'</td>'+
                         '<td class="tdmod">'+
                           '<select name="almacenpartida[]" class="form-control divorinputmodxl almacenpartida" style="width:100% !important;height: 28px !important;" onchange="obtenerexistenciasalmacen('+contadorproductos+')" required>'+
@@ -666,7 +677,7 @@ function alta(){
                       '</td>'+
                       '<td>'+
                         '<div class="form-line">'+
-                          '<input type="text" class="form-control" name="numeropersonalrecibe" id="numeropersonalrecibe" required data-parsley-type="integer">'+
+                          '<input type="text" class="form-control" name="numeropersonalrecibe" id="numeropersonalrecibe" required data-parsley-type="integer" autocomplete="off">'+
                           '<input type="hidden" class="form-control" name="numeropersonalrecibeanterior" id="numeropersonalrecibeanterior" required data-parsley-type="integer">'+
                           '<input type="hidden" class="form-control" name="personalrecibe" id="personalrecibe" required readonly>'+
                         '</div>'+
@@ -683,7 +694,7 @@ function alta(){
                       '</td>'+
                       '<td>'+    
                         '<div class="form-line">'+
-                          '<input type="text" class="form-control" name="numeropersonalentrega" id="numeropersonalentrega" required data-parsley-type="integer">'+
+                          '<input type="text" class="form-control" name="numeropersonalentrega" id="numeropersonalentrega" required data-parsley-type="integer" autocomplete="off">'+
                           '<input type="hidden" class="form-control" name="numeropersonalentregaanterior" id="numeropersonalentregaanterior" required data-parsley-type="integer">'+
                           '<input type="hidden" class="form-control" name="personalentrega" id="personalentrega" required readonly>'+
                         '</div>'+
@@ -697,10 +708,21 @@ function alta(){
                   '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                 '</div>'+
               '</div>'+
-              '<div class="row">'+
+              '<div class="row">'+ 
                 '<div class="col-md-4" id="divbuscarcodigoproducto">'+
                   '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
-                  '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código de la herramienta" autocomplete="off">'+
+                  '<table class="col-md-12">'+
+                    '<tr>'+
+                      '<td>'+
+                        '<div class="btn bg-blue waves-effect" id="btnobtenerproductos" onclick="listarherramientas()">Ver Herramientas</div>'+
+                      '</td>'+
+                      '<td>'+ 
+                        '<div class="form-line">'+
+                          '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código de la herramienta" autocomplete="off">'+
+                        '</div>'+
+                      '</td>'+
+                    '</tr>'+    
+                  '</table>'+
                 '</div>'+
               '</div>'+
             '</div>'+
@@ -769,7 +791,7 @@ function alta(){
     //recomentable para mayor compatibilidad entre navegadores.
     var code = (e.keyCode ? e.keyCode : e.which);
     if(code==13){
-      listarherramientas();
+      obtenerproductoporcodigo();
     }
   });
   //activar busqueda
@@ -949,9 +971,9 @@ $("#btnbaja").on('click', function(e){
   }
 });
 function obtenerdatos(asignacionmodificar){
-  $("#titulomodal").html('Modificación Asignación Herramienta');
   $('.page-loader-wrapper').css('display', 'block');
   $.get(asignacion_herramienta_obtener_asignacion_herramienta,{asignacionmodificar:asignacionmodificar },function(data){
+    $("#titulomodal").html('Modificación Asignación Herramienta --- STATUS : ' + data.Asignacion_Herramienta.status);
     //formulario modificacion
     var tabs ='<div class="col-md-12">'+
                 '<div class="row">'+
@@ -971,7 +993,7 @@ function obtenerdatos(asignacionmodificar){
                         '</td>'+
                         '<td>'+
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control" name="numeropersonalrecibe" id="numeropersonalrecibe" required data-parsley-type="integer">'+
+                            '<input type="text" class="form-control" name="numeropersonalrecibe" id="numeropersonalrecibe" required data-parsley-type="integer" autocomplete="off">'+
                             '<input type="hidden" class="form-control" name="numeropersonalrecibeanterior" id="numeropersonalrecibeanterior" required data-parsley-type="integer">'+
                             '<input type="hidden" class="form-control" name="personalrecibe" id="personalrecibe" required readonly>'+
                           '</div>'+
@@ -988,7 +1010,7 @@ function obtenerdatos(asignacionmodificar){
                         '</td>'+
                         '<td>'+    
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control" name="numeropersonalentrega" id="numeropersonalentrega" required data-parsley-type="integer">'+
+                            '<input type="text" class="form-control" name="numeropersonalentrega" id="numeropersonalentrega" required data-parsley-type="integer" autocomplete="off">'+
                             '<input type="hidden" class="form-control" name="numeropersonalentregaanterior" id="numeropersonalentregaanterior" required data-parsley-type="integer">'+
                             '<input type="hidden" class="form-control" name="personalentrega" id="personalentrega" required readonly>'+
                           '</div>'+
@@ -1005,7 +1027,18 @@ function obtenerdatos(asignacionmodificar){
                 '<div class="row">'+
                   '<div class="col-md-4" id="divbuscarcodigoproducto">'+
                     '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
-                    '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código de la herramienta" autocomplete="off">'+
+                    '<table class="col-md-12">'+
+                      '<tr>'+
+                        '<td>'+
+                          '<div class="btn bg-blue waves-effect" id="btnobtenerproductos" onclick="listarherramientas()">Ver Herramientas</div>'+
+                        '</td>'+
+                        '<td>'+ 
+                          '<div class="form-line">'+
+                            '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código de la herramienta" autocomplete="off">'+
+                          '</div>'+
+                        '</td>'+
+                      '</tr>'+    
+                    '</table>'+
                   '</div>'+
                 '</div>'+
               '</div>'+
@@ -1089,7 +1122,7 @@ function obtenerdatos(asignacionmodificar){
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
-        listarherramientas();
+        obtenerproductoporcodigo();
       }
     });
     //regresar numero

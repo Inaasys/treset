@@ -372,11 +372,11 @@ function alta(){
                 '</div>'+ 
                 '<div class="col-md-3">'+
                   '<label>OT Tecnodiesel</label>'+
-                  '<input type="text" class="form-control" name="ottecnodiesel" id="ottecnodiesel"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">'+
+                  '<input type="text" class="form-control" name="ottecnodiesel" id="ottecnodiesel"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                 '</div>'+
                 '<div class="col-md-3">'+
                   '<label>OT TyT</label>'+
-                  '<input type="text" class="form-control" name="ottyt" id="ottyt" required data-parsley-length="[0, 50]" onkeyup="tipoLetra(this);">'+
+                  '<input type="text" class="form-control" name="ottyt" id="ottyt" required data-parsley-length="[0, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                 '</div>'+ 
                 '<div class="col-md-3">'+
                   '<label>Fecha </label>'+
@@ -394,7 +394,7 @@ function alta(){
                       '</td>'+
                       '<td>'+
                         '<div class="form-line">'+
-                          '<input type="hidden" class="form-control" name="numeroremision" id="numeroremision" required readonly onkeyup="tipoLetra(this)">'+
+                          '<input type="hidden" class="form-control" name="numeroremision" id="numeroremision" required readonly onkeyup="tipoLetra(this)" autocomplete="off">'+
                           '<input type="text" class="form-control" name="remision" id="remision" required readonly>'+
                         '</div>'+
                       '</td>'+
@@ -403,11 +403,11 @@ function alta(){
                 '</div>'+
                 '<div class="col-md-3">'+
                   '<label>Equipo</label>'+
-                  '<input type="text" class="form-control" name="equipo" id="equipo" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">'+
+                  '<input type="text" class="form-control" name="equipo" id="equipo" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                 '</div>'+ 
                 '<div class="col-md-3">'+
                   '<label>Requisición</label>'+
-                  '<input type="text" class="form-control" name="requisicion" id="requisicion" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">'+
+                  '<input type="text" class="form-control" name="requisicion" id="requisicion" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                 '</div>'+  
               '</div>'+
             '</div>'+
@@ -573,9 +573,9 @@ $("#btnbaja").on('click', function(e){
   }
 });
 function obtenerdatos(cotizacionmodificar){
-  $("#titulomodal").html('Modificación Cotizaciones');
   $('.page-loader-wrapper').css('display', 'block');
   $.get(cotizaciones_obtener_cotizacion,{cotizacionmodificar:cotizacionmodificar },function(data){
+    $("#titulomodal").html('Modificación Cotizacion --- STATUS : ' + data.cotizacion.status);
     //formulario modificacion
     var tabs ='<div class="col-md-12">'+  
                 '<div class="row">'+
@@ -588,11 +588,11 @@ function obtenerdatos(cotizacionmodificar){
                   '</div>'+ 
                   '<div class="col-md-3">'+
                     '<label>OT Tecnodiesel</label>'+
-                    '<input type="text" class="form-control" name="ottecnodiesel" id="ottecnodiesel"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">'+
+                    '<input type="text" class="form-control" name="ottecnodiesel" id="ottecnodiesel"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                   '</div>'+
                   '<div class="col-md-3">'+
                     '<label>OT TyT</label>'+
-                    '<input type="text" class="form-control" name="ottyt" id="ottyt" required data-parsley-length="[0, 50]" onkeyup="tipoLetra(this);">'+
+                    '<input type="text" class="form-control" name="ottyt" id="ottyt" required data-parsley-length="[0, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                   '</div>'+ 
                   '<div class="col-md-3">'+
                     '<label>Fecha </label>'+
@@ -610,7 +610,7 @@ function obtenerdatos(cotizacionmodificar){
                         '</td>'+
                         '<td>'+
                           '<div class="form-line">'+
-                            '<input type="hidden" class="form-control" name="numeroremision" id="numeroremision" required readonly onkeyup="tipoLetra(this)">'+
+                            '<input type="hidden" class="form-control" name="numeroremision" id="numeroremision" required readonly onkeyup="tipoLetra(this)" autocomplete="off">'+
                             '<input type="text" class="form-control" name="remision" id="remision" required readonly>'+
                           '</div>'+
                         '</td>'+
@@ -619,11 +619,11 @@ function obtenerdatos(cotizacionmodificar){
                   '</div>'+
                   '<div class="col-md-3">'+
                     '<label>Equipo</label>'+
-                    '<input type="text" class="form-control" name="equipo" id="equipo" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">'+
+                    '<input type="text" class="form-control" name="equipo" id="equipo" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                   '</div>'+ 
                   '<div class="col-md-3">'+
                     '<label>Requisición</label>'+
-                    '<input type="text" class="form-control" name="requisicion" id="requisicion" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]">'+
+                    '<input type="text" class="form-control" name="requisicion" id="requisicion" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                   '</div>'+  
                 '</div>'+
               '</div>'+

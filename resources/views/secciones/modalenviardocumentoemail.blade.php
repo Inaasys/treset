@@ -10,7 +10,7 @@
                     @csrf
 		        	<h5 id="textomodalenviarpdfemail"> </h5>
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-12" hidden>
                             <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;De:</label>
                             <div class="col-md-12 form-check">
                                 <input type="text" class="form-control" name="emailde" id="emailde" data-parsley-type="email" required>

@@ -210,6 +210,7 @@
         var ordenes_compra_obtener_ordenes_trabajo = '{!!URL::to('ordenes_compra_obtener_ordenes_trabajo')!!}';
         var ordenes_compra_obtener_orden_trabajo_por_folio = '{!!URL::to('ordenes_compra_obtener_orden_trabajo_por_folio')!!}';
         var ordenes_compra_obtener_productos = '{!!URL::to('ordenes_compra_obtener_productos')!!}';
+        var ordenes_compra_obtener_producto_por_codigo = '{!!URL::to('ordenes_compra_obtener_producto_por_codigo')!!}';
         var ordenes_compra_obtener_proveedor_por_numero = '{!!URL::to('ordenes_compra_obtener_proveedor_por_numero')!!}';
         var ordenes_compra_obtener_almacen_por_numero = '{!!URL::to('ordenes_compra_obtener_almacen_por_numero')!!}';
         var ordenes_compra_guardar = '{!!URL::to('ordenes_compra_guardar')!!}';

@@ -1468,6 +1468,31 @@ function listarproductos(){
     }
   }
 }
+function obtenerproductoporcodigo(){
+  var numerofilasfacturas = $("#numerofilasfacturas").val();
+  var codigoabuscar = $("#codigoabuscar").val().toUpperCase();
+  if(parseInt(numerofilasfacturas) > parseInt(1) && codigoabuscar != 'DPPP'){
+    msj_errorsolo1factura();
+  }else if(parseInt(numerofilasfacturas) >= parseInt(1) && codigoabuscar == 'DPPP'){
+    agregarfiladppp();
+  }else{
+    var almacen = $("#almacen").val();
+    if(almacen == ''){
+      msj_erroreligeunalmacen();
+    }else{
+      var numeroalmacen = $("#numeroalmacen").val();
+      var stringfacturasseleccionadas = $("#stringfacturasseleccionadas").val();
+      var tipooperacion = $("#tipooperacion").val();
+      $.get(notas_credito_clientes_obtener_producto_por_codigo,{codigoabuscar:codigoabuscar,numeroalmacen:numeroalmacen,stringfacturasseleccionadas:stringfacturasseleccionadas}, function(data){
+        if(parseInt(data.contarproductos) > 0){
+          agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, data.SubTotal, data.Existencias, tipooperacion, data.Insumo, data.ClaveProducto, data.ClaveUnidad, data.NombreClaveProducto, data.NombreClaveUnidad, data.CostoDeLista);
+        }else{
+          msjnoseencontroningunproducto();
+        }
+      }) 
+    }
+  }
+}
 //listar claves productos
 function listarclavesproductos(fila){
   ocultarformulario();
@@ -1670,8 +1695,8 @@ function agregarfiladppp(){
     var fila= '<tr class="filasproductos" id="filaproducto'+contadorfilas+'">'+
                 '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfila" onclick="eliminarfila('+contadorfilas+')" >X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
                 '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="DPPP" readonly data-parsley-length="[1, 20]">DPPP</td>'+         
-                '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="DESCUENTO POR PRONTO PAGO" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'+
-                '<td class="tdmod"><input type="text" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="ACTIV" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)"></td>'+
+                '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="DESCUENTO POR PRONTO PAGO" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
+                '<td class="tdmod"><input type="text" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="ACTIV" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
                 '<td class="tdmod">'+
                     '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-max="1.0"  data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');">'+
                 '</td>'+
@@ -1747,8 +1772,8 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
         var fila= '<tr class="filasproductos" id="filaproducto'+contadorfilas+'">'+
                     '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfila" onclick="eliminarfila('+contadorfilas+')" >X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
                     '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+         
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'+
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="'+Unidad+'" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)"></td>'+
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="'+Unidad+'" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
                     '<td class="tdmod">'+
                         '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');revisarcantidadnotavscantidadfactura('+contadorfilas+');">'+
                         '<input type="hidden" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
@@ -1774,7 +1799,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
                     '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencioniepspesospartida" name="retencioniepspesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'+number_format(round(total, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
                     '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'+Costo+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm partidapartida" name="partidapartida[]" value="0"></td>'+
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm partidapartida" name="partidapartida[]" value="0" autocomplete="off"></td>'+
                     '<td class="tdmod">'+
                       '<div class="row divorinputmodxl">'+
                         '<div class="col-xs-2 col-sm-2 col-md-2">'+
@@ -1859,7 +1884,7 @@ function alta(){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required data-parsley-type="integer">'+
+                                                        '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
                                                         '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
                                                         '<input type="hidden" class="form-control" name="rfccliente" id="rfccliente" required readonly>'+
@@ -1877,7 +1902,7 @@ function alta(){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer">'+
+                                                        '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior"  required data-parsley-type="integer">'+
                                                         '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
                                                     '</div>'+
@@ -1914,11 +1939,22 @@ function alta(){
                                     '<div class="col-md-3">'+
                                         '<label>Cargar Facturas</label>'+
                                         '<div class="btn btn-block bg-blue waves-effect" id="btnlistarfacturas" onclick="listarfacturas()" style="display:none">Agregar Factura</div>'+
-                                    '</div>'+  
-                                    '<div class="col-md-3">'+
-                                      '<label>Escribe DPPP ó Código y presiona la tecla ENTER</label>'+
-                                      '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe DPPP ó el código del producto" autocomplete="off" readonly>'+
-                                    '</div>'+                                  
+                                    '</div>'+     
+                                    '<div class="col-md-3" id="divbuscarcodigoproducto">'+
+                                      '<label>Escribe DPPP ó el Código y presiona la tecla ENTER</label>'+
+                                      '<table class="col-md-12">'+
+                                        '<tr>'+
+                                          '<td>'+
+                                            '<div class="btn bg-blue waves-effect" id="btnobtenerproductos" onclick="listarproductos()">Ver Productos</div>'+
+                                          '</td>'+
+                                          '<td>'+ 
+                                            '<div class="form-line">'+
+                                              '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" readonly autocomplete="off">'+
+                                            '</div>'+
+                                          '</td>'+
+                                        '</tr>'+    
+                                      '</table>'+
+                                    '</div>'+                                 
                                 '</div>'+
                             '</div>'+   
                             '<div role="tabpanel" class="tab-pane fade" id="emisortab">'+
@@ -1933,7 +1969,7 @@ function alta(){
                                     '</div>'+
                                     '<div class="col-md-4">'+
                                         '<label>Confirmación</label>'+
-                                        '<input type="text" class="form-control" name="confirmacion" id="confirmacion" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control" name="confirmacion" id="confirmacion" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
@@ -1946,7 +1982,7 @@ function alta(){
                                               '</td>'+
                                               '<td>'+
                                                   '<div class="form-line">'+
-                                                      '<input type="text" class="form-control" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" required>'+
+                                                      '<input type="text" class="form-control" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" required autocomplete="off">'+
                                                       '<input type="hidden" class="form-control" name="lugarexpedicionanterior" id="lugarexpedicionanterior" value="'+lugarexpedicion+'" required>'+
                                                   '</div>'+
                                               '</td>'+
@@ -1962,7 +1998,7 @@ function alta(){
                                               '</td>'+
                                               '<td>'+
                                                   '<div class="form-line">'+
-                                                      '<input type="text" class="form-control" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" required onkeyup="tipoLetra(this)">'+
+                                                      '<input type="text" class="form-control" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" required onkeyup="tipoLetra(this)" autocomplete="off">'+
                                                       '<input type="hidden" class="form-control" name="claveregimenfiscalanterior" id="claveregimenfiscalanterior" value="'+claveregimenfiscal+'" required>'+
                                                       '<input type="hidden" class="form-control" name="regimenfiscal" id="regimenfiscal" value="'+regimenfiscal+'" required readonly>'+
                                                   '</div>'+
@@ -1979,7 +2015,7 @@ function alta(){
                                               '</td>'+
                                               '<td>'+
                                                   '<div class="form-line">'+
-                                                      '<input type="text" class="form-control" name="clavetiporelacion" id="clavetiporelacion" onkeyup="tipoLetra(this)" required>'+
+                                                      '<input type="text" class="form-control" name="clavetiporelacion" id="clavetiporelacion" onkeyup="tipoLetra(this)" required autocomplete="off">'+
                                                       '<input type="hidden" class="form-control" name="clavetiporelacionanterior" id="clavetiporelacionanterior" onkeyup="tipoLetra(this)">'+
                                                       '<input type="hidden" class="form-control" name="tiporelacion" id="tiporelacion" readonly>'+
                                                   '</div>'+
@@ -2008,7 +2044,7 @@ function alta(){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="claveformapago" id="claveformapago" required onkeyup="tipoLetra(this)">'+
+                                                        '<input type="text" class="form-control" name="claveformapago" id="claveformapago" required onkeyup="tipoLetra(this)" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="claveformapagoanterior" id="claveformapagoanterior" required readonly onkeyup="tipoLetra(this)">'+
                                                         '<input type="hidden" class="form-control" name="formapago" id="formapago" required readonly>'+
                                                     '</div>'+
@@ -2025,7 +2061,7 @@ function alta(){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="clavemetodopago" id="clavemetodopago" required onkeyup="tipoLetra(this)">'+
+                                                        '<input type="text" class="form-control" name="clavemetodopago" id="clavemetodopago" required onkeyup="tipoLetra(this)" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="clavemetodopagoanterior" id="clavemetodopagoanterior" required readonly onkeyup="tipoLetra(this)">'+
                                                         '<input type="hidden" class="form-control" name="metodopago" id="metodopago" required readonly>'+
                                                     '</div>'+
@@ -2035,7 +2071,7 @@ function alta(){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Condiciones de Pago</label>'+
-                                        '<input type="text" class="form-control" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required readonly data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required readonly data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Uso CFDI <span class="label label-danger" id="textonombreusocfdi"></span></label>'+
@@ -2046,7 +2082,7 @@ function alta(){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="claveusocfdi" id="claveusocfdi" required onkeyup="tipoLetra(this)">'+
+                                                        '<input type="text" class="form-control" name="claveusocfdi" id="claveusocfdi" required onkeyup="tipoLetra(this)" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="claveusocfdianterior" id="claveusocfdianterior" required readonly onkeyup="tipoLetra(this)">'+
                                                         '<input type="hidden" class="form-control" name="usocfdi" id="usocfdi" required readonly>'+
                                                     '</div>'+
@@ -2063,7 +2099,7 @@ function alta(){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="claveresidenciafiscal" id="claveresidenciafiscal" required onkeyup="tipoLetra(this)">'+
+                                                        '<input type="text" class="form-control" name="claveresidenciafiscal" id="claveresidenciafiscal" required onkeyup="tipoLetra(this)" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="claveresidenciafiscalanterior" id="claveresidenciafiscalanterior" required readonly onkeyup="tipoLetra(this)">'+
                                                         '<input type="hidden" class="form-control" name="residenciafiscal" id="residenciafiscal" required readonly>'+
                                                     '</div>'+
@@ -2073,7 +2109,7 @@ function alta(){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Num Reg Id Trib</label>'+
-                                        '<input type="text" class="form-control" name="numeroregidtrib" id="numeroregidtrib"  data-parsley-length="[1, 40]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control" name="numeroregidtrib" id="numeroregidtrib"  data-parsley-length="[1, 40]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                                     '</div>'+
                                 '</div>'+
                                 '</div>'+
@@ -2228,7 +2264,7 @@ function alta(){
     //recomentable para mayor compatibilidad entre navegadores.
     var code = (e.keyCode ? e.keyCode : e.which);
     if(code==13){
-      listarproductos();
+      obtenerproductoporcodigo();
     }
   });
   //activar busqueda para clientes
@@ -2648,9 +2684,9 @@ $("#btnGuardar").on('click', function (e) {
 });
 //modificacion compra
 function obtenerdatos(notamodificar){
-  $("#titulomodal").html('Modificación Nota Crédito Cliente');
   $('.page-loader-wrapper').css('display', 'block');
   $.get(notas_credito_clientes_obtener_nota_cliente,{notamodificar:notamodificar },function(data){
+    $("#titulomodal").html('Modificación Nota Crédito Cliente --- STATUS : ' + data.notacliente.Status);
     //formulario modificacion
     var tabs =    '<div class="row">'+
                     '<div class="col-md-12">'+
@@ -2690,7 +2726,7 @@ function obtenerdatos(notamodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required data-parsley-type="integer">'+
+                                                        '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
                                                         '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
                                                         '<input type="hidden" class="form-control" name="rfccliente" id="rfccliente" required readonly>'+
@@ -2708,7 +2744,7 @@ function obtenerdatos(notamodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required readonly onkeyup="tipoLetra(this)">'+
+                                                        '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required readonly onkeyup="tipoLetra(this)" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior"  required data-parsley-type="integer">'+
                                                         '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
                                                     '</div>'+
@@ -2745,10 +2781,21 @@ function obtenerdatos(notamodificar){
                                     '<div class="col-md-3">'+
                                         '<label>Cargar Facturas</label>'+
                                         '<div class="btn btn-block bg-blue waves-effect" id="btnlistarfacturas" onclick="listarfacturas()" style="display:none">Agregar Factura</div>'+
-                                    '</div>'+  
-                                    '<div class="col-md-3">'+
-                                      '<label>Escribe DPPP ó Código y presiona la tecla ENTER</label>'+
-                                      '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe DPPP ó el código del producto" autocomplete="off" readonly>'+
+                                    '</div>'+      
+                                    '<div class="col-md-3" id="divbuscarcodigoproducto">'+
+                                      '<label>Escribe DPPP ó el Código y presiona la tecla ENTER</label>'+
+                                      '<table class="col-md-12">'+
+                                        '<tr>'+
+                                          '<td>'+
+                                            '<div class="btn bg-blue waves-effect" id="btnobtenerproductos" onclick="listarproductos()">Ver Productos</div>'+
+                                          '</td>'+
+                                          '<td>'+ 
+                                            '<div class="form-line">'+
+                                              '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" readonly autocomplete="off">'+
+                                            '</div>'+
+                                          '</td>'+
+                                        '</tr>'+    
+                                      '</table>'+
                                     '</div>'+                                  
                                 '</div>'+
                             '</div>'+   
@@ -2777,7 +2824,7 @@ function obtenerdatos(notamodificar){
                                               '</td>'+
                                               '<td>'+
                                                   '<div class="form-line">'+
-                                                      '<input type="text" class="form-control" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" required>'+
+                                                      '<input type="text" class="form-control" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" required autocomplete="off">'+
                                                       '<input type="hidden" class="form-control" name="lugarexpedicionanterior" id="lugarexpedicionanterior" value="'+lugarexpedicion+'" required>'+
                                                   '</div>'+
                                               '</td>'+
@@ -2793,7 +2840,7 @@ function obtenerdatos(notamodificar){
                                               '</td>'+
                                               '<td>'+
                                                   '<div class="form-line">'+
-                                                      '<input type="text" class="form-control" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" required onkeyup="tipoLetra(this)">'+
+                                                      '<input type="text" class="form-control" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" required onkeyup="tipoLetra(this)" autocomplete="off">'+
                                                       '<input type="hidden" class="form-control" name="claveregimenfiscalanterior" id="claveregimenfiscalanterior" value="'+claveregimenfiscal+'" required readonly onkeyup="tipoLetra(this)">'+
                                                       '<input type="hidden" class="form-control" name="regimenfiscal" id="regimenfiscal" value="'+regimenfiscal+'" required readonly>'+
                                                   '</div>'+
@@ -2810,7 +2857,7 @@ function obtenerdatos(notamodificar){
                                               '</td>'+
                                               '<td>'+
                                                   '<div class="form-line">'+
-                                                      '<input type="text" class="form-control" name="clavetiporelacion" id="clavetiporelacion"  onkeyup="tipoLetra(this)" required>'+
+                                                      '<input type="text" class="form-control" name="clavetiporelacion" id="clavetiporelacion"  onkeyup="tipoLetra(this)" required autocomplete="off">'+
                                                       '<input type="hidden" class="form-control" name="clavetiporelacionanterior" id="clavetiporelacionanterior"  readonly onkeyup="tipoLetra(this)">'+
                                                       '<input type="hidden" class="form-control" name="tiporelacion" id="tiporelacion" readonly>'+
                                                   '</div>'+
@@ -2839,7 +2886,7 @@ function obtenerdatos(notamodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="claveformapago" id="claveformapago" required onkeyup="tipoLetra(this)">'+
+                                                        '<input type="text" class="form-control" name="claveformapago" id="claveformapago" required onkeyup="tipoLetra(this)" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="claveformapagoanterior" id="claveformapagoanterior" required readonly onkeyup="tipoLetra(this)">'+
                                                         '<input type="hidden" class="form-control" name="formapago" id="formapago" required readonly>'+
                                                     '</div>'+
@@ -2856,7 +2903,7 @@ function obtenerdatos(notamodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="clavemetodopago" id="clavemetodopago" required onkeyup="tipoLetra(this)">'+
+                                                        '<input type="text" class="form-control" name="clavemetodopago" id="clavemetodopago" required onkeyup="tipoLetra(this)" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="clavemetodopagoanterior" id="clavemetodopagoanterior" required readonly onkeyup="tipoLetra(this)">'+
                                                         '<input type="hidden" class="form-control" name="metodopago" id="metodopago" required readonly>'+
                                                     '</div>'+
@@ -2866,7 +2913,7 @@ function obtenerdatos(notamodificar){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Condiciones de Pago</label>'+
-                                        '<input type="text" class="form-control" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required readonly data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required readonly data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Uso CFDI  <span class="label label-danger" id="textonombreusocfdi"></span></label>'+
@@ -2877,7 +2924,7 @@ function obtenerdatos(notamodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="claveusocfdi" id="claveusocfdi" required onkeyup="tipoLetra(this)">'+
+                                                        '<input type="text" class="form-control" name="claveusocfdi" id="claveusocfdi" required onkeyup="tipoLetra(this)" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="claveusocfdianterior" id="claveusocfdianterior" required readonly onkeyup="tipoLetra(this)">'+
                                                         '<input type="hidden" class="form-control" name="usocfdi" id="usocfdi" required readonly>'+
                                                     '</div>'+
@@ -2894,7 +2941,7 @@ function obtenerdatos(notamodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="claveresidenciafiscal" id="claveresidenciafiscal" required onkeyup="tipoLetra(this)">'+
+                                                        '<input type="text" class="form-control" name="claveresidenciafiscal" id="claveresidenciafiscal" required onkeyup="tipoLetra(this)" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="claveresidenciafiscalanterior" id="claveresidenciafiscalanterior" required readonly onkeyup="tipoLetra(this)">'+
                                                         '<input type="hidden" class="form-control" name="residenciafiscal" id="residenciafiscal" required readonly>'+
                                                     '</div>'+
@@ -2904,7 +2951,7 @@ function obtenerdatos(notamodificar){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Num Reg Id Trib</label>'+
-                                        '<input type="text" class="form-control" name="numeroregidtrib" id="numeroregidtrib" data-parsley-length="[1, 40]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control" name="numeroregidtrib" id="numeroregidtrib" data-parsley-length="[1, 40]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                                     '</div>'+
                                 '</div>'+
                                 '</div>'+
@@ -3164,7 +3211,7 @@ function obtenerdatos(notamodificar){
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
-        listarproductos();
+        obtenerproductoporcodigo();
       }
     });
     //regresar numero cliente

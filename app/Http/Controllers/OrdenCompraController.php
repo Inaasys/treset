@@ -223,7 +223,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             $codigoabuscar = $request->codigoabuscar;
             $tipooperacion = $request->tipooperacion;
             $numeroalmacen = $request->numeroalmacen;
-            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->get();
+            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%');
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($tipooperacion, $numeroalmacen){
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.$tipooperacion.'\')">Seleccionar</div>';
@@ -241,6 +241,32 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
+    }
+    //obtener producto por codigo
+    public function ordenes_compra_obtener_producto_por_codigo(Request $request){
+        $codigoabuscar = $request->codigoabuscar;
+        $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->count();
+        if($contarproductos > 0){
+            $producto = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->first();
+            $data = array(
+                'Codigo' => $producto->Codigo,
+                'Producto' => htmlspecialchars($producto->Producto, ENT_QUOTES),
+                'Unidad' => $producto->Unidad,
+                'Costo' => Helpers::convertirvalorcorrecto($producto->Costo),
+                'Impuesto' => Helpers::convertirvalorcorrecto($producto->Impuesto),
+                'contarproductos' => $contarproductos
+            );
+        }else{
+            $data = array(
+                'Codigo' => '',
+                'Producto' => '',
+                'Unidad' => '',
+                'Costo' => '',
+                'Impuesto' => '',
+                'contarproductos' => $contarproductos
+            );
+        }
+        return response()->json($data);
     }
     //obtener proveedor por numero
     public function ordenes_compra_obtener_proveedor_por_numero(Request $request){
@@ -288,7 +314,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
 		$OrdenCompra = new OrdenCompra;
 		$OrdenCompra->Orden=$orden;
 		$OrdenCompra->Serie=$request->serie;
-		$OrdenCompra->Folio=$request->folio;
+		$OrdenCompra->Folio=$folio;
 		$OrdenCompra->Proveedor=$request->numeroproveedor;
         $OrdenCompra->Fecha=Carbon::parse($request->fecha)->toDateTimeString();
 		$OrdenCompra->Plazo=$request->plazo;

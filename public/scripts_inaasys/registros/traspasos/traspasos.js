@@ -665,6 +665,17 @@ function listarproductos(){
       
     });
 }
+function obtenerproductoporcodigo(){
+  var codigoabuscar = $("#codigoabuscar").val();
+  var tipooperacion = $("#tipooperacion").val();
+  $.get(traspasos_obtener_producto_por_codigo,{codigoabuscar:codigoabuscar}, function(data){
+    if(parseInt(data.contarproductos) > 0){
+      agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, data.SubTotal, data.Existencias, tipooperacion);
+    }else{
+      msjnoseencontroningunproducto();
+    }
+  }) 
+}
 //función que evalua si la partida que quieren ingresar ya existe o no en el detalle de la orden de compra
 function evaluarproductoexistente(Codigo){
     var sumaiguales=0;
@@ -889,7 +900,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
       var fila=   '<tr class="filasproductos" id="filaproducto'+contadorproductos+'">'+
                           '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('+contadorproductos+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
                           '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+
-                          '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'+
+                          '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
                           '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'+Unidad+'" readonly data-parsley-length="[1, 5]">'+Unidad+'</td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.'+numerocerosconfiguradosinputnumberstep+'" data-parsley-existencias="'+Existencias+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');cambiodecantidadopreciopartida('+contadorfilas+',\''+tipo +'\');"></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');cambiodecantidadopreciopartida('+contadorfilas+',\''+tipo +'\');"></td>'+
@@ -989,7 +1000,7 @@ function alta(){
                         '</td>'+
                         '<td>'+
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control" name="numeroalmacende" id="numeroalmacende" required data-parsley-type="integer" >'+
+                            '<input type="text" class="form-control" name="numeroalmacende" id="numeroalmacende" required data-parsley-type="integer" autocomplete="off" >'+
                             '<input type="hidden" class="form-control" name="numeroalmacendeanterior" id="numeroalmacendeanterior" required data-parsley-type="integer" >'+
                             '<input type="hidden" class="form-control" name="almacende" id="almacende" required readonly>'+
                           '</div>'+
@@ -1006,7 +1017,7 @@ function alta(){
                         '</td>'+
                         '<td>'+
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control" name="numeroalmacena" id="numeroalmacena"  required data-parsley-type="integer">'+
+                            '<input type="text" class="form-control" name="numeroalmacena" id="numeroalmacena"  required data-parsley-type="integer" autocomplete="off">'+
                             '<input type="hidden" class="form-control" name="numeroalmacenaanterior" id="numeroalmacenaanterior"  required data-parsley-type="integer">'+
                             '<input type="hidden" class="form-control" name="almacena" id="almacena"  readonly>'+
                           '</div>'+
@@ -1030,7 +1041,7 @@ function alta(){
                         '</td>'+
                         '<td>'+
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control" name="orden" id="orden" onkeyup="tipoLetra(this);" >'+
+                            '<input type="text" class="form-control" name="orden" id="orden" onkeyup="tipoLetra(this);" autocomplete="off" >'+
                             '<input type="hidden" class="form-control" name="ordenanterior" id="ordenanterior" >'+
                             '<input type="hidden" class="form-control" name="fechaorden" id="fechaorden"  readonly>'+
                             '<input type="hidden" class="form-control" name="tipo" id="tipo"  readonly>'+
@@ -1042,19 +1053,30 @@ function alta(){
                   '</div>'+
                   '<div class="col-md-2">'+
                     '<label>Status Orden</label>'+
-                    '<input type="text" class="form-control" name="statusorden" id="statusorden"  required readonly onkeyup="tipoLetra(this);">'+
+                    '<input type="text" class="form-control" name="statusorden" id="statusorden"  required readonly onkeyup="tipoLetra(this);" autocomplete="off">'+
                   '</div>'+
                   '<div class="col-md-2">'+
                     '<label>Cliente </label>'+
-                    '<input type="text" class="form-control" name="clienteorden" id="clienteorden"  required readonly onkeyup="tipoLetra(this);">'+
+                    '<input type="text" class="form-control" name="clienteorden" id="clienteorden"  required readonly onkeyup="tipoLetra(this);" autocomplete="off">'+
                   '</div>'+
                   '<div class="col-md-2">'+
                     '<label>Referencia </label>'+
-                    '<input type="text" class="form-control" name="referencia" id="referencia" data-parsley-length="[1, 200]" onkeyup="tipoLetra(this);">'+
-                  '</div>'+
+                    '<input type="text" class="form-control" name="referencia" id="referencia" data-parsley-length="[1, 200]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                  '</div>'+   
                   '<div class="col-md-3" id="divbuscarcodigoproducto" hidden>'+
                     '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
-                    '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                    '<table class="col-md-12">'+
+                      '<tr>'+
+                        '<td>'+
+                          '<div class="btn bg-blue waves-effect" id="btnobtenerproductos" onclick="listarproductos()">Ver Productos</div>'+
+                        '</td>'+
+                        '<td>'+ 
+                          '<div class="form-line">'+
+                            '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                          '</div>'+
+                        '</td>'+
+                      '</tr>'+    
+                    '</table>'+
                   '</div>'+
                 '</div>'+
               '</div>'+    
@@ -1174,7 +1196,7 @@ function alta(){
     //recomentable para mayor compatibilidad entre navegadores.
     var code = (e.keyCode ? e.keyCode : e.which);
     if(code==13){
-      listarproductos();
+      obtenerproductoporcodigo();
     }
   });
   //activar busqueda para almacen de
@@ -1330,9 +1352,9 @@ $("#btnbaja").on('click', function(e){
 });
 //modificacion
 function obtenerdatos(traspasomodificar){
-  $("#titulomodal").html('Modificación Traspaso');
   $('.page-loader-wrapper').css('display', 'block');
   $.get(traspasos_obtener_traspaso,{traspasomodificar:traspasomodificar },function(data){
+    $("#titulomodal").html('Modificación Traspaso --- STATUS : ' + data.traspaso.Status);
     //formulario modificacion
     var tabs ='<div class="col-md-12">'+
                 '<div class="row">'+
@@ -1352,7 +1374,7 @@ function obtenerdatos(traspasomodificar){
                         '</td>'+
                         '<td>'+
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control" name="numeroalmacende" id="numeroalmacende" required data-parsley-type="integer" >'+
+                            '<input type="text" class="form-control" name="numeroalmacende" id="numeroalmacende" required data-parsley-type="integer" autocomplete="off" >'+
                             '<input type="hidden" class="form-control" name="numeroalmacendeanterior" id="numeroalmacendeanterior" required data-parsley-type="integer" >'+
                             '<input type="hidden" class="form-control" name="almacende" id="almacende" required readonly>'+
                           '</div>'+
@@ -1369,7 +1391,7 @@ function obtenerdatos(traspasomodificar){
                         '</td>'+
                         '<td>'+
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control" name="numeroalmacena" id="numeroalmacena"  required data-parsley-type="integer">'+
+                            '<input type="text" class="form-control" name="numeroalmacena" id="numeroalmacena"  required data-parsley-type="integer" autocomplete="off">'+
                             '<input type="hidden" class="form-control" name="numeroalmacenaanterior" id="numeroalmacenaanterior"  required data-parsley-type="integer">'+
                             '<input type="hidden" class="form-control" name="almacena" id="almacena"  readonly>'+
                           '</div>'+
@@ -1393,7 +1415,7 @@ function obtenerdatos(traspasomodificar){
                         '</td>'+
                         '<td>'+
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control" name="orden" id="orden" onkeyup="tipoLetra(this);" >'+
+                            '<input type="text" class="form-control" name="orden" id="orden" onkeyup="tipoLetra(this);" autocomplete="off" >'+
                             '<input type="hidden" class="form-control" name="ordenanterior" id="ordenanterior" >'+
                             '<input type="hidden" class="form-control" name="fechaorden" id="fechaorden"  readonly>'+
                             '<input type="hidden" class="form-control" name="tipo" id="tipo"  readonly>'+
@@ -1405,19 +1427,30 @@ function obtenerdatos(traspasomodificar){
                   '</div>'+
                   '<div class="col-md-2">'+
                     '<label>Status Orden</label>'+
-                    '<input type="text" class="form-control" name="statusorden" id="statusorden"  required readonly onkeyup="tipoLetra(this);">'+
+                    '<input type="text" class="form-control" name="statusorden" id="statusorden"  required readonly onkeyup="tipoLetra(this);" autocomplete="off">'+
                   '</div>'+
                   '<div class="col-md-2">'+
                     '<label>Cliente </label>'+
-                    '<input type="text" class="form-control" name="clienteorden" id="clienteorden"  required readonly onkeyup="tipoLetra(this);">'+
+                    '<input type="text" class="form-control" name="clienteorden" id="clienteorden"  required readonly onkeyup="tipoLetra(this);" autocomplete="off">'+
                   '</div>'+
                   '<div class="col-md-2">'+
                     '<label>Referencia </label>'+
-                    '<input type="text" class="form-control" name="referencia" id="referencia" data-parsley-length="[1, 200]" onkeyup="tipoLetra(this);">'+
-                  '</div>'+
+                    '<input type="text" class="form-control" name="referencia" id="referencia" data-parsley-length="[1, 200]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                  '</div>'+  
                   '<div class="col-md-3" id="divbuscarcodigoproducto" hidden>'+
                     '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
-                    '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                    '<table class="col-md-12">'+
+                      '<tr>'+
+                        '<td>'+
+                          '<div class="btn bg-blue waves-effect" id="btnobtenerproductos" onclick="listarproductos()">Ver Productos</div>'+
+                        '</td>'+
+                        '<td>'+ 
+                          '<div class="form-line">'+
+                            '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                          '</div>'+
+                        '</td>'+
+                      '</tr>'+    
+                    '</table>'+
                   '</div>'+
                 '</div>'+
               '</div>'+    
@@ -1569,7 +1602,7 @@ function obtenerdatos(traspasomodificar){
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
-        listarproductos();
+        obtenerproductoporcodigo();
       }
     });
     //regresar numero almacen de

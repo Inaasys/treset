@@ -38,7 +38,7 @@ class UserController extends ConfiguracionSistemaController
             $data = User::query();
             return DataTables::of($data)
                     ->order(function ($query) {
-                        $query->orderBy('id', 'DESC');
+                        $query->orderBy('role_id', 'ASC');
                     })
                     ->addColumn('operaciones', function($data){
                         $operaciones = '<div class="dropdown">'.

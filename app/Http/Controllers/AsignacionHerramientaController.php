@@ -178,7 +178,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
         if($request->ajax()){
             $codigoabuscar = $request->codigoabuscar;
             $tipooperacion = $request->tipooperacion;
-            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->get();
+            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%');
             $almacenes = Almacen::where('status', 'ALTA')->get();
             $selectalmacenes = "<option selected disabled hidden>Selecciona el almacén</option>";
             foreach($almacenes as $a){
@@ -186,10 +186,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
             }
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($selectalmacenes, $tipooperacion){
-                        $boton = '';
-                        if($data->Existencias > 0){
-                            $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaherramienta(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$selectalmacenes.'\',\''.$tipooperacion.'\')">Seleccionar</div>';
-                        }
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaherramienta(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$selectalmacenes.'\',\''.$tipooperacion.'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->addColumn('Costo', function($data){ 
@@ -201,6 +198,39 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
+    }
+    //obtener herramienta por codigo
+    public function asignacion_herramienta_obtener_herramienta_por_codigo(Request $request){
+        $codigoabuscar = $request->codigoabuscar;
+        $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->count();
+        if($contarproductos > 0){
+            $almacenes = Almacen::where('status', 'ALTA')->get();
+            $selectalmacenes = "<option selected disabled hidden>Selecciona el almacén</option>";
+            foreach($almacenes as $a){
+                    $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.'>'.$a->Nombre;
+            }
+            $producto = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->first();
+            $data = array(
+                'Codigo' => $producto->Codigo,
+                'Producto' => htmlspecialchars($producto->Producto, ENT_QUOTES),
+                'Unidad' => $producto->Unidad,
+                'Costo' => Helpers::convertirvalorcorrecto($producto->Costo),
+                'Existencias' => Helpers::convertirvalorcorrecto($producto->Existencias),
+                'contarproductos' => $contarproductos,
+                'selectalmacenes' => $selectalmacenes
+            );
+        }else{
+            $data = array(
+                'Codigo' => '',
+                'Producto' => '',
+                'Unidad' => '',
+                'Costo' => '',
+                'Existencias' => '',
+                'contarproductos' => $contarproductos,
+                'selectalmacenes' => ''
+            );
+        }
+        return response()->json($data);  
     }
     //obtener existencia en almacen
     public function asignacion_herramienta_obtener_existencias_almacen(Request $request){

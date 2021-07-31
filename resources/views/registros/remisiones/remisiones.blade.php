@@ -183,8 +183,12 @@
         var remisiones_obtener_almacenes = '{!!URL::to('remisiones_obtener_almacenes')!!}';
         var remisiones_obtener_tipos_cliente = '{!!URL::to('remisiones_obtener_tipos_cliente')!!}';
         var remisiones_obtener_tipos_unidad = '{!!URL::to('remisiones_obtener_tipos_unidad')!!}';
+        var remisiones_obtener_cotizaciones = '{!!URL::to('remisiones_obtener_cotizaciones')!!}';
+        var remisiones_obtener_cotizacion = '{!!URL::to('remisiones_obtener_cotizacion')!!}';
         var remisiones_obtener_productos = '{!!URL::to('remisiones_obtener_productos')!!}';
+        var remisiones_obtener_producto_por_codigo = '{!!URL::to('remisiones_obtener_producto_por_codigo')!!}';
         var remisiones_obtener_existencias_almacen = '{!!URL::to('remisiones_obtener_existencias_almacen')!!}';
+        var remisiones_obtener_nuevo_saldo_cliente = '{!!URL::to('remisiones_obtener_nuevo_saldo_cliente')!!}';
         var remisiones_guardar = '{!!URL::to('remisiones_guardar')!!}';
         var remisiones_verificar_baja = '{!!URL::to('remisiones_verificar_baja')!!}';
         var remisiones_alta_o_baja = '{!!URL::to('remisiones_alta_o_baja')!!}'; 

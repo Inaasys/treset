@@ -154,7 +154,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
             $codigoabuscar = $request->codigoabuscar;
             $tipooperacion = $request->tipooperacion;
             $numeroalmacen = $request->numeroalmacen;
-            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->get();
+            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%');
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($tipooperacion, $numeroalmacen){
                         if($data->Almacen == $numeroalmacen || $data->Almacen == NULL){
@@ -176,6 +176,41 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
+    }
+    //obtener producto por codigo
+    public function ajustesinventario_obtener_producto_por_codigo(Request $request){
+        $codigoabuscar = $request->codigoabuscar;
+        $numeroalmacen = $request->numeroalmacen;
+        $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)
+                                                            ->where(function ($query) use ($numeroalmacen) {
+                                                                $query->where('Almacen', $numeroalmacen)
+                                                                ->orWhere('Almacen', NULL);
+                                                            })->count();
+        if($contarproductos > 0){
+            $producto = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)
+                                                        ->where(function ($query) use ($numeroalmacen) {
+                                                            $query->where('Almacen', $numeroalmacen)
+                                                            ->orWhere('Almacen', NULL);
+                                                        })->first();
+            $data = array(
+                'Codigo' => $producto->Codigo,
+                'Producto' => htmlspecialchars($producto->Producto, ENT_QUOTES),
+                'Unidad' => $producto->Unidad,
+                'Costo' => Helpers::convertirvalorcorrecto($producto->Costo),
+                'Impuesto' => Helpers::convertirvalorcorrecto($producto->Impuesto),
+                'contarproductos' => $contarproductos,
+            );
+        }else{
+            $data = array(
+                'Codigo' => '',
+                'Producto' => '',
+                'Unidad' => '',
+                'Costo' => '',
+                'Impuesto' => '',
+                'contarproductos' => $contarproductos,
+            );
+        }
+        return response()->json($data); 
     }
 
     //obtener existencias

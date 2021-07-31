@@ -241,6 +241,7 @@
         var notas_credito_clientes_obtener_facturas = '{!!URL::to('notas_credito_clientes_obtener_facturas')!!}'; 
         var notas_credito_clientes_obtener_factura = '{!!URL::to('notas_credito_clientes_obtener_factura')!!}';
         var notas_credito_clientes_obtener_productos = '{!!URL::to('notas_credito_clientes_obtener_productos')!!}';
+        var notas_credito_clientes_obtener_producto_por_codigo = '{!!URL::to('notas_credito_clientes_obtener_producto_por_codigo')!!}';
         var notas_credito_clientes_obtener_claves_productos = '{!!URL::to('notas_credito_clientes_obtener_claves_productos')!!}';
         var notas_credito_clientes_obtener_claves_unidades = '{!!URL::to('notas_credito_clientes_obtener_claves_unidades')!!}';
         var notas_credito_clientes_obtener_datos_almacen  = '{!!URL::to('notas_credito_clientes_obtener_datos_almacen')!!}';

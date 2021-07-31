@@ -578,7 +578,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                     array_push($arrayproductosseleccionables, $detalle->Codigo);
                 }
             }
-            $data = VistaObtenerExistenciaProducto::whereIn('Codigo', $arrayproductosseleccionables)->where('Codigo', 'like', '%' . $codigoabuscar . '%')->get();
+            $data = VistaObtenerExistenciaProducto::whereIn('Codigo', $arrayproductosseleccionables)->where('Codigo', 'like', '%' . $codigoabuscar . '%');
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($numeroalmacen, $tipooperacion, $stringfacturasseleccionadas){
                         if($data->Almacen == $numeroalmacen || $data->Almacen == NULL){
@@ -600,6 +600,55 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
+    }
+    //obtener producto por codigo
+    public function notas_credito_clientes_obtener_producto_por_codigo(Request $request){
+        $codigoabuscar = $request->codigoabuscar;
+        $numeroalmacen = $request->numeroalmacen;
+        $stringfacturasseleccionadas = $request->stringfacturasseleccionadas;
+        $arrayproductosseleccionables = Array();
+        foreach(explode(",", $request->stringfacturasseleccionadas) as $factura){
+            $detallesfactura = FacturaDetalle::where('Factura', $factura)->get();
+            foreach($detallesfactura as $detalle){
+                array_push($arrayproductosseleccionables, $detalle->Codigo);
+            }
+        }
+        $contarproductos = VistaObtenerExistenciaProducto::whereIn('Codigo', $arrayproductosseleccionables)->where('Codigo', $codigoabuscar)->where('Almacen', $numeroalmacen)->count();
+        if($contarproductos > 0){
+            $producto = VistaObtenerExistenciaProducto::whereIn('Codigo', $arrayproductosseleccionables)->where('Codigo', $codigoabuscar)->where('Almacen', $numeroalmacen)->first();
+            $data = array(
+                'Codigo' => $producto->Codigo,
+                'Producto' => htmlspecialchars($producto->Producto, ENT_QUOTES),
+                'Unidad' => $producto->Unidad,
+                'Costo' => Helpers::convertirvalorcorrecto($producto->Costo),
+                'Impuesto' => Helpers::convertirvalorcorrecto($producto->Impuesto),
+                'SubTotal' => Helpers::convertirvalorcorrecto($producto->SubTotal),
+                'Existencias' => Helpers::convertirvalorcorrecto($producto->Existencias),
+                'Insumo' => $producto->Insumo,
+                'ClaveProducto' => $producto->ClaveProducto,
+                'ClaveUnidad' => $producto->ClaveUnidad,
+                'NombreClaveProducto' => $producto->NombreClaveProducto,
+                'NombreClaveUnidad' => $producto->NombreClaveUnidad,
+                'contarproductos' => $contarproductos
+            );
+        }else{
+            $data = array(
+                'Codigo' => '',
+                'Producto' => '',
+                'Unidad' => '',
+                'Costo' => '',
+                'Impuesto' => '',
+                'SubTotal' => '',
+                'Existencias' => '',
+                'Insumo' => '',
+                'ClaveProducto' => '',
+                'ClaveUnidad' => '',
+                'NombreClaveProducto' => '',
+                'NombreClaveUnidad' => '',
+                'contarproductos' => $contarproductos
+            );
+        }
+        return response()->json($data);  
     }
 
     //obtener claves productos

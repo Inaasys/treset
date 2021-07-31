@@ -353,7 +353,7 @@ function alta(){
                                     '</td>'+
                                     '<td>'+
                                         '<div class="form-line">'+
-                                            '<input type="text" class="form-control" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer">'+
+                                            '<input type="text" class="form-control" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer" autocomplete="off">'+
                                             '<input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior" required data-parsley-type="integer">'+
                                             '<input type="hidden" class="form-control" name="proveedor" id="proveedor" required readonly>'+
                                         '</div>'+
@@ -576,9 +576,9 @@ $("#btnbaja").on('click', function(e){
     }
 });
 function obtenerdatos(contrarecibomodificar){
-    $("#titulomodal").html('Modificación ContraRecibos');
     $('.page-loader-wrapper').css('display', 'block');
     $.get(contrarecibos_obtener_contrarecibo,{contrarecibomodificar:contrarecibomodificar },function(data){
+        $("#titulomodal").html('Modificación ContraRecibo --- STATUS : ' + data.contrarecibo.Status);
     //formulario modificacion
     var tabs =  '<div class="col-md-12">'+
                     '<div class="row">'+
@@ -598,7 +598,7 @@ function obtenerdatos(contrarecibomodificar){
                                     '</td>'+
                                     '<td>'+
                                         '<div class="form-line">'+
-                                            '<input type="text" class="form-control" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer">'+
+                                            '<input type="text" class="form-control" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer" autocomplete="off">'+
                                             '<input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior"  required data-parsley-type="integer">'+
                                             '<input type="hidden" class="form-control" name="proveedor" id="proveedor" required readonly>'+
                                         '</div>'+

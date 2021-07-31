@@ -232,7 +232,10 @@
         var ordenes_trabajo_obtener_agente_por_numero = '{!!URL::to('ordenes_trabajo_obtener_agente_por_numero')!!}';
         var ordenes_trabajo_obtener_vines = '{!!URL::to('ordenes_trabajo_obtener_vines')!!}';
         var ordenes_trabajo_obtener_vin_por_numero = '{!!URL::to('ordenes_trabajo_obtener_vin_por_numero')!!}';
+        var ordenes_trabajo_obtener_cotizaciones = '{!!URL::to('ordenes_trabajo_obtener_cotizaciones')!!}';
+        var ordenes_trabajo_obtener_cotizacion = '{!!URL::to('ordenes_trabajo_obtener_cotizacion')!!}';
         var ordenes_trabajo_obtener_servicios = '{!!URL::to('ordenes_trabajo_obtener_servicios')!!}';
+        var ordenes_trabajo_obtener_servicio_por_codigo = '{!!URL::to('ordenes_trabajo_obtener_servicio_por_codigo')!!}';
         var ordenes_trabajo_obtener_tecnicos = '{!!URL::to('ordenes_trabajo_obtener_tecnicos')!!}';
         var ordenes_trabajo_guardar = '{!!URL::to('ordenes_trabajo_guardar')!!}';
         var ordenes_trabajo_verificar_uso_en_modulos = '{!!URL::to('ordenes_trabajo_verificar_uso_en_modulos')!!}'; 

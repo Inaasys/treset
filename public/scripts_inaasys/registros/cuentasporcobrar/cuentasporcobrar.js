@@ -1120,7 +1120,7 @@ function alta(){
                                             '</td>'+
                                             '<td>'+
                                                 '<div class="form-line">'+
-                                                    '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required data-parsley-type="integer">'+
+                                                    '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
                                                     '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
                                                     '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
                                                     '<input type="hidden" class="form-control" name="rfccliente" id="rfccliente" required readonly>'+
@@ -1138,7 +1138,7 @@ function alta(){
                                             '</td>'+
                                             '<td>'+
                                                 '<div class="form-line">'+
-                                                    '<input type="text" class="form-control" name="numerobanco" id="numerobanco" required data-parsley-type="integer">'+
+                                                    '<input type="text" class="form-control" name="numerobanco" id="numerobanco" required data-parsley-type="integer" autocomplete="off">'+
                                                     '<input type="hidden" class="form-control" name="numerobancoanterior" id="numerobancoanterior" required data-parsley-type="integer">'+
                                                     '<input type="hidden" class="form-control" name="banco" id="banco" required readonly>'+
                                                 '</div>'+
@@ -1201,7 +1201,7 @@ function alta(){
                                             '</td>'+
                                             '<td>'+
                                                 '<div class="form-line">'+
-                                                    '<input type="text" class="form-control" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" required>'+
+                                                    '<input type="text" class="form-control" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" required autocomplete="off">'+
                                                     '<input type="hidden" class="form-control" name="lugarexpedicionanterior" id="lugarexpedicionanterior" value="'+lugarexpedicion+'" required readonly>'+
                                                 '</div>'+
                                             '</td>'+
@@ -1219,7 +1219,7 @@ function alta(){
                                             '</td>'+
                                             '<td>'+
                                                 '<div class="form-line">'+
-                                                    '<input type="text" class="form-control" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" required>'+
+                                                    '<input type="text" class="form-control" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" required autocomplete="off">'+
                                                     '<input type="hidden" class="form-control" name="claveregimenfiscalanterior" id="claveregimenfiscalanterior" value="'+claveregimenfiscal+'" required>'+
                                                     '<input type="hidden" class="form-control" name="regimenfiscal" id="regimenfiscal" value="'+regimenfiscal+'" required readonly>'+
                                                 '</div>'+
@@ -1236,7 +1236,7 @@ function alta(){
                                             '</td>'+
                                             '<td>'+
                                                 '<div class="form-line">'+
-                                                    '<input type="text" class="form-control" name="clavetiporelacion" id="clavetiporelacion" >'+
+                                                    '<input type="text" class="form-control" name="clavetiporelacion" id="clavetiporelacion" autocomplete="off" >'+
                                                     '<input type="hidden" class="form-control" name="clavetiporelacionanterior" id="clavetiporelacionanterior" >'+
                                                     '<input type="hidden" class="form-control" name="tiporelacion" id="tiporelacion" readonly>'+
                                                 '</div>'+
@@ -1265,7 +1265,7 @@ function alta(){
                                             '</td>'+
                                             '<td>'+
                                                 '<div class="form-line">'+
-                                                    '<input type="text" class="form-control" name="claveformapago" id="claveformapago" required>'+
+                                                    '<input type="text" class="form-control" name="claveformapago" id="claveformapago" required autocomplete="off">'+
                                                     '<input type="hidden" class="form-control" name="claveformapagoanterior" id="claveformapagoanterior" required>'+
                                                     '<input type="hidden" class="form-control" name="formapago" id="formapago" required readonly>'+
                                                 '</div>'+
@@ -1542,9 +1542,9 @@ $("#btnbaja").on('click', function(e){
   }
 });
 function obtenerdatos(cxcmodificar){
-  $("#titulomodal").html('Modificación Cuenta por Cobrar');
   $('.page-loader-wrapper').css('display', 'block');
   $.get(cuentas_por_cobrar_obtener_cuenta_por_cobrar,{cxcmodificar:cxcmodificar },function(data){
+    $("#titulomodal").html('Modificación Cuenta por Cobrar --- STATUS : ' + data.cuentaxcobrar.Status);
     //formulario modificacion
     var tabs =  '<div class="row">'+
                     '<div class="col-md-12">'+
@@ -1581,7 +1581,7 @@ function obtenerdatos(cxcmodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required>'+
+                                                        '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required>'+
                                                         '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
                                                         '<input type="hidden" class="form-control" name="rfccliente" id="rfccliente" required readonly>'+
@@ -1599,7 +1599,7 @@ function obtenerdatos(cxcmodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="numerobanco" id="numerobanco" required>'+
+                                                        '<input type="text" class="form-control" name="numerobanco" id="numerobanco" required autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="numerobancoanterior" id="numerobancoanterior" required>'+
                                                         '<input type="hidden" class="form-control" name="banco" id="banco" required readonly>'+
                                                     '</div>'+
@@ -1662,7 +1662,7 @@ function obtenerdatos(cxcmodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" required>'+
+                                                        '<input type="text" class="form-control" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" required autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="lugarexpedicionanterior" id="lugarexpedicionanterior" value="'+lugarexpedicion+'" required>'+
                                                     '</div>'+
                                                 '</td>'+
@@ -1680,7 +1680,7 @@ function obtenerdatos(cxcmodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" required>'+
+                                                        '<input type="text" class="form-control" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" required autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="claveregimenfiscalanterior" id="claveregimenfiscalanterior" value="'+claveregimenfiscal+'" required>'+
                                                         '<input type="hidden" class="form-control" name="regimenfiscal" id="regimenfiscal" value="'+regimenfiscal+'" required readonly>'+
                                                     '</div>'+
@@ -1697,7 +1697,7 @@ function obtenerdatos(cxcmodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="clavetiporelacion" id="clavetiporelacion">'+
+                                                        '<input type="text" class="form-control" name="clavetiporelacion" id="clavetiporelacion" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="clavetiporelacionanterior" id="clavetiporelacionanterior">'+
                                                         '<input type="hidden" class="form-control" name="tiporelacion" id="tiporelacion"  readonly>'+
                                                     '</div>'+
@@ -1726,7 +1726,7 @@ function obtenerdatos(cxcmodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="claveformapago" id="claveformapago" required>'+
+                                                        '<input type="text" class="form-control" name="claveformapago" id="claveformapago" required autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="claveformapagoanterior" id="claveformapagoanterior" required>'+
                                                         '<input type="hidden" class="form-control" name="formapago" id="formapago" required readonly>'+
                                                     '</div>'+

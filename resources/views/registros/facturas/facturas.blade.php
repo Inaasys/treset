@@ -251,6 +251,7 @@
         var facturas_obtener_ordenes = '{!!URL::to('facturas_obtener_ordenes')!!}';
         var facturas_obtener_orden = '{!!URL::to('facturas_obtener_orden')!!}';
         var facturas_obtener_productos = '{!!URL::to('facturas_obtener_productos')!!}';
+        var facturas_obtener_producto_por_codigo = '{!!URL::to('facturas_obtener_producto_por_codigo')!!}';
         var facturas_obtener_claves_productos = '{!!URL::to('facturas_obtener_claves_productos')!!}';
         var facturas_obtener_claves_unidades = '{!!URL::to('facturas_obtener_claves_unidades')!!}';
         var facturas_cargar_xml_uuid_relacionado = '{!!URL::to('facturas_cargar_xml_uuid_relacionado')!!}';

@@ -548,7 +548,7 @@ function alta(){
                       '</td>'+
                       '<td>'+
                         '<div class="form-line">'+
-                          '<input type="text" class="form-control" name="numeropersonalrecibe" id="numeropersonalrecibe" required data-parsley-type="integer">'+
+                          '<input type="text" class="form-control" name="numeropersonalrecibe" id="numeropersonalrecibe" required data-parsley-type="integer" autocomplete="off">'+
                           '<input type="hidden" class="form-control" name="numeropersonalrecibeanterior" id="numeropersonalrecibeanterior" required data-parsley-type="integer">'+
                           '<input type="hidden" class="form-control" name="personalrecibe" id="personalrecibe" required readonly>'+
                         '</div>'+
@@ -573,7 +573,7 @@ function alta(){
                 '</div>'+
                 '<div class="col-md-4">'+
                   '<label >correo notificaciones</label>'+
-                  '<input type="email" class="form-control" name="correo" id="correo" data-parsley-type="email" required>'+
+                  '<input type="email" class="form-control" name="correo" id="correo" data-parsley-type="email" required  autocomplete="off">'+
                 '</div>'+
               '</div>'+  
             '</div>'+
@@ -783,9 +783,9 @@ $("#btnterminarprestamo").on('click', function(e){
 });
 //obtener datos para modificacion
 function obtenerdatos(prestamomodificar){
-  $("#titulomodal").html('Modificación Prestamo Herramienta');
   $('.page-loader-wrapper').css('display', 'block');
   $.get(prestamo_herramienta_obtener_prestamo_herramienta,{prestamomodificar:prestamomodificar },function(data){
+    $("#titulomodal").html('Modificación Prestamo Herramienta --- STATUS : ' + data.Prestamo_Herramienta.status);
     //formulario alta
     var tabs ='<div class="col-md-12">'+
                 '<div class="row">'+
@@ -814,7 +814,7 @@ function obtenerdatos(prestamomodificar){
                         '</td>'+
                         '<td>'+
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control" name="numeropersonalrecibe" id="numeropersonalrecibe" required required data-parsley-type="integer">'+
+                            '<input type="text" class="form-control" name="numeropersonalrecibe" id="numeropersonalrecibe" required required data-parsley-type="integer" autocomplete="off">'+
                             '<input type="hidden" class="form-control" name="numeropersonalrecibeanterior" id="numeropersonalrecibeanterior" required data-parsley-type="integer">'+
                             '<input type="hidden" class="form-control" name="personalrecibe" id="personalrecibe" required readonly>'+
                           '</div>'+
@@ -839,7 +839,7 @@ function obtenerdatos(prestamomodificar){
                   '</div>'+
                   '<div class="col-md-4">'+
                     '<label >correo notificaciones</label>'+
-                    '<input type="email" class="form-control" name="correo" id="correo" data-parsley-type="email" required>'+
+                    '<input type="email" class="form-control" name="correo" id="correo" data-parsley-type="email" required  autocomplete="off">'+
                   '</div>'+
                 '</div>'+  
               '</div>'+

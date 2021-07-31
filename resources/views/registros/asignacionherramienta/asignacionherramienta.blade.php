@@ -247,6 +247,7 @@
         var asignacion_herramienta_obtener_personal_entrega = '{!!URL::to('asignacion_herramienta_obtener_personal_entrega')!!}';
         var asignacion_herramienta_obtener_personal_entrega_por_numero = '{!!URL::to('asignacion_herramienta_obtener_personal_entrega_por_numero')!!}';
         var asignacion_herramienta_obtener_herramienta = '{!!URL::to('asignacion_herramienta_obtener_herramienta')!!}';
+        var asignacion_herramienta_obtener_herramienta_por_codigo = '{!!URL::to('asignacion_herramienta_obtener_herramienta_por_codigo')!!}';
         var asignacion_herramienta_obtener_existencias_almacen = '{!!URL::to('asignacion_herramienta_obtener_existencias_almacen')!!}';
         var asignacion_herramienta_guardar = '{!!URL::to('asignacion_herramienta_guardar')!!}';
         var asignacion_herramienta_obtener_asignacion_herramienta_a_autorizar = '{!!URL::to('asignacion_herramienta_obtener_asignacion_herramienta_a_autorizar')!!}'; 

@@ -404,7 +404,7 @@ class CompraController extends ConfiguracionSistemaController{
             $codigoabuscar = $request->codigoabuscar;
             $numeroalmacen = $request->numeroalmacen;
             $tipooperacion = $request->tipooperacion;
-            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->get();
+            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%');
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($numeroalmacen, $tipooperacion){
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$tipooperacion.'\',\''.$data->Insumo.'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$data->NombreClaveProducto.'\',\''.$data->NombreClaveUnidad.'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\')">Seleccionar</div>';
@@ -422,6 +422,48 @@ class CompraController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
+    }
+    //obtener producto por codigo
+    public function compras_obtener_producto_por_codigo(Request $request){
+        $codigoabuscar = $request->codigoabuscar;
+        $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->count();
+        if($contarproductos > 0){
+            $producto = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->first();
+            $data = array(
+                'Codigo' => $producto->Codigo,
+                'Producto' => htmlspecialchars($producto->Producto, ENT_QUOTES),
+                'Unidad' => $producto->Unidad,
+                'Costo' => Helpers::convertirvalorcorrecto($producto->Costo),
+                'Impuesto' => Helpers::convertirvalorcorrecto($producto->Impuesto),
+                'SubTotal' => Helpers::convertirvalorcorrecto($producto->SubTotal),
+                'Existencias' => Helpers::convertirvalorcorrecto($producto->Existencias),
+                'Insumo' => $producto->Insumo,
+                'ClaveProducto' => $producto->ClaveProducto,
+                'ClaveUnidad' => $producto->ClaveUnidad,
+                'NombreClaveProducto' => $producto->NombreClaveProducto,
+                'NombreClaveUnidad' => $producto->NombreClaveUnidad,
+                'CostoDeLista' => Helpers::convertirvalorcorrecto($producto->CostoDeLista),
+                'contarproductos' => $contarproductos
+            );
+        }else{
+            $data = array(
+                'Codigo' => '',
+                'Producto' => '',
+                'Unidad' => '',
+                'Costo' => '',
+                'Impuesto' => '',
+                'SubTotal' => '',
+                'Existencias' => '',
+                'Insumo' => '',
+                'ClaveProducto' => '',
+                'ClaveUnidad' => '',
+                'NombreClaveProducto' => '',
+                'NombreClaveUnidad' => '',
+                'CostoDeLista' => '',
+                'contarproductos' => $contarproductos
+            );
+        }
+        return response()->json($data);
     }
     //obtener proveedor por numero
     public function compras_obtener_proveedor_por_numero(Request $request){
@@ -663,7 +705,7 @@ class CompraController extends ConfiguracionSistemaController{
             $Compra = new Compra;
             $Compra->Compra=$compra;
             $Compra->Serie=$request->serie;
-            $Compra->Folio=$request->folio;
+            $Compra->Folio=$folio;
             $Compra->Proveedor=$request->numeroproveedor;
             switch ($request->tipo){
                 case "TOT":

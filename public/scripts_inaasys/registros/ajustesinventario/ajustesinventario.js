@@ -419,6 +419,18 @@ function listarproductos(){
       
     });
   }
+  function obtenerproductoporcodigo(){
+    var codigoabuscar = $("#codigoabuscar").val();
+    var numeroalmacen = $("#numeroalmacen").val();
+    var tipooperacion = $("#tipooperacion").val();
+    $.get(ajustesinventario_obtener_producto_por_codigo,{codigoabuscar:codigoabuscar,numeroalmacen:numeroalmacen}, function(data){
+      if(parseInt(data.contarproductos) > 0){
+        agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, tipooperacion);
+      }else{
+        msjnoseencontroningunproducto();
+      }
+    }) 
+  }
   //función que evalua si la partida que quieren ingresar ya existe o no en el detalle de la orden de compra
   function evaluarproductoexistente(Codigo){
     var sumaiguales=0;
@@ -659,7 +671,7 @@ function alta(){
                       '</td>'+
                       '<td>'+
                         '<div class="form-line">'+
-                          '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer">'+
+                          '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer" autocomplete="off">'+
                           '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required data-parsley-type="integer">'+
                           '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
                           '<input type="hidden" class="form-control" name="almacendb" id="almacendb" required readonly>'+
@@ -678,7 +690,18 @@ function alta(){
               '<div class="row">'+
                 '<div class="col-md-4" id="divbuscarcodigoproducto" hidden>'+
                   '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
-                  '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                  '<table class="col-md-12">'+
+                    '<tr>'+
+                      '<td>'+
+                        '<div class="btn bg-blue waves-effect" id="btnobtenerproductos" onclick="listarproductos()">Ver Productos</div>'+
+                      '</td>'+
+                      '<td>'+ 
+                        '<div class="form-line">'+
+                          '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                        '</div>'+
+                      '</td>'+
+                    '</tr>'+    
+                  '</table>'+
                 '</div>'+
               '</div>'+
             '</div>'+
@@ -745,7 +768,7 @@ function alta(){
     //recomentable para mayor compatibilidad entre navegadores.
     var code = (e.keyCode ? e.keyCode : e.which);
     if(code==13){
-      listarproductos();
+      obtenerproductoporcodigo();
     }
   });
   //activar busqueda
@@ -877,10 +900,9 @@ $("#btnbaja").on('click', function(e){
 });
 //modificacion
 function obtenerdatos(ajustemodificar){
-  $("#titulomodal").html('Modificación Ajuste Inventario');
   $('.page-loader-wrapper').css('display', 'block');
   $.get(ajustesinventario_obtener_ajuste,{ajustemodificar:ajustemodificar },function(data){
-    console.log(data);
+    $("#titulomodal").html('Modificación Ajuste Inventario --- STATUS : ' + data.ajuste.Status);
     //formulario modificacion
     var tabs ='<div class="col-md-12">'+  
                 '<div class="row">'+
@@ -900,7 +922,7 @@ function obtenerdatos(ajustemodificar){
                         '</td>'+
                         '<td>'+
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer">'+
+                            '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer" autocomplete="off">'+
                             '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required data-parsley-type="integer">'+
                             '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
                             '<input type="hidden" class="form-control" name="almacendb" id="almacendb" required readonly>'+
@@ -919,7 +941,18 @@ function obtenerdatos(ajustemodificar){
                 '<div class="row">'+
                   '<div class="col-md-4" id="divbuscarcodigoproducto" hidden>'+
                     '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
-                    '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                    '<table class="col-md-12">'+
+                      '<tr>'+
+                        '<td>'+
+                          '<div class="btn bg-blue waves-effect" id="btnobtenerproductos" onclick="listarproductos()">Ver Productos</div>'+
+                        '</td>'+
+                        '<td>'+ 
+                          '<div class="form-line">'+
+                            '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                          '</div>'+
+                        '</td>'+
+                      '</tr>'+    
+                    '</table>'+
                   '</div>'+
                 '</div>'+
               '</div>'+
@@ -996,7 +1029,7 @@ function obtenerdatos(ajustemodificar){
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
-        listarproductos();
+        obtenerproductoporcodigo();
       }
     });
     //activar busqueda

@@ -253,7 +253,7 @@ class TraspasoController extends ConfiguracionSistemaController{
             $codigoabuscar = $request->codigoabuscar;
             $numeroalmacende = $request->numeroalmacende;
             $tipooperacion = $request->tipooperacion;
-            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->get();
+            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%');
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($numeroalmacende, $tipooperacion){
                         if($data->Almacen == $numeroalmacende || $data->Almacen == NULL){
@@ -275,6 +275,36 @@ class TraspasoController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
+    }
+    //obtener producto por codigo
+    public function traspasos_obtener_producto_por_codigo(Request $request){
+        $codigoabuscar = $request->codigoabuscar;
+        $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->count();
+        if($contarproductos > 0){
+            $producto = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->first();
+            $data = array(
+                'Codigo' => $producto->Codigo,
+                'Producto' => htmlspecialchars($producto->Producto, ENT_QUOTES),
+                'Unidad' => $producto->Unidad,
+                'Costo' => Helpers::convertirvalorcorrecto($producto->Costo),
+                'Impuesto' => Helpers::convertirvalorcorrecto($producto->Impuesto),
+                'SubTotal' => Helpers::convertirvalorcorrecto($producto->SubTotal),
+                'Existencias' => Helpers::convertirvalorcorrecto($producto->Existencias),
+                'contarproductos' => $contarproductos
+            );
+        }else{
+            $data = array(
+                'Codigo' => '',
+                'Producto' => '',
+                'Unidad' => '',
+                'Costo' => '',
+                'Impuesto' => '',
+                'SubTotal' => '',
+                'Existencias' => '',
+                'contarproductos' => $contarproductos
+            );
+        }
+        return response()->json($data);        
     }
 
     //obtener existencias
