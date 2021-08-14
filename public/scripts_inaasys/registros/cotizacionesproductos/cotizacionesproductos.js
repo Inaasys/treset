@@ -339,6 +339,7 @@ function seleccionarcliente(Numero, Nombre, Credito, Saldo, NumeroAgente, Agente
             $("#textonombreagente").html(Agente.substring(0, 40));
         }
         mostrarformulario();
+        calculartotal();//para calcular nuevo saldo
     }
 }
 function seleccionaragente(Numero, Nombre){
@@ -378,6 +379,7 @@ function obtenerclientepornumero(){
                     $("#textonombreagente").html(data.nombreagente.substring(0, 40));
                 }
                 mostrarformulario();
+                calculartotal();//para calcular nuevo saldo
             }) 
         }
     }
@@ -667,6 +669,19 @@ function calculartotal(){
     $("#costo").val(number_format(round(costo, numerodecimales), numerodecimales, '.', ''));
     $("#utilidad").val(number_format(round(utilidad, numerodecimales), numerodecimales, '.', ''));
     $("#comision").val(number_format(round(comision, numerodecimales), numerodecimales, '.', ''));
+    //nuevo saldo
+    var numerocliente = $("#numerocliente").val();
+    $.get(cotizaciones_productos_obtener_nuevo_saldo_cliente,{numerocliente:numerocliente}, function(saldo){
+        var nuevosaldo = new Decimal(saldo).plus(total);
+        $("#saldo").val(number_format(round(nuevosaldo, numerodecimales), numerodecimales, '.', ''));
+        var saldo = $("#saldo").val();
+        var credito = $("#credito").val();
+        if(parseFloat(saldo) > parseFloat(credito)){
+            $("#mensajecreditoexcedido").html("CRÉDITO DEL CLIENTE EXCEDIDO");
+        }else{
+            $("#mensajecreditoexcedido").html("");           
+        }
+    })  
 }
 //agregar una fila en la tabla de precios productos
 var contadorproductos=0;
@@ -705,7 +720,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
                   '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="'+Costo+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                   '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm comisionporcentajepartida" name="comisionporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('+contadorfilas+');" required></td>'+
                   '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm comisionespesospartida" name="comisionespesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'+
-                  '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'+number_format(round(utilidad, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                  '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'+number_format(round(utilidad, numerodecimales), numerodecimales, '.', '')+'" data-parsley-utilidad="0.'+numerocerosconfiguradosinputnumberstep+'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                   '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm existenciaactualpartida" name="existenciaactualpartida[]" value="'+exis+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                   '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodxl cantidadsolicitadapartida" name="cantidadsolicitadapartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                   '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm indicesurtimientopartida" name="indicesurtimientopartida[]" value="'+number_format(round(indicesurtimientopartida, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
@@ -961,6 +976,11 @@ function alta(){
                                             '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
                                         '</tr>'+
                                     '</table>'+
+                                '</div>'+
+                            '</div>'+  
+                            '<div class="row">'+
+                                '<div class="col-md-12">'+   
+                                    '<h4 class="font-bold col-red" id="mensajecreditoexcedido"></h4>'+  
                                 '</div>'+
                             '</div>'+   
                         '</div>'+ 
@@ -1311,6 +1331,11 @@ function obtenerdatos(cotizacionmodificar){
                         '</table>'+
                       '</div>'+
                     '</div>'+   
+                    '<div class="row">'+
+                        '<div class="col-md-12">'+   
+                            '<h4 class="font-bold col-red" id="mensajecreditoexcedido"></h4>'+  
+                        '</div>'+
+                    '</div>'+  
                   '</div>'+ 
                 '</div>'+
               '</div>';

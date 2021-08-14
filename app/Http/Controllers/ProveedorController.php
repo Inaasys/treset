@@ -112,6 +112,7 @@ class ProveedorController extends ConfiguracionSistemaController{
             $Proveedor->Plazo=$request->plazo;
             $Proveedor->Telefonos=$request->telefonos;
             $Proveedor->Status='ALTA';
+            $Proveedor->SolicitarXML = $request->solicitarxmlencompras;
             Log::channel('proveedor')->info('Se registro un nuevo proveedor: '.$Proveedor.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
 		    $Proveedor->save();
       	}
@@ -155,6 +156,7 @@ class ProveedorController extends ConfiguracionSistemaController{
             $Proveedor->Email1=$request->email1;
             $Proveedor->Plazo=$request->plazo;
             $Proveedor->Telefonos=$request->telefonos;	  
+            $Proveedor->SolicitarXML = $request->solicitarxmlencompras;
             Log::channel('proveedor')->info('Se modifico el proveedor: '.$Proveedor.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());	      
 		    $Proveedor->save();
       	}

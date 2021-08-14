@@ -821,8 +821,8 @@ function alta(){
                           '<input type="text" class="form-control" name="tipo" id="tipo" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                       '<div class="col-md-4">'+
-                          '<label>Crédito Máximo  (0 = Crédito libre)</label>'+
-                          '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="creditomaximo" id="creditomaximo" value="10000.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                          '<label>Crédito Máximo</label>'+
+                          '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="creditomaximo" id="creditomaximo" value="10000.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                       '</div>'+
                   '</div>'+   
                 '</div>'+
@@ -1255,8 +1255,8 @@ function obtenerdatos(numerocliente){
                             '<input type="text" class="form-control" name="tipo" id="tipo" onkeyup="tipoLetra(this);">'+
                         '</div>'+
                         '<div class="col-md-4">'+
-                            '<label>Crédito Máximo  (0 = Crédito libre)</label>'+
-                            '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="creditomaximo" id="creditomaximo" value="10000.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                            '<label>Crédito Máximo</label>'+
+                            '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="creditomaximo" id="creditomaximo" value="10000.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                         '</div>'+
                     '</div>'+   
                   '</div>'+

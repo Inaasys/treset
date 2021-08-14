@@ -606,12 +606,16 @@ function comprobarfilaspreciosclientes(){
 }
 //agregar una fila en la tabla de la tab consumos
 var contadorconsumos=0;
-function agregarfilaconsumos(Codigo, Producto){
+function agregarfilaconsumos(Codigo, Producto, Unidad, Inventariable, Costo, Precio){
     var fila=   '<tr class="filasconsumos" id="filaconsumo'+contadorconsumos+'">'+
                     '<td><div class="btn btn-danger btn-xs" onclick="eliminarfilaconsumos('+contadorconsumos+')">X</div></td>'+
                     '<td><input type="hidden" name="codigoproductoconsumos[]" id="codigoproductoconsumos[]" value="'+Codigo+'" readonly>'+Codigo+'</td>'+
                     '<td><input type="hidden" name="productoconsumos[]" id="productoconsumos[]" value="'+Producto+'" readonly>'+Producto+'</td>'+
                     '<td><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" name="cantidadproductoconsumos[]" id="cantidadproductoconsumos[]" required value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);"></td>'+
+                    '<td><input type="hidden" name="unidadconsumos[]" id="unidadconsumos[]" value="'+Unidad+'" readonly>'+Unidad+'</td>'+
+                    '<td><input type="hidden" name="inventariableconsumos[]" id="inventariableconsumos[]" value="'+Inventariable+'" readonly>'+Inventariable+'</td>'+
+                    '<td><input type="hidden" step="0.'+numerocerosconfiguradosinputnumberstep+'" name="costoconsumos[]" id="costoconsumos[]" required value="'+Costo+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+Costo+'</td>'+
+                    '<td><input type="hidden" step="0.'+numerocerosconfiguradosinputnumberstep+'" name="precionetoconsumos[]" id="precionetoconsumos[]" required value="'+Precio+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+Precio+'</td>'+
                 '</tr>';
     contadorconsumos++;
     $("#tablaconsumosproductoterminado").append(fila);
@@ -1001,6 +1005,10 @@ function obtenerdatos(codigoproducto){
                                                 '<th>Código</th>'+
                                                 '<th>Producto</th>'+
                                                 '<th>Cantidad $</th>'+
+                                                '<th>Unidad</th>'+
+                                                '<th>Inventariable</th>'+
+                                                '<th>Costo</th>'+
+                                                '<th>Precio Neto $</th>'+
                                             '</tr>'+
                                         '</thead>'+
                                         '<tbody>'+           
@@ -1196,10 +1204,10 @@ function obtenerdatos(codigoproducto){
     $("#tablapreciosclientes").append(data.filaspreciosclientes);
     $("#numerofilasprecioscliente").val(data.numerofilasprecioscliente);
     //datos tab consumos
-    if(data.producto.Pt == ""){
+    if(data.pt == ""){
         $('input[name=consumosproductoterminado][value="N"]').attr('checked', 'checked');  
     }else{
-        $('input[name=consumosproductoterminado][value='+data.producto.Pt+']').attr('checked', 'checked');
+        $('input[name=consumosproductoterminado][value='+data.pt+']').attr('checked', 'checked');
     }
     $("#tablaconsumosproductoterminado").append(data.filasconsumos);
     $("#numerofilasconsumosproductoterminado").val(data.numerofilasconsumos);

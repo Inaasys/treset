@@ -301,6 +301,7 @@ function seleccionarcliente(Numero, Nombre, Credito, Saldo, NumeroAgente, Agente
         }
         mostrarformulario();
         mostrarbuscadorcodigoproducto();
+        calculartotal();//para calcular nuevo saldo
     }
 }
 //obtener agentes
@@ -494,6 +495,7 @@ function obtenerclientepornumero(){
                 }
                 mostrarformulario();
                 mostrarbuscadorcodigoproducto();
+                calculartotal();//para obtener nuevo saldo
             }) 
         }
     }
@@ -811,6 +813,10 @@ function calculartotalesfilas(fila){
       //utilidad de la partida
       utilidadpartida = new Decimal(subtotalpartida).minus(costototalpartida).minus(comisionespesospartida);
       $(".utilidadpartida", this).val(number_format(round(utilidadpartida, numerodecimales), numerodecimales, '.', ''));
+
+
+
+
       calculartotal();
     }  
     cuentaFilas++;
@@ -926,6 +932,13 @@ function calculartotal(){
     $.get(remisiones_obtener_nuevo_saldo_cliente,{numerocliente:numerocliente}, function(saldo){
         var nuevosaldo = new Decimal(saldo).plus(total);
         $("#saldo").val(number_format(round(nuevosaldo, numerodecimales), numerodecimales, '.', ''));
+        var saldo = $("#saldo").val();
+        var credito = $("#credito").val();
+        if(parseFloat(saldo) > parseFloat(credito)){
+            $("#mensajecreditoexcedido").html("CRÉDITO DEL CLIENTE EXCEDIDO");
+        }else{
+            $("#mensajecreditoexcedido").html("");           
+        }
     })  
 }
 //funcion asincrona para buscar existencias de la partida
@@ -974,7 +987,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="'+Costo+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm comisionporcentajepartida" name="comisionporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('+contadorfilas+');" required></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm comisionespesospartida" name="comisionespesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'+number_format(round(utilidad, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'+number_format(round(utilidad, numerodecimales), numerodecimales, '.', '')+'" data-parsley-utilidad="0.'+numerocerosconfiguradosinputnumberstep+'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                           '<td class="tdmod"><input type="text" class="form-control divorinputmodsm monedapartida" name="monedapartida[]" value="MXN" readonly data-parsley-length="[1, 3]" autocomplete="off"></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costolistapartida" name="costolistapartida[]" value="'+CostoDeLista+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm tipocambiopartida" name="tipocambiopartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
@@ -1313,6 +1326,11 @@ function alta(){
                                 '</table>'+
                             '</div>'+
                         '</div>'+   
+                        '<div class="row">'+
+                            '<div class="col-md-12">'+   
+                                '<h4 class="font-bold col-red" id="mensajecreditoexcedido"></h4>'+  
+                            '</div>'+
+                        '</div>'+
                     '</div>'+ 
                 '</div>'+
             '</div>';
@@ -1381,36 +1399,42 @@ $("#btnGuardar").on('click', function (e) {
     var formData = new FormData($("#formparsley")[0]);
     var form = $("#formparsley");
     if (form.parsley().isValid()){
-        var numerofilas = $("#numerofilas").val();
-        if(parseInt(numerofilas) > 0){
-            $('.page-loader-wrapper').css('display', 'block');
-            $.ajax({
-                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                url:remisiones_guardar,
-                type: "post",
-                dataType: "html",
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                success:function(data){
-                msj_datosguardadoscorrectamente();
-                limpiar();
-                ocultarmodalformulario();
-                limpiarmodales();
-                $('.page-loader-wrapper').css('display', 'none');
-                },
-                error:function(data){
-                if(data.status == 403){
-                    msj_errorenpermisos();
-                }else{
-                    msj_errorajax();
-                }
-                $('.page-loader-wrapper').css('display', 'none');
-                }
-            })
+        var saldo = $("#saldo").val();
+        var credito = $("#credito").val();
+        if(parseFloat(saldo) <= parseFloat(credito)){
+            var numerofilas = $("#numerofilas").val();
+            if(parseInt(numerofilas) > 0){
+                $('.page-loader-wrapper').css('display', 'block');
+                $.ajax({
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    url:remisiones_guardar,
+                    type: "post",
+                    dataType: "html",
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success:function(data){
+                    msj_datosguardadoscorrectamente();
+                    limpiar();
+                    ocultarmodalformulario();
+                    limpiarmodales();
+                    $('.page-loader-wrapper').css('display', 'none');
+                    },
+                    error:function(data){
+                    if(data.status == 403){
+                        msj_errorenpermisos();
+                    }else{
+                        msj_errorajax();
+                    }
+                    $('.page-loader-wrapper').css('display', 'none');
+                    }
+                })
+            }else{
+                msj_erroralmenosunaentrada();
+            }
         }else{
-            msj_erroralmenosunaentrada();
+            msj_creditoexcedido();
         }
     }else{
         msjfaltandatosporcapturar();
@@ -1751,7 +1775,12 @@ function obtenerdatos(remisionmodificar){
                                     '</tr>'+
                                 '</table>'+
                             '</div>'+
-                        '</div>'+   
+                        '</div>'+  
+                        '<div class="row">'+
+                            '<div class="col-md-12">'+   
+                                '<h4 class="font-bold col-red" id="mensajecreditoexcedido"></h4>'+  
+                            '</div>'+
+                        '</div>'+
                     '</div>'+ 
                 '</div>'+
             '</div>';
@@ -1870,36 +1899,42 @@ $("#btnGuardarModificacion").on('click', function (e) {
     var formData = new FormData($("#formparsley")[0]);
     var form = $("#formparsley");
     if (form.parsley().isValid()){
-        var numerofilas = $("#numerofilas").val();
-        if(parseInt(numerofilas) > 0){
-            $('.page-loader-wrapper').css('display', 'block');
-            $.ajax({
-                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                url:remisiones_guardar_modificacion,
-                type: "post",
-                dataType: "html",
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                success:function(data){
-                    msj_datosguardadoscorrectamente();
-                    limpiar();
-                    ocultarmodalformulario();
-                    limpiarmodales();
-                    $('.page-loader-wrapper').css('display', 'none');
-                },
-                error:function(data){
-                    if(data.status == 403){
-                    msj_errorenpermisos();
-                    }else{
-                    msj_errorajax();
+        var saldo = $("#saldo").val();
+        var credito = $("#credito").val();
+        if(parseFloat(saldo) <= parseFloat(credito)){
+            var numerofilas = $("#numerofilas").val();
+            if(parseInt(numerofilas) > 0){
+                $('.page-loader-wrapper').css('display', 'block');
+                $.ajax({
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    url:remisiones_guardar_modificacion,
+                    type: "post",
+                    dataType: "html",
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success:function(data){
+                        msj_datosguardadoscorrectamente();
+                        limpiar();
+                        ocultarmodalformulario();
+                        limpiarmodales();
+                        $('.page-loader-wrapper').css('display', 'none');
+                    },
+                    error:function(data){
+                        if(data.status == 403){
+                        msj_errorenpermisos();
+                        }else{
+                        msj_errorajax();
+                        }
+                        $('.page-loader-wrapper').css('display', 'none');
                     }
-                    $('.page-loader-wrapper').css('display', 'none');
-                }
-            })
+                })
+            }else{
+                msj_erroralmenosunaentrada();
+            }
         }else{
-            msj_erroralmenosunaentrada();
+            msj_creditoexcedido();
         }
     }else{
         msjfaltandatosporcapturar();

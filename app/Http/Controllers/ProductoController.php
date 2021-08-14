@@ -351,12 +351,12 @@ class ProductoController extends ConfiguracionSistemaController{
             function($join){
                 $join->on("e.codigo","=","t.codigo");
             })
-            ->select('t.Codigo as Codigo', 't.Producto as Producto', 't.Ubicacion as Ubicacion', 'e.Existencias as Existencias', 't.Costo as Costo', 't.SubTotal as SubTotal', 't.Marca as Marca', 't.Status as Status')
+            ->select('t.Codigo as Codigo', 't.Producto as Producto', 't.Ubicacion as Ubicacion', 'e.Existencias as Existencias', 't.Costo as Costo', 't.SubTotal as SubTotal', 't.Marca as Marca', 't.Status as Status', 't.Unidad as Unidad', 't.Inventariable as Inventariable', 't.Venta as Venta')
             ->where('t.Codigo', 'like', '%' . $codigoabuscar . '%')
             ->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaconsumos(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\')">Seleccionar</div>';
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaconsumos(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad.'\',\''.$data->Inventariable.'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Venta).'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->addColumn('Existencias', function($data){
@@ -434,6 +434,7 @@ class ProductoController extends ConfiguracionSistemaController{
     //obtener datos del catalogo
     public function productos_obtener_producto(Request $request){
         $producto = Producto::where('Codigo', $request->codigoproducto)->first();
+        $valores_producto = Producto::where('Codigo', $request->codigoproducto)->get();
         $marca = Marca::where('Numero', $producto->Marca)->first();
         $linea = Linea::where('Numero', $producto->Linea)->first();
         $precio = Helpers::convertirvalorcorrecto($producto->Precio);
@@ -486,6 +487,12 @@ class ProductoController extends ConfiguracionSistemaController{
                     '<td><input type="hidden" name="codigoproductoconsumos[]" value="'.$c->Equivale.'" readonly>'.$c->Equivale.'</td>'.
                     '<td><input type="hidden" name="productoconsumos[]"  value="'.$producto->Producto.'" readonly>'.$producto->Producto.'</td>'.
                     '<td><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" name="cantidadproductoconsumos[]" required value="'.Helpers::convertirvalorcorrecto($c->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);"></td>'.
+
+                    '<td><input type="hidden" name="unidadconsumos[]"  value="'.$producto->Unidad.'" readonly>'.$producto->Unidad.'</td>'.
+                    '<td><input type="hidden" name="inventariableconsumos[]"  value="'.$producto->Inventariable.'" readonly>'.$producto->Inventariable.'</td>'.
+                    '<td><input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" name="costoconsumos[]" required value="'.Helpers::convertirvalorcorrecto($producto->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);">'.Helpers::convertirvalorcorrecto($producto->Costo).'</td>'.
+                    '<td><input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" name="precionetoconsumos[]" required value="'.Helpers::convertirvalorcorrecto($producto->Venta).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);">'.Helpers::convertirvalorcorrecto($producto->Precio).'</td>'.
+
                 '</tr>';
                 $contadorconsumos++;
             }
@@ -493,7 +500,9 @@ class ProductoController extends ConfiguracionSistemaController{
             $filasconsumos = '';
         }
         $data = array(
-            "producto" => $producto->toArray(),
+            "producto" => $producto,
+            "pt" => $valores_producto[0]->Pt,
+            "valores_producto" => $valores_producto,
             "marca" => $marca,
             "linea" => $linea,
             "precio" => $precio,

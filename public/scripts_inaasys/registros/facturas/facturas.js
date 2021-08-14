@@ -2,6 +2,7 @@
 var tabla;
 var form;
 var contadorfilasfacturas = 0;
+var tipoformatopdf;
 //funcion que se ejecuta al inicio
 function init(){
   campos_a_filtrar_en_busquedas();
@@ -2376,7 +2377,7 @@ function alta(){
                         '</div>'+
                         '<div class="row">'+
                           '<div class="col-md-12">'+   
-                            '<h5 id="mensajecalculoscompra"></h5>'+  
+                            '<h4 class="font-bold col-red" id="mensajecreditoexcedido"></h4>'+  
                           '</div>'+
                         '</div>'+
                       '</div>'+
@@ -2721,6 +2722,19 @@ function calculartotal(){
   $("#utilidad").val(number_format(round(utilidad, numerodecimales), numerodecimales, '.', ''));
   $("#costo").val(number_format(round(costo, numerodecimales), numerodecimales, '.', ''));
   $("#comision").val(number_format(round(comision, numerodecimales), numerodecimales, '.', ''));
+  //nuevo saldo
+  var numerocliente = $("#numerocliente").val();
+  $.get(facturas_obtener_nuevo_saldo_cliente,{numerocliente:numerocliente}, function(saldo){
+      var nuevosaldo = new Decimal(saldo).plus(total);
+      $("#saldo").val(number_format(round(nuevosaldo, numerodecimales), numerodecimales, '.', ''));
+      var saldo = $("#saldo").val();
+      var credito = $("#credito").val();
+      if(parseFloat(saldo) > parseFloat(credito)){
+          $("#mensajecreditoexcedido").html("CRÉDITO DEL CLIENTE EXCEDIDO");
+      }else{
+          $("#mensajecreditoexcedido").html("");           
+      }
+  }) 
 }
 //eliminar fila
 function eliminarfila(fila){
@@ -2798,36 +2812,42 @@ $("#btnGuardar").on('click', function (e) {
   var formData = new FormData($("#formparsley")[0]);
   var form = $("#formparsley");
   if (form.parsley().isValid()){
-    var numerofilas = $("#numerofilas").val();
-    if(parseInt(numerofilas) > 0){
-        $('.page-loader-wrapper').css('display', 'block');
-        $.ajax({
-          headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-          url:facturas_guardar,
-          type: "post",
-          dataType: "html",
-          data: formData,
-          cache: false,
-          contentType: false,
-          processData: false,
-          success:function(data){
-              msj_datosguardadoscorrectamente();
-              limpiar();
-              ocultarmodalformulario();
-              limpiarmodales();
+    var saldo = $("#saldo").val();
+    var credito = $("#credito").val();
+    if(parseFloat(saldo) <= parseFloat(credito)){
+      var numerofilas = $("#numerofilas").val();
+      if(parseInt(numerofilas) > 0){
+          $('.page-loader-wrapper').css('display', 'block');
+          $.ajax({
+            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+            url:facturas_guardar,
+            type: "post",
+            dataType: "html",
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success:function(data){
+                msj_datosguardadoscorrectamente();
+                limpiar();
+                ocultarmodalformulario();
+                limpiarmodales();
+                $('.page-loader-wrapper').css('display', 'none');
+            },
+            error:function(data){
+              if(data.status == 403){
+                msj_errorenpermisos();
+              }else{
+                msj_errorajax();
+              }
               $('.page-loader-wrapper').css('display', 'none');
-          },
-          error:function(data){
-            if(data.status == 403){
-              msj_errorenpermisos();
-            }else{
-              msj_errorajax();
             }
-            $('.page-loader-wrapper').css('display', 'none');
-          }
-        })
+          })
+      }else{
+        msj_erroralmenosunaentrada();
+      }
     }else{
-      msj_erroralmenosunaentrada();
+        msj_creditoexcedido();
     }
   }else{
     msjfaltandatosporcapturar();
@@ -3313,7 +3333,7 @@ function obtenerdatos(facturamodificar){
                   '</div>'+
                   '<div class="row">'+
                     '<div class="col-md-12">'+   
-                      '<h5 id="mensajecalculoscompra"></h5>'+  
+                      '<h4 class="font-bold col-red" id="mensajecreditoexcedido"></h4>'+  
                     '</div>'+
                   '</div>'+
                 '</div>'+
@@ -3549,36 +3569,42 @@ $("#btnGuardarModificacion").on('click', function (e) {
   var formData = new FormData($("#formparsley")[0]);
   var form = $("#formparsley");
   if (form.parsley().isValid()){
-    var numerofilas = $("#numerofilas").val();
-    if(parseInt(numerofilas) > 0){
-      $('.page-loader-wrapper').css('display', 'block');
-      $.ajax({
-        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-        url:facturas_guardar_modificacion,
-        type: "post",
-        dataType: "html",
-        data: formData,
-        cache: false,
-        contentType: false,
-        processData: false,
-        success:function(data){
-          msj_datosguardadoscorrectamente();
-          limpiar();
-          ocultarmodalformulario();
-          limpiarmodales();
-          $('.page-loader-wrapper').css('display', 'none'); 
-        },
-        error:function(data){
-          if(data.status == 403){
-            msj_errorenpermisos();
-          }else{
-            msj_errorajax();
+    var saldo = $("#saldo").val();
+    var credito = $("#credito").val();
+    if(parseFloat(saldo) <= parseFloat(credito)){
+      var numerofilas = $("#numerofilas").val();
+      if(parseInt(numerofilas) > 0){
+        $('.page-loader-wrapper').css('display', 'block');
+        $.ajax({
+          headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+          url:facturas_guardar_modificacion,
+          type: "post",
+          dataType: "html",
+          data: formData,
+          cache: false,
+          contentType: false,
+          processData: false,
+          success:function(data){
+            msj_datosguardadoscorrectamente();
+            limpiar();
+            ocultarmodalformulario();
+            limpiarmodales();
+            $('.page-loader-wrapper').css('display', 'none'); 
+          },
+          error:function(data){
+            if(data.status == 403){
+              msj_errorenpermisos();
+            }else{
+              msj_errorajax();
+            }
+            $('.page-loader-wrapper').css('display', 'none');
           }
-          $('.page-loader-wrapper').css('display', 'none');
-        }
-      })
+        })
+      }else{
+        msj_erroralmenosunaentrada();
+      }
     }else{
-      msj_erroralmenosunaentrada();
+        msj_creditoexcedido();
     }
   }else{
     msjfaltandatosporcapturar();
@@ -3664,7 +3690,8 @@ $("#btnbaja").on('click', function(e){
 });
 //fin bajas
 //obtener datos para el envio del documento por email
-function enviardocumentoemail(documento){
+function enviardocumentoemail(documento, tipo){
+  tipoformatopdf = tipo;
   $.get(facturas_obtener_datos_envio_email,{documento:documento}, function(data){
     $("#textomodalenviarpdfemail").html("Enviar email Factura No." + documento);
     $("#emaildocumento").val(documento);
@@ -3685,11 +3712,16 @@ $("#btnenviarpdfemail").on('click', function (e) {
   e.preventDefault();
   var formData = new FormData($("#formenviarpdfemail")[0]);
   var form = $("#formenviarpdfemail");
+  if(tipoformatopdf == 1){
+    var urlenviarpdf = facturas_enviar_pdfs_email;
+  }else{
+    var urlenviarpdf = facturas_enviar_pdfs_clientes_email;
+  }
   if (form.parsley().isValid()){
     $('.page-loader-wrapper').css('display', 'block');
     $.ajax({
       headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-      url:facturas_enviar_pdfs_email,
+      url:urlenviarpdf,
       type: "post",
       dataType: "html",
       data: formData,

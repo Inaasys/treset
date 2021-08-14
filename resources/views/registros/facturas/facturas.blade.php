@@ -255,6 +255,7 @@
         var facturas_obtener_claves_productos = '{!!URL::to('facturas_obtener_claves_productos')!!}';
         var facturas_obtener_claves_unidades = '{!!URL::to('facturas_obtener_claves_unidades')!!}';
         var facturas_cargar_xml_uuid_relacionado = '{!!URL::to('facturas_cargar_xml_uuid_relacionado')!!}';
+        var facturas_obtener_nuevo_saldo_cliente = '{!!URL::to('facturas_obtener_nuevo_saldo_cliente')!!}';
         var facturas_guardar = '{!!URL::to('facturas_guardar')!!}';
         var facturas_obtener_factura = '{!!URL::to('facturas_obtener_factura')!!}';
         var facturas_guardar_modificacion = '{!!URL::to('facturas_guardar_modificacion')!!}';
@@ -262,6 +263,7 @@
         var facturas_alta_o_baja = '{!!URL::to('facturas_alta_o_baja')!!}'; 
         var facturas_obtener_datos_envio_email = '{!!URL::to('facturas_obtener_datos_envio_email')!!}';
         var facturas_enviar_pdfs_email = '{!!URL::to('facturas_enviar_pdfs_email')!!}';
+        var facturas_enviar_pdfs_clientes_email = '{!!URL::to('facturas_enviar_pdfs_clientes_email')!!}';
         var facturas_buscar_folio_string_like = '{!!URL::to('facturas_buscar_folio_string_like')!!}'; 
         var facturas_verificar_si_continua_timbrado = '{!!URL::to('facturas_verificar_si_continua_timbrado')!!}'; 
         var facturas_timbrar_factura = '{!!URL::to('facturas_timbrar_factura')!!}'; 

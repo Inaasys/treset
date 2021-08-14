@@ -20,6 +20,7 @@ use App\Personal;
 use App\CuentaXPagar;
 use App\CuentaXPagarDetalle;
 use App\OrdenCompraDetalle;
+use App\Proveedor;
 use Mail;
 use ColorPalette;
 use App\Configuracion_Tabla;
@@ -384,6 +385,32 @@ class PruebaController extends ConfiguracionSistemaController{
             'tercerordenamiento'=>'omitir',
             'formatercerordenamiento'=>'DESC',
             'campos_busquedas'=>'Cotizacion,Status,NombreCliente'
+        ]);
+    }
+
+    public function modificar_valores_en_bd_para_actualizacion_rama20210731correciones(){
+        //tabla Proveedores
+        Proveedor::where('Numero', '>', 0)
+        ->update([
+            'SolicitarXML'=>'1',
+        ]);
+        //Configuracion Tabla Produccion        
+        Configuracion_Tabla::where('tabla', 'Produccion')
+        ->update([
+            'primerordenamiento'=>'Folio',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'omitir',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'omitir',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'Produccion,Status'
+        ]);
+        //Configuracion columnas tabla produccion       
+        Configuracion_Tabla::where('tabla', 'Produccion')
+        ->update([
+            'campos_activados'=>'Produccion,Serie,Folio,Fecha,Codigo,Cliente,Almacen,Cantidad,Costo,Total,Obs,Status,Producido,Motivo de Baja,Usuario,Periodo',
+            'campos_desactivados'=>'Equipo',
+            'columnas_ordenadas'=>'Produccion,Serie,Folio,Fecha,Codigo,Cliente,Almacen,Cantidad,Costo,Total,Obs,Status,Producido,Motivo de Baja,Usuario,Periodo',
         ]);
     }
 

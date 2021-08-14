@@ -25,7 +25,16 @@
             </li>  
             <!--<li><a href="#" id="menuregistrospedidos">Pedidos</a></li>-->
             <li><a href="{{ route('remisiones') }}" id="menuregistrosremisiones">Remisiones</a></li>
-            <li><a href="{{ route('facturas') }}" id="menuregistrosfacturas">Facturas</a></li>                         
+            <li><a href="{{ route('facturas') }}" id="menuregistrosfacturas">Facturas</a></li>         
+            
+            <li class="dropdown-submenu">
+              <a class="test" href="#">Producción <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a  href="{{ route('produccion') }}" id="menuregistrosproduccion">Producción</a></li>
+              </ul>
+            </li> 
+            <li><a href="{{ route('requisiciones') }}" id="menuregistrosrequisiciones">Requisiciones</a></li> 
+
             <li><a href="{{ route('traspasos') }}" id="menuregistrostraspasos">Traspasos</a></li>                    
             <li><a href="{{ route('ordenes_trabajo') }}" id="menuregistrosordenestrabajo">Ordenes de Trabajo</a></li>
             <li><a href="{{ route('cuentas_por_pagar') }}" id="menuregistroscuentasxpagar">Cuentas por Pagar</a></li>

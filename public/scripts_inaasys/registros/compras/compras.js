@@ -281,7 +281,7 @@ function obtenerproveedores(){
     }); 
 } 
 //obtener datos del proveedor
-function seleccionarproveedor(Numero, Nombre, Plazo, Rfc){
+function seleccionarproveedor(Numero, Nombre, Plazo, Rfc, SolicitarXML){
   var numeroproveedoranterior = $("#numeroproveedoranterior").val();
   var numeroproveedor = Numero;
   if(numeroproveedoranterior != numeroproveedor){
@@ -296,9 +296,17 @@ function seleccionarproveedor(Numero, Nombre, Plazo, Rfc){
       $("#numeroproveedor").val(Numero);
       $("#numeroproveedoranterior").val(Numero);
       $("#proveedor").val(Nombre);
-      $("#emisornombredb").val(Nombre);
-      $("#emisorrfcdb").val(Rfc);
+      if(parseInt(SolicitarXML) == 1){
+        $("#emisornombredb").val(Nombre);
+        $("#emisorrfcdb").val(Rfc);
+      }else{
+        $("#emisornombredb").val(Nombre);
+        $("#emisorrfcdb").val(Rfc);
+        $("#emisornombre").val(Nombre);
+        $("#emisorrfc").val(Rfc);
+      }
       $("#plazo").val(Plazo);
+      $("#solicitarxml").val(SolicitarXML);
       if(Nombre != null){
         $("#textonombreproveedor").html(Nombre.substring(0, 40));
       }
@@ -707,6 +715,15 @@ function seleccionarordencompra(Folio, Orden, tipoalta){
     $("#subtotal").val(data.subtotal);
     $("#iva").val(data.iva);
     $("#total").val(data.total);
+    var solicitarxml = $("#solicitarxml").val();
+    if(solicitarxml == 0){
+      $("#importexml").val(data.importe);
+      $("#descuentoxml").val(data.descuento);
+      $("#subtotalxml").val(data.subtotal);
+      $("#ivaxml").val(data.iva);
+      $("#totalxml").val(data.total);
+      $("#fechaemitida").val(data.fecha);
+    }    
     //detalles
     $("#arraycodigosdetallesordencompra").val(data.arraycodigosdetallesordencompra);
     $("#numerofilas").val(data.numerodetallesordencompra);
@@ -734,61 +751,75 @@ $("#btnenviarxml").on('click', function(e){
   var xml = $('#xml')[0].files[0];
   var form_data = new FormData();
   form_data.append('xml', xml);  
-      $.ajax({
-          headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-          url:compras_cargar_xml_alta,
-          data: form_data,
-          type: 'POST',
-          contentType: false,
-          processData: false,
-          success: function (data) {
-            if(data.array_comprobante.Descuento == null){
-              var importexml = data.array_comprobante.SubTotal[0];
-              var descuentoxml = '0.'+numerocerosconfigurados;
-              var subtotalxml = data.array_comprobante.SubTotal[0];
-              var ivaxml = data.TotalImpuestosTrasladados[0];
-              var totalxml = data.array_comprobante.Total[0];
-            }else{
-              var importexml = data.array_comprobante.SubTotal[0];
-              var descuentoxml = data.array_comprobante.Descuento[0]
-              var subtotalxml = new Decimal(importexml).minus(descuentoxml);
-              var ivaxml = data.TotalImpuestosTrasladados[0];
-              var totalxml = new Decimal(subtotalxml).plus(ivaxml);
-            }
-              $("#uuidxml").val(data.uuid[0]);
-              $("#uuid").val(data.uuid[0]);
-              $("#fechatimbrado").val(data.fechatimbrado[0]);
-              $("#emisorrfc").val(data.array_emisor.Rfc[0]);
-              $("#emisornombre").val(data.array_emisor.Nombre[0]);
-              $("#receptorrfcxml").val(data.array_receptor.Rfc[0]);
-              $("#receptornombrexml").val(data.array_receptor.Nombre[0]);
-              $("#factura").val(data.array_comprobante.Serie[0]+data.array_comprobante.Folio[0]);
-              $("#importexml").val(number_format(round(importexml, numerodecimales), numerodecimales, '.', ''));
-              $("#descuentoxml").val(number_format(round(descuentoxml, numerodecimales), numerodecimales, '.', ''));
-              $("#subtotalxml").val(number_format(round(subtotalxml, numerodecimales), numerodecimales, '.', ''));
-              $("#ivaxml").val(number_format(round(ivaxml, numerodecimales), numerodecimales, '.', ''));
-              $("#totalxml").val(number_format(round(totalxml, numerodecimales), numerodecimales, '.', ''));
-              $("#fechaemitida").val(data.array_comprobante.Fecha[0]);
-              //mostrar el total de la factura del proveedor
-              //$("#totalfacturaproveedor").html("Total factura proveedor : "+ truncar(totalxml.toFixed(parseInt(numerodecimales)), numerodecimales));
-              $("#totalfacturaproveedor").html("Total factura proveedor :"+ number_format(round(totalxml, numerodecimales), numerodecimales, '.', ''))
-              //detalles xml
-              /*$("#tablaproductoscompras tbody").html(data.filasdetallesxml);
-              calculartotal();*/
-              //validar si la fecha de la compra es igual a la fecha de la factura del proveedor
-              validarmescompra();
-              //mostrar boton de buscar proveedores
-              $("#btnobtenerproveedores").show();
-              //vaciar la fecha de la compra
-              $("#fecha").val("");
-              if($("#total").val() > 0){
-                calculartotal();
-              }
-          },
-          error: function (data) {
-              console.log(data);
-          }
-      });                      
+  $.ajax({
+    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+    url:compras_cargar_xml_alta,
+    data: form_data,
+    type: 'POST',
+    contentType: false,
+    processData: false,
+    success: function (data) {
+      if(data.array_comprobante.Descuento == null){
+        var importexml = data.array_comprobante.SubTotal[0];
+        var descuentoxml = '0.'+numerocerosconfigurados;
+        var subtotalxml = data.array_comprobante.SubTotal[0];
+        var ivaxml = data.TotalImpuestosTrasladados[0];
+        var totalxml = data.array_comprobante.Total[0];
+      }else{
+        var importexml = data.array_comprobante.SubTotal[0];
+        var descuentoxml = data.array_comprobante.Descuento[0]
+        var subtotalxml = new Decimal(importexml).minus(descuentoxml);
+        var ivaxml = data.TotalImpuestosTrasladados[0];
+        var totalxml = new Decimal(subtotalxml).plus(ivaxml);
+      }
+      if(data.uuid != null){
+        $("#uuidxml").val(data.uuid[0]);
+        $("#uuid").val(data.uuid[0]);
+      }
+      if(data.fechatimbrado != null){
+        $("#fechatimbrado").val(data.fechatimbrado[0]);
+      }
+      if(data.array_emisor.Rfc != null){
+        $("#emisorrfc").val(data.array_emisor.Rfc[0]);
+      }
+      if(data.array_emisor.Nombre != null){
+        $("#emisornombre").val(data.array_emisor.Nombre[0]);
+      }
+      if(data.array_receptor.Rfc != null){
+        $("#receptorrfcxml").val(data.array_receptor.Rfc[0]);
+      }
+      if(data.array_receptor.Nombre != null){
+        $("#receptornombrexml").val(data.array_receptor.Nombre[0]);
+      }
+      if(data.array_comprobante.Serie != null && data.array_comprobante.Folio != null){
+        $("#factura").val(data.array_comprobante.Serie[0]+data.array_comprobante.Folio[0]);
+      }
+      $("#importexml").val(number_format(round(importexml, numerodecimales), numerodecimales, '.', ''));
+      $("#descuentoxml").val(number_format(round(descuentoxml, numerodecimales), numerodecimales, '.', ''));
+      $("#subtotalxml").val(number_format(round(subtotalxml, numerodecimales), numerodecimales, '.', ''));
+      $("#ivaxml").val(number_format(round(ivaxml, numerodecimales), numerodecimales, '.', ''));
+      $("#totalxml").val(number_format(round(totalxml, numerodecimales), numerodecimales, '.', ''));
+      $("#fechaemitida").val(data.array_comprobante.Fecha[0]);
+      //mostrar el total de la factura del proveedor
+      //$("#totalfacturaproveedor").html("Total factura proveedor : "+ truncar(totalxml.toFixed(parseInt(numerodecimales)), numerodecimales));
+      $("#totalfacturaproveedor").html("Total factura proveedor :"+ number_format(round(totalxml, numerodecimales), numerodecimales, '.', ''))
+      //detalles xml
+      /*$("#tablaproductoscompras tbody").html(data.filasdetallesxml);
+      calculartotal();*/
+      //validar si la fecha de la compra es igual a la fecha de la factura del proveedor
+      validarmescompra();
+      //mostrar boton de buscar proveedores
+      $("#btnobtenerproveedores").show();
+      //vaciar la fecha de la compra
+      $("#fecha").val("");
+      if($("#total").val() > 0){
+        calculartotal();
+      }
+    },
+    error: function (data) {
+      console.log(data);
+    }
+  });                      
 });
 //detectar cuando en el input de buscar por codigo de producto el usuario presione la tecla enter, si es asi se realizara la busqueda con el codigo escrito
 $(document).ready(function(){
@@ -818,9 +849,17 @@ function obtenerproveedorpornumero(){
           $("#numeroproveedor").val(data.numero);
           $("#numeroproveedoranterior").val(data.numero);
           $("#proveedor").val(data.nombre);
-          $("#emisornombredb").val(data.nombre);
-          $("#emisorrfcdb").val(data.rfc);
+          if(parseInt(data.SolicitarXML) == 1){
+            $("#emisornombredb").val(data.nombre);
+            $("#emisorrfcdb").val(data.rfc);
+          }else{
+            $("#emisornombredb").val(data.nombre);
+            $("#emisorrfcdb").val(data.rfc);
+            $("#emisornombre").val(data.nombre);
+            $("#emisorrfc").val(data.rfc);
+          }
           $("#plazo").val(data.plazo);
+          $("#solicitarxml").val(data.SolicitarXML);
           if(data.nombre != null){
             $("#textonombreproveedor").html(data.nombre.substring(0, 40));
           }
@@ -1393,6 +1432,7 @@ function alta(tipoalta){
                                         '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
                                         '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
                                         '<input type="hidden" class="form-control" name="arraycodigosdetallesordencompra" id="arraycodigosdetallesordencompra" readonly>'+
+                                        '<input type="hidden" class="form-control" name="solicitarxml" id="solicitarxml" readonly>'+
                                     '</div>'+   
                                     '<div class="col-md-3">'+
                                         '<label>Plazo Días (proveedor)</label>'+

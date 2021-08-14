@@ -40,6 +40,7 @@ class Proveedor extends Model
         'DescuentosCascada',
         'Credito',
         'Saldo',
-        'Status'
+        'Status',
+        'SolicitarXML'
     ];
 }

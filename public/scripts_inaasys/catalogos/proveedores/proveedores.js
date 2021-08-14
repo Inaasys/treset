@@ -187,6 +187,14 @@ function alta(){
                             '<label>Plazo</label>'+
                             '<input type="number" class="form-control" name="plazo" id="plazo" required>'+
                         '</div>'+
+                        '<div class="col-md-4">'+
+                          '<label class="col-red">Solicitar xml´s en compras</label>'+
+                          '<div class="col-md-12 form-check">'+ 
+                              '<input type="hidden" name="solicitarxmlencompras" value="0" />'+
+                              '<input type="checkbox" name="solicitarxmlencompras" id="idsolicitarxmlencompras" class="filled-in" value="1" checked/>'+
+                              '<label for="idsolicitarxmlencompras">Marcar</label>'+
+                          '</div>'+
+                        '</div>'+
                     '</div>'+   
                 '</div>'+
               '</div>';
@@ -317,6 +325,14 @@ function obtenerdatos(numeroproveedor){
                               '<label>Plazo</label>'+
                               '<input type="number" class="form-control" name="plazo" id="plazo" required>'+
                             '</div>'+
+                            '<div class="col-md-4">'+
+                              '<label class="col-red">Solicitar xml´s en compras</label>'+
+                              '<div class="col-md-12 form-check">'+ 
+                                  '<input type="hidden" name="solicitarxmlencompras" value="0" />'+
+                                  '<input type="checkbox" name="solicitarxmlencompras" id="idsolicitarxmlencompras" class="filled-in" value="1"/>'+
+                                  '<label for="idsolicitarxmlencompras">Marcar</label>'+
+                              '</div>'+
+                            '</div>'+
                         '</div>'+   
                     '</div>'+
                 '</div>';
@@ -329,6 +345,9 @@ function obtenerdatos(numeroproveedor){
     $("#email1").val(data.proveedor.Email1);
     $("#plazo").val(data.proveedor.Plazo);
     $("#telefonos").val(data.proveedor.Telefonos);
+    if(data.proveedor.SolicitarXML == 1){
+      $("input[name='solicitarxmlencompras']").prop('checked', true);
+    }
     mostrarmodalformulario('MODIFICACION');
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {

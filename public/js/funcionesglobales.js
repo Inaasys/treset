@@ -631,6 +631,14 @@ function msjnoseencontroningunproducto(){
         "extendedTImeout": "6000"
     });  
 }
+//mensaje credito de cliente excedido
+function msj_creditoexcedido(){
+    toastr.error( "Aviso, crédito del cliente excedido", "Mensaje", {
+        "timeOut": "6000",
+        "progressBar": true,
+        "extendedTImeout": "6000"
+    });   
+}
 //|||||MENSAJES API FACTURAPI |||||||
 //mensaje factura timbrada correctamente
 function msj_documentotimbradocorrectamente(mensaje, tipomensaje){
