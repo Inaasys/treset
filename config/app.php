@@ -137,6 +137,7 @@ return [
     'keyapicurrencylayer' => '6e2993559ed8ce04ef56d47f792e5a52',
     //API KEY FACTURAPI
     'keyfacturapi' => env('KEY_FACTURAPI'),
+    'keygeneralfacturapi' => env('KEY_GENERAL_FACTURAPI'),
     'periodoincialmodulos' => '', //aqui se asigna el periodo inicial de los select de los modulos
     'numerodedecimales' => '', //aqui se asignan el numero de decimales que se utilizaran en todas las cantidades utilizadas en el sistema
     'numerodecimalesendocumentos' => '', //numero de decimales que se ocuparan en documentos PDF

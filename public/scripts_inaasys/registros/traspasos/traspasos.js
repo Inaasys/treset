@@ -48,8 +48,12 @@ function mostrarbuscadorcodigoproducto(){
   var orden = $("#orden").val();
   if(almacen != "" && (almacenforaneo != "" || orden != "")){
     $("#divbuscarcodigoproducto").show();
+    $("#divlistarrequisiciones").show();
+    $("#divlistarcotizaciones").show();
   }else{
     $("#divbuscarcodigoproducto").hide();
+    $("#divlistarrequisiciones").hide();
+    $("#divlistarcotizaciones").hide();
   }
 }
 //mostrar modal formulario
@@ -354,6 +358,9 @@ function seleccionaralmacenforaneo(Numero, Nombre){
   var numeroalmacenaanterior = $("#numeroalmacenaanterior").val();
   var numeroalmacena = Numero;
   if(numeroalmacenaanterior != numeroalmacena){
+    //colocar requisicion y cotizacion en vacio
+    $("#requisicion").val("");
+    $("#cotizacion").val("");
     //colocar datos y required a los datos del almacen
     $("#numeroalmacena").val(Numero).attr('required', 'required');
     $("#numeroalmacenaanterior").val(Numero).attr('required', 'required');
@@ -451,6 +458,9 @@ function seleccionarordentrabajo(Orden, Fecha, Cliente, Tipo, Unidad, StatusOrde
   var ordenanterior = $("#ordenanterior").val();
   var orden = Orden;
   if(ordenanterior != orden){
+    //colocar requisicion y cotizacion en vacio
+    $("#requisicion").val("");
+    $("#cotizacion").val("");
     //colocar datos de orden y required
     $("#orden").val(Orden).attr('required', 'required');
     $("#ordenanterior").val(Orden).attr('required', 'required');
@@ -514,6 +524,9 @@ function obteneralmacenapornumero(){
     if($("#numeroalmacena").parsley().isValid()){
       var numeroalmacende = $("#numeroalmacende").val();
       $.get(traspasos_obtener_almacen_a_por_numero, {numeroalmacena:numeroalmacena,numeroalmacende:numeroalmacende}, function(data){
+        //colocar requisicion y cotizacion en vacio
+        $("#requisicion").val("");
+        $("#cotizacion").val("");
         //colocar datos y required a los datos del almacen
         $("#numeroalmacena").val(data.numero).attr('required', 'required');
         $("#numeroalmacenaanterior").val(data.numero).attr('required', 'required');
@@ -555,6 +568,9 @@ function obtenerordenporfolio(){
     if($("#orden").parsley().isValid()){
       var orden = $("#orden").val();
       $.get(traspasos_obtener_orden_trabajo_por_folio, {orden:orden}, function(data){
+        //colocar requisicion y cotizacion en vacio
+        $("#requisicion").val("");
+        $("#cotizacion").val("");
         //colocar datos de orden y required
         $("#orden").val(data.orden).attr('required', 'required');
         $("#ordenanterior").val(data.orden).attr('required', 'required');
@@ -588,6 +604,193 @@ function regresarfolioorden(){
   var ordenanterior = $("#ordenanterior").val();
   $("#orden").val(ordenanterior);
 }
+//listar todas las cotizaciones
+function listarcotizaciones (){
+  ocultarformulario();
+  var tablacotizaciones = '<div class="modal-header '+background_forms_and_modals+'">'+
+                              '<h4 class="modal-title">Cotizaciones</h4>'+
+                          '</div>'+
+                          '<div class="modal-body">'+
+                              '<div class="row">'+
+                                  '<div class="col-md-12">'+
+                                      '<div class="table-responsive">'+
+                                          '<table id="tbllistadocotizacion" class="tbllistadocotizacion table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                              '<thead class="'+background_tables+'">'+
+                                                  '<tr>'+
+                                                      '<th>Operaciones</th>'+
+                                                      '<th>Cotización</th>'+
+                                                      '<th>Fecha</th>'+
+                                                      '<th>Cliente</th>'+
+                                                      '<th>Nombre</th>'+
+                                                      '<th>Unidad</th>'+
+                                                      '<th>Total</th>'+
+                                                  '</tr>'+
+                                              '</thead>'+
+                                              '<tbody></tbody>'+
+                                          '</table>'+
+                                      '</div>'+
+                                  '</div>'+   
+                              '</div>'+
+                          '</div>'+
+                          '<div class="modal-footer">'+
+                              '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                          '</div>';
+  $("#contenidomodaltablas").html(tablacotizaciones);
+  $('#tbllistadocotizacion').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
+      "sScrollX": "110%",
+      "sScrollY": "370px",
+      "bScrollCollapse": true,  
+      processing: true,
+      'language': {
+          'loadingRecords': '&nbsp;',
+          'processing': '<div class="spinner"></div>'
+      },
+      serverSide: true,
+      ajax: {
+          url: traspasos_obtener_cotizaciones,
+          data: function (d) {
+              d.numerocliente = $("#numeroclientefacturaa").val();
+          }
+      },
+      columns: [
+        { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+        { data: 'Cotizacion', name: 'Cotizacion' },
+        { data: 'Fecha', name: 'Fecha' },
+        { data: 'Cliente', name: 'Cliente', orderable: false, searchable: false },
+        { data: 'Nombre', name: 'Nombre', orderable: false, searchable: false },
+        { data: 'Unidad', name: 'Unidad', orderable: false, searchable: false },
+        { data: 'Total', name: 'Total', orderable: false, searchable: false }
+      ],
+      "initComplete": function() {
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                  $('#tbllistadocotizacion').DataTable().search( this.value ).draw();
+              }
+          });
+      },
+  });  
+} 
+//obtener todos los datos de la cotizacion seleccionada
+function seleccionarcotizacion(Folio, Cotizacion){
+  $('.page-loader-wrapper').css('display', 'block');
+  $("#tablaproductostraspasos tbody").html("");
+  var numeroalmacende = $("#numeroalmacende").val();
+  $.get(traspasos_obtener_cotizacion, {Folio:Folio, Cotizacion:Cotizacion, numeroalmacende:numeroalmacende}, function(data){
+      $("#cotizacion").val(Cotizacion);
+      $("#requisicion").val("");
+      $("#observaciones").val(data.cotizacion.Obs);
+      $("#tablaproductostraspasos tbody").html(data.filasdetallescotizacion);
+      $("#importe").val(data.importe);
+      $("#descuento").val(data.descuento);
+      $("#subtotal").val(data.subtotal);
+      $("#iva").val(data.iva);
+      $("#total").val(data.total);  
+      //detalles
+      $("#numerofilas").val(data.numerodetallescotizacion);
+      //colocar valores a contadores
+      contadorproductos = data.contadorproductos;
+      contadorfilas = data.contadorfilas;
+      totalesfilas();
+      mostrarformulario();
+      $('.page-loader-wrapper').css('display', 'none');
+  })  
+}
+//listar todas las requisiciones
+function listarrequisiciones(){
+  ocultarformulario();
+  var tablarequisiciones ='<div class="modal-header '+background_forms_and_modals+'">'+
+                              '<h4 class="modal-title">Requisiciones</h4>'+
+                          '</div>'+
+                          '<div class="modal-body">'+
+                              '<div class="row">'+
+                                  '<div class="col-md-12">'+
+                                      '<div class="table-responsive">'+
+                                          '<table id="tbllistadorequisicion" class="tbllistadorequisicion table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                              '<thead class="'+background_tables+'">'+
+                                                  '<tr>'+
+                                                      '<th>Operaciones</th>'+
+                                                      '<th>Requisicion</th>'+
+                                                      '<th>Fecha</th>'+
+                                                      '<th>Orden</th>'+
+                                                      '<th>Obs</th>'+
+                                                  '</tr>'+
+                                              '</thead>'+
+                                              '<tbody></tbody>'+
+                                          '</table>'+
+                                      '</div>'+
+                                  '</div>'+   
+                              '</div>'+
+                          '</div>'+
+                          '<div class="modal-footer">'+
+                              '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                          '</div>';
+  $("#contenidomodaltablas").html(tablarequisiciones);
+  $('#tbllistadorequisicion').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
+      "sScrollX": "110%",
+      "sScrollY": "370px",
+      "bScrollCollapse": true,  
+      processing: true,
+      'language': {
+          'loadingRecords': '&nbsp;',
+          'processing': '<div class="spinner"></div>'
+      },
+      serverSide: true,
+      ajax: {
+          url: traspasos_obtener_requisiciones,
+          data: function (d) {
+              d.numerocliente = $("#numeroclientefacturaa").val();
+          }
+      },
+      columns: [
+        { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+        { data: 'Requisicion', name: 'Requisicion' },
+        { data: 'Fecha', name: 'Fecha' },
+        { data: 'Orden', name: 'Orden', orderable: false, searchable: false },
+        { data: 'Obs', name: 'Obs', orderable: false, searchable: false }
+      ],
+      "initComplete": function() {
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                  $('#tbllistadorequisicion').DataTable().search( this.value ).draw();
+              }
+          });
+      },
+  });  
+} 
+//obtener todos los datos de la requisicion seleccionada
+function seleccionarrequisicion(Folio, Requisicion){
+  $('.page-loader-wrapper').css('display', 'block');
+  $("#tablaproductostraspasos tbody").html("");
+  var numeroalmacende = $("#numeroalmacende").val();
+  $.get(traspasos_obtener_requisicion, {Folio:Folio, Requisicion:Requisicion, numeroalmacende:numeroalmacende}, function(data){
+      $("#requisicion").val(Requisicion);
+      $("#cotizacion").val("");
+      $("#observaciones").val(data.requisicion.Obs);
+      $("#tablaproductostraspasos tbody").html(data.filasdetallesrequisicion);
+      $("#importe").val(data.importe);
+      $("#descuento").val(data.descuento);
+      $("#subtotal").val(data.subtotal);
+      $("#iva").val(data.iva);
+      $("#total").val(data.total);  
+      //detalles
+      $("#numerofilas").val(data.numerodetallesrequisicion);
+      //colocar valores a contadores
+      contadorproductos = data.contadorproductos;
+      contadorfilas = data.contadorfilas;
+      totalesfilas();
+      mostrarformulario();
+      $('.page-loader-wrapper').css('display', 'none');
+  })  
+}
+
 //listar productos para tab consumos
 function listarproductos(){
     ocultarformulario();
@@ -668,7 +871,8 @@ function listarproductos(){
 function obtenerproductoporcodigo(){
   var codigoabuscar = $("#codigoabuscar").val();
   var tipooperacion = $("#tipooperacion").val();
-  $.get(traspasos_obtener_producto_por_codigo,{codigoabuscar:codigoabuscar}, function(data){
+  var numeroalmacende = $("#numeroalmacende").val();
+  $.get(traspasos_obtener_producto_por_codigo,{codigoabuscar:codigoabuscar,numeroalmacende:numeroalmacende}, function(data){
     if(parseInt(data.contarproductos) > 0){
       agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, data.SubTotal, data.Existencias, tipooperacion);
     }else{
@@ -699,6 +903,46 @@ function evaluarproductoexistente(Codigo){
     }
     return result;
 }
+
+
+function totalesfilas(){
+  $("tr.filasproductos").each(function () { 
+      // obtener los datos de la fila:
+      var cantidadpartida = $(".cantidadpartida", this).val();
+      var preciopartida = $('.preciopartida', this).val();
+      var importepartida = $('.importepartida', this).val();
+      var descuentopesospartida = $('.descuentopesospartida', this).val();
+      var subtotalpartida = $('.subtotalpartida', this).val();
+      var ivaporcentajepartida = $('.ivaporcentajepartida', this).val();
+      var ivapesospartida = $('.ivapesospartida', this).val();
+      var totalpesospartida = $('.totalpesospartida', this).val(); 
+      var utilidadpartida = $(".utilidadpartida", this).val();
+      var costopartida = $(".costopartida", this).val();
+      var costototalpartida = $(".costototalpartida ", this).val();
+      //importe de la partida
+      importepartida =  new Decimal(cantidadpartida).times(preciopartida);
+      $('.importepartida', this).val(number_format(round(importepartida, numerodecimales), numerodecimales, '.', ''));
+      //subtotal de la partida
+      subtotalpartida =  new Decimal(importepartida).minus(descuentopesospartida);
+      $('.subtotalpartida', this).val(number_format(round(subtotalpartida, numerodecimales), numerodecimales, '.', ''));
+      //iva en pesos de la partida
+      var multiplicacionivapesospartida = new Decimal(subtotalpartida).times(ivaporcentajepartida);
+      ivapesospartida = new Decimal(multiplicacionivapesospartida/100);
+      $('.ivapesospartida', this).val(number_format(round(ivapesospartida, numerodecimales), numerodecimales, '.', ''));
+      //total en pesos de la partida
+      totalpesospartida = new Decimal(subtotalpartida).plus(ivapesospartida);
+      $('.totalpesospartida', this).val(number_format(round(totalpesospartida, numerodecimales), numerodecimales, '.', ''));
+      //costo total
+      costototalpartida  = new Decimal(costopartida).times(cantidadpartida);
+      $('.costototalpartida', this).val(number_format(round(costototalpartida, numerodecimales), numerodecimales, '.', ''));
+      //utilidad de la partida
+      utilidadpartida = new Decimal(subtotalpartida).minus(costototalpartida);
+      $(".utilidadpartida", this).val(number_format(round(utilidadpartida, numerodecimales), numerodecimales, '.', ''));
+  });
+  calculartotal();
+
+}
+
 //calcular total de la orden de compra
 function calculartotalesfilas(fila){
   // for each por cada fila:
@@ -878,7 +1122,7 @@ function comprobarexistenciasenbdalmacenforaneo(fila, tipo, numeroalmacena, codi
 //agregar una fila en la tabla de precios productos
 var contadorproductos=0;
 var contadorfilas = 0;
-function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal, Existencias, tipooperacion){
+function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal, Existencias, CostoDeLista, tipooperacion){
   $('.page-loader-wrapper').css('display', 'block');
   var result = evaluarproductoexistente(Codigo);
   if(result == false){
@@ -914,7 +1158,12 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'+Costo+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="'+Costo+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-utilidad="0.'+numerocerosconfiguradosinputnumberstep+'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                          '<td class="tdmod"><input type="text" class="form-control divorinputmodxl observacionespartida" name="observacionespartida[]" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
+                          '<td class="tdmod"><input type="text" class="form-control divorinputmodsm requisicionpartida" name="requisicionpartida[]" readonly data-parsley-length="[1, 20]"></td>'+
+                          '<td class="tdmod"><input type="text" class="form-control divorinputmodsm cotizacionpartida" name="cotizacionpartida[]" readonly data-parsley-length="[1, 20]"></td>'+
                           '<td class="tdmod"><input type="text" class="form-control divorinputmodsm monedapartida" name="monedapartida[]" value="MXN" readonly data-parsley-length="[1, 3]"></td>'+
+                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costodelistapartida" name="costodelistapartida[]" value="'+number_format(round(CostoDeLista, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm tipodecambiopartida" name="tipodecambiopartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                   '</tr>';
       contadorproductos++;
       contadorfilas++;
@@ -1079,6 +1328,21 @@ function alta(){
                     '</table>'+
                   '</div>'+
                 '</div>'+
+                '<div class="row">'+
+
+                  '<div class="col-md-2" id="divlistarrequisiciones" hidden>'+
+                    '<label>Requisiciones</label>'+
+                    '<div class="btn btn-block bg-blue waves-effect" id="btnlistarrequisiciones" onclick="listarrequisiciones()">Ver Requisiciones</div>'+
+                    '<input type="hidden" class="form-control" name="requisicion" id="requisicion" readonly>'+
+                  '</div>'+ 
+                
+                  '<div class="col-md-2" id="divlistarcotizaciones" hidden>'+
+                    '<label>Cotizaciones</label>'+
+                    '<div class="btn btn-block bg-blue waves-effect" id="btnlistarcotizaciones" onclick="listarcotizaciones()">Ver Cotizaciones</div>'+
+                    '<input type="hidden" class="form-control" name="cotizacion" id="cotizacion" readonly>'+
+                  '</div>'+ 
+
+                '</div>'+
               '</div>'+    
               '<div class="col-md-12">'+
                 '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
@@ -1109,7 +1373,12 @@ function alta(){
                               '<th class="'+background_tables+'">Costo $</th>'+
                               '<th class="'+background_tables+'">Costo Total</th>'+
                               '<th class="bg-amber">Utilidad $</th>'+
+                              '<th class="customercolortheadth">Observaciones</th>'+
+                              '<th class="'+background_tables+'">Requisición</th>'+
+                              '<th class="'+background_tables+'">Cotización</th>'+
                               '<th class="'+background_tables+'">Moneda</th>'+
+                              '<th class="'+background_tables+'">Costo de Lista</th>'+
+                              '<th class="'+background_tables+'">Tipo de Cambio</th>'+
                             '</tr>'+
                           '</thead>'+
                           '<tbody>'+           
@@ -1483,7 +1752,12 @@ function obtenerdatos(traspasomodificar){
                               '<th class="'+background_tables+'">Costo $</th>'+
                               '<th class="'+background_tables+'">Costo Total</th>'+
                               '<th class="bg-amber">Utilidad $</th>'+
+                              '<th class="customercolortheadth">Observaciones</th>'+
+                              '<th class="'+background_tables+'">Requisición</th>'+
+                              '<th class="'+background_tables+'">Cotización</th>'+
                               '<th class="'+background_tables+'">Moneda</th>'+
+                              '<th class="'+background_tables+'">Costo de Lista</th>'+
+                              '<th class="'+background_tables+'">Tipo de Cambio</th>'+
                             '</tr>'+
                           '</thead>'+
                           '<tbody>'+           

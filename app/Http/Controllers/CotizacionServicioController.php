@@ -251,16 +251,16 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
         $color = '';
         $existevin = Vine::where('Vin', $request->vin)->where('Cliente', $request->numeroclientefacturaa)->where('Status', 'ALTA')->count();
         if($existevin > 0){
-            $vin = DB::table('Vines')->where('Vin', $request->vin)->where('Cliente', $request->numeroclientefacturaa)->where('Status', 'ALTA')->first();
-            $cliente = $vin->Cliente;
-            $economico = $vin->Economico;
-            $vin = $vin->Vin;
-            $placas = $vin->Placas;
-            $motor = $vin->Motor;
-            $marca = $vin->Marca;
-            $modelo = $vin->Modelo;
-            $año = $vin->Año;
-            $color = $vin->Color;
+            $v = DB::table('Vines')->where('Vin', $request->vin)->where('Cliente', $request->numeroclientefacturaa)->where('Status', 'ALTA')->first();
+            $cliente = $v->Cliente;
+            $economico = $v->Economico;
+            $vin = $v->Vin;
+            $placas = $v->Placas;
+            $motor = $v->Motor;
+            $marca = $v->Marca;
+            $modelo = $v->Modelo;
+            $año = $v->Año;
+            $color = $v->Color;
         }
         $data = array(
             'cliente' => $cliente,
@@ -631,7 +631,7 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dc->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dc->Codigo.'" readonly data-parsley-length="[1, 20]">'.$dc->Codigo.'</td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.$dc->Descripcion.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.htmlspecialchars($dc->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$dc->Unidad.'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'.$dc->Unidad.'</td>'.
                     '<td class="tdmod">'.
                         '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Cantidad).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodecantidadpartida('.$contadorfilas.',\''.$tipo.'\');">'.
@@ -692,7 +692,7 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
                 '<tr class="filasservicios" id="filaservicio'.$contadorservicios.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilaservicio('.$contadorservicios.')">X</div><input type="hidden" class="form-control itempartidaservicio" name="itempartidaservicio[]" value="'.$dsc->Item.'" readonly><input type="hidden" class="form-control agregadoenservicio" name="agregadoenservicio[]" value="NA" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control codigoserviciopartida" name="codigoserviciopartida[]" value="'.$dsc->Codigo.'" readonly data-parsley-length="[1, 20]">'.$dsc->Codigo.'</td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionserviciopartida" name="descripcionserviciopartida[]" value="'.$dsc->Descripcion.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionserviciopartida" name="descripcionserviciopartida[]" value="'.htmlspecialchars($dsc->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadserviciopartida" name="unidadserviciopartida[]" value="'.$dsc->Unidad.'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'.$dsc->Unidad.'</td>'.
                     '<td class="tdmod">'.
                         '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartidaservicio" name="cantidadpartidaservicio[]" value="'.Helpers::convertirvalorcorrecto($dsc->Cantidad).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasservicios('.$contadorfilasservicios.');cambiodecantidadpartidaservicio('.$contadorfilasservicios.',\''.$tipo .'\');">'.

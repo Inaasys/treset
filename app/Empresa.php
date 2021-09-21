@@ -125,6 +125,7 @@ class Empresa extends Model
         'Logo',
         'background_navbar',
         'background_forms_and_modals',
-        'background_tables'
+        'background_tables',
+        'IdFacturapi'
     ];
 }

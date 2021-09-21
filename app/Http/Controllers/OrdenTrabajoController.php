@@ -295,18 +295,16 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         $color = '';
         $existevin = Vine::where('Vin', $request->vin)->where('Cliente', $request->numeroclientefacturaa)->where('Status', 'ALTA')->count();
         if($existevin > 0){
-            $vin = DB::table('Vines')->where('Vin', $request->vin)->where('Cliente', $request->numeroclientefacturaa)->where('Status', 'ALTA')->first();
-            //dd($vin);
-
-            $cliente = $vin->Cliente;
-            $economico = $vin->Economico;
-            $vin = $vin->Vin;
-            $placas = $vin->Placas;
-            $motor = $vin->Motor;
-            $marca = $vin->Marca;
-            $modelo = $vin->Modelo;
-            $año = $vin->Año;
-            $color = $vin->Color;
+            $v = DB::table('Vines')->where('Vin', $request->vin)->where('Cliente', $request->numeroclientefacturaa)->where('Status', 'ALTA')->first();
+            $cliente = $v->Cliente;
+            $economico = $v->Economico;
+            $vin = $v->Vin;
+            $placas = $v->Placas;
+            $motor = $v->Motor;
+            $marca = $v->Marca;
+            $modelo = $v->Modelo;
+            $año = $v->Año;
+            $color = $v->Color;
         }
         $data = array(
             'cliente' => $cliente,
@@ -368,7 +366,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                         '</div>'.
                     '</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control tipofila" name="tipofila[]" value="agregado" readonly><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dc->Codigo.'" readonly data-parsley-length="[1, 20]">'.$dc->Codigo.'</td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.$dc->Descripcion.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($dc->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadpartidad" name="unidadpartidad[]" value="'.$dc->Unidad.'" readonly data-parsley-length="[1, 5]">'.$dc->Unidad.'</td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordentrabajo('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Precio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordentrabajo('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
@@ -711,7 +709,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     '<input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dot->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly>'.
                     '</div></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control tipofila" name="tipofila[]" value="consultado" readonly><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dot->Codigo.'" readonly data-parsley-length="[1, 20]">'.$dot->Codigo.'</td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.$dot->Descripcion.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($dot->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadpartidad" name="unidadpartidad[]" value="'.$dot->Unidad.'" readonly data-parsley-length="[1, 5]">'.$dot->Unidad.'</td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dot->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordentrabajo('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');" '.$readonly.'></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($dot->Precio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordentrabajo('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');" '.$readonlyprecio.'></td>'.

@@ -481,7 +481,7 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dc->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dc->Codigo.'" readonly data-parsley-length="[1, 20]">'.$dc->Codigo.'</td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.$dc->Descripcion.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.htmlspecialchars($dc->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$dc->Unidad.'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'.$dc->Unidad.'</td>'.
                     '<td class="tdmod">'.
                         '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Cantidad).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodecantidadpartida('.$contadorfilas.',\''.$tipo.'\');">'.
@@ -622,9 +622,14 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
         //INGRESAR DATOS A TABLA DETALLES
         foreach ($request->codigoproductopartida as $key => $codigoproductopartida){    
             //if la partida se agrego en la modificacion se agrega en los detalles del documento
-            if($request->agregadoen [$key] == 'modificacion'){
-                $item = CotizacionProductoDetalle::select('Item')->where('Cotizacion', $cotizacion)->orderBy('Item', 'DESC')->take(1)->get();
-                $ultimoitem = $item[0]->Item+1;
+            if($request->agregadoen [$key] == 'modificacion'){      
+                $contaritems = CotizacionProductoDetalle::select('Item')->where('Cotizacion', $cotizacion)->count();
+                if($contaritems > 0){
+                    $item = CotizacionProductoDetalle::select('Item')->where('Cotizacion', $cotizacion)->orderBy('Item', 'DESC')->take(1)->get();
+                    $ultimoitem = $item[0]->Item+1;
+                }else{
+                    $ultimoitem = 1;
+                }
                 $CotizacionProductoDetalle=new CotizacionProductoDetalle;
                 $CotizacionProductoDetalle->Cotizacion = $cotizacion;
                 $CotizacionProductoDetalle->Fecha = Carbon::parse($request->fecha)->toDateTimeString();

@@ -125,7 +125,7 @@
                     <input type="hidden" id="notadesactivar" name="notadesactivar">
                     <div id="divmotivobaja">
                         <label>Motivo Baja</label>
-                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></textarea>
+                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 required data-parsley-length="[1, 200]" onkeyup="tipoLetra(this)"></textarea>
                     </div>
 		        </form>	
       		</div>

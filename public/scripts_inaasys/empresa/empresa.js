@@ -632,4 +632,43 @@ $("#btnguardarlogotipo").on('click', function (e) {
     form.parsley().validate();
 });
 
+
+//guardar modificacion logo y temas
+$("#btnguardarregistroempresafacturapi").on('click', function (e) {
+  e.preventDefault();
+  //var formData = new FormData($("#formlogotipo")[0]);
+  var form = $("#formregistroempresafacturapi");
+  if (form.parsley().isValid()){
+      var formData = new FormData($("#formregistroempresafacturapi")[0]);
+      $('.page-loader-wrapper').css('display', 'block');
+      $.ajax({
+        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+        url:empresa_guardar_registro_empresa_facturapi,
+        type: "post",
+        dataType: "html",
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success:function(data){
+          console.log(data);
+          msj_datosguardadoscorrectamente();
+          $('.page-loader-wrapper').css('display', 'none');
+        },
+        error:function(data){
+          if(data.status == 403){
+            msj_errorenpermisos();
+          }else{
+            msj_errorajax();
+          }
+          $('.page-loader-wrapper').css('display', 'none');
+        }
+      })
+  }else{
+    msjfaltandatosporcapturar();
+  }
+  //validar formulario
+  form.parsley().validate();
+});
+
 init();

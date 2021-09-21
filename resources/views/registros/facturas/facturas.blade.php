@@ -127,7 +127,7 @@
                     <input type="hidden" class="form-control" id="facturadesactivar" name="facturadesactivar" readonly>
                     <div id="divmotivobaja">
                         <label>Motivo Baja</label>
-                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required data-parsley-length="[1, 255]"></textarea>
+                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required data-parsley-length="[1, 200]"></textarea>
                     </div>
 		        </form>	
       		</div>
@@ -179,6 +179,62 @@
     	</div>
   	</div>
 </div>
+
+
+    <!-- Modal Movimientos-->
+    <div class="modal fade" data-keyboard="false" id="modalmovimientos" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header {{$empresa->background_forms_and_modals}}">
+                    <h5 class="modal-title" >
+                        <div class="row">
+                            <div class="col-xs-10 col-sm-10 col-md-11">
+                                <label id="titulomodalmovimientos"></label>
+                            </div>
+                            <div class="col-xs-2 col-sm-2 col-md-1">
+                                <button type="button" class="btn btn-link waves-effect" data-dismiss="modal">Cerrar</button>
+                            </div>
+                        </div>
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row ">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label >Factura</label>
+                                    <input type="text" name="facturakardex" id="facturakardex" class="form-control divorinputmodmd" autocomplete="off" onkeyup="tipoLetra(this);">
+                                </div>
+                                <div class="col-md-6">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="table-responsive cabecerafija" style="height: 450px;overflow-y: scroll;padding: 0px 0px;">
+                                <table class="table table-bordered table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <td class="{{$empresa->background_tables}}">#</td>
+                                            <td class="{{$empresa->background_tables}}">Movimiento</td>
+                                            <td class="{{$empresa->background_tables}}">Número</td>
+                                            <td class="{{$empresa->background_tables}}">Fecha</td>
+                                            <td class="{{$empresa->background_tables}}">Abono</td>
+                                            <td class="{{$empresa->background_tables}}">Status</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="filasmovimientos"></tbody>
+                                </table> 
+                            </div>
+                        </div>
+                    </div>    	
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div> 
 <!-- modal para crear documento en PDF-->
 @include('secciones.modalcreardocumento')
 <!-- fin modal para crear documento en PDF-->
@@ -259,6 +315,7 @@
         var facturas_guardar = '{!!URL::to('facturas_guardar')!!}';
         var facturas_obtener_factura = '{!!URL::to('facturas_obtener_factura')!!}';
         var facturas_guardar_modificacion = '{!!URL::to('facturas_guardar_modificacion')!!}';
+        var facturas_obtener_kardex = '{!!URL::to('facturas_obtener_kardex')!!}';
         var facturas_verificar_si_continua_baja = '{!!URL::to('facturas_verificar_si_continua_baja')!!}';
         var facturas_alta_o_baja = '{!!URL::to('facturas_alta_o_baja')!!}'; 
         var facturas_obtener_datos_envio_email = '{!!URL::to('facturas_obtener_datos_envio_email')!!}';

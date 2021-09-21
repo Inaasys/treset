@@ -408,9 +408,31 @@ class PruebaController extends ConfiguracionSistemaController{
         //Configuracion columnas tabla produccion       
         Configuracion_Tabla::where('tabla', 'Produccion')
         ->update([
-            'campos_activados'=>'Produccion,Serie,Folio,Fecha,Codigo,Cliente,Almacen,Cantidad,Costo,Total,Obs,Status,Producido,Motivo de Baja,Usuario,Periodo',
+            'campos_activados'=>'Produccion,Serie,Folio,Fecha,Codigo,Cliente,Almacen,Cantidad,Costo,Total,Obs,Status,Producido,MotivoDeBaja,Usuario,Periodo',
             'campos_desactivados'=>'Equipo',
-            'columnas_ordenadas'=>'Produccion,Serie,Folio,Fecha,Codigo,Cliente,Almacen,Cantidad,Costo,Total,Obs,Status,Producido,Motivo de Baja,Usuario,Periodo',
+            'columnas_ordenadas'=>'Produccion,Serie,Folio,Fecha,Codigo,Cliente,Almacen,Cantidad,Costo,Total,Obs,Status,Producido,MotivoDeBaja,Usuario,Periodo',
+        ]);
+    }
+
+    public function modificar_valores_en_bd_para_actualizacion_rama20210814correciones(){
+        //Configuracion columnas tabla produccion       
+        Configuracion_Tabla::where('tabla', 'Produccion')
+        ->update([
+            'campos_activados'=>'Produccion,Serie,Folio,Fecha,Codigo,Cliente,Almacen,Cantidad,Costo,Total,Obs,Status,Producido,MotivoDeBaja,Usuario,Periodo',
+            'campos_desactivados'=>'Equipo',
+            'columnas_ordenadas'=>'Produccion,Serie,Folio,Fecha,Codigo,Cliente,Almacen,Cantidad,Costo,Total,Obs,Status,Producido,MotivoDeBaja,Usuario,Periodo',
+        ]);
+        
+        //Configuracion Tabla Produccion        
+        Configuracion_Tabla::where('tabla', 'Requisiciones')
+        ->update([
+            'primerordenamiento'=>'Folio',
+            'formaprimerordenamiento'=>'DESC',
+            'segundoordenamiento'=>'omitir',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'omitir',
+            'formatercerordenamiento'=>'DESC',
+            'campos_busquedas'=>'Requisicion,Orden,Vin,Economico,Status'
         ]);
     }
 

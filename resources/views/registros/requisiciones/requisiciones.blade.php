@@ -1,6 +1,6 @@
 @extends('plantilla_maestra')
 @section('titulo')
-    Cotizaciones Servicios
+  Requisiciones
 @endsection
 @section('additionals_css')
     @include('secciones.libreriascss')
@@ -15,11 +15,11 @@
                     <div class="card" id="listadoregistros">
                         <div class="header {{$empresa->background_forms_and_modals}}">
                             <div class="row clearfix">
-                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                                    <h5>&nbsp;&nbsp;&nbsp;COTIZACIONES SERVICIOS&nbsp;&nbsp;&nbsp;</h5>
+                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                    <h5>&nbsp;&nbsp;&nbsp;REQUISICIONES&nbsp;&nbsp;&nbsp;</h5>
                                 </div>
-                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 button-demo">
-                                    <div class="table-responsive  navbar-right">
+                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 button-demo">
+                                    <div class="table-responsive navbar-right">
                                         <table>
                                             <tr>
                                                 <td >
@@ -33,7 +33,7 @@
                                                     </div>
                                                 </td>
                                                 <td >
-                                                    <a class="btn bg-blue btn-xs waves-effect" id="btnGenerarFormatoExcel" href="{{route('ordenes_compra_exportar_excel')}}" target="_blank">
+                                                    <a class="btn bg-blue btn-xs waves-effect" id="btnGenerarFormatoExcel" href="{{route('traspasos_exportar_excel')}}" target="_blank">
                                                         Excel
                                                     </a>
                                                 </td>
@@ -69,11 +69,11 @@
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
-                                                    <th id="th{{$co}}">{{$co}}</th>
+                                                <th id="th{{$co}}">{{$co}}</th>
                                             @endforeach
                                         </tr>
                                     </thead>
-                                    <tbody ></tbody>
+                                    <tbody></tbody>
                                 </table>
                             </div>
                         </div>
@@ -120,10 +120,10 @@
       		<div class="modal-body">
 		      	<form id="formdesactivar" action="#">
 		        	<h5 id="textomodaldesactivar"> </h5>
-                    <input type="hidden" id="cotizaciondesactivar" name="cotizaciondesactivar">
+                    <input type="hidden" id="requisiciondesactivar" name="requisiciondesactivar">
                     <div id="divmotivobaja">
                         <label>Motivo Baja</label>
-                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 data-parsley-length="[1, 200]" onkeyup="tipoLetra(this)" required></textarea>
+                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required data-parsley-length="[1, 200]"></textarea>
                     </div>
 		        </form>	
       		</div>
@@ -166,38 +166,36 @@
         var campos_busquedas = '{{$configuracion_tabla->campos_busquedas}}';
         var nombreempresa = '{{$empresa->Nombre}}';
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
+        var almacende = '{{$almacendedefault->Nombre}}';
+        var numeroalmacende = '{{$almacendedefault->Numero}}';
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';
-        var cotizaciones_servicios_obtener = '{!!URL::to('cotizaciones_servicios_obtener')!!}';
-        var cotizaciones_servicios_obtener_series_documento = '{!!URL::to('cotizaciones_servicios_obtener_series_documento')!!}';
-        var cotizaciones_servicios_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('cotizaciones_servicios_obtener_ultimo_folio_serie_seleccionada')!!}';
-        var cotizaciones_servicios_obtener_ultimo_folio = '{!!URL::to('cotizaciones_servicios_obtener_ultimo_folio')!!}';
-        var cotizaciones_servicios_obtener_fecha_actual_datetimelocal = '{!!URL::to('cotizaciones_servicios_obtener_fecha_actual_datetimelocal')!!}';
-        var cotizaciones_servicios_obtener_tipos_unidades = '{!!URL::to('cotizaciones_servicios_obtener_tipos_unidades')!!}';
-        var cotizaciones_servicios_obtener_clientes = '{!!URL::to('cotizaciones_servicios_obtener_clientes')!!}';
-        var cotizaciones_servicios_obtener_agentes = '{!!URL::to('cotizaciones_servicios_obtener_agentes')!!}';
-        var cotizaciones_servicios_obtener_cliente_por_numero = '{!!URL::to('cotizaciones_servicios_obtener_cliente_por_numero')!!}';
-        var cotizaciones_servicios_obtener_agente_por_numero = '{!!URL::to('cotizaciones_servicios_obtener_agente_por_numero')!!}';
-        var cotizaciones_servicios_obtener_vines = '{!!URL::to('cotizaciones_servicios_obtener_vines')!!}';
-        var cotizaciones_servicios_obtener_vin_por_numero = '{!!URL::to('cotizaciones_servicios_obtener_vin_por_numero')!!}';
-        var cotizaciones_servicios_obtener_productos = '{!!URL::to('cotizaciones_servicios_obtener_productos')!!}';
-        var cotizaciones_servicios_obtener_producto_por_codigo = '{!!URL::to('cotizaciones_servicios_obtener_producto_por_codigo')!!}';
-        var cotizaciones_servicios_obtener_existencias_almacen_uno = '{!!URL::to('cotizaciones_servicios_obtener_existencias_almacen_uno')!!}';
-        var cotizaciones_servicios_obtener_servicios = '{!!URL::to('cotizaciones_servicios_obtener_servicios')!!}';
-        var cotizaciones_servicios_obtener_servicio_por_codigo = '{!!URL::to('cotizaciones_servicios_obtener_servicio_por_codigo')!!}';
-        var cotizaciones_servicios_guardar = '{!!URL::to('cotizaciones_servicios_guardar')!!}';
-        var cotizaciones_servicios_verificar_baja = '{!!URL::to('cotizaciones_servicios_verificar_baja')!!}'; 
-        var cotizaciones_servicios_bajas = '{!!URL::to('cotizaciones_servicios_bajas')!!}'; 
-        var cotizaciones_servicios_obtener_cotizacion_servicio = '{!!URL::to('cotizaciones_servicios_obtener_cotizacion_servicio')!!}'; 
-        var cotizaciones_servicios_guardar_modificacion = '{!!URL::to('cotizaciones_servicios_guardar_modificacion')!!}';
-        var cotizaciones_servicios_obtener_datos_envio_email = '{!!URL::to('cotizaciones_servicios_obtener_datos_envio_email')!!}';
-        var cotizaciones_servicios_enviar_pdfs_email = '{!!URL::to('cotizaciones_servicios_enviar_pdfs_email')!!}';
-        var cotizaciones_servicios_enviar_pdfs_cliente_email = '{!!URL::to('cotizaciones_servicios_enviar_pdfs_cliente_email')!!}';
-        var cotizaciones_servicios_buscar_folio_string_like = '{!!URL::to('cotizaciones_servicios_buscar_folio_string_like')!!}';
+        var requisiciones_obtener = '{!!URL::to('requisiciones_obtener')!!}';
+        var requisiciones_obtener_series_documento = '{!!URL::to('requisiciones_obtener_series_documento')!!}';
+        var requisiciones_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('requisiciones_obtener_ultimo_folio_serie_seleccionada')!!}';
+        var requisiciones_obtener_ultimo_folio = '{!!URL::to('requisiciones_obtener_ultimo_folio')!!}';
+        var ordenes_compra_obtener_fecha_actual_datetimelocal = '{!!URL::to('ordenes_compra_obtener_fecha_actual_datetimelocal')!!}';
+        var requisiciones_obtener_ordenes_trabajo = '{!!URL::to('requisiciones_obtener_ordenes_trabajo')!!}';
+        var requisiciones_obtener_orden_trabajo_por_folio = '{!!URL::to('requisiciones_obtener_orden_trabajo_por_folio')!!}';
+        var requisiciones_obtener_productos = '{!!URL::to('requisiciones_obtener_productos')!!}';
+        var requisiciones_obtener_producto_por_codigo = '{!!URL::to('requisiciones_obtener_producto_por_codigo')!!}';
+        var requisiciones_guardar = '{!!URL::to('requisiciones_guardar')!!}';
+
+        
+        var requisiciones_verificar_baja = '{!!URL::to('requisiciones_verificar_baja')!!}';
+        var requisiciones_alta_o_baja = '{!!URL::to('requisiciones_alta_o_baja')!!}'; 
+
+
+        var requisiciones_obtener_requisicion = '{!!URL::to('requisiciones_obtener_requisicion')!!}'; 
+        var requisiciones_guardar_modificacion = '{!!URL::to('requisiciones_guardar_modificacion')!!}';
+
+        var requisiciones_obtener_datos_envio_email = '{!!URL::to('requisiciones_obtener_datos_envio_email')!!}';
+        var requisiciones_enviar_pdfs_email = '{!!URL::to('requisiciones_enviar_pdfs_email')!!}';
+        var requisiciones_buscar_folio_string_like = '{!!URL::to('requisiciones_buscar_folio_string_like')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
-    <script src="scripts_inaasys/registros/cotizacionesservicios/cotizacionesservicios.js"></script>
+    <script src="scripts_inaasys/registros/requisiciones/requisiciones.js"></script>
 @endsection
 
 

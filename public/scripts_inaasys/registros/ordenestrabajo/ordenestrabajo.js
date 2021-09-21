@@ -1388,7 +1388,7 @@ function alta(){
                   '<div class="row">'+
                     '<div class="col-md-2">'+
                       '<label>Orden <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
-                      '<input type="text" class="form-control" name="folio" id="folio" required onkeyup="tipoLetra(this);">'+
+                      '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                       '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                       '<input type="hidden" class="form-control" name="numerofilastablaservicios" id="numerofilastablaservicios" value="0" required readonly>'+
                       '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
@@ -1992,7 +1992,7 @@ function obtenerdatos(ordenmodificar){
                     '<div class="row">'+
                       '<div class="col-md-2">'+
                         '<label>Orden <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
-                        '<input type="text" class="form-control" name="folio" id="folio" required onkeyup="tipoLetra(this);">'+
+                        '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                         '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                         '<input type="hidden" class="form-control" name="numerofilastablaservicios" id="numerofilastablaservicios" value="0" required readonly>'+
                         '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+

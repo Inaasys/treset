@@ -244,7 +244,7 @@ class ProduccionController extends ConfiguracionSistemaController{
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipo.'" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$if->Equivale.'" readonly data-parsley-length="[1, 20]">'.$if->Equivale.'</td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.$producto->Producto.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.htmlspecialchars($producto->Producto, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm unidadproductopartida" name="unidadproductopartida[]" value="'.$producto->Unidad.'" data-parsley-length="[1, 5]"></td>'.
                     '<td class="tdmod">'.
                         '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="'.Helpers::convertirvalorcorrecto($if->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
@@ -329,7 +329,7 @@ class ProduccionController extends ConfiguracionSistemaController{
             '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                 '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipo.'" readonly></td>'.
                 '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$insumo->Codigo.'" readonly data-parsley-length="[1, 20]">'.$insumo->Codigo.'</td>'.
-                '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.$insumo->Producto.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.htmlspecialchars($insumo->Producto, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                 '<td class="tdmod"><input type="text" class="form-control divorinputmodsm unidadproductopartida" name="unidadproductopartida[]" value="'.$insumo->Unidad.'" data-parsley-length="[1, 5]"></td>'.
                 '<td class="tdmod">'.
                     '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
@@ -539,7 +539,7 @@ class ProduccionController extends ConfiguracionSistemaController{
         $MotivoBaja = $request->motivobaja.', '.Helpers::fecha_exacta_accion_datetimestring().', '.Auth::user()->user;
         Produccion::where('Produccion', $request->producciondesactivar)
                 ->update([
-                    'Motivo de Baja' => $MotivoBaja,
+                    'MotivoDeBaja' => $MotivoBaja,
                     'Status' => 'BAJA',
                     'Cantidad' => '0.000000',
                     'Total' => '0.000000'
@@ -577,7 +577,7 @@ class ProduccionController extends ConfiguracionSistemaController{
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dp->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dp->Codigo.'" readonly data-parsley-length="[1, 20]">'.$dp->Codigo.'</td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.$dp->Descripcion.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.htmlspecialchars($dp->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm unidadproductopartida" name="unidadproductopartida[]" value="'.$dp->Unidad.'" data-parsley-length="[1, 5]"></td>'.
                     '<td class="tdmod">'.
                         '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="'.Helpers::convertirvalorcorrecto($dp->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.

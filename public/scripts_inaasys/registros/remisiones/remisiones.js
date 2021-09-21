@@ -813,10 +813,6 @@ function calculartotalesfilas(fila){
       //utilidad de la partida
       utilidadpartida = new Decimal(subtotalpartida).minus(costototalpartida).minus(comisionespesospartida);
       $(".utilidadpartida", this).val(number_format(round(utilidadpartida, numerodecimales), numerodecimales, '.', ''));
-
-
-
-
       calculartotal();
     }  
     cuentaFilas++;

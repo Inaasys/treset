@@ -151,7 +151,7 @@ class CotizacionController extends ConfiguracionSistemaController{
                     '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                         '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.');">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dr->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dr->Codigo.'" readonly data-parsley-length="[1, 50]">'.$dr->Codigo.'</td>'.
-                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.$dr->Descripcion.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($dr->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control unidadpartida" name="unidadpartida[]" value="'.$dr->Unidad.'" readonly data-parsley-length="[1, 50]">'.$dr->Unidad.'</td>'.
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'.$producto->Insumo.'" readonly required></td>'.
                         '<td class="tdmod">'.
@@ -331,7 +331,7 @@ class CotizacionController extends ConfiguracionSistemaController{
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" >X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dc->item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dc->numero_parte.'" readonly data-parsley-length="[1, 50]">'.$dc->numero_parte.'</td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.$dc->descripcion.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($dc->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadpartida" name="unidadpartida[]" value="'.$dc->unidad.'" readonly data-parsley-length="[1, 50]">'.$dc->unidad.'</td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'.$dc->insumo.'" readonly required></td>'.
                     '<td class="tdmod">'.

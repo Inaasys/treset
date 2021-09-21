@@ -124,7 +124,7 @@
                     <input type="hidden" id="remisiondesactivar" name="remisiondesactivar">
                     <div id="divmotivobaja">
                         <label>Motivo Baja</label>
-                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required data-parsley-length="[1, 255]"></textarea>
+                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required data-parsley-length="[1, 200]"></textarea>
                     </div>
 		        </form>	
       		</div>

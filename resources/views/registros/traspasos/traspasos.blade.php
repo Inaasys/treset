@@ -123,7 +123,7 @@
                     <input type="hidden" id="traspasodesactivar" name="traspasodesactivar">
                     <div id="divmotivobaja">
                         <label>Motivo Baja</label>
-                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required data-parsley-length="[1, 255]"></textarea>
+                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required data-parsley-length="[1, 200]"></textarea>
                     </div>
 		        </form>	
       		</div>
@@ -182,6 +182,13 @@
         var traspasos_obtener_almacen_a_por_numero = '{!!URL::to('traspasos_obtener_almacen_a_por_numero')!!}';
         var traspasos_obtener_ordenes_trabajo = '{!!URL::to('traspasos_obtener_ordenes_trabajo')!!}';
         var traspasos_obtener_orden_trabajo_por_folio = '{!!URL::to('traspasos_obtener_orden_trabajo_por_folio')!!}';
+
+        var traspasos_obtener_cotizaciones = '{!!URL::to('traspasos_obtener_cotizaciones')!!}';
+        var traspasos_obtener_cotizacion = '{!!URL::to('traspasos_obtener_cotizacion')!!}';
+        var traspasos_obtener_requisiciones = '{!!URL::to('traspasos_obtener_requisiciones')!!}';
+        var traspasos_obtener_requisicion = '{!!URL::to('traspasos_obtener_requisicion')!!}';
+
+
         var traspasos_obtener_productos = '{!!URL::to('traspasos_obtener_productos')!!}';
         var traspasos_obtener_producto_por_codigo = '{!!URL::to('traspasos_obtener_producto_por_codigo')!!}';
         var traspasos_obtener_existencias_partida = '{!!URL::to('traspasos_obtener_existencias_partida')!!}';

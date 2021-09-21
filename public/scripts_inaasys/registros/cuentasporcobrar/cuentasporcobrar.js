@@ -2030,7 +2030,12 @@ $("#btnenviarpdfemail").on('click', function (e) {
 //timbrar pago
 function timbrarpago(pago){
     $.get(cuentas_por_cobrar_verificar_si_continua_timbrado,{pago:pago}, function(data){
-        if(data.Status == 'BAJA'){
+        if(data.Esquema == 'PAGO'){
+          $("#pagotimbrado").val(0);
+          $("#textomodaltimbrado").html('Aviso, los pagos con Esquema PAGO no se pueden timbrar');
+          $('#modaltimbrado').modal('show');
+          $("#btntimbrarpago").hide();
+        }else if(data.Status == 'BAJA'){
             $("#pagotimbrado").val(0);
             $("#textomodaltimbrado").html('Aviso, este Pago se encuentra dada de baja');
             $('#modaltimbrado').modal('show');
@@ -2106,14 +2111,14 @@ function cancelartimbre(facturabajatimbre){
         }else{
           $("#facturabajatimbre").val(0);
           $("#iddocumentofacturapi").val(0);
-          $("#textomodalbajatimbre").html('Aviso, la factura No.'+ facturabajatimbre +' no esta timbrada en el nuevo sistema');
+          $("#textomodalbajatimbre").html('Aviso, el pago No.'+ facturabajatimbre +' no esta timbrada en el nuevo sistema');
           $("#btnbajatimbre").hide();
           $('#modalbajatimbre').modal('show');
         }
       }else{ 
         $("#facturabajatimbre").val(0);
         $("#iddocumentofacturapi").val(0);
-        $("#textomodalbajatimbre").html('Aviso, la factura No.'+ facturabajatimbre +' no esta timbrada');
+        $("#textomodalbajatimbre").html('Aviso, el pago No.'+ facturabajatimbre +' no esta timbrada');
         $("#btnbajatimbre").hide();
         $('#modalbajatimbre').modal('show');
       }

@@ -639,6 +639,22 @@ function msj_creditoexcedido(){
         "extendedTImeout": "6000"
     });   
 }
+//mensaje error la serie ya existe
+function msj_errorserieexistente(){
+    toastr.error( "Aviso, la Serie ya existe", "Mensaje", {
+        "timeOut": "6000",
+        "progressBar": true,
+        "extendedTImeout": "6000"
+    });
+}
+//mensaje faltan archivos o contrasena
+function msj_faltanarchivosocontrasena(msj){
+    toastr.error( msj, "Mensaje", {
+        "timeOut": "9000",
+        "progressBar": true,
+        "extendedTImeout": "9000"
+    });
+}
 //|||||MENSAJES API FACTURAPI |||||||
 //mensaje factura timbrada correctamente
 function msj_documentotimbradocorrectamente(mensaje, tipomensaje){

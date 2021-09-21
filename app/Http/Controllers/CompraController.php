@@ -697,8 +697,9 @@ class CompraController extends ConfiguracionSistemaController{
     public function compras_guardar(Request $request){
         ini_set('max_input_vars','20000' );
         $uuid=$request->uuid;
+        $solicitarxml=$request->solicitarxml;
 	    $ExisteUUID = Compra::where('UUID', $uuid )->where('Status', '<>', 'BAJA')->first();
-	    if($ExisteUUID == true){
+	    if($ExisteUUID == true && $solicitarxml == 1){
 	        $Compra = 1;
 	    }else{  
             //obtener el ultimo id de la tabla
@@ -722,7 +723,15 @@ class CompraController extends ConfiguracionSistemaController{
             }
             $Compra->Remision=$request->remision;
             $Compra->Factura=$request->factura;
-            $Compra->UUID=$request->uuid;
+            if($solicitarxml == 1){
+                $Compra->UUID=$request->uuid;
+                $Compra->FechaEmitida=$request->fechaemitida;
+                //$Compra->FechaTimbrado=$request->fechatimbrado;
+            }else{
+                $Compra->UUID="N/A";
+                $Compra->FechaEmitida=Helpers::fecha_exacta_accion_datetimestring();
+                //$Compra->FechaTimbrado=Helpers::fecha_exacta_accion_datetimestring();
+            }
             $Compra->Tipo=$request->tipo;
             $Compra->Plazo=$request->plazo;
             $Compra->Fecha=Carbon::parse($request->fecha)->toDateTimeString();
@@ -741,8 +750,6 @@ class CompraController extends ConfiguracionSistemaController{
             $Compra->Obs=$request->observaciones;
             $Compra->Moneda=$request->moneda;
             $Compra->TipoCambio=$request->pesosmoneda;
-            $Compra->FechaEmitida=$request->fechaemitida;
-            $Compra->FechaTimbrado=$request->fechatimbrado;
             $Compra->EmisorRfc=$request->emisorrfc;
             $Compra->EmisorNombre=$request->emisornombre;
             $Compra->ReceptorRfc=$request->receptorrfc;
@@ -974,7 +981,7 @@ class CompraController extends ConfiguracionSistemaController{
                     '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                         '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dc->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dc->Codigo.'" readonly data-parsley-length="[1, 20]">'.$dc->Codigo.'</td>'.
-                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" value="'.$dc->Descripcion.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" value="'.htmlspecialchars($dc->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$dc->Unidad.'" readonly data-parsley-length="[1, 5]">'.$dc->Unidad.'</td>'.
                         '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm porsurtirpartida"  name="porsurtirpartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                         '<td class="tdmod">'.
@@ -1138,7 +1145,7 @@ class CompraController extends ConfiguracionSistemaController{
         $uuid=$request->uuid;
         $compra = $request->compra;
 	    $ExisteUUID = Compra::where('Compra', '<>', $compra)->where('UUID', $uuid )->where('Status', '<>', 'BAJA')->first();
-	    if($ExisteUUID == true){
+	    if($ExisteUUID == true && $uuid != "N/A"){
 	        $Compra = 1;
 	    }else{  
             $Compra = Compra::where('Compra', $compra)->first();
@@ -1271,9 +1278,14 @@ class CompraController extends ConfiguracionSistemaController{
             //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
             foreach ($request->codigoproductopartida as $key => $codigoproductopartida){  
                 //if la partida se agrego en la modificacion se agrega en los detalles
-                if($request->agregadoen [$key] == 'modificacion'){         
-                    $item = CompraDetalle::select('Item')->where('Compra', $compra)->orderBy('Item', 'DESC')->take(1)->get();
-                    $ultimoitem = $item[0]->Item+1;
+                if($request->agregadoen [$key] == 'modificacion'){    
+                    $contaritems = CompraDetalle::select('Item')->where('Compra', $compra)->count();
+                    if($contaritems > 0){
+                        $item = CompraDetalle::select('Item')->where('Compra', $compra)->orderBy('Item', 'DESC')->take(1)->get();
+                        $ultimoitem = $item[0]->Item+1;
+                    }else{
+                        $ultimoitem = 1;
+                    }
                     $CompraDetalle->Compra = $compra;
                     $CompraDetalle->Proveedor = $request->numeroproveedor;
                     $CompraDetalle->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
@@ -1666,7 +1678,8 @@ class CompraController extends ConfiguracionSistemaController{
                     'ImpLocTraslados' => '0.000000',
                     'Total' => '0.000000',
                     'Abonos' => '0.000000',
-                    'Descuentos' => '0.000000'
+                    'Descuentos' => '0.000000',
+                    'Saldo' => '0.000000'
                 ]);
         $detalles = CompraDetalle::where('Compra', $request->compradesactivar)->get();
         foreach($detalles as $detalle){

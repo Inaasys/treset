@@ -17,11 +17,14 @@ use App\Municipio;
 use App\c_RegimenFiscal;
 use App\CodigoPostal;
 use App\Moneda;
+use Facturapi\Facturapi;
 
 class EmpresaController extends ConfiguracionSistemaController{
 
     public function __construct(){
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
+        //API FACTURAPI 
+        $this->facturapi = new Facturapi( config('app.keygeneralfacturapi') ); //
     }
     public function utilerias_empresa_guardar_modificacion(Request $request){
         $mover_a_carpeta="logotipo_empresa";
@@ -202,5 +205,37 @@ class EmpresaController extends ConfiguracionSistemaController{
             'background_tables' => $request->selectcolortables
         ]);
         return response()->json($nuevo_nombre_archivo);
+    }
+    //guardar registro de empresa en facturapi
+    public function empresa_guardar_registro_empresa_facturapi(Request $request){
+        $registro_empresa_facturapi = $this->facturapi->Organizations->create(array(
+            "name" => $this->empresa->Empresa
+        ));
+        //colocar id de facturapi
+        Empresa::where('Numero', 1)
+        ->update([
+            'IdFacturapi' => $registro_empresa_facturapi->id
+        ]);
+        //actualizar organizacion facturapi
+        $actualizar_empresa = $this->facturapi->Organizations->updateLegal(
+            $registro_empresa_facturapi->id, array(
+              "name" => $this->empresa->Empresa,
+              "legal_name" => $this->empresa->Empresa,
+              "tax_system" => config('app.regimenfiscal'),
+              "phone" => config('app.telefonosempresa'),
+              "address" => array(
+                "exterior" => config('app.noexteriorempresa'),
+                "interior" => config('app.nointeriorempresa'),
+                "zip" => config('app.lugarexpedicion'),
+                "neighborhood" => config('app.calleempresa'),
+                "city" => config('app.localidadempresa'),
+                "municipality" => config('app.municipioempresa'),
+                "state" => config('app.estadoempresa'),
+                "country" => config('app.paisempresa')
+              )
+            )
+          );
+
+        return response()->json($registro_empresa_facturapi);
     }
 }

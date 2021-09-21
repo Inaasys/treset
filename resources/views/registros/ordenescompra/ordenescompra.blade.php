@@ -153,7 +153,7 @@
                     <input type="hidden" id="ordendesactivar" name="ordendesactivar">
                     <div id="divmotivobaja">
                         <label>Motivo Baja</label>
-                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" required></textarea>
+                        <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 data-parsley-length="[1, 200]" onkeyup="tipoLetra(this)" required></textarea>
                     </div>
 		        </form>	
       		</div>

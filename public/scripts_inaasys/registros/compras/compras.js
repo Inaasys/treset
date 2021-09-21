@@ -736,7 +736,7 @@ function seleccionarordencompra(Folio, Orden, tipoalta){
 async function seleccionartipoordencompra(data){
   await retraso();
   $("#tipo").val(data.ordencompra.Tipo).change();
-  calculartotal();
+  //calculartotal();
   mostrarbuscadorcodigoproducto();
   mostrarformulario();
   $('.page-loader-wrapper').css('display', 'none');
@@ -1569,7 +1569,7 @@ function alta(tipoalta){
                                     '<div class="col-md-6">'+
                                         '<label>Receptor R.F.C.</label>'+
                                         '<input type="text" class="form-control" name="receptorrfc" id="receptorrfc"  value="'+rfcreceptor+'" required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
-                                        '<input type="hidden" class="form-control" name="receptorrfcxml" id="receptorrfcxml" required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                        '<input type="hidden" class="form-control" name="receptorrfcxml" id="receptorrfcxml" value="'+rfcreceptor+'" required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Receptor Nombre</label>'+
@@ -1770,14 +1770,15 @@ $("#btnGuardar").on('click', function (e) {
   var formData = new FormData($("#formparsley")[0]);
   var form = $("#formparsley");
   if (form.parsley().isValid()){
+    var solicitarxml = $("#solicitarxml").val();
     var diferenciatotales = $("#diferenciatotales").val();
     if(diferenciatotales <= 0.01){
       var emisorrfc = $("#emisorrfc").val();
       var emisorrfcdb = $("#emisorrfcdb").val();
-      if(emisorrfc == emisorrfcdb){
+      if(emisorrfc == emisorrfcdb  || solicitarxml == 1){
         var receptorrfc = $("#receptorrfc").val();
         var receptorrfcxml = $("#receptorrfcxml").val();
-        if(receptorrfc == receptorrfcxml){
+        if(receptorrfc == receptorrfcxml  || solicitarxml == 1){
           $("#tipo").prop("disabled", false);
             $('.page-loader-wrapper').css('display', 'block');
             $.ajax({
@@ -2242,7 +2243,7 @@ function obtenerdatos(compramodificar){
 async function seleccionartipocompra(data){
   await retraso();
   $("#tipo").val(data.compra.Tipo).change();
-  calculartotal();
+  //calculartotal();
   //$("#tipo").select2({disabled: true});
   $("#tipo").select2();
   $("#moneda").select2();

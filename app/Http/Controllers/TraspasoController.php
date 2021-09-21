@@ -22,6 +22,10 @@ use App\Producto;
 use App\Marca;
 use App\OrdenTrabajo;
 use App\OrdenTrabajoDetalle;
+use App\CotizacionServicio;
+use App\CotizacionServicioDetalle;
+use App\Requisicion;
+use App\RequisicionDetalle;
 use App\Cliente;
 use App\Configuracion_Tabla;
 use App\VistaTraspaso;
@@ -223,18 +227,18 @@ class TraspasoController extends ConfiguracionSistemaController{
                             ->where('ot.Orden', $request->orden)
                             ->count();
         if($existeorden > 0){
-            $orden = DB::table('Ordenes de Trabajo as ot')
+            $ot = DB::table('Ordenes de Trabajo as ot')
                         ->join('Clientes as c', 'ot.Cliente', '=', 'c.Numero')
                         ->select('ot.Orden as Orden', 'ot.Fecha as Fecha', 'c.Nombre as Cliente', 'ot.Tipo as Tipo', 'ot.Unidad as Unidad', 'ot.Status AS StatusOrden')
                         ->where('ot.Status', 'ABIERTA')
                         ->where('ot.Orden', $request->orden)
                         ->get();
-            $orden = $orden[0]->Orden;
-            $fecha = $orden[0]->Fecha;
-            $cliente = $orden[0]->Cliente;
-            $tipo = $orden[0]->Tipo;
-            $unidad = $orden[0]->Unidad;
-            $statusorden = $orden[0]->StatusOrden;
+            $orden = $ot[0]->Orden;
+            $fecha = $ot[0]->Fecha;
+            $cliente = $ot[0]->Cliente;
+            $tipo = $ot[0]->Tipo;
+            $unidad = $ot[0]->Unidad;
+            $statusorden = $ot[0]->StatusOrden;
         }
         $data = array(
             'orden' => $orden,
@@ -247,20 +251,190 @@ class TraspasoController extends ConfiguracionSistemaController{
         return response()->json($data); 
     }
 
+    //obtener cotizaciones 
+    public function traspasos_obtener_cotizaciones(Request $request){
+        if($request->ajax()){
+            $mesactual = date("m");
+            $data = DB::table('Cotizaciones Servicio as cots')
+                        ->leftJoin('Clientes as c', 'c.Numero', '=', 'cots.Cliente')
+                        ->select('cots.Cotizacion', 'cots.Folio', 'cots.Fecha', 'cots.Cliente', 'c.Nombre as Nombre', 'cots.Unidad', 'cots.Plazo as Dias', 'cots.Total')
+                        ->where('cots.Status', 'POR CARGAR')
+                        ->whereMonth('cots.Fecha', '=', $mesactual)
+                        ->orderBy("Folio", "DESC")
+                        ->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarcotizacion('.$data->Folio.',\''.$data->Cotizacion .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->addColumn('Fecha', function($data){ return Helpers::fecha_espanol($data->Fecha);  })
+                    ->addColumn('Total', function($data){ return Helpers::convertirvalorcorrecto($data->Total);  })
+
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+    //obtener datos de la cotizaciones seleccionada
+    public function traspasos_obtener_cotizacion(Request $request){
+        $cotizacion = CotizacionServicio::where('Cotizacion', $request->Cotizacion)->first();
+        $numeroalmacende = $request->numeroalmacende;
+        //detalles cotizacion
+        $detallescotizacion = CotizacionServicioDetalle::where('Cotizacion', $request->Cotizacion)->where('Departamento', 'REFACCIONES')->orderby('Item', 'ASC')->get();
+        $numerodetallescotizacion = CotizacionServicioDetalle::where('Cotizacion', $request->Cotizacion)->where('Departamento', 'REFACCIONES')->count();
+        $filasdetallescotizacion = '';
+        $contadorproductos = 0;
+        $contadorfilas = 0;
+        $tipo = "alta";
+        if($numerodetallescotizacion > 0){
+            foreach($detallescotizacion as $dc){
+                $ObtenerExistencia = VistaObtenerExistenciaProducto::select('Existencias')->where('Codigo', $dc->Codigo)->where('Almacen', $numeroalmacende)->first();
+                $Existencias = $ObtenerExistencia->Existencias;
+                $tipo = "alta";
+                $filasdetallescotizacion = $filasdetallescotizacion.
+                '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
+                    '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipo.'" readonly></td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dc->Codigo.'" readonly data-parsley-length="[1, 20]">'.$dc->Codigo.'</td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.htmlspecialchars($dc->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$dc->Unidad.'" readonly data-parsley-length="[1, 5]">'.$dc->Unidad.'</td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Cantidad).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-existencias="'.$Existencias.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Precio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Importe).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Dcto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('.$contadorfilas.');"></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Descuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentoporcentajepartida('.$contadorfilas.');"></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'.Helpers::convertirvalorcorrecto($dc->SubTotal).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Impuesto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');"></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm ivapesospartida" name="ivapesospartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Iva).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Total).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="'.Helpers::convertirvalorcorrecto($dc->CostoTotal).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Utilidad).'" data-parsley-utilidad="0.'.$this->numerocerosconfiguradosinputnumberstep.'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl observacionespartida" name="observacionespartida[]" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm requisicionpartida" name="requisicionpartida[]" readonly data-parsley-length="[1, 20]"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm cotizacionpartida" name="cotizacionpartida[]" value="'.$request->Cotizacion.'" readonly data-parsley-length="[1, 20]"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm monedapartida" name="monedapartida[]" value="MXN" readonly data-parsley-length="[1, 3]"></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costodelistapartida" name="costodelistapartida[]" value="'.Helpers::convertirvalorcorrecto($dc->CostoDeLista).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm tipodecambiopartida" name="tipodecambiopartida[]" value="'.Helpers::convertirvalorcorrecto($dc->TipoDeCambio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                '</tr>';
+                $contadorproductos++;
+                $contadorfilas++;
+            }
+        }else{
+            $filasdetallescotizacion = '';
+        }        
+        $data = array(
+            "cotizacion" => $cotizacion,
+            "filasdetallescotizacion" => $filasdetallescotizacion,
+            "numerodetallescotizacion" => $numerodetallescotizacion,
+            "contadorproductos" => $contadorproductos,
+            "contadorfilas" => $contadorfilas,
+            "fecha" => Helpers::formatoinputdatetime($cotizacion->Fecha),
+            "importe" => Helpers::convertirvalorcorrecto($cotizacion->Importe),
+            "descuento" => Helpers::convertirvalorcorrecto($cotizacion->Descuento),
+            "subtotal" => Helpers::convertirvalorcorrecto($cotizacion->SubTotal),
+            "iva" => Helpers::convertirvalorcorrecto($cotizacion->Iva),
+            "total" => Helpers::convertirvalorcorrecto($cotizacion->Total)
+        );
+        return response()->json($data);
+    }
+    
+    //obtener requisiciones 
+    public function traspasos_obtener_requisiciones(Request $request){
+        if($request->ajax()){
+            $mesactual = date("m");
+            $data = DB::table('Requisiciones as r')
+                        ->select('r.Requisicion', 'r.Folio', 'r.Fecha', 'r.Orden', 'r.Obs')
+                        ->where('r.Status', 'POR SURTIR')
+                        ->orWhere('r.Status', 'BACKORDER')
+                        ->whereMonth('r.Fecha', '=', $mesactual)
+                        ->orderBy("r.Folio", "DESC")
+                        ->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarrequisicion('.$data->Folio.',\''.$data->Requisicion .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->addColumn('Fecha', function($data){ return Helpers::fecha_espanol($data->Fecha);  })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+
+    //obtener datos de la requiscion seleccionada
+    public function traspasos_obtener_requisicion(Request $request){
+        $requisicion = Requisicion::where('Requisicion', $request->Requisicion)->first();
+        $numeroalmacende = $request->numeroalmacende;
+        //detalles requisicion
+        $detallesrequisicion = RequisicionDetalle::where('Requisicion', $request->Requisicion)->where('Surtir', '>', 0)->get();
+        $numerodetallesrequisicion = RequisicionDetalle::where('Requisicion', $request->Requisicion)->where('Surtir', '>', 0)->count();
+        $filasdetallesrequisicion = '';
+        $contadorproductos = 0;
+        $contadorfilas = 0;
+        $tipo = "alta";
+        if($numerodetallesrequisicion > 0){
+            foreach($detallesrequisicion as $dr){
+                $ObtenerExistencia = VistaObtenerExistenciaProducto::select('Existencias')->where('Codigo', 'like', '%' . $dr->Codigo . '%')->where('Almacen', $numeroalmacende)->first();
+                $Existencias = $ObtenerExistencia->Existencias;
+                $tipo = "alta";
+                $filasdetallesrequisicion = $filasdetallesrequisicion.
+                '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
+                    '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipo.'" readonly></td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dr->Codigo.'" readonly data-parsley-length="[1, 20]">'.$dr->Codigo.'</td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.htmlspecialchars($dr->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$dr->Unidad.'" readonly data-parsley-length="[1, 5]">'.$dr->Unidad.'</td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Surtir).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-existencias="'.$Existencias.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Precio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Importe).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Dcto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('.$contadorfilas.');"></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Descuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentoporcentajepartida('.$contadorfilas.');"></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'.Helpers::convertirvalorcorrecto($dr->SubTotal).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Impuesto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');"></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm ivapesospartida" name="ivapesospartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Iva).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Total).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="'.Helpers::convertirvalorcorrecto($dr->CostoTotal).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Utilidad).'" data-parsley-utilidad="0.'.$this->numerocerosconfiguradosinputnumberstep.'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl observacionespartida" name="observacionespartida[]" value="'.$dr->Obs.'" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm requisicionpartida" name="requisicionpartida[]" value="'.$request->Requisicion.'" readonly data-parsley-length="[1, 20]"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm cotizacionpartida" name="cotizacionpartida[]"  readonly data-parsley-length="[1, 20]"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm monedapartida" name="monedapartida[]" value="'.$dr->Moneda.'" readonly data-parsley-length="[1, 3]"></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costodelistapartida" name="costodelistapartida[]" value="'.Helpers::convertirvalorcorrecto($dr->CostoDeLista).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm tipodecambiopartida" name="tipodecambiopartida[]" value="'.Helpers::convertirvalorcorrecto($dr->TipoDeCambio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                '</tr>';
+                $contadorproductos++;
+                $contadorfilas++;
+            }
+        }else{
+            $filasdetallescotizacion = '';
+        }        
+        $data = array(
+            "requisicion" => $requisicion,
+            "filasdetallesrequisicion" => $filasdetallesrequisicion,
+            "numerodetallesrequisicion" => $numerodetallesrequisicion,
+            "contadorproductos" => $contadorproductos,
+            "contadorfilas" => $contadorfilas,
+            "fecha" => Helpers::formatoinputdatetime($requisicion->Fecha),
+            "importe" => Helpers::convertirvalorcorrecto($requisicion->Importe),
+            "descuento" => Helpers::convertirvalorcorrecto($requisicion->Descuento),
+            "subtotal" => Helpers::convertirvalorcorrecto($requisicion->SubTotal),
+            "iva" => Helpers::convertirvalorcorrecto($requisicion->Iva),
+            "total" => Helpers::convertirvalorcorrecto($requisicion->Total)
+        );
+        return response()->json($data);
+    }
+
     //obtener productos
     public function traspasos_obtener_productos(Request $request){
         if($request->ajax()){
             $codigoabuscar = $request->codigoabuscar;
             $numeroalmacende = $request->numeroalmacende;
             $tipooperacion = $request->tipooperacion;
-            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%');
+            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')
+                                                    ->where(function ($query) use ($numeroalmacende){
+                                                        $query->where('Almacen', $numeroalmacende);
+                                                    });
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($numeroalmacende, $tipooperacion){
-                        if($data->Almacen == $numeroalmacende || $data->Almacen == NULL){
-                            $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$tipooperacion.'\')">Seleccionar</div>';
-                        }else{
-                            $boton = '';
-                        }
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\',\''.$tipooperacion.'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->addColumn('Existencias', function($data){ 
@@ -279,9 +453,16 @@ class TraspasoController extends ConfiguracionSistemaController{
     //obtener producto por codigo
     public function traspasos_obtener_producto_por_codigo(Request $request){
         $codigoabuscar = $request->codigoabuscar;
-        $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->count();
+        $numeroalmacende = $request->numeroalmacende;
+        $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)
+                                                            ->where(function ($query) use ($numeroalmacende){
+                                                                $query->where('Almacen', $numeroalmacende);
+                                                            })->count();
         if($contarproductos > 0){
-            $producto = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->first();
+            $producto = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)
+                                                        ->where(function ($query) use ($numeroalmacende){
+                                                            $query->where('Almacen', $numeroalmacende);
+                                                        })->first();
             $data = array(
                 'Codigo' => $producto->Codigo,
                 'Producto' => htmlspecialchars($producto->Producto, ENT_QUOTES),
@@ -405,8 +586,23 @@ class TraspasoController extends ConfiguracionSistemaController{
             $TraspasoDetalle->CostoTotal =  $request->costototalpartida [$key];
             $TraspasoDetalle->Utilidad =  $request->utilidadpartida [$key];
             $TraspasoDetalle->Moneda =  $request->monedapartida [$key];
+            $TraspasoDetalle->Obs =  $request->observacionespartida [$key];
+            $TraspasoDetalle->Requisicion =  $request->requisicionpartida [$key];
+            $TraspasoDetalle->Cotizacion =  $request->cotizacionpartida [$key];
+            $TraspasoDetalle->CostoDeLista =  $request->costodelistapartida [$key];
+            $TraspasoDetalle->TipoDeCambio =  $request->tipodecambiopartida [$key];
             $TraspasoDetalle->Item = $item;
             $TraspasoDetalle->save();
+            if($request->requisicionpartida [$key] != ""){
+                //modificar faltante por surtir detalle requisicion
+                $RequisicionDetalle = RequisicionDetalle::where('Requisicion', $request->requisicionpartida [$key])->where('Codigo', $codigoproductopartida)->first();
+                $Surtir = $RequisicionDetalle->Surtir-$request->cantidadpartida  [$key];
+                RequisicionDetalle::where('Requisicion', $request->requisicionpartida [$key])
+                                    ->where('Codigo', $codigoproductopartida)
+                                    ->update([
+                                        'Surtir' => Helpers::convertirvalorcorrecto($Surtir)
+                                    ]);
+            }
             //restar existencias del almacen que se traspaso
             $ContarExistenciaAlmacenDe = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacende)->count();
             if($ContarExistenciaAlmacenDe > 0){
@@ -480,6 +676,21 @@ class TraspasoController extends ConfiguracionSistemaController{
                 $UltimaPartida++;
             }
             $item++;
+        }
+        if($request->requisicion != ""){
+            //modificar el status de la requisicion a SURTIDO o BACKORDER
+            $detallesrequisicionporsurtir = RequisicionDetalle::where('Requisicion', $request->requisicion)->where('Surtir', '>', 0)->count();
+            if($detallesrequisicionporsurtir > 0){
+                Requisicion::where('Requisicion', $request->requisicion)
+                                    ->update([
+                                        'Status' => "BACKORDER"
+                                    ]);
+            }else{
+                Requisicion::where('Requisicion', $request->requisicion)
+                                    ->update([
+                                        'Status' => "SURTIDO"
+                                    ]);
+            }
         }
         return response()->json($Traspaso);
     }
@@ -571,6 +782,31 @@ class TraspasoController extends ConfiguracionSistemaController{
             }
             if($Traspaso->Orden != ""){
                 $eliminarrefacciones = OrdenTrabajoDetalle::where('Traspaso', $request->traspasodesactivar)->where('Codigo', $detalle->Codigo)->forceDelete();
+                $detallestraspaso = TraspasoDetalle::where('Traspaso', $request->traspasodesactivar)->get();
+                foreach ($detallestraspaso as $dt){ 
+                    if($dt->Requisicion != ""){
+                        $RequisicionDetalle = RequisicionDetalle::where('Requisicion', $dt->Requisicion)->where('Codigo', $dt->Codigo)->first();
+                        $Surtir = $RequisicionDetalle->Surtir+$dt->Cantidad;
+                        RequisicionDetalle::where('Requisicion', $dt->Requisicion)
+                                            ->where('Codigo', $dt->Codigo)
+                                            ->update([
+                                                'Surtir' => Helpers::convertirvalorcorrecto($Surtir)
+                                            ]);
+                        //modificar el status de la requisicion a SURTIDO o BACKORDER
+                        $detallesrequisicionporsurtir = RequisicionDetalle::where('Requisicion', $dt->Requisicion)->where('Surtir', '>', 0)->count();
+                        if($detallesrequisicionporsurtir > 0){
+                            Requisicion::where('Requisicion', $dt->Requisicion)
+                                                ->update([
+                                                    'Status' => "BACKORDER"
+                                                ]);
+                        }else{
+                            Requisicion::where('Requisicion', $dt->Requisicion)
+                                                ->update([
+                                                    'Status' => "SURTIDO"
+                                                ]);
+                        }
+                    }
+                }
             }
             //colocar en ceros cantidades
             TraspasoDetalle::where('Traspaso', $request->traspasodesactivar)
@@ -584,7 +820,9 @@ class TraspasoController extends ConfiguracionSistemaController{
                                 'Iva' => '0.000000',
                                 'Total' => '0.000000',
                                 'CostoTotal' => '0.000000',
-                                'Utilidad' => '0.000000'
+                                'Utilidad' => '0.000000',
+                                'Requisicion' => '',
+                                'Cotizacion' => ''
                             ]);
         }
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
@@ -631,7 +869,7 @@ class TraspasoController extends ConfiguracionSistemaController{
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dt->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dt->Codigo.'" readonly>'.$dt->Codigo.'</td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.$dt->Descripcion.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.htmlspecialchars($dt->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$dt->Unidad.'" readonly data-parsley-length="[1, 5]">'.$dt->Unidad.'</td>'.
                     '<td class="tdmod">'.
                         '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="'.Helpers::convertirvalorcorrecto($dt->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
@@ -648,7 +886,12 @@ class TraspasoController extends ConfiguracionSistemaController{
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'.Helpers::convertirvalorcorrecto($dt->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="'.Helpers::convertirvalorcorrecto($dt->CostoTotal).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dt->Utilidad).'" data-parsley-utilidad="0.'.$this->numerocerosconfiguradosinputnumberstep.'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl observacionespartida" name="observacionespartida[]" value="'.$dt->Obs.'" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm requisicionpartida" name="requisicionpartida[]" value="'.$dt->Requisicion.'" readonly data-parsley-length="[1, 20]"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm cotizacionpartida" name="cotizacionpartida[]" value="'.$dt->Cotizacion.'" readonly data-parsley-length="[1, 20]"></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm monedapartida" name="monedapartida[]" value="'.$dt->Moneda.'" readonly data-parsley-length="[1, 3]"></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costodelistapartida" name="costodelistapartida[]" value="'.Helpers::convertirvalorcorrecto($dt->CostoDeLista).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm tipodecambiopartida" name="tipodecambiopartida[]" value="'.Helpers::convertirvalorcorrecto($dt->TipoDeCambio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
                 '</tr>';
                 $contadorproductos++;
                 $contadorfilas++;
@@ -705,7 +948,7 @@ class TraspasoController extends ConfiguracionSistemaController{
         ini_set('max_input_vars','20000' );
         $traspaso = $request->folio.'-'.$request->serie;
         $Traspaso = Traspaso::where('Traspaso', $traspaso)->first();
-        //modificar totales orden trabajo IMPORTANTE QUE ESTE AQUI
+        //modificar totales orden trabajo IMPORTANTE QUE ESTE AQUI NO MOVER ESTE CODIGO
         if($Traspaso->Orden != ""){
             $TraspasoAnterior = Traspaso::where('Traspaso', $traspaso)->first();
             $OrdenTrabajoAnterior = OrdenTrabajo::where('Orden', $TraspasoAnterior->Orden)->first();
@@ -726,13 +969,11 @@ class TraspasoController extends ConfiguracionSistemaController{
         $ArrayDetallesTraspasoAnterior = Array();
         $DetallesTraspasoAnterior = TraspasoDetalle::where('Traspaso', $traspaso)->get();
         foreach($DetallesTraspasoAnterior as $detalle){
-            //array_push($ArrayDetallesTraspasoAnterior, $detalle->Codigo);
             array_push($ArrayDetallesTraspasoAnterior, $detalle->Traspaso.'#'.$detalle->Codigo.'#'.$detalle->Item);
         }
         //array partida despues de modificacion
         $ArrayDetallesTraspasoNuevo = Array();
         foreach ($request->codigoproductopartida as $key => $nuevocodigo){
-            //array_push($ArrayDetallesTraspasoNuevo, $nuevocodigo);
             if($request->agregadoen [$key] == 'NA'){
                 array_push($ArrayDetallesTraspasoNuevo, $traspaso.'#'.$nuevocodigo.'#'.$request->itempartida [$key]);
             } 
@@ -763,11 +1004,34 @@ class TraspasoController extends ConfiguracionSistemaController{
                                     'Existencias' => $RestarExistenciaNuevaAlmacenA
                                 ]);
                 }
-                //eliminar detalle del traspaso eliminado
-                $eliminardetalletraspaso = TraspasoDetalle::where('Traspaso', $explode_d[0])->where('Codigo', $explode_d[1])->where('Item', $explode_d[2])->forceDelete();
                 if($Traspaso->Orden != ""){
                     $OrdenTrabajoDetalle = OrdenTrabajoDetalle::where('Traspaso', $explode_d[0])->where('Codigo', $explode_d[1])->forceDelete();
+                    if($detalletraspaso->Requisicion != ""){
+                        //sumar surtir detalle requisicion
+                        $RequisicionDetalle = RequisicionDetalle::where('Requisicion', $detalletraspaso->Requisicion)->where('Codigo', $detalletraspaso->Codigo)->first();
+                        $Surtir = $RequisicionDetalle->Surtir+$detalletraspaso->Cantidad;
+                        RequisicionDetalle::where('Requisicion', $detalletraspaso->Requisicion)
+                                            ->where('Codigo', $detalletraspaso->Codigo)
+                                            ->update([
+                                                'Surtir' => Helpers::convertirvalorcorrecto($Surtir)
+                                            ]);
+                        //modificar el status de la requisicion a SURTIDO o BACKORDER
+                        $detallesrequisicionporsurtir = RequisicionDetalle::where('Requisicion', $detalletraspaso->Requisicion)->where('Surtir', '>', 0)->count();
+                        if($detallesrequisicionporsurtir > 0){
+                            Requisicion::where('Requisicion', $detalletraspaso->Requisicion)
+                                                ->update([
+                                                    'Status' => "BACKORDER"
+                                                ]);
+                        }else{
+                            Requisicion::where('Requisicion', $detalletraspaso->Requisicion)
+                                                ->update([
+                                                    'Status' => "SURTIDO"
+                                                ]);
+                        }
+                    }
                 }
+                //eliminar detalle del traspaso eliminado
+                $eliminardetalletraspaso = TraspasoDetalle::where('Traspaso', $explode_d[0])->where('Codigo', $explode_d[1])->where('Item', $explode_d[2])->forceDelete();
             }
         }
         //modificar traspaso
@@ -795,11 +1059,16 @@ class TraspasoController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA DETALLES
-        $item = TraspasoDetalle::select('Item')->where('Traspaso', $traspaso)->orderBy('Item', 'DESC')->take(1)->get();
-        $ultimoitem = $item[0]->Item+1;
         foreach ($request->codigoproductopartida as $key => $codigoproductopartida){    
             //if la partida se agrego en la modificacion se agrega en los detalles de traspaso y de orden de trabajo si asi lo requiere
-            if($request->agregadoen [$key] == 'modificacion'){
+            if($request->agregadoen [$key] == 'modificacion'){     
+                $contaritems = TraspasoDetalle::select('Item')->where('Traspaso', $traspaso)->count();
+                if($contaritems > 0){
+                    $item = TraspasoDetalle::select('Item')->where('Traspaso', $traspaso)->orderBy('Item', 'DESC')->take(1)->get();
+                    $ultimoitem = $item[0]->Item+1;
+                }else{
+                    $ultimoitem = 1;
+                }
                 $TraspasoDetalle=new TraspasoDetalle;
                 $TraspasoDetalle->Traspaso = $traspaso;
                 $TraspasoDetalle->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
@@ -967,6 +1236,39 @@ class TraspasoController extends ConfiguracionSistemaController{
                         'Utilidad' => $request->utilidadpartida [$key]
                     ]);
                     $Partida++;
+                    $detalletraspaso = TraspasoDetalle::where('Traspaso', $traspaso)->where('Item', $request->itempartida [$key])->first();
+                    if($detalletraspaso->Requisicion != ""){
+                        //sumar surtir detalle requisicion
+                        $RequisicionDetalle = RequisicionDetalle::where('Requisicion', $detalletraspaso->Requisicion)->where('Codigo', $detalletraspaso->Codigo)->first();
+                        $Surtir = $RequisicionDetalle->Surtir+$detalletraspaso->Cantidad;
+                        RequisicionDetalle::where('Requisicion', $detalletraspaso->Requisicion)
+                                            ->where('Codigo', $detalletraspaso->Codigo)
+                                            ->update([
+                                                'Surtir' => Helpers::convertirvalorcorrecto($Surtir)
+                                            ]);
+
+                        //restar surtir detalle requisicion
+                        $RequisicionDetalle = RequisicionDetalle::where('Requisicion', $detalletraspaso->Requisicion)->where('Codigo', $detalletraspaso->Codigo)->first();
+                        $Surtir = $RequisicionDetalle->Surtir-$request->cantidadpartida [$key];
+                        RequisicionDetalle::where('Requisicion', $detalletraspaso->Requisicion)
+                                            ->where('Codigo', $detalletraspaso->Codigo)
+                                            ->update([
+                                                'Surtir' => Helpers::convertirvalorcorrecto($Surtir)
+                                            ]);
+                        //modificar el status de la requisicion a SURTIDO o BACKORDER
+                        $detallesrequisicionporsurtir = RequisicionDetalle::where('Requisicion', $detalletraspaso->Requisicion)->where('Surtir', '>', 0)->count();
+                        if($detallesrequisicionporsurtir > 0){
+                            Requisicion::where('Requisicion', $detalletraspaso->Requisicion)
+                                                ->update([
+                                                    'Status' => "BACKORDER"
+                                                ]);
+                        }else{
+                            Requisicion::where('Requisicion', $detalletraspaso->Requisicion)
+                                                ->update([
+                                                    'Status' => "SURTIDO"
+                                                ]);
+                        }
+                    }
                 }
             }
         }

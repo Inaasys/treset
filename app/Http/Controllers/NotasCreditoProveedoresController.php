@@ -882,7 +882,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                         '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                             '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfila" onclick="eliminarfila('.$contadorfilas.')" >X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dnp->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dnp->Codigo.'" readonly data-parsley-length="[1, 20]">'.$dnp->Codigo.'</td>'.         
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodl descripcionpartida" name="descripcionpartida[]" value="'.$dnp->Descripcion.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($dnp->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="'.$dnp->Unidad.'" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)"></td>'.
                             '<td class="tdmod">'.
                                 '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dnp->Cantidad).'" data-parsley-min="0.1" data-parsley-max="1.0"  data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');">'.
@@ -936,7 +936,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                         '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                             '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfila" onclick="eliminarfila('.$contadorfilas.')" >X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dnp->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dnp->Codigo.'" readonly data-parsley-length="[1, 20]">'.$dnp->Codigo.'</td>'.         
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodl descripcionpartida" name="descripcionpartida[]" value="'.$dnp->Descripcion.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($dnp->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="'.$dnp->Unidad.'" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)"></td>'.
                             '<td class="tdmod">'.
                                 '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dnp->Cantidad).'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');revisarexistenciasalmacen('.$contadorfilas.');">'.
@@ -1201,9 +1201,9 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             //detalles
             foreach ($request->codigopartida as $key => $codigopartida){  
                 //if la partida se agrego en la modificacion se realiza un insert
-                if($request->agregadoen [$key] == 'modificacion'){     
-                    $contardetalles = NotaProveedorDetalle::where('Nota', $notaproveedor)->count();
-                    if($contardetalles > 0){
+                if($request->agregadoen [$key] == 'modificacion'){         
+                    $contaritems = NotaProveedorDetalle::select('Item')->where('Nota', $notaproveedor)->count();
+                    if($contaritems > 0){
                         $item = NotaProveedorDetalle::select('Item')->where('Nota', $notaproveedor)->orderBy('Item', 'DESC')->take(1)->get();
                         $ultimoitem = $item[0]->Item+1;
                     }else{

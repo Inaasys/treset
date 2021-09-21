@@ -3486,7 +3486,12 @@ $("#btnenviarpdfemail").on('click', function (e) {
 //timbrar pago
 function timbrarnota(nota){
   $.get(notas_credito_clientes_verificar_si_continua_timbrado,{nota:nota}, function(data){
-      if(data.Status == 'BAJA'){
+      if(data.Esquema == 'INTERNA' || data.Esquema == 'NOTA'){
+        $("#notatimbrado").val(0);
+        $("#textomodaltimbrado").html('Aviso, las Notas de crédito cliente con Esquema INTERNA o NOTA no se pueden timbrar');
+        $('#modaltimbrado').modal('show');
+        $("#btntimbrarnota").hide();
+      }else if(data.Status == 'BAJA'){
           $("#notatimbrado").val(0);
           $("#textomodaltimbrado").html('Aviso, esta Nota se encuentra dada de baja');
           $('#modaltimbrado').modal('show');
@@ -3563,14 +3568,14 @@ function cancelartimbre(facturabajatimbre){
       }else{
         $("#facturabajatimbre").val(0);
         $("#iddocumentofacturapi").val(0);
-        $("#textomodalbajatimbre").html('Aviso, la factura No.'+ facturabajatimbre +' no esta timbrada en el nuevo sistema');
+        $("#textomodalbajatimbre").html('Aviso, la Nota No.'+ facturabajatimbre +' no esta timbrada en el nuevo sistema');
         $("#btnbajatimbre").hide();
         $('#modalbajatimbre').modal('show');
       }
     }else{ 
       $("#facturabajatimbre").val(0);
       $("#iddocumentofacturapi").val(0);
-      $("#textomodalbajatimbre").html('Aviso, la factura No.'+ facturabajatimbre +' no esta timbrada');
+      $("#textomodalbajatimbre").html('Aviso, la Nota No.'+ facturabajatimbre +' no esta timbrada');
       $("#btnbajatimbre").hide();
       $('#modalbajatimbre').modal('show');
     }

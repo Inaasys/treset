@@ -317,7 +317,7 @@ class RemisionController extends ConfiguracionSistemaController{
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipo.'" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dc->Codigo.'" readonly data-parsley-length="[1, 20]">'.$dc->Codigo.'</td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.$dc->Descripcion.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.htmlspecialchars($dc->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$dc->Unidad.'" readonly data-parsley-length="[1, 5]">'.$dc->Unidad.'</td>'.
                     '<td class="tdmod">'.
                         '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="'.Helpers::convertirvalorcorrecto($dc->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
@@ -384,7 +384,7 @@ class RemisionController extends ConfiguracionSistemaController{
             $codigoabuscar = $request->codigoabuscar;
             $numeroalmacen = $request->numeroalmacen;
             $tipooperacion = $request->tipooperacion;
-            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%');
+            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->where('Almacen', $numeroalmacen);
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($tipooperacion, $numeroalmacen){
                         if($data->Almacen == $numeroalmacen){
@@ -616,7 +616,7 @@ class RemisionController extends ConfiguracionSistemaController{
             if($detalle->Cotizacion != ''){
                 CotizacionProducto::where('Cotizacion', $detalle->Cotizacion)
                         ->update([
-                            'Status' => 'ALTA'
+                            'Status' => 'POR CARGAR'
                         ]);
             }
             //sumar existencias al almacen
@@ -698,7 +698,7 @@ class RemisionController extends ConfiguracionSistemaController{
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dr->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dr->Codigo.'" readonly data-parsley-length="[1, 20]">'.$dr->Codigo.'</td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.$dr->Descripcion.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.htmlspecialchars($dr->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$dr->Unidad.'" readonly data-parsley-length="[1, 5]">'.$dr->Unidad.'</td>'.
                     '<td class="tdmod">'.
                         '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="'.Helpers::convertirvalorcorrecto($dr->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
@@ -863,9 +863,14 @@ class RemisionController extends ConfiguracionSistemaController{
         //INGRESAR DATOS A TABLA DETALLES
         foreach ($request->codigoproductopartida as $key => $codigoproductopartida){    
             //if la partida se agrego en la modificacion se agrega en los detalles de traspaso y de orden de trabajo si asi lo requiere
-            if($request->agregadoen [$key] == 'modificacion'){
-                $item = RemisionDetalle::select('Item')->where('Remision', $remision)->orderBy('Item', 'DESC')->take(1)->get();
-                $ultimoitem = $item[0]->Item+1;
+            if($request->agregadoen [$key] == 'modificacion'){     
+                $contaritems = RemisionDetalle::select('Item')->where('Remision', $remision)->count();
+                if($contaritems > 0){
+                    $item = RemisionDetalle::select('Item')->where('Remision', $remision)->orderBy('Item', 'DESC')->take(1)->get();
+                    $ultimoitem = $item[0]->Item+1;
+                }else{
+                    $ultimoitem = 1;
+                }
                 $RemisionDetalle=new RemisionDetalle;
                 $RemisionDetalle->Remision = $remision;
                 $RemisionDetalle->Cliente = $request->numerocliente;

@@ -99,6 +99,9 @@
                                         <a href="#cambiar_contrasena" data-toggle="tab">Cambiar Contraseña</a>
                                     </li>
                                     <li role="presentation">
+                                        <a href="#registro_facturapi" data-toggle="tab">Registro en Facturapi</a>
+                                    </li>
+                                    <li role="presentation">
                                         <a href="#cambiar_logotipo" data-toggle="tab">Cambiar Logotipo</a>
                                     </li>
                                 </ul>
@@ -624,6 +627,32 @@
                                             </div>
                                         </form>
                                     </div> 
+
+
+
+                                    
+                                    <div role="tabpanel" class="tab-pane fade" id="registro_facturapi">
+                                        <form id="formregistroempresafacturapi" action="#">
+                                            <div class="row">  
+                                                <div class="col-md-12">  
+                                                    @if(Auth::user()->role_id == 1 && $empresa->IdFacturapi == "")
+                                                        <h3>Da click en registrar en facturapi para poder timbrar las facturas de la empresa</h3>
+                                                    @else
+                                                        <h3>La empresa ya se encuentra registrada</h3>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <div class="row">    
+                                                <div class="col-md-2 col-md-offset-10">
+                                                    @if(Auth::user()->role_id == 1 && $empresa->IdFacturapi == "")
+                                                        <button type="submit" class="btn bg-green btn-block waves-effect" id="btnguardarregistroempresafacturapi">Registrar Facturapi</button>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div> 
+
+
                                     <div role="tabpanel" class="tab-pane fade" id="cambiar_logotipo">
                                         <form id="formlogotipo" action="#" enctype="multipart/form-data">
                                             <div class="row">
@@ -1006,6 +1035,7 @@
         var empresa_guardar_modificacion_lugar_expedicion = '{!!URL::to('empresa_guardar_modificacion_lugar_expedicion')!!}';
         var empresa_guardar_modificacion_configurar = '{!!URL::to('empresa_guardar_modificacion_configurar')!!}';
         var empresa_guardar_modificacion_logo_y_tema = '{!!URL::to('empresa_guardar_modificacion_logo_y_tema')!!}';
+        var empresa_guardar_registro_empresa_facturapi = '{!!URL::to('empresa_guardar_registro_empresa_facturapi')!!}';
         var cambiar_contrasena = '{!!URL::to('cambiar_contrasena')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')

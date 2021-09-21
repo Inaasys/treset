@@ -3612,6 +3612,39 @@ $("#btnGuardarModificacion").on('click', function (e) {
   //validar formulario
   form.parsley().validate();
 });
+
+
+
+//detectar cuando en el input de buscar por codigo de producto el usuario presione la tecla enter, si es asi se realizara la busqueda con el codigo escrito
+$(document).ready(function(){
+  //activar busqueda de kardex por codigo
+  $('#facturakardex').on('keypress', function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+          obtenerkardexporfactura();
+      }
+  });
+});
+//obtener kardex al dar click en detalle de la fila
+function obtenerkardex(factura){
+  $('.page-loader-wrapper').css('display', 'block');
+  $.get(facturas_obtener_kardex,{factura:factura},function(data){
+      $("#titulomodalmovimientos").html("Kardex: " + factura);
+      $("#facturakardex").val(factura);
+      $("#filasmovimientos").html(data.filasmovimientos);
+      $("#modalmovimientos").modal('show');
+      $('.page-loader-wrapper').css('display', 'none');
+  });
+}
+//obtener kardex al dar enter en el input del codigo
+function obtenerkardexporfactura(){
+  var facturakardex = $("#facturakardex").val();
+  obtenerkardex(facturakardex);
+}
+
+
+
 //verificar si se puede dar de baja
 function desactivar(facturadesactivar){
   $.get(facturas_verificar_si_continua_baja,{facturadesactivar:facturadesactivar}, function(data){
@@ -3751,7 +3784,12 @@ $("#btnenviarpdfemail").on('click', function (e) {
 //timbrar factura
 function timbrarfactura(factura){
   $.get(facturas_verificar_si_continua_timbrado,{factura:factura}, function(data){
-    if(data.Status == 'BAJA'){
+    if(data.Esquema == 'INTERNA' || data.Esquema == 'NOTA'){
+      $("#facturatimbrado").val(0);
+      $("#textomodaltimbrado").html('Aviso, las Facturas con Esquema INTERNA o NOTA no se pueden timbrar');
+      $('#modaltimbrado').modal('show');
+      $("#btntimbrarfactura").hide();
+    }else if(data.Status == 'BAJA'){
       $("#facturatimbrado").val(0);
       $("#textomodaltimbrado").html('Aviso, esta Factura se encuentra dada de baja');
       $('#modaltimbrado').modal('show');

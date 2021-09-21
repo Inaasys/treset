@@ -597,7 +597,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
     public function cuentas_por_cobrar_guardar(Request $request){
         ini_set('max_input_vars','20000' );
         //obtener el ultimo id de la tabla
-        $folio = Helpers::ultimofoliotablamodulos('App\CuentaXCobrar');
+        $folio = Helpers::ultimofolioserietablamodulos('App\CuentaXCobrar', $request->serie);
         //INGRESAR DATOS A TABLA
         $pago = $folio.'-'.$request->serie;
 		$CuentaXCobrar = new CuentaXCobrar;
@@ -1212,6 +1212,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
     public function cuentas_por_cobrar_verificar_si_continua_timbrado(Request $request){
         $CXC = CuentaXCobrar::where('Pago', $request->pago)->first();
         $data = array(
+            'Esquema' => $CXC->Esquema,
             'Status' => $CXC->Status,
             'UUID' => $CXC->UUID
         );

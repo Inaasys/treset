@@ -134,6 +134,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                             '<ul class="dropdown-menu">'.
                                                 '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Factura .'\')">Cambios</a></li>'.
                                                 '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Factura .'\')">Bajas</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="obtenerkardex(\''.$data->Factura .'\')">Ver Movimientos</a></li>'.
                                                 '<li><a href="'.route('facturas_generar_pdfs_indiv',$data->Factura).'" target="_blank">Ver Documento Interno PDF</a></li>'.
                                                 '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Factura .'\',1)">Enviar Documento Interno por Correo</a></li>'.
                                                 '<li><a href="'.route('facturas_generar_pdfs_cliente_indiv',$data->Factura).'" target="_blank">Ver Documento Cliente PDF</a></li>'.
@@ -632,7 +633,7 @@ class FacturaController extends ConfiguracionSistemaController{
             '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                 '<td class="tdmod"><div class="numeropartida">'.$partida.'</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
                 '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$detalle->Codigo.'" readonly data-parsley-length="[1, 20]">'.$detalle->Codigo.'</td>'.
-                '<td class="tdmod"><input type="hidden" class="form-control descripcionpartida" name="descripcionpartida[]" value="'.$detalle->Descripcion.'" required data-parsley-length="[1, 255]">'.$detalle->Descripcion.'</td>'.
+                '<td class="tdmod"><input type="hidden" class="form-control descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($detalle->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]">'.htmlspecialchars($detalle->Descripcion, ENT_QUOTES).'</td>'.
                 '<td class="tdmod"><input type="hidden" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="'.$detalle->Unidad.'" required data-parsley-length="[1, 5]">'.$detalle->Unidad.'</td>'.
                 '<td class="tdmod">'.
                     '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Cantidad).'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" readonly>'.
@@ -772,7 +773,7 @@ class FacturaController extends ConfiguracionSistemaController{
             '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                 '<td class="tdmod"><div class="numeropartida">'.$partida.'</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
                 '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$detalle->Codigo.'" readonly data-parsley-length="[1, 20]">'.$detalle->Codigo.'</td>'.
-                '<td class="tdmod"><input type="hidden" class="form-control descripcionpartida" name="descripcionpartida[]" value="'.$detalle->Descripcion.'" required data-parsley-length="[1, 255]">'.$detalle->Descripcion.'</td>'.
+                '<td class="tdmod"><input type="hidden" class="form-control descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($detalle->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]">'.htmlspecialchars($detalle->Descripcion, ENT_QUOTES).'</td>'.
                 '<td class="tdmod"><input type="hidden" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="'.$detalle->Unidad.'" required data-parsley-length="[1, 5]">'.$detalle->Unidad.'</td>'.
                 '<td class="tdmod">'.
                     '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Cantidad).'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" readonly>'.
@@ -1160,7 +1161,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                     '<td class="tdmod"><div class="numeropartida">'.$partida.'</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$df->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$df->Codigo.'" readonly data-parsley-length="[1, 20]">'.$df->Codigo.'</td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.$df->Descripcion.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($df->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="'.$df->Unidad.'" required data-parsley-length="[1, 5]">'.$df->Unidad.'</td>'.
                     '<td class="tdmod">'.
                         '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($df->Cantidad).'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" readonly>'.
@@ -1399,6 +1400,34 @@ class FacturaController extends ConfiguracionSistemaController{
             }  
         }
         return response()->json($Factura);        
+    }
+
+    //obtener movimientos factura
+    public function facturas_obtener_kardex(Request $request){
+        $kardex = DB::select('exec ObtenerKardexFactura ?', array($request->factura));
+        $numerodecimalesconfigurados = config('app.numerodedecimales');
+        $filasmovimientos = "";
+        $fila = 1;
+        foreach($kardex as $d){
+            $colorfila = '';
+            if($d->status == 'BAJA'){
+                $colorfila = 'bg-red';
+            }
+            $filasmovimientos= $filasmovimientos.
+            '<tr class="'.$colorfila.'">'.
+                '<td><b>'.$fila.'</b></td>'.
+                '<td>'.$d->Movimiento.'</td>'.
+                '<td>'.$d->pago.'</td>'.
+                '<td>'.$d->fecha.'</td>'.
+                '<td>'.Helpers::convertirvalorcorrecto($d->abono).'</td>'.
+                '<td>'.$d->status.'</td>'.
+            '</tr>';
+            $fila++;
+        }
+        $data = array(
+            'filasmovimientos' => $filasmovimientos,
+        );
+        return response()->json($data);
     }
 
     //verificar si continua baja
@@ -2524,6 +2553,7 @@ class FacturaController extends ConfiguracionSistemaController{
     public function facturas_verificar_si_continua_timbrado(Request $request){
         $Factura = Factura::where('factura', $request->factura)->first();
         $data = array(
+            'Esquema' => $Factura->Esquema,
             'Status' => $Factura->Status,
             'UUID' => $Factura->UUID
         );

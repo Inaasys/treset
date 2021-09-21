@@ -481,7 +481,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$doc->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$doc->Codigo.'" readonly data-parsley-length="[1, 20]">'.$doc->Codigo.'</td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" value="'.$doc->Descripcion.'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" value="'.htmlspecialchars($doc->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$doc->Unidad.'" readonly data-parsley-length="[1, 5]">'.$doc->Unidad.'</td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm porsurtirpartida"  name="porsurtirpartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Surtir).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida"  name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Cantidad).'" data-parsley-min="'.Helpers::convertirvalorcorrecto($cantidadyasurtidapartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculartotalesfilasordencompra('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo .'\');formatocorrectoinputcantidades(this);" '.$readonly.'></td>'.
@@ -611,8 +611,13 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         foreach ($request->codigoproductopartida as $key => $codigoproductopartida){    
             //if la partida se agrego en la modificacion se agrega en los detalles
             if($request->agregadoen [$key] == 'modificacion'){      
-                $item = OrdenCompraDetalle::select('Item')->where('Orden', $orden)->orderBy('Item', 'DESC')->take(1)->get();
-                $ultimoitem = $item[0]->Item+1;
+                $contaritems = OrdenCompraDetalle::select('Item')->where('Orden', $orden)->count();
+                if($contaritems > 0){
+                    $item = OrdenCompraDetalle::select('Item')->where('Orden', $orden)->orderBy('Item', 'DESC')->take(1)->get();
+                    $ultimoitem = $item[0]->Item+1;
+                }else{
+                    $ultimoitem = 1;
+                }
                 $OrdenCompraDetalle=new OrdenCompraDetalle;
                 $OrdenCompraDetalle->Orden = $orden;
                 $OrdenCompraDetalle->Proveedor = $request->numeroproveedor;

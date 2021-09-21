@@ -27,7 +27,8 @@ class Produccion extends Model
         'Periodo',
         'Total',
         'Cliente',
-        'Producido'
+        'Producido',
+        'MotivoDeBaja'
     ];
     //cantidad
     public function getCantidadAttribute($value){

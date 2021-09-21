@@ -442,7 +442,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" >X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$da->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodmd codigoproductopartida" name="codigoproductopartida[]" value="'.$da->Codigo.'" readonly data-parsley-length="[1, 20]"></td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" value="'.$da->Descripcion.'" readonly data-parsley-length="[1, 255]"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" value="'.htmlspecialchars($da->Descripcion, ENT_QUOTES).'" readonly data-parsley-length="[1, 255]"></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm unidadproductopartida" name="unidadproductopartida[]" value="'.$da->Unidad.'" readonly data-parsley-length="[1, 5]"></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm existenciaactualpartida" name="existenciaactualpartida[]" value="'.Helpers::convertirvalorcorrecto($da->Existencias).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                     '<td class="tdmod">'.
@@ -604,9 +604,9 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
         if($numeroalmacendb == $numeroalmacen){  
             foreach ($request->codigoproductopartida as $key => $codigoproductopartida){ 
                 //if la partida se agrego en la modificacion se realiza un insert
-                if($request->agregadoen [$key] == 'modificacion'){
-                    $contardetalles = AjusteInventarioDetalle::where('Ajuste', $ajuste)->count();
-                    if($contardetalles > 0){
+                if($request->agregadoen [$key] == 'modificacion'){      
+                    $contaritems = AjusteInventarioDetalle::select('Item')->where('Ajuste', $ajuste)->count();
+                    if($contaritems > 0){
                         $item = AjusteInventarioDetalle::select('Item')->where('Ajuste', $ajuste)->orderBy('Item', 'DESC')->take(1)->get();
                         $ultimoitem = $item[0]->Item+1;
                     }else{

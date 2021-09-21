@@ -10,16 +10,19 @@ use Helpers;
 use DB;
 use DataTables;
 use App\FolioComprobanteFactura;
+use Facturapi\Facturapi;
+use Storage;
 
 class FolioComprobanteFacturaController extends ConfiguracionSistemaController{
 
     public function __construct(){
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
+        //API FACTURAPI 
+        $this->facturapi = new Facturapi( config('app.keygeneralfacturapi') ); //
     }
     
     public function folios_comprobantes_facturas(){
-        $mayusculas_sistema = Helpers::mayusculas_sistema();
-        return view('catalogos.foliosfiscales.folioscomprobantesfacturas', compact('mayusculas_sistema'));
+        return view('catalogos.foliosfiscales.folioscomprobantesfacturas');
     }
     public function folios_comprobantes_facturas_obtener(Request $request){
         if($request->ajax()){
@@ -58,20 +61,153 @@ class FolioComprobanteFacturaController extends ConfiguracionSistemaController{
     //predeterminar folio
     public function folios_comprobantes_facturas_predeterminar(Request $request){
         //predeterminar folio
-        FolioComprobanteFactura::where('Numero', $request->numerofolio)
+        FolioComprobanteFactura::where('Numero', $request->numerofoliopred)
         ->update([
             'Predeterminar' => '+'
         ]);
         //vaciar predeterminar de folio anterior
-        FolioComprobanteFactura::where('Numero', '<>', $request->numerofolio)
+        FolioComprobanteFactura::where('Numero', '<>', $request->numerofoliopred)
         ->update([
             'Predeterminar' => ''
         ]);        
     }
 
+    //folios fiscales
+    public function folios_comprobantes_facturas_enviar_archivos_timbrado(Request $request){
+        if($request->archivocertificado != "" && $request->archivollaveprivada != "" && $request->contrasenallaveprivada != ""){
+            $mover_a_carpeta="archivos_timbrado_empresa";
+            $path = public_path('archivos_timbrado_empresa');
+            //archivo certificado
+            $ArchivoDeCertificado = $request->archivocertificado;
+            $nombre_original_certificado = $ArchivoDeCertificado->getClientOriginalName();
+            $ArchivoCertificado = $nombre_original_certificado;
+            //guardar en public/archivos_timbrado_empresa
+            $ArchivoDeCertificado->move($mover_a_carpeta, $ArchivoCertificado);
+            $urlcertificado = $path."\\".$ArchivoCertificado;
+            //archivo llave privada
+            $ArchivoDeLlave = $request->archivollaveprivada;
+            $nombre_original_llave = $ArchivoDeLlave->getClientOriginalName();
+            $ArchivoLlave = $nombre_original_llave;
+            //guardar en public/archivos_timbrado_empresa
+            $ArchivoDeLlave->move($mover_a_carpeta, $ArchivoLlave);
+            $urlllave = $path."\\".$ArchivoLlave;
+            //contraseña archivos
+            $Contraseña = $request->contrasenallaveprivada;
+            //actualizar archivos de certificado
+            $archivos = $this->facturapi->Organizations->uploadCertificate($this->empresa->IdFacturapi, array(
+                "cerFile" => $urlcertificado,
+                "keyFile" => $urlllave,
+                "password" => $Contraseña
+            ));
+            $result = json_encode($archivos);
+            $result2 = json_decode($result, true);
+            if(array_key_exists('id', $result2)){
+                $data = array(
+                    'msj' => 'OK',
+                    'updated_at' => $archivos->certificate->updated_at,
+                    'expires_at' => $archivos->certificate->expires_at
+                );
+            }else{
+                $data = array(
+                    'msj' => 'Archivos o contraseña incorrectos',
+                    'updated_at' => "",
+                    'expires_at' => ""
+                );
+            }
+        }else{
+            $data = array(
+                'msj' => 'Para obtener fechas Certificado válido desde y Certificado válido hasta, se requieren Archivo de certificado, Archivo de llave y Contraseña',
+                'updated_at' => "",
+                'expires_at' => ""
+            );
+        }
+        return response()->json($data);
+    }
+
     //altas
     public function folios_comprobantes_facturas_guardar(Request $request){
+        $serie=$request->serie;
+	    $ExisteSerie = FolioComprobanteFactura::where('Serie', $serie )->first();
+	    if($ExisteSerie == true){
+	        $FolioComprobanteFactura = 1;
+	    }else{
+            $id = Helpers::ultimoidtabla('App\FolioComprobanteFactura');
+            $ArchivoCertificado = "";
+            $ArchivoLlave = "";
+            $Contraseña = "";
+            $NoCertificado = "";
+            $ValidoDesde = "";
+            $ValidoHasta = "";
+            if($request->esquema == "CFDI"){
+                $mover_a_carpeta="archivos_timbrado_empresa";
+                $path = public_path('archivos_timbrado_empresa');
+                //archivo certificado
+                $ArchivoDeCertificado = $request->archivocertificado;
+                $nombre_original_certificado = $ArchivoDeCertificado->getClientOriginalName();
+                $ArchivoCertificado = $nombre_original_certificado;
+                //guardar en public/archivos_timbrado_empresa
+                $ArchivoDeCertificado->move($mover_a_carpeta, $ArchivoCertificado);
+                $urlcertificado = $path."\\".$ArchivoCertificado;
+                //archivo llave privada
+                $ArchivoDeLlave = $request->archivollaveprivada;
+                $nombre_original_llave = $ArchivoDeLlave->getClientOriginalName();
+                $ArchivoLlave = $nombre_original_llave;
+                //guardar en public/archivos_timbrado_empresa
+                $ArchivoDeLlave->move($mover_a_carpeta, $ArchivoLlave);
+                $urlllave = $path."\\".$ArchivoLlave;
+                //contraseña archivos
+                $Contraseña = $request->contrasenallaveprivada;
+                //actualizar archivos de certificado
+                $archivos = $this->facturapi->Organizations->uploadCertificate($this->empresa->IdFacturapi, array(
+                    "cerFile" => $urlcertificado,
+                    "keyFile" => $urlllave,
+                    "password" => $Contraseña
+                ));
+                /*
+                $mover_a_carpeta="archivos_timbrado_empresa";
+                //archivo certificado
+                $ArchivoDeCertificado = $request->archivocertificado;
+                $nombre_original_certificado = $ArchivoDeCertificado->getClientOriginalName();
+                $ArchivoCertificado = $nombre_original_certificado;
+                //guardar en public/archivos_timbrado_empresa
+                $ArchivoDeCertificado->move($mover_a_carpeta, $ArchivoCertificado);
 
+                //archivo llave privada
+                $ArchivoDeLlave = $request->archivollaveprivada;
+                $nombre_original_llave = $ArchivoDeLlave->getClientOriginalName();
+                $ArchivoLlave = $nombre_original_llave;
+                //guardar en public/archivos_timbrado_empresa
+                $ArchivoDeLlave->move($mover_a_carpeta, $ArchivoLlave);
+
+                $Contraseña = $request->contrasenallaveprivada;
+                */
+                $ValidoDesde = Carbon::parse($request->certificadovalidodesde)->toDateTimeString();
+                $ValidoHasta = Carbon::parse($request->certificadovalidohasta)->toDateTimeString();
+            }
+            $FolioComprobanteFactura = new FolioComprobanteFactura;
+            $FolioComprobanteFactura->Numero=$id;
+            $FolioComprobanteFactura->Serie=$request->serie;
+            $FolioComprobanteFactura->Esquema=$request->esquema;
+            $FolioComprobanteFactura->FolioInicial=$request->folioinicial;
+            $FolioComprobanteFactura->Titulo=$request->titulo; 
+            $FolioComprobanteFactura->Depto=$request->departamento;
+            $FolioComprobanteFactura->ArchivoCertificado=$ArchivoCertificado;
+            $FolioComprobanteFactura->ArchivoLlave=$ArchivoLlave;
+            $FolioComprobanteFactura->Contraseña=$Contraseña;
+            $FolioComprobanteFactura->NoCertificado=$NoCertificado;
+            $FolioComprobanteFactura->ValidoDesde=$ValidoDesde;
+            $FolioComprobanteFactura->ValidoHasta=$ValidoHasta;
+            $FolioComprobanteFactura->Empresa=$request->empresa;
+            $FolioComprobanteFactura->Domicilio=$request->domicilio;
+            $FolioComprobanteFactura->Leyenda1=$request->leyenda1;
+            $FolioComprobanteFactura->Leyenda2=$request->leyenda2;
+            $FolioComprobanteFactura->Leyenda3=$request->leyenda3;
+            $FolioComprobanteFactura->Pagare=$request->pagare;
+            $FolioComprobanteFactura->Version=$request->versioncfdi;
+            $FolioComprobanteFactura->Status="ALTA";
+            $FolioComprobanteFactura->save();
+        }
+        return response()->json($FolioComprobanteFactura); 
     }
 
     //bajas
@@ -95,15 +231,92 @@ class FolioComprobanteFacturaController extends ConfiguracionSistemaController{
     //obtener folio
     public function folios_comprobantes_facturas_obtener_folio(Request $request){
         $FolioComprobanteFactura = FolioComprobanteFactura::where('Numero', $request->numerofolio)->first();
+        $path = public_path('archivos_timbrado_empresa');
+        $urlcertificado = $path."\\".$FolioComprobanteFactura->ArchivoCertificado;
+        $urlllave = $path."\\".$FolioComprobanteFactura->ArchivoLlave;
         $data = array(
-            'FolioComprobanteFactura' => $FolioComprobanteFactura
+            'FolioComprobanteFactura' => $FolioComprobanteFactura,
+            'urlcertificado' => $urlcertificado,
+            'urlllave' => $urlllave
         );
         return response()->json($data);
     }
 
     //cambios
     public function folios_comprobantes_facturas_guardar_modificacion(Request $request){
-
+        $FolioComprobanteFactura = FolioComprobanteFactura::where('Numero', $request->numero)->first(); 
+        $ArchivoCertificado = "";
+        $ArchivoLlave = "";
+        $Contraseña = "";
+        $NoCertificado = "";
+        $ValidoDesde = "";
+        $ValidoHasta = "";
+        if($request->esquema == "CFDI"){
+            if($request->actualizarcertificado == 1){
+                $mover_a_carpeta="archivos_timbrado_empresa";
+                $path = public_path('archivos_timbrado_empresa');
+                //archivo certificado
+                $ArchivoDeCertificado = $request->archivocertificado;
+                $nombre_original_certificado = $ArchivoDeCertificado->getClientOriginalName();
+                $ArchivoCertificado = $nombre_original_certificado;
+                //guardar en public/archivos_timbrado_empresa
+                $ArchivoDeCertificado->move($mover_a_carpeta, $ArchivoCertificado);
+                $urlcertificado = $path."\\".$ArchivoCertificado;
+                //archivo llave privada
+                $ArchivoDeLlave = $request->archivollaveprivada;
+                $nombre_original_llave = $ArchivoDeLlave->getClientOriginalName();
+                $ArchivoLlave = $nombre_original_llave;
+                //guardar en public/archivos_timbrado_empresa
+                $ArchivoDeLlave->move($mover_a_carpeta, $ArchivoLlave);
+                $urlllave = $path."\\".$ArchivoLlave;
+                //contraseña archivos
+                $Contraseña = $request->contrasenallaveprivada;
+                //actualizar archivos de certificado
+                $archivos = $this->facturapi->Organizations->uploadCertificate($this->empresa->IdFacturapi, array(
+                    "cerFile" => $urlcertificado,
+                    "keyFile" => $urlllave,
+                    "password" => $Contraseña
+                ));
+                $ValidoDesde = Carbon::parse($request->certificadovalidodesde)->toDateTimeString();
+                $ValidoHasta = Carbon::parse($request->certificadovalidohasta)->toDateTimeString();
+            }
+        }
+        if($request->actualizarcertificado == 1){
+            //modificar con archivos
+            FolioComprobanteFactura::where('Numero', $request->numero)
+            ->update([
+                'Titulo' => $request->titulo,
+                'Depto' => $request->departamento,
+                'ArchivoCertificado' => $ArchivoCertificado,
+                'ArchivoLlave' => $ArchivoLlave,
+                'Contraseña' => $Contraseña,
+                'NoCertificado' => $NoCertificado,
+                'ValidoDesde' => $ValidoDesde,
+                'ValidoHasta' => $ValidoHasta,
+                'Empresa' => $request->empresa,
+                'Domicilio' => $request->domicilio,
+                'Leyenda1' => $request->leyenda1,
+                'Leyenda2' => $request->leyenda2,
+                'Leyenda3' => $request->leyenda3,
+                'Pagare' => $request->pagare,
+                'Version' => $request->versioncfdi
+            ]);
+        }else{
+            //modificar sin archivos
+            FolioComprobanteFactura::where('Numero', $request->numero)
+            ->update([
+                'Titulo' => $request->titulo,
+                'Depto' => $request->departamento,
+                'Empresa' => $request->empresa,
+                'Domicilio' => $request->domicilio,
+                'Leyenda1' => $request->leyenda1,
+                'Leyenda2' => $request->leyenda2,
+                'Leyenda3' => $request->leyenda3,
+                'Pagare' => $request->pagare,
+                'Version' => $request->versioncfdi
+            ]);
+        }
+        return response()->json($FolioComprobanteFactura); 
     }
 
 }
