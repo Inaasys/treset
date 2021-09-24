@@ -64,7 +64,7 @@
                     </div>
                     <div style="width:45%; height:110px; float:left; text-align: left; border-style: groove;">
                         <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
-                            <li style="font-size:12px; margin-left: 5px;"><b>Nota Cliente:</b> <b style="color:red">{{$d['notacreditocliente']->Nota}}</b></li>
+                            <li style="font-size:18px; margin-left: 5px;"><b>Nota Cliente:</b> <b style="color:red">{{$d['notacreditocliente']->Nota}}</b></li>
                             <li style="font-size:9px; margin-left: 5px;">UsoCfdi: {{$d['notacreditocliente']->UsoCfdi}} {{$d['usocfdi']->Nombre}}</li>
                             <li style="font-size:9px; margin-left: 5px;">Forma de Pago: {{$d['notacreditocliente']->FormaPago}} {{$d['formapago']->Nombre}}</li>
                             <li style="font-size:9px; margin-left: 5px;">Método de Pago: {{$d['notacreditocliente']->MetodoPago}} {{$d['metodopago']->Nombre}}</li>

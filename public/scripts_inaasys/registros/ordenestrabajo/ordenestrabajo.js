@@ -1170,7 +1170,7 @@ function asignaciontecnicos(fila){
                                           '</div>'+
                                           '<div class="col-md-12">'+
                                               '<label>Anotaciones</label>'+
-                                              '<textarea class="form-control" name="asignaciontecnicosanotaciones" id="asignaciontecnicosanotaciones" placeholder="Escribe las anotaciones" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rowspan="1">'+anotaciones+'</textarea>'+
+                                              '<textarea class="form-control" name="asignaciontecnicosanotaciones" id="asignaciontecnicosanotaciones" placeholder="Escribe las anotaciones" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rowspan="1">'+anotaciones+'</textarea>'+
                                           '</div>'+
                                           '<div class="col-md-12">'+
                                             '<label><br>Técnicos</label>&nbsp;&nbsp;'+
@@ -1388,7 +1388,7 @@ function alta(){
                   '<div class="row">'+
                     '<div class="col-md-2">'+
                       '<label>Orden <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
-                      '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                      '<input type="text" class="form-control" name="folio" id="folio" required onkeyup="tipoLetra(this);">'+
                       '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                       '<input type="hidden" class="form-control" name="numerofilastablaservicios" id="numerofilastablaservicios" value="0" required readonly>'+
                       '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+

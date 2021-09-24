@@ -63,7 +63,7 @@
                     </div>
                     <div style="width:45%; height:110px; float:left; text-align: left; border-style: groove;">
                         <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
-                            <li style="font-size:12px; margin-left: 5px;"><b>Orden Compra: </b> <b style="color:red">{{$d['ordencompra']->Orden}}</b></li>
+                            <li style="font-size:18px; margin-left: 5px;"><b>Orden Compra: </b> <b style="color:red">{{$d['ordencompra']->Orden}}</b></li>
                             <li style="font-size:9px; margin-left: 5px;">Fecha: {{$d['ordencompra']->Fecha}}</li>
                             <li style="font-size:9px; margin-left: 5px;">Status: {{$d['ordencompra']->Status}}</li>
                             <li style="font-size:9px; margin-left: 5px;">Tipo: {{$d['ordencompra']->Tipo}}</li>

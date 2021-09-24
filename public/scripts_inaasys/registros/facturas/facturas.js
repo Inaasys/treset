@@ -1786,6 +1786,93 @@ function seleccionarclaveunidad(clave, nombre, fila){
   $("#filaproducto"+fila+" .nombreclaveunidadpartida").val(nombre);
   mostrarformulario();
 }
+//listar facturas relacionadas
+function listaruuidrelacionados(){
+  ocultarformulario();
+  var numerocliente = $("#numerocliente").val();
+  var tablafacturasrel =    '<div class="modal-header '+background_forms_and_modals+'">'+
+                                '<h4 class="modal-title">Comprobantes UUIDS</h4>'+
+                            '</div>'+
+                            '<div class="modal-body">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-12">'+
+                                        '<div class="table-responsive">'+
+                                            '<table id="tbllistadofacturarel" class="tbllistadofacturarel table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                                '<thead class="'+background_tables+'">'+
+                                                    '<tr>'+
+                                                        '<th>Operaciones</th>'+
+                                                        '<th>UUID</th>'+
+                                                        '<th>Emisor</th>'+
+                                                        '<th>Receptor</th>'+
+                                                        '<th>Serie</th>'+
+                                                        '<th>Folio</th>'+
+                                                        '<th>Fecha</th>'+
+                                                        '<th>Total</th>'+
+                                                    '</tr>'+
+                                                '</thead>'+
+                                                '<tbody></tbody>'+
+                                            '</table>'+
+                                        '</div>'+
+                                    '</div>'+  
+                                '</div>'+
+                            '</div>'+
+                            '<div class="modal-footer">'+
+                                '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                            '</div>';   
+  $("#contenidomodaltablas").html(tablafacturasrel);
+  $('#tbllistadofacturarel').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
+      "sScrollX": "110%",
+      "sScrollY": "370px",
+      "bScrollCollapse": true,  
+      processing: true,
+      'language': {
+          'loadingRecords': '&nbsp;',
+          'processing': '<div class="spinner"></div>'
+      },
+      serverSide: true,
+      ajax: {
+          url: facturas_obtener_facturas_relacionadas,
+          data: function (d) {
+            d.numerocliente = numerocliente;
+          }
+      },
+      columns: [
+          { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+          { data: 'UUID', name: 'UUID' },
+          { data: 'EmisorRfc', name: 'EmisorRfc' },
+          { data: 'ReceptorRfc', name: 'ReceptorRfc' },
+          { data: 'Serie', name: 'Serie' },
+          { data: 'Folio', name: 'Folio' },
+          { data: 'Fecha', name: 'Fecha' },
+          { data: 'Total', name: 'Total' }
+      ],
+      "initComplete": function() {
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistadofacturarel').DataTable().search( this.value ).draw();
+              }
+          });
+      },
+  });
+}
+
+function seleccionarfacturarel(UUID, Factura){
+  var tipooperacion = $("#tipooperacion").val();
+  var uuidrelacionado = '<tr class="filasuuid" id="filauuid0">'+
+                                    '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminaruuid" onclick="eliminarfilauuid(0)">X</div><input type="hidden" class="form-control uuidagregadoen" name="uuidagregadoen[]" value="'+tipooperacion+'" readonly></td>'+
+                                    '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm uuidrelacionado" name="uuidrelacionado[]" value="'+UUID+'" readonly>'+UUID+'</td>'+
+                                '</tr>';
+  $("#tablauuidrelacionados tbody").append(uuidrelacionado);  
+  renumerarfilasuuid();
+  comprobarfilasuuid();
+  mostrarformulario();
+}
+
+
 //función que evalua si la partida que quieren ingresar ya existe o no en el detalle de la orden de compra
 function evaluarproductoexistente(Codigo){
   var sumaiguales=0;
@@ -2109,7 +2196,7 @@ function alta(){
                               '</div>'+
                             '</div>'+
                             '<div class="row">'+
-                              '<div class="col-md-6">'+
+                              '<div class="col-md-8">'+
                                 '<div class="row">'+
                                   '<div class="col-md-12 table-responsive cabecerafija" style="height: 125px;overflow-y: scroll;padding: 0px 0px;">'+
                                     '<input type="hidden" class="form-control" name="numerofilasuuid" id="numerofilasuuid" value="0" readonly>'+
@@ -2118,9 +2205,12 @@ function alta(){
                                         '<tr>'+
                                           '<th class="customercolortheadth">Comprobante o UUID Relacionado</th>'+
                                           '<th class="customercolortheadth">'+
-                                              '<div class="col-md-12">'+
-                                                '<label for="xml" class="btn btn-success">Selecciona el UUID relacionado</label>'+
+                                              '<div class="col-md-6">'+
+                                                '<label for="xml" class="btn btn-success">Selecciona el xml relacionado</label>'+
                                                 '<input type="file" class="form-control" name="xml" id="xml" onchange="cambiodexml(this)" style="visibility:hidden;display:none;" onclick="this.value=null;" form="formxml">'+
+                                              '</div>'+  
+                                              '<div class="col-md-6">'+
+                                                '<label class="btn btn-success" onclick="listaruuidrelacionados();">Selecciona factura relacionada</label>'+
                                               '</div>'+
                                           '</th>'+
                                         '</tr>'+

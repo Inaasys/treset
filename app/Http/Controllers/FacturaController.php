@@ -623,8 +623,8 @@ class FacturaController extends ConfiguracionSistemaController{
         foreach($detallesremision as $detalle){
             $ImporteDescuento = $detalle->Importe - $detalle->Descuento;
             $producto = Producto::where('Codigo', $detalle->Codigo)->first();
-            $claveproductopartida = ClaveProdServ::where('Clave', $detalle->ClaveProducto)->first();
-            $claveunidadpartida = ClaveUnidad::where('Clave', $detalle->ClaveUnidad)->first();
+            $claveproductopartida = ClaveProdServ::where('Clave', $producto->ClaveProducto)->first();
+            $claveunidadpartida = ClaveUnidad::where('Clave', $producto->ClaveUnidad)->first();
             $claveproducto = $claveproductopartida ? $claveproductopartida->Clave : '';
             $nombreclaveproducto = $claveproductopartida ? $claveproductopartida->Nombre : '';
             $claveunidad = $claveunidadpartida ? $claveunidadpartida->Clave : '';
@@ -938,6 +938,23 @@ class FacturaController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         }         
+    }
+    //obtener facturas relaciinadas
+    public function facturas_obtener_facturas_relacionadas(Request $request){
+        if($request->ajax()){
+            $data = Factura::where('Status', 'BAJA')->where('Cliente', $request->numerocliente)->where('UUID', '<>', '');
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarfacturarel(\''.$data->UUID .'\',\''.$data->Factura.'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->addColumn('Total', function($data){ 
+                        return Helpers::convertirvalorcorrecto($data->Total);
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        } 
+
     }
 
     //cargar uuid relacionado
@@ -1738,9 +1755,9 @@ class FacturaController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.facturas.formato_pdf_facturas', compact('data'))
-        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        ->setOption('footer-center', 'Página [page] de [toPage]')
-        ->setOption('footer-right', ''.$fechaformato.'')
+        //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        //->setOption('footer-center', 'Página [page] de [toPage]')
+        //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
         ->setOption('margin-right', 2)
@@ -1903,9 +1920,9 @@ class FacturaController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.facturas.formato_pdf_facturas', compact('data'))
-        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        ->setOption('footer-center', 'Página [page] de [toPage]')
-        ->setOption('footer-right', ''.$fechaformato.'')
+        //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        //->setOption('footer-center', 'Página [page] de [toPage]')
+        //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
         ->setOption('margin-right', 2)
@@ -2081,9 +2098,9 @@ class FacturaController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.facturas.formato_pdf_facturas', compact('data'))
-        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        ->setOption('footer-center', 'Página [page] de [toPage]')
-        ->setOption('footer-right', ''.$fechaformato.'')
+        //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        //->setOption('footer-center', 'Página [page] de [toPage]')
+        //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
         ->setOption('margin-right', 2)
@@ -2294,9 +2311,9 @@ class FacturaController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.facturas.formato_pdf_clientes_facturas', compact('data'))
-        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        ->setOption('footer-center', 'Página [page] de [toPage]')
-        ->setOption('footer-right', ''.$fechaformato.'')
+        //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        //->setOption('footer-center', 'Página [page] de [toPage]')
+        //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
         ->setOption('margin-right', 2)
@@ -2458,9 +2475,9 @@ class FacturaController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.facturas.formato_pdf_clientes_facturas', compact('data'))
-        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        ->setOption('footer-center', 'Página [page] de [toPage]')
-        ->setOption('footer-right', ''.$fechaformato.'')
+        //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        //->setOption('footer-center', 'Página [page] de [toPage]')
+        //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
         ->setOption('margin-right', 2)

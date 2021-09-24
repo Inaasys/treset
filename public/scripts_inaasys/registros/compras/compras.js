@@ -1218,7 +1218,7 @@ function calculartotal(){
 }
 //validar que la fecha de la compra sea la misma que la fecha de emision de la factura del proveedor y validar que la fecha de la compra solo sea del mismo mes y año en curso
 function validarmescompra(){
-  var fechaxml = new Date($("#fechaemitida").val());
+  /*var fechaxml = new Date($("#fechaemitida").val());
   var dia = ("0" + fechaxml.getDate()).slice(-2);
   var mes = ("0" + (fechaxml.getMonth() + 1)).slice(-2);
   var fechafacturasinhoras = fechaxml.getFullYear()+"-"+(mes)+"-"+(dia) ;  
@@ -1229,7 +1229,7 @@ function validarmescompra(){
   if(fechafacturasinhoras != fechacomprasinhoras){
     $("#fecha").val("");
     msj_errorfechaigualafechafactura();
-  }
+  }*/
 }
 //agregar una fila en la tabla de precios productos
 var contadorproductos=0;

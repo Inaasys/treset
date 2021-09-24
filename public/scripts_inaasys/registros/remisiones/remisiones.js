@@ -1080,7 +1080,7 @@ function alta(){
                         '<div class="row">'+
                             '<div class="col-md-3">'+
                                 '<label>Remisión <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
-                                '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control" name="folio" id="folio" required onkeyup="tipoLetra(this);">'+
                                 '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                                 '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
                                 '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
@@ -1411,11 +1411,15 @@ $("#btnGuardar").on('click', function (e) {
                     contentType: false,
                     processData: false,
                     success:function(data){
-                    msj_datosguardadoscorrectamente();
-                    limpiar();
-                    ocultarmodalformulario();
-                    limpiarmodales();
-                    $('.page-loader-wrapper').css('display', 'none');
+                        if(data == 1){
+                            msj_errorremisionexistente();
+                        }else{
+                            msj_datosguardadoscorrectamente();
+                            limpiar();
+                            ocultarmodalformulario();
+                            limpiarmodales();
+                        }
+                        $('.page-loader-wrapper').css('display', 'none');
                     },
                     error:function(data){
                     if(data.status == 403){

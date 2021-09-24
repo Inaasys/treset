@@ -463,102 +463,108 @@ class RemisionController extends ConfiguracionSistemaController{
     public function remisiones_guardar(Request $request){
         ini_set('max_input_vars','20000' );
         //obtener el ultimo folio de la tabla
-        $folio = Helpers::ultimofolioserietablamodulos('App\Remision',$request->serie);
+        //$folio = Helpers::ultimofolioserietablamodulos('App\Remision',$request->serie);
+        $folio = $request->folio;
         //INGRESAR DATOS A TABLA ORDEN COMPRA
         $remision = $folio.'-'.$request->serie;
-        $Remision = new Remision;
-        $Remision->Remision=$remision;
-        $Remision->Serie=$request->serie;
-        $Remision->Folio=$folio;
-        $Remision->Cliente=$request->numerocliente;
-        $Remision->Agente=$request->numeroagente;
-        $Remision->Fecha=Carbon::parse($request->fecha)->toDateTimeString();
-        $Remision->Plazo=$request->plazo;
-        $Remision->Tipo=$request->tipo;
-        $Remision->Unidad=$request->unidad;
-        $Remision->Pedido=$request->pedido;
-        $Remision->Solicita=$request->solicitadopor;
-        $Remision->Referencia=$request->referencia;
-        $Remision->Destino=$request->destinodelpedido;
-        $Remision->Almacen=$request->numeroalmacen;
-        $Remision->Os=$request->ordenservicio;
-        $Remision->Eq=$request->equipo;
-        $Remision->Rq=$request->requisicion;
-        $Remision->Importe=$request->importe;
-        $Remision->Descuento=$request->descuento;
-        $Remision->SubTotal=$request->subtotal;
-        $Remision->Iva=$request->iva;
-        $Remision->Total=$request->total;
-        $Remision->Costo=$request->costo;
-        $Remision->Comision=$request->comision;
-        $Remision->Utilidad=$request->utilidad;
-        $Remision->Obs=$request->observaciones;
-        $Remision->Hora=Helpers::fecha_exacta_accion_datetimestring();
-        $Remision->Status="POR FACTURAR";
-        $Remision->Usuario=Auth::user()->user;
-        $Remision->Periodo=$this->periodohoy;
-        $Remision->save();
-        //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
-        $BitacoraDocumento = new BitacoraDocumento;
-        $BitacoraDocumento->Documento = "REMISIONES";
-        $BitacoraDocumento->Movimiento = $remision;
-        $BitacoraDocumento->Aplicacion = "ALTA";
-        $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
-        $BitacoraDocumento->Status = "POR FACTURAR";
-        $BitacoraDocumento->Usuario = Auth::user()->user;
-        $BitacoraDocumento->Periodo = $this->periodohoy;
-        $BitacoraDocumento->save();
-        //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
-        $item = 1;
-        foreach ($request->codigoproductopartida as $key => $codigoproductopartida){             
-            $RemisionDetalle=new RemisionDetalle;
-            $RemisionDetalle->Remision = $remision;
-            $RemisionDetalle->Cliente = $request->numerocliente;
-            $RemisionDetalle->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
-            $RemisionDetalle->Codigo = $codigoproductopartida;
-            $RemisionDetalle->Descripcion = $request->descripcionproductopartida [$key];
-            $RemisionDetalle->Unidad = $request->unidadproductopartida [$key];
-            $RemisionDetalle->Cantidad =  $request->cantidadpartida [$key];
-            $RemisionDetalle->Precio =  $request->preciopartida [$key];
-            $RemisionDetalle->Importe =  $request->importepartida [$key];
-            $RemisionDetalle->Dcto =  $request->descuentoporcentajepartida [$key];
-            $RemisionDetalle->Descuento =  $request->descuentopesospartida  [$key];
-            $RemisionDetalle->SubTotal =  $request->subtotalpartida [$key];
-            $RemisionDetalle->Impuesto =  $request->ivaporcentajepartida [$key];
-            $RemisionDetalle->Iva =  $request->ivapesospartida [$key];
-            $RemisionDetalle->Total =  $request->totalpesospartida [$key];
-            $RemisionDetalle->Costo =  $request->costopartida [$key];
-            $RemisionDetalle->CostoTotal =  $request->costototalpartida [$key];
-            $RemisionDetalle->Com =  $request->comisionporcentajepartida [$key];
-            $RemisionDetalle->Comision =  $request->comisionespesospartida [$key];
-            $RemisionDetalle->Utilidad =  $request->utilidadpartida [$key];
-            $RemisionDetalle->Moneda =  $request->monedapartida [$key];
-            $RemisionDetalle->CostoDeLista =  $request->costolistapartida [$key];
-            $RemisionDetalle->TipoDeCambio =  $request->tipocambiopartida [$key];
-            $RemisionDetalle->Cotizacion =  $request->cotizacionpartida [$key];
-            $RemisionDetalle->Insumo =  $request->insumopartida [$key];
-            $RemisionDetalle->InteresMeses =  $request->mesespartida [$key];
-            $RemisionDetalle->InteresTasa =  $request->tasainterespartida  [$key];
-            $RemisionDetalle->InteresMonto =  $request->montointerespartida  [$key];
-            $RemisionDetalle->Item = $item;
-            $RemisionDetalle->save();
-            //modificar fechaultimaventa y ultimocosto
-            $Producto = Producto::where('Codigo', $codigoproductopartida)->first();
-            $Producto->{'Fecha Ultima Venta'} = Carbon::parse($request->fecha)->toDateTimeString();
-            $Producto->{'Ultima Venta'} = $request->preciopartida [$key];
-            $Producto->save();
-            //restar existencias del almacen 
-            $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
-            if($ContarExistenciaAlmacen > 0){
-                $ExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
-                $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias - $request->cantidadpartida [$key];
-                Existencia::where('Codigo', $codigoproductopartida)
-                            ->where('Almacen', $request->numeroalmacen)
-                            ->update([
-                                'Existencias' => $ExistenciaNuevaAlmacen
-                            ]);
+        $ExisteRemision = Remision::where('Remision', $remision)->first();
+	    if($ExisteRemision == true){
+	        $Remision = 1;
+	    }else{  
+            $Remision = new Remision;
+            $Remision->Remision=$remision;
+            $Remision->Serie=$request->serie;
+            $Remision->Folio=$folio;
+            $Remision->Cliente=$request->numerocliente;
+            $Remision->Agente=$request->numeroagente;
+            $Remision->Fecha=Carbon::parse($request->fecha)->toDateTimeString();
+            $Remision->Plazo=$request->plazo;
+            $Remision->Tipo=$request->tipo;
+            $Remision->Unidad=$request->unidad;
+            $Remision->Pedido=$request->pedido;
+            $Remision->Solicita=$request->solicitadopor;
+            $Remision->Referencia=$request->referencia;
+            $Remision->Destino=$request->destinodelpedido;
+            $Remision->Almacen=$request->numeroalmacen;
+            $Remision->Os=$request->ordenservicio;
+            $Remision->Eq=$request->equipo;
+            $Remision->Rq=$request->requisicion;
+            $Remision->Importe=$request->importe;
+            $Remision->Descuento=$request->descuento;
+            $Remision->SubTotal=$request->subtotal;
+            $Remision->Iva=$request->iva;
+            $Remision->Total=$request->total;
+            $Remision->Costo=$request->costo;
+            $Remision->Comision=$request->comision;
+            $Remision->Utilidad=$request->utilidad;
+            $Remision->Obs=$request->observaciones;
+            $Remision->Hora=Helpers::fecha_exacta_accion_datetimestring();
+            $Remision->Status="POR FACTURAR";
+            $Remision->Usuario=Auth::user()->user;
+            $Remision->Periodo=$this->periodohoy;
+            $Remision->save();
+            //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
+            $BitacoraDocumento = new BitacoraDocumento;
+            $BitacoraDocumento->Documento = "REMISIONES";
+            $BitacoraDocumento->Movimiento = $remision;
+            $BitacoraDocumento->Aplicacion = "ALTA";
+            $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
+            $BitacoraDocumento->Status = "POR FACTURAR";
+            $BitacoraDocumento->Usuario = Auth::user()->user;
+            $BitacoraDocumento->Periodo = $this->periodohoy;
+            $BitacoraDocumento->save();
+            //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
+            $item = 1;
+            foreach ($request->codigoproductopartida as $key => $codigoproductopartida){             
+                $RemisionDetalle=new RemisionDetalle;
+                $RemisionDetalle->Remision = $remision;
+                $RemisionDetalle->Cliente = $request->numerocliente;
+                $RemisionDetalle->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
+                $RemisionDetalle->Codigo = $codigoproductopartida;
+                $RemisionDetalle->Descripcion = $request->descripcionproductopartida [$key];
+                $RemisionDetalle->Unidad = $request->unidadproductopartida [$key];
+                $RemisionDetalle->Cantidad =  $request->cantidadpartida [$key];
+                $RemisionDetalle->Precio =  $request->preciopartida [$key];
+                $RemisionDetalle->Importe =  $request->importepartida [$key];
+                $RemisionDetalle->Dcto =  $request->descuentoporcentajepartida [$key];
+                $RemisionDetalle->Descuento =  $request->descuentopesospartida  [$key];
+                $RemisionDetalle->SubTotal =  $request->subtotalpartida [$key];
+                $RemisionDetalle->Impuesto =  $request->ivaporcentajepartida [$key];
+                $RemisionDetalle->Iva =  $request->ivapesospartida [$key];
+                $RemisionDetalle->Total =  $request->totalpesospartida [$key];
+                $RemisionDetalle->Costo =  $request->costopartida [$key];
+                $RemisionDetalle->CostoTotal =  $request->costototalpartida [$key];
+                $RemisionDetalle->Com =  $request->comisionporcentajepartida [$key];
+                $RemisionDetalle->Comision =  $request->comisionespesospartida [$key];
+                $RemisionDetalle->Utilidad =  $request->utilidadpartida [$key];
+                $RemisionDetalle->Moneda =  $request->monedapartida [$key];
+                $RemisionDetalle->CostoDeLista =  $request->costolistapartida [$key];
+                $RemisionDetalle->TipoDeCambio =  $request->tipocambiopartida [$key];
+                $RemisionDetalle->Cotizacion =  $request->cotizacionpartida [$key];
+                $RemisionDetalle->Insumo =  $request->insumopartida [$key];
+                $RemisionDetalle->InteresMeses =  $request->mesespartida [$key];
+                $RemisionDetalle->InteresTasa =  $request->tasainterespartida  [$key];
+                $RemisionDetalle->InteresMonto =  $request->montointerespartida  [$key];
+                $RemisionDetalle->Item = $item;
+                $RemisionDetalle->save();
+                //modificar fechaultimaventa y ultimocosto
+                $Producto = Producto::where('Codigo', $codigoproductopartida)->first();
+                $Producto->{'Fecha Ultima Venta'} = Carbon::parse($request->fecha)->toDateTimeString();
+                $Producto->{'Ultima Venta'} = $request->preciopartida [$key];
+                $Producto->save();
+                //restar existencias del almacen 
+                $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
+                if($ContarExistenciaAlmacen > 0){
+                    $ExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
+                    $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias - $request->cantidadpartida [$key];
+                    Existencia::where('Codigo', $codigoproductopartida)
+                                ->where('Almacen', $request->numeroalmacen)
+                                ->update([
+                                    'Existencias' => $ExistenciaNuevaAlmacen
+                                ]);
+                }
+                $item++;
             }
-            $item++;
         }
         return response()->json($Remision);
     }
@@ -1031,9 +1037,9 @@ class RemisionController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.remisiones.formato_pdf_remisiones', compact('data'))
-        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        ->setOption('footer-center', 'Página [page] de [toPage]')
-        ->setOption('footer-right', ''.$fechaformato.'')
+        //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        //->setOption('footer-center', 'Página [page] de [toPage]')
+        //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
         ->setOption('margin-right', 2)
@@ -1081,9 +1087,9 @@ class RemisionController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.remisiones.formato_pdf_remisiones', compact('data'))
-        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        ->setOption('footer-center', 'Página [page] de [toPage]')
-        ->setOption('footer-right', ''.$fechaformato.'')
+        //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        //->setOption('footer-center', 'Página [page] de [toPage]')
+        //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
         ->setOption('margin-right', 2)
@@ -1144,9 +1150,9 @@ class RemisionController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.remisiones.formato_pdf_remisiones', compact('data'))
-        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        ->setOption('footer-center', 'Página [page] de [toPage]')
-        ->setOption('footer-right', ''.$fechaformato.'')
+        //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        //->setOption('footer-center', 'Página [page] de [toPage]')
+        //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
         ->setOption('margin-right', 2)

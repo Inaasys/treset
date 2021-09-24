@@ -296,6 +296,14 @@ function msj_errorordenexistente(){
         "extendedTImeout": "6000"
     });
 }
+//mensaje error la remision ya existe
+function msj_errorremisionexistente(){
+    toastr.error( "Aviso, el número de remision ya existe", "Mensaje", {
+        "timeOut": "6000",
+        "progressBar": true,
+        "extendedTImeout": "6000"
+    });
+}
 //mensaje error el UUID ya existe
 function msj_erroruuidexistente(){
             toastr.error( "Aviso, el uuid de la factura ya fue ingresado en el sistema", "Mensaje", {

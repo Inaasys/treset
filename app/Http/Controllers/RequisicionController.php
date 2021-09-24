@@ -704,9 +704,9 @@ class RequisicionController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.requisiciones.formato_pdf_requisiciones', compact('data'))
-        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        ->setOption('footer-center', 'Página [page] de [toPage]')
-        ->setOption('footer-right', ''.$fechaformato.'')
+        //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        //->setOption('footer-center', 'Página [page] de [toPage]')
+        //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
         ->setOption('margin-right', 2)
@@ -751,9 +751,9 @@ class RequisicionController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.requisiciones.formato_pdf_requisiciones', compact('data'))
-        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        ->setOption('footer-center', 'Página [page] de [toPage]')
-        ->setOption('footer-right', ''.$fechaformato.'')
+        //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        //->setOption('footer-center', 'Página [page] de [toPage]')
+        //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
         ->setOption('margin-right', 2)
@@ -807,9 +807,9 @@ class RequisicionController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.requisiciones.formato_pdf_requisiciones', compact('data'))
-        ->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        ->setOption('footer-center', 'Página [page] de [toPage]')
-        ->setOption('footer-right', ''.$fechaformato.'')
+        //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+        //->setOption('footer-center', 'Página [page] de [toPage]')
+        //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
         ->setOption('margin-right', 2)

@@ -310,6 +310,7 @@
         var facturas_obtener_producto_por_codigo = '{!!URL::to('facturas_obtener_producto_por_codigo')!!}';
         var facturas_obtener_claves_productos = '{!!URL::to('facturas_obtener_claves_productos')!!}';
         var facturas_obtener_claves_unidades = '{!!URL::to('facturas_obtener_claves_unidades')!!}';
+        var facturas_obtener_facturas_relacionadas = '{!!URL::to('facturas_obtener_facturas_relacionadas')!!}';
         var facturas_cargar_xml_uuid_relacionado = '{!!URL::to('facturas_cargar_xml_uuid_relacionado')!!}';
         var facturas_obtener_nuevo_saldo_cliente = '{!!URL::to('facturas_obtener_nuevo_saldo_cliente')!!}';
         var facturas_guardar = '{!!URL::to('facturas_guardar')!!}';

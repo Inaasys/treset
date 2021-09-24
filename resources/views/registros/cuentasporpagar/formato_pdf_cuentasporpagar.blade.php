@@ -51,7 +51,7 @@
                 </div>
                 <div id ="contenedor">
                     <div style="width:50%; float:left; text-align: left;">
-                        <p style="font-size:12px;"><b>POLIZA DE EGRESO No. {{$d['cuentaporpagar']->Pago}}</b></p>
+                        <p style="font-size:18px;"><b>POLIZA DE EGRESO No. {{$d['cuentaporpagar']->Pago}}</b></p>
                         <p style="font-size:12px;">{{$empresa->Colonia}}</p>
                     </div>
                     <div style="width:50%; float:right; text-align: right;">

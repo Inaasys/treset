@@ -741,6 +741,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/facturas_obtener_producto_por_codigo', 'FacturaController@facturas_obtener_producto_por_codigo')->name('facturas_obtener_producto_por_codigo')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_claves_productos', 'FacturaController@facturas_obtener_claves_productos')->name('facturas_obtener_claves_productos')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_claves_unidades', 'FacturaController@facturas_obtener_claves_unidades')->name('facturas_obtener_claves_unidades')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_facturas_relacionadas', 'FacturaController@facturas_obtener_facturas_relacionadas')->name('facturas_obtener_facturas_relacionadas')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::post('/facturas_cargar_xml_uuid_relacionado', 'FacturaController@facturas_cargar_xml_uuid_relacionado')->name('facturas_cargar_xml_uuid_relacionado')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_nuevo_saldo_cliente', 'FacturaController@facturas_obtener_nuevo_saldo_cliente')->name('facturas_obtener_nuevo_saldo_cliente')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::post('/facturas_guardar', 'FacturaController@facturas_guardar')->name('facturas_guardar')->middleware('revisarpermisos:registros.facturas.altas');

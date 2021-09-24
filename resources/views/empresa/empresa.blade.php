@@ -14,7 +14,7 @@
                         <div class="profile-header {{$empresa->background_forms_and_modals}}" id="infoprofile"></div>
                         <div class="profile-body">
                             <div class="image-area text-center">
-                                <img id="perfillogotipoempresa" src="logotipo_empresa/{{$empresa->Logo}}" alt="Perfil Empresa" height="100%" class="text-center"/>
+                                <img id="perfillogotipoempresa" src="logotipo_empresa/{{$empresa->Logo}}" alt="Perfil Empresa" height="100%" width="100%" class="text-center"/>
                             </div>
                             <div class="content-area text-center">
                                 <h4>{{$empresa->Empresa}}</h4>
