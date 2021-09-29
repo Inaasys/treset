@@ -768,12 +768,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             if($ordentrabajo->Status != 'ABIERTA'){
                 $modificacionpermitida = 0;
             }else{
-                $resultadofechas = Helpers::compararanoymesfechas($ordentrabajo->Fecha);
-                if($resultadofechas != ''){
-                    $modificacionpermitida = 0;
-                }else{
-                    $modificacionpermitida = 1;
-                }
+                $modificacionpermitida = 1;
             }
         } 
         $data = array(
