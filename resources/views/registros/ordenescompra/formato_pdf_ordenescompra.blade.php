@@ -84,7 +84,7 @@
                                 <th>SubTotal</th>
                             </tr>
                             @foreach($d['datadetalle'] as $ocd)
-                            <tr>
+                            <tr style="font-size:10px;">
                                 <td>{{ number_format($ocd['cantidaddetalle'], $d['numerodecimalesdocumento']) }}</td>
                                 <td>{{$ocd['codigodetalle']}}</td>
                                 <td>{{$ocd['descripciondetalle']}}</td>

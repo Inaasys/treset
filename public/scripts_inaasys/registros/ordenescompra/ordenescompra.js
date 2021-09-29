@@ -124,6 +124,11 @@ function listar(){
         });
     }
   });
+  //modificacion al dar doble click
+  $('#tbllistado tbody').on('dblclick', 'tr', function () {
+    var data = tabla.row( this ).data();
+    obtenerdatos(data.Orden);
+  });
 }
 //obtener tipos ordenes de compra
 function obtenertiposordenescompra(tipoalta){

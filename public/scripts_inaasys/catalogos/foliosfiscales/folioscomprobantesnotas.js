@@ -86,6 +86,11 @@ function listar(){
             });
         }
     });
+    //modificacion al dar doble click
+    $('#tbllistado tbody').on('dblclick', 'tr', function () {
+      var data = tabla.row( this ).data();
+      obtenerdatos(data.Numero);
+    }); 
 }
 //colocar pagare default 1
 function pagaredefault1(){

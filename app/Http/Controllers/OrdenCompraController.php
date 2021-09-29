@@ -29,6 +29,7 @@ use App\VistaObtenerExistenciaProducto;
 use Config;
 use Mail;
 use Schema;
+use LynX39\LaraPdfMerger\Facades\PdfMerger;
 
 class OrdenCompraController extends ConfiguracionSistemaController{
 
@@ -448,10 +449,8 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         $sumatotalcompras = 0;
         if($ordencompra->Status == 'POR SURTIR' || $ordencompra->Status == 'BACKORDER' && $ordencompra->AutorizadoPor == ''){
             $modificacionpermitida = 1;
-            $readonly = '';  
         }else if($ordencompra->Status == 'BACKORDER'){
             $modificacionpermitida = 1;
-            $readonly = '';  
             //traer los totales de las compras en las que la orden ya fue utilizada
             $compras = Compra::where('Orden',$request->ordenmodificar)->get();
             foreach($compras as $compra){
@@ -459,7 +458,6 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             }
         }else{
             $modificacionpermitida = 0;
-            $readonly = 'readonly="readonly"';
         }
         //detalles orden compra
         $detallesordencompra = OrdenCompraDetalle::where('Orden', $request->ordenmodificar)->orderBy('Item', 'ASC')->get();
@@ -471,12 +469,6 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             $tipo = "modificacion";
             foreach($detallesordencompra as $doc){
                 $cantidadyasurtidapartida = $doc->Cantidad - $doc->Surtir;
-                //si la partida ya fue surtida no se puede modificar
-                if($doc->Surtir == 0){
-                    $readonly = 'readonly="readonly"';
-                }else{
-                    $readonly = ''; 
-                }
                 $filasdetallesordencompra= $filasdetallesordencompra.
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$doc->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
@@ -484,14 +476,14 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" value="'.htmlspecialchars($doc->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$doc->Unidad.'" readonly data-parsley-length="[1, 5]">'.$doc->Unidad.'</td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm porsurtirpartida"  name="porsurtirpartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Surtir).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida"  name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Cantidad).'" data-parsley-min="'.Helpers::convertirvalorcorrecto($cantidadyasurtidapartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculartotalesfilasordencompra('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo .'\');formatocorrectoinputcantidades(this);" '.$readonly.'></td>'.
-                    '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadyasurtidapartida"  name="cantidadyasurtidapartida[]" value="'.Helpers::convertirvalorcorrecto($cantidadyasurtidapartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" '.$readonly.'></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartida"  name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Precio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculartotalesfilasordencompra('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo .'\');formatocorrectoinputcantidades(this);" '.$readonly.'></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida"  name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Cantidad).'" data-parsley-min="'.Helpers::convertirvalorcorrecto($cantidadyasurtidapartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculartotalesfilasordencompra('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo .'\');formatocorrectoinputcantidades(this);" ></td>'.
+                    '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadyasurtidapartida"  name="cantidadyasurtidapartida[]" value="'.Helpers::convertirvalorcorrecto($cantidadyasurtidapartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" ></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartida"  name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Precio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculartotalesfilasordencompra('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo .'\');formatocorrectoinputcantidades(this);"></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida"  name="importepartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Importe).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentoporcentajepartida"  name="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Dcto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculardescuentopesospartida('.$contadorfilas.');formatocorrectoinputcantidades(this);" '.$readonly.'></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentopesospartida"  name="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Descuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculardescuentoporcentajepartida('.$contadorfilas.');formatocorrectoinputcantidades(this);" '.$readonly.'></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentoporcentajepartida"  name="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Dcto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculardescuentopesospartida('.$contadorfilas.');formatocorrectoinputcantidades(this);" ></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentopesospartida"  name="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Descuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculardescuentoporcentajepartida('.$contadorfilas.');formatocorrectoinputcantidades(this);" ></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm subtotalpartida"  name="subtotalpartida[]" value="'.Helpers::convertirvalorcorrecto($doc->SubTotal).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm ivaporcentajepartida"  name="ivaporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Impuesto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculartotalesfilasordencompra('.$contadorfilas.');formatocorrectoinputcantidades(this);" '.$readonly.'></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm ivaporcentajepartida"  name="ivaporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Impuesto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculartotalesfilasordencompra('.$contadorfilas.');formatocorrectoinputcantidades(this);" ></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm ivapesospartida"  name="ivapesospartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Iva).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida"  name="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Total).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                 '</tr>';
@@ -695,6 +687,8 @@ class OrdenCompraController extends ConfiguracionSistemaController{
     }
     //generacion de formato en PDF
     public function ordenes_compra_generar_pdfs(Request $request){
+        //primero eliminar todos los archivos de la carpeta
+        Helpers::eliminararchivospdfsgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
             $ordenescompra = OrdenCompra::whereIn('Orden', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
@@ -704,8 +698,8 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             $ordenescompra = OrdenCompra::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
-        $data=array();
         foreach ($ordenescompra as $oc){
+            $data=array();
             $ordencompradetalle = OrdenCompraDetalle::where('Orden', $oc->Orden)->get();
             $datadetalle=array();
             foreach($ordencompradetalle as $ocd){
@@ -734,19 +728,30 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                       "datadetalle" => $datadetalle,
                       "numerodecimalesdocumento"=> $request->numerodecimalesdocumento
             );
+            //dd($data);
+            ini_set('max_execution_time', 300); // 5 minutos
+            ini_set('memory_limit', '-1');
+            $pdf = PDF::loadView('registros.ordenescompra.formato_pdf_ordenescompra', compact('data'))
+            //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+            ->setOption('footer-center', 'Página [page] de [toPage]')
+            //->setOption('footer-right', ''.$fechaformato.'')
+            ->setOption('footer-font-size', 7)
+            ->setOption('margin-left', 2)
+            ->setOption('margin-right', 2)
+            ->setOption('margin-bottom', 10);
+            //return $pdf->stream();
+            $ArchivoPDF = "PDF".$oc->Orden.".pdf";
+            $pdf->save(storage_path('archivos_pdf_documentos_generados/'.$ArchivoPDF)); 
         }
-        //dd($data);
-        ini_set('max_execution_time', 300); // 5 minutos
-        ini_set('memory_limit', '-1');
-        $pdf = PDF::loadView('registros.ordenescompra.formato_pdf_ordenescompra', compact('data'))
-        //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
-        //->setOption('footer-right', ''.$fechaformato.'')
-        ->setOption('footer-font-size', 7)
-        ->setOption('margin-left', 2)
-        ->setOption('margin-right', 2)
-        ->setOption('margin-bottom', 10);
-        return $pdf->stream();
+        $pdfMerger = PDFMerger::init(); //Initialize the merger
+        //unir pdfs
+        foreach ($ordenescompra as $orc){
+            $ArchivoPDF = "PDF".$orc->Orden.".pdf";
+            $urlarchivo = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
+            $pdfMerger->addPDF($urlarchivo, 'all');
+        }
+        $pdfMerger->merge(); //unirlos
+        $pdfMerger->save("OrdenesCompra.pdf", "browser");//mostrarlos en el navegador
     }
 
     //generacion de formato en PDF
@@ -789,7 +794,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.ordenescompra.formato_pdf_ordenescompra', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
@@ -850,7 +855,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.ordenescompra.formato_pdf_ordenescompra', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)

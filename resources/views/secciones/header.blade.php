@@ -381,7 +381,7 @@
           </a>
         </li>    
         <!-- Notificaciones -->
-        <li class="dropdown">
+        <li class="dropdown" style="display:none">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
             <i class="material-icons">notifications</i>
             <span class="label-count">7</span>

@@ -36,6 +36,7 @@ use App\Cotizacion;
 use App\CotizacionDetalle;
 use Config;
 use Mail;
+use LynX39\LaraPdfMerger\Facades\PdfMerger;
 
 class RemisionController extends ConfiguracionSistemaController{
 
@@ -991,6 +992,8 @@ class RemisionController extends ConfiguracionSistemaController{
 
     //generar documento pdf
     public function remisiones_generar_pdfs(Request $request){
+        //primero eliminar todos los archivos de la carpeta
+        Helpers::eliminararchivospdfsgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
             $remisiones = Remision::whereIn('Remision', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
@@ -1000,8 +1003,8 @@ class RemisionController extends ConfiguracionSistemaController{
             $remisiones = Remision::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
-        $data=array();
         foreach ($remisiones as $r){
+            $data=array();
             $remisiondetalle = RemisionDetalle::where('Remision', $r->Remision)->get();
             $datadetalle=array();
             foreach($remisiondetalle as $rd){
@@ -1032,19 +1035,30 @@ class RemisionController extends ConfiguracionSistemaController{
                       "datadetalle" => $datadetalle,
                       "numerodecimalesdocumento"=> $request->numerodecimalesdocumento
             );
+            //dd($data);
+            ini_set('max_execution_time', 300); // 5 minutos
+            ini_set('memory_limit', '-1');
+            $pdf = PDF::loadView('registros.remisiones.formato_pdf_remisiones', compact('data'))
+            //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+            ->setOption('footer-center', 'Página [page] de [toPage]')
+            //->setOption('footer-right', ''.$fechaformato.'')
+            ->setOption('footer-font-size', 7)
+            ->setOption('margin-left', 2)
+            ->setOption('margin-right', 2)
+            ->setOption('margin-bottom', 10);
+            //return $pdf->stream();
+            $ArchivoPDF = "PDF".$r->Remision.".pdf";
+            $pdf->save(storage_path('archivos_pdf_documentos_generados/'.$ArchivoPDF));
         }
-        //dd($data);
-        ini_set('max_execution_time', 300); // 5 minutos
-        ini_set('memory_limit', '-1');
-        $pdf = PDF::loadView('registros.remisiones.formato_pdf_remisiones', compact('data'))
-        //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
-        //->setOption('footer-right', ''.$fechaformato.'')
-        ->setOption('footer-font-size', 7)
-        ->setOption('margin-left', 2)
-        ->setOption('margin-right', 2)
-        ->setOption('margin-bottom', 10);
-        return $pdf->stream();
+        $pdfMerger = PDFMerger::init(); //Initialize the merger
+        //unir pdfs
+        foreach ($remisiones as $re){
+            $ArchivoPDF = "PDF".$re->Remision.".pdf";
+            $urlarchivo = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
+            $pdfMerger->addPDF($urlarchivo, 'all');
+        }
+        $pdfMerger->merge(); //unirlos
+        $pdfMerger->save("Remisiones.pdf", "browser");//mostrarlos en el navegador
     }
 
     //generacion de formato en PDF
@@ -1088,7 +1102,7 @@ class RemisionController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.remisiones.formato_pdf_remisiones', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
@@ -1151,7 +1165,7 @@ class RemisionController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.remisiones.formato_pdf_remisiones', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)

@@ -74,6 +74,11 @@ function listar(){
             });
         }
     });
+    //modificacion al dar doble click
+    $('#tbllistado tbody').on('dblclick', 'tr', function () {
+      var data = tabla.row( this ).data();
+      obtenerdatos(data.Codigo);
+    }); 
 }
 //listar claves productos
 function listarclavesproductos(){
@@ -1309,6 +1314,12 @@ function obtenerkardex(codigo,almacen){
         $("#filasmovimientos").html(data.filasmovimientos);
         $("#modalmovimientos").modal('show');
         $('.page-loader-wrapper').css('display', 'none');
+        //obtener documento
+        $('#tablakardexproducto tr').dblclick(function(){
+            var documento = $(this).find("td").eq(1).html();    
+            var numerodocumento = $(this).find("td").eq(2).html();    
+            obtenerdocumento(documento,numerodocumento);
+        });
     });
 }
 //obtener kardex al dar enter en el input del codigo
@@ -1323,6 +1334,53 @@ $("#almacenkardex").on('change', function (e) {
     var almacenkardex = $("#almacenkardex").val();
     obtenerkardex(codigokardex,almacenkardex);
 });
+
+//obtener documento
+function obtenerdocumento(documento,numerodocumento){
+    //alert("numerodocumento: "+numerodocumento+ "documento:"+documento);
+    switch(documento){
+        case 'Compras':
+            //alert("Compras");
+            break;
+        case 'Ajustes':
+            //alert("Ajustes");
+            break;
+        case 'Remisiones':
+            //alert("Remisiones");
+            break;
+        case 'Traspasos':
+            //alert("Traspasos");
+            break;
+        case 'NC Cliente':
+            //alert("Notas Clientes");
+            break;
+        case 'NC Proveedor':
+            //alert("Notas Proveedores");
+            break;
+        case 'Asignacion Herramienta':
+            //alert("Asignacion Herramienta");
+            break;
+        case 'Produccion':
+            //alert("Produccion");
+            break;
+        case 'Consumo Produccion':
+            //alert("Consumo Produccion");
+            break;
+        case 'Produccion Ter':
+            //alert("Produccion Terminado");
+            break;
+        case 'Produccion Det':
+            //alert("Produccion Detalles");
+            break;
+        case 'Destinar Ter':
+            //alert("Destinar Terminado");
+            break;
+        case 'Destinar Det':
+            //alert("Destinar Detalles");
+            break;
+    }
+}
+
 //configurar tabla
 function configurar_tabla(){
     var checkboxscolumnas = '';

@@ -114,7 +114,7 @@
 								<th>Total</th>
                             </tr>
                             @foreach($d['datadetalle'] as $otd)
-                            <tr>
+                            <tr style="font-size:10px;">
                                 <td>{{$otd['codigodetalle']}}</td>
                                 <td>{{$otd['descripciondetalle']}}</td>
                                 <td>{{$otd['unidaddetalle']}}</td>

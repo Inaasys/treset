@@ -32,6 +32,7 @@ use App\VistaObtenerExistenciaProducto;
 use App\Serie;
 use Config;
 use Mail;
+use LynX39\LaraPdfMerger\Facades\PdfMerger;
 
 class ProduccionController extends ConfiguracionSistemaController{
 
@@ -752,6 +753,8 @@ class ProduccionController extends ConfiguracionSistemaController{
     }
     //generar pdfs
     public function produccion_generar_pdfs(Request $request){
+        //primero eliminar todos los archivos de la carpeta
+        Helpers::eliminararchivospdfsgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
             $producciones = Produccion::whereIn('Produccion', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
@@ -761,8 +764,8 @@ class ProduccionController extends ConfiguracionSistemaController{
             $producciones = Produccion::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
-        $data=array();
         foreach ($producciones as $p){
+            $data=array();
             $producciondetalle = ProduccionDetalle::where('Produccion', $p->Produccion)->get();
             $datadetalle=array();
             foreach($producciondetalle as $pd){
@@ -801,18 +804,29 @@ class ProduccionController extends ConfiguracionSistemaController{
                       "datadetalle" => $datadetalle,
                       "numerodecimalesdocumento"=> $request->numerodecimalesdocumento
             );
+            ini_set('max_execution_time', 300); // 5 minutos
+            ini_set('memory_limit', '-1');
+            $pdf = PDF::loadView('registros.produccion.formato_pdf_producciones', compact('data'))
+            //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+            ->setOption('footer-center', 'Página [page] de [toPage]')
+            //->setOption('footer-right', ''.$fechaformato.'')
+            ->setOption('footer-font-size', 7)
+            ->setOption('margin-left', 2)
+            ->setOption('margin-right', 2)
+            ->setOption('margin-bottom', 10);
+            //return $pdf->stream();
+            $ArchivoPDF = "PDF".$p->Produccion.".pdf";
+            $pdf->save(storage_path('archivos_pdf_documentos_generados/'.$ArchivoPDF));
         }
-        ini_set('max_execution_time', 300); // 5 minutos
-        ini_set('memory_limit', '-1');
-        $pdf = PDF::loadView('registros.produccion.formato_pdf_producciones', compact('data'))
-        //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
-        //->setOption('footer-right', ''.$fechaformato.'')
-        ->setOption('footer-font-size', 7)
-        ->setOption('margin-left', 2)
-        ->setOption('margin-right', 2)
-        ->setOption('margin-bottom', 10);
-        return $pdf->stream();
+        $pdfMerger = PDFMerger::init(); //Initialize the merger
+        //unir pdfs
+        foreach ($producciones as $pro){
+            $ArchivoPDF = "PDF".$pro->Produccion.".pdf";
+            $urlarchivo = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
+            $pdfMerger->addPDF($urlarchivo, 'all');
+        }
+        $pdfMerger->merge(); //unirlos
+        $pdfMerger->save("Producciones.pdf", "browser");//mostrarlos en el navegador
     }
     //generar pef por folio
     public function produccion_generar_pdfs_indiv($documento){
@@ -863,7 +877,7 @@ class ProduccionController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.produccion.formato_pdf_producciones', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
@@ -930,7 +944,7 @@ class ProduccionController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.produccion.formato_pdf_producciones', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)

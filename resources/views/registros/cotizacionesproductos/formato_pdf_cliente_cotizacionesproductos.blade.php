@@ -84,7 +84,7 @@
                                 <th>SubTotal</th>
                             </tr>
                             @foreach($d['datadetalle'] as $cpd)
-                            <tr>
+                            <tr style="font-size:10px;">
                                 <td>{{ number_format($cpd['cantidaddetalle'], $d['numerodecimalesdocumento']) }}</td>
                                 <td>{{$cpd['descripciondetalle']}}</td>
                                 <td>{{ number_format($cpd['existenciasdetalle'], $d['numerodecimalesdocumento']) }}</td>

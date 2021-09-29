@@ -259,6 +259,7 @@
         var compras_obtener_compra = '{!!URL::to('compras_obtener_compra')!!}';
         var compras_obtener_existencias_partida = '{!!URL::to('compras_obtener_existencias_partida')!!}';
         var compras_obtener_existencias_almacen = '{!!URL::to('compras_obtener_existencias_almacen')!!}';
+        var compras_obtener_valor_modificacionpermitida = '{!!URL::to('compras_obtener_valor_modificacionpermitida')!!}';
         var compras_guardar_modificacion = '{!!URL::to('compras_guardar_modificacion')!!}';
         var compras_verificar_uso_en_modulos =  '{!!URL::to('compras_verificar_uso_en_modulos')!!}';
         var compras_alta_o_baja = '{!!URL::to('compras_alta_o_baja')!!}'; 

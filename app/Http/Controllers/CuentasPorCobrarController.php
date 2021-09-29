@@ -40,6 +40,7 @@ use Config;
 use Mail;
 use Facturapi\Facturapi;
 use Storage;
+use LynX39\LaraPdfMerger\Facades\PdfMerger;
 
 class CuentasPorCobrarController extends ConfiguracionSistemaController{
 
@@ -881,6 +882,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
 
     //generar documento PDF
     public function cuentas_por_cobrar_generar_pdfs(Request $request){
+        //primero eliminar todos los archivos de la carpeta
+        Helpers::eliminararchivospdfsgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
             $cuentasporcobrar = CuentaXCobrar::whereIn('Pago', $request->arraypdf)->orderBy('Folio', 'ASC')->take(150)->get(); 
@@ -890,8 +893,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $cuentasporcobrar = CuentaXCobrar::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(150)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
-        $data=array();
         foreach ($cuentasporcobrar as $cxc){
+            $data=array();
             $formatter = new NumeroALetras;
             $abonoletras =  $formatter->toInvoice($cxc->Abono, $this->numerodecimales, 'M.N.');
             $cuentaporcobrardetalle = CuentaXCobrarDetalle::where('Pago', $cxc->Pago)->get();
@@ -946,19 +949,30 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                         "tipocambiocxc"=>Helpers::convertirvalorcorrecto($cxc->TipoCambio),
                         "totalletras"=>$totalletras,
                         "numerodecimalesdocumento"=> $request->numerodecimalesdocumento
-            );
+            );        
+            ini_set('max_execution_time', 300); // 5 minutos
+            ini_set('memory_limit', '-1');
+            $pdf = PDF::loadView('registros.cuentasporcobrar.formato_pdf_cuentasporcobrar', compact('data'))
+            //->setOption('footer-left', 'Este pago es una representación impresa de un CFDi')
+            ->setOption('footer-center', 'Página [page] de [toPage]')
+            //->setOption('footer-right', ''.$fechaformato.'')
+            ->setOption('footer-font-size', 7)
+            ->setOption('margin-left', 2)
+            ->setOption('margin-right', 2)
+            ->setOption('margin-bottom', 10);
+            //return $pdf->stream();
+            $ArchivoPDF = "PDF".$cxc->Pago.".pdf";
+            $pdf->save(storage_path('archivos_pdf_documentos_generados/'.$ArchivoPDF));
         }
-        ini_set('max_execution_time', 300); // 5 minutos
-        ini_set('memory_limit', '-1');
-        $pdf = PDF::loadView('registros.cuentasporcobrar.formato_pdf_cuentasporcobrar', compact('data'))
-        //->setOption('footer-left', 'Este pago es una representación impresa de un CFDi')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
-        //->setOption('footer-right', ''.$fechaformato.'')
-        ->setOption('footer-font-size', 7)
-        ->setOption('margin-left', 2)
-        ->setOption('margin-right', 2)
-        ->setOption('margin-bottom', 10);
-        return $pdf->stream();
+        $pdfMerger = PDFMerger::init(); //Initialize the merger
+        //unir pdfs
+        foreach ($cuentasporcobrar as $cxco){
+            $ArchivoPDF = "PDF".$cxco->Pago.".pdf";
+            $urlarchivo = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
+            $pdfMerger->addPDF($urlarchivo, 'all');
+        }
+        $pdfMerger->merge(); //unirlos
+        $pdfMerger->save("CuentasPorCobrar.pdf", "browser");//mostrarlos en el navegador
     }
 
     //generacion de formato en PDF
@@ -1027,7 +1041,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.cuentasporcobrar.formato_pdf_cuentasporcobrar', compact('data'))
         //->setOption('footer-left', 'Este pago es una representación impresa de un CFDi')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
@@ -1115,7 +1129,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.cuentasporcobrar.formato_pdf_cuentasporcobrar', compact('data'))
         //->setOption('footer-left', 'Este pago es una representación impresa de un CFDi')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)

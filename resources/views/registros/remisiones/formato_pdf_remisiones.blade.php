@@ -86,7 +86,7 @@
                                 <th>SubTotal</th>
                             </tr>
                             @foreach($d['datadetalle'] as $rd)
-                            <tr>
+                            <tr style="font-size:10px;">
                                 <td>{{ number_format($rd['cantidaddetalle'], $d['numerodecimalesdocumento']) }}</td>
                                 <td>{{$rd['codigodetalle']}}</td>
                                 <td>{{$rd['descripciondetalle']}}</td>

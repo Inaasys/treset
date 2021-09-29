@@ -83,7 +83,7 @@
                                 <th>Total</th>
                             </tr>
                             @foreach($d['datadetalle'] as $ad)
-                            <tr>
+                            <tr style="font-size:10px;">
                                 <td>{{$ad['codigodetalle']}}</td>
                                 <td>{{$ad['descripciondetalle']}}</td>
                                 <td>{{$ad['ubicaciondetalle']}}</td>

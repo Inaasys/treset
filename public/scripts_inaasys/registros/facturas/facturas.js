@@ -138,6 +138,11 @@ function listar(){
         });
     }
   });
+  //modificacion al dar doble click
+  $('#tbllistado tbody').on('dblclick', 'tr', function () {
+    var data = tabla.row( this ).data();
+    obtenerdatos(data.Factura);
+  });
 }
 //obtener registros de proveedores
 function obtenerclientes(){
@@ -1044,6 +1049,7 @@ function listarremisiones(){
                         '</div>'+
                       '</div>'+
                       '<div class="modal-footer">'+
+                        '<div type="button" class="btn btn-info btn-sm" onclick="mostrarmodalnumeropedido();">Seleccionar remisiones por número de pedido</div>'+
                         '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                       '</div>';
     $("#contenidomodaltablas").html(tablaremisiones);
@@ -1089,6 +1095,145 @@ function listarremisiones(){
         "order": [[ 0, "desc" ]]
     });
 } 
+//mostrar modal remisiones por numero de pedido
+function mostrarmodalnumeropedido(){
+  $("#modalremisionesporpedido").modal('show');
+  $("#modalremisionesporpedido").css('overflow', 'auto');
+  $("#ModalFormulario").modal('hide');
+}
+//seleccionar las remisiones por numero de pedido especificado
+function seleccionarremisionesporpedido(){
+  $("#tabladetallesfactura tbody").html("");
+  partida=1;
+  contadorfilas=0;
+  var form = $("#formremisionesporpedido");
+  if (form.parsley().isValid()){
+    var numeropedidoremisiones = $("#numeropedidoremisiones").val();
+    var numerocliente = $("#numerocliente").val();
+    var tipooperacion = $("#tipooperacion").val();
+    var tablaremisiones ='<div class="modal-header '+background_forms_and_modals+'">'+
+                              '<h4 class="modal-title">Facturar Remisiones</h4>'+
+                          '</div>'+
+                          '<div class="modal-body">'+
+                            '<div class="row">'+
+                              '<div class="col-md-12">'+
+                                '<div class="table-responsive">'+
+                                  '<table id="tbllistadoremision" class="tbllistadoremision table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                    '<thead class="'+background_tables+'">'+
+                                      '<tr>'+
+                                        '<th>Remisión</th>'+
+                                        '<th>Fecha</th>'+
+                                        '<th>Cliente</th>'+
+                                        '<th>Nombre</th>'+
+                                        '<th>Facturar $</th>'+
+                                        '<th>Plazo</th>'+
+                                        '<th>Pedido</th>'+
+                                        '<th>Selecciona</th>'+
+                                      '</tr>'+
+                                    '</thead>'+
+                                    '<tbody></tbody>'+
+                                  '</table>'+
+                                '</div>'+
+                              '</div>'+   
+                            '</div>'+
+                            '<div class="row">'+
+                              '<div class="col-md-6 col-md-offset-4">'+
+                              '</div>'+ 
+                              '<div class="col-md-2">'+
+                                '<label>Total $</label>'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="totalafacturar" id="totalafacturar" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                              '</div>'+   
+                            '</div>'+
+                          '</div>'+
+                          '<div class="modal-footer">'+
+                            '<div type="button" class="btn btn-info btn-sm" onclick="mostrarmodalnumeropedido();">Seleccionar remisiones por número de pedido</div>'+
+                            '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                          '</div>';
+                          $("#contenidomodaltablas").html(tablaremisiones);
+                          $('#tbllistadoremision').DataTable({
+                            "searching": false,
+                            "paging":   false,
+                            "sScrollX": "110%",
+                            "sScrollY": "370px",
+                            "bScrollCollapse": true,  
+                            processing: true,
+                            'language': {
+                              'loadingRecords': '&nbsp;',
+                              'processing': '<div class="spinner"></div>'
+                            },
+                            serverSide: true,
+                            ajax: {
+                              url: facturas_obtener_remisiones_por_pedido,
+                              data: function (d) {
+                                d.numerocliente = numerocliente;
+                                d.numeropedidoremisiones = numeropedidoremisiones;
+                              }
+                            },
+                            columns: [
+                              { data: 'Remision', name: 'Remision' },
+                              { data: 'Fecha', name: 'Fecha' },
+                              { data: 'Cliente', name: 'Cliente', orderable: false, searchable: false },
+                              { data: 'NombreCliente', name: 'NombreCliente', orderable: false, searchable: false },
+                              { data: 'Facturar', name: 'Facturar', orderable: false, searchable: false },
+                              { data: 'Plazo', name: 'Plazo', orderable: false, searchable: false },
+                              { data: 'Pedido', name: 'Pedido', orderable: false, searchable: false },
+                              { data: 'Selecciona', name: 'Selecciona', orderable: false, searchable: false }
+                            ],
+                            "initComplete": function() {
+                              var $buscar = $('div.dataTables_filter input');
+                              $buscar.unbind();
+                              $buscar.bind('keyup change', function(e) {
+                                if(e.keyCode == 13 || this.value == "") {
+                                  $('#tbllistadoremision').DataTable().search( this.value ).draw();
+                                }
+                              });
+                            },
+                            "iDisplayLength": 1000,
+                            "order": [[ 0, "desc" ]]
+                          });
+    //obtener remisiones
+    $.get(facturas_obtener_remisiones_pedido, {numeropedidoremisiones:numeropedidoremisiones,numerocliente:numerocliente,contadorfilas:contadorfilas,partida:partida,tipooperacion:tipooperacion} , function(data){
+      $("#tabladetallesfactura tbody").append(data.filasremisiones);
+      //array de remisiones seleccionadas
+      construirarrayremisionesseleccionadas();
+      //comprobar numero de filas en la tabla
+      comprobarfilas();
+      //calcular totales compras nota proveedor
+      calculartotal();
+      contadorfilas = data.contadorfilas;
+      partida = data.partida;
+      remisionagregadacorrectamente();
+    });
+    $("#modalremisionesporpedido").modal('hide');
+    $("#ModalFormulario").modal('show');
+    $("#ModalFormulario").css('overflow', 'auto');
+  }else{
+    msjfaltandatosporcapturar();
+  }
+  //validar formulario
+  form.parsley().validate();
+}
+//eliminar fila
+function seleccionarremisionasync(Remision){
+  return new Promise((ejecuta)=>{
+    setTimeout(function(){ 
+      var tipooperacion = $("#tipooperacion").val();
+      $.get(facturas_obtener_remision, {Remision:Remision, contadorfilas:contadorfilas, partida:partida, tipooperacion:tipooperacion}, function(data){
+        $("#tabladetallesfactura tbody").append(data.filasremisiones);
+        //array de remisiones seleccionadas
+        construirarrayremisionesseleccionadas();
+        //comprobar numero de filas en la tabla
+        comprobarfilas();
+        //calcular totales compras nota proveedor
+        calculartotal();
+        contadorfilas = data.contadorfilas;
+        partida = data.partida;
+        remisionagregadacorrectamente();
+      });
+      return ejecuta(fila);
+    },1500);
+  })
+}
 function construirarrayremisionesseleccionadas(){
   var arrayremisionesseleccionadas = [];
   var lista = document.getElementsByClassName("remisionesseleccionadas");
@@ -2352,7 +2497,7 @@ function alta(){
                         '<div class="tab-content">'+
                           '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
                             '<div class="row">'+
-                              '<div class="col-md-12 table-responsive cabecerafija" style="height: 200px;overflow-y: scroll;padding: 0px 0px;">'+
+                              '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
                                 '<table id="tabladetallesfactura" class="table table-bordered tabladetallesfactura">'+
                                   '<thead class="'+background_tables+'">'+
                                     '<tr>'+
@@ -3308,7 +3453,7 @@ function obtenerdatos(facturamodificar){
                   '<div class="tab-content">'+
                     '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
                       '<div class="row">'+
-                        '<div class="col-md-12 table-responsive cabecerafija" style="height: 200px;overflow-y: scroll;padding: 0px 0px;">'+
+                        '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
                           '<table id="tabladetallesfactura" class="table table-bordered tabladetallesfactura">'+
                             '<thead class="'+background_tables+'">'+
                               '<tr>'+

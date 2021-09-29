@@ -81,7 +81,7 @@
                                 <th>Total Herramienta</th>
                             </tr>
                             @foreach($d['datadetalle'] as $ahd)
-                            <tr>
+                            <tr style="font-size:10px;">
                                 <td>{{$ahd['herramientadetalle']}}</td>
                                 <td>{{$ahd['descripciondetalle']}}</td>
                                 <td>{{$ahd['estadodetalle']}}</td>

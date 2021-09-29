@@ -123,6 +123,11 @@ function listar(){
         });
     }
   });
+  //modificacion al dar doble click
+  $('#tbllistado tbody').on('dblclick', 'tr', function () {
+    var data = tabla.row( this ).data();
+    obtenerdatos(data.Cotizacion);
+  });
 }
 //obtener tipos ordenes de compra
 function obtenertiposordenescompra(){

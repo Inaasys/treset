@@ -31,6 +31,7 @@ use App\Existencia;
 use Config;
 use Mail;
 use Schema;
+use LynX39\LaraPdfMerger\Facades\PdfMerger;
 
 class CotizacionProductoController extends ConfiguracionSistemaController{
 
@@ -717,6 +718,8 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
     }
     //generacion de formato en PDF
     public function cotizaciones_productos_generar_pdfs(Request $request){
+        //primero eliminar todos los archivos de la carpeta
+        Helpers::eliminararchivospdfsgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
             $cotizacionesproductos = CotizacionProducto::whereIn('Cotizacion', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
@@ -726,8 +729,8 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
             $cotizacionesproductos = CotizacionProducto::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
-        $data=array();
         foreach ($cotizacionesproductos as $cp){
+            $data=array();
             $cotizacionesproductosdetalle = CotizacionProductoDetalle::where('Cotizacion', $cp->Cotizacion)->get();
             $datadetalle=array();
             foreach($cotizacionesproductosdetalle as $cpd){
@@ -755,18 +758,29 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
                       "datadetalle" => $datadetalle,
                       "numerodecimalesdocumento"=> $request->numerodecimalesdocumento
             );
+            ini_set('max_execution_time', 300); // 5 minutos
+            ini_set('memory_limit', '-1');
+            $pdf = PDF::loadView('registros.cotizacionesproductos.formato_pdf_cotizacionesproductos', compact('data'))
+            //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+            ->setOption('footer-center', 'Página [page] de [toPage]')
+            //->setOption('footer-right', ''.$fechaformato.'')
+            ->setOption('footer-font-size', 7)
+            ->setOption('margin-left', 2)
+            ->setOption('margin-right', 2)
+            ->setOption('margin-bottom', 10);
+            //return $pdf->stream();
+            $ArchivoPDF = "PDF".$cp->Cotizacion.".pdf";
+            $pdf->save(storage_path('archivos_pdf_documentos_generados/'.$ArchivoPDF)); 
         }
-        ini_set('max_execution_time', 300); // 5 minutos
-        ini_set('memory_limit', '-1');
-        $pdf = PDF::loadView('registros.cotizacionesproductos.formato_pdf_cotizacionesproductos', compact('data'))
-        //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
-        //->setOption('footer-right', ''.$fechaformato.'')
-        ->setOption('footer-font-size', 7)
-        ->setOption('margin-left', 2)
-        ->setOption('margin-right', 2)
-        ->setOption('margin-bottom', 10);
-        return $pdf->stream();
+        $pdfMerger = PDFMerger::init(); //Initialize the merger
+        //unir pdfs
+        foreach ($cotizacionesproductos as $cotp){
+            $ArchivoPDF = "PDF".$cotp->Cotizacion.".pdf";
+            $urlarchivo = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
+            $pdfMerger->addPDF($urlarchivo, 'all');
+        }
+        $pdfMerger->merge(); //unirlos
+        $pdfMerger->save("CotizacionesProducto.pdf", "browser");//mostrarlos en el navegador
     }
 
     //generacion de formato en PDF
@@ -807,7 +821,7 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.cotizacionesproductos.formato_pdf_cotizacionesproductos', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
@@ -867,7 +881,7 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.cotizacionesproductos.formato_pdf_cotizacionesproductos', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
@@ -941,7 +955,7 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.cotizacionesproductos.formato_pdf_cliente_cotizacionesproductos', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
@@ -988,7 +1002,7 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.cotizacionesproductos.formato_pdf_cliente_cotizacionesproductos', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)

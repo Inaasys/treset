@@ -29,6 +29,7 @@ use App\BitacoraDocumento;
 use Config;
 use Mail;
 use App\Serie;
+use LynX39\LaraPdfMerger\Facades\PdfMerger;
 
 class OrdenTrabajoController extends ConfiguracionSistemaController
 {
@@ -1084,6 +1085,8 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
     }
     //generacion de formato en PDF
     public function ordenes_trabajo_generar_pdfs(Request $request){
+        //primero eliminar todos los archivos de la carpeta
+        Helpers::eliminararchivospdfsgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
             $ordenestrabajo = OrdenTrabajo::whereIn('Orden', $request->arraypdf)->orderBy('Folio', 'ASC')->take(500)->get(); 
@@ -1094,8 +1097,8 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             $ordenestrabajo = OrdenTrabajo::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(500)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
-        $data=array();
         foreach ($ordenestrabajo as $ot){
+            $data=array();
             $ordentrabajodetalle = OrdenTrabajoDetalle::where('Orden', $ot->Orden)->get();
             $datadetalle=array();
             foreach($ordentrabajodetalle as $otd){
@@ -1123,19 +1126,30 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     "datadetalle" => $datadetalle,
                     "numerodecimalesdocumento"=> $request->numerodecimalesdocumento
             );
+            //dd($data);
+            ini_set('max_execution_time', 300); // 5 minutos
+            ini_set('memory_limit', '-1');
+            $pdf = PDF::loadView('registros.ordenestrabajo.formato_pdf_ordenestrabajo', compact('data'))
+            //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+            ->setOption('footer-center', 'Página [page] de [toPage]')
+            //->setOption('footer-right', ''.$fechaformato.'')
+            ->setOption('footer-font-size', 7)
+            ->setOption('margin-left', 2)
+            ->setOption('margin-right', 2)
+            ->setOption('margin-bottom', 10);
+            //return $pdf->stream();
+            $ArchivoPDF = "PDF".$ot->Orden.".pdf";
+            $pdf->save(storage_path('archivos_pdf_documentos_generados/'.$ArchivoPDF));
         }
-        //dd($data);
-        ini_set('max_execution_time', 300); // 5 minutos
-        ini_set('memory_limit', '-1');
-        $pdf = PDF::loadView('registros.ordenestrabajo.formato_pdf_ordenestrabajo', compact('data'))
-        //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
-        //->setOption('footer-right', ''.$fechaformato.'')
-        ->setOption('footer-font-size', 7)
-        ->setOption('margin-left', 2)
-        ->setOption('margin-right', 2)
-        ->setOption('margin-bottom', 10);
-        return $pdf->stream();
+        $pdfMerger = PDFMerger::init(); //Initialize the merger
+        //unir pdfs
+        foreach ($ordenestrabajo as $ots){
+            $ArchivoPDF = "PDF".$ots->Orden.".pdf";
+            $urlarchivo = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
+            $pdfMerger->addPDF($urlarchivo, 'all');
+        }
+        $pdfMerger->merge(); //unirlos
+        $pdfMerger->save("OrdenesTrabajo.pdf", "browser");//mostrarlos en el navegador
     }
 
     //generacion de formato en PDF
@@ -1176,7 +1190,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.ordenestrabajo.formato_pdf_ordenestrabajo', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
@@ -1233,7 +1247,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.ordenestrabajo.formato_pdf_ordenestrabajo', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)

@@ -279,6 +279,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/compras_obtener_compra', 'CompraController@compras_obtener_compra')->name('compras_obtener_compra')->middleware('revisaraccesomenu:menuregistroscompras');
     Route::get('/compras_obtener_existencias_partida', 'CompraController@compras_obtener_existencias_partida')->name('compras_obtener_existencias_partida')->middleware('revisaraccesomenu:menuregistroscompras');
     Route::get('/compras_obtener_existencias_almacen', 'CompraController@compras_obtener_existencias_almacen')->name('compras_obtener_existencias_almacen')->middleware('revisaraccesomenu:menuregistroscompras');
+    
+    Route::get('/compras_obtener_valor_modificacionpermitida', 'CompraController@compras_obtener_valor_modificacionpermitida')->name('compras_obtener_valor_modificacionpermitida')->middleware('revisaraccesomenu:menuregistroscompras');
+    
     Route::post('/compras_guardar_modificacion', 'CompraController@compras_guardar_modificacion')->name('compras_guardar_modificacion')->middleware('revisarpermisos:registros.compras.cambios');
     Route::get('/compras_verificar_uso_en_modulos', 'CompraController@compras_verificar_uso_en_modulos')->name('compras_verificar_uso_en_modulos')->middleware('revisaraccesomenu:menuregistroscompras');
     Route::post('/compras_alta_o_baja', 'CompraController@compras_alta_o_baja')->name('compras_alta_o_baja')->middleware('revisarpermisos:registros.compras.bajas');
@@ -734,6 +737,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/facturas_obtener_ultimo_folio_serie_seleccionada', 'FacturaController@facturas_obtener_ultimo_folio_serie_seleccionada')->name('facturas_obtener_ultimo_folio_serie_seleccionada')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_datos_agente', 'FacturaController@facturas_obtener_datos_agente')->name('facturas_obtener_datos_agente')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_remisiones', 'FacturaController@facturas_obtener_remisiones')->name('facturas_obtener_remisiones')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_remisiones_por_pedido', 'FacturaController@facturas_obtener_remisiones_por_pedido')->name('facturas_obtener_remisiones_por_pedido')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_remisiones_pedido', 'FacturaController@facturas_obtener_remisiones_pedido')->name('facturas_obtener_remisiones_pedido')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_remision', 'FacturaController@facturas_obtener_remision')->name('facturas_obtener_remision')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_ordenes', 'FacturaController@facturas_obtener_ordenes')->name('facturas_obtener_ordenes')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_orden', 'FacturaController@facturas_obtener_orden')->name('facturas_obtener_orden')->middleware('revisaraccesomenu:menuregistrosfacturas');
@@ -852,6 +857,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/modificar_valores_en_bd_para_actualizacion_rama20210706correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20210706correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20210706correciones');
     Route::get('/modificar_valores_en_bd_para_actualizacion_rama20210731correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20210731correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20210731correciones');
     Route::get('/modificar_valores_en_bd_para_actualizacion_rama20210814correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20210814correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20210814correciones');
+    Route::get('/modificar_valores_en_bd_para_actualizacion_rama20210924correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20210924correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20210924correciones');
     /* -----------------------------------||||||||||||||||||||FIN CONFIGURACIONES Y PRUEBAS||||||||||||||||||||||-------------------------------------*/
 });
 

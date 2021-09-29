@@ -24,6 +24,7 @@ use App\VistaAjusteInventario;
 use App\VistaObtenerExistenciaProducto;
 use Config;
 use Mail;
+use LynX39\LaraPdfMerger\Facades\PdfMerger;
 
 class AjusteInventarioController extends ConfiguracionSistemaController{
 
@@ -724,6 +725,8 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
 
     //generar documento pdf
     public function ajustesinventario_generar_pdfs(Request $request){
+        //primero eliminar todos los archivos de la carpeta
+        Helpers::eliminararchivospdfsgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
             $ajustes = AjusteInventario::whereIn('Ajuste', $request->arraypdf)->orderBy('Folio', 'ASC')->take(500)->get(); 
@@ -733,8 +736,8 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
             $ajustes = AjusteInventario::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(500)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
-        $data=array();
         foreach ($ajustes as $a){
+            $data=array();
             $ajustedetalle = AjusteInventarioDetalle::where('Ajuste', $a->Ajuste)->get();
             $datadetalle=array();
             foreach($ajustedetalle as $ad){
@@ -765,19 +768,30 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
                       "datadetalle" => $datadetalle,
                       "numerodecimalesdocumento"=> $request->numerodecimalesdocumento
             );
+            //dd($data);
+            ini_set('max_execution_time', 300); // 5 minutos
+            ini_set('memory_limit', '-1');
+            $pdf = PDF::loadView('registros.ajustesinventario.formato_pdf_ajustesinventario', compact('data'))
+            //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+            ->setOption('footer-center', 'Página [page] de [toPage]')
+            //->setOption('footer-right', ''.$fechaformato.'')
+            ->setOption('footer-font-size', 7)
+            ->setOption('margin-left', 2)
+            ->setOption('margin-right', 2)
+            ->setOption('margin-bottom', 10);
+            //return $pdf->stream();
+            $ArchivoPDF = "PDF".$a->Ajuste.".pdf";
+            $pdf->save(storage_path('archivos_pdf_documentos_generados/'.$ArchivoPDF));
         }
-        //dd($data);
-        ini_set('max_execution_time', 300); // 5 minutos
-        ini_set('memory_limit', '-1');
-        $pdf = PDF::loadView('registros.ajustesinventario.formato_pdf_ajustesinventario', compact('data'))
-        //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
-        //->setOption('footer-right', ''.$fechaformato.'')
-        ->setOption('footer-font-size', 7)
-        ->setOption('margin-left', 2)
-        ->setOption('margin-right', 2)
-        ->setOption('margin-bottom', 10);
-        return $pdf->stream();
+        $pdfMerger = PDFMerger::init(); //Initialize the merger
+        //unir pdfs
+        foreach ($ajustes as $aj){
+            $ArchivoPDF = "PDF".$aj->Ajuste.".pdf";
+            $urlarchivo = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
+            $pdfMerger->addPDF($urlarchivo, 'all');
+        }
+        $pdfMerger->merge(); //unirlos
+        $pdfMerger->save("AjustesInventario.pdf", "browser");//mostrarlos en el navegador
     }
 
     //generacion de formato en PDF
@@ -821,7 +835,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.ajustesinventario.formato_pdf_ajustesinventario', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
@@ -881,7 +895,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.ajustesinventario.formato_pdf_ajustesinventario', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)

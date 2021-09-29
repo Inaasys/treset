@@ -54,36 +54,41 @@ function ocultarformulario(){
 }
 //listar todos los registros de la tabla
 function listar(){
-  tabla=$('#tbllistado').DataTable({
-    "lengthMenu": [ 100, 250, 500, 1000 ],
-    "pageLength": 1000,
-    "sScrollX": "110%",
-    "sScrollY": "350px",
-    processing: true,
-    'language': {
-      'loadingRecords': '&nbsp;',
-      'processing': '<div class="spinner"></div>'
-    },
-    serverSide: true,
-    ajax: usuarios_obtener,
-    columns: [
-        { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
-        { data: 'id', name: 'id', orderable: false, searchable: true },
-        { data: 'name', name: 'name', orderable: false, searchable: true },
-        { data: 'email', name: 'email', orderable: false, searchable: true },
-        { data: 'user', name: 'user', orderable: false, searchable: false  },
-        { data: 'role_id', name: 'role_id', orderable: false, searchable: false  }
-    ],
-    "initComplete": function() {
-      var $buscar = $('div.dataTables_filter input');
-      $buscar.unbind();
-      $buscar.bind('keyup change', function(e) {
-          if(e.keyCode == 13 || this.value == "") {
-            $('#tbllistado').DataTable().search( this.value ).draw();
-          }
-      });
-    }
-  });
+    tabla=$('#tbllistado').DataTable({
+        "lengthMenu": [ 100, 250, 500, 1000 ],
+        "pageLength": 1000,
+        "sScrollX": "110%",
+        "sScrollY": "350px",
+        processing: true,
+        'language': {
+            'loadingRecords': '&nbsp;',
+            'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: usuarios_obtener,
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'id', name: 'id', orderable: false, searchable: true },
+            { data: 'name', name: 'name', orderable: false, searchable: true },
+            { data: 'email', name: 'email', orderable: false, searchable: true },
+            { data: 'user', name: 'user', orderable: false, searchable: false  },
+            { data: 'role_id', name: 'role_id', orderable: false, searchable: false  }
+        ],
+        "initComplete": function() {
+            var $buscar = $('div.dataTables_filter input');
+            $buscar.unbind();
+            $buscar.bind('keyup change', function(e) {
+                if(e.keyCode == 13 || this.value == "") {
+                    $('#tbllistado').DataTable().search( this.value ).draw();
+                }
+            });
+        }
+    });
+    //modificacion al dar doble click
+    $('#tbllistado tbody').on('dblclick', 'tr', function () {
+        var data = tabla.row( this ).data();
+        obtenerdatos(data.id);
+    }); 
 }
 //obtener roles
 function obtenerroles(){

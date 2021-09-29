@@ -91,16 +91,26 @@
                                 @foreach($d['datageneral'] as $dataremisionoorden)
                                     @if($dataremisionoorden['datosgenerales'] != null)
                                         <tr>
-                                            <td style="font-size:12px;" colspan="6"><b>Remisión:</b> {{$dataremisionoorden['datosgenerales']->Remision}} &nbsp;&nbsp;&nbsp; <b>Pedido:</b> {{$dataremisionoorden['datosgenerales']->Pedido}} &nbsp;&nbsp;&nbsp; <b>Orden Servicio:</b> {{$dataremisionoorden['datosgenerales']->Os}} &nbsp;&nbsp;&nbsp; <b>Equipo:</b> {{$dataremisionoorden['datosgenerales']->Eq}} &nbsp;&nbsp;&nbsp; <b>Requisición:</b> {{$dataremisionoorden['datosgenerales']->Rq}}</td>
+                                            <td colspan="6" style="font-size:12px; text-align: center;">
+                                                <table style="width:100%">
+                                                    <tr>
+                                                        <td><b>Remisión:</b> <br>{{$dataremisionoorden['datosgenerales']->Remision}}</td>
+                                                        <td><b>Pedido:</b> <br>{{$dataremisionoorden['datosgenerales']->Pedido}}</td>
+                                                        <td><b>Orden Servicio:</b> <br>{{$dataremisionoorden['datosgenerales']->Os}}</td>
+                                                        <td><b>Equipo:</b> <br>{{$dataremisionoorden['datosgenerales']->Eq}}</td>
+                                                        <td><b>Requisición:</b> <br>{{$dataremisionoorden['datosgenerales']->Rq}}</td>
+                                                    </tr>
+                                                </table>
+                                            </td>
                                         </tr>
                                     @endif
                                     @foreach($dataremisionoorden['datadetalle'] as $detalle)
-                                        <tr>
-                                        <td>{{ number_format($detalle['cantidaddetalle'], $d['numerodecimalesdocumento']) }}</td>
+                                        <tr style="font-size:10px;">
+                                            <td>{{ number_format($detalle['cantidaddetalle'], $d['numerodecimalesdocumento']) }}</td>
                                             <td>{{$detalle['descripciondetalle']}}</td>
                                             <td>{{$detalle['insumodetalle']}}</td>
-                                            <td>{{ number_format($detalle['preciodetalle'], $d['numerodecimalesdocumento']) }}</td>
-                                            <td colspan="2">{{ number_format($detalle['subtotaldetalle'], $d['numerodecimalesdocumento']) }}</td>
+                                            <td style="text-align: right;">{{ number_format($detalle['preciodetalle'], $d['numerodecimalesdocumento']) }}</td>
+                                            <td colspan="2" style="text-align: right;">{{ number_format($detalle['subtotaldetalle'], $d['numerodecimalesdocumento']) }}</td>
                                         </tr>
                                         <tr style="font-size:8px; text-align: justify;">
                                             <td colspan="2">Clave Producto: @if($detalle['claveproducto'] != null) {{$detalle['claveproducto']->Clave}} {{$detalle['claveproducto']->Nombre}} @endif</td>
@@ -118,11 +128,25 @@
                                 @foreach($d['datageneral'] as $dataremisionoorden)
                                     @if($dataremisionoorden['datosgenerales'] != null)
                                         <tr>
-                                            <td style="font-size:12px;" colspan="6"><b>Orden:</b> {{$dataremisionoorden['datosgenerales']->Orden}} &nbsp;&nbsp; <b>Pedido:</b> {{$dataremisionoorden['datosgenerales']->Pedido}} &nbsp;&nbsp; <b>No. de Vin:</b> {{$dataremisionoorden['datosgenerales']->Vin}} &nbsp;&nbsp; <b>Economico:</b> {{$dataremisionoorden['datosgenerales']->Economico}} &nbsp;&nbsp; <b>Motor:</b> {{$dataremisionoorden['datosgenerales']->Motor}} &nbsp;&nbsp; <b>Marca:</b> {{$dataremisionoorden['datosgenerales']->Marca}} &nbsp;&nbsp; <b>Modelo:</b> {{$dataremisionoorden['datosgenerales']->Modelo}} &nbsp;&nbsp; <b>Año:</b> {{$dataremisionoorden['datosgenerales']->Año}} &nbsp;&nbsp; <b>Kilometros:</b> {{$dataremisionoorden['datosgenerales']->Kilometros}}</td>
+                                            <td colspan="6" style="font-size:12px; text-align: center;">
+                                                <table style="width:100%">
+                                                    <tr>
+                                                        <td><b>Orden:</b> <br>{{$dataremisionoorden['datosgenerales']->Orden}}</td><td></td>
+                                                        <td><b>Pedido:</b> <br>{{$dataremisionoorden['datosgenerales']->Pedido}}</td><td></td>
+                                                        <td><b>No. de Vin:</b> <br>{{$dataremisionoorden['datosgenerales']->Vin}}</td><td></td>
+                                                        <td><b>Economico:</b> <br>{{$dataremisionoorden['datosgenerales']->Economico}}</td><td></td>
+                                                        <td><b>Motor:</b> <br>{{$dataremisionoorden['datosgenerales']->Motor}}</td><td></td>
+                                                        <td><b>Marca:</b> <br>{{$dataremisionoorden['datosgenerales']->Marca}}</td><td></td>
+                                                        <td><b>Modelo:</b> <br>{{$dataremisionoorden['datosgenerales']->Modelo}} </td><td></td>
+                                                        <td><b>Año:</b> <br>{{$dataremisionoorden['datosgenerales']->Año}}</td><td></td>
+                                                        <td><b>Kilometros:</b> <br>{{ number_format($dataremisionoorden['datosgenerales']->Kilometros, 0, '.', '') }}</td>
+                                                    </tr>
+                                                </table>
+                                            </td>
                                         </tr>
                                     @endif
                                     @foreach($dataremisionoorden['datadetalle'] as $detalle)
-                                        <tr>
+                                        <tr style="font-size:10px;">
                                             <td>{{ number_format($detalle['cantidaddetalle'], $d['numerodecimalesdocumento']) }}</td>
                                             <td>{{$detalle['descripciondetalle']}}</td>
                                             <td></td>
@@ -144,12 +168,12 @@
                             @if($d['tipodetalles'] == 'libre')
                                 @foreach($d['datageneral'] as $dataremisionoorden)
                                     @foreach($dataremisionoorden['datadetalle'] as $detalle)
-                                        <tr>
+                                        <tr style="font-size:10px;">
                                             <td>{{ number_format($detalle['cantidaddetalle'], $d['numerodecimalesdocumento']) }}</td>
                                             <td>{{$detalle['descripciondetalle']}}</td>
                                             <td></td>
-                                            <td>{{ number_format($detalle['preciodetalle'], $d['numerodecimalesdocumento']) }}</td>
-                                            <td colspan="2">{{ number_format($detalle['subtotaldetalle'], $d['numerodecimalesdocumento']) }}</td>
+                                            <td style="text-align: right;">{{ number_format($detalle['preciodetalle'], $d['numerodecimalesdocumento']) }}</td>
+                                            <td style="text-align: right;" colspan="2">{{ number_format($detalle['subtotaldetalle'], $d['numerodecimalesdocumento']) }}</td>
                                         </tr>
                                         <tr style="font-size:8px; text-align: justify;">
                                             <td colspan="2">Clave Producto: @if($detalle['claveproducto'] != null) {{$detalle['claveproducto']->Clave}} {{$detalle['claveproducto']->Nombre}} @endif</td>

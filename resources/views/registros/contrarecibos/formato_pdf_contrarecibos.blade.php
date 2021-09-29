@@ -79,7 +79,7 @@
                                 <th>Movimiento de Compra</th>
                             </tr>
                             @foreach($d['datadetalle'] as $crd)
-                            <tr>
+                            <tr style="font-size:10px;">
                                 <td>{{$crd['fechadetalle']}}</td>
                                 <td>{{$crd['facturadetalle']}}</td>
                                 <td>{{$crd['remisiondetalle']}}</td>

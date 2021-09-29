@@ -644,7 +644,6 @@ class ProductoController extends ConfiguracionSistemaController{
         $salidas = 0;
         $existencias = 0;
         $numerodecimalesconfigurados = config('app.numerodedecimales');
-
         $data = array();
         foreach(array_reverse($kardex) as $k){
             $entradas = $entradas + $k->Entradas;

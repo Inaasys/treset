@@ -32,6 +32,7 @@ use App\VistaTraspaso;
 use App\VistaObtenerExistenciaProducto;
 use Config;
 use Mail;
+use LynX39\LaraPdfMerger\Facades\PdfMerger;
 
 class TraspasoController extends ConfiguracionSistemaController{
 
@@ -1296,6 +1297,8 @@ class TraspasoController extends ConfiguracionSistemaController{
     
     //generar documento pdf
     public function traspasos_generar_pdfs(Request $request){
+        //primero eliminar todos los archivos de la carpeta
+        Helpers::eliminararchivospdfsgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
             $traspasos = Traspaso::whereIn('Traspaso', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
@@ -1305,8 +1308,8 @@ class TraspasoController extends ConfiguracionSistemaController{
             $traspasos = Traspaso::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
-        $data=array();
         foreach ($traspasos as $t){
+            $data=array();
             $traspasodetalle = TraspasoDetalle::where('Traspaso', $t->Traspaso)->get();
             $datadetalle=array();
             foreach($traspasodetalle as $td){
@@ -1342,19 +1345,30 @@ class TraspasoController extends ConfiguracionSistemaController{
                       "datadetalle" => $datadetalle,
                       "numerodecimalesdocumento"=> $request->numerodecimalesdocumento
             );
+            //dd($data);
+            ini_set('max_execution_time', 300); // 5 minutos
+            ini_set('memory_limit', '-1');
+            $pdf = PDF::loadView('registros.traspasos.formato_pdf_traspasos', compact('data'))
+            //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+            ->setOption('footer-center', 'Página [page] de [toPage]')
+            //->setOption('footer-right', ''.$fechaformato.'')
+            ->setOption('footer-font-size', 7)
+            ->setOption('margin-left', 2)
+            ->setOption('margin-right', 2)
+            ->setOption('margin-bottom', 10);
+            //return $pdf->stream();
+            $ArchivoPDF = "PDF".$t->Traspaso.".pdf";
+            $pdf->save(storage_path('archivos_pdf_documentos_generados/'.$ArchivoPDF));
         }
-        //dd($data);
-        ini_set('max_execution_time', 300); // 5 minutos
-        ini_set('memory_limit', '-1');
-        $pdf = PDF::loadView('registros.traspasos.formato_pdf_traspasos', compact('data'))
-        //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
-        //->setOption('footer-right', ''.$fechaformato.'')
-        ->setOption('footer-font-size', 7)
-        ->setOption('margin-left', 2)
-        ->setOption('margin-right', 2)
-        ->setOption('margin-bottom', 10);
-        return $pdf->stream();
+        $pdfMerger = PDFMerger::init(); //Initialize the merger
+        //unir pdfs
+        foreach ($traspasos as $tra){
+            $ArchivoPDF = "PDF".$tra->Traspaso.".pdf";
+            $urlarchivo = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
+            $pdfMerger->addPDF($urlarchivo, 'all');
+        }
+        $pdfMerger->merge(); //unirlos
+        $pdfMerger->save("Traspasos.pdf", "browser");//mostrarlos en el navegador
     }
 
     //generacion de formato en PDF
@@ -1403,7 +1417,7 @@ class TraspasoController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.traspasos.formato_pdf_traspasos', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
@@ -1468,7 +1482,7 @@ class TraspasoController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.traspasos.formato_pdf_traspasos', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)

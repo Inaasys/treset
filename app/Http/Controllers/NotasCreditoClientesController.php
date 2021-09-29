@@ -44,6 +44,7 @@ use Config;
 use Mail;
 use Facturapi\Facturapi;
 use Storage;
+use LynX39\LaraPdfMerger\Facades\PdfMerger;
 
 class NotasCreditoClientesController extends ConfiguracionSistemaController{
 
@@ -1551,6 +1552,8 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
     }
     //generacion de formato en PDF
     public function notas_credito_clientes_generar_pdfs(Request $request){
+        //primero eliminar todos los archivos de la carpeta
+        Helpers::eliminararchivospdfsgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
             $notascreditocliente = NotaCliente::whereIn('Nota', $request->arraypdf)->orderBy('Folio', 'ASC')->take(250)->get(); 
@@ -1561,8 +1564,8 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $notascreditocliente = NotaCliente::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(250)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
-        $data=array();
         foreach ($notascreditocliente as $ncc){
+            $data=array();
             $notascreditoclientedetalle = NotaClienteDetalle::where('Nota', $ncc->Nota)->get();
             $datadetalle=array();
             foreach($notascreditoclientedetalle as $nccd){
@@ -1610,18 +1613,29 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                 "totalletras"=>$totalletras,
                 "numerodecimalesdocumento"=> $request->numerodecimalesdocumento
             );
+            ini_set('max_execution_time', 300); // 5 minutos
+            ini_set('memory_limit', '-1');
+            $pdf = PDF::loadView('registros.notascreditoclientes.formato_pdf_notascreditoclientes', compact('data'))
+            //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+            ->setOption('footer-center', 'Página [page] de [toPage]')
+            //->setOption('footer-right', ''.$fechaformato.'')
+            ->setOption('footer-font-size', 7)
+            ->setOption('margin-left', 2)
+            ->setOption('margin-right', 2)
+            ->setOption('margin-bottom', 10);
+            //return $pdf->stream();
+            $ArchivoPDF = "PDF".$ncc->Nota.".pdf";
+            $pdf->save(storage_path('archivos_pdf_documentos_generados/'.$ArchivoPDF));
         }
-        ini_set('max_execution_time', 300); // 5 minutos
-        ini_set('memory_limit', '-1');
-        $pdf = PDF::loadView('registros.notascreditoclientes.formato_pdf_notascreditoclientes', compact('data'))
-        //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
-        //->setOption('footer-right', ''.$fechaformato.'')
-        ->setOption('footer-font-size', 7)
-        ->setOption('margin-left', 2)
-        ->setOption('margin-right', 2)
-        ->setOption('margin-bottom', 10);
-        return $pdf->stream();
+        $pdfMerger = PDFMerger::init(); //Initialize the merger
+        //unir pdfs
+        foreach ($notascreditocliente as $notcc){
+            $ArchivoPDF = "PDF".$notcc->Nota.".pdf";
+            $urlarchivo = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
+            $pdfMerger->addPDF($urlarchivo, 'all');
+        }
+        $pdfMerger->merge(); //unirlos
+        $pdfMerger->save("NotasCreditoCliente.pdf", "browser");//mostrarlos en el navegador
     }
 
     //generacion de formato en PDF
@@ -1682,7 +1696,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.notascreditoclientes.formato_pdf_notascreditoclientes', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
@@ -1762,7 +1776,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.notascreditoclientes.formato_pdf_notascreditoclientes', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)

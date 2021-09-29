@@ -134,6 +134,11 @@ function listar(){
         });
     }
   });
+  //modificacion al dar doble click
+  $('#tbllistado tbody').on('dblclick', 'tr', function () {
+    var data = tabla.row( this ).data();
+    obtenerdatos(data.Compra);
+  });
 }
 //obtener tipos ordenes de compra
 function obtenertiposordenescompra(tipoalta){
@@ -736,7 +741,7 @@ function seleccionarordencompra(Folio, Orden, tipoalta){
 async function seleccionartipoordencompra(data){
   await retraso();
   $("#tipo").val(data.ordencompra.Tipo).change();
-  //calculartotal();
+  calculartotal();
   mostrarbuscadorcodigoproducto();
   mostrarformulario();
   $('.page-loader-wrapper').css('display', 'none');
@@ -2312,16 +2317,23 @@ async function cantidadesinsuficientesalmacen(tipooperacion){
       cantidadincorrecta++;
     }
   });
-  if(cantidadincorrecta == 0 && tipooperacion == 'alta'){
-    $("#btnGuardar").show();
-    $("#btnGuardarModificacion").hide();
-  }else if(cantidadincorrecta == 0 && tipooperacion == 'modificacion'){
-    $("#btnGuardar").hide();
-    $("#btnGuardarModificacion").show();
-  }else{
-    $("#btnGuardar").hide();
-    $("#btnGuardarModificacion").hide();
-  }
+  var folio = $("#folio").val();
+  var serie = $("#serie").val();
+  var compra = folio+"-"+serie;
+  $.get(compras_obtener_valor_modificacionpermitida, {compra:compra}, function(modificacionpermitida){
+    if(modificacionpermitida == 1){
+      if(cantidadincorrecta == 0 && tipooperacion == 'alta'){
+        $("#btnGuardar").show();
+        $("#btnGuardarModificacion").hide();
+      }else if(cantidadincorrecta == 0 && tipooperacion == 'modificacion'){
+        $("#btnGuardar").hide();
+        $("#btnGuardarModificacion").show();
+      }else{
+        $("#btnGuardar").hide();
+        $("#btnGuardarModificacion").hide();
+      }
+    }
+  });
 }
 //funcion asincrona para buscar existencias de la partida
 function comprobarexistenciaspartida(almacen, codigopartida, folio, serie, compra, cantidadpartida){

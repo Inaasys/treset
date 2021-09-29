@@ -24,6 +24,7 @@ use App\Producto;
 use App\Existencia;
 use App\Almacen;
 use App\Serie;
+use LynX39\LaraPdfMerger\Facades\PdfMerger;
 
 class AsignacionHerramientaController extends ConfiguracionSistemaController{
 
@@ -328,6 +329,8 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
     }
     //generar documento
     public function asignacion_herramienta_generar_pdfs(Request $request){
+        //primero eliminar todos los archivos de la carpeta
+        Helpers::eliminararchivospdfsgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
             $asignacionesherramientas = VistaAsignacionHerramienta::whereIn('asignacion', $request->arraypdf)->orderBy('id', 'ASC')->take(500)->get(); 
@@ -337,8 +340,8 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
             $asignacionesherramientas = VistaAsignacionHerramienta::whereBetween('fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('id', 'ASC')->take(500)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
-        $data=array();
         foreach ($asignacionesherramientas as $ah){
+            $data=array();
             $asignacionherramientadetalle = Asignacion_Herramienta_Detalle::where('asignacion', $ah->asignacion)->get();
             $datadetalle=array();
             foreach($asignacionherramientadetalle as $ahd){
@@ -359,19 +362,30 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                       "datadetalle" => $datadetalle,
                       "numerodecimalesdocumento"=> $request->numerodecimalesdocumento
             );
+            //dd($data);
+            ini_set('max_execution_time', 300); // 5 minutos
+            ini_set('memory_limit', '-1');
+            $pdf = PDF::loadView('registros.asignacionherramienta.formato_pdf_asignacion_herramienta', compact('data'))
+            //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+            ->setOption('footer-center', 'Página [page] de [toPage]')
+            //->setOption('footer-right', ''.$fechaformato.'')
+            ->setOption('footer-font-size', 7)
+            ->setOption('margin-left', 5)
+            ->setOption('margin-right', 5)
+            ->setOption('margin-bottom', 10);
+            //return $pdf->stream();
+            $ArchivoPDF = "PDF".$ah->asignacion.".pdf";
+            $pdf->save(storage_path('archivos_pdf_documentos_generados/'.$ArchivoPDF));
         }
-        //dd($data);
-        ini_set('max_execution_time', 300); // 5 minutos
-        ini_set('memory_limit', '-1');
-        $pdf = PDF::loadView('registros.asignacionherramienta.formato_pdf_asignacion_herramienta', compact('data'))
-        //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
-        //->setOption('footer-right', ''.$fechaformato.'')
-        ->setOption('footer-font-size', 7)
-        ->setOption('margin-left', 5)
-        ->setOption('margin-right', 5)
-        ->setOption('margin-bottom', 10);
-        return $pdf->stream();
+        $pdfMerger = PDFMerger::init(); //Initialize the merger
+        //unir pdfs
+        foreach ($asignacionesherramientas as $asigh){
+            $ArchivoPDF = "PDF".$asigh->asignacion.".pdf";
+            $urlarchivo = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
+            $pdfMerger->addPDF($urlarchivo, 'all');
+        }
+        $pdfMerger->merge(); //unirlos
+        $pdfMerger->save("AsignacionesHerramienta.pdf", "browser");//mostrarlos en el navegador
     }
     //guardar configuracion tabla
     public function asignacion_herramienta_guardar_configuracion_tabla(Request $request){
@@ -826,7 +840,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
         );
         $pdf = PDF::loadView('registros.asignacionherramienta.formato_pdf_asignacion_herramienta_auditoria', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
@@ -893,7 +907,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.asignacionherramienta.formato_pdf_reporte_general_herramienta_asignada', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)

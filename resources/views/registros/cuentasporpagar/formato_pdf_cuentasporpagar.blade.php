@@ -88,7 +88,7 @@
                                 <th>Abono $</th>
                             </tr>
                             @foreach($d['datadetalle'] as $cxpd)
-                            <tr>
+                            <tr style="font-size:10px;">
                                 <td></td>
                                 <td>{{$cxpd['proveedordetalle']->Nombre}} ({{$cxpd['proveedordetalle']->Numero}})</td>
                                 <td>{{$cxpd['remisiondetalle']}}</td>

@@ -436,4 +436,15 @@ class PruebaController extends ConfiguracionSistemaController{
         ]);
     }
 
+    public function modificar_valores_en_bd_para_actualizacion_rama20210924correciones(){
+        //Configuracion columnas tabla Existencias       
+        Configuracion_Tabla::where('tabla', 'Existencias')
+        ->update([
+            'campos_activados'=>'Codigo,Status,Producto,Ubicacion,Almacen,Existencias,Costo,Utilidad,SubTotal,Iva,Total,totalCostoInventario,Insumo',
+            'campos_desactivados'=>'Unidad,CostoDeLista,Moneda,CostoDeVenta,Marca,Linea,FechaUltimaCompra,FechaUltimaVenta,ClaveProducto,ClaveUnidad,Precio,NombreMarca,NombreLinea',
+            'columnas_ordenadas'=>'Codigo,Insumo,Status,Producto,Ubicacion,Almacen,Existencias,Costo,Utilidad,SubTotal,Iva,Total,totalCostoInventario',
+        ]);
+        
+    }
+
 }

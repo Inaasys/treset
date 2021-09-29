@@ -193,7 +193,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="table-responsive cabecerafija" style="height: 450px;overflow-y: scroll;padding: 0px 0px;">
-                                <table class="table table-bordered table-striped table-hover">
+                                <table class="table table-bordered table-striped table-hover" id="tablakardexproducto">
                                     <thead>
                                         <tr>
                                             <td class="{{$empresa->background_tables}}">#</td>
@@ -220,6 +220,45 @@
             </div>
         </div>
     </div> 
+
+
+    <!-- Modal Info Documentos Kardex-->
+    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalinfodocumentokardex" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div id="formulario">
+                    <div class="modal-header {{$empresa->background_forms_and_modals}}">
+                        <h4 class="modal-title" id="titulomodal"></h4>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formparsley" action="#">
+                            <div class="col-md-12" id="tabsform">
+                                <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
+                            </div>
+                        </form> 
+                    </div>
+                    <div class="modal-footer">
+                        <div class="col-md-4">
+                            <h5 style="color:#F44336 !important;"  id="totalfacturaproveedor"></h5>
+                        </div>
+                        <div class="col-md-4">
+                            <h5 style="color:#F44336 !important;" id="diferenciafacturaproveedor"></h5>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
+                            <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
+                            <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
+                        </div> 
+                    </div>
+                </div>
+                <div id="contenidomodaltablas">
+                    <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
+                </div> 
+            </div>
+        </div>
+    </div>
+
+
 <!-- modal para configuraciones de tablas-->
 @include('secciones.modalconfiguraciontablas')
 <!-- fin modal para configuraciones de tablas-->

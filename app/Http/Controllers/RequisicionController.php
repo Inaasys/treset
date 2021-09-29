@@ -36,6 +36,7 @@ use App\OrdenTrabajoDetalle;
 use App\Serie;
 use Config;
 use Mail;
+use LynX39\LaraPdfMerger\Facades\PdfMerger;
 
 class RequisicionController extends ConfiguracionSistemaController{
 
@@ -661,6 +662,8 @@ class RequisicionController extends ConfiguracionSistemaController{
     }
     //generar documento pdf
     public function requisiciones_generar_pdfs(Request $request){
+        //primero eliminar todos los archivos de la carpeta
+        Helpers::eliminararchivospdfsgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
             $requisiciones = Requisicion::whereIn('Requisicion', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
@@ -670,8 +673,8 @@ class RequisicionController extends ConfiguracionSistemaController{
             $requisiciones = Requisicion::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
-        $data=array();
         foreach ($requisiciones as $r){
+            $data=array();
             $requisiciondetalle = RequisicionDetalle::where('Requisicion', $r->Requisicion)->get();
             $datadetalle=array();
             foreach($requisiciondetalle as $rd){
@@ -700,18 +703,29 @@ class RequisicionController extends ConfiguracionSistemaController{
                       "datadetalle" => $datadetalle,
                       "numerodecimalesdocumento"=> $request->numerodecimalesdocumento
             );
+            ini_set('max_execution_time', 300); // 5 minutos
+            ini_set('memory_limit', '-1');
+            $pdf = PDF::loadView('registros.requisiciones.formato_pdf_requisiciones', compact('data'))
+            //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+            ->setOption('footer-center', 'Página [page] de [toPage]')
+            //->setOption('footer-right', ''.$fechaformato.'')
+            ->setOption('footer-font-size', 7)
+            ->setOption('margin-left', 2)
+            ->setOption('margin-right', 2)
+            ->setOption('margin-bottom', 10);
+            //return $pdf->stream();
+            $ArchivoPDF = "PDF".$r->Requisicion.".pdf";
+            $pdf->save(storage_path('archivos_pdf_documentos_generados/'.$ArchivoPDF));
         }
-        ini_set('max_execution_time', 300); // 5 minutos
-        ini_set('memory_limit', '-1');
-        $pdf = PDF::loadView('registros.requisiciones.formato_pdf_requisiciones', compact('data'))
-        //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
-        //->setOption('footer-right', ''.$fechaformato.'')
-        ->setOption('footer-font-size', 7)
-        ->setOption('margin-left', 2)
-        ->setOption('margin-right', 2)
-        ->setOption('margin-bottom', 10);
-        return $pdf->stream();
+        $pdfMerger = PDFMerger::init(); //Initialize the merger
+        //unir pdfs
+        foreach ($requisiciones as $req){
+            $ArchivoPDF = "PDF".$req->Requisicion.".pdf";
+            $urlarchivo = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
+            $pdfMerger->addPDF($urlarchivo, 'all');
+        }
+        $pdfMerger->merge(); //unirlos
+        $pdfMerger->save("Requisiciones.pdf", "browser");//mostrarlos en el navegador
     }
     //generacion de formato en PDF
     public function requisiciones_generar_pdfs_indiv($documento){
@@ -752,7 +766,7 @@ class RequisicionController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.requisiciones.formato_pdf_requisiciones', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)
@@ -808,7 +822,7 @@ class RequisicionController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.requisiciones.formato_pdf_requisiciones', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)

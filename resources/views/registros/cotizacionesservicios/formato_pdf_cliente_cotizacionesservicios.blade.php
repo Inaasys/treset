@@ -109,7 +109,7 @@
                                 <th>SubTotal</th>
                             </tr>
                             @foreach($d['datadetalle'] as $csd)
-                            <tr>
+                            <tr style="font-size:10px;">
                                 <td>{{ number_format($csd['cantidaddetalle'], $d['numerodecimalesdocumento']) }}</td>
                                 <td>{{$csd['descripciondetalle']}}</td>
                                 <td>{{$csd['marcadetalle']}}</td>

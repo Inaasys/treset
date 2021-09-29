@@ -84,7 +84,7 @@
                                 <th>Costo Total</th>
                             </tr>
                             @foreach($d['datadetalle'] as $pd)
-                            <tr>
+                            <tr style="font-size:10px;">
                                 <td>{{ number_format($pd['cantidaddetalle'], $d['numerodecimalesdocumento']) }}</td>
                                 <td>{{$pd['codigodetalle']}}</td>
                                 <td>{{$pd['descripciondetalle']}}</td>

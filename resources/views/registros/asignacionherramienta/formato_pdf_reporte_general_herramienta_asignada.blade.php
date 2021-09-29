@@ -79,7 +79,7 @@
                         </thead>
                         <tbody style="background-color:#ddd; font-size:11px; text-align: center;">
                             @foreach($data[0]['datadetalle'] as $dd)
-                            <tr>
+                            <tr style="font-size:10px;">
                                 <td>{{$dd['asignaciondetalle']}}</td>    
                                 <td>{{$dd['herramientadetalle']}}</td>
                                 <td>{{$dd['descripciondetalle']}}</td>

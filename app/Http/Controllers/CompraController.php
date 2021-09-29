@@ -43,6 +43,7 @@ use App\OrdenTrabajoDetalle;
 use App\Serie;
 use Config;
 use Mail;
+use LynX39\LaraPdfMerger\Facades\PdfMerger;
 
 class CompraController extends ConfiguracionSistemaController{
 
@@ -1139,6 +1140,31 @@ class CompraController extends ConfiguracionSistemaController{
         }
         return response()->json($Existencias);
     }
+    //obtener valor moduficacion permitida
+    public function compras_obtener_valor_modificacionpermitida(Request $request){
+        $compra = Compra::where('Compra', $request->compra)->first();
+        //permitir o no modificar registro
+        if(Auth::user()->role_id == 1){
+            if($compra->Status == 'LIQUIDADA' || $compra->Status == 'BAJA'){
+                $modificacionpermitida = 0;
+            } else{
+                $modificacionpermitida = 1;
+            }
+        }
+        if(Auth::user()->role_id != 1){
+            if($compra->Status == 'LIQUIDADA' || $compra->Status == 'BAJA'){
+                $modificacionpermitida = 0;
+            }else{
+                $resultadofechas = Helpers::compararanoymesfechas($compra->Fecha);
+                if($resultadofechas != ''){
+                    $modificacionpermitida = 0;
+                }else{
+                    $modificacionpermitida = 1;
+                }
+            }
+        } 
+        return response()->json($modificacionpermitida);
+    }
     //guardar modificacion compra
     public function compras_guardar_modificacion(Request $request){
         ini_set('max_input_vars','20000' );
@@ -1805,6 +1831,8 @@ class CompraController extends ConfiguracionSistemaController{
     }
     //generacion de formato en PDF
     public function compras_generar_pdfs(Request $request){
+        //primero eliminar todos los archivos de la carpeta
+        Helpers::eliminararchivospdfsgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
             $compras = Compra::whereIn('Compra', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
@@ -1814,8 +1842,8 @@ class CompraController extends ConfiguracionSistemaController{
             $compras = Compra::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
-        $data=array();
         foreach ($compras as $c){
+            $data=array();
             $compradetalle = CompraDetalle::where('Compra', $c->Compra)->get();
             $datadetalle=array();
             foreach($compradetalle as $cd){
@@ -1844,19 +1872,30 @@ class CompraController extends ConfiguracionSistemaController{
                       "datadetalle" => $datadetalle,
                       "numerodecimalesdocumento"=> $request->numerodecimalesdocumento
             );
+            //dd($data);
+            ini_set('max_execution_time', 300); // 5 minutos
+            ini_set('memory_limit', '-1');
+            $pdf = PDF::loadView('registros.compras.formato_pdf_compras', compact('data'))
+            //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
+            ->setOption('footer-center', 'Página [page] de [toPage]')
+            //->setOption('footer-right', ''.$fechaformato.'')
+            ->setOption('footer-font-size', 7)
+            ->setOption('margin-left', 2)
+            ->setOption('margin-right', 2)
+            ->setOption('margin-bottom', 10);
+            //return $pdf->stream();
+            $ArchivoPDF = "PDF".$c->Compra.".pdf";
+            $pdf->save(storage_path('archivos_pdf_documentos_generados/'.$ArchivoPDF));  
         }
-        //dd($data);
-        ini_set('max_execution_time', 300); // 5 minutos
-        ini_set('memory_limit', '-1');
-        $pdf = PDF::loadView('registros.compras.formato_pdf_compras', compact('data'))
-        //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
-        //->setOption('footer-right', ''.$fechaformato.'')
-        ->setOption('footer-font-size', 7)
-        ->setOption('margin-left', 2)
-        ->setOption('margin-right', 2)
-        ->setOption('margin-bottom', 10);
-        return $pdf->stream();
+        $pdfMerger = PDFMerger::init(); //Initialize the merger
+        //unir pdfs
+        foreach ($compras as $com){
+            $ArchivoPDF = "PDF".$com->Compra.".pdf";
+            $urlarchivo = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
+            $pdfMerger->addPDF($urlarchivo, 'all');
+        }
+        $pdfMerger->merge(); //unirlos
+        $pdfMerger->save("Compras.pdf", "browser");//mostrarlos en el navegador   
     }
 
     //generacion de formato en PDF
@@ -1898,7 +1937,7 @@ class CompraController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.compras.formato_pdf_compras', compact('data'))
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
-        //->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
         ->setOption('footer-font-size', 7)
         ->setOption('margin-left', 2)

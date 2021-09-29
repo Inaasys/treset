@@ -86,7 +86,7 @@
                                 <th>ImpSaldoInsoluto $</th>
                             </tr>
                             @foreach($d['datadetalle'] as $cxcd)
-                                <tr>
+                                <tr style="font-size:10px;">
                                     <td>{{$cxcd['iddocumentodetalle']}}</td>
                                     <td>{{$cxcd['facturadetalle']}}</td>
                                     <td>{{$cxcd['fechadetalle']}}</td>
@@ -98,7 +98,7 @@
                                     <td>{{ number_format($cxcd['imppagadodetalle'], $d['numerodecimalesdocumento']) }}</td>
                                     <td>{{ number_format($cxcd['impsaldoinsolutodetalle'], $d['numerodecimalesdocumento']) }}</td>
                                 </tr>
-                                <tr>
+                                <tr style="font-size:10px;">
                                     <td></td> 
                                     <td colspan="2"><b>{{ number_format($cxcd['tipocambiofacturadetalle'], $d['numerodecimalesdocumento']) }}</b></td> 
                                     <td colspan="7"><b>Método de Pago: {{$cxcd['nombremetodopagodetalle']}} ({{$cxcd['clavemetodopagodetalle']}})</b></td>

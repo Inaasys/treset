@@ -140,6 +140,11 @@ function listar(){
             });
         }
     });
+    //modificacion al dar doble click
+    $('#tbllistado tbody').on('dblclick', 'tr', function () {
+      var data = tabla.row( this ).data();
+      obtenerdatos(data.Orden);
+    });
 }
 //obtener tipos ordenes de compra
 function obtenertiposordenestrabajo(){
@@ -1572,7 +1577,7 @@ function alta(){
                     '</div>'+
                     '<div class="col-md-2">'+
                       '<label>Orden Cliente</label>'+
-                      '<input type="text" class="form-control" name="ordencliente" id="ordencliente"   onkeyup="tipoLetra(this);" autocomplete="off">'+
+                      '<input type="text" class="form-control" name="ordencliente" id="ordencliente"   onkeyup="tipoLetra(this);" autocomplete="off" required>'+
                     '</div>'+
                     '<div class="col-md-2">'+
                       '<label>Campaña No</label>'+
@@ -1584,7 +1589,7 @@ function alta(){
                     '</div>'+
                     '<div class="col-md-2">'+
                       '<label>Bahia</label>'+
-                      '<input type="text" class="form-control" name="bahia" id="bahia"  required  onkeyup="tipoLetra(this);" autocomplete="off">'+
+                      '<input type="text" class="form-control" name="bahia" id="bahia"  required  onkeyup="tipoLetra(this);" data-parsley-type="number"	autocomplete="off">'+
                     '</div>'+
                     '<div class="col-md-2" >'+
                       '<label>Horas Reales</label>'+
@@ -1613,7 +1618,7 @@ function alta(){
               '<div class="tab-content">'+
                 '<div role="tabpanel" class="tab-pane fade in active" id="serviciostab">'+
                   '<div class="row">'+
-                    '<div class="col-md-12 table-responsive cabecerafija" style="height: 150px;overflow-y: scroll;padding: 0px 0px;">'+
+                    '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
                       '<table id="tablaserviciosordentrabajo" class="table table-bordered tablaserviciosordentrabajo">'+
                         '<thead class="'+background_tables+'">'+
                           '<tr>'+
@@ -2172,7 +2177,7 @@ function obtenerdatos(ordenmodificar){
                       '</div>'+
                       '<div class="col-md-2">'+
                         '<label>Orden Cliente</label>'+
-                        '<input type="text" class="form-control" name="ordencliente" id="ordencliente"   onkeyup="tipoLetra(this);" autocomplete="off">'+
+                        '<input type="text" class="form-control" name="ordencliente" id="ordencliente"   onkeyup="tipoLetra(this);" autocomplete="off" required>'+
                       '</div>'+
                       '<div class="col-md-2">'+
                         '<label>Campaña No</label>'+
@@ -2213,7 +2218,7 @@ function obtenerdatos(ordenmodificar){
                 '<div class="tab-content">'+
                   '<div role="tabpanel" class="tab-pane fade in active" id="serviciostab">'+
                     '<div class="row">'+
-                      '<div class="col-md-12 table-responsive cabecerafija" style="height: 150px;overflow-y: scroll;padding: 0px 0px;">'+
+                      '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
                         '<table id="tablaserviciosordentrabajo" class="table table-bordered tablaserviciosordentrabajo">'+
                           '<thead class="'+background_tables+'">'+
                             '<tr>'+

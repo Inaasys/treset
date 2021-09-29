@@ -310,6 +310,17 @@ class Helpers{
         }
         return $estado_conexion_internet;
     }
+
+    //eliminar archivos pdfs generados
+    public static function eliminararchivospdfsgenerados(){
+        //primero eliminar todos los archivos de la carpeta
+        $pdfs = glob(storage_path('archivos_pdf_documentos_generados/*')); //obtenemos todos los nombres de los ficheros
+        foreach($pdfs as $pd){
+            if(is_file($pd))
+            unlink($pd); //elimino el fichero
+        }
+        return $pdfs;
+    }
     
     //quitar acentos
     public static function quitaracentos($string){
