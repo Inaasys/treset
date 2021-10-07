@@ -703,9 +703,9 @@ $("#btnGuardar").on('click', function (e) {
 });
 //desactivar prestamo
 function desactivar(prestamodesactivar){
-      $("#motivobaja").val("");
       $("#prestamodesactivar").val(prestamodesactivar);
       $("#textomodaldesactivar").html('Estas seguro de dar de baja el prestamo de herramienta? No'+prestamodesactivar);
+      $("#motivobaja").val("");
       $("#divmotivobaja").show();
       $("#btnbaja").show();
       $('#estatusregistro').modal('show');

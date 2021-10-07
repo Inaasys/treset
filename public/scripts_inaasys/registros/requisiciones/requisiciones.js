@@ -933,6 +933,7 @@ function desactivar(requisiciondesactivar){
         }else{
           $("#requisiciondesactivar").val(requisiciondesactivar);
           $("#textomodaldesactivar").html('Estas seguro de dar de baja la requisición? No'+ requisiciondesactivar);
+          $("#motivobaja").val("");
           $("#divmotivobaja").show();
           $("#btnbaja").show();
           $('#estatusregistro').modal('show');

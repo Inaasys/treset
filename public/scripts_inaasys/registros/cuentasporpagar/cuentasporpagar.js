@@ -687,6 +687,7 @@ function desactivar(cxpdesactivar){
                 $("#divmotivobaja").show();
                 $("#btnbaja").show();
                 $("#textomodaldesactivar").html('Estas seguro de dar de baja la cuenta por pagar? No'+cxpdesactivar);
+                $("#motivobaja").val("");
                 $('#estatusregistro').modal('show');
             }
         }

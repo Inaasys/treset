@@ -1507,6 +1507,7 @@ function desactivar(cxcdesactivar){
                 $("#divmotivobaja").show();
                 $("#btnbaja").show();
                 $("#textomodaldesactivar").html('Estas seguro de dar de baja la cuenta por cobrar? No'+ cxcdesactivar);
+                $("#motivobaja").val("");
                 $('#estatusregistro').modal('show');
             }
         }

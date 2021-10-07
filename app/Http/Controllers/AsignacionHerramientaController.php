@@ -366,6 +366,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
             ini_set('max_execution_time', 300); // 5 minutos
             ini_set('memory_limit', '-1');
             $pdf = PDF::loadView('registros.asignacionherramienta.formato_pdf_asignacion_herramienta', compact('data'))
+            ->setPaper('Letter')
             //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
             ->setOption('footer-center', 'Página [page] de [toPage]')
             //->setOption('footer-right', ''.$fechaformato.'')
@@ -839,6 +840,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
             "Personal_Recibe_Herramienta" => $Personal_Recibe_Herramienta
         );
         $pdf = PDF::loadView('registros.asignacionherramienta.formato_pdf_asignacion_herramienta_auditoria', compact('data'))
+        ->setPaper('Letter')
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
         ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')
@@ -906,6 +908,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.asignacionherramienta.formato_pdf_reporte_general_herramienta_asignada', compact('data'))
+        ->setPaper('Letter')
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
         ->setOption('footer-center', 'Página [page] de [toPage]')
         //->setOption('footer-right', ''.$fechaformato.'')

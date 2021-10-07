@@ -1581,6 +1581,7 @@ function desactivar(traspasodesactivar){
         }else{
           $("#traspasodesactivar").val(traspasodesactivar);
           $("#textomodaldesactivar").html('Estas seguro de dar de baja el traspaso? No'+ traspasodesactivar);
+          $("#motivobaja").val("");
           $("#divmotivobaja").show();
           $("#btnbaja").show();
           $('#estatusregistro').modal('show');

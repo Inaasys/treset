@@ -1480,6 +1480,7 @@ function desactivar(remisiondesactivar){
                 }else{
                     $("#remisiondesactivar").val(remisiondesactivar);
                     $("#textomodaldesactivar").html('Estas seguro de desactivar la remisión? No'+ remisiondesactivar);
+                    $("#motivobaja").val("");
                     $("#divmotivobaja").show();
                     $("#btnbaja").show();
                     $('#estatusregistro').modal('show');

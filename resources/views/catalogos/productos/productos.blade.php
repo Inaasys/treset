@@ -47,7 +47,7 @@
                         </div>
                         <div class="body">
                             <div class="table-responsive">
-                                <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover" style="width:100% !important;">
+                                <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap" style="width:100% !important;">
                                     <thead class="{{$empresa->background_tables}}">
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
@@ -222,42 +222,32 @@
     </div> 
 
 
-    <!-- Modal Info Documentos Kardex-->
-    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalinfodocumentokardex" role="dialog">
+    <!-- Modal Info Documentos-->
+    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="ModalFormulario1" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
-                <div id="formulario">
+                <div id="formulario1">
                     <div class="modal-header {{$empresa->background_forms_and_modals}}">
-                        <h4 class="modal-title" id="titulomodal"></h4>
+                        <h4 class="modal-title" id="titulomodal1"></h4>
                     </div>
                     <div class="modal-body">
-                        <form id="formparsley" action="#">
-                            <div class="col-md-12" id="tabsform">
+                        <form id="formxml1" action="#" enctype="multipart/form-data">
+                        </form>
+                        <form id="formparsley1" action="#">
+                            <div class="col-md-12" id="tabsform1">
                                 <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
                             </div>
                         </form> 
                     </div>
-                    <div class="modal-footer">
-                        <div class="col-md-4">
-                            <h5 style="color:#F44336 !important;"  id="totalfacturaproveedor"></h5>
-                        </div>
-                        <div class="col-md-4">
-                            <h5 style="color:#F44336 !important;" id="diferenciafacturaproveedor"></h5>
-                        </div>
-                        <div class="col-md-4">
-                            <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
-                            <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
-                            <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
-                        </div> 
+                    <div class="modal-footer" id="modal-footer">
                     </div>
                 </div>
-                <div id="contenidomodaltablas">
+                <div id="contenidomodaltablas1">
                     <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
                 </div> 
             </div>
         </div>
     </div>
-
 
 <!-- modal para configuraciones de tablas-->
 @include('secciones.modalconfiguraciontablas')
@@ -298,7 +288,33 @@
         var productos_alta_o_baja = '{!!URL::to('productos_alta_o_baja')!!}'; 
         var productos_obtener_producto = '{!!URL::to('productos_obtener_producto')!!}'; 
         var productos_guardar_modificacion = '{!!URL::to('productos_guardar_modificacion')!!}';
+
+
+        //compras
+        
+        var compras_obtener_tipos_ordenes_compra = '{!!URL::to('compras_obtener_tipos_ordenes_compra')!!}';
+        var compras_cargar_xml_alta = '{!!URL::to('compras_cargar_xml_alta')!!}';
+        var compras_obtener_proveedores = '{!!URL::to('compras_obtener_proveedores')!!}';
+        var compras_obtener_almacenes = '{!!URL::to('compras_obtener_almacenes')!!}';
+        var compras_obtener_almacen_por_numero = '{!!URL::to('compras_obtener_almacen_por_numero')!!}';
+        var compras_obtener_productos = '{!!URL::to('compras_obtener_productos')!!}';
+        var compras_obtener_producto_por_codigo = '{!!URL::to('compras_obtener_producto_por_codigo')!!}';
+        var compras_obtener_proveedor_por_numero = '{!!URL::to('compras_obtener_proveedor_por_numero')!!}';
+        var compras_obtener_ordenes_compra = '{!!URL::to('compras_obtener_ordenes_compra')!!}';
+        var compras_obtener_orden_compra = '{!!URL::to('compras_obtener_orden_compra')!!}'; 
+        var compras_obtener_departamentos = '{!!URL::to('compras_obtener_departamentos')!!}'; 
+        var compras_obtener_claves_productos = '{!!URL::to('compras_obtener_claves_productos')!!}'; 
+        var compras_obtener_claves_unidades = '{!!URL::to('compras_obtener_claves_unidades')!!}'; 
+        var compras_obtener_compra = '{!!URL::to('compras_obtener_compra')!!}';
+        var compras_obtener_existencias_partida = '{!!URL::to('compras_obtener_existencias_partida')!!}';
+        var compras_obtener_existencias_almacen = '{!!URL::to('compras_obtener_existencias_almacen')!!}';
+        var compras_obtener_valor_modificacionpermitida = '{!!URL::to('compras_obtener_valor_modificacionpermitida')!!}';
+        var compras_guardar_modificacion = '{!!URL::to('compras_guardar_modificacion')!!}';
+
+
+
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="scripts_inaasys/catalogos/productos/productos.js"></script>
+    <script src="scripts_inaasys/catalogos/productos/infodocumentos.js"></script>
 @endsection

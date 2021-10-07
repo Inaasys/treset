@@ -36,11 +36,11 @@
                     <img src="{!! public_path('logotipo_empresa/') !!}{{$empresa->Logo}}" width="125px" height="80px">
                     </div>
                     <div style="float:left;width:60%;text-align: center;">
-                        <b style="font-size:12px;color:#122b40;">{{$empresa->Empresa}}</b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$calleempresa}} No. {{$noexteriorempresa}} </b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$coloniaempresa}} CP: {{$cpempresa}}</b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$municipioempresa}}, {{$estadoempresa}}</b><br>
-                        <b style="font-size:12px;color:#122b40;">RFC {{$empresa->Rfc}} Telefonos {{$telefonosempresa}}</b>
+                        <b style="font-size:13px;color:#122b40;">{{$empresa->Empresa}}</b><br>
+                        <b style="font-size:13px;color:#122b40;">{{$calleempresa}} No. {{$noexteriorempresa}} </b><br>
+                        <b style="font-size:13px;color:#122b40;">{{$coloniaempresa}} CP: {{$cpempresa}}</b><br>
+                        <b style="font-size:13px;color:#122b40;">{{$municipioempresa}}, {{$estadoempresa}}</b><br>
+                        <b style="font-size:13px;color:#122b40;">RFC {{$empresa->Rfc}} Telefonos {{$telefonosempresa}}</b>
                     </div>
                     <div style="float:right;width:20%;text-align: right;">
                         <p style="font-size:10px;"></p>
@@ -50,30 +50,30 @@
                     <hr></hr>
                 </div>
                 <div id ="contenedor" style="margin-top:10px;">
-                    <div style="width:53%; height:110px;float:left;text-align:left;border-style:groove;">    
+                    <div style="width:53%; height:120px;float:left;text-align:left;border-style:groove;">    
                         <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
-                            <li style="font-size:9px; margin-left: 5px;"> Nombre: {{$d['cliente']->Nombre}} ({{$d['cliente']->Numero}})</li>
-                            <li style="font-size:9px; margin-left: 5px;"> Dirección: {{$d['cliente']->Calle}} {{$d['cliente']->noExterior}} {{$d['cliente']->noInterior}}</b></li>
-                            <li style="font-size:9px; margin-left: 5px;"> Colonia: {{$d['cliente']->Colonia}}</li>
-                            <li style="font-size:9px; margin-left: 5px;"> Estado: {{$d['cliente']->Localidad}}</li>
-                            <li style="font-size:9px; margin-left: 5px;"> Ciudad: {{$d['cliente']->Municipio}} C.P. {{$d['cliente']->CodigoPostal}}</li>
-                            <li style="font-size:9px; margin-left: 5px;"> Agente: {{$d['agente']->Nombre}}</li>
-                            <li style="font-size:9px; margin-left: 5px;"> EmisorRfc: {{$d['factura']->EmisorRfc}}</li>
-                            <li style="font-size:9px; margin-left: 5px;"> ReceptorRfc: {{$d['factura']->ReceptorRfc}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> Nombre: {{$d['cliente']->Nombre}} ({{$d['cliente']->Numero}})</li>
+                            <li style="font-size:10px; margin-left: 5px;"> Dirección: {{$d['cliente']->Calle}} {{$d['cliente']->noExterior}} {{$d['cliente']->noInterior}}</b></li>
+                            <li style="font-size:10px; margin-left: 5px;"> Colonia: {{$d['cliente']->Colonia}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> Estado: {{$d['cliente']->Localidad}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> Ciudad: {{$d['cliente']->Municipio}} C.P. {{$d['cliente']->CodigoPostal}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> Agente: {{$d['agente']->Nombre}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> EmisorRfc: {{$d['factura']->EmisorRfc}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> ReceptorRfc: {{$d['factura']->ReceptorRfc}}</li>
                         </ul>
                     </div>
                     <div style="width:1%; float:left;">
                     </div>
-                    <div style="width:45%; height:110px; float:left; text-align: left; border-style: groove;">
+                    <div style="width:45%; height:120px; float:left; text-align: left; border-style: groove;">
                         <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
                             <li style="font-size:18px; margin-left: 5px;"><b>Factura:</b> <b style="color:red">{{$d['factura']->Factura}}</b></li>
-                            <li style="font-size:9px; margin-left: 5px;">Plazo: {{$d['factura']->Plazo}} Días</li>
-                            <li style="font-size:9px; margin-left: 5px;">Emitida: {{$d['factura']->Hora}}</li>
-                            <li style="font-size:9px; margin-left: 5px;">Vence: {{$d['fechavence']}}</li>
-                            <li style="font-size:9px; margin-left: 5px;">Pedido: {{$d['factura']->Pedido}}</li>
-                            <li style="font-size:9px; margin-left: 5px;">UsoCfdi: @if($d['usocfdi'] != null) {{$d['usocfdi']->Clave}} {{$d['usocfdi']->Nombre}} @endif</li>
-                            <li style="font-size:9px; margin-left: 5px;">Forma de Pago: @if($d['formapago'] != null) {{$d['formapago']->Clave}} {{$d['formapago']->Nombre}} @endif</li>
-                            <li style="font-size:9px; margin-left: 5px;">Método de Pago: @if($d['metodopago'] != null) {{$d['metodopago']->Clave}} {{$d['metodopago']->Nombre}} @endif</li>
+                            <li style="font-size:10px; margin-left: 5px;">Plazo: {{$d['factura']->Plazo}} Días</li>
+                            <li style="font-size:10px; margin-left: 5px;">Emitida: {{$d['factura']->Hora}}</li>
+                            <li style="font-size:10px; margin-left: 5px;">Vence: {{$d['fechavence']}}</li>
+                            <li style="font-size:10px; margin-left: 5px;">Pedido: {{$d['factura']->Pedido}}</li>
+                            <li style="font-size:10px; margin-left: 5px;">UsoCfdi: @if($d['usocfdi'] != null) {{$d['usocfdi']->Clave}} {{$d['usocfdi']->Nombre}} @endif</li>
+                            <li style="font-size:10px; margin-left: 5px;">Forma de Pago: @if($d['formapago'] != null) {{$d['formapago']->Clave}} {{$d['formapago']->Nombre}} @endif</li>
+                            <li style="font-size:10px; margin-left: 5px;">Método de Pago: @if($d['metodopago'] != null) {{$d['metodopago']->Clave}} {{$d['metodopago']->Nombre}} @endif</li>
                         </ul>
                     </div>
                 </div>
@@ -81,11 +81,11 @@
                     <table style="width: 100%;max-width: 100%;border: 1px solid #ddd;">
                         <tbody style="font-size:9px; text-align: justify;">
                             <tr style="background-color:#a6a6b3;font-size:10px;">
-                                <th>Cantidad</th>
-                                <th>Descripción</th>
-                                <th>Insumo</th>
-                                <th>Precio $</th>
-                                <th colspan="2">SubTotal $</th>
+                                <th style="width:10%;">Cantidad</th>
+                                <th style="width:45%;">Descripción</th>
+                                <th style="width:20%;">Insumo</th>
+                                <th style="width:10%;">Precio $</th>
+                                <th style="width:15%;" colspan="2">SubTotal $</th>
                             </tr>
                             @if($d['tipodetalles'] == 'remisiones')
                                 @foreach($d['datageneral'] as $dataremisionoorden)
@@ -108,14 +108,14 @@
                                         <tr style="font-size:10px;">
                                             <td>{{ number_format($detalle['cantidaddetalle'], $d['numerodecimalesdocumento']) }}</td>
                                             <td>{{$detalle['descripciondetalle']}}</td>
-                                            <td>{{$detalle['insumodetalle']}}</td>
+                                            <td style="text-align: center;">{{$detalle['insumodetalle']}}</td>
                                             <td style="text-align: right;">{{ number_format($detalle['preciodetalle'], $d['numerodecimalesdocumento']) }}</td>
                                             <td colspan="2" style="text-align: right;">{{ number_format($detalle['subtotaldetalle'], $d['numerodecimalesdocumento']) }}</td>
                                         </tr>
                                         <tr style="font-size:8px; text-align: justify;">
-                                            <td colspan="2">Clave Producto: @if($detalle['claveproducto'] != null) {{$detalle['claveproducto']->Clave}} {{$detalle['claveproducto']->Nombre}} @endif</td>
-                                            <td>Clave Unidad: @if($detalle['claveunidad'] != null) {{$detalle['claveunidad']->Clave}} {{$detalle['claveunidad']->Nombre}} @endif</td>
-                                            <td colspan="3"><b>Traslado:</b>Tasa002 Iva{{ number_format($detalle['impuestodetalle'], $d['numerodecimalesdocumento']) }}% = {{ number_format($detalle['ivadetalle'], $d['numerodecimalesdocumento']) }} Base {{ number_format($detalle['subtotaldetalle'], $d['numerodecimalesdocumento']) }}</td>
+                                            <td colspan="2" style="text-align: left;">&nbsp;&nbsp;&nbsp;&nbsp;Clave Producto: @if($detalle['claveproducto'] != null) {{$detalle['claveproducto']->Clave}} {{$detalle['claveproducto']->Nombre}} @endif</td>
+                                            <td style="text-align: left;">&nbsp;&nbsp;&nbsp;&nbsp;Clave Unidad: @if($detalle['claveunidad'] != null) {{$detalle['claveunidad']->Clave}} {{$detalle['claveunidad']->Nombre}} @endif</td>
+                                            <td colspan="3" style="white-space:nowrap;text-align: right;"><b>Traslado:</b>Tasa002 Iva{{ number_format($detalle['impuestodetalle'], $d['numerodecimalesdocumento']) }}% = {{ number_format($detalle['ivadetalle'], $d['numerodecimalesdocumento']) }} Base {{ number_format($detalle['subtotaldetalle'], $d['numerodecimalesdocumento']) }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                                         </tr>
                                     @endforeach
                                     <tr>
@@ -154,9 +154,9 @@
                                             <td style="text-align: right;" colspan="2">{{ number_format($detalle['subtotaldetalle'], $d['numerodecimalesdocumento']) }}</td>
                                         </tr>
                                         <tr style="font-size:8px; text-align: justify;">
-                                            <td colspan="2">Clave Producto: @if($detalle['claveproducto'] != null) {{$detalle['claveproducto']->Clave}} {{$detalle['claveproducto']->Nombre}} @endif</td>
-                                            <td>Clave Unidad: @if($detalle['claveunidad'] != null) {{$detalle['claveunidad']->Clave}} {{$detalle['claveunidad']->Nombre}} @endif</td>
-                                            <td colspan="3"><b>Traslado:</b>Tasa002 Iva{{ number_format($detalle['impuestodetalle'], $d['numerodecimalesdocumento']) }}% = {{ number_format($detalle['ivadetalle'], $d['numerodecimalesdocumento']) }} Base {{ number_format($detalle['subtotaldetalle'], $d['numerodecimalesdocumento']) }}</td>
+                                            <td colspan="2" style="white-space:nowrap;text-align: left;">Clave Producto: @if($detalle['claveproducto'] != null) {{$detalle['claveproducto']->Clave}} {{$detalle['claveproducto']->Nombre}} @endif</td>
+                                            <td style="white-space:nowrap;text-align: center;">Clave Unidad: @if($detalle['claveunidad'] != null) {{$detalle['claveunidad']->Clave}} {{$detalle['claveunidad']->Nombre}} @endif</td>
+                                            <td colspan="3" style="white-space:nowrap;text-align: center;"><b>Traslado:</b>Tasa002 Iva{{ number_format($detalle['impuestodetalle'], $d['numerodecimalesdocumento']) }}% = {{ number_format($detalle['ivadetalle'], $d['numerodecimalesdocumento']) }} Base {{ number_format($detalle['subtotaldetalle'], $d['numerodecimalesdocumento']) }}</td>
                                         </tr>
                                     @endforeach
                                     <tr>
@@ -176,9 +176,9 @@
                                             <td style="text-align: right;" colspan="2">{{ number_format($detalle['subtotaldetalle'], $d['numerodecimalesdocumento']) }}</td>
                                         </tr>
                                         <tr style="font-size:8px; text-align: justify;">
-                                            <td colspan="2">Clave Producto: @if($detalle['claveproducto'] != null) {{$detalle['claveproducto']->Clave}} {{$detalle['claveproducto']->Nombre}} @endif</td>
-                                            <td>Clave Unidad: @if($detalle['claveunidad'] != null) {{$detalle['claveunidad']->Clave}} {{$detalle['claveunidad']->Nombre}} @endif</td>
-                                            <td colspan="3"><b>Traslado:</b>Tasa002 Iva{{ number_format($detalle['impuestodetalle'], $d['numerodecimalesdocumento']) }}% = {{ number_format($detalle['ivadetalle'], $d['numerodecimalesdocumento']) }} Base {{ number_format($detalle['subtotaldetalle'], $d['numerodecimalesdocumento']) }}</td>
+                                            <td colspan="2" style="white-space:nowrap;text-align: left;">Clave Producto: @if($detalle['claveproducto'] != null) {{$detalle['claveproducto']->Clave}} {{$detalle['claveproducto']->Nombre}} @endif</td>
+                                            <td style="white-space:nowrap;text-align: center;">Clave Unidad: @if($detalle['claveunidad'] != null) {{$detalle['claveunidad']->Clave}} {{$detalle['claveunidad']->Nombre}} @endif</td>
+                                            <td colspan="3" style="white-space:nowrap;text-align: center;"><b>Traslado:</b>Tasa002 Iva{{ number_format($detalle['impuestodetalle'], $d['numerodecimalesdocumento']) }}% = {{ number_format($detalle['ivadetalle'], $d['numerodecimalesdocumento']) }} Base {{ number_format($detalle['subtotaldetalle'], $d['numerodecimalesdocumento']) }}</td>
                                         </tr>
                                     @endforeach
                                     <tr>

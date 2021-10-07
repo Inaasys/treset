@@ -85,6 +85,7 @@
             <li><a href="{{ route('personal') }}" id="menucatalogopersonal">Personal</a></li>
             @if(Auth::user()->role_id == 1)
               <li><a href="{{ route('usuarios') }}">Usuarios</a></li>
+              <li><a href="{{ route('errors_inaasys') }}"><b>LOGS-ERRORS</b></a></li>
             @endif
           </ul>
         </li>
@@ -168,12 +169,12 @@
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Reportes <span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <!--<li class="dropdown-submenu">
+            <li class="dropdown-submenu">
               <a class="test"  href="#">Ordenes de Compra <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a  href="#">Relación de Ordenes de Compra</a></li>
+                <li><a href="{{route('reporte_relacion_ordenes_compra')}}" id="menureporterelacionordenescompra">Relación de Ordenes de Compra</a></li>
               </ul>
-            </li>-->
+            </li>
             <li class="dropdown-submenu">
               <a class="test"  href="#">Compras <span class="caret"></span></a>
               <ul class="dropdown-menu">

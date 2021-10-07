@@ -539,6 +539,7 @@ function desactivar(contrarecibodesactivar){
             }else{
                 $("#contrarecibodesactivar").val(contrarecibodesactivar);
                 $("#textomodaldesactivar").html('Estas seguro de dar de baja el contrarecibo? No'+ contrarecibodesactivar);
+                $("#motivobaja").val("");
                 $("#divmotivobaja").show();
                 $("#btnbaja").show();
                 $('#estatusregistro').modal('show');

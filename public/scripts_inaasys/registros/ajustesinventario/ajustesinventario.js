@@ -860,6 +860,7 @@ function desactivar(ajustedesactivar){
         }else{
           $("#ajustedesactivar").val(ajustedesactivar);
           $("#textomodaldesactivar").html('Estas seguro de dar de baja el ajuste de inventario? No'+ajustedesactivar);
+          $("#motivobaja").val("");
           $("#divmotivobaja").show();
           $("#btnbaja").show();
           $('#estatusregistro').modal('show');

@@ -38,11 +38,11 @@
                     <img src="{!! public_path('logotipo_empresa/') !!}{{$empresa->Logo}}" width="125px" height="80px">
                     </div>
                     <div style="float:left;width:60%;text-align: center;">
-                        <b style="font-size:12px;color:#122b40;">{{$empresa->Empresa}}</b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$calleempresa}} No. {{$noexteriorempresa}} </b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$coloniaempresa}} CP: {{$cpempresa}}</b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$municipioempresa}}, {{$estadoempresa}}</b><br>
-                        <b style="font-size:12px;color:#122b40;">RFC {{$empresa->Rfc}} Telefonos {{$telefonosempresa}}</b>
+                        <b style="font-size:13px;color:#122b40;">{{$empresa->Empresa}}</b><br>
+                        <b style="font-size:13px;color:#122b40;">{{$calleempresa}} No. {{$noexteriorempresa}} </b><br>
+                        <b style="font-size:13px;color:#122b40;">{{$coloniaempresa}} CP: {{$cpempresa}}</b><br>
+                        <b style="font-size:13px;color:#122b40;">{{$municipioempresa}}, {{$estadoempresa}}</b><br>
+                        <b style="font-size:13px;color:#122b40;">RFC {{$empresa->Rfc}} Telefonos {{$telefonosempresa}}</b>
                     </div>
                     <div style="float:right;width:20%;text-align: right;">
                         <p style="font-size:10px;"></p>
@@ -54,10 +54,10 @@
                 <div id ="contenedor" style="margin-top:10px;">
                     <div style="width:53%; height:110px; float:left; text-align: left; border-style: groove;">
                         <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
-                            <li style="font-size:9px; margin-left: 5px;"> Del Almacén: {{$d['almacende']->Nombre}} ({{$d['almacende']->Numero}})</li>
-                            <li style="font-size:9px; margin-left: 5px;"> Al Almacén: {{$d['almacena']}}</li>
-                            <li style="font-size:9px; margin-left: 5px;"> Referencia: {{$d['traspaso']->Referencia}}</li>
-                            <li style="font-size:9px; margin-left: 5px;"> Observaciones: {{$d['traspaso']->Obs}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> Del Almacén: {{$d['almacende']->Nombre}} ({{$d['almacende']->Numero}})</li>
+                            <li style="font-size:10px; margin-left: 5px;"> Al Almacén: {{$d['almacena']}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> Referencia: {{$d['traspaso']->Referencia}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> Observaciones: {{$d['traspaso']->Obs}}</li>
                         </ul>
                     </div>
                     <div style="width:1%; float:left;">
@@ -65,9 +65,9 @@
                     <div style="width:45%; height:110px; float:left; text-align: left; border-style: groove;">
                         <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
                             <li style="font-size:18px; margin-left: 5px;"><b>Traspaso: </b><b style="color:red">{{$d['traspaso']->Traspaso}}</b></li>
-                            <li style="font-size:9px; margin-left: 5px;">Fecha: {{$d['traspaso']->Fecha}}</li>
-                            <li style="font-size:9px; margin-left: 5px;">Status: {{$d['traspaso']->Status}}</li>
-                            <li style="font-size:9px; margin-left: 5px;">Orden: {{$d['traspaso']->Orden}}</li>
+                            <li style="font-size:10px; margin-left: 5px;">Fecha: {{$d['traspaso']->Fecha}}</li>
+                            <li style="font-size:10px; margin-left: 5px;">Status: {{$d['traspaso']->Status}}</li>
+                            <li style="font-size:10px; margin-left: 5px;">Orden: {{$d['traspaso']->Orden}}</li>
                         </ul>
                     </div>
                 </div>

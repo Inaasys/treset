@@ -2460,6 +2460,7 @@ function desactivar(compradesactivar){
         }else{
           $("#compradesactivar").val(compradesactivar);
           $("#textomodaldesactivar").html('Estas seguro de dar de baja la compra? No'+ compradesactivar);
+          $("#motivobaja").val("");
           $("#divmotivobaja").show();
           $("#btnbaja").show();
           $('#estatusregistro').modal('show');

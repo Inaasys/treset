@@ -87,6 +87,13 @@ function ocultarformulario(){
   $("#formulario").hide();
   $("#contenidomodaltablas").show();
 }
+//
+function cerrarmodalnumeropedido(){
+  $("#modalremisionesporpedido").modal('hide');
+  $("#ModalFormulario").modal('show');
+  $("#ModalFormulario").css('overflow', 'auto');
+  ocultarformulario();
+}
 //cambiar url para exportar excel
 function cambiarurlexportarexcel(){
     //colocar el periodo seleccionado como parametro para exportar a excel
@@ -211,7 +218,6 @@ function obtenerclientes(){
                 }
             });
         },
-        
     }); 
 } 
 //seleccionar cliente
@@ -351,7 +357,6 @@ function obteneragentes(){
                   }
               });
           },
-          
       }); 
 } 
 //seleccionar almacen
@@ -430,8 +435,7 @@ function obtenerlugaresexpedicion(){
               $('#tbllistadocodigopostal').DataTable().search( this.value ).draw();
             }
         });
-      },
-      
+      }, 
   });
 } 
 //seleccionar lugar expedicion
@@ -505,8 +509,7 @@ function obtenerregimenesfiscales(){
               $('#tbllistadoregimenfiscal').DataTable().search( this.value ).draw();
             }
         });
-      },
-      
+      }, 
   });
 } 
 //seleccionar lugar expedicion
@@ -580,7 +583,6 @@ function obtenertiposrelaciones(){
             }
         });
       },
-      
   });
 } 
 //seleccionar lugar expedicion
@@ -655,8 +657,7 @@ function obtenerformaspago(){
               $('#tbllistadoformapago').DataTable().search( this.value ).draw();
             }
         });
-      },
-      
+      }, 
   });
 } 
 //seleccionar forma pago
@@ -729,8 +730,7 @@ function obtenermetodospago(){
               $('#tbllistadometodopago').DataTable().search( this.value ).draw();
             }
         });
-      },
-      
+      }, 
   });
 } 
 //seleccionar metodo pago
@@ -807,8 +807,7 @@ function obtenerusoscfdi(){
               $('#tbllistadousocfdi').DataTable().search( this.value ).draw();
             }
         });
-      },
-      
+      }, 
   });
 } 
 //seleccionar uso cfdi
@@ -882,7 +881,6 @@ function obtenerresidenciasfiscales(){
             }
         });
       },
-      
   });
 } 
 //seleccionar residencia fiscal
@@ -958,7 +956,6 @@ function obtenerfoliosfacturas(){
             }
         });
       },
-      
   });  
 }
 function seleccionarfoliofiscal(Serie, Esquema, Depto){
@@ -994,8 +991,8 @@ function seleccionarfoliofiscal(Serie, Esquema, Depto){
 }
 //comprobar el tipo de serie para la factura
 function comprobartiposerie(Depto){
-  var cliente = $("#cliente").val();
-  if(cliente != ""){
+  //var cliente = $("#cliente").val();
+  //if(cliente != ""){
     if(Depto == 'PRODUCTOS'){
       $("#divlistarremisiones").show();
       $("#divlistarservicios").hide();
@@ -1009,7 +1006,7 @@ function comprobartiposerie(Depto){
       $("#divlistarservicios").hide();
       $("#divbuscarcodigos").show();
     }
-  }
+  //}
 }
 //listar todas las facturas
 function listarremisiones(){
@@ -1051,6 +1048,7 @@ function listarremisiones(){
                       '<div class="modal-footer">'+
                         '<div type="button" class="btn btn-info btn-sm" onclick="mostrarmodalnumeropedido();">Seleccionar remisiones por número de pedido</div>'+
                         '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                        '<button type="button" class="btn btn-success btn-sm" onclick="cargarremisionesseleccionadas();">Cargar remisiones</button>'+
                       '</div>';
     $("#contenidomodaltablas").html(tablaremisiones);
     $('#tbllistadoremision').DataTable({
@@ -1068,7 +1066,7 @@ function listarremisiones(){
         ajax: {
           url: facturas_obtener_remisiones,
           data: function (d) {
-              d.numerocliente = $("#numerocliente").val();
+              //d.numerocliente = $("#numerocliente").val();
               d.stringremisionesseleccionadas = $("#stringremisionesseleccionadas").val();
           }
         },
@@ -1147,7 +1145,8 @@ function seleccionarremisionesporpedido(){
                           '</div>'+
                           '<div class="modal-footer">'+
                             '<div type="button" class="btn btn-info btn-sm" onclick="mostrarmodalnumeropedido();">Seleccionar remisiones por número de pedido</div>'+
-                            '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                            '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+                        
+                            '<button type="button" class="btn btn-success btn-sm" onclick="cargarremisionesseleccionadas();">Cargar remisiones</button>'+
                           '</div>';
                           $("#contenidomodaltablas").html(tablaremisiones);
                           $('#tbllistadoremision').DataTable({
@@ -1187,10 +1186,13 @@ function seleccionarremisionesporpedido(){
                                   $('#tbllistadoremision').DataTable().search( this.value ).draw();
                                 }
                               });
+                              construirarrayremisionesseleccionadas();
+                              calculartotalafacturar("REMISIONES");
                             },
                             "iDisplayLength": 1000,
                             "order": [[ 0, "desc" ]]
                           });
+    /*
     //obtener remisiones
     $.get(facturas_obtener_remisiones_pedido, {numeropedidoremisiones:numeropedidoremisiones,numerocliente:numerocliente,contadorfilas:contadorfilas,partida:partida,tipooperacion:tipooperacion} , function(data){
       $("#tabladetallesfactura tbody").append(data.filasremisiones);
@@ -1204,6 +1206,7 @@ function seleccionarremisionesporpedido(){
       partida = data.partida;
       remisionagregadacorrectamente();
     });
+    */
     $("#modalremisionesporpedido").modal('hide');
     $("#ModalFormulario").modal('show');
     $("#ModalFormulario").css('overflow', 'auto');
@@ -1242,11 +1245,30 @@ function construirarrayremisionesseleccionadas(){
       arrayremisionesseleccionadas.push(lista[i].value);
     }
   }
-  $("#stringremisionesseleccionadas").val(arrayremisionesseleccionadas);
+  $("#stringremisionesseleccionadas").val(arrayremisionesseleccionadas.sort());
 }
+var arrayclientesremisionesseleccionadas = [];
 //obtener todos los datos de la orden de compra seleccionada
-function seleccionarremision(Remision){
-    if( $('#idremisionesseleccionadas'+Remision).prop('checked') ) {
+function seleccionarremision(Folio,Remision,Cliente){
+  if( $('#idremisionesseleccionadas'+Remision).prop('checked') ) {
+    var cantidadclientesremisionesseleccionadas = arrayclientesremisionesseleccionadas.length;
+    if(cantidadclientesremisionesseleccionadas == 0){
+      arrayclientesremisionesseleccionadas.push(Cliente);
+    }else{
+      var existeclienteenarray = arrayclientesremisionesseleccionadas.indexOf(Cliente);
+      if(existeclienteenarray == -1){
+        alert("Solo se debe seleccionar un mismo cliente para facturación");
+        $('#idremisionesseleccionadas'+Remision).removeAttr('checked');
+      }else{
+        arrayclientesremisionesseleccionadas.push(Cliente);
+      }
+    }
+  }else{
+    arrayclientesremisionesseleccionadas.pop();
+  }
+  construirarrayremisionesseleccionadas();
+  calculartotalafacturar("REMISIONES");
+  /*if( $('#idremisionesseleccionadas'+Remision).prop('checked') ) {
       var tipooperacion = $("#tipooperacion").val();
       $.get(facturas_obtener_remision, {Remision:Remision, contadorfilas:contadorfilas, partida:partida, tipooperacion:tipooperacion}, function(data){
         $("#tabladetallesfactura tbody").append(data.filasremisiones);
@@ -1265,7 +1287,31 @@ function seleccionarremision(Remision){
       if (confirmacion == true) { 
         eliminarfilasremisiondeseleccionada(Remision);
       }
-    }
+    }*/
+}
+//cargar remisiones
+function cargarremisionesseleccionadas(){
+  contadorfilas = 0;
+  partida = 1;
+  $("#tabladetallesfactura tbody").html("");
+  var tipooperacion = $("#tipooperacion").val();
+  var stringremisionesseleccionadas = $("#stringremisionesseleccionadas").val();
+  $.get(facturas_obtener_remision, {stringremisionesseleccionadas:stringremisionesseleccionadas, contadorfilas:contadorfilas, partida:partida, tipooperacion:tipooperacion}, function(data){
+    $("#tabladetallesfactura tbody").append(data.filasremisiones);
+    //array de remisiones seleccionadas
+    construirarrayremisionesseleccionadas();
+    //comprobar numero de filas en la tabla
+    comprobarfilas();
+    //calcular totales compras nota proveedor
+    calculartotal();
+    contadorfilas = data.contadorfilas;
+    partida = data.partida;
+    remisionagregadacorrectamente();
+    mostrarformulario();
+    //cargar datos cliente
+    $("#numerocliente").val(data.cliente);
+    obtenerclientepornumero();
+  })
 }
 //eliminar todas las filas de la remision que se deselecciono
 function eliminarfilasremisiondeseleccionada(Remision){
@@ -1327,7 +1373,8 @@ function listarordenes(){
                         '</div>'+
                       '</div>'+
                       '<div class="modal-footer">'+
-                        '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                        '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+                       
+                        '<button type="button" class="btn btn-success btn-sm" onclick="cargarserviciosseleccionadas();">Cargar servicios</button>'+
                       '</div>';
     $("#contenidomodaltablas").html(tablaordenes);
     $('#tbllistadoorden').DataTable({
@@ -1380,10 +1427,30 @@ function construirarrayordenesseleccionadas(){
       arrayordenesseleccionadas.push(lista[i].value);
     }
   }
-  $("#stringordenesseleccionadas").val(arrayordenesseleccionadas);
+  $("#stringordenesseleccionadas").val(arrayordenesseleccionadas.sort());
 }
+var arrayclientesordenesseleccionadas = [];
 //obtener todos los datos de la orden de compra seleccionada
-function seleccionarorden(Orden){
+function seleccionarorden(Orden,Cliente){
+  if( $('#idordenesseleccionadas'+Orden).prop('checked') ) {
+    var cantidadclientesordenesseleccionadas = arrayclientesordenesseleccionadas.length;
+    if(cantidadclientesordenesseleccionadas == 0){
+      arrayclientesordenesseleccionadas.push(Cliente);
+    }else{
+      var existeclienteenarray = arrayclientesordenesseleccionadas.indexOf(Cliente);
+      if(existeclienteenarray == -1){
+        alert("Solo se debe seleccionar un mismo cliente para facturación");
+        $('#idordenesseleccionadas'+Orden).removeAttr('checked');
+      }else{
+        arrayclientesordenesseleccionadas.push(Cliente);
+      }
+    }
+  }else{
+    arrayclientesordenesseleccionadas.pop();
+  }
+  construirarrayordenesseleccionadas();
+  calculartotalafacturar("SERVICIOS");
+    /*
     if( $('#idordenesseleccionadas'+Orden).prop('checked') ) {
       var tipooperacion = $("#tipooperacion").val();
       $.get(facturas_obtener_orden, {Orden:Orden, contadorfilas:contadorfilas, partida:partida, tipooperacion:tipooperacion}, function(data){
@@ -1404,6 +1471,31 @@ function seleccionarorden(Orden){
         eliminarfilasordendeseleccionada(Orden);
       }
     }
+    */
+}
+//cargar servicios
+function cargarserviciosseleccionadas(){
+  contadorfilas = 0;
+  partida = 1;
+  $("#tabladetallesfactura tbody").html("");
+  var tipooperacion = $("#tipooperacion").val();
+  var stringordenesseleccionadas = $("#stringordenesseleccionadas").val();
+  $.get(facturas_obtener_orden, {stringordenesseleccionadas:stringordenesseleccionadas, contadorfilas:contadorfilas, partida:partida, tipooperacion:tipooperacion}, function(data){
+    $("#tabladetallesfactura tbody").append(data.filasordenes);
+    //array de ordenes seleccionadas
+    construirarrayordenesseleccionadas();
+    //comprobar numero de filas en la tabla
+    comprobarfilas();
+    //calcular totales compras nota proveedor
+    calculartotal();
+    contadorfilas = data.contadorfilas;
+    partida = data.partida;
+    ordenagregadacorrectamente();
+    mostrarformulario();
+    //cargar datos cliente
+    $("#numerocliente").val(data.cliente);
+    obtenerclientepornumero();
+  })
 }
 //eliminar todas las filas de la orden que se deselecciono
 function eliminarfilasordendeseleccionada(Orden){
@@ -1444,14 +1536,14 @@ function obtenerclientepornumero(){
   if(numeroclienteanterior != numerocliente){
     if($("#numerocliente").parsley().isValid()){
       $.get(facturas_obtener_cliente_por_numero, {numerocliente:numerocliente}, function(data){
-          var numerofilas = $("#numerofilas").val()
-          if(parseInt(numerofilas) > 0){
-            var confirmacion = confirm("Esta seguro de cambiar el cliente, esto eliminara las partidas agregadas (Remisiones ó Servicios)?"); 
-          }else{
+          //var numerofilas = $("#numerofilas").val()
+          //if(parseInt(numerofilas) > 0){
+            //var confirmacion = confirm("Esta seguro de cambiar el cliente, esto eliminara las partidas agregadas (Remisiones ó Servicios)?"); 
+          //}else{
             var confirmacion = true;
-          }
+          //}
           if (confirmacion == true) { 
-            $("#tabladetallesfactura tbody").html("");
+            //$("#tabladetallesfactura tbody").html("");
             $("#numerocliente").val(data.numero);
             $("#numeroclienteanterior").val(data.numero);
             $("#cliente").val(data.nombre);
@@ -1506,11 +1598,11 @@ function obtenerclientepornumero(){
             //calcular totales compras nota proveedor
             calculartotal();
             //colocar strings vacios
-            $("#stringremisionesseleccionadas").val("");
-            $("#stringordenesseleccionadas").val("");
-            contadorproductos = 0;
-            contadorfilas = 0;
-            partida = 1;
+            //$("#stringremisionesseleccionadas").val("");
+            //$("#stringordenesseleccionadas").val("");
+            //contadorproductos = 0;
+            //contadorfilas = 0;
+            //partida = 1;
             mostrarformulario();
           }
       }) 
@@ -1922,7 +2014,6 @@ function listarclavesunidades(fila){
               }
           });
       },
-      
   });
 }
 //seleccion de clave unidad
@@ -2004,7 +2095,6 @@ function listaruuidrelacionados(){
       },
   });
 }
-
 function seleccionarfacturarel(UUID, Factura){
   var tipooperacion = $("#tipooperacion").val();
   var uuidrelacionado = '<tr class="filasuuid" id="filauuid0">'+
@@ -2016,8 +2106,6 @@ function seleccionarfacturarel(UUID, Factura){
   comprobarfilasuuid();
   mostrarformulario();
 }
-
-
 //función que evalua si la partida que quieren ingresar ya existe o no en el detalle de la orden de compra
 function evaluarproductoexistente(Codigo){
   var sumaiguales=0;
@@ -2959,16 +3047,26 @@ function calculartotal(){
   $("#comision").val(number_format(round(comision, numerodecimales), numerodecimales, '.', ''));
   //nuevo saldo
   var numerocliente = $("#numerocliente").val();
-  $.get(facturas_obtener_nuevo_saldo_cliente,{numerocliente:numerocliente}, function(saldo){
-      var nuevosaldo = new Decimal(saldo).plus(total);
-      $("#saldo").val(number_format(round(nuevosaldo, numerodecimales), numerodecimales, '.', ''));
-      var saldo = $("#saldo").val();
-      var credito = $("#credito").val();
-      if(parseFloat(saldo) > parseFloat(credito)){
-          $("#mensajecreditoexcedido").html("CRÉDITO DEL CLIENTE EXCEDIDO");
-      }else{
-          $("#mensajecreditoexcedido").html("");           
-      }
+  if(numerocliente != ""){
+    $.get(facturas_obtener_nuevo_saldo_cliente,{numerocliente:numerocliente}, function(saldo){
+        var nuevosaldo = new Decimal(saldo).plus(total);
+        $("#saldo").val(number_format(round(nuevosaldo, numerodecimales), numerodecimales, '.', ''));
+        var saldo = $("#saldo").val();
+        var credito = $("#credito").val();
+        if(parseFloat(saldo) > parseFloat(credito)){
+            $("#mensajecreditoexcedido").html("CRÉDITO DEL CLIENTE EXCEDIDO");
+        }else{
+            $("#mensajecreditoexcedido").html("");           
+        }
+    }) 
+  }
+}
+//calcular total a facturar
+function calculartotalafacturar(tipo){
+  var stringremisionesseleccionadas = $("#stringremisionesseleccionadas").val();
+  var stringordenesseleccionadas = $("#stringordenesseleccionadas").val();
+  $.get(facturas_obtener_total_a_facturar,{stringremisionesseleccionadas:stringremisionesseleccionadas,stringordenesseleccionadas:stringordenesseleccionadas,tipo:tipo}, function(totalafacturar){
+    $("#totalafacturar").val(totalafacturar);
   }) 
 }
 //eliminar fila
@@ -3847,9 +3945,6 @@ $("#btnGuardarModificacion").on('click', function (e) {
   //validar formulario
   form.parsley().validate();
 });
-
-
-
 //detectar cuando en el input de buscar por codigo de producto el usuario presione la tecla enter, si es asi se realizara la busqueda con el codigo escrito
 $(document).ready(function(){
   //activar busqueda de kardex por codigo
@@ -3877,9 +3972,6 @@ function obtenerkardexporfactura(){
   var facturakardex = $("#facturakardex").val();
   obtenerkardex(facturakardex);
 }
-
-
-
 //verificar si se puede dar de baja
 function desactivar(facturadesactivar){
   $.get(facturas_verificar_si_continua_baja,{facturadesactivar:facturadesactivar}, function(data){
@@ -3912,6 +4004,7 @@ function desactivar(facturadesactivar){
         }else{
           $("#facturadesactivar").val(facturadesactivar);
           $("#textomodaldesactivar").html('Estas seguro de dar de baja la factura? No'+ facturadesactivar);
+          $("#motivobaja").val("");
           $("#divmotivobaja").show();
           $("#btnbaja").show();
           $('#estatusregistro').modal('show');

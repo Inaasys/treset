@@ -3393,6 +3393,7 @@ function desactivar(notadesactivar){
         }else{
           $("#notadesactivar").val(notadesactivar);
           $("#textomodaldesactivar").html('Estas seguro de dar de baja la nota de crédito cliente? No'+notadesactivar);
+          $("#motivobaja").val("");
           $("#divmotivobaja").show();
           $("#btnbaja").show();
           $('#estatusregistro').modal('show');

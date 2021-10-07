@@ -974,6 +974,13 @@ function permisos(id){
                         '<div role="tabpanel" class="tab-pane fade" id="tabreportes">'+
                             '<div class="row">'+
                                 '<div class="col-md-6">'+
+                                    '<label>Ordenes Compra</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="menureporterelacionordenescompra" id="idmenureporterelacionordenescompra" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureporterelacionordenescompra">Relación Ordenes Compra</label>'+
+                                    '</div>'+
+                                '</div>'+ 
+                                '<div class="col-md-6">'+
                                     '<label>Compras</label>'+
                                     '<div class="col-md-12 form-check">'+
                                         '<input type="checkbox" name="menureportescomprascajachica" id="idmenureportescomprascajachica" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+

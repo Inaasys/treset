@@ -64,7 +64,7 @@
                             </div>
                             <div class="body">
                                 <div class="table-responsive">
-                                    <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover">
+                                    <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap">
                                         <thead class="{{$empresa->background_tables}}">
                                             <tr>
                                                 <th><div style="width:100px !important;">Operaciones</div></th>
@@ -192,7 +192,7 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="cerrarmodalnumeropedido();">Regresar</button>
                     <button type="button" class="btn btn-success btn-sm" onclick="seleccionarremisionesporpedido();">Seleccionar remisiones con pedido</button>
                 </div>
             </div>
@@ -322,6 +322,9 @@
         var facturas_obtener_remisiones = '{!!URL::to('facturas_obtener_remisiones')!!}';
         var facturas_obtener_remisiones_por_pedido  = '{!!URL::to('facturas_obtener_remisiones_por_pedido')!!}';
         var facturas_obtener_remisiones_pedido  = '{!!URL::to('facturas_obtener_remisiones_pedido')!!}'; 
+
+        var facturas_obtener_total_a_facturar  = '{!!URL::to('facturas_obtener_total_a_facturar')!!}'; 
+
         var facturas_obtener_remision = '{!!URL::to('facturas_obtener_remision')!!}';
         var facturas_obtener_ordenes = '{!!URL::to('facturas_obtener_ordenes')!!}';
         var facturas_obtener_orden = '{!!URL::to('facturas_obtener_orden')!!}';

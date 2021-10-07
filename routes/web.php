@@ -739,6 +739,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/facturas_obtener_remisiones', 'FacturaController@facturas_obtener_remisiones')->name('facturas_obtener_remisiones')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_remisiones_por_pedido', 'FacturaController@facturas_obtener_remisiones_por_pedido')->name('facturas_obtener_remisiones_por_pedido')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_remisiones_pedido', 'FacturaController@facturas_obtener_remisiones_pedido')->name('facturas_obtener_remisiones_pedido')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_total_a_facturar', 'FacturaController@facturas_obtener_total_a_facturar')->name('facturas_obtener_total_a_facturar')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_remision', 'FacturaController@facturas_obtener_remision')->name('facturas_obtener_remision')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_ordenes', 'FacturaController@facturas_obtener_ordenes')->name('facturas_obtener_ordenes')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_orden', 'FacturaController@facturas_obtener_orden')->name('facturas_obtener_orden')->middleware('revisaraccesomenu:menuregistrosfacturas');
@@ -836,6 +837,16 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/generar_reporte_horas_tecnico', 'ReportesOrdenesTrabajoController@generar_reporte_horas_tecnico')->name('generar_reporte_horas_tecnico')->middleware('revisaraccesomenu:menureportesordenestrabajohorastecnico');
     Route::get('/reporte_horas_tecnico_obtener_tecnicos', 'ReportesOrdenesTrabajoController@reporte_horas_tecnico_obtener_tecnicos')->name('reporte_horas_tecnico_obtener_tecnicos')->middleware('revisaraccesomenu:menureportesordenestrabajohorastecnico');
     Route::get('/reporte_horas_tecnico_generar_formato_excel', 'ReportesOrdenesTrabajoController@reporte_horas_tecnico_generar_formato_excel')->name('reporte_horas_tecnico_generar_formato_excel')->middleware('revisaraccesomenu:menureportesordenestrabajohorastecnico');
+    //reportes ordenes de compra
+    Route::get('/reporte_relacion_ordenes_compra', 'ReportesOrdenesCompraController@reporte_relacion_ordenes_compra')->name('reporte_relacion_ordenes_compra')->middleware('revisaraccesomenu:menureporterelacionordenescompra');
+    Route::get('/reporte_relacion_ordenes_compra_generar_formato_excel', 'ReportesOrdenesCompraController@reporte_relacion_ordenes_compra_generar_formato_excel')->name('reporte_relacion_ordenes_compra_generar_formato_excel')->middleware('revisaraccesomenu:menureporterelacionordenescompra');
+    Route::get('/reporte_relacion_ordenes_compra_obtener_tipos_ordenes_compra', 'ReportesOrdenesCompraController@reporte_relacion_ordenes_compra_obtener_tipos_ordenes_compra')->name('reporte_relacion_ordenes_compra_obtener_tipos_ordenes_compra')->middleware('revisaraccesomenu:menureporterelacionordenescompra');
+    Route::get('/reporte_relacion_ordenes_compra_obtener_proveedores', 'ReportesOrdenesCompraController@reporte_relacion_ordenes_compra_obtener_proveedores')->name('reporte_relacion_ordenes_compra_obtener_proveedores')->middleware('revisaraccesomenu:menureporterelacionordenescompra');
+    Route::get('/reporte_relacion_ordenes_compra_obtener_almacenes', 'ReportesOrdenesCompraController@reporte_relacion_ordenes_compra_obtener_almacenes')->name('reporte_relacion_ordenes_compra_obtener_almacenes')->middleware('revisaraccesomenu:menureporterelacionordenescompra');
+    Route::get('/reporte_relacion_ordenes_compra_obtener_proveedor_por_numero', 'ReportesOrdenesCompraController@reporte_relacion_ordenes_compra_obtener_proveedor_por_numero')->name('reporte_relacion_ordenes_compra_obtener_proveedor_por_numero')->middleware('revisaraccesomenu:menureporterelacionordenescompra');
+    Route::get('/reporte_relacion_ordenes_compra_obtener_almacen_por_numero', 'ReportesOrdenesCompraController@reporte_relacion_ordenes_compra_obtener_almacen_por_numero')->name('reporte_relacion_ordenes_compra_obtener_almacen_por_numero')->middleware('revisaraccesomenu:menureporterelacionordenescompra');
+    Route::get('/reporte_relacion_ordenes_compra_generar_reporte', 'ReportesOrdenesCompraController@reporte_relacion_ordenes_compra_generar_reporte')->name('reporte_relacion_ordenes_compra_generar_reporte')->middleware('revisaraccesomenu:menureporterelacionordenescompra');
+    Route::get('/reporte_relacion_ordenes_compra_generar_formato_excel', 'ReportesOrdenesCompraController@reporte_relacion_ordenes_compra_generar_formato_excel')->name('reporte_relacion_ordenes_compra_generar_formato_excel')->middleware('revisaraccesomenu:menureporterelacionordenescompra');
     /* -----------------------------------||||||||||||||||||||FIN REPORTES||||||||||||||||||||||-------------------------------------*/
     /* -----------------------------------||||||||||||||||||||EMPRESA||||||||||||||||||||||-------------------------------------*/
     Route::get('/empresa', 'EmpresaController@empresa')->name('empresa');
@@ -858,7 +869,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/modificar_valores_en_bd_para_actualizacion_rama20210731correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20210731correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20210731correciones');
     Route::get('/modificar_valores_en_bd_para_actualizacion_rama20210814correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20210814correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20210814correciones');
     Route::get('/modificar_valores_en_bd_para_actualizacion_rama20210924correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20210924correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20210924correciones');
+    Route::get('/modificar_valores_en_bd_para_actualizacion_rama20211001correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20211001correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20211001correciones');
     /* -----------------------------------||||||||||||||||||||FIN CONFIGURACIONES Y PRUEBAS||||||||||||||||||||||-------------------------------------*/
+    /*---------------------------------------|||||||||||||||||||MANEJO DE ERRORES LOGS|||||||||||||||||||||------------------------------------------*/
+    Route::get('errors_inaasys', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index')->name('errors_inaasys');
+    /*---------------------------------------|||||||||||||||||||FIN MANEJO DE ERRORES LOGS|||||||||||||||||||||------------------------------------------*/
 });
 
 

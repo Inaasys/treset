@@ -1176,6 +1176,7 @@ function desactivar(ordendesactivar){
         }else{
           $("#ordendesactivar").val(ordendesactivar);
           $("#textomodaldesactivar").html('Estas seguro de dar de baja la orden de compra? No'+ ordendesactivar);
+          $("#motivobaja").val("");
           $("#divmotivobaja").show();
           $("#btnbaja").show();
           $('#estatusregistro').modal('show');

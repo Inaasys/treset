@@ -38,11 +38,11 @@
                     <img src="{!! public_path('logotipo_empresa/') !!}{{$empresa->Logo}}" width="125px" height="80px">
                     </div>
                     <div style="float:left;width:60%;text-align: center;">
-                        <b style="font-size:12px;color:#122b40;">{{$empresa->Empresa}}</b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$calleempresa}} No. {{$noexteriorempresa}} </b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$coloniaempresa}} CP: {{$cpempresa}}</b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$municipioempresa}}, {{$estadoempresa}}</b><br>
-                        <b style="font-size:12px;color:#122b40;">RFC {{$empresa->Rfc}} Telefonos {{$telefonosempresa}}</b>
+                        <b style="font-size:13px;color:#122b40;">{{$empresa->Empresa}}</b><br>
+                        <b style="font-size:13px;color:#122b40;">{{$calleempresa}} No. {{$noexteriorempresa}} </b><br>
+                        <b style="font-size:13px;color:#122b40;">{{$coloniaempresa}} CP: {{$cpempresa}}</b><br>
+                        <b style="font-size:13px;color:#122b40;">{{$municipioempresa}}, {{$estadoempresa}}</b><br>
+                        <b style="font-size:13px;color:#122b40;">RFC {{$empresa->Rfc}} Telefonos {{$telefonosempresa}}</b>
                     </div>
                     <div style="float:right;width:20%;text-align: right;">
                         <p style="font-size:10px;"></p>
@@ -54,10 +54,10 @@
                 <div id ="contenedor" style="margin-top:10px;">
                     <div style="width:53%; height:110px; float:left; text-align: left; border-style: groove;">
                         <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
-                            <li style="font-size:9px; margin-left: 5px;"> Cliente: {{$d['cliente']->Nombre}} ({{$d['remision']->Cliente}})</li>
-                            <li style="font-size:9px; margin-left: 5px;"> Agente: {{$d['agente']->Nombre}} ({{$d['remision']->Agente}})</li>
-                            <li style="font-size:9px; margin-left: 5px;"> Referencia: {{$d['remision']->Referencia}}</li>
-                            <li style="font-size:9px; margin-left: 5px;"> Observaciones: {{$d['remision']->Obs}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> Cliente: {{$d['cliente']->Nombre}} ({{$d['remision']->Cliente}})</li>
+                            <li style="font-size:10px; margin-left: 5px;"> Agente: {{$d['agente']->Nombre}} ({{$d['remision']->Agente}})</li>
+                            <li style="font-size:10px; margin-left: 5px;"> Referencia: {{$d['remision']->Referencia}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> Observaciones: {{$d['remision']->Obs}}</li>
                         </ul>
                     </div>
                     <div style="width:1%; float:left;">
@@ -65,10 +65,10 @@
                     <div style="width:45%; height:110px; float:left; text-align: left; border-style: groove;">
                         <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
                             <li style="font-size:18px; margin-left: 5px;"><b>Remisión: </b><b style="color:red">{{$d['remision']->Remision}}</b></li>
-                            <li style="font-size:9px; margin-left: 5px;">Fecha: {{$d['remision']->Fecha}}</li>
-                            <li style="font-size:9px; margin-left: 5px;">Status: {{$d['remision']->Status}}</li>
-                            <li style="font-size:9px; margin-left: 5px;">Tipo: {{$d['remision']->Tipo}}</li>
-                            <li style="font-size:9px; margin-left: 5px;">Pedido: {{$d['remision']->Pedido}}</li>
+                            <li style="font-size:10px; margin-left: 5px;">Fecha: {{$d['remision']->Fecha}}</li>
+                            <li style="font-size:10px; margin-left: 5px;">Status: {{$d['remision']->Status}}</li>
+                            <li style="font-size:10px; margin-left: 5px;">Tipo: {{$d['remision']->Tipo}}</li>
+                            <li style="font-size:10px; margin-left: 5px;">Pedido: {{$d['remision']->Pedido}}</li>
                         </ul>
                     </div>
                 </div>

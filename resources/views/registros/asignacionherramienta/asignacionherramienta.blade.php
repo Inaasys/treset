@@ -69,7 +69,7 @@
                         </div>
                         <div class="body">
                             <div class="table-responsive">
-                                <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover" >
+                                <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap" >
                                     <thead class="{{$empresa->background_tables}}">
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>

@@ -933,6 +933,7 @@ function desactivar(asignaciondesactivar){
         $("#motivobaja").val("");
         $("#asignaciondesactivar").val(asignaciondesactivar);
         $("#textomodaldesactivar").html('Estas seguro de dar de baja la asignación de herramienta? No'+asignaciondesactivar);
+        $("#motivobaja").val("");
         $("#divmotivobaja").show();
         $("#btnbaja").show();
         $('#estatusregistro').modal('show');

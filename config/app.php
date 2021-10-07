@@ -204,6 +204,7 @@ return [
         SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,
         NikKanetiya\LaravelColorPalette\ColorPaletteServiceProvider::class,
         LynX39\LaraPdfMerger\PdfMergerServiceProvider::class,
+        Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class,
 
         /*
          * Package Service Providers...

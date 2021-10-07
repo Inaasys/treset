@@ -447,4 +447,14 @@ class PruebaController extends ConfiguracionSistemaController{
         
     }
 
+    public function modificar_valores_en_bd_para_actualizacion_rama20211001correciones(){
+        //Configuracion columnas tabla CuentasPorPagar       
+        Configuracion_Tabla::where('tabla', 'CuentasPorPagar')
+        ->update([
+            'campos_activados'=>'Pago,Status,Fecha,Proveedor,Transferencia,Abono,Periodo,Banco,NombreProveedor,Compras',
+            'campos_desactivados'=>'Equipo,MotivoBaja,Folio,Serie,Cheque,Beneficiario,CuentaDeposito,Anotacion,Usuario,NumeroBanco,NombreBanco,CuentaBanco,NumeroProveedor,RfcProveedor,CodigoPostalProveedor,PlazoProveedor,TelefonosProveedor,Email1Proveedor',
+            'columnas_ordenadas'=>'Pago,Status,Fecha,Proveedor,Banco,NombreProveedor,Transferencia,Abono,Compras,Periodo',
+        ]);
+        
+    }
 }

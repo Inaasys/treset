@@ -36,11 +36,11 @@
                     <img src="{!! public_path('logotipo_empresa/') !!}{{$empresa->Logo}}" width="125px" height="80px">
                     </div>
                     <div style="float:left;width:60%;text-align: center;">
-                        <b style="font-size:12px;color:#122b40;">{{$empresa->Empresa}}</b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$calleempresa}} No. {{$noexteriorempresa}} </b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$coloniaempresa}} CP: {{$cpempresa}}</b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$municipioempresa}}, {{$estadoempresa}}</b><br>
-                        <b style="font-size:12px;color:#122b40;">RFC {{$empresa->Rfc}} Telefonos {{$telefonosempresa}}</b>
+                        <b style="font-size:13px;color:#122b40;">{{$empresa->Empresa}}</b><br>
+                        <b style="font-size:13px;color:#122b40;">{{$calleempresa}} No. {{$noexteriorempresa}} </b><br>
+                        <b style="font-size:13px;color:#122b40;">{{$coloniaempresa}} CP: {{$cpempresa}}</b><br>
+                        <b style="font-size:13px;color:#122b40;">{{$municipioempresa}}, {{$estadoempresa}}</b><br>
+                        <b style="font-size:13px;color:#122b40;">RFC {{$empresa->Rfc}} Telefonos {{$telefonosempresa}}</b>
                     </div>
                     <div style="float:right;width:20%;text-align: right;">
                         <p style="font-size:10px;"></p>
@@ -53,9 +53,9 @@
 					<p style="font-size:11px; margin-left: 5px;"> <b>Se Factura a:</b></p>
                     <div style="width:53%; height:110px; float:left; text-align: left; border-style: groove;">
 						<ul style="list-style:none;margin-left:-35px;margin-top:5px;">
-							<li style="font-size:9px; margin-left: 5px;"> {{$d['cliente']->Nombre}} ({{$d['ordentrabajo']->Cliente}}), {{$d['cliente']->Calle}} {{$d['cliente']->noExterior}}, {{$d['cliente']->Colonia}}</b></li>
-							<li style="font-size:9px; margin-left: 5px;"> Pedido: {{$d['ordentrabajo']->Pedido}}</li>
-							<li style="font-size:9px; margin-left: 5px;"> Campaña: {{$d['ordentrabajo']->Campaña}}</li>
+							<li style="font-size:10px; margin-left: 5px;"> {{$d['cliente']->Nombre}} ({{$d['ordentrabajo']->Cliente}}), {{$d['cliente']->Calle}} {{$d['cliente']->noExterior}}, {{$d['cliente']->Colonia}}</b></li>
+							<li style="font-size:10px; margin-left: 5px;"> Pedido: {{$d['ordentrabajo']->Pedido}}</li>
+							<li style="font-size:10px; margin-left: 5px;"> Campaña: {{$d['ordentrabajo']->Campaña}}</li>
 						</ul>
                     </div>
                     <div style="width:1%; float:left;">
@@ -63,20 +63,20 @@
                     <div style="width:45%; height:110px; float:left; text-align: left; border-style: groove;">
 						<ul style="list-style:none;margin-left:-35px;margin-top:5px;">
 							<li style="font-size:18px; margin-left: 5px;"><b>Orden Trabajo: </b><b style="color:red">{{$d['ordentrabajo']->Orden}}</b></li>
-							<li style="font-size:9px; margin-left: 5px;">Tipo: {{$d['ordentrabajo']->Tipo}}</li>
-							<li style="font-size:9px; margin-left: 5px;">Entrada: {{$d['ordentrabajo']->Fecha}}</li>
-							<li style="font-size:9px; margin-left: 5px;">Entrega: {{$d['ordentrabajo']->Entrega}}</li>
-							<li style="font-size:9px; margin-left: 5px;">Facturada: {{$d['ordentrabajo']->Facturada}}</li>
-							<li style="font-size:9px; margin-left: 5px;">Reclamo: {{$d['ordentrabajo']->Reclamo}}</li>
-							<li style="font-size:9px; margin-left: 5px;">Status: {{$d['ordentrabajo']->Status}}</li>
+							<li style="font-size:10px; margin-left: 5px;">Tipo: {{$d['ordentrabajo']->Tipo}}</li>
+							<li style="font-size:10px; margin-left: 5px;">Entrada: {{$d['ordentrabajo']->Fecha}}</li>
+							<li style="font-size:10px; margin-left: 5px;">Entrega: {{$d['ordentrabajo']->Entrega}}</li>
+							<li style="font-size:10px; margin-left: 5px;">Facturada: {{$d['ordentrabajo']->Facturada}}</li>
+							<li style="font-size:10px; margin-left: 5px;">Reclamo: {{$d['ordentrabajo']->Reclamo}}</li>
+							<li style="font-size:10px; margin-left: 5px;">Status: {{$d['ordentrabajo']->Status}}</li>
 						</ul>
                     </div>
                 </div>
 				<div id ="contenedor">
 					<p style="font-size:11px; margin-left: 5px;"> <b>Propietario:</b></p>
                     <div style="width:98.5%; height:75px; float:left; text-align: left; border-style: groove;">
-                        <p style="font-size:9px; margin-left: 5px;">{{$d['cliente']->Nombre}} ({{$d['ordentrabajo']->Cliente}})</p>
-                        <p style="font-size:9px; margin-left: 5px;"> Obs: </p>
+                        <p style="font-size:10px; margin-left: 5px;">{{$d['cliente']->Nombre}} ({{$d['ordentrabajo']->Cliente}})</p>
+                        <p style="font-size:10px; margin-left: 5px;"> Obs: </p>
                     </div>
                 </div>
 				<div id ="contenedor">
@@ -84,16 +84,16 @@
                     <div style="width:98.5%; height:60px; float:left; text-align: left; border-style: groove;">
                         <table style="width:100%;">
 							<tr style="text-align:center">
-								<td style="font-size:9px;width:25%">Serie/VIN: {{$d['ordentrabajo']->Vin}}</td>
-								<td style="font-size:9px;width:25%">Motor: {{$d['ordentrabajo']->Motor}}</td>
-								<td style="font-size:9px;width:25%">Año: {{$d['ordentrabajo']->Año}}</td>
-								<td style="font-size:9px;width:25%">Kms: {{$d['ordentrabajo']->Kilometros}}</td>
+								<td style="font-size:10px;width:25%">Serie/VIN: {{$d['ordentrabajo']->Vin}}</td>
+								<td style="font-size:10px;width:25%">Motor: {{$d['ordentrabajo']->Motor}}</td>
+								<td style="font-size:10px;width:25%">Año: {{$d['ordentrabajo']->Año}}</td>
+								<td style="font-size:10px;width:25%">Kms: {{$d['ordentrabajo']->Kilometros}}</td>
 							</tr>
 							<tr style="text-align:center">
-								<td style="font-size:9px;width:25%">Marca: {{$d['ordentrabajo']->Marca}}</td>
-								<td style="font-size:9px;width:25%">Modelo: {{$d['ordentrabajo']->Modelo}}</td>
-								<td style="font-size:9px;width:25%">Placas: {{$d['ordentrabajo']->Placas}}</td>
-								<td style="font-size:9px;width:25%">No. Económico: {{$d['ordentrabajo']->Economico}}</td>
+								<td style="font-size:10px;width:25%">Marca: {{$d['ordentrabajo']->Marca}}</td>
+								<td style="font-size:10px;width:25%">Modelo: {{$d['ordentrabajo']->Modelo}}</td>
+								<td style="font-size:10px;width:25%">Placas: {{$d['ordentrabajo']->Placas}}</td>
+								<td style="font-size:10px;width:25%">No. Económico: {{$d['ordentrabajo']->Economico}}</td>
 							</tr>
 						</table>
                     </div>

@@ -1706,6 +1706,7 @@ function desactivar(cotizaciondesactivar){
         }else{
           $("#cotizaciondesactivar").val(cotizaciondesactivar);
           $("#textomodaldesactivar").html('Estas seguro de desactivar la cotización? No'+ cotizaciondesactivar);
+          $("#motivobaja").val("");
           $("#divmotivobaja").show();
           $("#btnbaja").show();
           $('#estatusregistro').modal('show');

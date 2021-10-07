@@ -1093,6 +1093,7 @@ function desactivar(producciondesactivar){
                 }else{
                     $("#producciondesactivar").val(producciondesactivar);
                     $("#textomodaldesactivar").html('Estas seguro de desactivar la producción? No'+ producciondesactivar);
+                    $("#motivobaja").val("");
                     $("#divmotivobaja").show();
                     $("#btnbaja").show();
                     $('#estatusregistro').modal('show');

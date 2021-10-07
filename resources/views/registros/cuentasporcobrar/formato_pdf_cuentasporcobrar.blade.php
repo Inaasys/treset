@@ -36,11 +36,11 @@
                     <img src="{!! public_path('logotipo_empresa/') !!}{{$empresa->Logo}}" width="125px" height="80px">
                     </div>
                     <div style="float:left;width:60%;text-align: center;">
-                        <b style="font-size:12px;color:#122b40;">{{$empresa->Empresa}}</b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$calleempresa}} No. {{$noexteriorempresa}} </b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$coloniaempresa}} CP: {{$cpempresa}}</b><br>
-                        <b style="font-size:12px;color:#122b40;">{{$municipioempresa}}, {{$estadoempresa}}</b><br>
-                        <b style="font-size:12px;color:#122b40;">RFC {{$empresa->Rfc}} Telefonos {{$telefonosempresa}}</b>
+                        <b style="font-size:13px;color:#122b40;">{{$empresa->Empresa}}</b><br>
+                        <b style="font-size:13px;color:#122b40;">{{$calleempresa}} No. {{$noexteriorempresa}} </b><br>
+                        <b style="font-size:13px;color:#122b40;">{{$coloniaempresa}} CP: {{$cpempresa}}</b><br>
+                        <b style="font-size:13px;color:#122b40;">{{$municipioempresa}}, {{$estadoempresa}}</b><br>
+                        <b style="font-size:13px;color:#122b40;">RFC {{$empresa->Rfc}} Telefonos {{$telefonosempresa}}</b>
                     </div>
                     <div style="float:right;width:20%;text-align: right;">
                         <p style="font-size:10px;"></p>
@@ -52,12 +52,12 @@
                 <div id ="contenedor" style="margin-top:10px;">
                     <div style="width:53%; height:110px; float:left; text-align: left; border-style: groove;">
                         <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
-                            <li style="font-size:9px; margin-left: 5px;"> Nombre: {{$d['cliente']->Nombre}}</li>
-                            <li style="font-size:9px; margin-left: 5px;"> Dirección: {{$d['cliente']->Calle}}</li>
-                            <li style="font-size:9px; margin-left: 5px;"> Colonia: {{$d['cliente']->Colonia}}  &nbsp;&nbsp;  Estado: @if($d['estadocliente'] != null) {{$d['estadocliente']->Nombre}} @endif</li>
-                            <li style="font-size:9px; margin-left: 5px;"> Municipio: {{$d['cliente']->Municipio}} &nbsp;&nbsp; C.P. {{$d['cliente']->CodigoPostal}}</li>
-                            <li style="font-size:9px; margin-left: 5px;"> EmisorRfc:{{$d['cuentaporcobrar']->EmisorRfc}}</li>
-                            <li style="font-size:9px; margin-left: 5px;"> ReceptorRfc: {{$d['cuentaporcobrar']->ReceptorRfc}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> Nombre: {{$d['cliente']->Nombre}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> Dirección: {{$d['cliente']->Calle}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> Colonia: {{$d['cliente']->Colonia}}  &nbsp;&nbsp;  Estado: @if($d['estadocliente'] != null) {{$d['estadocliente']->Nombre}} @endif</li>
+                            <li style="font-size:10px; margin-left: 5px;"> Municipio: {{$d['cliente']->Municipio}} &nbsp;&nbsp; C.P. {{$d['cliente']->CodigoPostal}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> EmisorRfc:{{$d['cuentaporcobrar']->EmisorRfc}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> ReceptorRfc: {{$d['cuentaporcobrar']->ReceptorRfc}}</li>
                         </ul>
                     </div>
                     <div style="width:1%; float:left;">
@@ -65,8 +65,8 @@
                     <div style="width:45%; height:110px; float:left; text-align: left; border-style: groove;">
                         <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
                             <li style="font-size:18px; margin-left: 5px;"><b>Pago:</b> <b style="color:red">{{$d['cuentaporcobrar']->Pago}}</b></li>
-                            <li style="font-size:9px; margin-left: 5px;">Emitida: {{$d['cuentaporcobrar']->Hora}}</li>
-                            <li style="font-size:9px; margin-left: 5px;">Fecha Depósito: {{$d['cuentaporcobrar']->FechaPago}}</li>
+                            <li style="font-size:10px; margin-left: 5px;">Emitida: {{$d['cuentaporcobrar']->Hora}}</li>
+                            <li style="font-size:10px; margin-left: 5px;">Fecha Depósito: {{$d['cuentaporcobrar']->FechaPago}}</li>
                         </ul>
                     </div>
                 </div>
@@ -94,9 +94,9 @@
                                     <td>{{$cxcd['vencedetalle']}}</td>
                                     <td>{{ number_format($cxcd['totalfactura'], $d['numerodecimalesdocumento']) }}</td>
                                     <td>{{$cxcd['numparcialidaddetalle']}}</td>
-                                    <td>{{ number_format($cxcd['impsaldoantdetalle'], $d['numerodecimalesdocumento']) }}</td>
-                                    <td>{{ number_format($cxcd['imppagadodetalle'], $d['numerodecimalesdocumento']) }}</td>
-                                    <td>{{ number_format($cxcd['impsaldoinsolutodetalle'], $d['numerodecimalesdocumento']) }}</td>
+                                    <td style="text-align: right;">{{ number_format($cxcd['impsaldoantdetalle'], $d['numerodecimalesdocumento']) }}</td>
+                                    <td style="text-align: right;">{{ number_format($cxcd['imppagadodetalle'], $d['numerodecimalesdocumento']) }}</td>
+                                    <td style="text-align: right;">{{ number_format($cxcd['impsaldoinsolutodetalle'], $d['numerodecimalesdocumento']) }}</td>
                                 </tr>
                                 <tr style="font-size:10px;">
                                     <td></td> 
