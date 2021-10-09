@@ -444,7 +444,6 @@ function obtenerdatos(numerofolio){
                                     '<div class="col-md-12">'+
                                         '<input type="checkbox" name="actualizarcertificado" id="idactualizarcertificado" value="1" onchange="mostrardivcertificados();">'+
                                         '<label for="idactualizarcertificado">Actualizar Certificados</label>'+
-                                        '<input type="hidden" class="form-control" name="actualizarcertificado" value="0">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row" id="divcertificadosempresa" hidden>'+ 
@@ -526,7 +525,6 @@ function obtenerdatos(numerofolio){
     $("#tabsform").html(tabs);
     $("#numero").val(data.FolioComprobanteFactura.Numero);
     $("#serie").val(data.FolioComprobanteFactura.Serie);
-    $("#esquema").val(data.FolioComprobanteFactura.Esquema).change();
     $("#titulo").val(data.FolioComprobanteFactura.Titulo);
     $("#departamento").val(data.FolioComprobanteFactura.Depto).change();
     $("#folioinicial").val(data.FolioComprobanteFactura.FolioInicial);

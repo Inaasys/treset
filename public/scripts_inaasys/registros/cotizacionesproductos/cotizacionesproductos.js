@@ -1477,6 +1477,8 @@ function enviardocumentoemail(documento, tipo){
     $("#emaildocumento").val(documento);
     $("#emailde").val(data.emailde);
     $("#emailpara").val(data.emailpara);
+    $("#email2cc").val(data.email2cc);
+    $("#email3cc").val(data.email3cc);
     $("#emailasunto").val("COTIZACIÓN PRODUCTO NO. " + documento +" DE "+ nombreempresa);
     $("#modalenviarpdfemail").modal('show');
   })   

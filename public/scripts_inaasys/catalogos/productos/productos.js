@@ -1341,7 +1341,7 @@ function obtenerdocumento(documento,numerodocumento){
     switch(documento){
         case 'Compras':
             //alert("Compras");
-            obtenerdatoscompra(numerodocumento);
+            //obtenerdatoscompra(numerodocumento);
             break;
         case 'Ajustes':
             //alert("Ajustes");

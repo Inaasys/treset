@@ -211,7 +211,7 @@ class FolioComprobanteFacturaController extends ConfiguracionSistemaController{
     }
 
     //bajas
-    public function folios_comprobantes_facturas_alta_o_baja(Requesr $request){
+    public function folios_comprobantes_facturas_alta_o_baja(Request $request){
         $numerofolio=$request->numerofolio;
 	    $FolioComprobanteFactura = FolioComprobanteFactura::where('Numero', $numerofolio )->first();
 	    if($FolioComprobanteFactura->Status == 'ALTA'){

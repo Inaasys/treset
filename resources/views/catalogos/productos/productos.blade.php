@@ -316,5 +316,5 @@
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="scripts_inaasys/catalogos/productos/productos.js"></script>
-    <script src="scripts_inaasys/catalogos/productos/infodocumentos.js"></script>
+    <!--<script src="scripts_inaasys/catalogos/productos/infodocumentos.js"></script>-->
 @endsection

@@ -1434,6 +1434,9 @@ class TraspasoController extends ConfiguracionSistemaController{
         $data = array(
             'traspaso' => $traspaso,
             'emailde' => Config::get('mail.from.address'),
+            'emailpara' => '',
+            'email2cc' => '',
+            'email3cc' => ''
         );
         return response()->json($data);
     }
@@ -1495,6 +1498,14 @@ class TraspasoController extends ConfiguracionSistemaController{
             //enviar correo electrónico	
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
+            $arraycc = array();
+            array_push($arraycc, $request->emailpara);
+            if($request->email2cc != ""){
+                array_push($arraycc, $request->email2cc);
+            }
+            if($request->email3cc != ""){
+                array_push($arraycc, $request->email3cc);
+            }
             $correos = [$request->emailpara];
             $asunto = $request->emailasunto;
             $emaildocumento = $request->emaildocumento;
@@ -1502,9 +1513,9 @@ class TraspasoController extends ConfiguracionSistemaController{
             $body = $request->emailasunto;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
-            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
+            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
                 $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
-                        ->cc($correos)
+                        ->cc($arraycc)
                         ->subject($asunto)
                         ->attachData($pdf->output(), "TraspasoNo".$emaildocumento.".pdf");
             });

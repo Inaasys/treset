@@ -96,163 +96,179 @@ function listar(){
 function pagaredefault1(){
     $("#pagare").val(pagaredefaultuno);
 }
+//tipo de esquema
+function tipoesquema(){
+    var tipoesquema = $("#esquema").val();
+    if(tipoesquema != "CFDI"){
+        $("#divcertificadosempresa").hide();
+        $("#archivocertificado").removeAttr('required');
+        $("#contrasenallaveprivada").removeAttr('required');
+        $("#archivollaveprivada").removeAttr('required');
+        $("#certificadovalidodesde").removeAttr('required');
+        $("#certificadovalidohasta").removeAttr('required');
+    }else{
+        $("#divcertificadosempresa").show();
+        $("#archivocertificado").attr('required', 'required');
+        $("#contrasenallaveprivada").attr('required', 'required');
+        $("#archivollaveprivada").attr('required', 'required');
+        $("#certificadovalidodesde").attr('required', 'required');
+        $("#certificadovalidohasta").attr('required', 'required');
+    }
+}
 //alta
 function alta(){
     $("#titulomodal").html('Alta Folio Fiscal Nota');
     mostrarmodalformulario('ALTA');
     mostrarformulario();
     //formulario alta
-    var tabs =  '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
-                    '<li role="presentation" class="active">'+
-                        '<a href="#foliostab" data-toggle="tab">Folios</a>'+
-                    '</li>'+
-                    '<li role="presentation">'+
-                        '<a href="#domiciliotab" data-toggle="tab">Domicilio</a>'+
-                    '</li>'+
-                    '<li role="presentation">'+
-                        '<a href="#pagaretab" data-toggle="tab">Leyenda</a>'+
-                    '</li>'+
-                    '<li role="presentation">'+
-                        '<a href="#alineartab" data-toggle="tab">Alinear</a>'+
-                    '</li>'+
-                '</ul>'+
-                '<div class="tab-content">'+
-                    '<div role="tabpanel" class="tab-pane fade in active" id="foliostab">'+
-                        '<div class="row">'+
-                            '<div class="col-md-6">'+
-                                '<label>Folio Inicial (Las Notas empiezan con este folio)</label>'+
-                                '<input type="text" class="form-control" name="folioinicial" id="folioinicial" value="1" required >'+
-                            '</div>'+
-                        '</div>'+  
-                        '<div class="row">'+ 
-                            '<div class="col-md-4">'+
-                                '<label>Archivo de Certificado (*.cer)</label>'+
-                                '<input type="file" class="form-control" name="archivocertificado" id="archivocertificado" required data-parsley-length="[1, 100]"></input>'+
-                            '</div>'+
-                            '<div class="col-md-4">'+
-                                '<label>Contraseña Llave Privada</label>'+
-                                '<input type="text" class="form-control" name="contrasenallaveprivada" id="contrasenallaveprivada" required data-parsley-length="[1, 100]">'+
-                            '</div>'+  
-                            '<div class="col-md-4">'+
-                                '<label>Archivo Llave Privada (*.key)</label>'+
-                                '<input type="file" class="form-control" name="archivollaveprivada" id="archivollaveprivada" required data-parsley-length="[1, 100]"></input>'+
-                            '</div>'+
-                        '</div>'+  
-                        '<div class="row">'+   
-                            '<div class="col-md-4">'+
-                                '<label>Número de Certificado</label>'+
-                                '<input type="text" class="form-control" name="numerocertificado" id="numerocertificado" onkeyup="tipoLetra(this);" required readonly data-parsley-length="[1, 50]">'+
-                            '</div>'+
-                            '<div class="col-md-4">'+
-                                '<label>Certificado Válido Desde</label>'+
-                                '<input type="text" class="form-control" name="certificadovalidodesde" id="certificadovalidodesde" onkeyup="tipoLetra(this);" required readonly data-parsley-length="[1, 20]">'+
-                            '</div>'+  
-                            '<div class="col-md-4">'+
-                                '<label>Certificado Válido Hasta</label>'+
-                                '<input type="text" class="form-control" name="certificadovalidohasta" id="certificadovalidohasta" onkeyup="tipoLetra(this);" required readonly data-parsley-length="[1, 20]">'+
-                            '</div>'+
-                        '</div>'+  
+    var tabs =  '<div class="row">'+
+                    '<div class="col-md-3">'+
+                        '<label>Número</label>'+
+                        '<input type="text" class="form-control" name="numero" id="numero" required readonly>'+
                     '</div>'+
-                    '<div role="tabpanel" class="tab-pane fade" id="domiciliotab">'+
-                        '<div class="row">'+
-                            '<div class="col-md-12">'+
-                                '<label>Empresa</label>'+
-                                '<input type="text" class="form-control" name="empresa" id="empresa" value="'+nombreempresa+'" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]">'+
-                            '</div>'+
-                            '<div class="col-md-12">'+
-                                '<label>Domicilio</label>'+
-                                '<textarea class="form-control" name="domicilio" id="domicilio" onkeyup="tipoLetra(this);" rows="10" required>'+textareadomicilio+'</textarea>'+
-                            '</div>'+
-                        '</div>'+
-                        '<div class="row">'+
-                            '<div class="col-md-4">'+
-                                '<label>Leyenda 1</label>'+
-                                '<input type="text" class="form-control" name="leyenda1" id="leyenda1" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]">'+
-                            '</div>'+
-                            '<div class="col-md-4">'+
-                                '<label>Leyenda 2</label>'+
-                                '<input type="text" class="form-control" name="leyenda2" id="leyenda2" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]">'+
-                            '</div>'+
-                            '<div class="col-md-4">'+
-                                '<label>Leyenda 3</label>'+
-                                '<input type="text" class="form-control" name="leyenda3" id="leyenda3" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]">'+
-                            '</div>'+
-                        '</div>'+
+                    '<div class="col-md-3">'+
+                        '<label>Serie</label>'+
+                        '<input type="text" class="form-control" name="serie" id="serie" value="N"  onkeyup="tipoLetra(this)" required data-parsley-length="[1, 10]">'+
                     '</div>'+
-                    '<div role="tabpanel" class="tab-pane fade" id="pagaretab">'+
-                        '<div class="row">'+
-                            '<div class="col-md-12">'+
-                                '<div class="btn bg-blue btn-xs waves-effect" onclick="pagaredefault1()">'+
-                                    'Asignar Pagaré Default 1'+
-                                '</div>'+
-                            '</div>'+
-                            '<div class="col-md-12">'+
-                                '<label>Pagare</label>'+
-                                '<textarea class="form-control" name="pagare" id="pagare" onkeyup="tipoLetra(this);" rows="15" required></textarea>'+
-                            '</div>'+
-                        '</div>'+
+                    '<div class="col-md-3">'+
+                        '<label>Esquema</label>'+
+                        '<select name="esquema" id="esquema" class="form-control select2" style="width:100%" onchange="tipoesquema();" required>'+
+                            '<option selected disabled hidden>Selecciona...</option>'+
+                            '<option value="CFDI" selected>CFDI</option>'+
+                            '<option value="INTERNA">INTERNA</option>'+
+                            '<option value="NOTA">NOTA</option>'+
+                        '</select>'+
                     '</div>'+
-                    '<div role="tabpanel" class="tab-pane fade" id="alineartab">'+
-                        '<div class="row">'+
-                            '<div class="col-md-4">'+
-                                '<label>Ubicar Logotipo</label>'+
-                                '<select name="ubicarlogotipo" id="ubicarlogotipo" class="form-control select2" style="width:100%" required>'+
-                                    '<option selected disabled hidden>Selecciona...</option>'+
-                                    '<option value="0" selected>Izquierda</option>'+
-                                    '<option value="1">Derecha</option>'+
-                                '</select>'+
-                            '</div>'+
-                            '<div class="col-md-4">'+
-                                '<label>Alinear Logotipo</label>'+
-                                '<select name="alinearlogotipo" id="alinearlogotipo" class="form-control select2" style="width:100%" required>'+
-                                    '<option selected disabled hidden>Selecciona...</option>'+
-                                    '<option value="0">Arriba Izquierda</option>'+
-                                    '<option value="1">Arriba Centrado</option>'+
-                                    '<option value="2">Arriba Derecha</option>'+
-                                    '<option value="3">Abajo Izquierda</option>'+
-                                    '<option value="4">Abajo Centrado</option>'+
-                                    '<option value="5">Abajo Derecha</option>'+
-                                    '<option value="6">Medio Izquierda</option>'+
-                                    '<option value="7">Medio Centrado</option>'+
-                                    '<option value="8">Medio Derecha</option>'+
-                                    '<option value="9">Recortar</option>'+
-                                    '<option value="10" selected>Ajustar Zoom</option>'+
-                                    '<option value="11">Estrechar</option>'+
-                                    '<option value="12">Imagen de Fondo</option>'+
-                                '</select>'+
-                            '</div>'+
-                            '<div class="col-md-4">'+
-                                '<label>Alinear Empresa</label>'+
-                                '<select name="alinearempresa" id="alinearempresa" class="form-control select2" style="width:100%" required>'+
-                                    '<option selected disabled hidden>Selecciona...</option>'+
-                                    '<option value="0">Arriba Izquierda</option>'+
-                                    '<option value="1">Arriba Centrado</option>'+
-                                    '<option value="2">Arriba Derecha</option>'+
-                                    '<option value="3">Abajo Izquierda</option>'+
-                                    '<option value="4">Abajo Centrado</option>'+
-                                    '<option value="5">Abajo Derecha</option>'+
-                                    '<option value="6">Medio Izquierda</option>'+
-                                    '<option value="7" selected>Medio Centrado</option>'+
-                                    '<option value="8">Medio Derecha</option>'+
-                                    '<option value="9">Arriba</option>'+
-                                    '<option value="10">Abajo</option>'+
-                                    '<option value="11">Medio</option>'+
-                                '</select>'+
-                            '</div>'+
-                        '</div>'+
+                    '<div class="col-md-3">'+
+                        '<label>Titulo</label>'+
+                        '<input type="text" class="form-control" name="titulo" id="titulo" value="NOTA DE CREDITO" onkeyup="tipoLetra(this)" required data-parsley-length="[1, 20]">'+
                     '</div>'+
                 '</div>'+
                 '<div class="row">'+
-                    '<div class="col-md-6 form-check">'+
-                        '<input type="checkbox" name="imprimirlogotipo" id="idimprimirlogotipo" class="filled-in datotabla" value="S" checked readonly />'+
-                        '<label for="idimprimirlogotipo">imprimirlogotipo</label>'+
-                    '</div>'+
-                    '<div class="col-md-6">'+
-                        '<b>Versión 3.3</b>'+
+                    '<div class="col-md-12">'+
+                        '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                            '<li role="presentation" class="active">'+
+                                '<a href="#foliostab" data-toggle="tab">Folios</a>'+
+                            '</li>'+
+                            '<li role="presentation">'+
+                                '<a href="#domiciliotab" data-toggle="tab">Domicilio</a>'+
+                            '</li>'+
+                            '<li role="presentation">'+
+                                '<a href="#pagaretab" data-toggle="tab">Leyenda</a>'+
+                            '</li>'+
+                        '</ul>'+
+                        '<div class="tab-content">'+
+                            '<div role="tabpanel" class="tab-pane fade in active" id="foliostab">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-6">'+
+                                        '<label>Folio Inicial (Las Notas empiezan con este folio)</label>'+
+                                        '<input type="text" class="form-control" name="folioinicial" id="folioinicial" value="1" required >'+
+                                    '</div>'+
+                                '</div>'+  
+                                '<div class="row" id="divcertificadosempresa">'+ 
+                                    '<div class="col-md-6">'+
+                                        '<label>Archivo de Certificado (*.cer)</label>'+
+                                        '<input type="file" name="archivocertificado" id="archivocertificado"  class="dropify" required data-parsley-length="[1, 100]" data-allowed-file-extensions="cer" data-height="100" onchange="validararchivostimbrado();" />'+
+                                    '</div>'+ 
+                                    '<div class="col-md-6">'+
+                                        '<label>Archivo Llave Privada (*.key)</label>'+
+                                        '<input type="file" name="archivollaveprivada" id="archivollaveprivada"  class="dropify" required data-parsley-length="[1, 100]" data-allowed-file-extensions="key" data-height="100" onchange="validararchivostimbrado();" />'+
+                                    '</div>'+
+                                    '<div class="col-md-4">'+
+                                        '<label>Contraseña Llave Privada</label>'+
+                                        '<input type="password" class="form-control" name="contrasenallaveprivada" id="contrasenallaveprivada" required data-parsley-length="[1, 100]" onchange="validararchivostimbrado();">'+
+                                    '</div>'+ 
+                                    '<div class="col-md-4">'+
+                                        '<label>Certificado Válido Desde</label>'+
+                                        '<input type="text" class="form-control" name="certificadovalidodesde" id="certificadovalidodesde" required readonly>'+
+                                    '</div>'+ 
+                                    '<div class="col-md-4">'+
+                                        '<label>Certificado Válido Hasta</label>'+
+                                        '<input type="text" class="form-control" name="certificadovalidohasta" id="certificadovalidohasta" required readonly>'+
+                                    '</div>'+ 
+                                '</div>'+ 
+                            '</div>'+
+                            '<div role="tabpanel" class="tab-pane fade" id="domiciliotab">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-12">'+
+                                        '<label>Empresa</label>'+
+                                        '<input type="text" class="form-control" name="empresa" id="empresa" value="'+nombreempresa+'" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]">'+
+                                    '</div>'+
+                                    '<div class="col-md-12">'+
+                                        '<label>Domicilio</label>'+
+                                        '<textarea class="form-control" name="domicilio" id="domicilio" onkeyup="tipoLetra(this);" rows="10" required>'+textareadomicilio+'</textarea>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-md-4">'+
+                                        '<label>Leyenda 1</label>'+
+                                        '<input type="text" class="form-control" name="leyenda1" id="leyenda1" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]">'+
+                                    '</div>'+
+                                    '<div class="col-md-4">'+
+                                        '<label>Leyenda 2</label>'+
+                                        '<input type="text" class="form-control" name="leyenda2" id="leyenda2" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]">'+
+                                    '</div>'+
+                                    '<div class="col-md-4">'+
+                                        '<label>Leyenda 3</label>'+
+                                        '<input type="text" class="form-control" name="leyenda3" id="leyenda3" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]">'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                            '<div role="tabpanel" class="tab-pane fade" id="pagaretab">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-12">'+
+                                        '<div class="btn bg-blue btn-xs waves-effect" onclick="pagaredefault1()">'+
+                                            'Asignar Pagaré Default 1'+
+                                        '</div>'+
+                                    '</div>'+
+                                    '<div class="col-md-12">'+
+                                        '<label>Pagare</label>'+
+                                        '<textarea class="form-control" name="pagare" id="pagare" onkeyup="tipoLetra(this);" rows="15"></textarea>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
+                        '<br>'+
+                        '<div class="row">'+
+                            '<div class="col-md-6">'+
+                                '<b>Versión 3.3</b>'+
+                                '<input type="hidden" class="form-control" name="versioncfdi" id="versioncfdi" value="3.3">'+
+                            '</div>'+
+                        '</div>'+
                     '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
+    $('.dropify').dropify();
     obtenultimonumero();
+}
+//validar archivos para timbrado electronico
+function validararchivostimbrado(){
+    var formData = new FormData($("#formparsley")[0]);
+    $.ajax({
+        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+        url:folios_comprobantes_notas_enviar_archivos_timbrado,
+        type: "post",
+        dataType: "html",
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success:function(data){ 
+            var results = JSON.parse(data);
+            if(results.msj != "OK"){
+                msj_faltanarchivosocontrasena(results.msj);
+            }
+            $("#certificadovalidodesde").val(results.updated_at).change();
+            $("#certificadovalidohasta").val(results.expires_at);
+        },
+        error:function(data){
+            if(data.status == 403){
+                msj_errorenpermisos();
+            }else{
+                msj_errorajax();
+            }
+        }
+    })
 }
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
@@ -272,7 +288,7 @@ $("#btnGuardar").on('click', function (e) {
             processData: false,
             success:function(data){
                 if(data == 1){
-                    msj_errorcodigoexistente();
+                    msj_errorserieexistente();
                 }else{
                     msj_datosguardadoscorrectamente();
                     limpiar();
@@ -333,183 +349,163 @@ $("#aceptar").on('click', function(e){
         form.parsley().validate();
     }
 });
+//mostrar div certificados
+function mostrardivcertificados(){
+    if( $('#idactualizarcertificado').prop('checked') ) {
+        $("#divcertificadosempresa").show();
+        $("#archivocertificado").attr('required', 'required');
+        $("#contrasenallaveprivada").attr('required', 'required');
+        $("#archivollaveprivada").attr('required', 'required');
+        $("#certificadovalidodesde").attr('required', 'required');
+        $("#certificadovalidohasta").attr('required', 'required');
+    }else{
+        $("#divcertificadosempresa").hide();
+        $("#archivocertificado").removeAttr('required');
+        $("#contrasenallaveprivada").removeAttr('required');
+        $("#archivollaveprivada").removeAttr('required');
+        $("#certificadovalidodesde").removeAttr('required');
+        $("#certificadovalidohasta").removeAttr('required');
+    }
+}
 function obtenerdatos(numerofolio){
     $("#titulomodal").html('Modificación Folio Fiscal Nota');
     $('.page-loader-wrapper').css('display', 'block');
     $.get(folios_comprobantes_notas_obtener_folio,{numerofolio:numerofolio },function(data){
     //formulario modificacion
-    var tabs =  '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
-                    '<li role="presentation" class="active">'+
-                        '<a href="#foliostab" data-toggle="tab">Folios</a>'+
-                    '</li>'+
-                    '<li role="presentation">'+
-                        '<a href="#domiciliotab" data-toggle="tab">Domicilio</a>'+
-                    '</li>'+
-                    '<li role="presentation">'+
-                        '<a href="#pagaretab" data-toggle="tab">Leyenda</a>'+
-                    '</li>'+
-                    '<li role="presentation">'+
-                        '<a href="#alineartab" data-toggle="tab">Alinear</a>'+
-                    '</li>'+
-                '</ul>'+
-                '<div class="tab-content">'+
-                    '<div role="tabpanel" class="tab-pane fade in active" id="foliostab">'+
-                        '<div class="row">'+
-                            '<div class="col-md-6">'+
-                                '<label>Folio Inicial (Las Notas empiezan con este folio)</label>'+
-                                '<input type="text" class="form-control" name="folioinicial" id="folioinicial" value="1" required >'+
-                            '</div>'+
-                        '</div>'+  
-                        '<div class="row">'+ 
-                            '<div class="col-md-4">'+
-                                '<label>Archivo de Certificado (*.cer)</label>'+
-                                '<input type="file" class="form-control" name="archivocertificado" id="archivocertificado" required data-parsley-length="[1, 100]"></input>'+
-                            '</div>'+
-                            '<div class="col-md-4">'+
-                                '<label>Contraseña Llave Privada</label>'+
-                                '<input type="text" class="form-control" name="contrasenallaveprivada" id="contrasenallaveprivada" required data-parsley-length="[1, 100]">'+
-                            '</div>'+  
-                            '<div class="col-md-4">'+
-                                '<label>Archivo Llave Privada (*.key)</label>'+
-                                '<input type="file" class="form-control" name="archivollaveprivada" id="archivollaveprivada" required data-parsley-length="[1, 100]"></input>'+
-                            '</div>'+
-                        '</div>'+  
-                        '<div class="row">'+   
-                            '<div class="col-md-4">'+
-                                '<label>Número de Certificado</label>'+
-                                '<input type="text" class="form-control" name="numerocertificado" id="numerocertificado" onkeyup="tipoLetra(this);" required readonly data-parsley-length="[1, 50]">'+
-                            '</div>'+
-                            '<div class="col-md-4">'+
-                                '<label>Certificado Válido Desde</label>'+
-                                '<input type="text" class="form-control" name="certificadovalidodesde" id="certificadovalidodesde" onkeyup="tipoLetra(this);" required readonly data-parsley-length="[1, 20]">'+
-                            '</div>'+  
-                            '<div class="col-md-4">'+
-                                '<label>Certificado Válido Hasta</label>'+
-                                '<input type="text" class="form-control" name="certificadovalidohasta" id="certificadovalidohasta" onkeyup="tipoLetra(this);" required readonly data-parsley-length="[1, 20]">'+
-                            '</div>'+
-                        '</div>'+  
+    var tabs =  '<div class="row">'+
+                    '<div class="col-md-3">'+
+                        '<label>Número</label>'+
+                        '<input type="text" class="form-control" name="numero" id="numero" required readonly>'+
                     '</div>'+
-                    '<div role="tabpanel" class="tab-pane fade" id="domiciliotab">'+
-                        '<div class="row">'+
-                            '<div class="col-md-12">'+
-                                '<label>Empresa</label>'+
-                                '<input type="text" class="form-control" name="empresa" id="empresa" value="'+nombreempresa+'" onkeyup="tipoLetra(this);" required>'+
-                            '</div>'+
-                            '<div class="col-md-12">'+
-                                '<label>Domicilio</label>'+
-                                '<textarea class="form-control" name="domicilio" id="domicilio" onkeyup="tipoLetra(this);" rows="10" required>'+textareadomicilio+'</textarea>'+
-                            '</div>'+
-                        '</div>'+
-                        '<div class="row">'+
-                            '<div class="col-md-4">'+
-                                '<label>Leyenda 1</label>'+
-                                '<input type="text" class="form-control" name="leyenda1" id="leyenda1" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]">'+
-                            '</div>'+
-                            '<div class="col-md-4">'+
-                                '<label>Leyenda 2</label>'+
-                                '<input type="text" class="form-control" name="leyenda2" id="leyenda2" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]">'+
-                            '</div>'+
-                            '<div class="col-md-4">'+
-                                '<label>Leyenda 3</label>'+
-                                '<input type="text" class="form-control" name="leyenda3" id="leyenda3" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]">'+
-                            '</div>'+
-                        '</div>'+
+                    '<div class="col-md-3">'+
+                        '<label>Serie</label>'+
+                        '<input type="text" class="form-control" name="serie" id="serie" value="N"  onkeyup="tipoLetra(this)" required readonly data-parsley-length="[1, 10]">'+
                     '</div>'+
-                    '<div role="tabpanel" class="tab-pane fade" id="pagaretab">'+
-                        '<div class="row">'+
-                            '<div class="col-md-12">'+
-                                '<div class="btn bg-blue btn-xs waves-effect" onclick="pagaredefault1()">'+
-                                    'Asignar Pagaré Default 1'+
-                                '</div>'+
-                            '</div>'+
-                            '<div class="col-md-12">'+
-                                '<label>Pagare</label>'+
-                                '<textarea class="form-control" name="pagare" id="pagare" onkeyup="tipoLetra(this);" rows="15" required></textarea>'+
-                            '</div>'+
-                        '</div>'+
+                    '<div class="col-md-3">'+
+                        '<label>Esquema</label>'+
+                        '<select name="esquema" id="esquema" class="form-control select2" style="width:100%"  required>'+
+                            '<option value="'+data.FolioComprobanteNota.Esquema+'" selected>'+data.FolioComprobanteNota.Esquema+'</option>'+
+                        '</select>'+
                     '</div>'+
-                    '<div role="tabpanel" class="tab-pane fade" id="alineartab">'+
-                        '<div class="row">'+
-                            '<div class="col-md-4">'+
-                                '<label>Ubicar Logotipo</label>'+
-                                '<select name="ubicarlogotipo" id="ubicarlogotipo" class="form-control select2" style="width:100%" required>'+
-                                    '<option selected disabled hidden>Selecciona...</option>'+
-                                    '<option value="0" selected>Izquierda</option>'+
-                                    '<option value="1">Derecha</option>'+
-                                '</select>'+
-                            '</div>'+
-                            '<div class="col-md-4">'+
-                                '<label>Alinear Logotipo</label>'+
-                                '<select name="alinearlogotipo" id="alinearlogotipo" class="form-control select2" style="width:100%" required>'+
-                                    '<option selected disabled hidden>Selecciona...</option>'+
-                                    '<option value="0">Arriba Izquierda</option>'+
-                                    '<option value="1">Arriba Centrado</option>'+
-                                    '<option value="2">Arriba Derecha</option>'+
-                                    '<option value="3">Abajo Izquierda</option>'+
-                                    '<option value="4">Abajo Centrado</option>'+
-                                    '<option value="5">Abajo Derecha</option>'+
-                                    '<option value="6">Medio Izquierda</option>'+
-                                    '<option value="7">Medio Centrado</option>'+
-                                    '<option value="8">Medio Derecha</option>'+
-                                    '<option value="9">Recortar</option>'+
-                                    '<option value="10" selected>Ajustar Zoom</option>'+
-                                    '<option value="11">Estrechar</option>'+
-                                    '<option value="12">Imagen de Fondo</option>'+
-                                '</select>'+
-                            '</div>'+
-                            '<div class="col-md-4">'+
-                                '<label>Alinear Empresa</label>'+
-                                '<select name="alinearempresa" id="alinearempresa" class="form-control select2" style="width:100%" required>'+
-                                    '<option selected disabled hidden>Selecciona...</option>'+
-                                    '<option value="0">Arriba Izquierda</option>'+
-                                    '<option value="1">Arriba Centrado</option>'+
-                                    '<option value="2">Arriba Derecha</option>'+
-                                    '<option value="3">Abajo Izquierda</option>'+
-                                    '<option value="4">Abajo Centrado</option>'+
-                                    '<option value="5">Abajo Derecha</option>'+
-                                    '<option value="6">Medio Izquierda</option>'+
-                                    '<option value="7" selected>Medio Centrado</option>'+
-                                    '<option value="8">Medio Derecha</option>'+
-                                    '<option value="9">Arriba</option>'+
-                                    '<option value="10">Abajo</option>'+
-                                    '<option value="11">Medio</option>'+
-                                '</select>'+
-                            '</div>'+
-                        '</div>'+
+                    '<div class="col-md-3">'+
+                        '<label>Titulo</label>'+
+                        '<input type="text" class="form-control" name="titulo" id="titulo" value="NOTA DE CREDITO" onkeyup="tipoLetra(this)" required data-parsley-length="[1, 20]">'+
                     '</div>'+
                 '</div>'+
                 '<div class="row">'+
-                    '<div class="col-md-6 form-check">'+
-                        '<input type="checkbox" name="imprimirlogotipo" id="idimprimirlogotipo" class="filled-in datotabla" value="S" checked readonly />'+
-                        '<label for="idimprimirlogotipo">imprimirlogotipo</label>'+
-                    '</div>'+
-                    '<div class="col-md-6">'+
-                        '<b>Versión 3.3</b>'+
+                    '<div class="col-md-12">'+
+                        '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                            '<li role="presentation" class="active">'+
+                                '<a href="#foliostab" data-toggle="tab">Folios</a>'+
+                            '</li>'+
+                            '<li role="presentation">'+
+                                '<a href="#domiciliotab" data-toggle="tab">Domicilio</a>'+
+                            '</li>'+
+                            '<li role="presentation">'+
+                                '<a href="#pagaretab" data-toggle="tab">Leyenda</a>'+
+                            '</li>'+
+                        '</ul>'+
+                        '<div class="tab-content">'+
+                            '<div role="tabpanel" class="tab-pane fade in active" id="foliostab">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-6">'+
+                                        '<label>Folio Inicial (Las Notas empiezan con este folio)</label>'+
+                                        '<input type="text" class="form-control" name="folioinicial" id="folioinicial" value="1" required >'+
+                                    '</div>'+
+                                '</div>'+   
+                                '<div class="row">'+
+                                    '<div class="col-md-12">'+
+                                        '<input type="checkbox" name="actualizarcertificado" id="idactualizarcertificado" value="1" onchange="mostrardivcertificados();">'+
+                                        '<label for="idactualizarcertificado">Actualizar Certificados</label>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="row" id="divcertificadosempresa" hidden>'+ 
+                                    '<div class="col-md-6">'+
+                                        '<label>Archivo de Certificado (*.cer)</label>'+
+                                        '<input type="file" name="archivocertificado" id="archivocertificado"  class="dropify"  data-parsley-length="[1, 100]" data-allowed-file-extensions="cer" data-height="100" onchange="validararchivostimbrado();" />'+
+                                    '</div>'+ 
+                                    '<div class="col-md-6">'+
+                                        '<label>Archivo Llave Privada (*.key)</label>'+
+                                        '<input type="file" name="archivollaveprivada" id="archivollaveprivada"  class="dropify"  data-parsley-length="[1, 100]" data-allowed-file-extensions="key" data-height="100" onchange="validararchivostimbrado();" />'+
+                                    '</div>'+
+                                    '<div class="col-md-4">'+
+                                        '<label>Contraseña Llave Privada</label>'+
+                                        '<input type="password" class="form-control" name="contrasenallaveprivada" id="contrasenallaveprivada"  data-parsley-length="[1, 100]" onchange="validararchivostimbrado();">'+
+                                    '</div>'+ 
+                                    '<div class="col-md-4">'+
+                                        '<label>Certificado Válido Desde</label>'+
+                                        '<input type="text" class="form-control" name="certificadovalidodesde" id="certificadovalidodesde"  readonly>'+
+                                    '</div>'+ 
+                                    '<div class="col-md-4">'+
+                                        '<label>Certificado Válido Hasta</label>'+
+                                        '<input type="text" class="form-control" name="certificadovalidohasta" id="certificadovalidohasta"  readonly>'+
+                                    '</div>'+ 
+                                '</div>'+ 
+                            '</div>'+
+                            '<div role="tabpanel" class="tab-pane fade" id="domiciliotab">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-12">'+
+                                        '<label>Empresa</label>'+
+                                        '<input type="text" class="form-control" name="empresa" id="empresa" value="'+nombreempresa+'" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]">'+
+                                    '</div>'+
+                                    '<div class="col-md-12">'+
+                                        '<label>Domicilio</label>'+
+                                        '<textarea class="form-control" name="domicilio" id="domicilio" onkeyup="tipoLetra(this);" rows="10" required>'+textareadomicilio+'</textarea>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-md-4">'+
+                                        '<label>Leyenda 1</label>'+
+                                        '<input type="text" class="form-control" name="leyenda1" id="leyenda1" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]">'+
+                                    '</div>'+
+                                    '<div class="col-md-4">'+
+                                        '<label>Leyenda 2</label>'+
+                                        '<input type="text" class="form-control" name="leyenda2" id="leyenda2" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]">'+
+                                    '</div>'+
+                                    '<div class="col-md-4">'+
+                                        '<label>Leyenda 3</label>'+
+                                        '<input type="text" class="form-control" name="leyenda3" id="leyenda3" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]">'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                            '<div role="tabpanel" class="tab-pane fade" id="pagaretab">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-12">'+
+                                        '<div class="btn bg-blue btn-xs waves-effect" onclick="pagaredefault1()">'+
+                                            'Asignar Pagaré Default 1'+
+                                        '</div>'+
+                                    '</div>'+
+                                    '<div class="col-md-12">'+
+                                        '<label>Pagare</label>'+
+                                        '<textarea class="form-control" name="pagare" id="pagare" onkeyup="tipoLetra(this);" rows="15"></textarea>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
+                        '<br>'+
+                        '<div class="row">'+
+                            '<div class="col-md-6">'+
+                                '<b>Versión 3.3</b>'+
+                                '<input type="hidden" class="form-control" name="versioncfdi" id="versioncfdi" value="3.3">'+
+                            '</div>'+
+                        '</div>'+
                     '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
     $("#numero").val(data.FolioComprobanteNota.Numero);
     $("#serie").val(data.FolioComprobanteNota.Serie);
-    $("#esquema").val(data.FolioComprobanteNota.Esquema).change();
     $("#titulo").val(data.FolioComprobanteNota.Titulo);
-    $("#contrasenallaveprivada").val(data.FolioComprobanteNota.Contraseña);
-    $("#numerocertificado").val(data.FolioComprobanteNota.NoCertificado);
-    $("#certificadovalidodesde").val(data.FolioComprobanteNota.ValidoDesde);
-    $("#certificadovalidohasta").val(data.FolioComprobanteNota.ValidoHasta);
+    $("#folioinicial").val(data.FolioComprobanteNota.FolioInicial);
+    if(data.FolioComprobanteNota.Esquema != 'CFDI'){
+        $("#idactualizarcertificado").attr('onclick','javascript: return false');
+    }
     $("#empresa").val(data.FolioComprobanteNota.Empresa);
     $("#domicilio").val(data.FolioComprobanteNota.Domicilio);
     $("#leyenda1").val(data.FolioComprobanteNota.Leyenda1);
     $("#leyenda2").val(data.FolioComprobanteNota.Leyenda2);
     $("#leyenda3").val(data.FolioComprobanteNota.Leyenda3);
-    $("#pagare").val(data.FolioComprobanteNota.Pagare);
-    $("#ubicarlogotipo").val(data.FolioComprobanteNota.UbicarLogotipo).change();
-    $("#alinearlogotipo").val(data.FolioComprobanteNota.AlinearLogotipo).change();
-    $("#alinearempresa").val(data.FolioComprobanteNota.AlinearEmpresa).change();
-    if(data.FolioComprobanteNota.ImprimirLogotipo == 'S'){
-        $("#imprimirlogotipo").attr('checked', 'checked');
-    }else{
-        $("#imprimirlogotipo").removeAttr('checked');
-    }
+    $("#pagare").val(data.FolioComprobanteNota.Leyenda);
+    $('.dropify').dropify();
     mostrarmodalformulario('MODIFICACION');
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {
@@ -555,7 +551,7 @@ $("#btnGuardarModificacion").on('click', function (e) {
 });
 //verificar si la orden de compra se esta utilzando en alguna orden de compra
 function predeterminarfolio(numerofolio){
-    $("#numerofolio").val(numerofolio);
+    $("#numerofoliopred").val(numerofolio);
     $("#btnpredeterminar").show();
     $('#modalpredeterminarfolio').modal('show');
 }

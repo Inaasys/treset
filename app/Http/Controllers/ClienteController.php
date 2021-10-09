@@ -282,6 +282,8 @@ class ClienteController extends ConfiguracionSistemaController{
             $Cliente->Telefonos=$request->telefonos;
             $Cliente->Celular=$request->celular;
             $Cliente->Email1=$request->email1;
+            $Cliente->Email2=$request->email2;
+            $Cliente->Email3=$request->email3;
             $Cliente->Cuenta=$request->cuentaref;
             $Cliente->CuentaServicio=$request->cuentaser;
             $Cliente->Anotaciones=$request->anotaciones;
@@ -417,6 +419,8 @@ class ClienteController extends ConfiguracionSistemaController{
             $Cliente->Telefonos=$request->telefonos;
             $Cliente->Celular=$request->celular;
             $Cliente->Email1=$request->email1;
+            $Cliente->Email2=$request->email2;
+            $Cliente->Email3=$request->email3;
             $Cliente->Cuenta=$request->cuentaref;
             $Cliente->CuentaServicio=$request->cuentaser;
             $Cliente->Anotaciones=$request->anotaciones;

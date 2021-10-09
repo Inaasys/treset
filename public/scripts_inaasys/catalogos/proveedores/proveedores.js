@@ -189,6 +189,14 @@ function alta(){
                             '<input type="text" class="form-control" name="email1" id="email1"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 100]">'+
                         '</div>'+
                         '<div class="col-md-4">'+
+                            '<label>E-mail 2</label>'+
+                            '<input type="text" class="form-control" name="email2" id="email2"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 100]">'+
+                        '</div>'+
+                        '<div class="col-md-4">'+
+                            '<label>E-mail 3</label>'+
+                            '<input type="text" class="form-control" name="email3" id="email3"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 100]">'+
+                        '</div>'+
+                        '<div class="col-md-4">'+
                             '<label>Plazo</label>'+
                             '<input type="number" class="form-control" name="plazo" id="plazo" required>'+
                         '</div>'+
@@ -324,7 +332,15 @@ function obtenerdatos(numeroproveedor){
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>E-mail 1</label>'+
-                                '<input type="text" class="form-control" name="email1" id="email1"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 100]">'+
+                                '<input type="text" class="form-control" name="email1" id="email1"  data-parsley-type="email" data-parsley-length="[1, 100]">'+
+                            '</div>'+
+                            '<div class="col-md-4">'+
+                                '<label>E-mail 2</label>'+
+                                '<input type="text" class="form-control" name="email2" id="email2"  data-parsley-type="email" data-parsley-length="[1, 100]">'+
+                            '</div>'+
+                            '<div class="col-md-4">'+
+                                '<label>E-mail 3</label>'+
+                                '<input type="text" class="form-control" name="email3" id="email3"  data-parsley-type="email" data-parsley-length="[1, 100]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                               '<label>Plazo</label>'+
@@ -348,6 +364,8 @@ function obtenerdatos(numeroproveedor){
     $("#rfc").val(data.proveedor.Rfc);
     $("#codigopostal").val(data.proveedor.CodigoPostal);
     $("#email1").val(data.proveedor.Email1);
+    $("#email2").val(data.proveedor.Email2);
+    $("#email3").val(data.proveedor.Email3);
     $("#plazo").val(data.proveedor.Plazo);
     $("#telefonos").val(data.proveedor.Telefonos);
     if(data.proveedor.SolicitarXML == 1){

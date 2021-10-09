@@ -2550,6 +2550,9 @@ function enviardocumentoemail(documento){
     $("#textomodalenviarpdfemail").html("Enviar email Orden de Trabajo No." + documento);
     $("#emaildocumento").val(documento);
     $("#emailde").val(data.emailde);
+    $("#emailpara").val(data.emailpara);
+    $("#email2cc").val(data.email2cc);
+    $("#email3cc").val(data.email3cc);
     $("#emailasunto").val("ORDEN DE TRABAJO NO. " + documento +" DE "+ nombreempresa);
     $("#modalenviarpdfemail").modal('show');
   })   

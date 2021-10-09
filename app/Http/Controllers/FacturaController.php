@@ -137,9 +137,9 @@ class FacturaController extends ConfiguracionSistemaController{
                                                 '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Factura .'\')">Bajas</a></li>'.
                                                 '<li><a href="javascript:void(0);" onclick="obtenerkardex(\''.$data->Factura .'\')">Ver Movimientos</a></li>'.
                                                 '<li><a href="'.route('facturas_generar_pdfs_indiv',$data->Factura).'" target="_blank">Ver Documento Interno PDF</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Factura .'\',1)">Enviar Documento Interno por Correo</a></li>'.
+                                                //'<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Factura .'\',1)">Enviar Documento Interno por Correo</a></li>'.
                                                 '<li><a href="'.route('facturas_generar_pdfs_cliente_indiv',$data->Factura).'" target="_blank">Ver Documento Cliente PDF</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Factura .'\',0)">Enviar Documento Cliente por Correo</a></li>'.
+                                                //'<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Factura .'\',0)">Enviar Documento Cliente por Correo</a></li>'.
                                                 //'<li><a href="javascript:void(0);" onclick="timbrarfactura(\''.$data->Factura .'\')">Timbrar Factura</a></li>'.
                                                 //'<li><a href="javascript:void(0);" onclick="cancelartimbre(\''.$data->Factura .'\')">Cancelar Timbre</a></li>'.
                                             '</ul>'.
@@ -2304,7 +2304,9 @@ class FacturaController extends ConfiguracionSistemaController{
             'factura' => $factura,
             'cliente' => $cliente,
             'emailde' => Config::get('mail.from.address'),
-            'emailpara' => $cliente->Email1
+            'emailpara' => $cliente->Email1,
+            'email2cc' => $cliente->Email2,
+            'email3cc' => $cliente->Email3
         );
         return response()->json($data);
     }
@@ -2487,6 +2489,14 @@ class FacturaController extends ConfiguracionSistemaController{
             //enviar correo electrónico	
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
+            $arraycc = array();
+            array_push($arraycc, $request->emailpara);
+            if($request->email2cc != ""){
+                array_push($arraycc, $request->email2cc);
+            }
+            if($request->email3cc != ""){
+                array_push($arraycc, $request->email3cc);
+            }
             $correos = [$request->emailpara];
             $asunto = $request->emailasunto;
             $emaildocumento = $request->emaildocumento;
@@ -2495,9 +2505,9 @@ class FacturaController extends ConfiguracionSistemaController{
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             if (file_exists($url_xml) != false) {
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento,$url_xml) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento,$url_xml) {
                     $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento,$url_xml)
-                            ->cc($correos)
+                            ->cc($arraycc)
                             ->subject($asunto)
                             ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf")
                             ->attach($url_xml);
@@ -2866,6 +2876,14 @@ class FacturaController extends ConfiguracionSistemaController{
             //enviar correo electrónico	
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
+            $arraycc = array();
+            array_push($arraycc, $request->emailpara);
+            if($request->email2cc != ""){
+                array_push($arraycc, $request->email2cc);
+            }
+            if($request->email3cc != ""){
+                array_push($arraycc, $request->email3cc);
+            }
             $correos = [$request->emailpara];
             $asunto = $request->emailasunto;
             $emaildocumento = $request->emaildocumento;
@@ -2874,9 +2892,9 @@ class FacturaController extends ConfiguracionSistemaController{
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             if (file_exists($url_xml) != false) {
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento,$url_xml) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento,$url_xml) {
                     $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento,$url_xml)
-                            ->cc($correos)
+                            ->cc($arraycc)
                             ->subject($asunto)
                             ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf")
                             ->attach($url_xml);

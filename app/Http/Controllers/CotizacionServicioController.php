@@ -1195,7 +1195,9 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
             'cotizacionservicio' => $cotizacionservicio,
             'cliente' => $cliente,
             'emailde' => Config::get('mail.from.address'),
-            'emailpara' => $cliente->Email1
+            'emailpara' => $cliente->Email1,
+            'email2cc' => $cliente->Email2,
+            'email3cc' => $cliente->Email3
         );
         return response()->json($data);
     }
@@ -1257,6 +1259,14 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
             //enviar correo electrónico	
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
+            $arraycc = array();
+            array_push($arraycc, $request->emailpara);
+            if($request->email2cc != ""){
+                array_push($arraycc, $request->email2cc);
+            }
+            if($request->email3cc != ""){
+                array_push($arraycc, $request->email3cc);
+            }
             $correos = [$request->emailpara];
             $asunto = $request->emailasunto;
             $emaildocumento = $request->emaildocumento;
@@ -1264,9 +1274,9 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
             $body = $request->emailasunto;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
-            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
+            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
                 $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
-                        ->cc($correos)
+                        ->cc($arraycc)
                         ->subject($asunto)
                         ->attachData($pdf->output(), "CotizacionServicioNo".$emaildocumento.".pdf");
             });
@@ -1396,6 +1406,14 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
             //enviar correo electrónico	
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
+            $arraycc = array();
+            array_push($arraycc, $request->emailpara);
+            if($request->email2cc != ""){
+                array_push($arraycc, $request->email2cc);
+            }
+            if($request->email3cc != ""){
+                array_push($arraycc, $request->email3cc);
+            }
             $correos = [$request->emailpara];
             $asunto = $request->emailasunto;
             $emaildocumento = $request->emaildocumento;
@@ -1403,9 +1421,9 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
             $body = $request->emailasunto;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
-            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
+            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
                 $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
-                        ->cc($correos)
+                        ->cc($arraycc)
                         ->subject($asunto)
                         ->attachData($pdf->output(), "CotizacionServicioClienteNo".$emaildocumento.".pdf");
             });

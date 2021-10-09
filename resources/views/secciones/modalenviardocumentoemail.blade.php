@@ -24,6 +24,18 @@
                             </div>
                         </div>
                         <div class="col-md-12">
+                            <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CC:</label>
+                            <div class="col-md-12 form-check">
+                                <input type="text" class="form-control" name="email2cc" id="email2cc" data-parsley-type="email">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CC:</label>
+                            <div class="col-md-12 form-check">
+                                <input type="text" class="form-control" name="email3cc" id="email3cc" data-parsley-type="email">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
                             <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Asunto:</label>
                             <div class="col-md-12 form-check">
                                 <textarea class="form-control" name="emailasunto" id="emailasunto"  required rows="4" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>

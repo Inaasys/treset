@@ -1106,6 +1106,9 @@ function enviardocumentoemail(documento){
     $("#textomodalenviarpdfemail").html("Enviar email Ajuste de Inventario No." + documento);
     $("#emaildocumento").val(documento);
     $("#emailde").val(data.emailde);
+    $("#emailpara").val(data.emailpara);
+    $("#email2cc").val(data.email2cc);
+    $("#email3cc").val(data.email3cc);
     $("#emailasunto").val("AJUSTE DE INVENTARIO NO. " + documento +" DE "+ nombreempresa);
     $("#modalenviarpdfemail").modal('show');
   })   

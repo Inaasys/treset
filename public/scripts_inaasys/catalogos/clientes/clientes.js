@@ -849,8 +849,18 @@ function alta(){
                   '<div class="row">'+
                       '<div class="col-md-4">'+
                           '<label>E-mail 1</label>'+
-                          '<input type="text" class="form-control" name="email1" id="email1"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 100]">'+
+                          '<input type="text" class="form-control" name="email1" id="email1"  data-parsley-type="email" data-parsley-length="[1, 100]">'+
                       '</div>'+
+                      '<div class="col-md-4">'+
+                          '<label>E-mail 2</label>'+
+                          '<input type="text" class="form-control" name="email2" id="email2"  data-parsley-type="email" data-parsley-length="[1, 100]">'+
+                      '</div>'+
+                      '<div class="col-md-4">'+
+                          '<label>E-mail 3</label>'+
+                          '<input type="text" class="form-control" name="email3" id="email3"  data-parsley-type="email" data-parsley-length="[1, 100]">'+
+                      '</div>'+
+                  '</div>'+
+                  '<div class="row">'+
                       '<div class="col-md-4">'+
                           '<label>Cuenta Ref</label>'+
                           '<input type="text" class="form-control" name="cuentaref" id="cuentaref" data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);">'+
@@ -859,8 +869,6 @@ function alta(){
                           '<label>Cuenta Ser</label>'+
                           '<input type="text" class="form-control" name="cuentaser" id="cuentaser" data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
-                  '</div>'+
-                  '<div class="row">'+
                       '<div class="col-md-4">'+
                           '<label>Anotaciones</label>'+
                           '<textarea class="form-control" name="anotaciones" id="anotaciones"  data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
@@ -1286,6 +1294,16 @@ function obtenerdatos(numerocliente){
                             '<input type="text" class="form-control" name="email1" id="email1"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 100]">'+
                         '</div>'+
                         '<div class="col-md-4">'+
+                            '<label>E-mail 2</label>'+
+                            '<input type="text" class="form-control" name="email2" id="email2"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 100]">'+
+                        '</div>'+
+                        '<div class="col-md-4">'+
+                            '<label>E-mail 3</label>'+
+                            '<input type="text" class="form-control" name="email3" id="email3"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 100]">'+
+                        '</div>'+
+                    '</div>'+
+                    '<div class="row">'+
+                        '<div class="col-md-4">'+
                             '<label>Cuenta Ref</label>'+
                             '<input type="text" class="form-control" name="cuentaref" id="cuentaref" data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
@@ -1293,8 +1311,6 @@ function obtenerdatos(numerocliente){
                             '<label>Cuenta Ser</label>'+
                             '<input type="text" class="form-control" name="cuentaser" id="cuentaser" data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
-                    '</div>'+
-                    '<div class="row">'+
                         '<div class="col-md-4">'+
                             '<label>Anotaciones</label>'+
                             '<textarea class="form-control" name="anotaciones" id="anotaciones"  data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
@@ -1376,6 +1392,8 @@ function obtenerdatos(numerocliente){
     $("#telefonos").val(data.cliente.Telefonos);
     $("#celular").val(data.cliente.Celular);
     $("#email1").val(data.cliente.Email1);
+    $("#email2").val(data.cliente.Email2);
+    $("#email3").val(data.cliente.Email3);
     $("#cuentaref").val(data.cliente.Cuenta);
     $("#cuentaser").val(data.cliente.CuentaServicio);
     $("#anotaciones").val(data.cliente.Anotaciones);

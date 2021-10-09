@@ -6,8 +6,8 @@
     @include('secciones.libreriascss') 
 @endsection
 @section('content')
-<section class="content">
-    <div class="container-fluid">
+    <section class="content">
+        <div class="container-fluid">
             @include('secciones.nombreempresa')
             <!-- Basic Examples -->
             <div class="row clearfix">
@@ -60,75 +60,75 @@
                 </div>
             </div>
             <!-- #END# Basic Examples -->
-    </div>
-</section>
-<!-- Modal Alta/Modificacion-->
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="ModalFormulario" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div id="formulario">
-                <div class="modal-header {{$empresa->background_forms_and_modals}}">
-                    <h4 class="modal-title" id="titulomodal"></h4>
-                </div>
-                <div class="modal-body">
-                    <form id="formparsley" action="#" enctype="multipart/form-data">
-                        <div class="col-md-12" id="tabsform">
-                            <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
-                        </div>
-                    </form> 
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
-                    <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
-                    <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
-                </div>
-            </div> 
-            <div id="contenidomodaltablas">
-                <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
-            </div>    
+        </div>
+    </section>
+    <!-- Modal Alta/Modificacion-->
+    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="ModalFormulario" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div id="formulario">
+                    <div class="modal-header {{$empresa->background_forms_and_modals}}">
+                        <h4 class="modal-title" id="titulomodal"></h4>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formparsley" action="#" enctype="multipart/form-data">
+                            <div class="col-md-12" id="tabsform">
+                                <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
+                            </div>
+                        </form> 
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
+                        <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
+                        <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
+                    </div>
+                </div> 
+                <div id="contenidomodaltablas">
+                    <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
+                </div>    
+            </div>
         </div>
     </div>
-</div>
-<!-- Modal Baja o Alta-->
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="estatusregistro" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  	<div class="modal-dialog" role="document">
-    	<div class="modal-content">
-      		<div class="modal-header {{$empresa->background_forms_and_modals}}">
-        		<h5 class="modal-title" id="exampleModalLabel">Aviso</h5>
-      		</div>
-      		<div class="modal-body">
-		      	<form id="formdesactivar" action="#">
-                  <h5>Esta seguro de dar de baja este registro?</h5>
-		        	<input type="hidden" id="numerofolio" name="numerofolio">
-		        </form>	
-      		</div>
-	      	<div class="modal-footer">
-	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
-	        	<button type="button" class="btn btn-success btn-sm" id="aceptar">Confirmar Baja</button>
-	      	</div>
-    	</div>
-  	</div>
-</div> 
-<!-- Modal Predeterminar Folio-->
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalpredeterminarfolio" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  	<div class="modal-dialog" role="document">
-    	<div class="modal-content">
-      		<div class="modal-header {{$empresa->background_forms_and_modals}}">
-        		<h5 class="modal-title" id="exampleModalLabel">Aviso</h5>
-      		</div>
-      		<div class="modal-body">
-		      	<form id="formpredeterminar" action="#">
-		        	<h5>Esta seguro de asignar como default este folio?</h5>
-		        	<input type="hidden" id="numerofoliopred" name="numerofoliopred">
-		        </form>	
-      		</div>
-	      	<div class="modal-footer">
-	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
-	        	<button type="button" class="btn btn-success btn-sm" id="btnpredeterminar">Predeterminar</button>
-	      	</div>
-    	</div>
-  	</div>
-</div> 
+    <!-- Modal Baja o Alta-->
+    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="estatusregistro" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header {{$empresa->background_forms_and_modals}}">
+                    <h5 class="modal-title" id="exampleModalLabel">Aviso</h5>
+                </div>
+                <div class="modal-body">
+                    <form id="formdesactivar" action="#">
+                    <h5>Esta seguro de dar de baja este registro?</h5>
+                        <input type="hidden" id="numerofolio" name="numerofolio">
+                    </form>	
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
+                    <button type="button" class="btn btn-success btn-sm" id="aceptar">Confirmar Baja</button>
+                </div>
+            </div>
+        </div>
+    </div> 
+    <!-- Modal Predeterminar Folio-->
+    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalpredeterminarfolio" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header {{$empresa->background_forms_and_modals}}">
+                    <h5 class="modal-title" id="exampleModalLabel">Aviso</h5>
+                </div>
+                <div class="modal-body">
+                    <form id="formpredeterminar" action="#">
+                        <h5>Esta seguro de asignar como default este folio?</h5>
+                        <input type="hidden" id="numerofoliopred" name="numerofoliopred">
+                    </form>	
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
+                    <button type="button" class="btn btn-success btn-sm" id="btnpredeterminar">Predeterminar</button>
+                </div>
+            </div>
+        </div>
+    </div> 
 @endsection
 @section('additionals_js')
     <script>

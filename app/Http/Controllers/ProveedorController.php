@@ -109,6 +109,8 @@ class ProveedorController extends ConfiguracionSistemaController{
 		    $Proveedor->Rfc=$request->rfc;
             $Proveedor->CodigoPostal=$request->codigopostal;
             $Proveedor->Email1=$request->email1;
+            $Proveedor->Email2=$request->email2;
+            $Proveedor->Email3=$request->email3;
             $Proveedor->Plazo=$request->plazo;
             $Proveedor->Telefonos=$request->telefonos;
             $Proveedor->Status='ALTA';
@@ -154,6 +156,8 @@ class ProveedorController extends ConfiguracionSistemaController{
 		    $Proveedor->Rfc=$request->rfc;
             $Proveedor->CodigoPostal=$request->codigopostal;
             $Proveedor->Email1=$request->email1;
+            $Proveedor->Email2=$request->email2;
+            $Proveedor->Email3=$request->email3;
             $Proveedor->Plazo=$request->plazo;
             $Proveedor->Telefonos=$request->telefonos;	  
             $Proveedor->SolicitarXML = $request->solicitarxmlencompras;
