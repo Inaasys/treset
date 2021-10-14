@@ -708,7 +708,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     '<td class="tdmod"><div class="divorinputmodmd">'.
                     $botoneliminarfila.
                     $botonasignartecnicos.
-                    '<input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dot->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly>'.
+                    '<input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly>'.
                     '</div></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control tipofila" name="tipofila[]" value="consultado" readonly><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dot->Codigo.'" readonly data-parsley-length="[1, 20]">'.$dot->Codigo.'</td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($dot->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.

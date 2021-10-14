@@ -326,7 +326,7 @@ function generar_formato_excel(){
         var tipo = $("#tipo").val();
         var status = $("#status").val();
         var reporte = $("#reporte").val();
-        $("#btnGenerarFormatoReporteRelacionOrdenesCompra").attr("href", urlgenerarformatoexcelrelacionordenescompra+'?fechainicialreporte='+fechainicialreporte+'&fechafinalreporte='+fechafinalreporte+'&numeroproveedor='+numeroproveedor+'&numeroalmacen='+numeroalmacen+'&tipo='+tipo+'&status='+status+'&reporte='+reporte);
+        $("#btnGenerarFormatoReporteRelacionOrdenesCompra").attr("href", urlgenerarformatoexcel+'?fechainicialreporte='+fechainicialreporte+'&fechafinalreporte='+fechafinalreporte+'&numeroproveedor='+numeroproveedor+'&numeroalmacen='+numeroalmacen+'&tipo='+tipo+'&status='+status+'&reporte='+reporte);
         $("#btnGenerarFormatoReporteRelacionOrdenesCompra").click();
     }else{
         form.parsley().validate();
@@ -353,7 +353,7 @@ function listar(){
     }
     $("#cabecerastablareporte").html(cabecerastablareporte);
     tabla=$('#tbllistado').DataTable({
-        "lengthMenu": [ 1000, 2000 ],
+        "lengthMenu": [ 500, 1000 ],
         "sScrollX": "110%",
         "sScrollY": "300px",
         "bScrollCollapse": true,  
@@ -362,7 +362,7 @@ function listar(){
         "ordering": false,
         "info":     true,
         "searching": false,
-        "iDisplayLength": 1000,//paginacion cada 50 registros
+        "iDisplayLength": 500,//paginacion cada 50 registros
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',

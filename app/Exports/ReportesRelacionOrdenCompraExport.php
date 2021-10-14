@@ -2,7 +2,6 @@
 
 namespace App\Exports;
 
-
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -11,6 +10,7 @@ use Maatwebsite\Excel\Concerns\FromQuery;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Jenssegers\Date\Date;
@@ -21,7 +21,7 @@ use App\Proveedor;
 use App\Almacen;
 use DB;
 
-class ReportesRelacionOrdenCompraExport implements FromCollection,WithHeadings,WithTitle
+class ReportesRelacionOrdenCompraExport implements FromCollection,WithHeadings,WithTitle,WithColumnWidths
 {
 
     /**
@@ -56,9 +56,51 @@ class ReportesRelacionOrdenCompraExport implements FromCollection,WithHeadings,W
         $this->empresa = $empresa;
     }
 
+    public function columnWidths(): array
+    {
+        return [
+            'A' => 15,
+            'B' => 15,
+            'C' => 15,
+            'D' => 15,
+            'E' => 15,
+            'F' => 15,
+            'G' => 15,
+            'H' => 15,
+            'I' => 15,
+            'J' => 15,
+            'K' => 15,
+            'L' => 15,
+            'M' => 15,
+            'N' => 15,
+            'O' => 15,
+            'P' => 15,
+            'Q' => 15,
+            'R' => 15,
+            'S' => 15,
+            'T' => 15,
+            'U' => 15,
+            'V' => 15,
+            'W' => 15,
+            'X' => 15,
+            'Y' => 15,
+            'Z' => 15,
+            'AA' => 15,
+            'AB' => 15,
+            'AC' => 15,
+            'AD' => 15,
+            'AE' => 15,
+            'AF' => 15,
+            'AG' => 15,
+            'AH' => 15,
+            'AI' => 15,
+            'AJ' => 15            
+        ];
+    }
+
     //titulo de la hoja de excel
     public function title(): string{
-        return 'Relación Ordenes Compra';
+        return 'Relación Ordenes Compra'.$this->reporte;
     }
 
     public function headings(): array{
@@ -78,10 +120,10 @@ class ReportesRelacionOrdenCompraExport implements FromCollection,WithHeadings,W
             ->orderby('oc.Folio', 'ASC')
             ->get();
             if($this->numeroproveedor != ""){
-                $data = $data->where('oc.Proveedor', $this->numeroproveedor);
+                $data = $data->where('Proveedor', $this->numeroproveedor);
             }
             if($this->numeroalmacen != ""){
-                $data = $data->where('oc.Almacen', $this->numeroalmacen);
+                $data = $data->where('Almacen', $this->numeroalmacen);
             }
             if($this->tipo != 'TODOS'){
                 $data = $data->where('Tipo', $this->tipo);
@@ -99,10 +141,10 @@ class ReportesRelacionOrdenCompraExport implements FromCollection,WithHeadings,W
             ->orderby('oc.Folio', 'ASC')
             ->get();
             if($this->numeroproveedor != ""){
-                $data = $data->where('oc.Proveedor', $this->numeroproveedor);
+                $data = $data->where('Proveedor', $this->numeroproveedor);
             }
             if($this->numeroalmacen != ""){
-                $data = $data->where('oc.Almacen', $this->numeroalmacen);
+                $data = $data->where('Almacen', $this->numeroalmacen);
             }
             if($this->tipo != 'TODOS'){
                 $data = $data->where('Tipo', $this->tipo);

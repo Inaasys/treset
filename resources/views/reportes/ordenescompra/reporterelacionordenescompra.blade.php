@@ -82,8 +82,6 @@
                                     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
                                         <label>Tipo</label>
                                         <select class="form-control select2" name="tipo" id="tipo" onchange="generar_reporte()"  required>
-                                            <option value="LIQUIDADA">LIQUIDADA</option>
-                                            <option value="POR PAGAR">POR PAGAR</option>
                                         </select>
                                     </div> 
                                     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
@@ -145,7 +143,7 @@
         var numerodecimales = '{{$numerodecimales}}';
         var numerocerosconfigurados = '{{$numerocerosconfigurados}}';
         var numerocerosconfiguradosinputnumberstep = '{{$numerocerosconfiguradosinputnumberstep}}';
-        var urlgenerarformatoexcelrelacionordenescompra = '{{$urlgenerarformatoexcelrelacionordenescompra}}';
+        var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';

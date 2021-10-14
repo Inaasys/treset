@@ -28,8 +28,8 @@ class ReportesOrdenesCompraController extends ConfiguracionSistemaController{
 
     //vista
     public function reporte_relacion_ordenes_compra(Request $request){
-        $urlgenerarformatoexcelrelacionordenescompra = route('reporte_relacion_ordenes_compra_generar_formato_excel');
-        return view('reportes.ordenescompra.reporterelacionordenescompra', compact('urlgenerarformatoexcelrelacionordenescompra'));
+        $urlgenerarformatoexcel = route('reporte_relacion_ordenes_compra_generar_formato_excel');
+        return view('reportes.ordenescompra.reporterelacionordenescompra', compact('urlgenerarformatoexcel'));
     }
     //obtener tipos ordenes de compra
     public function reporte_relacion_ordenes_compra_obtener_tipos_ordenes_compra(Request $request){
@@ -114,10 +114,10 @@ class ReportesOrdenesCompraController extends ConfiguracionSistemaController{
             ->orderby('oc.Folio', 'ASC')
             ->get();
             if($request->numeroproveedor != ""){
-                $data = $data->where('oc.Proveedor', $request->numeroproveedor);
+                $data = $data->where('Proveedor', $request->numeroproveedor);
             }
             if($request->numeroalmacen != ""){
-                $data = $data->where('oc.Almacen', $request->numeroalmacen);
+                $data = $data->where('Almacen', $request->numeroalmacen);
             }
             if($request->tipo != 'TODOS'){
                 $data = $data->where('Tipo', $request->tipo);
@@ -125,6 +125,11 @@ class ReportesOrdenesCompraController extends ConfiguracionSistemaController{
             if($request->status != 'TODOS'){
                 $data = $data->where('Status', $request->status);
             }
+            return DataTables::of($data)
+            ->addColumn('Nombre', function($data){ return substr($data->Nombre, 0, 30); })
+            ->addColumn('Obs', function($data){ return substr($data->Obs, 0, 30); })
+            ->addColumn('MotivoBaja', function($data){ return substr($data->MotivoBaja, 0, 30); })
+            ->make(true);
         }else{
             $data = DB::table('Ordenes de Compra as oc')
             ->leftjoin('Proveedores as p', 'oc.Proveedor', '=', 'p.Numero')
@@ -135,10 +140,10 @@ class ReportesOrdenesCompraController extends ConfiguracionSistemaController{
             ->orderby('oc.Folio', 'ASC')
             ->get();
             if($request->numeroproveedor != ""){
-                $data = $data->where('oc.Proveedor', $request->numeroproveedor);
+                $data = $data->where('Proveedor', $request->numeroproveedor);
             }
             if($request->numeroalmacen != ""){
-                $data = $data->where('oc.Almacen', $request->numeroalmacen);
+                $data = $data->where('Almacen', $request->numeroalmacen);
             }
             if($request->tipo != 'TODOS'){
                 $data = $data->where('Tipo', $request->tipo);
@@ -146,13 +151,17 @@ class ReportesOrdenesCompraController extends ConfiguracionSistemaController{
             if($request->status != 'TODOS'){
                 $data = $data->where('Status', $request->status);
             }
+            return DataTables::of($data)
+            ->addColumn('Nombre', function($data){ return substr($data->Nombre, 0, 30); })
+            ->addColumn('Descripcion', function($data){ return substr($data->Descripcion, 0, 30); })
+            ->addColumn('Obs', function($data){ return substr($data->Obs, 0, 30); })
+            ->addColumn('MotivoBaja', function($data){ return substr($data->MotivoBaja, 0, 30); })
+            ->make(true);
         }
-        return DataTables::of($data)
-        ->make(true);
     }
     //generar excel reporte relacion ordenes compra
     public function reporte_relacion_ordenes_compra_generar_formato_excel(Request $request){
-        return Excel::download(new ReportesRelacionOrdenCompraExport($request->fechainicialreporte, $request->fechafinalreporte, $request->numeroproveedor, $request->numeroalmacen, $request->tipo, $request->status, $request->reporte, $this->numerodecimales, $this->empresa), "formatorelacionordenescompra.xlsx"); 
+        return Excel::download(new ReportesRelacionOrdenCompraExport($request->fechainicialreporte, $request->fechafinalreporte, $request->numeroproveedor, $request->numeroalmacen, $request->tipo, $request->status, $request->reporte, $this->numerodecimales, $this->empresa), "formatorelacionordenescompra-".$request->reporte.".xlsx"); 
     }
 
 }

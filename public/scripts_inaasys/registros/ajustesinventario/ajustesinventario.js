@@ -127,6 +127,53 @@ function listar(){
     obtenerdatos(data.Ajuste);
   });
 }
+
+
+//realizar en reporte en excel
+function descargar_plantilla(){
+  $("#btnGenerarPlantilla").attr("href", urlgenerarplantilla);
+  $("#btnGenerarPlantilla").click();
+}
+function seleccionarpartidasexcel(){
+  $("#partidasexcel").click();
+}
+//Cada que se elija un archivo
+function cargarpartidasexcel(e) {
+  $("#btnenviarpartidasexcel").click();
+}
+//Agregar respuesta a la datatable
+$("#btnenviarpartidasexcel").on('click', function(e){
+  e.preventDefault();
+  var partidasexcel = $('#partidasexcel')[0].files[0];
+  var numeroalmacen = $("#numeroalmacen").val();
+  var form_data = new FormData();
+  form_data.append('partidasexcel', partidasexcel); 
+  form_data.append('numeroalmacen', numeroalmacen);
+  form_data.append('contadorproductos', contadorproductos);
+  form_data.append('contadorfilas', contadorfilas);
+  $.ajax({
+    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+    url:ajustesinventario_cargar_partidas_excel,
+    data: form_data,
+    type: 'POST',
+    contentType: false,
+    processData: false,
+    success: function (data) {
+      console.log(data);
+      contadorfilas = data.contadorfilas;
+      contadorproductos = data.contadorproductos;
+      $("#tablaproductosajuste tbody").append(data.filasdetallesajuste);
+      
+      comprobarfilas();
+      calculartotales();
+    },
+    error: function (data) {
+      console.log(data);
+    }
+  });                      
+});
+
+
 //obtener series documento
 function obtenerseriesdocumento(){
   ocultarformulario();
@@ -739,6 +786,18 @@ function alta(){
                       '</table>'+
                     '</div>'+
                   '</div>'+ 
+
+                  '<div class="row">'+
+                    '<div class="col-md-12">'+   
+                      '<table>'+
+                        '<tr>'+
+                          '<td><div type="button" class="btn btn-success btn-sm" onclick="seleccionarpartidasexcel()">Subir partidas en excel</div></td>'+
+                          '<td data-toggle="tooltip" data-placement="top" title data-original-title="Bajar plantilla"><a class="material-icons" onclick="descargar_plantilla()" id="btnGenerarPlantilla" target="_blank">get_app</a></td>'+
+                        '</tr>'+
+                      '</table>'+
+                    '</div>'+ 
+                  '</div>'+
+
                   '<div class="row">'+
                     '<div class="col-md-6">'+   
                       '<label>Observaciones</label>'+
@@ -757,6 +816,13 @@ function alta(){
               '</div>'+ 
             '</div>';
   $("#tabsform").html(tabs);
+  //mostrar mensaje de bajar plantilla
+  $('[data-toggle="tooltip"]').tooltip({
+    container: 'body'
+  });
+  //asignar alamcen 1 por default
+  $("#numeroalmacen").val(1);
+  obteneralmacenpornumero();
   $("#serie").val(serieusuario);
   $("#serietexto").html("Serie: "+serieusuario);
   obtenultimonumero();

@@ -624,6 +624,12 @@ Route::group(['middleware' => ['auth']], function () {
     //Ajuste Inventario
     Route::get('/ajustesinventario', 'AjusteInventarioController@ajustesinventario')->name('ajustesinventario')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
     Route::get('/ajustesinventario_obtener', 'AjusteInventarioController@ajustesinventario_obtener')->name('ajustesinventario_obtener')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
+    
+    
+    Route::get('/ajustesinventario_generar_plantilla', 'AjusteInventarioController@ajustesinventario_generar_plantilla')->name('ajustesinventario_generar_plantilla')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
+    Route::post('/ajustesinventario_cargar_partidas_excel', 'AjusteInventarioController@ajustesinventario_cargar_partidas_excel')->name('ajustesinventario_cargar_partidas_excel')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
+    
+    
     Route::get('/ajustesinventario_obtener_series_documento', 'AjusteInventarioController@ajustesinventario_obtener_series_documento')->name('ajustesinventario_obtener_series_documento')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
     Route::get('/ajustesinventario_obtener_ultimo_folio_serie_seleccionada', 'AjusteInventarioController@ajustesinventario_obtener_ultimo_folio_serie_seleccionada')->name('ajustesinventario_obtener_ultimo_folio_serie_seleccionada')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
     Route::get('/ajustesinventario_obtener_ultimo_id', 'AjusteInventarioController@ajustesinventario_obtener_ultimo_id')->name('ajustesinventario_obtener_ultimo_id')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
@@ -823,15 +829,26 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/facturas_baja_timbre', 'FacturaController@facturas_baja_timbre')->name('facturas_baja_timbre')->middleware('revisarpermisos:registros.facturas.cancelartimbres');
     /* -----------------------------------||||||||||||||||||||FIN REGISTROS||||||||||||||||||||||-------------------------------------*/
     /* -----------------------------------||||||||||||||||||||REPORTES||||||||||||||||||||||-------------------------------------*/
+    /*#################################COMPRAS##########################################*/
+    //reporte caja chica
+    Route::get('/reporte_caja_chica', 'ReporteCajaChicaController@reporte_caja_chica')->name('reporte_caja_chica')->middleware('revisaraccesomenu:menureportescomprascajachica');
+    Route::get('/generar_reporte_caja_chica', 'ReporteCajaChicaController@generar_reporte_caja_chica')->name('generar_reporte_caja_chica')->middleware('revisaraccesomenu:menureportescomprascajachica');
+    Route::get('/reporte_caja_chica_generar_formato_excel', 'ReporteCajaChicaController@reporte_caja_chica_generar_formato_excel')->name('reporte_caja_chica_generar_formato_excel')->middleware('revisaraccesomenu:menureportescomprascajachica');
+    //reporte relacion compras
+    Route::get('/reporte_relacion_compras', 'ReportesComprasController@reporte_relacion_compras')->name('reporte_relacion_compras')->middleware('revisaraccesomenu:menureporterelacioncompras');
+    Route::get('/reporte_relacion_compras_generar_formato_excel', 'ReportesComprasController@reporte_relacion_compras_generar_formato_excel')->name('reporte_relacion_compras_generar_formato_excel')->middleware('revisaraccesomenu:menureporterelacioncompras');
+    Route::get('/reporte_relacion_compras_obtener_tipos_ordenes_compra', 'ReportesComprasController@reporte_relacion_compras_obtener_tipos_ordenes_compra')->name('reporte_relacion_compras_obtener_tipos_ordenes_compra')->middleware('revisaraccesomenu:menureporterelacioncompras');
+    Route::get('/reporte_relacion_compras_obtener_proveedores', 'ReportesComprasController@reporte_relacion_compras_obtener_proveedores')->name('reporte_relacion_compras_obtener_proveedores')->middleware('revisaraccesomenu:menureporterelacioncompras');
+    Route::get('/reporte_relacion_compras_obtener_almacenes', 'ReportesComprasController@reporte_relacion_compras_obtener_almacenes')->name('reporte_relacion_compras_obtener_almacenes')->middleware('revisaraccesomenu:menureporterelacioncompras');
+    Route::get('/reporte_relacion_compras_obtener_proveedor_por_numero', 'ReportesComprasController@reporte_relacion_compras_obtener_proveedor_por_numero')->name('reporte_relacion_compras_obtener_proveedor_por_numero')->middleware('revisaraccesomenu:menureporterelacioncompras');
+    Route::get('/reporte_relacion_compras_obtener_almacen_por_numero', 'ReportesComprasController@reporte_relacion_compras_obtener_almacen_por_numero')->name('reporte_relacion_compras_obtener_almacen_por_numero')->middleware('revisaraccesomenu:menureporterelacioncompras');
+    Route::get('/reporte_relacion_compras_generar_reporte', 'ReportesComprasController@reporte_relacion_compras_generar_reporte')->name('reporte_relacion_compras_generar_reporte')->middleware('revisaraccesomenu:menureporterelacioncompras');
+    /*###############################FIN COMPRAS##################################3*/
     //reporte diario de ventas
     Route::get('/reporte_diario_ventas', 'ReporteFacturaController@reporte_diario_ventas')->name('reporte_diario_ventas')->middleware('revisaraccesomenu:menureportesfacturasventasdiarias');
     Route::get('/generar_reporte_diario_ventas', 'ReporteFacturaController@generar_reporte_diario_ventas')->name('generar_reporte_diario_ventas')->middleware('revisaraccesomenu:menureportesfacturasventasdiarias');
     Route::get('/reporte_ventas_diarias_obtener_clientes', 'ReporteFacturaController@reporte_ventas_diarias_obtener_clientes')->name('reporte_ventas_diarias_obtener_clientes')->middleware('revisaraccesomenu:menureportesfacturasventasdiarias');
     Route::post('/generar_excel_reporte_diario_ventas', 'ReporteFacturaController@generar_excel_reporte_diario_ventas')->name('generar_excel_reporte_diario_ventas')->middleware('revisaraccesomenu:menureportesfacturasventasdiarias');
-    //reporte caja chica
-    Route::get('/reporte_caja_chica', 'ReporteCajaChicaController@reporte_caja_chica')->name('reporte_caja_chica')->middleware('revisaraccesomenu:menureportescomprascajachica');
-    Route::get('/generar_reporte_caja_chica', 'ReporteCajaChicaController@generar_reporte_caja_chica')->name('generar_reporte_caja_chica')->middleware('revisaraccesomenu:menureportescomprascajachica');
-    Route::get('/reporte_caja_chica_generar_formato_excel', 'ReporteCajaChicaController@reporte_caja_chica_generar_formato_excel')->name('reporte_caja_chica_generar_formato_excel')->middleware('revisaraccesomenu:menureportescomprascajachica');
     //reporte horas tecnico
     Route::get('/reporte_ordenes_trabajo_horas_tecnico', 'ReportesOrdenesTrabajoController@reporte_ordenes_trabajo_horas_tecnico')->name('reporte_ordenes_trabajo_horas_tecnico')->middleware('revisaraccesomenu:menureportesordenestrabajohorastecnico');
     Route::get('/generar_reporte_horas_tecnico', 'ReportesOrdenesTrabajoController@generar_reporte_horas_tecnico')->name('generar_reporte_horas_tecnico')->middleware('revisaraccesomenu:menureportesordenestrabajohorastecnico');

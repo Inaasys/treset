@@ -985,13 +985,63 @@ function permisos(id){
                                     '<div class="col-md-12 form-check">'+
                                         '<input type="checkbox" name="menureportescomprascajachica" id="idmenureportescomprascajachica" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
                                         '<label for="idmenureportescomprascajachica">Caja Chica</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="menureporterelacioncompras" id="idmenureporterelacioncompras" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureporterelacioncompras">Relación Compras</label>'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="col-md-6">'+
+                                    '<label>Contra Recibos</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="menureporterelacioncontrarecibos" id="idmenureporterelacioncontrarecibos" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureporterelacioncontrarecibos">Relación Contrarecibos</label>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label>Cotizaciones</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="menureporterelacioncotizaciones" id="idmenureporterelacioncotizaciones" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureporterelacioncotizaciones">Relación Cotizaciones</label>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label>Remisiones</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="menureporterelacionremisiones" id="idmenureporterelacionremisiones" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureporterelacionremisiones">Relación Remisiones</label>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-12">'+
                                     '<label>Facturas</label>'+
                                     '<div class="col-md-12 form-check">'+
-                                        '<input type="checkbox" name="menureportesfacturasventasdiarias" id="idmenureportesfacturasventasdiarias" class="filled-in submenu accesoreportes" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<input type="checkbox" name="menureporterelacionfacturasventasclientes" id="idmenureporterelacionfacturasventasclientes" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureporterelacionfacturasventasclientes">Relación Ventas Clientes</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="menureporterelacionfacturasventasagentes" id="idmenureporterelacionfacturasventasagentes" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureporterelacionfacturasventasagentes">Relación Ventas Agentes</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="menureporterelacionfacturasventasmarcas" id="idmenureporterelacionfacturasventasmarcas" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureporterelacionfacturasventasmarcas">Relación Ventas Marcas</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="menureportesfacturasventasdiarias" id="idmenureportesfacturasventasdiarias" class="filled-in submenu accesoreportes" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
                                         '<label for="idmenureportesfacturasventasdiarias">Ventas Diarias</label>'+                                     
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label>Producción</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="menureporterelacionproduccion" id="idmenureporterelacionproduccion" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureporterelacionproduccion">Relación Producción</label>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label>Comprobantes</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="menureporterelacioncomprobantes" id="idmenureporterelacioncomprobantes" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureporterelacioncomprobantes">Relación Comprobantes</label>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label>Requisiciones</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="menureporterelacionrequisiciones" id="idmenureporterelacionrequisiciones" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureporterelacionrequisiciones">Relación Requisiciones</label>'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="col-md-6">'+
@@ -999,6 +1049,67 @@ function permisos(id){
                                     '<div class="col-md-12 form-check">'+
                                         '<input type="checkbox" name="menureportesordenestrabajohorastecnico" id="idmenureportesordenestrabajohorastecnico" class="filled-in submenu accesoreportes" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
                                         '<label for="idmenureportesordenestrabajohorastecnico">Horas Técnico</label>'+                                     
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label>Cuentas por Cobrar</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="menureporterelacioncxc" id="idmenureporterelacioncxc" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureporterelacioncxc">Relación Cuentas Por Cobrar</label>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label>Cuentas por Pagar</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="menureporterelacioncxp" id="idmenureporterelacioncxp" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureporterelacioncxp">Relación Cuentas Por Pagar</label>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label>Notas Crédito Clientes</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="menureporterelacionnotasclientes" id="idmenureporterelacionnotasclientes" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureporterelacionnotasclientes">Relación Notas Clientes</label>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label>Notas Credito Proveedores</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="menureporterelacionnotasproveedores" id="idmenureporterelacionnotasproveedores" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureporterelacionnotasproveedores">Relación Notas Proveedores</label>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-12">'+
+                                    '<label>Iventario</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="menureportecostoinventario" id="idmenureportecostoinventario" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureportecostoinventario">Costo Inventario</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="menureportecostoinventarioparametros" id="idmenureportecostoinventarioparametros" class="filled-in submenu accesoreportes" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureportecostoinventarioparametros">Costo Inventario (Ultimo Costo, Promedio y Más Alto)</label>'+ 
+                                        '&nbsp;&nbsp;<input type="checkbox" name="menureporteproductossincomprasyventas" id="idmenureporteproductossincomprasyventas" class="filled-in submenu accesoreportes" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureporteproductossincomprasyventas">Productos sin Movimientos de Compras y Ventas</label>'+ 
+                                        '&nbsp;&nbsp;<input type="checkbox" name="menureportemovimientosalinventario" id="idmenureportemovimientosalinventario" class="filled-in submenu accesoreportes" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureportemovimientosalinventario">Movimientos al Inventario</label>'+ 
+                                        '&nbsp;&nbsp;<input type="checkbox" name="menureporteultimafechaycostosproductoscomprados" id="idmenureporteultimafechaycostosproductoscomprados" class="filled-in submenu accesoreportes" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureporteultimafechaycostosproductoscomprados">Ultima Fecha y Costos de Productos Comprados</label>'+ 
+                                        '&nbsp;&nbsp;<input type="checkbox" name="menureporteultimafechaypreciosproductosfacturados" id="idmenureporteultimafechaypreciosproductosfacturados" class="filled-in submenu accesoreportes" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureporteultimafechaypreciosproductosfacturados">Ultima Fecha y Precios de Productos Facturados</label>'+ 
+                                        '&nbsp;&nbsp;<input type="checkbox" name="menureporteinventariomaximosyminimos" id="idmenureporteinventariomaximosyminimos" class="filled-in submenu accesoreportes" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureporteinventariomaximosyminimos">Maximos y Minimos</label>'+ 
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label>Bitacoras</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="menureportebitacorasdocumentosyclientes" id="idmenureportebitacorasdocumentosyclientes" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureportebitacorasdocumentosyclientes">Bitacoras Documentos y Clientes</label>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label>Usuarios</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="menureportepermisosusuarios" id="idmenureportepermisosusuarios" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureportepermisosusuarios">Permisos Usuarios</label>'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'+

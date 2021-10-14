@@ -178,46 +178,45 @@
             <li class="dropdown-submenu">
               <a class="test"  href="#">Compras <span class="caret"></span></a>
               <ul class="dropdown-menu">
+                <li><a  href="{{route('reporte_relacion_compras')}}" id="menureporterelacioncompras">Relación de Compras por Proveedor</a></li>                        
                 <li><a  href="{{route('reporte_caja_chica')}}" id="menureportescomprascajachica">Caja Chica</a></li>   
-                <!--<li><a  href="#">Relación de Compras por Proveedor</a></li>                        
-                <li><a  href="#">Proyección de Pagos a Proveedores</a></li>
+                <!--<li><a  href="#">Proyección de Pagos a Proveedores</a></li>
                 <li><a  href="#">Cartera Vencida a Proveedores</a></li>                      
                 <li><a  href="#">Productos + Comprados</a></li>-->
               </ul>
             </li>
-            <!--<li class="dropdown-submenu">
+            <li class="dropdown-submenu">
               <a class="test"  href="#">ContraRecibos <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a  href="#">Relación de ContraRecibos</a></li>
+                <li><a  href="#" id="menureporterelacioncontrarecibos">Relación de ContraRecibos</a></li>
               </ul>
             </li>                 
             <li class="dropdown-submenu">
               <a class="test"  href="#">Cotizaciones <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a  href="#">Relación de Cotizaciones</a></li>
+                <li><a  href="#" id="menureporterelacioncotizaciones">Relación de Cotizaciones</a></li>
               </ul>
             </li>
-            <li class="dropdown-submenu">
+            <!--<li class="dropdown-submenu">
               <a class="test"  href="#">Pedidos <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a  href="#">Relación de Pedidos</a></li>
               </ul>
-            </li>
+            </li>-->
             <li class="dropdown-submenu">
               <a class="test"  href="#">Remisiones <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a  href="#">Relación de Remisiones por Clientes</a></li>
-                <li><a  href="#">Relación de Remisiones por Agentes</a></li>
+                <li><a  href="#" id="menureporterelacionremisiones">Relación de Remisiones por Clientes</a></li>
               </ul>
-            </li>-->
+            </li>
             <li class="dropdown-submenu">
               <a class="test"  href="#">Facturas <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a  href="{{route('reporte_diario_ventas')}}" id="menureportesfacturasventasdiarias">Ventas Diarias</a></li>
-                <!--<li><a  href="#">Relación de Ventas por Clientes</a></li>
-                <li><a  href="#">Relación de Ventas por Agentes</a></li>
-                <li><a  href="#">Relación de Ventas por Marcas</a></li>                         
-                <li><a  href="#">Proyección de Cobranza a Clientes</a></li>
+                <li><a  href="#" id="menureporterelacionfacturasventasclientes">Relación de Ventas por Clientes</a></li>
+                <li><a  href="#" id="menureporterelacionfacturasventasagentes">Relación de Ventas por Agentes</a></li>
+                <li><a  href="#" id="menureporterelacionfacturasventasmarcas">Relación de Ventas por Marcas</a></li>                       
+                <!--<li><a  href="#">Proyección de Cobranza a Clientes</a></li>
                 <li><a  href="#">Cartera Vencida de Clientes</a></li>                        
                 <li><a  href="#">Productos + Vendidos</a></li>                        
                 <li><a  href="#">Ventas Servicio</a></li>                       
@@ -227,24 +226,24 @@
                 <li><a  href="#">Facturas Liquidadas para Comisiones</a></li>-->
               </ul>
             </li>            
-            <!--<li class="dropdown-submenu">
+            <li class="dropdown-submenu">
               <a class="test"  href="#">Producción <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a  href="#">Relación de Producción</a></li>
+                <li><a  href="#" id="menureporterelacionproduccion">Relación de Producción</a></li>
               </ul>
             </li>            
             <li class="dropdown-submenu">
               <a class="test"  href="#">Comprobantes <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a  href="#">Relación de Comprobantes</a></li>
+                <li><a  href="#" id="menureporterelacioncomprobantes">Relación de Comprobantes</a></li>
               </ul>
             </li>           
             <li class="dropdown-submenu">
               <a class="test"  href="#">Requisiciones <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a  href="#">Relación de Requisiciones</a></li>
+                <li><a  href="#" id="menureporterelacionrequisiciones">Relación de Requisiciones</a></li>
               </ul>
-            </li>-->
+            </li>
             <li class="dropdown-submenu">
               <a class="test"  href="#">Ordenes de Trabajo <span class="caret"></span></a>
               <ul class="dropdown-menu">
@@ -266,67 +265,61 @@
                 <li><a  href="#">Montos Facturación Refacciones</a></li>
                 <li><a  href="#">Horas Facturadas y Producidas</a></li>
               </ul>
-            </li>                 
+            </li>   -->              
             <li class="dropdown-submenu">
               <a class="test"  href="#">Cuentas x Cobrar <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a  href="#">Relación de Cobranza a Clientes</a></li>                       
-                <li><a  href="#">Entrega de Facturas a Cobrar</a></li>
+                <li><a  href="#" id="menureporterelacioncxc">Relación de Cobranza a Clientes</a></li>                       
+                <!--<li><a  href="#">Entrega de Facturas a Cobrar</a></li>-->
               </ul>
             </li>
             <li class="dropdown-submenu">
               <a class="test"  href="#">Cuentas x Pagar <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a  href="#">Relación de Pagos a Proveedores</a></li>
+                <li><a  href="#" id="menureporterelacioncxp">Relación de Pagos a Proveedores</a></li>
               </ul>
             </li>                  
             <li class="dropdown-submenu">
               <a class="test"  href="#">Notas de Crédito Clientes <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a  href="#">Relación de Notas de Crédito  </a></li>
+                <li><a  href="#" id="menureporterelacionnotasclientes">Relación de Notas de Crédito Clientes </a></li>
               </ul>
             </li>
             <li class="dropdown-submenu">
               <a class="test"  href="#">Notas de Crédito Proveedores <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a  href="#">Relación de Notas de Crédito  </a></li>
+                <li><a  href="#" id="menureporterelacionnotasproveedores">Relación de Notas de Crédito Proveedores</a></li>
               </ul>
             </li>
             <li class="dropdown-submenu">
               <a class="test" href="#">Inventario <span class="caret"></span></a>
               <ul class="dropdown-menu " style="margin-top: -224px !important;">
-                <li><a  href="#">Costo del Inventario </a></li>
-                <li><a  href="#">Costo del Inventario (Costo Ultimo, Promedio y Más Alto)</a></li>
-                <li><a  href="#">Partes sin Movimiento de Compras y Ventas </a></li>
-                <li><a  href="#">Movimientos al Inventario </a></li>
-                <li><a  href="#">Productos Obsoletos </a></li>
+                <li><a  href="#" id="menureportecostoinventario">Costo del Inventario </a></li>
+                <li><a  href="#" id="menureportecostoinventarioparametros">Costo del Inventario (Costo Ultimo, Promedio y Más Alto)</a></li>
+                <li><a  href="#" id="menureporteproductossincomprasyventas">Productos sin Movimiento de Compras y Ventas </a></li>
+                <li><a  href="#" id="menureportemovimientosalinventario">Movimientos al Inventario </a></li>
+                <!--<li><a  href="#">Productos Obsoletos </a></li>
                 <li><a  href="#">Productos Reman (CORES)</a></li>
-                <li><a  href="#">Existencias en Sucursales </a></li>
-                <li><a  href="#">Ultima Fecha y Costos de Productos Comprados </a></li>
-                <li><a  href="#">Ultima Fecha y Precios de Productos Facturados </a></li>
-                <li><a  href="#">Lpa </a></li>
-                <li><a  href="#">Máximos y Mínimos </a></li>
-                <li><a  href="#">Etiquetas </a></li>
-              </ul>
-            </li>
-            <li class="dropdown-submenu">
-              <a class="test"  href="#">Punto de Venta <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="#">Corte de Caja  </a></li>
+                <li><a  href="#">Existencias en Sucursales </a></li>-->
+                <li><a  href="#" id="menureporteultimafechaycostosproductoscomprados">Ultima Fecha y Costos de Productos Comprados </a></li>
+                <li><a  href="#" id="menureporteultimafechaypreciosproductosfacturados">Ultima Fecha y Precios de Productos Facturados </a></li>
+                <!--<li><a  href="#">Lpa </a></li>-->
+                <li><a  href="#" id="menureporteinventariomaximosyminimos">Máximos y Mínimos </a></li>
+                <!--<li><a  href="#">Etiquetas </a></li>-->
               </ul>
             </li>
             <li class="dropdown-submenu">
               <a class="test"  href="#">Bitácoras <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href="#">Sesiones, Clientes y Documentos  </a></li>
+                <li><a href="#" id="menureportebitacorasdocumentosyclientes">Documentos y Clientes  </a></li>
               </ul>
             </li>             
             <li class="dropdown-submenu">
               <a class="test" href="#">Usuarios <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href="#">Permisos de Usuarios  </a></li>
+                <li><a href="#" id="menureportepermisosusuarios">Permisos de Usuarios  </a></li>
               </ul>
-            </li>-->
+            </li>
           </ul>
         </li>
         <li class="dropdown">

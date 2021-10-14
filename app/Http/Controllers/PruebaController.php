@@ -107,7 +107,7 @@ class PruebaController extends ConfiguracionSistemaController{
     }
 
     public function prueba_diferencias_arrays(){
-        $ArrayDetallesTraspasoAnterior = Array();
+        /*$ArrayDetallesTraspasoAnterior = Array();
 
         $ArrayDetallesTraspasoNuevo = Array('20725387');
 
@@ -115,12 +115,15 @@ class PruebaController extends ConfiguracionSistemaController{
         //echo $clave;
         $diferencias_arreglos = array_diff($ArrayDetallesTraspasoAnterior, $ArrayDetallesTraspasoNuevo);
         dd($diferencias_arreglos);
+        */
 /*
         if(count($diferencias_arreglos) > 0){
             foreach($diferencias_arreglos as $eliminapartida){
                 echo $eliminapartida."<br>";
             }
         }*/
+
+        //dd(Helpers::convertirvalorcorrecto("-1"));
 
     }
 

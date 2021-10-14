@@ -213,25 +213,25 @@ class Helpers{
         for($i=0;$i<$numerodecimalesconfigurados;$i++){
             $decimalesconfigurados = $decimalesconfigurados.'0';
         }
-        if($valorbd == null){
-            $valorcorrecto = '0.'.$decimalesconfigurados;
-            return number_format(round($valorcorrecto, $numerodecimalesconfigurados), $numerodecimalesconfigurados, '.', '');
-        }else{
+        //if($valorbd == null){
+            //$valorcorrecto = '0.'.$decimalesconfigurados;
+            return number_format(round($valorbd, $numerodecimalesconfigurados), $numerodecimalesconfigurados, '.', '');
+        //}else{
             /*if($valorbd<0){//si el numero es negativo
                 $numero = abs($valorbd);
                 $valorcorrecto = number_format($numero) * -1;
                 return number_format(round($valorcorrecto, $numerodecimalesconfigurados), $numerodecimalesconfigurados, '.', '');
             }else {*/
-                $encontrar = '.';
-                $result = strpos($valorbd, $encontrar);
-                if($result == 0){
-                    $valorcorrecto = '0'.$valorbd;
-                }else{
-                    $valorcorrecto = $valorbd;
-                }
-                return number_format(round($valorcorrecto, $numerodecimalesconfigurados), $numerodecimalesconfigurados, '.', '');
+                //$encontrar = '.';
+                //$result = strpos($valorbd, $encontrar);
+                //if($result == 0){
+                  //  $valorcorrecto = '0'.$valorbd;
+                //}else{
+                  //  $valorcorrecto = $valorbd;
+               // }
+                //return number_format(round($valorcorrecto, $numerodecimalesconfigurados), $numerodecimalesconfigurados, '.', '');
             //}
-        }
+        //}
         //dar formato correcto a la cantidad con base a los numero de decimales configurados y redondear
         //return number_format(round($valorcorrecto, $numerodecimalesconfigurados), $numerodecimalesconfigurados, '.', '');
     }

@@ -91,6 +91,25 @@
                 <div class="modal-header {{$empresa->background_forms_and_modals}}">
                     <h4 class="modal-title" id="titulomodal"></h4>
                 </div>
+
+                
+
+                <form id="formplantilla" action="#" enctype="multipart/form-data" hidden>
+                    <div class="col-md-12">
+                        <table class="col-md-12">
+                            <tr>
+                                <td>
+                                    <div class="col-md-6">
+                                        <label>Selecciona el archivo excel</label>
+                                        <input type="file" class="form-control" name="partidasexcel" id="partidasexcel" onchange="cargarpartidasexcel(this)" onclick="this.value=null;">
+                                        <button type="button" class="btn btn-success btn-sm" id="btnenviarpartidasexcel" style="display:none">Enviar Excel</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>   
+                    </div>
+                </form>
+
                 <form id="formparsley" action="#">
                     <div class="modal-body">
                         <div class="col-md-12" id="tabsform">
@@ -103,6 +122,8 @@
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
                     </div>
                 </form> 
+
+
             </div>
             <div id="contenidomodaltablas">
                 <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
@@ -169,7 +190,10 @@
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';
+        var urlgenerarplantilla = '{{$urlgenerarplantilla}}';
         var ajustesinventario_obtener = '{!!URL::to('ajustesinventario_obtener')!!}';
+        var ajustesinventario_descargar_plantilla = '{!!URL::to('ajustesinventario_descargar_plantilla')!!}';
+        var ajustesinventario_cargar_partidas_excel = '{!!URL::to('ajustesinventario_cargar_partidas_excel')!!}';
         var ajustesinventario_obtener_series_documento = '{!!URL::to('ajustesinventario_obtener_series_documento')!!}';
         var ajustesinventario_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('ajustesinventario_obtener_ultimo_folio_serie_seleccionada')!!}';
         var ajustesinventario_obtener_ultimo_id = '{!!URL::to('ajustesinventario_obtener_ultimo_id')!!}';
