@@ -130,6 +130,52 @@ function listar(){
     obtenerdatos(data.Orden);
   });
 }
+//realizar en reporte en excel
+function descargar_plantilla(){
+  $("#btnGenerarPlantilla").attr("href", urlgenerarplantilla);
+  $("#btnGenerarPlantilla").click();
+}
+function seleccionarpartidasexcel(){
+  $("#partidasexcel").click();
+}
+//Cada que se elija un archivo
+function cargarpartidasexcel(e) {
+  $("#btnenviarpartidasexcel").click();
+}
+//Agregar respuesta a la datatable
+$("#btnenviarpartidasexcel").on('click', function(e){
+  e.preventDefault();
+  var arraycodigospartidas = [];
+  var lista = document.getElementsByClassName("codigoproductopartida");
+  for (var i = 0; i < lista.length; i++) {
+    arraycodigospartidas.push(lista[i].value);
+  }
+  var partidasexcel = $('#partidasexcel')[0].files[0];
+  var form_data = new FormData();
+  form_data.append('partidasexcel', partidasexcel); 
+  form_data.append('contadorproductos', contadorproductos);
+  form_data.append('contadorfilas', contadorfilas);
+  form_data.append('arraycodigospartidas', arraycodigospartidas);
+  $.ajax({
+    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+    url:ordenes_compra_cargar_partidas_excel,
+    data: form_data,
+    type: 'POST',
+    contentType: false,
+    processData: false,
+    success: function (data) {
+      contadorfilas = data.contadorfilas;
+      contadorproductos = data.contadorproductos;
+      $("#tablaproductodordencompra tbody").append(data.filasdetallesordencompra);
+      comprobarfilaspreciosproductos();
+      calculartotalordencompra();
+      $("#codigoabuscar").val("");
+    },
+    error: function (data) {
+      console.log(data);
+    }
+  });                      
+});
 //obtener tipos ordenes de compra
 function obtenertiposordenescompra(tipoalta){
   $.get(ordenes_compra_obtener_tipos_ordenes_compra, {tipoalta:tipoalta}, function(select_tipos_ordenes_compra){
@@ -955,6 +1001,16 @@ function alta(tipoalta){
                     '</div>'+
                   '</div>'+ 
                   '<div class="row">'+
+                    '<div class="col-md-12">'+   
+                      '<table>'+
+                        '<tr>'+
+                          '<td><div type="button" class="btn btn-success btn-sm" onclick="seleccionarpartidasexcel()">Subir partidas en excel</div></td>'+
+                          '<td data-toggle="tooltip" data-placement="top" title data-original-title="Bajar plantilla"><a class="material-icons" onclick="descargar_plantilla()" id="btnGenerarPlantilla" target="_blank">get_app</a></td>'+
+                        '</tr>'+
+                      '</table>'+
+                    '</div>'+ 
+                  '</div>'+
+                  '<div class="row">'+
                     '<div class="col-md-6">'+   
                       '<label>Observaciones</label>'+
                       '<textarea class="form-control" name="observaciones" id="observaciones" rows="5" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" required></textarea>'+
@@ -988,6 +1044,10 @@ function alta(tipoalta){
               '</div>'+
             '</div>';
   $("#tabsform").html(tabs);
+  //mostrar mensaje de bajar plantilla
+  $('[data-toggle="tooltip"]').tooltip({
+    container: 'body'
+  });
   obtenultimonumero();
   obtenertiposordenescompra(tipoalta);
   asignarfechaactual();
@@ -1112,9 +1172,24 @@ $("#btnGuardar").on('click', function (e) {
 });
 //autorizar orden de compra
 function autorizarordencompra(ordenautorizar){
-  $("#ordenautorizar").val(ordenautorizar);
-  $("#textomodalautorizar").html("Estas seguro de autorizar la orden de compra? No."+ ordenautorizar);
-  $('#autorizarorden').modal('show');
+  $.get(ordenes_compra_verificar_autorizacion,{ordenautorizar:ordenautorizar}, function(data){
+    console.log(data);
+    if(data.AutorizadoPor == ''){
+      $("#ordenautorizar").val(ordenautorizar);
+      $("#ordenquitarautorizacion").val("");
+      $("#textomodalautorizar").html("Estas seguro de autorizar la orden de compra? No."+ ordenautorizar);
+      $("#btnautorizar").show();
+      $("#btnquitarautorizacion").hide();
+      $('#autorizarorden').modal('show');
+    }else{
+      $("#ordenautorizar").val("");
+      $("#ordenquitarautorizacion").val("");
+      $("#textomodalautorizar").html("La orden ya fue autorizada");
+      $("#btnautorizar").hide();
+      $("#btnquitarautorizacion").hide();
+      $('#autorizarorden').modal('show');
+    }
+  });
 }
 $("#btnautorizar").on('click', function(e){
   e.preventDefault();
@@ -1125,6 +1200,60 @@ $("#btnautorizar").on('click', function(e){
     $.ajax({
       headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
       url:ordenes_compra_autorizar,
+      type: "post",
+      dataType: "html",
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false,
+      success:function(data){
+        $('#autorizarorden').modal('hide');
+        msj_datosguardadoscorrectamente();
+        $('.page-loader-wrapper').css('display', 'none');
+      },
+      error:function(data){
+        if(data.status == 403){
+          msj_errorenpermisos();
+        }else{
+          msj_errorajax();
+        }
+        $('#autorizarorden').modal('hide');
+        $('.page-loader-wrapper').css('display', 'none');
+      }
+    })
+  }else{
+    form.parsley().validate();
+  }
+});
+//quitar autorzacion a orden compra
+function quitarautorizacionordencompra(orden){
+  $.get(ordenes_compra_verificar_quitar_autorizacion,{orden:orden}, function(data){
+    if(data.Status == 'POR SURTIR'){
+      $("#ordenquitarautorizacion").val(orden);
+      $("#ordenautorizar").val("");
+      $("#textomodalautorizar").html("Estas seguro de quitar autorizacion a la orden de compra? No."+ orden);
+      $("#btnautorizar").hide();
+      $("#btnquitarautorizacion").show();
+      $('#autorizarorden').modal('show');
+    }else{
+      $("#ordenquitarautorizacion").val("");
+      $("#ordenautorizar").val("");
+      $("#textomodalautorizar").html("No se puede quitar autorización a la Orden de Compra porque esta dada de BAJA o ya fue utilizada en una Compra");
+      $("#btnautorizar").hide();
+      $("#btnquitarautorizacion").hide();
+      $('#autorizarorden').modal('show');
+    } 
+  });
+}
+$("#btnquitarautorizacion").on('click', function(e){
+  e.preventDefault();
+  var formData = new FormData($("#formautorizar")[0]);
+  var form = $("#formautorizar");
+  if (form.parsley().isValid()){
+    $('.page-loader-wrapper').css('display', 'block');
+    $.ajax({
+      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+      url:ordenes_compra_quitar_autorizacion,
       type: "post",
       dataType: "html",
       data: formData,

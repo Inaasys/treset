@@ -114,78 +114,113 @@ class ReportesRelacionCompraExport implements FromCollection,WithHeadings,WithTi
         $fechainicio = date($this->fechainicialreporte);
         $fechaterminacion = date($this->fechafinalreporte);
         $reporte = $this->reporte;
+        $numeroproveedor = $this->numeroproveedor;
+        $numeroalmacen = $this->numeroalmacen;
+        $tipo = $this->tipo;
+        $movimiento = $this->movimiento;
+        $status = $this->status;
         $campos_consulta = $this->campos_consulta;
         if($reporte == "RELACION"){
             $sql = DB::table('Compras as c')
             ->leftjoin('Proveedores as p', 'c.Proveedor', '=', 'p.Numero')
             ->select('c.Compra', 'c.Proveedor', 'p.Nombre', 'c.Fecha', 'c.Plazo', DB::raw("c.Fecha+c.Plazo as Vence"), 'c.Remision', 'c.Factura', 'c.Movimiento', 'c.Almacen', 'c.Tipo', 'c.Importe', 'c.Descuento', 'c.SubTotal', 'c.Iva', 'c.Total', 'c.Abonos', 'c.Descuentos', 'c.Saldo', 'c.Obs', 'c.Status', 'c.MotivoBaja', 'c.Usuario', 'p.Rfc', 'p.Calle', 'p.NoExterior', 'p.Colonia', 'p.Municipio', 'p.Estado', 'p.CodigoPostal', 'p.Contacto', 'p.Telefonos', 'p.Email1')
             ->whereBetween('c.Fecha', [$fechainicio, $fechaterminacion])
+            ->where(function($q) use ($numeroproveedor) {
+                if($numeroproveedor != ""){
+                    $q->where('c.Proveedor', $numeroproveedor);
+                }
+            })
+            ->where(function($q) use ($numeroalmacen) {
+                if($numeroalmacen != ""){
+                    $q->whereIn('c.Almacen', array($numeroalmacen));
+                }
+            })
+            ->where(function($q) use ($tipo) {
+                if($tipo != 'TODOS'){
+                    $q->where('c.Tipo', $tipo);
+                }
+            })
+            ->where(function($q) use ($movimiento) {
+                if($movimiento != 'TODOS'){
+                    $q->where('c.Movimiento', 'LIKE', '%'.$movimiento.'%');
+                }
+            })
+            ->where(function($q) use ($status) {
+                if($status != 'TODOS'){
+                    $q->where('c.Status', $status);
+                }
+            })
             ->orderby('c.Serie', 'ASC')
             ->orderby('c.Folio', 'ASC')
             ->get();
-            if($this->numeroproveedor != ""){
-                $sql = $sql->where('Proveedor', $this->numeroproveedor);
-            }
-            if($this->numeroalmacen != ""){
-                $sql = $sql->where('Almacen', $this->numeroalmacen);
-            }
-            if($this->tipo != 'TODOS'){
-                $sql = $sql->where('Tipo', $this->tipo);
-            }
-            if($this->movimiento != 'TODOS'){
-                $sql = $sql->where('Movimiento', $this->movimiento);
-            }
-            if($this->status != 'TODOS'){
-                $sql = $sql->where('Status', $this->status);
-            }
         }else if($reporte == "DETALLES"){
             $sql = DB::table('Compras as c')
             ->leftjoin('Proveedores as p', 'c.Proveedor', '=', 'p.Numero')
             ->leftjoin('Compras Detalles as cd', 'c.Compra', '=', 'cd.Compra')
             ->select('c.Compra', 'c.Proveedor', 'p.Nombre', 'c.Fecha', 'c.Plazo', DB::raw("c.Fecha+c.Plazo as Vence"), 'c.Remision', 'c.Factura', 'c.Movimiento', 'c.Almacen', 'c.Tipo', 'cd.Codigo', 'cd.Descripcion', 'cd.Unidad', 'cd.Cantidad', 'cd.Precio', 'cd.Importe', 'cd.Descuento', 'cd.SubTotal', 'cd.Iva', 'cd.Total', 'c.Obs AS ObsCompra', 'cd.Obs As ObsDetalle', 'c.Status', 'c.MotivoBaja', 'c.Usuario', 'p.Rfc', 'p.Calle', 'p.NoExterior', 'p.Colonia', 'p.Municipio', 'p.Estado', 'p.CodigoPostal', 'p.Contacto', 'p.Telefonos', 'p.Email1')
             ->whereBetween('c.Fecha', [$fechainicio, $fechaterminacion])
+            ->where(function($q) use ($numeroproveedor) {
+                if($numeroproveedor != ""){
+                    $q->where('c.Proveedor', $numeroproveedor);
+                }
+            })
+            ->where(function($q) use ($numeroalmacen) {
+                if($numeroalmacen != ""){
+                    $q->whereIn('c.Almacen', array($numeroalmacen));
+                }
+            })
+            ->where(function($q) use ($tipo) {
+                if($tipo != 'TODOS'){
+                    $q->where('c.Tipo', $tipo);
+                }
+            })
+            ->where(function($q) use ($movimiento) {
+                if($movimiento != 'TODOS'){
+                    $q->where('c.Movimiento', 'LIKE', '%'.$movimiento.'%');
+                }
+            })
+            ->where(function($q) use ($status) {
+                if($status != 'TODOS'){
+                    $q->where('c.Status', $status);
+                }
+            })
             ->orderby('c.Serie', 'ASC')
             ->orderby('c.Folio', 'ASC')
             ->get();
-            if($this->numeroproveedor != ""){
-                $sql = $sql->where('Proveedor', $this->numeroproveedor);
-            }
-            if($this->numeroalmacen != ""){
-                $sql = $sql->where('Almacen', $this->numeroalmacen);
-            }
-            if($this->tipo != 'TODOS'){
-                $sql = $sql->where('Tipo', $this->tipo);
-            }
-            if($this->movimiento != 'TODOS'){
-                $sql = $sql->where('Movimiento', $this->movimiento);
-            }
-            if($this->status != 'TODOS'){
-                $sql = $sql->where('Status', $this->status);
-            }
         }else{
             $sql = DB::table('Compras as c')
             ->leftjoin('Proveedores as p', 'c.Proveedor', '=', 'p.Numero')
             ->select('p.Numero', 'p.Nombre', DB::raw("FORMAT(SUM(c.Total), 'N6') as Totalc"), 'p.Rfc', 'p.Calle', 'p.NoExterior', 'p.Colonia', 'p.Municipio', 'p.Estado', 'p.CodigoPostal', 'p.Contacto', 'p.Telefonos', 'p.Email1')
             ->whereBetween('c.Fecha', [$fechainicio, $fechaterminacion])
+            ->where(function($q) use ($numeroproveedor) {
+                if($numeroproveedor != ""){
+                    $q->where('p.Numero', $numeroproveedor);
+                }
+            })
+            ->where(function($q) use ($numeroalmacen) {
+                if($numeroalmacen != ""){
+                    $q->whereIn('c.Almacen', array($numeroalmacen));
+                }
+            })
+            ->where(function($q) use ($tipo) {
+                if($tipo != 'TODOS'){
+                    $q->where('c.Tipo', $tipo);
+                }
+            })
+            ->where(function($q) use ($movimiento) {
+                if($movimiento != 'TODOS'){
+                    $q->where('c.Movimiento', 'LIKE', '%'.$movimiento.'%');
+                }
+            })
+            ->where(function($q) use ($status) {
+                if($status != 'TODOS'){
+                    $q->where('c.Status', $status);
+                }
+            })
             ->where('c.Status', '<>', 'BAJA')
             ->groupby('p.Numero', 'p.Nombre', 'p.Rfc', 'p.Calle', 'p.NoExterior', 'p.Colonia', 'p.Municipio', 'p.Estado', 'p.CodigoPostal', 'p.Contacto', 'p.Telefonos', 'p.Email1')
             ->orderby(DB::raw("SUM(c.Total)"), 'DESC')
             ->get();
-            if($this->numeroproveedor != ""){
-                $sql = $sql->where('Proveedor', $this->numeroproveedor);
-            }
-            if($this->numeroalmacen != ""){
-                $sql = $sql->where('Almacen', $this->numeroalmacen);
-            }
-            if($this->tipo != 'TODOS'){
-                $sql = $sql->where('Tipo', $this->tipo);
-            }
-            if($this->movimiento != 'TODOS'){
-                $sql = $sql->where('Movimiento', $this->movimiento);
-            }
-            if($this->status != 'TODOS'){
-                $sql = $sql->where('Status', $this->status);
-            }
         }
         return $sql;
     }
@@ -330,7 +365,7 @@ class ReportesRelacionCompraExport implements FromCollection,WithHeadings,WithTi
             ->orderby(DB::raw("SUM(c.Total)"), 'DESC')
             ->get();
             if($this->numeroproveedor != ""){
-                $sql = $sql->where('Proveedor', $this->numeroproveedor);
+                $sql = $sql->where('Numero', $this->numeroproveedor);
             }
             if($this->numeroalmacen != ""){
                 $sql = $sql->where('Almacen', $this->numeroalmacen);

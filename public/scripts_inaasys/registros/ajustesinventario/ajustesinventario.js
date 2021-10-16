@@ -127,8 +127,6 @@ function listar(){
     obtenerdatos(data.Ajuste);
   });
 }
-
-
 //realizar en reporte en excel
 function descargar_plantilla(){
   $("#btnGenerarPlantilla").attr("href", urlgenerarplantilla);
@@ -144,6 +142,11 @@ function cargarpartidasexcel(e) {
 //Agregar respuesta a la datatable
 $("#btnenviarpartidasexcel").on('click', function(e){
   e.preventDefault();
+  var arraycodigospartidas = [];
+  var lista = document.getElementsByClassName("codigoproductopartida");
+  for (var i = 0; i < lista.length; i++) {
+    arraycodigospartidas.push(lista[i].value);
+  }
   var partidasexcel = $('#partidasexcel')[0].files[0];
   var numeroalmacen = $("#numeroalmacen").val();
   var form_data = new FormData();
@@ -151,6 +154,7 @@ $("#btnenviarpartidasexcel").on('click', function(e){
   form_data.append('numeroalmacen', numeroalmacen);
   form_data.append('contadorproductos', contadorproductos);
   form_data.append('contadorfilas', contadorfilas);
+  form_data.append('arraycodigospartidas', arraycodigospartidas);
   $.ajax({
     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
     url:ajustesinventario_cargar_partidas_excel,
@@ -159,21 +163,18 @@ $("#btnenviarpartidasexcel").on('click', function(e){
     contentType: false,
     processData: false,
     success: function (data) {
-      console.log(data);
       contadorfilas = data.contadorfilas;
       contadorproductos = data.contadorproductos;
       $("#tablaproductosajuste tbody").append(data.filasdetallesajuste);
-      
       comprobarfilas();
       calculartotales();
+      $("#codigoabuscar").val("");
     },
     error: function (data) {
       console.log(data);
     }
   });                      
 });
-
-
 //obtener series documento
 function obtenerseriesdocumento(){
   ocultarformulario();
@@ -623,6 +624,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, tipooper
       mostrarformulario();
       comprobarfilas();
       calculartotales();
+      $("#codigoabuscar").val("");
       $('.page-loader-wrapper').css('display', 'none');
     }) 
   }else{
@@ -786,7 +788,6 @@ function alta(){
                       '</table>'+
                     '</div>'+
                   '</div>'+ 
-
                   '<div class="row">'+
                     '<div class="col-md-12">'+   
                       '<table>'+
@@ -797,7 +798,6 @@ function alta(){
                       '</table>'+
                     '</div>'+ 
                   '</div>'+
-
                   '<div class="row">'+
                     '<div class="col-md-6">'+   
                       '<label>Observaciones</label>'+

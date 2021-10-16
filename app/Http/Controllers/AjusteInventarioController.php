@@ -110,77 +110,83 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
         $contadorproductos = $request->contadorproductos;
         $contadorfilas = $request->contadorfilas;
         $tipooperacion = 'alta';
+        $arraycodigosyaagregados = $porciones = explode(",", $request->arraycodigospartidas);
         foreach($partidasexcel as $partida){
             if($rowexcel > 0){
-                $codigoabuscar = $partida[0];
-                $entradas = 0;
-                $salidas = 0;
-                $parsleyminentradas = '0.000000';
-                $parsleyminsalidas = '0.000000';
-                //si entradas y salidas son nulos, ceros o strings
-                if(($partida[1] == null || $partida[1] == 0 || is_string($partida[1]) == true) && ($partida[2] == null || $partida[2] == 0 || is_string($partida[2]) == true)){
-                    $parsleyminentradas = '0.'.$this->numerocerosconfiguradosinputnumberstep;
-                    $parsleyminsalidas = '0.'.$this->numerocerosconfiguradosinputnumberstep;
+                if (in_array(strtoupper($partida[0]), $arraycodigosyaagregados)) {
+                    
+                }else{
+                    $codigoabuscar = $partida[0];
                     $entradas = 0;
                     $salidas = 0;
-                }
-                //si entradas y salidas son mayores a 0
-                if($partida[1] > 0 && $partida[2] > 0){
-                    $parsleyminentradas = '0.'.$this->numerocerosconfiguradosinputnumberstep;
-                    $parsleyminsalidas = '0.000000';
-                    $entradas = $partida[1];
-                    $salidas = 0;
-                }
-                //si escribio entradas y la salidas son nulas, cero o string
-                if($partida[1] > 0 && ($partida[2] == null || $partida[2] == 0 || is_string($partida[2]) == true) ){
-                    $parsleyminentradas = '0.'.$this->numerocerosconfiguradosinputnumberstep;
-                    $parsleyminsalidas = '0.000000';
-                    $entradas = $partida[1];
-                    $salidas = 0;
-                }
-                //si escribio salidas y las entradas son nulas, cero o string
-                if($partida[2] > 0 && ($partida[1] == null || $partida[1] == 0 || is_string($partida[1]) == true) ){
-                    $parsleyminsalidas = '0.'.$this->numerocerosconfiguradosinputnumberstep;
                     $parsleyminentradas = '0.000000';
-                    $salidas = $partida[2];
-                    $entradas = 0;
-                }
-                $numeroalmacen = $request->numeroalmacen;
-                $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', ''.$codigoabuscar.'')->count();
-                if($contarproductos > 0){
-                    $producto = VistaObtenerExistenciaProducto::where('Codigo', ''.$codigoabuscar.'')->first();
-                    $contarexistencia = Existencia::where('Codigo', ''.$codigoabuscar.'')->where('Almacen', $numeroalmacen)->count();
-                    if($contarexistencia > 0){
-                        $Existencia = Existencia::where('Codigo', ''.$codigoabuscar.'')->where('Almacen', $numeroalmacen)->first();
-                        $parsleymax = $Existencia->Existencias;
-                    }else{
-                        $parsleymax = 0;
+                    $parsleyminsalidas = '0.000000';
+                    //si entradas y salidas son nulos, ceros o strings
+                    if(($partida[1] == null || $partida[1] == 0 || is_string($partida[1]) == true) && ($partida[2] == null || $partida[2] == 0 || is_string($partida[2]) == true)){
+                        $parsleyminentradas = '0.'.$this->numerocerosconfiguradosinputnumberstep;
+                        $parsleyminsalidas = '0.'.$this->numerocerosconfiguradosinputnumberstep;
+                        $entradas = 0;
+                        $salidas = 0;
                     }
-                    $subtotalentradaspartida = $entradas*$producto->Costo;
-                    $subtotalsalidaspartida = $salidas*$producto->Costo;
-                    $existencianuevapartida = $parsleymax + $entradas - $salidas;
-                    $filasdetallesajuste= $filasdetallesajuste.
-                    '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
-                        '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
-                        '<td class="tdmod"><input type="text" class="form-control divorinputmodmd codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]"></td>'.
-                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'.htmlspecialchars($producto->Producto, ENT_QUOTES).'" readonly data-parsley-length="[1, 255]"></td>'.
-                        '<td class="tdmod"><input type="text" class="form-control divorinputmodsm unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'.$producto->Unidad.'" readonly data-parsley-length="[1, 5]"></td>'.
-                        '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm existenciaactualpartida" name="existenciaactualpartida[]" id="existenciaactualpartida[]" value="'.Helpers::convertirvalorcorrecto($parsleymax).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                        '<td class="tdmod">'.
-                            '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm entradaspartidadb" name="entradaspartidadb[]" value="'.Helpers::convertirvalorcorrecto($entradas).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
-                            '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm entradaspartida" name="entradaspartida[]" id="entradaspartida[]" value="'.Helpers::convertirvalorcorrecto($entradas).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" data-parsley-min="'.$parsleyminentradas.'" onchange="formatocorrectoinputcantidades(this);calcularsubtotalentradas('.$contadorfilas.');calcularexistencianueva('.$contadorfilas.');colocardataparsleyminentradas('.$contadorfilas.');">'.
-                        '</td>'.
-                        '<td class="tdmod">'.
-                            '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm salidaspartidadb" name="salidaspartidadb[]" value="'.Helpers::convertirvalorcorrecto($salidas).'"data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/"  readonly>'.
-                            '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm salidaspartida" name="salidaspartida[]" id="salidaspartida[]" value="'.Helpers::convertirvalorcorrecto($salidas).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" data-parsley-min="'.$parsleyminsalidas.'" data-parsley-existencias="'.$parsleymax.'"	 onchange="formatocorrectoinputcantidades(this);calcularsubtotalsalidas('.$contadorfilas.');calcularexistencianueva('.$contadorfilas.');revisarexistenciasalmacen('.$contadorfilas.');colocardataparsleyminsalidas('.$contadorfilas.');">'.
-                        '</td>'.
-                        '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm existencianuevapartida" name="existencianuevapartida[]" id="existencianuevapartida[]" value="'.Helpers::convertirvalorcorrecto($existencianuevapartida).'"data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                        '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costopartida" name="costopartida[]" id="costopartida[]" value="'.Helpers::convertirvalorcorrecto($producto->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);cambiocosto('.$contadorfilas.');"></td>'.
-                        '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm subtotalentradaspartida" name="subtotalentradaspartida[]" id="subtotalentradaspartida[]" value="'.Helpers::convertirvalorcorrecto($subtotalentradaspartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                        '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm subtotalsalidaspartida" name="subtotalsalidaspartida[]" id="subtotalsalidaspartida[]" value="'.Helpers::convertirvalorcorrecto($subtotalsalidaspartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '</tr>';
-                    $contadorproductos++;
-                    $contadorfilas++;
+                    //si entradas y salidas son mayores a 0
+                    if($partida[1] > 0 && $partida[2] > 0){
+                        $parsleyminentradas = '0.'.$this->numerocerosconfiguradosinputnumberstep;
+                        $parsleyminsalidas = '0.000000';
+                        $entradas = $partida[1];
+                        $salidas = 0;
+                    }
+                    //si escribio entradas y la salidas son nulas, cero o string
+                    if($partida[1] > 0 && ($partida[2] == null || $partida[2] == 0 || is_string($partida[2]) == true) ){
+                        $parsleyminentradas = '0.'.$this->numerocerosconfiguradosinputnumberstep;
+                        $parsleyminsalidas = '0.000000';
+                        $entradas = $partida[1];
+                        $salidas = 0;
+                    }
+                    //si escribio salidas y las entradas son nulas, cero o string
+                    if($partida[2] > 0 && ($partida[1] == null || $partida[1] == 0 || is_string($partida[1]) == true) ){
+                        $parsleyminsalidas = '0.'.$this->numerocerosconfiguradosinputnumberstep;
+                        $parsleyminentradas = '0.000000';
+                        $salidas = $partida[2];
+                        $entradas = 0;
+                    }
+                    $numeroalmacen = $request->numeroalmacen;
+                    $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', ''.$codigoabuscar.'')->count();
+                    if($contarproductos > 0){
+                        $producto = VistaObtenerExistenciaProducto::where('Codigo', ''.$codigoabuscar.'')->first();
+                        $contarexistencia = Existencia::where('Codigo', ''.$codigoabuscar.'')->where('Almacen', $numeroalmacen)->count();
+                        if($contarexistencia > 0){
+                            $Existencia = Existencia::where('Codigo', ''.$codigoabuscar.'')->where('Almacen', $numeroalmacen)->first();
+                            $parsleymax = $Existencia->Existencias;
+                        }else{
+                            $parsleymax = 0;
+                        }
+                        $subtotalentradaspartida = $entradas*$producto->Costo;
+                        $subtotalsalidaspartida = $salidas*$producto->Costo;
+                        $existencianuevapartida = $parsleymax + $entradas - $salidas;
+                        $filasdetallesajuste= $filasdetallesajuste.
+                        '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
+                            '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodmd codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]"></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'.htmlspecialchars($producto->Producto, ENT_QUOTES).'" readonly data-parsley-length="[1, 255]"></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'.$producto->Unidad.'" readonly data-parsley-length="[1, 5]"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm existenciaactualpartida" name="existenciaactualpartida[]" id="existenciaactualpartida[]" value="'.Helpers::convertirvalorcorrecto($parsleymax).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                            '<td class="tdmod">'.
+                                '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm entradaspartidadb" name="entradaspartidadb[]" value="'.Helpers::convertirvalorcorrecto($entradas).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
+                                '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm entradaspartida" name="entradaspartida[]" id="entradaspartida[]" value="'.Helpers::convertirvalorcorrecto($entradas).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" data-parsley-min="'.$parsleyminentradas.'" onchange="formatocorrectoinputcantidades(this);calcularsubtotalentradas('.$contadorfilas.');calcularexistencianueva('.$contadorfilas.');colocardataparsleyminentradas('.$contadorfilas.');">'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm salidaspartidadb" name="salidaspartidadb[]" value="'.Helpers::convertirvalorcorrecto($salidas).'"data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/"  readonly>'.
+                                '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm salidaspartida" name="salidaspartida[]" id="salidaspartida[]" value="'.Helpers::convertirvalorcorrecto($salidas).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" data-parsley-min="'.$parsleyminsalidas.'" data-parsley-existencias="'.$parsleymax.'"	 onchange="formatocorrectoinputcantidades(this);calcularsubtotalsalidas('.$contadorfilas.');calcularexistencianueva('.$contadorfilas.');revisarexistenciasalmacen('.$contadorfilas.');colocardataparsleyminsalidas('.$contadorfilas.');">'.
+                            '</td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm existencianuevapartida" name="existencianuevapartida[]" id="existencianuevapartida[]" value="'.Helpers::convertirvalorcorrecto($existencianuevapartida).'"data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costopartida" name="costopartida[]" id="costopartida[]" value="'.Helpers::convertirvalorcorrecto($producto->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);cambiocosto('.$contadorfilas.');"></td>'.
+                            '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm subtotalentradaspartida" name="subtotalentradaspartida[]" id="subtotalentradaspartida[]" value="'.Helpers::convertirvalorcorrecto($subtotalentradaspartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                            '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm subtotalsalidaspartida" name="subtotalsalidaspartida[]" id="subtotalsalidaspartida[]" value="'.Helpers::convertirvalorcorrecto($subtotalsalidaspartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                        '</tr>';
+                        array_push($arraycodigosyaagregados, $producto->Codigo);
+                        $contadorproductos++;
+                        $contadorfilas++;
+                    }
                 }
             }
             $rowexcel++;
@@ -192,7 +198,6 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
         );
         return response()->json($data); 
     }
-
     //obtener series documento
     public function ajustesinventario_obtener_series_documento(Request $request){
         if($request->ajax()){

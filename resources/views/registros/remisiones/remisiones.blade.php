@@ -92,8 +92,22 @@
                     <h4 class="modal-title" id="titulomodal"></h4>
                 </div>
                 <div class="modal-body">
+                    <form id="formplantilla" action="#" enctype="multipart/form-data" hidden>
+                        <div class="col-md-12">
+                            <table class="col-md-12">
+                                <tr>
+                                    <td>
+                                        <div class="col-md-6">
+                                            <label>Selecciona el archivo excel</label>
+                                            <input type="file" class="form-control" name="partidasexcel" id="partidasexcel" onchange="cargarpartidasexcel(this)" onclick="this.value=null;">
+                                            <button type="button" class="btn btn-success btn-sm" id="btnenviarpartidasexcel" style="display:none">Enviar Excel</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>   
+                        </div>
+                    </form>
                     <form id="formparsley" action="#">
-                        
                         <div class="col-md-12" id="tabsform">
                             <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
                         </div>
@@ -170,7 +184,10 @@
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';
+        var urlgenerarplantilla = '{{$urlgenerarplantilla}}';
         var remisiones_obtener = '{!!URL::to('remisiones_obtener')!!}';
+        var remisiones_descargar_plantilla = '{!!URL::to('remisiones_descargar_plantilla')!!}';
+        var remisiones_cargar_partidas_excel = '{!!URL::to('remisiones_cargar_partidas_excel')!!}';
         var remisiones_obtener_series_documento = '{!!URL::to('remisiones_obtener_series_documento')!!}';
         var remisiones_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('remisiones_obtener_ultimo_folio_serie_seleccionada')!!}';
         var remisiones_obtener_ultimo_folio = '{!!URL::to('remisiones_obtener_ultimo_folio')!!}';

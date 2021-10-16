@@ -97,9 +97,8 @@
                                         <label>Status</label>
                                         <select class="form-control select2" name="status" id="status" onchange="generar_reporte()"  required>
                                             <option value="TODOS">TODOS</option>
-                                            <option value="POR SURTIR">POR SURTIR</option>
-                                            <option value="SURTIDO">SURTIDO</option>
-                                            <option value="BACKORDER">BACKORDER</option>
+                                            <option value="POR PAGAR">POR PAGAR</option>
+                                            <option value="LIQUIDADA">LIQUIDADA</option>
                                             <option value="BAJA">BAJA</option>
                                         </select>
                                     </div> 

@@ -101,6 +101,21 @@
                     <div class="modal-header {{$empresa->background_forms_and_modals}}">
                         <h4 class="modal-title" id="titulomodal"></h4>
                     </div>
+                    <form id="formplantilla" action="#" enctype="multipart/form-data" hidden>
+                        <div class="col-md-12">
+                            <table class="col-md-12">
+                                <tr>
+                                    <td>
+                                        <div class="col-md-6">
+                                            <label>Selecciona el archivo excel</label>
+                                            <input type="file" class="form-control" name="partidasexcel" id="partidasexcel" onchange="cargarpartidasexcel(this)" onclick="this.value=null;">
+                                            <button type="button" class="btn btn-success btn-sm" id="btnenviarpartidasexcel" style="display:none">Enviar Excel</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>   
+                        </div>
+                    </form>
                     <form id="formparsley" action="#">
                         <div class="modal-body">
                             <div class="col-md-12" id="tabsform">
@@ -131,11 +146,13 @@
                     <form id="formautorizar" action="#">
                         <h5 id="textomodalautorizar">Estas seguro de autorizar la orden de compra?</h5>
                         <input type="hidden" id="ordenautorizar" name="ordenautorizar">
+                        <input type="hidden" id="ordenquitarautorizacion" name="ordenquitarautorizacion">
                     </form>	
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
                     <button type="button" class="btn btn-success btn-sm" id="btnautorizar">Confirmar Autorización</button>
+                    <button type="button" class="btn btn-success btn-sm" id="btnquitarautorizacion">Quitar Autorización</button>
                 </div>
             </div>
         </div>
@@ -199,7 +216,10 @@
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';
+        var urlgenerarplantilla = '{{$urlgenerarplantilla}}';
         var ordenes_compra_obtener = '{!!URL::to('ordenes_compra_obtener')!!}';
+        var ordenes_compra_descargar_plantilla = '{!!URL::to('ordenes_compra_descargar_plantilla')!!}';
+        var ordenes_compra_cargar_partidas_excel = '{!!URL::to('ordenes_compra_cargar_partidas_excel')!!}';
         var ordenes_compra_obtener_series_documento = '{!!URL::to('ordenes_compra_obtener_series_documento')!!}';
         var ordenes_compra_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('ordenes_compra_obtener_ultimo_folio_serie_seleccionada')!!}';
         var ordenes_compra_obtener_ultimo_folio = '{!!URL::to('ordenes_compra_obtener_ultimo_folio')!!}';
@@ -214,7 +234,10 @@
         var ordenes_compra_obtener_proveedor_por_numero = '{!!URL::to('ordenes_compra_obtener_proveedor_por_numero')!!}';
         var ordenes_compra_obtener_almacen_por_numero = '{!!URL::to('ordenes_compra_obtener_almacen_por_numero')!!}';
         var ordenes_compra_guardar = '{!!URL::to('ordenes_compra_guardar')!!}';
-        var ordenes_compra_autorizar = '{!!URL::to('ordenes_compra_autorizar')!!}'; 
+        var ordenes_compra_verificar_autorizacion = '{!!URL::to('ordenes_compra_verificar_autorizacion')!!}';
+        var ordenes_compra_autorizar = '{!!URL::to('ordenes_compra_autorizar')!!}';
+        var ordenes_compra_verificar_quitar_autorizacion  = '{!!URL::to('ordenes_compra_verificar_quitar_autorizacion')!!}';
+        var ordenes_compra_quitar_autorizacion  = '{!!URL::to('ordenes_compra_quitar_autorizacion')!!}';
         var ordenes_compra_verificar_uso_en_modulos = '{!!URL::to('ordenes_compra_verificar_uso_en_modulos')!!}'; 
         var ordenes_compra_alta_o_baja = '{!!URL::to('ordenes_compra_alta_o_baja')!!}'; 
         var ordenes_compra_obtener_orden_compra = '{!!URL::to('ordenes_compra_obtener_orden_compra')!!}'; 

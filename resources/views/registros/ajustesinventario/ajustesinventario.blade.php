@@ -91,9 +91,6 @@
                 <div class="modal-header {{$empresa->background_forms_and_modals}}">
                     <h4 class="modal-title" id="titulomodal"></h4>
                 </div>
-
-                
-
                 <form id="formplantilla" action="#" enctype="multipart/form-data" hidden>
                     <div class="col-md-12">
                         <table class="col-md-12">
@@ -109,7 +106,6 @@
                         </table>   
                     </div>
                 </form>
-
                 <form id="formparsley" action="#">
                     <div class="modal-body">
                         <div class="col-md-12" id="tabsform">
@@ -122,8 +118,6 @@
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
                     </div>
                 </form> 
-
-
             </div>
             <div id="contenidomodaltablas">
                 <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->

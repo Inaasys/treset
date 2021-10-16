@@ -8,7 +8,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 
-class PlantillasAjusteExport implements FromCollection,WithHeadings,WithTitle,WithColumnWidths
+class PlantillasOrdenesCompraExport implements FromCollection,WithHeadings,WithTitle,WithColumnWidths
 {
     /**
     * @return \Illuminate\Support\Collection
@@ -17,7 +17,7 @@ class PlantillasAjusteExport implements FromCollection,WithHeadings,WithTitle,Wi
     private $campos_consulta;
 
     public function __construct(){
-        $this->campos_consulta = array('codigo', 'entradas', 'salidas');
+        $this->campos_consulta = array('codigo', 'cantidad');
     }
 
     public function columnWidths(): array
@@ -31,7 +31,7 @@ class PlantillasAjusteExport implements FromCollection,WithHeadings,WithTitle,Wi
 
     //titulo de la hoja de excel
     public function title(): string{
-        return 'ajustes';
+        return 'ordenescompra';
     }
 
     public function headings(): array{
@@ -39,7 +39,7 @@ class PlantillasAjusteExport implements FromCollection,WithHeadings,WithTitle,Wi
     }
     
     public function collection(){
-        $plantilla = \App\VistaAjusteInventario::where('Periodo', 3000)->get();
+        $plantilla = \App\VistaOrdenCompra::where('Periodo', 3000)->get();
         return $plantilla;
     }
 }

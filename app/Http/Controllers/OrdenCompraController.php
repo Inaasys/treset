@@ -11,6 +11,8 @@ use DataTables;
 use DB;
 use PDF;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\PlantillasOrdenesCompraExport;
+use App\Imports\OrdenesCompraImport;
 use App\Exports\OrdenesDeCompraExport;
 use App\OrdenCompra;
 use App\OrdenCompraDetalle;
@@ -59,7 +61,8 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         $rutaconfiguraciontabla = route('ordenes_compra_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('ordenes_compra_exportar_excel');
         $rutacreardocumento = route('ordenes_compra_generar_pdfs');
-        return view('registros.ordenescompra.ordenescompra', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','rutacreardocumento'));
+        $urlgenerarplantilla = route('ordenes_compra_generar_plantilla');
+        return view('registros.ordenescompra.ordenescompra', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','rutacreardocumento','urlgenerarplantilla'));
     }
     //obtener todos los registros
     public function ordenes_compra_obtener(Request $request){
@@ -88,6 +91,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                                             '<ul class="dropdown-menu">'.
                                                 '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Orden .'\')">Cambios</a></li>'.
                                                 '<li><a href="javascript:void(0);" onclick="autorizarordencompra(\''.$data->Orden .'\')">Autorizar</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="quitarautorizacionordencompra(\''.$data->Orden .'\')">Quitar Autorización</a></li>'.
                                                 '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Orden .'\')">Bajas</a></li>'.
                                                 '<li><a href="'.route('ordenes_compra_generar_pdfs_indiv',$data->Orden).'" target="_blank">Ver Documento PDF</a></li>'.
                                                 '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Orden .'\')">Enviar Documento por Correo</a></li>'.
@@ -104,6 +108,66 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     ->make(true);
         } 
     } 
+    //descargar plantilla
+    public function ordenes_compra_generar_plantilla(){
+        return Excel::download(new PlantillasOrdenesCompraExport(), "plantillaordenescompra.xlsx"); 
+    }
+    //cargar partidas excel
+    public function ordenes_compra_cargar_partidas_excel(Request $request){
+        $arrayexcel =  Excel::toArray(new OrdenesCompraImport, request()->file('partidasexcel'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $filasdetallesordencompra = '';
+        $contadorproductos = $request->contadorproductos;
+        $contadorfilas = $request->contadorfilas;
+        $tipooperacion = 'alta';
+        $arraycodigosyaagregados = $porciones = explode(",", $request->arraycodigospartidas);
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 0){
+                if (in_array(strtoupper($partida[0]), $arraycodigosyaagregados)) {
+                    
+                }else{
+                    $codigoabuscar = $partida[0];
+                    $cantidad = $partida[1];
+                    $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', ''.$codigoabuscar.'')->count();
+                    if($contarproductos > 0){
+                        $producto = VistaObtenerExistenciaProducto::where('Codigo', ''.$codigoabuscar.'')->first();
+                        $multiplicacioncostoimpuesto =  $producto->Costo*$producto->Impuesto;      
+                        $ivapesos = $multiplicacioncostoimpuesto/100;
+                        $total = $producto->Costo+$ivapesos;
+                        $tipo = "alta";
+                        $filasdetallesordencompra= $filasdetallesordencompra.
+                        '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
+                            '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]">'.$producto->Codigo.'</td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'.htmlspecialchars($producto->Producto, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'.$producto->Unidad.'" readonly data-parsley-length="[1, 5]">'.$producto->Unidad.'</td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm porsurtirpartida" name="porsurtirpartida[]" id="porsurtirpartida[]" value="'.Helpers::convertirvalorcorrecto($cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($cantidad).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" id="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($producto->Costo).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" id="importepartida[]" value="'.Helpers::convertirvalorcorrecto($producto->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" id="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('.$contadorfilas.');"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" id="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentoporcentajepartida('.$contadorfilas.');"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" id="subtotalpartida[]" value="'.Helpers::convertirvalorcorrecto($producto->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" id="ivaporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($producto->Impuesto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('.$contadorfilas.');"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm ivapesospartida" name="ivapesospartida[]" id="ivapesospartida[]" value="'.Helpers::convertirvalorcorrecto($ivapesos).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" id="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto($total).'"data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                        '</tr>';
+                        array_push($arraycodigosyaagregados, $producto->Codigo);
+                        $contadorproductos++;
+                        $contadorfilas++;
+                    }
+                }
+            }
+            $rowexcel++;
+        }
+        $data = array(
+            "filasdetallesordencompra" => $filasdetallesordencompra,
+            "contadorproductos" => $contadorproductos,
+            "contadorfilas" => $contadorfilas,
+        );
+        return response()->json($data); 
+    }
     //obtener series documento
     public function ordenes_compra_obtener_series_documento(Request $request){
         if($request->ajax()){
@@ -371,12 +435,32 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         }
     	return response()->json($OrdenCompra); 
     }
+    //verificar autorizacion
+    public function ordenes_compra_verificar_autorizacion(Request $request){
+        $OrdenCompra = OrdenCompra::where('Orden', $request->ordenautorizar)->first();
+        return response()->json($OrdenCompra);
+    }
     //autorizar una orden de compra
     public function ordenes_compra_autorizar(Request $request){
         $OrdenCompra = OrdenCompra::where('Orden', $request->ordenautorizar)->first();
         $OrdenCompra->AutorizadoPor = Auth::user()->user; 
         $OrdenCompra->AutorizadoFecha = Helpers::fecha_exacta_accion_datetimestring();
         $OrdenCompra->save();
+        return response()->json($OrdenCompra);
+    }
+    //verificar si se puede quitar auotizacion a orden compra
+    public function ordenes_compra_verificar_quitar_autorizacion(Request $request){
+        $OrdenCompra = OrdenCompra::where('Orden', $request->orden)->first();
+        return response()->json($OrdenCompra);
+    }
+    //quitar autorizacion a orden de compra
+    public function ordenes_compra_quitar_autorizacion(Request $request){
+        $OrdenCompra = OrdenCompra::where('Orden', $request->ordenquitarautorizacion)->first();
+        OrdenCompra::where('Orden', $request->ordenquitarautorizacion)
+        ->update([
+            'AutorizadoPor' => '',
+            'AutorizadoFecha' => null
+        ]);
         return response()->json($OrdenCompra);
     }
     //verificar si la orden de compra ya fue utilizada en una compra
@@ -505,16 +589,16 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             if($ordencompra->Status == 'SURTIDO' || $ordencompra->Status == 'BAJA'){
                 $modificacionpermitida = 0;
             }else{
-                $resultadofechas = Helpers::compararanoymesfechas($ordencompra->Fecha);
+                /*$resultadofechas = Helpers::compararanoymesfechas($ordencompra->Fecha);
                 if($resultadofechas != ''){
                     $modificacionpermitida = 0;
-                }else{
+                }else{*/
                     if($ordencompra->AutorizadoPor == ''){
                         $modificacionpermitida = 1;
                     }else{
                         $modificacionpermitida = 0;
                     }
-                }
+                //}
             }
         }     
         $data = array(

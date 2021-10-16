@@ -111,47 +111,67 @@ class ReportesRelacionOrdenCompraExport implements FromCollection,WithHeadings,W
         $fechainicio = date($this->fechainicialreporte);
         $fechaterminacion = date($this->fechafinalreporte);
         $reporte = $this->reporte;
+        $numeroproveedor=$this->numeroproveedor;
+        $numeroalmacen=$this->numeroalmacen;
+        $tipo=$this->tipo;
+        $status=$this->status;
         if($reporte == "RELACION"){
             $data = DB::table('Ordenes de Compra as oc')
             ->leftjoin('Proveedores as p', 'oc.Proveedor', '=', 'p.Numero')
             ->select('oc.Orden', 'oc.Proveedor', 'p.Nombre', 'oc.Fecha', 'oc.Plazo', 'oc.Almacen', 'oc.Tipo', 'oc.Referencia', 'oc.Importe', 'oc.Descuento', 'oc.SubTotal', 'oc.Iva', 'oc.Total', 'oc.Obs', 'oc.Status', 'oc.MotivoBaja', 'oc.Usuario')
             ->whereBetween('oc.Fecha', [$fechainicio, $fechaterminacion])
+            ->where(function($q) use ($numeroproveedor) {
+                if($numeroproveedor != ""){
+                    $q->where('oc.Proveedor', $numeroproveedor);
+                }
+            })
+            ->where(function($q) use ($numeroalmacen) {
+                if($numeroalmacen != ""){
+                    $q->whereIn('oc.Almacen', array($numeroalmacen));
+                }
+            })
+            ->where(function($q) use ($tipo) {
+                if($tipo != 'TODOS'){
+                    $q->where('oc.Tipo', $tipo);
+                }
+            })
+            ->where(function($q) use ($status) {
+                if($status != 'TODOS'){
+                    $q->where('oc.Status', $status);
+                }
+            })
             ->orderby('oc.Serie', 'ASC')
             ->orderby('oc.Folio', 'ASC')
             ->get();
-            if($this->numeroproveedor != ""){
-                $data = $data->where('Proveedor', $this->numeroproveedor);
-            }
-            if($this->numeroalmacen != ""){
-                $data = $data->where('Almacen', $this->numeroalmacen);
-            }
-            if($this->tipo != 'TODOS'){
-                $data = $data->where('Tipo', $this->tipo);
-            }
-            if($this->status != 'TODOS'){
-                $data = $data->where('Status', $this->status);
-            }
         }else{
             $data = DB::table('Ordenes de Compra as oc')
             ->leftjoin('Proveedores as p', 'oc.Proveedor', '=', 'p.Numero')
             ->leftjoin('Ordenes de Compra Detalles as ocd', 'oc.Orden', '=', 'ocd.Orden')
             ->select('oc.Orden', 'oc.Proveedor', 'p.Nombre', 'oc.Fecha', 'oc.Plazo', 'oc.Almacen', 'oc.Tipo', 'oc.Referencia', 'ocd.Codigo', 'ocd.Descripcion', 'ocd.Unidad', 'ocd.Surtir as Por Surtir', 'ocd.Cantidad', 'ocd.Precio', 'ocd.Importe', 'ocd.Descuento', 'ocd.SubTotal', 'ocd.Iva', 'ocd.Total', 'oc.Obs', 'oc.Status', 'oc.MotivoBaja', 'oc.Usuario')
             ->whereBetween('oc.Fecha', [$fechainicio, $fechaterminacion])
+            ->where(function($q) use ($numeroproveedor) {
+                if($numeroproveedor != ""){
+                    $q->where('oc.Proveedor', $numeroproveedor);
+                }
+            })
+            ->where(function($q) use ($numeroalmacen) {
+                if($numeroalmacen != ""){
+                    $q->whereIn('oc.Almacen', array($numeroalmacen));
+                }
+            })
+            ->where(function($q) use ($tipo) {
+                if($tipo != 'TODOS'){
+                    $q->where('oc.Tipo', $tipo);
+                }
+            })
+            ->where(function($q) use ($status) {
+                if($status != 'TODOS'){
+                    $q->where('oc.Status', $status);
+                }
+            })
             ->orderby('oc.Serie', 'ASC')
             ->orderby('oc.Folio', 'ASC')
             ->get();
-            if($this->numeroproveedor != ""){
-                $data = $data->where('Proveedor', $this->numeroproveedor);
-            }
-            if($this->numeroalmacen != ""){
-                $data = $data->where('Almacen', $this->numeroalmacen);
-            }
-            if($this->tipo != 'TODOS'){
-                $data = $data->where('Tipo', $this->tipo);
-            }
-            if($this->status != 'TODOS'){
-                $data = $data->where('Status', $this->status);
-            }
         }
         return $data;
     }

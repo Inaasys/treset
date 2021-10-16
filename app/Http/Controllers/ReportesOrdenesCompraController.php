@@ -105,26 +105,38 @@ class ReportesOrdenesCompraController extends ConfiguracionSistemaController{
         $fechainicio = date($request->fechainicialreporte);
         $fechaterminacion = date($request->fechafinalreporte);
         $reporte = $request->reporte;
+        $numeroproveedor=$request->numeroproveedor;
+        $numeroalmacen=$request->numeroalmacen;
+        $tipo=$request->tipo;
+        $status=$request->status;
         if($reporte == "RELACION"){
             $data = DB::table('Ordenes de Compra as oc')
             ->leftjoin('Proveedores as p', 'oc.Proveedor', '=', 'p.Numero')
             ->select('oc.Orden', 'oc.Proveedor', 'p.Nombre', 'oc.Fecha', 'oc.Plazo', 'oc.Almacen', 'oc.Tipo', 'oc.Referencia', 'oc.Importe', 'oc.Descuento', 'oc.SubTotal', 'oc.Iva', 'oc.Total', 'oc.Obs', 'oc.Status', 'oc.MotivoBaja', 'oc.Usuario')
             ->whereBetween('oc.Fecha', [$fechainicio, $fechaterminacion])
+            ->where(function($q) use ($numeroproveedor) {
+                if($numeroproveedor != ""){
+                    $q->where('oc.Proveedor', $numeroproveedor);
+                }
+            })
+            ->where(function($q) use ($numeroalmacen) {
+                if($numeroalmacen != ""){
+                    $q->whereIn('oc.Almacen', array($numeroalmacen));
+                }
+            })
+            ->where(function($q) use ($tipo) {
+                if($tipo != 'TODOS'){
+                    $q->where('oc.Tipo', $tipo);
+                }
+            })
+            ->where(function($q) use ($status) {
+                if($status != 'TODOS'){
+                    $q->where('oc.Status', $status);
+                }
+            })
             ->orderby('oc.Serie', 'ASC')
             ->orderby('oc.Folio', 'ASC')
             ->get();
-            if($request->numeroproveedor != ""){
-                $data = $data->where('Proveedor', $request->numeroproveedor);
-            }
-            if($request->numeroalmacen != ""){
-                $data = $data->where('Almacen', $request->numeroalmacen);
-            }
-            if($request->tipo != 'TODOS'){
-                $data = $data->where('Tipo', $request->tipo);
-            }
-            if($request->status != 'TODOS'){
-                $data = $data->where('Status', $request->status);
-            }
             return DataTables::of($data)
             ->addColumn('Nombre', function($data){ return substr($data->Nombre, 0, 30); })
             ->addColumn('Obs', function($data){ return substr($data->Obs, 0, 30); })
@@ -136,21 +148,29 @@ class ReportesOrdenesCompraController extends ConfiguracionSistemaController{
             ->leftjoin('Ordenes de Compra Detalles as ocd', 'oc.Orden', '=', 'ocd.Orden')
             ->select('oc.Orden', 'oc.Proveedor', 'p.Nombre', 'oc.Fecha', 'oc.Plazo', 'oc.Almacen', 'oc.Tipo', 'oc.Referencia', 'ocd.Codigo', 'ocd.Descripcion', 'ocd.Unidad', 'ocd.Surtir as Por Surtir', 'ocd.Cantidad', 'ocd.Precio', 'ocd.Importe', 'ocd.Descuento', 'ocd.SubTotal', 'ocd.Iva', 'ocd.Total', 'oc.Obs', 'oc.Status', 'oc.MotivoBaja', 'oc.Usuario')
             ->whereBetween('oc.Fecha', [$fechainicio, $fechaterminacion])
+            ->where(function($q) use ($numeroproveedor) {
+                if($numeroproveedor != ""){
+                    $q->where('oc.Proveedor', $numeroproveedor);
+                }
+            })
+            ->where(function($q) use ($numeroalmacen) {
+                if($numeroalmacen != ""){
+                    $q->whereIn('oc.Almacen', array($numeroalmacen));
+                }
+            })
+            ->where(function($q) use ($tipo) {
+                if($tipo != 'TODOS'){
+                    $q->where('oc.Tipo', $tipo);
+                }
+            })
+            ->where(function($q) use ($status) {
+                if($status != 'TODOS'){
+                    $q->where('oc.Status', $status);
+                }
+            })
             ->orderby('oc.Serie', 'ASC')
             ->orderby('oc.Folio', 'ASC')
             ->get();
-            if($request->numeroproveedor != ""){
-                $data = $data->where('Proveedor', $request->numeroproveedor);
-            }
-            if($request->numeroalmacen != ""){
-                $data = $data->where('Almacen', $request->numeroalmacen);
-            }
-            if($request->tipo != 'TODOS'){
-                $data = $data->where('Tipo', $request->tipo);
-            }
-            if($request->status != 'TODOS'){
-                $data = $data->where('Status', $request->status);
-            }
             return DataTables::of($data)
             ->addColumn('Nombre', function($data){ return substr($data->Nombre, 0, 30); })
             ->addColumn('Descripcion', function($data){ return substr($data->Descripcion, 0, 30); })
