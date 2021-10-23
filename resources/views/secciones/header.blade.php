@@ -85,7 +85,6 @@
             <li><a href="{{ route('personal') }}" id="menucatalogopersonal">Personal</a></li>
             @if(Auth::user()->role_id == 1)
               <li><a href="{{ route('usuarios') }}">Usuarios</a></li>
-              <li><a href="{{ route('errors_inaasys') }}"><b>LOGS-ERRORS</b></a></li>
             @endif
           </ul>
         </li>
@@ -186,15 +185,15 @@
               </ul>
             </li>
             <li class="dropdown-submenu">
-              <a class="test"  href="#">ContraRecibos <span class="caret"></span></a>
+              <a class="test" href="#">ContraRecibos <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a  href="#" id="menureporterelacioncontrarecibos">Relación de ContraRecibos</a></li>
+                <li><a  href="{{route('reporte_relacion_contrarecibos')}}" id="menureporterelacioncontrarecibos">Relación de ContraRecibos</a></li>
               </ul>
             </li>                 
             <li class="dropdown-submenu">
               <a class="test"  href="#">Cotizaciones <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a  href="#" id="menureporterelacioncotizaciones">Relación de Cotizaciones</a></li>
+                <li><a  href="{{route('reporte_relacion_cotizaciones')}}" id="menureporterelacioncotizaciones">Relación de Cotizaciones</a></li>
               </ul>
             </li>
             <!--<li class="dropdown-submenu">
@@ -206,7 +205,7 @@
             <li class="dropdown-submenu">
               <a class="test"  href="#">Remisiones <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a  href="#" id="menureporterelacionremisiones">Relación de Remisiones por Clientes</a></li>
+                <li><a  href="{{route('reporte_relacion_remisiones')}}" id="menureporterelacionremisiones">Relación de Remisiones por Clientes</a></li>
               </ul>
             </li>
             <li class="dropdown-submenu">
@@ -293,7 +292,7 @@
             </li>
             <li class="dropdown-submenu">
               <a class="test" href="#">Inventario <span class="caret"></span></a>
-              <ul class="dropdown-menu " style="margin-top: -224px !important;">
+              <ul class="dropdown-menu " style="margin-top: -150px !important;">
                 <li><a  href="#" id="menureportecostoinventario">Costo del Inventario </a></li>
                 <li><a  href="#" id="menureportecostoinventarioparametros">Costo del Inventario (Costo Ultimo, Promedio y Más Alto)</a></li>
                 <li><a  href="#" id="menureporteproductossincomprasyventas">Productos sin Movimiento de Compras y Ventas </a></li>
@@ -351,6 +350,9 @@
             </li>                 
             <li><a href="#">Generar Pólizas</a></li>-->
             <li><a href="{{ route('empresa') }}">Empresa</a></li>
+            @if(Auth::user()->role_id == 1)
+              <li><a href="{{ route('errors_inaasys') }}"><b>LOGS-ERRORS</b></a></li>
+            @endif
             <li class="bg-deep-orange">
               <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                 <b>CERRAR SESIÓN</b>

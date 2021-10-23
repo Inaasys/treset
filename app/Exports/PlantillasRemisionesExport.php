@@ -31,7 +31,7 @@ class PlantillasRemisionesExport implements FromCollection,WithHeadings,WithTitl
 
     //titulo de la hoja de excel
     public function title(): string{
-        return 'remisiones';
+        return 'plantillaremisiones';
     }
 
     public function headings(): array{

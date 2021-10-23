@@ -99,7 +99,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
     }
     //descargar plantilla
     public function ajustesinventario_generar_plantilla(){
-        return Excel::download(new PlantillasAjusteExport(), "ajustes.xlsx"); 
+        return Excel::download(new PlantillasAjusteExport(), "plantillaajustes.xlsx"); 
     }
     //cargar partidas excel
     public function ajustesinventario_cargar_partidas_excel(Request $request){

@@ -11,6 +11,8 @@ use DataTables;
 use DB;
 use PDF;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\PlantillasOrdenesTrabajoExport;
+use App\Imports\OrdenesTrabajoImport;
 use App\Exports\OrdenesDeTrabajoExport;
 use App\OrdenTrabajo;
 use App\OrdenTrabajoDetalle;
@@ -58,7 +60,8 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         $rutaconfiguraciontabla = route('ordenes_trabajo_guardar_configuracion_tabla');
         $rutacreardocumento = route('ordenes_trabajo_generar_pdfs');
         $urlgenerarformatoexcel = route('ordenes_trabajo_exportar_excel');
-        return view('registros.ordenestrabajo.ordenestrabajo', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','rutacreardocumento','urlgenerarformatoexcel'));
+        $urlgenerarplantilla = route('ordenes_trabajo_generar_plantilla');
+        return view('registros.ordenestrabajo.ordenestrabajo', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','rutacreardocumento','urlgenerarformatoexcel','urlgenerarplantilla'));
     }
     //obtener todos los registros del modulo
     public function ordenes_trabajo_obtener(Request $request){
@@ -111,6 +114,123 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                 ->rawColumns(['operaciones'])
                 ->make(true);
         } 
+    }
+    //descargar plantilla
+    public function ordenes_trabajo_generar_plantilla(){
+        return Excel::download(new PlantillasOrdenesTrabajoExport(), "plantillaordenestrabajo.xlsx"); 
+    }
+    //cargar partidas excel
+    public function ordenes_trabajo_cargar_partidas_excel(Request $request){
+        $arrayexcel =  Excel::toArray(new OrdenesTrabajoImport, request()->file('partidasexcel'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $filasdetallesordentrabajo = '';
+        $contadorservicios = $request->contadorservicios;
+        $contadorfilas = $request->contadorfilas;
+        $item = $request->item;
+        $hoy = $request->hoy;
+        $tipooperacion = 'alta';
+        $arraycodigosyaagregados = $porciones = explode(",", $request->arraycodigospartidas);
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 0){
+                //if (in_array(strtoupper($partida[0]), $arraycodigosyaagregados)) {
+                    
+                //}else{
+                    $codigoabuscar = $partida[0];
+                    $cantidadpartida = $partida[1];
+                    $contarservicios = Servicio::where('Codigo', ''.$codigoabuscar.'')->count();
+                    if($contarservicios > 0){
+                        $servicio = Servicio::where('Codigo', ''.$codigoabuscar.'')->first();
+                        if(Helpers::convertirvalorcorrecto($cantidadpartida) == 0){
+                            $cantidad = 1;
+                        }else{
+                            $cantidad = $cantidadpartida;
+                        }
+                        //precio de la partidad
+                        $preciopartidaservicio = $servicio->Venta;
+                        //importe de la partida
+                        $importepartidaservicio =  $cantidad*$preciopartidaservicio;
+                        //subtotal de la partida
+                        $subtotalpartidaservicio =  $importepartidaservicio-0;
+                        //iva porcentaje partida 
+                        $ivaporcentajepartidaservicio = Helpers::convertirvalorcorrecto(16);
+                        //iva en pesos de la partida
+                        $multiplicacionivapesospartida = $subtotalpartidaservicio*$ivaporcentajepartidaservicio;
+                        $ivapesospartidaservicio = $multiplicacionivapesospartida/100;
+                        //total en pesos de la partida
+                        $totalpesospartidaservicio = $subtotalpartidaservicio+$ivapesospartidaservicio;
+                        //costo partida servicio
+                        $costopartidaservicio = Helpers::convertirvalorcorrecto(0);
+                        //costo total
+                        $costototalpartidaservicio  = $costopartidaservicio*$cantidad;
+                        //comision de la partida
+                        $comisionporcentajepartidaservicio = $subtotalpartidaservicio*0;
+                        $comisionespesospartidaservicio = $comisionporcentajepartidaservicio/100;
+                        //utilidad de la partida
+                        $utilidadpartidaservicio = $subtotalpartidaservicio-$costototalpartidaservicio-$comisionespesospartidaservicio;
+                        $tipo = "alta";
+                        $filasdetallesordentrabajo= $filasdetallesordentrabajo.
+                        '<tr class="filasservicios" id="filaservicio'.$contadorservicios.'">'.
+                            '<td class="tdmod"><div class="divorinputmodmd">'.
+                                '<div class="btn bg-red btn-xs" data-toggle="tooltip" title="Eliminar Fila" onclick="eliminarfila('.$contadorservicios.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly> '.
+                                '<div class="btn bg-blue btn-xs" data-toggle="tooltip" title="Asignar Técnicos" onclick="asignaciontecnicos('.$contadorservicios.')">Asignar técnicos</div>'.
+                                '</div>'.
+                            '</td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control tipofila" name="tipofila[]" value="agregado" readonly><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$servicio->Codigo.'" readonly data-parsley-length="[1, 20]">'.$servicio->Codigo.'</td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($servicio->Servicio, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control unidadpartidad" name="unidadpartidad[]" value="'.$servicio->Unidad.'" readonly data-parsley-length="[1, 5]">'.$servicio->Unidad.'</td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordentrabajo('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($preciopartidaservicio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordentrabajo('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.Helpers::convertirvalorcorrecto($importepartidaservicio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('.$contadorfilas.');"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentoporcentajepartida('.$contadorfilas.');"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'.Helpers::convertirvalorcorrecto($subtotalpartidaservicio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($ivaporcentajepartidaservicio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordentrabajo('.$contadorfilas.');" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm ivapesospartida" name="ivapesospartida[]" value="'.Helpers::convertirvalorcorrecto($ivapesospartidaservicio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto($totalpesospartidaservicio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'.Helpers::convertirvalorcorrecto($costopartidaservicio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this)" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="'.Helpers::convertirvalorcorrecto($costototalpartidaservicio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this)" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm comisionporcentajepartida" name="comisionporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($comisionporcentajepartidaservicio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this)" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm comisionpesospartida" name="comisionpesospartida[]" value="'.Helpers::convertirvalorcorrecto($comisionespesospartidaservicio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this)" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'.Helpers::convertirvalorcorrecto($utilidadpartidaservicio).'"  data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this)" readonly></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodxs departamentopartida" name="departamentopartida[]" value="SERVICIO" readonly data-parsley-length="[1, 20]"></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodxs cargopartida" name="cargopartida[]" value="SERVICIO" readonly data-parsley-length="[1, 20]"></td>'.
+                            '<td class="tdmod"><input type="datetime-local" class="form-control divorinputmodxl fechapartida" name="fechapartida[]" value="'.$hoy.'" readonly></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodxs traspasopartida" name="traspasopartida[]" readonly></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodxs comprapartida" name="comprapartida[]" readonly data-parsley-length="[1, 20]"></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodxs usuariopartida" name="usuariopartida[]" value="'.Auth::user()->user.'" readonly></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodxl anotacionespartida" name="anotacionespartida[]" data-parsley-length="[1, 255]" autocomplete="off"></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodxs statuspartida" name="statuspartida[]" readonly></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodxs itempartida" name="itempartida[]" value="'.$item.'" readonly></td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida1" name="numerotecnicopartida1[]" value="0" readonly><input type="text" class="form-control divorinputmodl tecnicopartida1" name="tecnicopartida1[]" value="0" readonly></td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida2" name="numerotecnicopartida2[]" value="0" readonly><input type="text" class="form-control divorinputmodl tecnicopartida2" name="tecnicopartida2[]" value="0" readonly></td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida3" name="numerotecnicopartida3[]" value="0" readonly><input type="text" class="form-control divorinputmodl tecnicopartida3" name="tecnicopartida3[]" value="0" readonly></td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida4" name="numerotecnicopartida4[]" value="0" readonly><input type="text" class="form-control divorinputmodl tecnicopartida4" name="tecnicopartida4[]" value="0" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm horaspartida1" name="horaspartida1[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this)" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm horaspartida2" name="horaspartida2[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this)" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm horaspartida3" name="horaspartida3[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this)" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm horaspartida4" name="horaspartida4[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this)" readonly></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodxs promocionpartida" name="promocionpartida[]" readonly></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodxs partidapartida" name="partidapartida[]" value="'.$item.'" readonly></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodxs almacenpartida" name="almacenpartida[]" value="0" readonly></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodxs cotizacionpartida" name="cotizacionpartida[]" readonly data-parsley-length="[1, 20]"></td>'.
+                        '</tr>';
+                        //array_push($arraycodigosyaagregados, $servicio->Codigo);
+                        $contadorservicios++;
+                        $contadorfilas++;
+                        $item++;
+                    }
+                //}
+            }
+            $rowexcel++;
+        }
+        $data = array(
+            "filasdetallesordentrabajo" => $filasdetallesordentrabajo,
+            "contadorservicios" => $contadorservicios,
+            "contadorfilas" => $contadorfilas,
+            "item" => $item
+        );
+        return response()->json($data); 
     }
     //obtener series documento
     public function ordenes_trabajo_obtener_series_documento(Request $request){

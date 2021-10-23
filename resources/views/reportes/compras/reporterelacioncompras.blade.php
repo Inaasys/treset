@@ -33,7 +33,7 @@
                         	</table>
                         </div>
                         <div class="body">
-                            <form id="formrelacionordenescompra">
+                            <form id="formreporte">
                                 <div class="row">
                                     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
                                         <label>Proveedor <span class="label label-danger" id="textonombreproveedor"></span></label>
@@ -105,7 +105,7 @@
                                     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
                                         <label>Reporte</label>
                                         <select class="form-control select2" name="reporte" id="reporte" onchange="generar_reporte()"  required>
-                                            <option value="RELACION">RELACION</option>
+                                            <option value="GENERAL">GENERAL</option>
                                             <option value="DETALLES">DETALLES</option>
                                             <option value="POTENCIALES">POTENCIALES</option>
                                         </select>

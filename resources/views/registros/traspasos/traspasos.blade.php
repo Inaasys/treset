@@ -91,6 +91,21 @@
                 <div class="modal-header {{$empresa->background_forms_and_modals}}">
                     <h4 class="modal-title" id="titulomodal"></h4>
                 </div>
+                <form id="formplantilla" action="#" enctype="multipart/form-data" hidden>
+                    <div class="col-md-12">
+                        <table class="col-md-12">
+                            <tr>
+                                <td>
+                                    <div class="col-md-6">
+                                        <label>Selecciona el archivo excel</label>
+                                        <input type="file" class="form-control" name="partidasexcel" id="partidasexcel" onchange="cargarpartidasexcel(this)" onclick="this.value=null;">
+                                        <button type="button" class="btn btn-success btn-sm" id="btnenviarpartidasexcel" style="display:none">Enviar Excel</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>   
+                    </div>
+                </form>
                 <form id="formparsley" action="#">
                     <div class="modal-body">
                         <div class="col-md-12" id="tabsform">
@@ -171,7 +186,10 @@
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';
+        var urlgenerarplantilla = '{{$urlgenerarplantilla}}';
         var traspasos_obtener = '{!!URL::to('traspasos_obtener')!!}';
+        var traspasos_descargar_plantilla = '{!!URL::to('traspasos_descargar_plantilla')!!}';
+        var traspasos_cargar_partidas_excel = '{!!URL::to('traspasos_cargar_partidas_excel')!!}';
         var traspasos_obtener_series_documento = '{!!URL::to('traspasos_obtener_series_documento')!!}';
         var traspasos_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('traspasos_obtener_ultimo_folio_serie_seleccionada')!!}';
         var traspasos_obtener_ultimo_folio = '{!!URL::to('traspasos_obtener_ultimo_folio')!!}';
@@ -182,13 +200,10 @@
         var traspasos_obtener_almacen_a_por_numero = '{!!URL::to('traspasos_obtener_almacen_a_por_numero')!!}';
         var traspasos_obtener_ordenes_trabajo = '{!!URL::to('traspasos_obtener_ordenes_trabajo')!!}';
         var traspasos_obtener_orden_trabajo_por_folio = '{!!URL::to('traspasos_obtener_orden_trabajo_por_folio')!!}';
-
         var traspasos_obtener_cotizaciones = '{!!URL::to('traspasos_obtener_cotizaciones')!!}';
         var traspasos_obtener_cotizacion = '{!!URL::to('traspasos_obtener_cotizacion')!!}';
         var traspasos_obtener_requisiciones = '{!!URL::to('traspasos_obtener_requisiciones')!!}';
         var traspasos_obtener_requisicion = '{!!URL::to('traspasos_obtener_requisicion')!!}';
-
-
         var traspasos_obtener_productos = '{!!URL::to('traspasos_obtener_productos')!!}';
         var traspasos_obtener_producto_por_codigo = '{!!URL::to('traspasos_obtener_producto_por_codigo')!!}';
         var traspasos_obtener_existencias_partida = '{!!URL::to('traspasos_obtener_existencias_partida')!!}';

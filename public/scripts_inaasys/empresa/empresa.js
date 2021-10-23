@@ -29,9 +29,10 @@ function setvaluesselects(){
     //tab configurar
     $("#numerodecimalessistema").val(numerodecimales).trigger("change");
     $("#numerodecilamesdocumentospdfsistema").val(numerodecimalesendocumentos).trigger("change");
-    $("input[name=utilizarmayusculasistema][value='"+mayusculas_sistema+"']").prop("checked",true);    
+    $("input[name=utilizarmayusculasistema][value='"+mayusculas_sistema+"']").prop("checked",true);   
+    //tipo utilidad
+    $("#tipoutilidadventa").val(tipo_de_utilidad).trigger("change");
 }
-
 //ocultar modal formulario
 function ocultarmodaltablaseleccion(){
   $("#ModalTablas").modal('show');
@@ -236,9 +237,6 @@ function obtenermunicipios() {
       "iDisplayLength": 8,
   });  
 }
-
-
-
 //obtener registros de paises
 function obtenerlugaresexpedicion(){
   ocultarmodaltablaseleccion();
@@ -413,8 +411,6 @@ function obtenermonedas(){
       "iDisplayLength": 8,
   }); 
 } 
-
-
 function seleccionarpais(Numero, Clave){
   $("#empresanombrepais").val(Clave);
   $("#empresanumeropais").val(Numero);
@@ -432,7 +428,6 @@ function seleccionarmunicipio(Nombre){
   $("#empresanombremunicipio").val(Nombre);
   mostrarmodaltablaseleccion();
 }
-
 function seleccionarlugarexpedicion(Clave){
   $("#empresalugarexpedicion").val(Clave);
   mostrarmodaltablaseleccion();
@@ -445,7 +440,6 @@ function seleccionarmoneda(Clave){
   $("#empresamoneda").val(Clave);
   mostrarmodaltablaseleccion();
 }
-
 //guardar modificacion domicilio fiscal
 $("#btnguardardomiciliofiscal").on('click', function (e) {
     e.preventDefault();
@@ -481,8 +475,6 @@ $("#btnguardardomiciliofiscal").on('click', function (e) {
     //validar formulario
     form.parsley().validate();
 });
-
-
 //guardar modificacion domicilio fiscal
 $("#btnguardarlugarexpedicion").on('click', function (e) {
   e.preventDefault();
@@ -518,7 +510,6 @@ $("#btnguardarlugarexpedicion").on('click', function (e) {
   //validar formulario
   form.parsley().validate();
 });
-
 //guardar modificacion configurar
 $("#btnguardarconfigurar").on('click', function (e) {
   e.preventDefault();
@@ -554,7 +545,6 @@ $("#btnguardarconfigurar").on('click', function (e) {
   //validar formulario
   form.parsley().validate();
 });
-
 //guardar modificacion contrasena
 $("#btnguardarcontrasena").on('click', function (e) {
   e.preventDefault();
@@ -631,8 +621,6 @@ $("#btnguardarlogotipo").on('click', function (e) {
     //validar formulario
     form.parsley().validate();
 });
-
-
 //guardar modificacion logo y temas
 $("#btnguardarregistroempresafacturapi").on('click', function (e) {
   e.preventDefault();
@@ -670,5 +658,4 @@ $("#btnguardarregistroempresafacturapi").on('click', function (e) {
   //validar formulario
   form.parsley().validate();
 });
-
 init();

@@ -282,12 +282,24 @@ class ProductoController extends ConfiguracionSistemaController{
             $utilidades[] = array("utilidad" => Helpers::convertirvalorcorrecto($marca[0]->Utilidad5), "costo" => $costo, "impuesto" => $impuesto);
             $filasutilidadesproducto = '';
                 foreach($utilidades as $utilidad){
+                    if($this->tipodeutilidad == 'Financiera'){
+                        $subtotalpesos = $utilidad["costo"]/(((100 - $utilidad["utilidad"]/Helpers::convertirvalorcorrecto(100)) / 100));
+                    }else{
+                        //$nuevosubtotalproducto = $request->preciopartida [$key]*(1+($Producto->Utilidad/100));
+                        $multiplicacionsubtotalpesos = $utilidad["costo"]*($utilidad["utilidad"]/Helpers::convertirvalorcorrecto(100));
+                        $subtotalpesos = $utilidad["costo"]+$multiplicacionsubtotalpesos;
+                    }
+                    $utilidadpesos = $subtotalpesos - $utilidad["costo"];
+                    $ivapesos = $subtotalpesos*($utilidad["impuesto"]/Helpers::convertirvalorcorrecto(100));
+                    $totalpesos = $subtotalpesos + $ivapesos;
+                    /*
                     $utilidadrestante = Helpers::convertirvalorcorrecto(100) - $utilidad["utilidad"];
                     $subtotalpesos = $utilidad["costo"] / ($utilidadrestante/100);
                     $utilidadpesos = $subtotalpesos - $utilidad["costo"];
                     $subtotalpesos = $utilidad["costo"] / ($utilidadrestante/100);
                     $ivapesos = $subtotalpesos * ($utilidad["impuesto"]/100);
                     $totalpesos = $subtotalpesos + $ivapesos;
+                    */
                     $filasutilidadesproducto= $filasutilidadesproducto.
                     '<tr>'.
                         '<td>'.Helpers::convertirvalorcorrecto($utilidad["costo"]).'</td>'.
@@ -487,7 +499,6 @@ class ProductoController extends ConfiguracionSistemaController{
                     '<td><input type="hidden" name="codigoproductoconsumos[]" value="'.$c->Equivale.'" readonly>'.$c->Equivale.'</td>'.
                     '<td><input type="hidden" name="productoconsumos[]"  value="'.$producto->Producto.'" readonly>'.$producto->Producto.'</td>'.
                     '<td><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" name="cantidadproductoconsumos[]" required value="'.Helpers::convertirvalorcorrecto($c->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);"></td>'.
-
                     '<td><input type="hidden" name="unidadconsumos[]"  value="'.$producto->Unidad.'" readonly>'.$producto->Unidad.'</td>'.
                     '<td><input type="hidden" name="inventariableconsumos[]"  value="'.$producto->Inventariable.'" readonly>'.$producto->Inventariable.'</td>'.
                     '<td><input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" name="costoconsumos[]" required value="'.Helpers::convertirvalorcorrecto($producto->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);">'.Helpers::convertirvalorcorrecto($producto->Costo).'</td>'.

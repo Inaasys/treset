@@ -65,6 +65,7 @@ $(document).ready(function() {
         var code = (e.keyCode ? e.keyCode : e.which);
         if(code==13){
             obtenerproveedorpornumero();
+            e.preventDefault();
         }
     });
     //activar busqueda
@@ -73,6 +74,7 @@ $(document).ready(function() {
         var code = (e.keyCode ? e.keyCode : e.which);
         if(code==13){
             obteneralmacenpornumero();
+            e.preventDefault();
         }
     });
     //regresar numero
@@ -296,7 +298,7 @@ function regresarnumeroalmacen(){
 }
 //actualizar reporte
 function generar_reporte(){
-    var form = $("#formrelacionordenescompra");
+    var form = $("#formreporte");
     if (form.parsley().isValid()){
         var result = validafechas();
         if(result == 'fechafinalmayorahoy'){
@@ -317,7 +319,7 @@ function generar_reporte(){
 }
 //realizar en reporte en excel
 function generar_formato_excel(){
-    var form = $("#formrelacionordenescompra");
+    var form = $("#formreporte");
     if (form.parsley().isValid()){
         var numeroproveedor = $("#numeroproveedor").val();
         var numeroalmacen = $("#numeroalmacen").val();
@@ -336,7 +338,7 @@ function generar_formato_excel(){
 //listar tabla reporte
 function listar(){
     var reporte = $("#reporte").val();
-    if(reporte == 'RELACION'){
+    if(reporte == 'GENERAL'){
         var columnas = new Array('Compra', 'Proveedor', 'Nombre', 'Fecha', 'Plazo', 'Vence', 'Remision', 'Factura', 'Movimiento', 'Almacen', 'Tipo', 'Importe', 'Descuento', 'SubTotal', 'Iva', 'Total', 'Abonos', 'Descuentos', 'Saldo', 'Obs', 'Status', 'MotivoBaja', 'Usuario', 'Rfc', 'Calle', 'NoExterior', 'Colonia', 'Municipio', 'Estado', 'CodigoPostal', 'Contacto', 'Telefonos', 'Email1');
     }else if(reporte == 'DETALLES'){
         var columnas = new Array('Compra', 'Proveedor', 'Nombre', 'Fecha', 'Plazo', 'Vence', 'Remision', 'Factura', 'Movimiento', 'Almacen', 'Tipo', 'Codigo', 'Descripcion', 'Unidad', 'Cantidad', 'Precio', 'Importe', 'Descuento', 'SubTotal', 'Iva', 'Total', 'ObsCompra', 'ObsDetalle', 'Status', 'MotivoBaja', 'Usuario', 'Rfc', 'Calle', 'NoExterior', 'Colonia', 'Municipio', 'Estado', 'CodigoPostal', 'Contacto', 'Telefonos', 'Email1');

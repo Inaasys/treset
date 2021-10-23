@@ -627,10 +627,6 @@
                                             </div>
                                         </form>
                                     </div> 
-
-
-
-                                    
                                     <div role="tabpanel" class="tab-pane fade" id="registro_facturapi">
                                         <form id="formregistroempresafacturapi" action="#">
                                             <div class="row">  
@@ -651,8 +647,6 @@
                                             </div>
                                         </form>
                                     </div> 
-
-
                                     <div role="tabpanel" class="tab-pane fade" id="cambiar_logotipo">
                                         <form id="formlogotipo" action="#" enctype="multipart/form-data">
                                             <div class="row">
@@ -997,18 +991,16 @@
             </div>
         </div>
     </section>
-
-<!-- Modal Tablas Seleccion-->
-<div class="modal fade" data-backdrop="static" data-keyboard="false" id="ModalTablas" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div id="contenidomodaltablas">
-                <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
-            </div> 
+    <!-- Modal Tablas Seleccion-->
+    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="ModalTablas" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div id="contenidomodaltablas">
+                    <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
+                </div> 
+            </div>
         </div>
     </div>
-</div>
-
 @endsection
 @section('additionals_js')
     <script>
@@ -1025,6 +1017,7 @@
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';
+        var tipo_de_utilidad = '{{$empresa->Tipo_De_Utilidad}}';
         var empresa_obtener_paises = '{!!URL::to('empresa_obtener_paises')!!}';
         var empresa_obtener_estados = '{!!URL::to('empresa_obtener_estados')!!}';
         var empresa_obtener_municipios = '{!!URL::to('empresa_obtener_municipios')!!}';

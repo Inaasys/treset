@@ -129,6 +129,54 @@ function listar(){
     obtenerdatos(data.Cotizacion);
   });
 }
+//realizar en reporte en excel
+function descargar_plantilla(){
+  $("#btnGenerarPlantilla").attr("href", urlgenerarplantilla);
+  $("#btnGenerarPlantilla").click();
+}
+function seleccionarpartidasexcel(){
+  $("#partidasexcel").click();
+}
+//Cada que se elija un archivo
+function cargarpartidasexcel(e) {
+  $("#btnenviarpartidasexcel").click();
+}
+//Agregar respuesta a la datatable
+$("#btnenviarpartidasexcel").on('click', function(e){
+  e.preventDefault();
+  var arraycodigospartidas = [];
+  var lista = document.getElementsByClassName("codigoproductopartida");
+  for (var i = 0; i < lista.length; i++) {
+    arraycodigospartidas.push(lista[i].value);
+  }
+  var partidasexcel = $('#partidasexcel')[0].files[0];
+  var numeroalmacen = 1;
+  var form_data = new FormData();
+  form_data.append('partidasexcel', partidasexcel);  
+  form_data.append('numeroalmacen', numeroalmacen);
+  form_data.append('contadorproductos', contadorproductos);
+  form_data.append('contadorfilas', contadorfilas);
+  form_data.append('arraycodigospartidas', arraycodigospartidas);
+  $.ajax({
+    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+    url:cotizaciones_productos_cargar_partidas_excel,
+    data: form_data,
+    type: 'POST',
+    contentType: false,
+    processData: false,
+    success: function (data) {
+      contadorfilas = data.contadorfilas;
+      contadorproductos = data.contadorproductos;
+      $("#tablaproductocotizacion tbody").append(data.filasdetallescotizacion);
+      comprobarfilas();
+      calculartotal();
+      $("#codigoabuscar").val("");
+    },
+    error: function (data) {
+      console.log(data);
+    }
+  });                      
+});
 //obtener tipos ordenes de compra
 function obtenertiposordenescompra(){
   $.get(cotizaciones_productos_obtener_tipos_ordenes_compra, function(select_tipos_ordenes_compra){
@@ -695,7 +743,8 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
   var result = evaluarproductoexistente(Codigo);
   if(result == false){
     $.get(cotizaciones_productos_obtener_existencias_almacen_uno, {Codigo:Codigo}, function(exis){
-      var indicesurtimientopartida = new Decimal(exis).times(100);
+      var multiplicacionexistenciaporindicesurtimiento = new Decimal(exis).times(100);
+      var indicesurtimientopartida = new Decimal(multiplicacionexistenciaporindicesurtimiento).dividedBy(1);
       var multiplicacioncostoimpuesto =  new Decimal(SubTotal).times(Impuesto);      
       var ivapesos = new Decimal(multiplicacioncostoimpuesto/100);
       var total = new Decimal(SubTotal).plus(ivapesos);
@@ -928,6 +977,16 @@ function alta(){
                                 '</div>'+
                             '</div>'+ 
                             '<div class="row">'+
+                              '<div class="col-md-12">'+   
+                                '<table>'+
+                                  '<tr>'+
+                                    '<td><div type="button" class="btn btn-success btn-sm" onclick="seleccionarpartidasexcel()">Importar partidas en excel</div></td>'+
+                                    '<td data-toggle="tooltip" data-placement="top" title data-original-title="Bajar plantilla"><a class="material-icons" onclick="descargar_plantilla()" id="btnGenerarPlantilla" target="_blank">get_app</a></td>'+
+                                  '</tr>'+
+                                '</table>'+
+                              '</div>'+ 
+                            '</div>'+
+                            '<div class="row">'+
                                 '<div class="col-md-6">'+   
                                     '<label>Observaciones</label>'+
                                     '<textarea class="form-control" name="observaciones" id="observaciones" rows="5" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" required></textarea>'+
@@ -992,6 +1051,10 @@ function alta(){
                     '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
+    //mostrar mensaje de bajar plantilla
+    $('[data-toggle="tooltip"]').tooltip({
+      container: 'body'
+    });
     obtenultimonumero();
     obtenertiposordenescompra();
     asignarfechaactual();

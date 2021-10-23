@@ -151,6 +151,56 @@ function listar(){
     obtenerdatos(data.Factura);
   });
 }
+//realizar en reporte en excel
+function descargar_plantilla(){
+  $("#btnGenerarPlantilla").attr("href", urlgenerarplantilla);
+  $("#btnGenerarPlantilla").click();
+}
+function seleccionarpartidasexcel(){
+  $("#partidasexcel").click();
+}
+//Cada que se elija un archivo
+function cargarpartidasexcel(e) {
+  $("#btnenviarpartidasexcel").click();
+}
+//Agregar respuesta a la datatable
+$("#btnenviarpartidasexcel").on('click', function(e){
+  e.preventDefault();
+  var arraycodigospartidas = [];
+  var lista = document.getElementsByClassName("codigoproductopartida");
+  for (var i = 0; i < lista.length; i++) {
+    arraycodigospartidas.push(lista[i].value);
+  }
+  var partidasexcel = $('#partidasexcel')[0].files[0];
+  var numeroalmacen = 1;
+  var form_data = new FormData();
+  form_data.append('partidasexcel', partidasexcel);  
+  form_data.append('numeroalmacen', numeroalmacen);
+  form_data.append('contadorproductos', contadorproductos);
+  form_data.append('contadorfilas', contadorfilas);
+  form_data.append('partida', partida);
+  form_data.append('arraycodigospartidas', arraycodigospartidas);
+  $.ajax({
+    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+    url:facturas_cargar_partidas_excel,
+    data: form_data,
+    type: 'POST',
+    contentType: false,
+    processData: false,
+    success: function (data) {
+      contadorfilas = data.contadorfilas;
+      contadorproductos = data.contadorproductos;
+      partida = data.numeropartida;
+      $("#tabladetallesfactura tbody").append(data.filasdetallesfactura);
+      comprobarfilas();
+      calculartotal();
+      $("#codigoabuscar").val("");
+    },
+    error: function (data) {
+      console.log(data);
+    }
+  });                      
+});
 //obtener registros de proveedores
 function obtenerclientes(){
   ocultarformulario();
@@ -997,14 +1047,17 @@ function comprobartiposerie(Depto){
       $("#divlistarremisiones").show();
       $("#divlistarservicios").hide();
       $("#divbuscarcodigos").hide();
+      $("#divimportarpartidas").hide();
     }else if(Depto == 'SERVICIO'){
       $("#divlistarremisiones").hide();
       $("#divlistarservicios").show();
       $("#divbuscarcodigos").hide();
+      $("#divimportarpartidas").hide();
     }else{
       $("#divlistarremisiones").hide();
       $("#divlistarservicios").hide();
       $("#divbuscarcodigos").show();
+      $("#divimportarpartidas").show();
     }
   //}
 }
@@ -2209,6 +2262,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
                   '</tr>';
         contadorproductos++;
         contadorfilas++;
+        partida++;
         $("#tabladetallesfactura").append(fila);
         mostrarformulario();      
         comprobarfilas();
@@ -2644,6 +2698,16 @@ function alta(){
                             '</div>'+ 
                           '</div>'+ 
                         '</div>'+
+                        '<div class="row" id="divimportarpartidas">'+
+                          '<div class="col-md-12">'+   
+                            '<table>'+
+                              '<tr>'+
+                                '<td><div type="button" class="btn btn-success btn-sm" onclick="seleccionarpartidasexcel()">Importar partidas en excel</div></td>'+
+                                '<td data-toggle="tooltip" data-placement="top" title data-original-title="Bajar plantilla"><a class="material-icons" onclick="descargar_plantilla()" id="btnGenerarPlantilla" target="_blank">get_app</a></td>'+
+                              '</tr>'+
+                            '</table>'+
+                          '</div>'+ 
+                        '</div>'+
                         '<div class="row">'+
                           '<div class="col-md-6">'+   
                             '<label>Observaciones</label>'+
@@ -2706,6 +2770,10 @@ function alta(){
                       '</div>'+
                     '</div>';
   $("#tabsform").html(tabs);
+  //mostrar mensaje de bajar plantilla
+  $('[data-toggle="tooltip"]').tooltip({
+    container: 'body'
+  });
   obtenultimonumero();
   obtenertiposordenescompra();
   obtenertiposunidades();

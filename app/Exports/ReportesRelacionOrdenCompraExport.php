@@ -115,7 +115,7 @@ class ReportesRelacionOrdenCompraExport implements FromCollection,WithHeadings,W
         $numeroalmacen=$this->numeroalmacen;
         $tipo=$this->tipo;
         $status=$this->status;
-        if($reporte == "RELACION"){
+        if($reporte == "GENERAL"){
             $data = DB::table('Ordenes de Compra as oc')
             ->leftjoin('Proveedores as p', 'oc.Proveedor', '=', 'p.Numero')
             ->select('oc.Orden', 'oc.Proveedor', 'p.Nombre', 'oc.Fecha', 'oc.Plazo', 'oc.Almacen', 'oc.Tipo', 'oc.Referencia', 'oc.Importe', 'oc.Descuento', 'oc.SubTotal', 'oc.Iva', 'oc.Total', 'oc.Obs', 'oc.Status', 'oc.MotivoBaja', 'oc.Usuario')

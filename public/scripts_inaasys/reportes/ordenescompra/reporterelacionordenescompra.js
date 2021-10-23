@@ -65,6 +65,7 @@ $(document).ready(function() {
         var code = (e.keyCode ? e.keyCode : e.which);
         if(code==13){
             obtenerproveedorpornumero();
+            e.preventDefault();
         }
     });
     //activar busqueda
@@ -73,6 +74,7 @@ $(document).ready(function() {
         var code = (e.keyCode ? e.keyCode : e.which);
         if(code==13){
             obteneralmacenpornumero();
+            e.preventDefault();
         }
     });
     //regresar numero
@@ -296,7 +298,7 @@ function regresarnumeroalmacen(){
 }
 //actualizar reporte
 function generar_reporte(){
-    var form = $("#formrelacionordenescompra");
+    var form = $("#formreporte");
     if (form.parsley().isValid()){
         var result = validafechas();
         if(result == 'fechafinalmayorahoy'){
@@ -317,7 +319,7 @@ function generar_reporte(){
 }
 //realizar en reporte en excel
 function generar_formato_excel(){
-    var form = $("#formrelacionordenescompra");
+    var form = $("#formreporte");
     if (form.parsley().isValid()){
         var numeroproveedor = $("#numeroproveedor").val();
         var numeroalmacen = $("#numeroalmacen").val();
@@ -326,8 +328,8 @@ function generar_formato_excel(){
         var tipo = $("#tipo").val();
         var status = $("#status").val();
         var reporte = $("#reporte").val();
-        $("#btnGenerarFormatoReporteRelacionOrdenesCompra").attr("href", urlgenerarformatoexcel+'?fechainicialreporte='+fechainicialreporte+'&fechafinalreporte='+fechafinalreporte+'&numeroproveedor='+numeroproveedor+'&numeroalmacen='+numeroalmacen+'&tipo='+tipo+'&status='+status+'&reporte='+reporte);
-        $("#btnGenerarFormatoReporteRelacionOrdenesCompra").click();
+        $("#btnGenerarFormatoReporteExcel").attr("href", urlgenerarformatoexcel+'?fechainicialreporte='+fechainicialreporte+'&fechafinalreporte='+fechafinalreporte+'&numeroproveedor='+numeroproveedor+'&numeroalmacen='+numeroalmacen+'&tipo='+tipo+'&status='+status+'&reporte='+reporte);
+        $("#btnGenerarFormatoReporteExcel").click();
     }else{
         form.parsley().validate();
     }
@@ -335,7 +337,7 @@ function generar_formato_excel(){
 //listar tabla reporte
 function listar(){
     var reporte = $("#reporte").val();
-    if(reporte == 'RELACION'){
+    if(reporte == 'GENERAL'){
         var columnas = new Array("Orden", "Proveedor", "Nombre", "Fecha", "Plazo", "Almacen", "Tipo", "Referencia", "Importe", "Descuento", "SubTotal", "Iva", "Total", "Obs", "Status", "MotivoBaja", "Usuario");
     }else{
         var columnas = new Array("Orden", "Proveedor", "Nombre", "Fecha", "Plazo", "Almacen", "Tipo", "Referencia", "Codigo", "Descripcion", "Unidad", "Por Surtir", "Cantidad", "Precio", "Importe", "Descuento", "SubTotal", "Iva", "Total", "Obs", "Status", "MotivoBaja", "Usuario");

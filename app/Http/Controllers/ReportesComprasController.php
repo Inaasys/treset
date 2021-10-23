@@ -110,7 +110,7 @@ class ReportesComprasController extends ConfiguracionSistemaController{
         $tipo = $request->tipo;
         $movimiento = $request->movimiento;
         $status = $request->status;
-        if($reporte == "RELACION"){
+        if($reporte == "GENERAL"){
             $data = DB::table('Compras as c')
             ->leftjoin('Proveedores as p', 'c.Proveedor', '=', 'p.Numero')
             ->select('c.Compra', 'c.Proveedor', 'p.Nombre', 'c.Fecha', 'c.Plazo', DB::raw("c.Fecha+c.Plazo as Vence"), 'c.Remision', 'c.Factura', 'c.Movimiento', 'c.Almacen', 'c.Tipo', 'c.Importe', 'c.Descuento', 'c.SubTotal', 'c.Iva', 'c.Total', 'c.Abonos', 'c.Descuentos', 'c.Saldo', 'c.Obs', 'c.Status', 'c.MotivoBaja', 'c.Usuario', 'p.Rfc', 'p.Calle', 'p.NoExterior', 'p.Colonia', 'p.Municipio', 'p.Estado', 'p.CodigoPostal', 'p.Contacto', 'p.Telefonos', 'p.Email1')
@@ -145,6 +145,14 @@ class ReportesComprasController extends ConfiguracionSistemaController{
             ->get();
             return DataTables::of($data)
             ->addColumn('Nombre', function($data){ return substr($data->Nombre, 0, 30); })
+            ->addColumn('Importe', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Importe), $this->numerodecimales); })
+            ->addColumn('Descuento', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Descuento), $this->numerodecimales); })
+            ->addColumn('SubTotal', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->SubTotal), $this->numerodecimales); })
+            ->addColumn('Iva', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Iva), $this->numerodecimales); })
+            ->addColumn('Total', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Total), $this->numerodecimales); })
+            ->addColumn('Abonos', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Abonos), $this->numerodecimales); })
+            ->addColumn('Descuentos', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Descuentos), $this->numerodecimales); })
+            ->addColumn('Saldo', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Saldo), $this->numerodecimales); })
             ->addColumn('Obs', function($data){ return substr($data->Obs, 0, 30); })
             ->addColumn('MotivoBaja', function($data){ return substr($data->MotivoBaja, 0, 30); })
             ->addColumn('Calle', function($data){ return substr($data->Calle, 0, 30); })
@@ -190,6 +198,12 @@ class ReportesComprasController extends ConfiguracionSistemaController{
             return DataTables::of($data)
             ->addColumn('Nombre', function($data){ return substr($data->Nombre, 0, 30); })
             ->addColumn('Descripcion', function($data){ return substr($data->Descripcion, 0, 30); })
+            ->addColumn('Precio', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Precio), $this->numerodecimales); })
+            ->addColumn('Importe', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Importe), $this->numerodecimales); })
+            ->addColumn('Descuento', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Descuento), $this->numerodecimales); })
+            ->addColumn('SubTotal', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->SubTotal), $this->numerodecimales); })
+            ->addColumn('Iva', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Iva), $this->numerodecimales); })
+            ->addColumn('Total', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Total), $this->numerodecimales); })
             ->addColumn('ObsCompra', function($data){ return substr($data->ObsCompra, 0, 30); })
             ->addColumn('ObsDetalle', function($data){ return substr($data->ObsDetalle, 0, 30); })
             ->addColumn('MotivoBaja', function($data){ return substr($data->MotivoBaja, 0, 30); })

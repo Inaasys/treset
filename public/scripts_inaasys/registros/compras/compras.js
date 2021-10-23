@@ -324,6 +324,8 @@ function seleccionarproveedor(Numero, Nombre, Plazo, Rfc, SolicitarXML){
       //reiniciar contadores
       contadorproductos = 0;
       contadorfilas = 0;
+      //pasar al siguiente input remision
+      setTimeout(function() { $("#remision").focus() }, 500);
       mostrarformulario();
     }
   }
@@ -877,6 +879,8 @@ function obtenerproveedorpornumero(){
           //reiniciar contadores
           contadorproductos = 0;
           contadorfilas = 0;
+          //pasar al siguiente input remision
+          $("#remision").focus();
           mostrarformulario();
         }else{
           $("#numeroproveedor").val(numeroproveedoranterior);
@@ -1000,6 +1004,11 @@ function obtenerproductoporcodigo(){
       msjnoseencontroningunproducto();
     }
   }) 
+}
+//pasar al siguiente input despues de remision
+function enterinputremision(){
+  //$('#tipo').select2('open');
+  $("#factura").focus();
 }
 //funcion que evalua si el codigo agregado existe en la orden de compra
 function evaluarcodigoenordencompra(Codigo){
@@ -1763,10 +1772,20 @@ function alta(tipoalta){
     default:
       $("#busquedaordenestrabajo").hide();
   }
+  //siguiente input despues de remision
+  $('#remision').on('keypress', function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      enterinputremision();
+    }
+  });
   //regresar numero
   $('#numeroalmacen').on('change', function(e) {
     regresarnumeroalmacen();
   });
+  //colocar focus a proveedor 
+  setTimeout(function() { $("#numeroproveedor").focus() }, 1000);
   $("#ModalAlta").modal('show');
 }
 //guardar el registro
@@ -2226,6 +2245,14 @@ function obtenerdatos(compramodificar){
         if(code==13){
           obtenerproductoporcodigo();
         }
+    });
+    //siguiente input despues de remision
+    $('#remision').on('keypress', function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        enterinputremision();
+      }
     });
     //regresar numero
     $('#numeroproveedor').on('change', function(e) {

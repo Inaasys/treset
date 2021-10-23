@@ -250,6 +250,8 @@ function seleccionarseriedocumento(Serie){
       $("#serie").val(Serie);
       $("#serietexto").html("Serie: "+Serie);
       mostrarformulario();
+      //pasar al siguiente input proveedor
+      $("#numeroproveedor").focus();
     }) 
 }
 //obtener registros de proveedores
@@ -392,6 +394,8 @@ function seleccionarproveedor(Numero, Nombre, Plazo){
     }
     //colocar el plazo del proveedor
     $("#plazo").val(Plazo);
+    //pasar al siguiente input almacen
+    $("#numeroalmacen").focus();
     mostrarformulario();
   }
 }
@@ -405,6 +409,8 @@ function seleccionaralmacen(Numero, Nombre){
     if(Nombre != null){
       $("#textonombrealmacen").html(Nombre.substring(0, 60));
     }
+    //pasar al siguiente input referencia
+    setTimeout(function() { $("#referencia").focus() }, 500);
     mostrarformulario();
   }
 }
@@ -484,6 +490,8 @@ function seleccionarordentrabajo(Orden, Fecha, Cliente, Tipo, Unidad, StatusOrde
     if(Orden != null){
       $("#textonombreordentrabajo").html(Orden.substring(0, 40));
     }
+    //pasar al siguiente input referencia
+    setTimeout(function() { $("#referencia").focus() }, 500);
     mostrarformulario();
   }
 }
@@ -501,6 +509,8 @@ function obtenerproveedorpornumero(){
           $("#textonombreproveedor").html(data.nombre.substring(0, 60));
         }
         $("#plazo").val(data.plazo);
+        //pasar al siguiente input almacen
+        $("#numeroalmacen").focus();
       }) 
     }
   }
@@ -523,6 +533,8 @@ function obteneralmacenpornumero(){
         if(data.nombre != null){
           $("#textonombrealmacen").html(data.nombre.substring(0, 60));
         }
+        //pasar al siguiente input referencia
+        $("#referencia").focus();
       })  
     }
   }
@@ -545,6 +557,8 @@ function obtenerordenporfolio(){
         if(data.orden != null){
           $("#textonombreordentrabajo").html(data.orden.substring(0, 40));
         }
+        //pasar al siguiente input referencia
+        $("#referencia").focus();
         mostrarformulario();
       }) 
     }
@@ -642,6 +656,11 @@ function obtenerproductoporcodigo(){
       msjnoseencontroningunproducto();
     }
   }) 
+}
+//pasar al siguiente input despues de referencia
+function enterinputreferencia(){
+  //$('#tipo').select2('open');
+  $("#codigoabuscar").focus();
 }
 //función que evalua si la partida que quieren ingresar ya existe o no en el detalle de la orden de compra
 function evaluarproductoexistente(Codigo){
@@ -1004,7 +1023,7 @@ function alta(tipoalta){
                     '<div class="col-md-12">'+   
                       '<table>'+
                         '<tr>'+
-                          '<td><div type="button" class="btn btn-success btn-sm" onclick="seleccionarpartidasexcel()">Subir partidas en excel</div></td>'+
+                          '<td><div type="button" class="btn btn-success btn-sm" onclick="seleccionarpartidasexcel()">Importar partidas en excel</div></td>'+
                           '<td data-toggle="tooltip" data-placement="top" title data-original-title="Bajar plantilla"><a class="material-icons" onclick="descargar_plantilla()" id="btnGenerarPlantilla" target="_blank">get_app</a></td>'+
                         '</tr>'+
                       '</table>'+
@@ -1117,6 +1136,14 @@ function alta(tipoalta){
       });
       $("#busquedaordenestrabajo").hide();
   }
+  //siguiente input despues de referencia
+  $('#referencia').on('keypress', function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      enterinputreferencia();
+    }
+  });
   //regresar numero
   $('#numeroalmacen').on('change', function(e) {
     regresarnumeroalmacen();
@@ -1125,6 +1152,8 @@ function alta(tipoalta){
   $('#ordentrabajo').on('change', function(e) {
     regresarfolioorden();
   });
+  //colocar focus a proveedor 
+  setTimeout(function() { $("#numeroproveedor").focus() }, 1000);
   $("#ModalAlta").modal('show');
 }
 //guardar el registro
@@ -1618,6 +1647,14 @@ function obtenerdatos(ordenmodificar){
         obtenerproveedorpornumero();
       }
     });
+    //siguiente input despues de referencia
+    $('#referencia').on('keypress', function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        enterinputreferencia();
+      }
+    });
     //regresar numero
     $('#numeroproveedor').on('change', function(e) {
       regresarnumeroproveedor();
@@ -1641,6 +1678,8 @@ async function seleccionartipoordencompra(data){
   await retraso();
   $("#tipo").val(data.ordencompra.Tipo).change();
   $("#tipo").select2();
+  //colocar focus a proveedor 
+  setTimeout(function() { $("#numeroproveedor").focus() }, 1000);
   mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
   $('.page-loader-wrapper').css('display', 'none');
 }

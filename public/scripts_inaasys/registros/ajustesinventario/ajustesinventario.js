@@ -792,7 +792,7 @@ function alta(){
                     '<div class="col-md-12">'+   
                       '<table>'+
                         '<tr>'+
-                          '<td><div type="button" class="btn btn-success btn-sm" onclick="seleccionarpartidasexcel()">Subir partidas en excel</div></td>'+
+                          '<td><div type="button" class="btn btn-success btn-sm" onclick="seleccionarpartidasexcel()">Importar partidas en excel</div></td>'+
                           '<td data-toggle="tooltip" data-placement="top" title data-original-title="Bajar plantilla"><a class="material-icons" onclick="descargar_plantilla()" id="btnGenerarPlantilla" target="_blank">get_app</a></td>'+
                         '</tr>'+
                       '</table>'+

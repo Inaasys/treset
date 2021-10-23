@@ -165,7 +165,7 @@ class CompraController extends ConfiguracionSistemaController{
                 $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->where('Nombre', '<>', 'GASTOS')->Where('Nombre', '<>', 'TOT')->get();
 
         } 
-        $select_tipos_ordenes_compra = "<option selected disabled hidden>Selecciona...</option>";
+        $select_tipos_ordenes_compra = "";
         foreach($tipos_ordenes_compra as $tipo){
             $select_tipos_ordenes_compra = $select_tipos_ordenes_compra."<option value='".$tipo->Nombre."'>".$tipo->Nombre."</option>";
         }
@@ -831,10 +831,42 @@ class CompraController extends ConfiguracionSistemaController{
                 $CompraDetalle->Item = $item;
                 $CompraDetalle->save();
                 //modificar fechaultimacompra y ultimocosto
+                
                 $Producto = Producto::where('Codigo', $codigoproductopartida)->first();
+                /*
                 $Producto->{'Fecha Ultima Compra'} = Carbon::parse($request->fecha)->toDateTimeString();
                 $Producto->{'Ultimo Costo'} = $request->preciopartida [$key];
+                $Producto->Costo = $request->preciopartida [$key];
+                $Producto->CostoDeLista = $request->preciopartida [$key];
+                $Producto->CostoDeVenta = $request->preciopartida [$key];
                 $Producto->save();
+                */
+                if($this->tipodeutilidad == 'Financiera'){
+                    $nuevosubtotalproducto = $request->preciopartida [$key]/(((100 - $Producto->Utilidad) / 100));
+                }else{
+                    //$nuevosubtotalproducto = $request->preciopartida [$key]*(1+($Producto->Utilidad/100));
+                    $multiplicacionnuevosubtotalproducto = $request->preciopartida [$key]*($Producto->Utilidad/Helpers::convertirvalorcorrecto(100));
+                    $nuevosubtotalproducto = $request->preciopartida [$key]+$multiplicacionnuevosubtotalproducto;
+                }
+                $nuevoivaproducto = $nuevosubtotalproducto*($Producto->Impuesto/Helpers::convertirvalorcorrecto(100));
+                $nuevototalproducto = $nuevosubtotalproducto + $nuevoivaproducto;
+                Producto::where('Codigo', $codigoproductopartida)
+                ->update([
+                    'Fecha Ultima Compra' => Carbon::parse($request->fecha)->toDateTimeString(),
+                    'Costo' => $request->preciopartida [$key],
+                    'CostoDeLista' => $request->preciopartida [$key],
+                    'CostoDeVenta' => $request->preciopartida [$key],
+                    'Ultimo Costo' => $request->preciopartida [$key],
+                    'SubTotal' => Helpers::convertirvalorcorrecto($nuevosubtotalproducto),
+                    'Iva' => Helpers::convertirvalorcorrecto($nuevoivaproducto),
+                    'Total' => Helpers::convertirvalorcorrecto($nuevototalproducto)
+                ]);
+                //modificar proveedor 1 y proveedor 2
+                Producto::where('Codigo', $codigoproductopartida)
+                ->update([
+                    'Proveedor2' => $Producto->Proveedor1,
+                    'Proveedor1' => $request->numeroproveedor
+                ]);
                 //modificar faltante por surtir detalle orden de compra
                 $OrdenCompraDetalle = OrdenCompraDetalle::where('Orden', $request->ordenpartida [$key])->where('Codigo', $codigoproductopartida)->first();
                 $Surtir = $OrdenCompraDetalle->Surtir-$request->cantidadpartida  [$key];

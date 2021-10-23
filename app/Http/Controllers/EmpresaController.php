@@ -174,7 +174,8 @@ class EmpresaController extends ConfiguracionSistemaController{
         ->update([
             'Numero_Decimales' => $request->numerodecimalessistema,
             'Numero_Decimales_En_Documentos' => $request->numerodecilamesdocumentospdfsistema,
-            'Mayusculas_Sistema' => $request->utilizarmayusculasistema
+            'Mayusculas_Sistema' => $request->utilizarmayusculasistema,
+            'Tipo_De_Utilidad' => $request->tipoutilidadventa
         ]);
         return response()->json($request->all());
     }

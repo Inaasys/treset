@@ -26,14 +26,14 @@
                                     </td>
                                     <td>
                                         <div class="">
-                                            <a class="btn bg-blue btn-xs waves-effect" id="btnGenerarFormatoReporteRelacionOrdenesCompra" onclick="generar_formato_excel()">Generar Reporte en Excel</a>
+                                            <a class="btn bg-blue btn-xs waves-effect" id="btnGenerarFormatoReporteExcel" onclick="generar_formato_excel()">Generar Reporte en Excel</a>
                                         </div>  
                                     </td>
                         		</tr>
                         	</table>
                         </div>
                         <div class="body">
-                            <form id="formrelacionordenescompra">
+                            <form id="formreporte">
                                 <div class="row">
                                     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
                                         <label>Proveedor <span class="label label-danger" id="textonombreproveedor"></span></label>
@@ -97,7 +97,7 @@
                                     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
                                         <label>Reporte</label>
                                         <select class="form-control select2" name="reporte" id="reporte" onchange="generar_reporte()"  required>
-                                            <option value="RELACION">RELACION</option>
+                                            <option value="GENERAL">GENERAL</option>
                                             <option value="DETALLES">DETALLES</option>
                                         </select>
                                     </div>
@@ -152,7 +152,6 @@
         var reporte_relacion_ordenes_compra_obtener_almacenes = '{!!URL::to('reporte_relacion_ordenes_compra_obtener_almacenes')!!}';
         var reporte_relacion_ordenes_compra_obtener_proveedor_por_numero = '{!!URL::to('reporte_relacion_ordenes_compra_obtener_proveedor_por_numero')!!}';
         var reporte_relacion_ordenes_compra_obtener_almacen_por_numero = '{!!URL::to('reporte_relacion_ordenes_compra_obtener_almacen_por_numero')!!}';
-
         var reporte_relacion_ordenes_compra_generar_reporte = '{!!URL::to('reporte_relacion_ordenes_compra_generar_reporte')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')

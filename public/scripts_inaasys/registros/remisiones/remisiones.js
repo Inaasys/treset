@@ -1299,10 +1299,8 @@ function alta(){
                                           '<th class="bg-amber">Utilidad $</th>'+
                                           '<th class="'+background_tables+'">Moneda</th>'+
                                           '<th class="'+background_tables+'">Costo de Lista</th>'+
-                                          
                                           '<th class="'+background_tables+'">Tipo de Cambio</th>'+
                                           '<th class="'+background_tables+'">Cotización</th>'+
-
                                           '<th class="'+background_tables+'">Insumo</th>'+
                                           '<th class="'+background_tables+'">ClaveProducto</th>'+
                                           '<th class="'+background_tables+'">ClaveUnidad</th>'+
@@ -1320,7 +1318,7 @@ function alta(){
                           '<div class="col-md-12">'+   
                             '<table>'+
                               '<tr>'+
-                                '<td><div type="button" class="btn btn-success btn-sm" onclick="seleccionarpartidasexcel()">Subir partidas en excel</div></td>'+
+                                '<td><div type="button" class="btn btn-success btn-sm" onclick="seleccionarpartidasexcel()">Importar partidas en excel</div></td>'+
                                 '<td data-toggle="tooltip" data-placement="top" title data-original-title="Bajar plantilla"><a class="material-icons" onclick="descargar_plantilla()" id="btnGenerarPlantilla" target="_blank">get_app</a></td>'+
                               '</tr>'+
                             '</table>'+

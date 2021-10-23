@@ -157,6 +157,8 @@ return [
     //para emisor documentos
     'lugarexpedicion' => '',//lugar expedicion
     'regimenfiscal' => '',//regimen fiscal
+    //tipo de utilidad
+    'tipodeutilidad' => '',
 
     /*
     |--------------------------------------------------------------------------

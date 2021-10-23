@@ -109,7 +109,7 @@ class ReportesOrdenesCompraController extends ConfiguracionSistemaController{
         $numeroalmacen=$request->numeroalmacen;
         $tipo=$request->tipo;
         $status=$request->status;
-        if($reporte == "RELACION"){
+        if($reporte == "GENERAL"){
             $data = DB::table('Ordenes de Compra as oc')
             ->leftjoin('Proveedores as p', 'oc.Proveedor', '=', 'p.Numero')
             ->select('oc.Orden', 'oc.Proveedor', 'p.Nombre', 'oc.Fecha', 'oc.Plazo', 'oc.Almacen', 'oc.Tipo', 'oc.Referencia', 'oc.Importe', 'oc.Descuento', 'oc.SubTotal', 'oc.Iva', 'oc.Total', 'oc.Obs', 'oc.Status', 'oc.MotivoBaja', 'oc.Usuario')
@@ -139,6 +139,11 @@ class ReportesOrdenesCompraController extends ConfiguracionSistemaController{
             ->get();
             return DataTables::of($data)
             ->addColumn('Nombre', function($data){ return substr($data->Nombre, 0, 30); })
+            ->addColumn('Importe', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Importe), $this->numerodecimales); })
+            ->addColumn('Descuento', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Descuento), $this->numerodecimales); })
+            ->addColumn('SubTotal', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->SubTotal), $this->numerodecimales); })
+            ->addColumn('Iva', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Iva), $this->numerodecimales); })
+            ->addColumn('Total', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Total), $this->numerodecimales); })
             ->addColumn('Obs', function($data){ return substr($data->Obs, 0, 30); })
             ->addColumn('MotivoBaja', function($data){ return substr($data->MotivoBaja, 0, 30); })
             ->make(true);
@@ -174,6 +179,12 @@ class ReportesOrdenesCompraController extends ConfiguracionSistemaController{
             return DataTables::of($data)
             ->addColumn('Nombre', function($data){ return substr($data->Nombre, 0, 30); })
             ->addColumn('Descripcion', function($data){ return substr($data->Descripcion, 0, 30); })
+            ->addColumn('Precio', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Precio), $this->numerodecimales); })
+            ->addColumn('Importe', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Importe), $this->numerodecimales); })
+            ->addColumn('Descuento', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Descuento), $this->numerodecimales); })
+            ->addColumn('SubTotal', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->SubTotal), $this->numerodecimales); })
+            ->addColumn('Iva', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Iva), $this->numerodecimales); })
+            ->addColumn('Total', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Total), $this->numerodecimales); })
             ->addColumn('Obs', function($data){ return substr($data->Obs, 0, 30); })
             ->addColumn('MotivoBaja', function($data){ return substr($data->MotivoBaja, 0, 30); })
             ->make(true);

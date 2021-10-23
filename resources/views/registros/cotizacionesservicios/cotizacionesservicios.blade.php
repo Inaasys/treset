@@ -91,6 +91,23 @@
                 <div class="modal-header {{$empresa->background_forms_and_modals}}">
                     <h4 class="modal-title" id="titulomodal"></h4>
                 </div>
+                <form id="formplantilla" action="#" enctype="multipart/form-data" hidden>
+                    <div class="col-md-12">
+                        <table class="col-md-12">
+                            <tr>
+                                <td>
+                                    <div class="col-md-6">
+                                        <label>Selecciona el archivo excel</label>
+                                        <input type="file" class="form-control" name="partidasexcelser" id="partidasexcelser" onchange="cargarpartidasexcel(this,'ser')" onclick="this.value=null;">
+                                        <input type="file" class="form-control" name="partidasexcelref" id="partidasexcelref" onchange="cargarpartidasexcel(this,'ref')" onclick="this.value=null;">
+                                        <button type="button" class="btn btn-success btn-sm" id="btnenviarpartidasexcelser" style="display:none">Enviar Excel S</button>
+                                        <button type="button" class="btn btn-success btn-sm" id="btnenviarpartidasexcelref" style="display:none">Enviar Excel R</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>   
+                    </div>
+                </form>
                 <form id="formparsley" action="#">
                     <div class="modal-body">
                         <div class="col-md-12" id="tabsform">
@@ -169,7 +186,13 @@
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';
+        var urlgenerarplantillaser = '{{$urlgenerarplantillaser}}';
+        var urlgenerarplantillaref = '{{$urlgenerarplantillaref}}';
         var cotizaciones_servicios_obtener = '{!!URL::to('cotizaciones_servicios_obtener')!!}';
+        var cotizaciones_servicios_descargar_plantillaser = '{!!URL::to('cotizaciones_servicios_descargar_plantillaser')!!}';
+        var cotizaciones_servicios_cargar_partidas_excelser = '{!!URL::to('cotizaciones_servicios_cargar_partidas_excelser')!!}';
+        var cotizaciones_servicios_descargar_plantillaref = '{!!URL::to('cotizaciones_servicios_descargar_plantillaref')!!}';
+        var cotizaciones_servicios_cargar_partidas_excelref = '{!!URL::to('cotizaciones_servicios_cargar_partidas_excelref')!!}';
         var cotizaciones_servicios_obtener_series_documento = '{!!URL::to('cotizaciones_servicios_obtener_series_documento')!!}';
         var cotizaciones_servicios_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('cotizaciones_servicios_obtener_ultimo_folio_serie_seleccionada')!!}';
         var cotizaciones_servicios_obtener_ultimo_folio = '{!!URL::to('cotizaciones_servicios_obtener_ultimo_folio')!!}';

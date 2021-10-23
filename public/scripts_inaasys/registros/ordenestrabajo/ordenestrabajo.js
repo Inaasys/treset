@@ -146,6 +146,59 @@ function listar(){
       obtenerdatos(data.Orden);
     });
 }
+//realizar en reporte en excel
+function descargar_plantilla(){
+  $("#btnGenerarPlantilla").attr("href", urlgenerarplantilla);
+  $("#btnGenerarPlantilla").click();
+}
+function seleccionarpartidasexcel(){
+  $("#partidasexcel").click();
+}
+//Cada que se elija un archivo
+function cargarpartidasexcel(e) {
+  $("#btnenviarpartidasexcel").click();
+}
+//Agregar respuesta a la datatable
+$("#btnenviarpartidasexcel").on('click', function(e){
+  e.preventDefault();
+  var arraycodigospartidas = [];
+  var lista = document.getElementsByClassName("codigopartida");
+  for (var i = 0; i < lista.length; i++) {
+    arraycodigospartidas.push(lista[i].value);
+  }
+  var partidasexcel = $('#partidasexcel')[0].files[0];
+  var numeroalmacen = 1;
+  var hoy = $("#fecha").val();
+  var form_data = new FormData();
+  form_data.append('partidasexcel', partidasexcel);  
+  form_data.append('numeroalmacen', numeroalmacen);
+  form_data.append('contadorservicios', contadorservicios);
+  form_data.append('contadorfilas', contadorfilas);
+  form_data.append('arraycodigospartidas', arraycodigospartidas);
+  form_data.append('hoy', hoy);
+  form_data.append('item', item);
+  $.ajax({
+    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+    url:ordenes_trabajo_cargar_partidas_excel,
+    data: form_data,
+    type: 'POST',
+    contentType: false,
+    processData: false,
+    success: function (data) {
+      contadorfilas = data.contadorfilas;
+      contadorservicios = data.contadorservicios;
+      item = data.item;
+      $("#tablaserviciosordentrabajo tbody").append(data.filasdetallesordentrabajo);
+      $("#numerofilastablaservicios").val(data.contadorservicios);
+      //comprobarfilas();
+      calculartotalordentrabajo();
+      $("#codigoabuscar").val("");
+    },
+    error: function (data) {
+      console.log(data);
+    }
+  });                      
+});
 //obtener tipos ordenes de compra
 function obtenertiposordenestrabajo(){
     $.get(ordenes_trabajo_obtener_tipos_ordenes_trabajo, function(select_tipos_ordenes_trabajo){
@@ -1669,6 +1722,16 @@ function alta(){
                     '</div>'+
                   '</div>'+ 
                   '<div class="row">'+
+                    '<div class="col-md-12">'+   
+                      '<table>'+
+                        '<tr>'+
+                          '<td><div type="button" class="btn btn-success btn-sm" onclick="seleccionarpartidasexcel()">Importar partidas en excel</div></td>'+
+                          '<td data-toggle="tooltip" data-placement="top" title data-original-title="Bajar plantilla"><a class="material-icons" onclick="descargar_plantilla()" id="btnGenerarPlantilla" target="_blank">get_app</a></td>'+
+                        '</tr>'+
+                      '</table>'+
+                    '</div>'+ 
+                  '</div>'+
+                  '<div class="row">'+
                     '<div class="col-md-9">'+
                       '<div class="row">'+ 
                         '<div class="col-md-3">'+
@@ -1718,6 +1781,10 @@ function alta(){
               '</div>'+ 
             '</div>';
   $("#tabsform").html(tabs);
+  //mostrar mensaje de bajar plantilla
+  $('[data-toggle="tooltip"]').tooltip({
+    container: 'body'
+  });
   $("#serie").val(serieusuario);
   $("#serietexto").html("Serie: "+serieusuario);
   $("#numerofilastablaservicios").val(0);
@@ -2269,6 +2336,16 @@ function obtenerdatos(ordenmodificar){
                         '</table>'+
                       '</div>'+
                     '</div>'+ 
+                    '<div class="row">'+
+                      '<div class="col-md-12">'+   
+                        '<table>'+
+                          '<tr>'+
+                            '<td><div type="button" class="btn btn-success btn-sm" onclick="seleccionarpartidasexcel()">Importar partidas en excel</div></td>'+
+                            '<td data-toggle="tooltip" data-placement="top" title data-original-title="Bajar plantilla"><a class="material-icons" onclick="descargar_plantilla()" id="btnGenerarPlantilla" target="_blank">get_app</a></td>'+
+                          '</tr>'+
+                        '</table>'+
+                      '</div>'+ 
+                    '</div>'+
                     '<div class="row">'+
                       '<div class="col-md-9">'+  
                         '<div class="row">'+ 

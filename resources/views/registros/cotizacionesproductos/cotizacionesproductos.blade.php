@@ -91,6 +91,21 @@
                 <div class="modal-header {{$empresa->background_forms_and_modals}}">
                     <h4 class="modal-title" id="titulomodal"></h4>
                 </div>
+                <form id="formplantilla" action="#" enctype="multipart/form-data" hidden>
+                    <div class="col-md-12">
+                        <table class="col-md-12">
+                            <tr>
+                                <td>
+                                    <div class="col-md-6">
+                                        <label>Selecciona el archivo excel</label>
+                                        <input type="file" class="form-control" name="partidasexcel" id="partidasexcel" onchange="cargarpartidasexcel(this)" onclick="this.value=null;">
+                                        <button type="button" class="btn btn-success btn-sm" id="btnenviarpartidasexcel" style="display:none">Enviar Excel</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>   
+                    </div>
+                </form>
                 <form id="formparsley" action="#">
                     <div class="modal-body">
                         <div class="col-md-12" id="tabsform">
@@ -169,7 +184,10 @@
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';
+        var urlgenerarplantilla = '{{$urlgenerarplantilla}}';
         var cotizaciones_productos_obtener = '{!!URL::to('cotizaciones_productos_obtener')!!}';
+        var cotizaciones_productos_descargar_plantilla = '{!!URL::to('cotizaciones_productos_descargar_plantilla')!!}';
+        var cotizaciones_productos_cargar_partidas_excel = '{!!URL::to('cotizaciones_productos_cargar_partidas_excel')!!}';
         var cotizaciones_productos_obtener_series_documento = '{!!URL::to('cotizaciones_productos_obtener_series_documento')!!}';
         var cotizaciones_productos_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('cotizaciones_productos_obtener_ultimo_folio_serie_seleccionada')!!}';
         var cotizaciones_productos_obtener_ultimo_folio = '{!!URL::to('cotizaciones_productos_obtener_ultimo_folio')!!}';

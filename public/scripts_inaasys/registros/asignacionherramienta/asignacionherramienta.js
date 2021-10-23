@@ -129,6 +129,52 @@ function listar(){
     obtenerdatos(data.asignacion);
   });
 }
+//realizar en reporte en excel
+function descargar_plantilla(){
+  $("#btnGenerarPlantilla").attr("href", urlgenerarplantilla);
+  $("#btnGenerarPlantilla").click();
+}
+function seleccionarpartidasexcel(){
+  $("#partidasexcel").click();
+}
+//Cada que se elija un archivo
+function cargarpartidasexcel(e) {
+  $("#btnenviarpartidasexcel").click();
+}
+//Agregar respuesta a la datatable
+$("#btnenviarpartidasexcel").on('click', function(e){
+  e.preventDefault();
+  var arraycodigospartidas = [];
+  var lista = document.getElementsByClassName("codigoproductopartida");
+  for (var i = 0; i < lista.length; i++) {
+    arraycodigospartidas.push(lista[i].value);
+  }
+  var partidasexcel = $('#partidasexcel')[0].files[0];
+  var form_data = new FormData();
+  form_data.append('partidasexcel', partidasexcel);  
+  form_data.append('contadorproductos', contadorproductos);
+  form_data.append('contadorfilas', contadorfilas);
+  form_data.append('arraycodigospartidas', arraycodigospartidas);
+  $.ajax({
+    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+    url:asignacion_herramienta_cargar_partidas_excel,
+    data: form_data,
+    type: 'POST',
+    contentType: false,
+    processData: false,
+    success: function (data) {
+      contadorfilas = data.contadorfilas;
+      contadorproductos = data.contadorproductos;
+      $("#tablaherramientasasignadas tbody").append(data.filasdetallesasignacion);
+      comprobarfilas();
+      calculartotalordencompra();
+      $("#codigoabuscar").val("");
+    },
+    error: function (data) {
+      console.log(data);
+    }
+  });                      
+});
 //obtener series documento
 function obtenerseriesdocumento(){
   ocultarformulario();
@@ -567,8 +613,8 @@ function agregarfilaherramienta(Codigo, Producto, Unidad, Costo, Existencias, se
                             selectalmacenes+
                           '</select>'+
                         '</td>'+ 
-                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm existenciasalmacenpartida" name="existenciasalmacenpartida[]" id="existenciasalmacenpartida[]" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-max="'+Existencias+'" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" required></td>'+
+                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm existenciasalmacenpartida" name="existenciasalmacenpartida[]" id="existenciasalmacenpartida[]" value="'+Existencias+'"  onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                        '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-existencias="'+Existencias+'" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" required></td>'+
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" id="preciopartida[]" value="'+Costo+'" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');"></td>'+
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" id="totalpesospartida[]" value="'+Costo+'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                         '<td class="tdmod">'+
@@ -610,13 +656,13 @@ function obtenerexistenciasalmacen(fila){
           var nuevaexistencia = new Decimal(existencias).plus(cantidadpartida);
           $(".existenciasalmacenpartida", this).val(number_format(round(existencias, numerodecimales), numerodecimales, '.', ''));
           $(".cantidadpartida", this).removeAttr('readonly');
-          $(".cantidadpartida", this).attr('data-parsley-max', number_format(round(nuevaexistencia, numerodecimales), numerodecimales, '.', ''));
+          $(".cantidadpartida", this).attr('data-parsley-existencias', number_format(round(nuevaexistencia, numerodecimales), numerodecimales, '.', ''));
         }else{
           var nuevaexistencia = new Decimal(0).plus(cantidadpartida);
           $(".existenciasalmacenpartida", this).val(number_format(round(existencias, numerodecimales), numerodecimales, '.', ''));
           $(".cantidadpartida", this).val("0."+numerocerosconfigurados);
           $(".cantidadpartida", this).attr('readonly', 'readonly');
-          $(".cantidadpartida", this).attr('data-parsley-max', number_format(round(nuevaexistencia, numerodecimales), numerodecimales, '.', ''));
+          $(".cantidadpartida", this).attr('data-parsley-existencias', number_format(round(nuevaexistencia, numerodecimales), numerodecimales, '.', ''));
         }
       }) 
     }  
@@ -762,6 +808,16 @@ function alta(){
                     '</div>'+
                   '</div>'+ 
                   '<div class="row">'+
+                    '<div class="col-md-12">'+   
+                      '<table>'+
+                        '<tr>'+
+                          '<td><div type="button" class="btn btn-success btn-sm" onclick="seleccionarpartidasexcel()">Importar partidas en excel</div></td>'+
+                          '<td data-toggle="tooltip" data-placement="top" title data-original-title="Bajar plantilla"><a class="material-icons" onclick="descargar_plantilla()" id="btnGenerarPlantilla" target="_blank">get_app</a></td>'+
+                        '</tr>'+
+                      '</table>'+
+                    '</div>'+ 
+                  '</div>'+
+                  '<div class="row">'+
                     '<div class="col-md-6">'+   
                       '<label>Observaciones</label>'+
                       '<textarea class="form-control" name="observaciones" id="observaciones" rows="2" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
@@ -779,6 +835,10 @@ function alta(){
               '</div>'+ 
             '</div>';
   $("#tabsform").html(tabs);
+  //mostrar mensaje de bajar plantilla
+  $('[data-toggle="tooltip"]').tooltip({
+    container: 'body'
+  });
   $("#serie").val(serieusuario);
   $("#serietexto").html("Serie: "+serieusuario);
   obtenultimonumero();

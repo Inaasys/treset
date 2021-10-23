@@ -31,7 +31,7 @@ class PlantillasAjusteExport implements FromCollection,WithHeadings,WithTitle,Wi
 
     //titulo de la hoja de excel
     public function title(): string{
-        return 'ajustes';
+        return 'plantillaajustes';
     }
 
     public function headings(): array{

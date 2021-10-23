@@ -31,7 +31,7 @@ class PlantillasOrdenesCompraExport implements FromCollection,WithHeadings,WithT
 
     //titulo de la hoja de excel
     public function title(): string{
-        return 'ordenescompra';
+        return 'plantillaordenescompra';
     }
 
     public function headings(): array{
