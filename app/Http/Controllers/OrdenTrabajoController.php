@@ -129,7 +129,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         $contadorfilas = $request->contadorfilas;
         $item = $request->item;
         $hoy = $request->hoy;
-        $tipooperacion = 'alta';
+        $tipooperacion = $request->tipooperacion;
         $arraycodigosyaagregados = $porciones = explode(",", $request->arraycodigospartidas);
         foreach($partidasexcel as $partida){
             if($rowexcel > 0){

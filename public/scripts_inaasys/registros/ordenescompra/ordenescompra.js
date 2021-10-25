@@ -250,8 +250,6 @@ function seleccionarseriedocumento(Serie){
       $("#serie").val(Serie);
       $("#serietexto").html("Serie: "+Serie);
       mostrarformulario();
-      //pasar al siguiente input proveedor
-      $("#numeroproveedor").focus();
     }) 
 }
 //obtener registros de proveedores
@@ -394,8 +392,6 @@ function seleccionarproveedor(Numero, Nombre, Plazo){
     }
     //colocar el plazo del proveedor
     $("#plazo").val(Plazo);
-    //pasar al siguiente input almacen
-    $("#numeroalmacen").focus();
     mostrarformulario();
   }
 }
@@ -409,8 +405,6 @@ function seleccionaralmacen(Numero, Nombre){
     if(Nombre != null){
       $("#textonombrealmacen").html(Nombre.substring(0, 60));
     }
-    //pasar al siguiente input referencia
-    setTimeout(function() { $("#referencia").focus() }, 500);
     mostrarformulario();
   }
 }
@@ -490,8 +484,6 @@ function seleccionarordentrabajo(Orden, Fecha, Cliente, Tipo, Unidad, StatusOrde
     if(Orden != null){
       $("#textonombreordentrabajo").html(Orden.substring(0, 40));
     }
-    //pasar al siguiente input referencia
-    setTimeout(function() { $("#referencia").focus() }, 500);
     mostrarformulario();
   }
 }
@@ -509,8 +501,6 @@ function obtenerproveedorpornumero(){
           $("#textonombreproveedor").html(data.nombre.substring(0, 60));
         }
         $("#plazo").val(data.plazo);
-        //pasar al siguiente input almacen
-        $("#numeroalmacen").focus();
       }) 
     }
   }
@@ -533,8 +523,6 @@ function obteneralmacenpornumero(){
         if(data.nombre != null){
           $("#textonombrealmacen").html(data.nombre.substring(0, 60));
         }
-        //pasar al siguiente input referencia
-        $("#referencia").focus();
       })  
     }
   }
@@ -557,8 +545,6 @@ function obtenerordenporfolio(){
         if(data.orden != null){
           $("#textonombreordentrabajo").html(data.orden.substring(0, 40));
         }
-        //pasar al siguiente input referencia
-        $("#referencia").focus();
         mostrarformulario();
       }) 
     }
@@ -656,11 +642,6 @@ function obtenerproductoporcodigo(){
       msjnoseencontroningunproducto();
     }
   }) 
-}
-//pasar al siguiente input despues de referencia
-function enterinputreferencia(){
-  //$('#tipo').select2('open');
-  $("#codigoabuscar").focus();
 }
 //función que evalua si la partida que quieren ingresar ya existe o no en el detalle de la orden de compra
 function evaluarproductoexistente(Codigo){
@@ -891,18 +872,18 @@ function alta(tipoalta){
               '<div class="row">'+
                 '<div class="col-md-3">'+
                   '<label>Orden <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b> &nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
-                  '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                  '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                   '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" data-parsley-length="[0, 10]" required readonly>'+
                   '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
                   '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
                 '</div>'+  
                 '<div class="col-md-2">'+
                   '<label>Plazo Días (proveedor)</label>'+
-                  '<input type="text" class="form-control" name="plazo" id="plazo" required autocomplete="off">'+
+                  '<input type="text" class="form-control inputnext" name="plazo" id="plazo" required autocomplete="off">'+
                 '</div>'+
                 '<div class="col-md-2">'+
                   '<label>Referencia</label>'+
-                  '<input type="text" class="form-control" name="referencia" id="referencia" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                  '<input type="text" class="form-control inputnext" name="referencia" id="referencia" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                 '</div>'+
                 '<div class="col-md-2">'+
                   '<label>Tipo</label>'+
@@ -911,7 +892,7 @@ function alta(tipoalta){
                 '</div>'+
                 '<div class="col-xs-12 col-sm-12 col-md-3">'+
                   '<label>Fecha</label>'+
-                  '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" style="min-width:95%;">'+
+                  '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();" style="min-width:95%;">'+
                   '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                 '</div>'+
               '</div>'+
@@ -925,7 +906,7 @@ function alta(tipoalta){
                       '</td>'+
                       '<td>'+
                         '<div class="form-line">'+
-                          '<input type="text" class="form-control" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer" autocomplete="off">'+
+                          '<input type="text" class="form-control inputnext" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer" autocomplete="off">'+
                           '<input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior" required data-parsley-type="integer">'+
                           '<input type="hidden" class="form-control" name="proveedor" id="proveedor" required readonly onkeyup="tipoLetra(this)">'+
                         '</div>'+
@@ -942,7 +923,7 @@ function alta(tipoalta){
                       '</td>'+
                       '<td>'+ 
                         '<div class="form-line">'+
-                          '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer" autocomplete="off">'+
+                          '<input type="text" class="form-control inputnext" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer" autocomplete="off">'+
                           '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required data-parsley-type="integer">'+
                           '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly onkeyup="tipoLetra(this)">'+
                         '</div>'+
@@ -1032,7 +1013,7 @@ function alta(tipoalta){
                   '<div class="row">'+
                     '<div class="col-md-6">'+   
                       '<label>Observaciones</label>'+
-                      '<textarea class="form-control" name="observaciones" id="observaciones" rows="5" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" required></textarea>'+
+                      '<textarea class="form-control inputnext" name="observaciones" id="observaciones" rows="5" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" required></textarea>'+
                     '</div>'+ 
                     '<div class="col-md-3 col-md-offset-3">'+
                       '<table class="table table-striped table-hover">'+
@@ -1116,7 +1097,7 @@ function alta(tipoalta){
         }
       });
       //colocar required a campo orden
-      $("#ordentrabajo").attr('required', 'required');
+      $("#ordentrabajo").attr('required', 'required').addClass('inputnext');
       $("#ordentrabajoanterior").attr('required', 'required');
       //desabilitar almacen
       $("#numeroalmacen").val(0).attr('readonly', 'readonly');
@@ -1136,14 +1117,6 @@ function alta(tipoalta){
       });
       $("#busquedaordenestrabajo").hide();
   }
-  //siguiente input despues de referencia
-  $('#referencia').on('keypress', function(e) {
-    //recomentable para mayor compatibilidad entre navegadores.
-    var code = (e.keyCode ? e.keyCode : e.which);
-    if(code==13){
-      enterinputreferencia();
-    }
-  });
   //regresar numero
   $('#numeroalmacen').on('change', function(e) {
     regresarnumeroalmacen();
@@ -1152,8 +1125,15 @@ function alta(tipoalta){
   $('#ordentrabajo').on('change', function(e) {
     regresarfolioorden();
   });
-  //colocar focus a proveedor 
-  setTimeout(function() { $("#numeroproveedor").focus() }, 1000);
+  //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+  $(".inputnext").keypress(function (e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      var index = $(this).index(".inputnext");          
+      $(".inputnext").eq(index + 1).focus(); 
+    }
+  });
   $("#ModalAlta").modal('show');
 }
 //guardar el registro
@@ -1387,18 +1367,18 @@ function obtenerdatos(ordenmodificar){
                 '<div class="row">'+
                   '<div class="col-md-3">'+
                     '<label>Orden <b style="color:#F44336 !important;" id="serietexto"> Serie:</b></label>'+
-                    '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                    '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                     '<input type="hidden" class="form-control" name="serie" id="serie"  data-parsley-length="[0, 10]" required readonly>'+
                     '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion"  readonly>'+
                     '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
                   '</div>'+  
                   '<div class="col-md-2">'+
                     '<label>Plazo Días (proveedor)</label>'+
-                    '<input type="text" class="form-control" name="plazo" id="plazo"  required autocomplete="off">'+
+                    '<input type="text" class="form-control inputnext" name="plazo" id="plazo"  required autocomplete="off">'+
                   '</div>'+
                   '<div class="col-md-2">'+
                     '<label>Referencia</label>'+
-                    '<input type="text" class="form-control" name="referencia" id="referencia" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                    '<input type="text" class="form-control inputnext" name="referencia" id="referencia" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                   '</div>'+
                   '<div class="col-md-2">'+
                     '<label>Tipo</label>'+
@@ -1407,7 +1387,7 @@ function obtenerdatos(ordenmodificar){
                   '</div>'+
                   '<div class="col-xs-12 col-sm-12 col-md-3">'+
                     '<label>Fecha</label>'+
-                    '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required onchange="validasolomesactual();" style="min-width:95%;">'+
+                    '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" required onchange="validasolomesactual();" style="min-width:95%;">'+
                     '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy">'+
                   '</div>'+
                 '</div>'+
@@ -1421,7 +1401,7 @@ function obtenerdatos(ordenmodificar){
                         '</td>'+
                         '<td>'+
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control" name="numeroproveedor" id="numeroproveedor"  required data-parsley-type="integer" autocomplete="off">'+
+                            '<input type="text" class="form-control inputnext" name="numeroproveedor" id="numeroproveedor"  required data-parsley-type="integer" autocomplete="off">'+
                             '<input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior"  required data-parsley-type="integer">'+
                             '<input type="hidden" class="form-control" name="proveedor" id="proveedor"  required readonly onkeyup="tipoLetra(this)">'+
                           '</div>'+
@@ -1438,7 +1418,7 @@ function obtenerdatos(ordenmodificar){
                         '</td>'+
                         '<td>'+ 
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer" autocomplete="off">'+
+                            '<input type="text" class="form-control inputnext" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer" autocomplete="off">'+
                             '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required data-parsley-type="integer">'+
                             '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly onkeyup="tipoLetra(this)">'+
                           '</div>'+
@@ -1518,7 +1498,7 @@ function obtenerdatos(ordenmodificar){
                     '<div class="row">'+
                       '<div class="col-md-6">'+   
                         '<label>Observaciones</label>'+
-                        '<textarea class="form-control" name="observaciones" id="observaciones" rows="5" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" required></textarea>'+
+                        '<textarea class="form-control inputnext" name="observaciones" id="observaciones" rows="5" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" required></textarea>'+
                       '</div>'+ 
                       '<div class="col-md-3 col-md-offset-3">'+
                         '<table class="table table-striped table-hover">'+
@@ -1579,7 +1559,7 @@ function obtenerdatos(ordenmodificar){
         break;
       case 'TOT':
         //colocar required a campo orden
-        $("#ordentrabajo").val(data.ordencompra.OrdenTrabajo).attr('required', 'required');
+        $("#ordentrabajo").val(data.ordencompra.OrdenTrabajo).attr('required', 'required').addClass('inputnext');
         $("#ordentrabajoanterior").val(data.ordencompra.OrdenTrabajo).attr('required', 'required');
         if(data.ordencompra.OrdenTrabajo != null){
           $("#textonombreordentrabajo").html(data.ordencompra.OrdenTrabajo.substring(0, 60));
@@ -1647,14 +1627,6 @@ function obtenerdatos(ordenmodificar){
         obtenerproveedorpornumero();
       }
     });
-    //siguiente input despues de referencia
-    $('#referencia').on('keypress', function(e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        enterinputreferencia();
-      }
-    });
     //regresar numero
     $('#numeroproveedor').on('change', function(e) {
       regresarnumeroproveedor();
@@ -1667,6 +1639,15 @@ function obtenerdatos(ordenmodificar){
     $('#ordentrabajo').on('change', function(e) {
       regresarfolioorden();
     });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        var index = $(this).index(".inputnext");          
+        $(".inputnext").eq(index + 1).focus(); 
+      }
+    });
     obtenertiposordenescompra(data.ordencompra.Tipo);
     seleccionartipoordencompra(data);
   }).fail( function() {
@@ -1678,8 +1659,6 @@ async function seleccionartipoordencompra(data){
   await retraso();
   $("#tipo").val(data.ordencompra.Tipo).change();
   $("#tipo").select2();
-  //colocar focus a proveedor 
-  setTimeout(function() { $("#numeroproveedor").focus() }, 1000);
   mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
   $('.page-loader-wrapper').css('display', 'none');
 }

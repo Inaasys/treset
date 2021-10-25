@@ -1342,7 +1342,7 @@ function alta(){
                     '<div class="row">'+
                         '<div class="col-md-3">'+
                             '<label>Cotización <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b> &nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
-                            '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                             '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" data-parsley-length="[0, 10]" required readonly>'+
                             '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
                             '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
@@ -1350,11 +1350,11 @@ function alta(){
                         '</div>'+  
                         '<div class="col-md-2">'+
                             '<label>Plazo Días</label>'+
-                            '<input type="text" class="form-control" name="plazo" id="plazo"  required autocomplete="off">'+
+                            '<input type="text" class="form-control inputnext" name="plazo" id="plazo"  required autocomplete="off">'+
                         '</div>'+
                         '<div class="col-md-2">'+
                             '<label>Referencia</label>'+
-                            '<input type="text" class="form-control" name="referencia" id="referencia" data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                            '<input type="text" class="form-control inputnext" name="referencia" id="referencia" data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                         '</div>'+
                         '<div class="col-md-2">'+
                             '<label>Unidad</label>'+
@@ -1363,7 +1363,7 @@ function alta(){
                         '</div>'+
                         '<div class="col-xs-12 col-sm-12 col-md-3">'+
                             '<label>Fecha</label>'+
-                            '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" style="min-width:95%;">'+
+                            '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();" style="min-width:95%;">'+
                             '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                         '</div>'+
                     '</div>'+
@@ -1377,7 +1377,7 @@ function alta(){
                                     '</td>'+
                                     '<td>'+
                                         '<div class="form-line">'+
-                                            '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
+                                            '<input type="text" class="form-control inputnext" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
                                             '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
                                             '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly onkeyup="tipoLetra(this)">'+
                                         '</div>'+
@@ -1394,7 +1394,7 @@ function alta(){
                                     '</td>'+
                                     '<td>'+ 
                                         '<div class="form-line">'+
-                                            '<input type="text" class="form-control" name="numeroagente" id="numeroagente" required data-parsley-type="integer" autocomplete="off">'+
+                                            '<input type="text" class="form-control inputnext" name="numeroagente" id="numeroagente" required data-parsley-type="integer" autocomplete="off">'+
                                             '<input type="hidden" class="form-control" name="numeroagenteanterior" id="numeroagenteanterior" required data-parsley-type="integer">'+
                                             '<input type="hidden" class="form-control" name="agente" id="agente" required readonly onkeyup="tipoLetra(this)">'+
                                         '</div>'+
@@ -1550,7 +1550,7 @@ function alta(){
                                                     '</td>'+
                                                     '<td>'+    
                                                         '<div class="form-line">'+
-                                                            '<input type="text" class="form-control" name="vin" id="vin" data-parsley-length="[1, 30]" autocomplete="off">'+
+                                                            '<input type="text" class="form-control inputnexttabdu" name="vin" id="vin" data-parsley-length="[1, 30]" autocomplete="off">'+
                                                             '<input type="hidden" class="form-control" name="vinanterior" id="vinanterior" data-parsley-length="[1, 30]">'+
                                                         '</div>'+
                                                     '</td>'+    
@@ -1559,19 +1559,19 @@ function alta(){
                                         '</div>'+
                                         '<div class="col-md-2">'+
                                             '<label>Motor / Serie</label>'+
-                                            '<input type="text" class="form-control" name="motor" id="motor"  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
+                                            '<input type="text" class="form-control inputnexttabdu" name="motor" id="motor"  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
                                         '</div>'+
                                         '<div class="col-md-2">'+
                                             '<label>Marca</label>'+
-                                            '<input type="text" class="form-control" name="marca" id="marca"  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
+                                            '<input type="text" class="form-control inputnexttabdu" name="marca" id="marca"  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
                                         '</div>'+
                                         '<div class="col-md-2">'+
                                             '<label>Modelo</label>'+
-                                            '<input type="text" class="form-control" name="modelo" id="modelo"  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
+                                            '<input type="text" class="form-control inputnexttabdu" name="modelo" id="modelo"  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
                                         '</div>'+
                                         '<div class="col-md-1">'+
                                             '<label>Año</label>'+
-                                            '<input type="text" class="form-control" name="ano" id="ano"  data-parsley-max="'+parseInt(periodohoy)+'" data-parsley-type="digits" data-parsley-length="[4,4]"  onkeyup="tipoLetra(this);" autocomplete="off">'+
+                                            '<input type="text" class="form-control inputnexttabdu" name="ano" id="ano"  data-parsley-max="'+parseInt(periodohoy)+'" data-parsley-type="digits" data-parsley-length="[4,4]"  onkeyup="tipoLetra(this);" autocomplete="off">'+
                                         '</div>'+
                                         '<div class="col-md-2">'+
                                             '<label>Tipo Servicio</label>'+
@@ -1586,19 +1586,19 @@ function alta(){
                                     '<div class="row">'+
                                         '<div class="col-md-2">'+
                                             '<label>Kilómetros</label>'+
-                                            '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="kilometros" id="kilometros" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)"  required >'+
+                                            '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabdu" name="kilometros" id="kilometros" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)"  required >'+
                                         '</div>'+
                                         '<div class="col-md-2">'+
                                             '<label>Placas</label>'+
-                                            '<input type="text" class="form-control" name="placas" id="placas" data-parsley-length="[1, 10]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                                            '<input type="text" class="form-control inputnexttabdu" name="placas" id="placas" data-parsley-length="[1, 10]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                                         '</div>'+
                                         '<div class="col-md-2">'+
                                             '<label># Económico</label>'+
-                                            '<input type="text" class="form-control" name="economico" id="economico"  data-parsley-length="[1, 30]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                                            '<input type="text" class="form-control inputnexttabdu" name="economico" id="economico"  data-parsley-length="[1, 30]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                                         '</div>'+
                                         '<div class="col-md-2">'+
                                             '<label>Color</label>'+
-                                            '<input type="text" class="form-control" name="color" id="color" data-parsley-length="[3, 30]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                                            '<input type="text" class="form-control inputnexttabdu" name="color" id="color" data-parsley-length="[3, 30]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                                         '</div>'+
                                     '</div>'+
                                 '</div>'+
@@ -1608,7 +1608,7 @@ function alta(){
                     '<div class="row">'+
                         '<div class="col-md-3">'+   
                             '<label>Observaciones</label>'+
-                            '<textarea class="form-control" name="observaciones" id="observaciones" rows="5" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" required></textarea>'+
+                            '<textarea class="form-control inputnext" name="observaciones" id="observaciones" rows="5" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" required></textarea>'+
                         '</div>'+ 
                         '<div class="col-md-3">'+
                             '<table class="table table-striped table-hover">'+
@@ -1749,6 +1749,24 @@ function alta(){
     $('#vin').on('change', function(e) {
         regresarnumerovin();
     });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        var index = $(this).index(".inputnext");          
+        $(".inputnext").eq(index + 1).focus(); 
+      }
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB DATOS UNIDAD
+    $(".inputnexttabdu").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        var index = $(this).index(".inputnexttabdu");          
+        $(".inputnexttabdu").eq(index + 1).focus(); 
+      }
+    });
     $("#ModalAlta").modal('show');
 }
 //guardar el registro
@@ -1875,7 +1893,7 @@ function obtenerdatos(cotizacionmodificar){
                 '<div class="row">'+
                   '<div class="col-md-3">'+
                     '<label>Cotización <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b> &nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
-                    '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                    '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                     '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" data-parsley-length="[0, 10]" required readonly>'+
                     '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
                     '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
@@ -1883,11 +1901,11 @@ function obtenerdatos(cotizacionmodificar){
                   '</div>'+  
                   '<div class="col-md-2">'+
                     '<label>Plazo Días</label>'+
-                    '<input type="text" class="form-control" name="plazo" id="plazo"  required autocomplete="off">'+
+                    '<input type="text" class="form-control inputnext" name="plazo" id="plazo"  required autocomplete="off">'+
                   '</div>'+
                   '<div class="col-md-2">'+
                     '<label>Referencia</label>'+
-                    '<input type="text" class="form-control" name="referencia" id="referencia" data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                    '<input type="text" class="form-control inputnext" name="referencia" id="referencia" data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                   '</div>'+
                   '<div class="col-md-2">'+
                     '<label>Unidad</label>'+
@@ -1896,7 +1914,7 @@ function obtenerdatos(cotizacionmodificar){
                   '</div>'+
                   '<div class="col-xs-12 col-sm-12 col-md-3">'+
                     '<label>Fecha</label>'+
-                    '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" style="min-width:95%;">'+
+                    '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();" style="min-width:95%;">'+
                     '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                   '</div>'+
                 '</div>'+
@@ -1910,7 +1928,7 @@ function obtenerdatos(cotizacionmodificar){
                         '</td>'+
                         '<td>'+
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
+                            '<input type="text" class="form-control inputnext" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
                             '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
                             '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly onkeyup="tipoLetra(this)">'+
                           '</div>'+
@@ -1927,7 +1945,7 @@ function obtenerdatos(cotizacionmodificar){
                         '</td>'+
                         '<td>'+ 
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control" name="numeroagente" id="numeroagente" required data-parsley-type="integer" autocomplete="off">'+
+                            '<input type="text" class="form-control inputnext" name="numeroagente" id="numeroagente" required data-parsley-type="integer" autocomplete="off">'+
                             '<input type="hidden" class="form-control" name="numeroagenteanterior" id="numeroagenteanterior" required data-parsley-type="integer">'+
                             '<input type="hidden" class="form-control" name="agente" id="agente" required readonly onkeyup="tipoLetra(this)">'+
                           '</div>'+
@@ -2063,7 +2081,7 @@ function obtenerdatos(cotizacionmodificar){
                                 '</td>'+
                                 '<td>'+    
                                   '<div class="form-line">'+
-                                    '<input type="text" class="form-control" name="vin" id="vin" data-parsley-length="[1, 30]" autocomplete="off">'+
+                                    '<input type="text" class="form-control inputnexttabdu" name="vin" id="vin" data-parsley-length="[1, 30]" autocomplete="off">'+
                                     '<input type="hidden" class="form-control" name="vinanterior" id="vinanterior" data-parsley-length="[1, 30]">'+
                                   '</div>'+
                                 '</td>'+    
@@ -2072,19 +2090,19 @@ function obtenerdatos(cotizacionmodificar){
                           '</div>'+
                           '<div class="col-md-2">'+
                             '<label>Motor / Serie</label>'+
-                            '<input type="text" class="form-control" name="motor" id="motor"  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
+                            '<input type="text" class="form-control inputnexttabdu" name="motor" id="motor"  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
                           '</div>'+
                           '<div class="col-md-2">'+
                             '<label>Marca</label>'+
-                            '<input type="text" class="form-control" name="marca" id="marca"  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
+                            '<input type="text" class="form-control inputnexttabdu" name="marca" id="marca"  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
                           '</div>'+
                           '<div class="col-md-2">'+
                             '<label>Modelo</label>'+
-                            '<input type="text" class="form-control" name="modelo" id="modelo"  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
+                            '<input type="text" class="form-control inputnexttabdu" name="modelo" id="modelo"  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
                           '</div>'+
                           '<div class="col-md-1">'+
                             '<label>Año</label>'+
-                            '<input type="text" class="form-control" name="ano" id="ano"  data-parsley-max="'+parseInt(periodohoy)+'" data-parsley-type="digits" data-parsley-length="[4,4]"  onkeyup="tipoLetra(this);" autocomplete="off">'+
+                            '<input type="text" class="form-control inputnexttabdu" name="ano" id="ano"  data-parsley-max="'+parseInt(periodohoy)+'" data-parsley-type="digits" data-parsley-length="[4,4]"  onkeyup="tipoLetra(this);" autocomplete="off">'+
                           '</div>'+
                           '<div class="col-md-2">'+
                             '<label>Tipo Servicio</label>'+
@@ -2099,19 +2117,19 @@ function obtenerdatos(cotizacionmodificar){
                         '<div class="row">'+
                           '<div class="col-md-2">'+
                             '<label>Kilómetros</label>'+
-                            '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="kilometros" id="kilometros" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)"  required >'+
+                            '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabdu" name="kilometros" id="kilometros" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)"  required >'+
                           '</div>'+
                           '<div class="col-md-2">'+
                             '<label>Placas</label>'+
-                            '<input type="text" class="form-control" name="placas" id="placas" data-parsley-length="[1, 10]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                            '<input type="text" class="form-control inputnexttabdu" name="placas" id="placas" data-parsley-length="[1, 10]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                           '</div>'+
                           '<div class="col-md-2">'+
                             '<label># Económico</label>'+
-                            '<input type="text" class="form-control" name="economico" id="economico"  data-parsley-length="[1, 30]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                            '<input type="text" class="form-control inputnexttabdu" name="economico" id="economico"  data-parsley-length="[1, 30]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                           '</div>'+
                           '<div class="col-md-2">'+
                             '<label>Color</label>'+
-                            '<input type="text" class="form-control" name="color" id="color" data-parsley-length="[3, 30]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                            '<input type="text" class="form-control inputnexttabdu" name="color" id="color" data-parsley-length="[3, 30]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                           '</div>'+
                         '</div>'+
                       '</div>'+
@@ -2121,7 +2139,7 @@ function obtenerdatos(cotizacionmodificar){
                 '<div class="row">'+
                   '<div class="col-md-3">'+   
                     '<label>Observaciones</label>'+
-                    '<textarea class="form-control" name="observaciones" id="observaciones" rows="5" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" required></textarea>'+
+                    '<textarea class="form-control inputnext" name="observaciones" id="observaciones" rows="5" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" required></textarea>'+
                   '</div>'+ 
                   '<div class="col-md-3">'+
                     '<table class="table table-striped table-hover">'+
@@ -2319,6 +2337,24 @@ function obtenerdatos(cotizacionmodificar){
     //regresar vin
     $('#vin').on('change', function(e) {
         regresarnumerovin();
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        var index = $(this).index(".inputnext");          
+        $(".inputnext").eq(index + 1).focus(); 
+      }
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB DATOS UNIDAD
+    $(".inputnexttabdu").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        var index = $(this).index(".inputnexttabdu");          
+        $(".inputnexttabdu").eq(index + 1).focus(); 
+      }
     });
     obtenertiposunidades();
     seleccionartipounidad(data);

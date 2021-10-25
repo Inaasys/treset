@@ -771,7 +771,7 @@ function alta(){
                         '<div class="row">'+
                             '<div class="col-md-3">'+
                                 '<label>Producción <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
-                                '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                                 '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                                 '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
                                 '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
@@ -785,7 +785,7 @@ function alta(){
                                         '</td>'+
                                         '<td>'+
                                             '<div class="form-line">'+
-                                                '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
+                                                '<input type="text" class="form-control inputnext" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
                                                 '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
                                                 '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
                                             '</div>'+
@@ -802,7 +802,7 @@ function alta(){
                                         '</td>'+
                                         '<td>'+
                                             '<div class="form-line">'+
-                                                '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer" autocomplete="off">'+
+                                                '<input type="text" class="form-control inputnext" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer" autocomplete="off">'+
                                                 '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required data-parsley-type="integer">'+
                                                 '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
                                             '</div>'+
@@ -812,7 +812,7 @@ function alta(){
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Fecha </label>'+
-                                '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" >'+
+                                '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();" >'+
                                 '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                             '</div>'+
                         '</div>'+
@@ -826,7 +826,7 @@ function alta(){
                                         '</td>'+
                                         '<td>'+ 
                                             '<div class="form-line">'+
-                                            '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del PT" required autocomplete="off" onkeyup="tipoLetra(this);">'+
+                                            '<input type="text" class="form-control inputnext" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del PT" required autocomplete="off" onkeyup="tipoLetra(this);">'+
                                             '</div>'+
                                         '</td>'+
                                     '</tr>'+    
@@ -834,11 +834,11 @@ function alta(){
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Cantidad a fabricar PT</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="cantidad" id="cantidad" value="0.'+numerocerosconfigurados+'" data-parsley-min="0.'+numerocerosconfiguradosinputnumberstep+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas();" required>'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="cantidad" id="cantidad" value="0.'+numerocerosconfigurados+'" data-parsley-min="0.'+numerocerosconfiguradosinputnumberstep+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas();" required>'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Costo PT</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="costo" id="costo" value="0.'+numerocerosconfigurados+'" readonly required>'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="costo" id="costo" value="0.'+numerocerosconfigurados+'" readonly required>'+
                             '</div>'+
                             '<div class="col-md-4" hidden>'+
                                 '<label>Escribe el código del Insumo a buscar y presiona la tecla ENTER</label>'+
@@ -891,7 +891,7 @@ function alta(){
                         '<div class="row">'+
                             '<div class="col-md-6">'+   
                                 '<label>Observaciones de PT</label>'+
-                                '<textarea class="form-control" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]" rows="2"></textarea>'+
+                                '<textarea class="form-control inputnext" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]" rows="2"></textarea>'+
                             '</div>'+ 
                             '<div class="col-md-3">'+  
                             '</div>'+
@@ -955,6 +955,15 @@ function alta(){
     //regresar numero almacen
     $('#numeroalmacen').on('change', function(e) {
         regresarnumeroalmacen();
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        var index = $(this).index(".inputnext");          
+        $(".inputnext").eq(index + 1).focus(); 
+      }
     });
     $("#ModalAlta").modal('show');
 }
@@ -1156,7 +1165,7 @@ function obtenerdatos(produccionmodificar){
                             '<div class="row">'+
                                 '<div class="col-md-3">'+
                                     '<label>Producción <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
-                                    '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                                    '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                                     '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                                     '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
                                     '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
@@ -1170,7 +1179,7 @@ function obtenerdatos(produccionmodificar){
                                             '</td>'+
                                             '<td>'+
                                                 '<div class="form-line">'+
-                                                    '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
+                                                    '<input type="text" class="form-control inputnext" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
                                                     '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
                                                     '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
                                                 '</div>'+
@@ -1187,7 +1196,7 @@ function obtenerdatos(produccionmodificar){
                                             '</td>'+
                                             '<td>'+
                                                 '<div class="form-line">'+
-                                                    '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer" autocomplete="off">'+
+                                                    '<input type="text" class="form-control inputnext" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer" autocomplete="off">'+
                                                     '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required data-parsley-type="integer">'+
                                                     '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
                                                 '</div>'+
@@ -1197,7 +1206,7 @@ function obtenerdatos(produccionmodificar){
                                 '</div>'+
                                 '<div class="col-md-3">'+
                                     '<label>Fecha </label>'+
-                                    '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" >'+
+                                    '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();" >'+
                                     '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                 '</div>'+
                             '</div>'+
@@ -1211,7 +1220,7 @@ function obtenerdatos(produccionmodificar){
                                             '</td>'+
                                             '<td>'+ 
                                                 '<div class="form-line">'+
-                                                '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del PT" required autocomplete="off" onkeyup="tipoLetra(this);">'+
+                                                '<input type="text" class="form-control inputnext" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del PT" required autocomplete="off" onkeyup="tipoLetra(this);">'+
                                                 '</div>'+
                                             '</td>'+
                                         '</tr>'+    
@@ -1219,11 +1228,11 @@ function obtenerdatos(produccionmodificar){
                                 '</div>'+
                                 '<div class="col-md-4">'+
                                     '<label>Cantidad a fabricar PT</label>'+
-                                    '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="cantidad" id="cantidad" value="0.'+numerocerosconfigurados+'" data-parsley-min="0.'+numerocerosconfiguradosinputnumberstep+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas();" required>'+
+                                    '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="cantidad" id="cantidad" value="0.'+numerocerosconfigurados+'" data-parsley-min="0.'+numerocerosconfiguradosinputnumberstep+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas();" required>'+
                                 '</div>'+
                                 '<div class="col-md-4">'+
                                     '<label>Costo PT</label>'+
-                                    '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="costo" id="costo" value="0.'+numerocerosconfigurados+'" readonly required>'+
+                                    '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="costo" id="costo" value="0.'+numerocerosconfigurados+'" readonly required>'+
                                 '</div>'+
                                 '<div class="col-md-4" hidden>'+
                                     '<label>Escribe el código del Insumo a buscar y presiona la tecla ENTER</label>'+
@@ -1276,7 +1285,7 @@ function obtenerdatos(produccionmodificar){
                             '<div class="row">'+
                                 '<div class="col-md-6">'+   
                                     '<label>Observaciones de PT</label>'+
-                                    '<textarea class="form-control" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]" rows="2"></textarea>'+
+                                    '<textarea class="form-control inputnext" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]" rows="2"></textarea>'+
                                 '</div>'+ 
                                 '<div class="col-md-3">'+  
                                 '</div>'+
@@ -1364,6 +1373,15 @@ function obtenerdatos(produccionmodificar){
     //regresar numero almacen
     $('#numeroalmacen').on('change', function(e) {
         regresarnumeroalmacen();
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        var index = $(this).index(".inputnext");          
+        $(".inputnext").eq(index + 1).focus(); 
+      }
     });
     //asignar el tipo de operacion que se realizara
     $("#tipooperacion").val("modificacion");

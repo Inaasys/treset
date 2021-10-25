@@ -168,6 +168,7 @@ $("#btnenviarpartidasexcel").on('click', function(e){
   }
   var partidasexcel = $('#partidasexcel')[0].files[0];
   var numeroalmacen = 1;
+  var tipooperacion = $("#tipooperacion").val();
   var hoy = $("#fecha").val();
   var form_data = new FormData();
   form_data.append('partidasexcel', partidasexcel);  
@@ -177,6 +178,7 @@ $("#btnenviarpartidasexcel").on('click', function(e){
   form_data.append('arraycodigospartidas', arraycodigospartidas);
   form_data.append('hoy', hoy);
   form_data.append('item', item);
+  form_data.append('tipooperacion', tipooperacion);
   $.ajax({
     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
     url:ordenes_trabajo_cargar_partidas_excel,
@@ -1446,7 +1448,7 @@ function alta(){
                   '<div class="row">'+
                     '<div class="col-md-2">'+
                       '<label>Orden <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
-                      '<input type="text" class="form-control" name="folio" id="folio" required onkeyup="tipoLetra(this);">'+
+                      '<input type="text" class="form-control inputnext" name="folio" id="folio" required onkeyup="tipoLetra(this);">'+
                       '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                       '<input type="hidden" class="form-control" name="numerofilastablaservicios" id="numerofilastablaservicios" value="0" required readonly>'+
                       '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
@@ -1464,12 +1466,12 @@ function alta(){
                     '</div>'+
                     '<div class="col-md-3">'+
                       '<label>Fecha</label>'+
-                      '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" onkeyup="tipoLetra(this);">'+
+                      '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();">'+
                       '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                     '</div>'+
                     '<div class="col-md-3">'+
                       '<label>Entrega Promesa</label>'+
-                      '<input type="datetime-local" class="form-control" name="fechaentregapromesa" id="fechaentregapromesa"  required onchange="validasolomesactual();" onkeyup="tipoLetra(this);">'+
+                      '<input type="datetime-local" class="form-control inputnext" name="fechaentregapromesa" id="fechaentregapromesa"  required onchange="validasolomesactual();">'+
                     '</div>'+
                   '</div>'+
                   '<div class="row">'+
@@ -1482,7 +1484,7 @@ function alta(){
                           '</td>'+
                           '<td>'+
                             '<div class="form-line">'+
-                              '<input type="text" class="form-control" name="numeroclientefacturaa" id="numeroclientefacturaa" required data-parsley-type="integer" autocomplete="off">'+
+                              '<input type="text" class="form-control inputnext" name="numeroclientefacturaa" id="numeroclientefacturaa" required data-parsley-type="integer" autocomplete="off">'+
                               '<input type="hidden" class="form-control" name="numeroclientefacturaaanterior" id="numeroclientefacturaaanterior" required data-parsley-type="integer">'+
                               '<input type="hidden" class="form-control" name="clientefacturaa" id="clientefacturaa" required readonly>'+
                             '</div>'+
@@ -1499,7 +1501,7 @@ function alta(){
                           '</td>'+
                           '<td>'+    
                             '<div class="form-line">'+
-                              '<input type="text" class="form-control" name="numeroclientedelcliente" id="numeroclientedelcliente" required data-parsley-type="integer" autocomplete="off">'+
+                              '<input type="text" class="form-control inputnext" name="numeroclientedelcliente" id="numeroclientedelcliente" required data-parsley-type="integer" autocomplete="off">'+
                               '<input type="hidden" class="form-control" name="numeroclientedelclienteanterior" id="numeroclientedelclienteanterior" required data-parsley-type="integer">'+
                               '<input type="hidden" class="form-control" name="clientedelcliente" id="clientedelcliente" required readonly>'+
                             '</div>'+
@@ -1516,7 +1518,7 @@ function alta(){
                           '</td>'+
                           '<td>'+   
                             '<div class="form-line">'+
-                              '<input type="text" class="form-control" name="numeroagente" id="numeroagente" required data-parsley-type="integer" autocomplete="off">'+
+                              '<input type="text" class="form-control inputnext" name="numeroagente" id="numeroagente" required data-parsley-type="integer" autocomplete="off">'+
                               '<input type="hidden" class="form-control" name="numeroagenteanterior" id="numeroagenteanterior" required data-parsley-type="integer">'+
                               '<input type="hidden" class="form-control" name="agente" id="agente" required readonly>'+
                             '</div>'+
@@ -1526,7 +1528,7 @@ function alta(){
                     '</div>'+
                     '<div class="col-md-3" id="divcaso">'+
                       '<label>Caso</label>'+
-                      '<input type="text" class="form-control" name="caso" id="caso"   onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]" autocomplete="off">'+
+                      '<input type="text" class="form-control inputnext" name="caso" id="caso"   onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]" autocomplete="off">'+
                     '</div>'+
                   '</div>'+
                     '<div class="row">'+
@@ -1571,7 +1573,7 @@ function alta(){
                           '</td>'+
                           '<td>'+    
                             '<div class="form-line">'+
-                              '<input type="text" class="form-control" name="vin" id="vin" required data-parsley-length="[1, 30]" autocomplete="off">'+
+                              '<input type="text" class="form-control inputnexttabda" name="vin" id="vin" required data-parsley-length="[1, 30]" autocomplete="off">'+
                               '<input type="hidden" class="form-control" name="vinanterior" id="vinanterior" required data-parsley-length="[1, 30]">'+
                             '</div>'+
                           '</td>'+    
@@ -1580,45 +1582,45 @@ function alta(){
                     '</div>'+
                     '<div class="col-md-2">'+
                       '<label>Motor / Serie</label>'+
-                      '<input type="text" class="form-control" name="motor" id="motor"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
+                      '<input type="text" class="form-control inputnexttabda" name="motor" id="motor"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
                     '</div>'+
                     '<div class="col-md-2">'+
                       '<label>Marca</label>'+
-                      '<input type="text" class="form-control" name="marca" id="marca"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
+                      '<input type="text" class="form-control inputnexttabda" name="marca" id="marca"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
                     '</div>'+
                     '<div class="col-md-2">'+
                       '<label>Modelo</label>'+
-                      '<input type="text" class="form-control" name="modelo" id="modelo"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
+                      '<input type="text" class="form-control inputnexttabda" name="modelo" id="modelo"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
                     '</div>'+
                     '<div class="col-md-1">'+
                       '<label>Año</label>'+
-                      '<input type="text" class="form-control" name="ano" id="ano"  data-parsley-max="'+parseInt(periodohoy)+'" data-parsley-type="digits" data-parsley-length="[4,4]" required  onkeyup="tipoLetra(this);" autocomplete="off">'+
+                      '<input type="text" class="form-control inputnexttabda" name="ano" id="ano"  data-parsley-max="'+parseInt(periodohoy)+'" data-parsley-type="digits" data-parsley-length="[4,4]" required  onkeyup="tipoLetra(this);" autocomplete="off">'+
                     '</div>'+
                   '</div>'+
                   '<div class="row">'+
                     '<div class="col-md-2">'+
                       '<label>Kilómetros</label>'+
-                      '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="kilometros" id="kilometros" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)"  required >'+
+                      '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabda" name="kilometros" id="kilometros" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)"  required >'+
                     '</div>'+
                     '<div class="col-md-2">'+
                       '<label>Placas</label>'+
-                      '<input type="text" class="form-control" name="placas" id="placas"  required data-parsley-length="[1, 10]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                      '<input type="text" class="form-control inputnexttabda" name="placas" id="placas"  required data-parsley-length="[1, 10]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                     '</div>'+
                     '<div class="col-md-2">'+
                       '<label># Económico</label>'+
-                      '<input type="text" class="form-control" name="economico" id="economico"  required  data-parsley-length="[1, 30]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                      '<input type="text" class="form-control inputnexttabda" name="economico" id="economico"  required  data-parsley-length="[1, 30]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                     '</div>'+
                     '<div class="col-md-2">'+
                       '<label>Color</label>'+
-                      '<input type="text" class="form-control" name="color" id="color"  required data-parsley-length="[3, 30]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                      '<input type="text" class="form-control inputnexttabda" name="color" id="color"  required data-parsley-length="[3, 30]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                     '</div>'+
                     '<div class="col-md-2">'+
                       '<label>Km Próx Servicio</label>'+
-                      '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="kmproxservicio" id="kmproxservicio" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)"  >'+
+                      '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabda" name="kmproxservicio" id="kmproxservicio" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)"  >'+
                     '</div>'+
                     '<div class="col-md-2">'+
                       '<label>Fecha Recordatorio Cliente</label>'+
-                      '<input type="date" class="form-control" name="fecharecordatoriocliente" id="fecharecordatoriocliente"   onkeyup="tipoLetra(this);">'+
+                      '<input type="date" class="form-control inputnexttabda" name="fecharecordatoriocliente" id="fecharecordatoriocliente">'+
                     '</div>'+
                   '</div>'+
                 '</div>'+
@@ -1626,37 +1628,37 @@ function alta(){
                   '<div class="row">'+
                     '<div class="col-md-2">'+
                       '<label>Reclamo</label>'+
-                      '<input type="text" class="form-control" name="reclamo" id="reclamo"  data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                      '<input type="text" class="form-control inputnexttabes" name="reclamo" id="reclamo"  data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                     '</div>'+
                     '<div class="col-md-2">'+
                       '<label>Orden Cliente</label>'+
-                      '<input type="text" class="form-control" name="ordencliente" id="ordencliente"   onkeyup="tipoLetra(this);" autocomplete="off" required>'+
+                      '<input type="text" class="form-control inputnexttabes" name="ordencliente" id="ordencliente"   onkeyup="tipoLetra(this);" autocomplete="off" required>'+
                     '</div>'+
                     '<div class="col-md-2">'+
                       '<label>Campaña No</label>'+
-                      '<input type="text" class="form-control" name="campana" id="campana" data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                      '<input type="text" class="form-control inputnexttabes" name="campana" id="campana" data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                     '</div>'+
                     '<div class="col-md-2" >'+
                       '<label>Promoción</label>'+
-                      '<input type="text" class="form-control" name="promocion" id="promocion"   onkeyup="tipoLetra(this);" autocomplete="off">'+
+                      '<input type="text" class="form-control inputnexttabes" name="promocion" id="promocion"   onkeyup="tipoLetra(this);" autocomplete="off">'+
                     '</div>'+
                     '<div class="col-md-2">'+
                       '<label>Bahia</label>'+
-                      '<input type="text" class="form-control" name="bahia" id="bahia"  required  onkeyup="tipoLetra(this);" data-parsley-type="number"	autocomplete="off">'+
+                      '<input type="text" class="form-control inputnexttabes" name="bahia" id="bahia"  required  onkeyup="tipoLetra(this);" data-parsley-type="number"	autocomplete="off">'+
                     '</div>'+
                     '<div class="col-md-2" >'+
                       '<label>Horas Reales</label>'+
-                      '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="horasreales" id="horasreales" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)">'+
+                      '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabes" name="horasreales" id="horasreales" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)">'+
                     '</div>'+
                   '</div>'+
                   '<div class="row">'+
                     '<div class="col-md-2" >'+
                       '<label>Rodar</label>'+
-                      '<input type="text" class="form-control" name="rodar" id="rodar"  data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                      '<input type="text" class="form-control inputnexttabes" name="rodar" id="rodar"  data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                     '</div>'+
                     '<div class="col-md-2">'+
                       '<label>Plazo Días</label>'+
-                      '<input type="text" class="form-control" name="plazodias" id="plazodias"  required  onkeyup="tipoLetra(this);" autocomplete="off">'+
+                      '<input type="text" class="form-control inputnexttabes" name="plazodias" id="plazodias"  required  onkeyup="tipoLetra(this);" autocomplete="off">'+
                     '</div>'+
                   '</div>'+
                 '</div>'+
@@ -1736,19 +1738,19 @@ function alta(){
                       '<div class="row">'+ 
                         '<div class="col-md-3">'+
                           '<label>Falla</label>'+
-                          '<textarea class="form-control" name="falla" id="falla"  required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"  rows="4"></textarea>'+
+                          '<textarea class="form-control inputnext" name="falla" id="falla"  required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"  rows="4"></textarea>'+
                         '</div>'+
                         '<div class="col-md-3">'+
                           '<label>Observaciones</label>'+
-                          '<textarea class="form-control" name="observaciones" id="observaciones"  required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rows="4"></textarea>'+
+                          '<textarea class="form-control inputnext" name="observaciones" id="observaciones"  required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rows="4"></textarea>'+
                         '</div>'+
                         '<div class="col-md-3">'+
                           '<label>Causa</label>'+
-                          '<textarea class="form-control" name="causa" id="causa" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rows="4"></textarea>'+
+                          '<textarea class="form-control inputnext" name="causa" id="causa" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rows="4"></textarea>'+
                         '</div>'+
                         '<div class="col-md-3">'+
                           '<label>Corrección</label>'+
-                          '<textarea class="form-control" name="correccion" id="correccion"  data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rows="4"></textarea>'+
+                          '<textarea class="form-control inputnext" name="correccion" id="correccion"  data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rows="4"></textarea>'+
                         '</div>'+
                       '</div>'+  
                     '</div>'+ 
@@ -1866,6 +1868,33 @@ function alta(){
   //regresar vin
   $('#vin').on('change', function(e) {
     regresarnumerovin();
+  });
+  //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+  $(".inputnext").keypress(function (e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      var index = $(this).index(".inputnext");          
+      $(".inputnext").eq(index + 1).focus(); 
+    }
+  });
+  //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB DATOS
+  $(".inputnexttabda").keypress(function (e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      var index = $(this).index(".inputnexttabda");          
+      $(".inputnexttabda").eq(index + 1).focus(); 
+    }
+  });
+  //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB ESTADO
+  $(".inputnexttabes").keypress(function (e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      var index = $(this).index(".inputnexttabes");          
+      $(".inputnexttabes").eq(index + 1).focus(); 
+    }
   });
   //se debe motrar el input para buscar los productos
   $("#divbuscarcodigoservicio").show();
@@ -2065,7 +2094,7 @@ function obtenerdatos(ordenmodificar){
                     '<div class="row">'+
                       '<div class="col-md-2">'+
                         '<label>Orden <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
-                        '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                        '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                         '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                         '<input type="hidden" class="form-control" name="numerofilastablaservicios" id="numerofilastablaservicios" value="0" required readonly>'+
                         '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
@@ -2083,12 +2112,12 @@ function obtenerdatos(ordenmodificar){
                       '</div>'+
                       '<div class="col-md-3">'+
                         '<label>Fecha</label>'+
-                        '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" onkeyup="tipoLetra(this);">'+
+                        '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();" >'+
                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                       '</div>'+
                       '<div class="col-md-3">'+
                         '<label>Entrega Promesa</label>'+
-                        '<input type="datetime-local" class="form-control" name="fechaentregapromesa" id="fechaentregapromesa"  required onchange="validasolomesactual();" onkeyup="tipoLetra(this);">'+
+                        '<input type="datetime-local" class="form-control inputnext" name="fechaentregapromesa" id="fechaentregapromesa"  required onchange="validasolomesactual();" >'+
                       '</div>'+
                     '</div>'+
                     '<div class="row">'+
@@ -2101,7 +2130,7 @@ function obtenerdatos(ordenmodificar){
                             '</td>'+
                             '<td>'+
                               '<div class="form-line">'+
-                                '<input type="text" class="form-control" name="numeroclientefacturaa" id="numeroclientefacturaa" required data-parsley-type="integer" autocomplete="off">'+
+                                '<input type="text" class="form-control inputnext" name="numeroclientefacturaa" id="numeroclientefacturaa" required data-parsley-type="integer" autocomplete="off">'+
                                 '<input type="hidden" class="form-control" name="numeroclientefacturaaanterior" id="numeroclientefacturaaanterior" required data-parsley-type="integer">'+
                                 '<input type="hidden" class="form-control" name="clientefacturaa" id="clientefacturaa" required readonly>'+
                               '</div>'+
@@ -2118,7 +2147,7 @@ function obtenerdatos(ordenmodificar){
                             '</td>'+
                             '<td>'+    
                               '<div class="form-line">'+
-                                '<input type="text" class="form-control" name="numeroclientedelcliente" id="numeroclientedelcliente" required data-parsley-type="integer" autocomplete="off">'+
+                                '<input type="text" class="form-control inputnext" name="numeroclientedelcliente" id="numeroclientedelcliente" required data-parsley-type="integer" autocomplete="off">'+
                                 '<input type="hidden" class="form-control" name="numeroclientedelclienteanterior" id="numeroclientedelclienteanterior" required data-parsley-type="integer">'+
                                 '<input type="hidden" class="form-control" name="clientedelcliente" id="clientedelcliente" required readonly>'+
                               '</div>'+
@@ -2135,7 +2164,7 @@ function obtenerdatos(ordenmodificar){
                             '</td>'+
                             '<td>'+   
                               '<div class="form-line">'+
-                                '<input type="text" class="form-control" name="numeroagente" id="numeroagente" required data-parsley-type="integer" autocomplete="off">'+
+                                '<input type="text" class="form-control inputnext" name="numeroagente" id="numeroagente" required data-parsley-type="integer" autocomplete="off">'+
                                 '<input type="hidden" class="form-control" name="numeroagenteanterior" id="numeroagenteanterior" required data-parsley-type="integer">'+
                                 '<input type="hidden" class="form-control" name="agente" id="agente" required readonly>'+
                               '</div>'+
@@ -2145,7 +2174,7 @@ function obtenerdatos(ordenmodificar){
                       '</div>'+
                       '<div class="col-md-3" id="divcaso">'+
                         '<label>Caso</label>'+
-                        '<input type="text" class="form-control" name="caso" id="caso"   onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]" autocomplete="off">'+
+                        '<input type="text" class="form-control inputnext" name="caso" id="caso"   onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]" autocomplete="off">'+
                       '</div>'+
                     '</div>'+
                       '<div class="row">'+
@@ -2186,7 +2215,7 @@ function obtenerdatos(ordenmodificar){
                             '</td>'+
                             '<td>'+    
                               '<div class="form-line">'+
-                                '<input type="text" class="form-control" name="vin" id="vin" required data-parsley-length="[1, 30]" autocomplete="off">'+
+                                '<input type="text" class="form-control inputnexttabda" name="vin" id="vin" required data-parsley-length="[1, 30]" autocomplete="off">'+
                                 '<input type="hidden" class="form-control" name="vinanterior" id="vinanterior" required data-parsley-length="[1, 30]">'+
                               '</div>'+
                             '</td>'+    
@@ -2195,45 +2224,45 @@ function obtenerdatos(ordenmodificar){
                       '</div>'+
                       '<div class="col-md-2">'+
                         '<label>Motor / Serie</label>'+
-                        '<input type="text" class="form-control" name="motor" id="motor"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
+                        '<input type="text" class="form-control inputnexttabda" name="motor" id="motor"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
                       '</div>'+
                       '<div class="col-md-2">'+
                         '<label>Marca</label>'+
-                        '<input type="text" class="form-control" name="marca" id="marca"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
+                        '<input type="text" class="form-control inputnexttabda" name="marca" id="marca"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
                       '</div>'+
                       '<div class="col-md-2">'+
                         '<label>Modelo</label>'+
-                        '<input type="text" class="form-control" name="modelo" id="modelo"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
+                        '<input type="text" class="form-control inputnexttabda" name="modelo" id="modelo"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 30]" autocomplete="off">'+
                       '</div>'+
                       '<div class="col-md-1">'+
                         '<label>Año</label>'+
-                        '<input type="text" class="form-control" name="ano" id="ano"  data-parsley-max="'+parseInt(periodohoy)+'" data-parsley-type="digits" data-parsley-length="[4,4]" required  onkeyup="tipoLetra(this);" autocomplete="off">'+
+                        '<input type="text" class="form-control inputnexttabda" name="ano" id="ano"  data-parsley-max="'+parseInt(periodohoy)+'" data-parsley-type="digits" data-parsley-length="[4,4]" required  onkeyup="tipoLetra(this);" autocomplete="off">'+
                       '</div>'+
                     '</div>'+
                     '<div class="row">'+
                       '<div class="col-md-2">'+
                         '<label>Kilómetros</label>'+
-                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="kilometros" id="kilometros" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)"  required >'+
+                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabda" name="kilometros" id="kilometros" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)"  required >'+
                       '</div>'+
                       '<div class="col-md-2">'+
                         '<label>Placas</label>'+
-                        '<input type="text" class="form-control" name="placas" id="placas"  required data-parsley-length="[1, 10]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                        '<input type="text" class="form-control inputnexttabda" name="placas" id="placas"  required data-parsley-length="[1, 10]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                       '</div>'+
                       '<div class="col-md-2">'+
                         '<label># Económico</label>'+
-                        '<input type="text" class="form-control" name="economico" id="economico"  required  data-parsley-length="[1, 30]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                        '<input type="text" class="form-control inputnexttabda" name="economico" id="economico"  required  data-parsley-length="[1, 30]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                       '</div>'+
                       '<div class="col-md-2">'+
                         '<label>Color</label>'+
-                        '<input type="text" class="form-control" name="color" id="color"  required data-parsley-length="[3, 30]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                        '<input type="text" class="form-control inputnexttabda" name="color" id="color"  required data-parsley-length="[3, 30]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                       '</div>'+
                       '<div class="col-md-2">'+
                         '<label>Km Próx Servicio</label>'+
-                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="kmproxservicio" id="kmproxservicio" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)"  >'+
+                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabda" name="kmproxservicio" id="kmproxservicio" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)"  >'+
                       '</div>'+
                       '<div class="col-md-2">'+
                         '<label>Fecha Recordatorio Cliente</label>'+
-                        '<input type="date" class="form-control" name="fecharecordatoriocliente" id="fecharecordatoriocliente"   onkeyup="tipoLetra(this);">'+
+                        '<input type="date" class="form-control inputnexttabda" name="fecharecordatoriocliente" id="fecharecordatoriocliente">'+
                       '</div>'+
                     '</div>'+
                   '</div>'+
@@ -2241,37 +2270,37 @@ function obtenerdatos(ordenmodificar){
                     '<div class="row">'+
                       '<div class="col-md-2">'+
                         '<label>Reclamo</label>'+
-                        '<input type="text" class="form-control" name="reclamo" id="reclamo"  data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                        '<input type="text" class="form-control inputnexttabes" name="reclamo" id="reclamo"  data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                       '</div>'+
                       '<div class="col-md-2">'+
                         '<label>Orden Cliente</label>'+
-                        '<input type="text" class="form-control" name="ordencliente" id="ordencliente"   onkeyup="tipoLetra(this);" autocomplete="off" required>'+
+                        '<input type="text" class="form-control inputnexttabes" name="ordencliente" id="ordencliente"   onkeyup="tipoLetra(this);" autocomplete="off" required>'+
                       '</div>'+
                       '<div class="col-md-2">'+
                         '<label>Campaña No</label>'+
-                        '<input type="text" class="form-control" name="campana" id="campana" data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                        '<input type="text" class="form-control inputnexttabes" name="campana" id="campana" data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                       '</div>'+
                       '<div class="col-md-2" >'+
                         '<label>Promoción</label>'+
-                        '<input type="text" class="form-control" name="promocion" id="promocion"   onkeyup="tipoLetra(this);" autocomplete="off">'+
+                        '<input type="text" class="form-control inputnexttabes" name="promocion" id="promocion"   onkeyup="tipoLetra(this);" autocomplete="off">'+
                       '</div>'+
                       '<div class="col-md-2">'+
                         '<label>Bahia</label>'+
-                        '<input type="text" class="form-control" name="bahia" id="bahia"  required  onkeyup="tipoLetra(this);" autocomplete="off">'+
+                        '<input type="text" class="form-control inputnexttabes" name="bahia" id="bahia"  required  onkeyup="tipoLetra(this);" autocomplete="off">'+
                       '</div>'+
                       '<div class="col-md-2" >'+
                         '<label>Horas Reales</label>'+
-                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="horasreales" id="horasreales" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)">'+
+                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabes" name="horasreales" id="horasreales" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)">'+
                       '</div>'+
                     '</div>'+
                     '<div class="row">'+
                       '<div class="col-md-2" >'+
                         '<label>Rodar</label>'+
-                        '<input type="text" class="form-control" name="rodar" id="rodar"  data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                        '<input type="text" class="form-control inputnexttabes" name="rodar" id="rodar"  data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                       '</div>'+
                       '<div class="col-md-2">'+
                         '<label>Plazo Días</label>'+
-                        '<input type="text" class="form-control" name="plazodias" id="plazodias"  required  onkeyup="tipoLetra(this);" autocomplete="off">'+
+                        '<input type="text" class="form-control inputnexttabes" name="plazodias" id="plazodias"  required  onkeyup="tipoLetra(this);" autocomplete="off">'+
                       '</div>'+
                     '</div>'+
                   '</div>'+
@@ -2351,19 +2380,19 @@ function obtenerdatos(ordenmodificar){
                         '<div class="row">'+ 
                           '<div class="col-md-3">'+
                             '<label>Falla</label>'+
-                            '<textarea class="form-control" name="falla" id="falla"  required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rows="4"></textarea>'+
+                            '<textarea class="form-control inputnext" name="falla" id="falla"  required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rows="4"></textarea>'+
                           '</div>'+
                           '<div class="col-md-3">'+
                             '<label>Observaciones</label>'+
-                            '<textarea class="form-control" name="observaciones" id="observaciones"  required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rows="4"></textarea>'+
+                            '<textarea class="form-control inputnext" name="observaciones" id="observaciones"  required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rows="4"></textarea>'+
                           '</div>'+
                           '<div class="col-md-3">'+
                             '<label>Causa</label>'+
-                            '<textarea class="form-control" name="causa" id="causa" data-parsley-length="[1, 255]"  onkeyup="tipoLetra(this);" rows="4"></textarea>'+
+                            '<textarea class="form-control inputnext" name="causa" id="causa" data-parsley-length="[1, 255]"  onkeyup="tipoLetra(this);" rows="4"></textarea>'+
                           '</div>'+
                           '<div class="col-md-3">'+
                             '<label>Corrección</label>'+
-                            '<textarea class="form-control" name="correccion" id="correccion"  data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rows="4"></textarea>'+
+                            '<textarea class="form-control inputnext" name="correccion" id="correccion"  data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rows="4"></textarea>'+
                           '</div>'+
                         '</div>'+
                       '</div>'+ 
@@ -2510,6 +2539,33 @@ function obtenerdatos(ordenmodificar){
     //regresar vin
     $('#vin').on('change', function(e) {
       regresarnumerovin();
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        var index = $(this).index(".inputnext");          
+        $(".inputnext").eq(index + 1).focus(); 
+      }
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB DATOS
+    $(".inputnexttabda").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        var index = $(this).index(".inputnexttabda");          
+        $(".inputnexttabda").eq(index + 1).focus(); 
+      }
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB ESTADO
+    $(".inputnexttabes").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        var index = $(this).index(".inputnexttabes");          
+        $(".inputnexttabes").eq(index + 1).focus(); 
+      }
     });
     selectsordentrabajo(data);
   }).fail( function() {

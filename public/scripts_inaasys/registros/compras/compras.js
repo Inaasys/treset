@@ -324,8 +324,6 @@ function seleccionarproveedor(Numero, Nombre, Plazo, Rfc, SolicitarXML){
       //reiniciar contadores
       contadorproductos = 0;
       contadorfilas = 0;
-      //pasar al siguiente input remision
-      setTimeout(function() { $("#remision").focus() }, 500);
       mostrarformulario();
     }
   }
@@ -879,8 +877,6 @@ function obtenerproveedorpornumero(){
           //reiniciar contadores
           contadorproductos = 0;
           contadorfilas = 0;
-          //pasar al siguiente input remision
-          $("#remision").focus();
           mostrarformulario();
         }else{
           $("#numeroproveedor").val(numeroproveedoranterior);
@@ -1004,11 +1000,6 @@ function obtenerproductoporcodigo(){
       msjnoseencontroningunproducto();
     }
   }) 
-}
-//pasar al siguiente input despues de remision
-function enterinputremision(){
-  //$('#tipo').select2('open');
-  $("#factura").focus();
 }
 //funcion que evalua si el codigo agregado existe en la orden de compra
 function evaluarcodigoenordencompra(Codigo){
@@ -1439,7 +1430,7 @@ function alta(tipoalta){
                                 '<div class="row">'+
                                     '<div class="col-md-3">'+
                                         '<label>Compra <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
-                                        '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                                         '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'"  required readonly data-parsley-length="[1, 10]">'+
                                         '<input type="hidden" class="form-control" name="uuid" id="uuid" readonly required data-parsley-length="[1, 50]">'+
                                         '<input type="hidden" class="form-control" name="diferenciatotales" id="diferenciatotales" readonly required>'+
@@ -1450,17 +1441,17 @@ function alta(tipoalta){
                                     '</div>'+   
                                     '<div class="col-md-3">'+
                                         '<label>Plazo Días (proveedor)</label>'+
-                                        '<input type="text" class="form-control" name="plazo" id="plazo"  required onkeyup="tipoLetra(this);" autocomplete="off">'+
+                                        '<input type="text" class="form-control inputnext" name="plazo" id="plazo"  required onkeyup="tipoLetra(this);" autocomplete="off">'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Fecha</label>'+
-                                        '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();validarmescompra();" style="min-width:95%;">'+
+                                        '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();validarmescompra();" style="min-width:95%;">'+
                                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                         '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
                                     '</div>'+   
                                     '<div class="col-md-3">'+
                                         '<label>Emitida</label>'+
-                                        '<input type="datetime-local" class="form-control" name="fechaemitida" id="fechaemitida"  required readonly>'+
+                                        '<input type="datetime-local" class="form-control inputnext" name="fechaemitida" id="fechaemitida"  required readonly>'+
                                         '<input type="hidden" class="form-control" name="fechatimbrado" id="fechatimbrado" >'+
                                     '</div>'+
                                 '</div>'+
@@ -1474,7 +1465,7 @@ function alta(tipoalta){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer" autocomplete="off">'+
+                                                        '<input type="text" class="form-control inputnext" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior" required data-parsley-type="integer">'+
                                                         '<input type="hidden" class="form-control" name="proveedor" id="proveedor" required readonly>'+
                                                     '</div>'+
@@ -1491,7 +1482,7 @@ function alta(tipoalta){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required readonly data-parsley-type="integer" autocomplete="off">'+
+                                                        '<input type="text" class="form-control inputnext" name="numeroalmacen" id="numeroalmacen" required readonly data-parsley-type="integer" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required readonly data-parsley-type="integer">'+
                                                         '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
                                                     '</div>'+
@@ -1501,11 +1492,11 @@ function alta(tipoalta){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Remisión</label>'+
-                                        '<input type="text" class="form-control" name="remision" id="remision" onkeyup="tipoLetra(this)" data-parsley-length="[1, 20]" autocomplete="off">'+
+                                        '<input type="text" class="form-control inputnext" name="remision" id="remision" onkeyup="tipoLetra(this)" data-parsley-length="[1, 20]" autocomplete="off">'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Factura</label>'+
-                                        '<input type="text" class="form-control" name="factura" id="factura" required onkeyup="tipoLetra(this)" data-parsley-length="[1, 20]" autocomplete="off">'+
+                                        '<input type="text" class="form-control inputnext" name="factura" id="factura" required onkeyup="tipoLetra(this)" data-parsley-length="[1, 20]" autocomplete="off">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+    
@@ -1528,7 +1519,7 @@ function alta(tipoalta){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<label>Pesos</label>'+
-                                                    '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="pesosmoneda" id="pesosmoneda" value="1.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                                    '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="pesosmoneda" id="pesosmoneda" value="1.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                                 '</td>'+
                                             '</tr>'+
                                         '</table>'+
@@ -1572,22 +1563,22 @@ function alta(tipoalta){
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Emisor R.F.C.</label>'+
-                                        '<input type="text" class="form-control" name="emisorrfc" id="emisorrfc"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                        '<input type="text" class="form-control inputnexttabem" name="emisorrfc" id="emisorrfc"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                         '<input type="hidden" class="form-control" name="emisorrfcdb" id="emisorrfcdb"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Emisor Nombre</label>'+
-                                        '<input type="text" class="form-control" name="emisornombre" id="emisornombre" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnexttabem" name="emisornombre" id="emisornombre" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                         '<input type="hidden" class="form-control" name="emisornombredb" id="emisornombredb" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Receptor R.F.C.</label>'+
-                                        '<input type="text" class="form-control" name="receptorrfc" id="receptorrfc"  value="'+rfcreceptor+'" required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                        '<input type="text" class="form-control inputnexttabem" name="receptorrfc" id="receptorrfc"  value="'+rfcreceptor+'" required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                         '<input type="hidden" class="form-control" name="receptorrfcxml" id="receptorrfcxml" value="'+rfcreceptor+'" required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Receptor Nombre</label>'+
-                                        '<input type="text" class="form-control" name="receptornombre" id="receptornombre" value="'+nombrereceptor+'" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnexttabem" name="receptornombre" id="receptornombre" value="'+nombrereceptor+'" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                         '<input type="hidden" class="form-control" name="receptornombrexml" id="receptornombrexml" value="'+nombrereceptor+'" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                 '</div>'+
@@ -1652,7 +1643,7 @@ function alta(tipoalta){
                                 '<div class="row">'+
                                   '<div class="col-md-6">'+   
                                       '<label>Observaciones</label>'+
-                                      '<textarea class="form-control" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
+                                      '<textarea class="form-control inputnext" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
                                   '</div>'+ 
                                   '<div class="col-md-3 col-md-offset-3">'+
                                         '<table class="table table-striped table-hover">'+
@@ -1760,7 +1751,7 @@ function alta(tipoalta){
       break;
     case 'TOT':
       //colocar required a campo orden
-      $("#ordentrabajo").attr('required', 'required');
+      $("#ordentrabajo").attr('required', 'required').addClass('inputnext');
       $("#ordentrabajoanterior").attr('required', 'required');
       //desabilitar almacen
       $("#numeroalmacen").val(0).attr('readonly', 'readonly');
@@ -1772,20 +1763,28 @@ function alta(tipoalta){
     default:
       $("#busquedaordenestrabajo").hide();
   }
-  //siguiente input despues de remision
-  $('#remision').on('keypress', function(e) {
-    //recomentable para mayor compatibilidad entre navegadores.
-    var code = (e.keyCode ? e.keyCode : e.which);
-    if(code==13){
-      enterinputremision();
-    }
-  });
   //regresar numero
   $('#numeroalmacen').on('change', function(e) {
     regresarnumeroalmacen();
   });
-  //colocar focus a proveedor 
-  setTimeout(function() { $("#numeroproveedor").focus() }, 1000);
+  //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+  $(".inputnext").keypress(function (e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      var index = $(this).index(".inputnext");          
+      $(".inputnext").eq(index + 1).focus(); 
+    }
+  });
+  //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB EMISOR RECEPTOR
+  $(".inputnexttabem").keypress(function (e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      var index = $(this).index(".inputnexttabem");          
+      $(".inputnexttabem").eq(index + 1).focus(); 
+    }
+  });
   $("#ModalAlta").modal('show');
 }
 //guardar el registro
@@ -1871,7 +1870,7 @@ function obtenerdatos(compramodificar){
                                 '<div class="row">'+
                                     '<div class="col-md-3">'+
                                         '<label>Compra <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
-                                        '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                                         '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                                         '<input type="hidden" class="form-control" name="compra" id="compra" required readonly>'+
                                         '<input type="hidden" class="form-control" name="uuid" id="uuid" readonly required data-parsley-length="[1, 50]">'+
@@ -1882,17 +1881,17 @@ function obtenerdatos(compramodificar){
                                     '</div>'+   
                                     '<div class="col-md-3">'+
                                         '<label>Plazo Días (proveedor)</label>'+
-                                        '<input type="text" class="form-control" name="plazo" id="plazo"  required onkeyup="tipoLetra(this);" autocomplete="off">'+
+                                        '<input type="text" class="form-control inputnext" name="plazo" id="plazo"  required onkeyup="tipoLetra(this);" autocomplete="off">'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Fecha</label>'+
-                                        '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();validarmescompra();" style="min-width:95%;">'+
+                                        '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();validarmescompra();" style="min-width:95%;">'+
                                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                         '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
                                     '</div>'+   
                                     '<div class="col-md-3">'+
                                         '<label>Emitida</label>'+
-                                        '<input type="datetime-local" class="form-control" name="fechaemitida" id="fechaemitida"  required readonly>'+
+                                        '<input type="datetime-local" class="form-control inputnext" name="fechaemitida" id="fechaemitida"  required readonly>'+
                                         '<input type="hidden" class="form-control" name="fechatimbrado" id="fechatimbrado" >'+
                                     '</div>'+
                                 '</div>'+
@@ -1906,7 +1905,7 @@ function obtenerdatos(compramodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer" autocomplete="off">'+
+                                                        '<input type="text" class="form-control inputnext" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior" required data-parsley-type="integer">'+
                                                         '<input type="hidden" class="form-control" name="proveedor" id="proveedor" required readonly>'+
                                                     '</div>'+
@@ -1923,7 +1922,7 @@ function obtenerdatos(compramodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer" autocomplete="off">'+
+                                                        '<input type="text" class="form-control inputnext" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required readonly data-parsley-type="integer">'+
                                                         '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
                                                     '</div>'+
@@ -1933,11 +1932,11 @@ function obtenerdatos(compramodificar){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Remisión</label>'+
-                                        '<input type="text" class="form-control" name="remision" id="remision" onkeyup="tipoLetra(this)" data-parsley-length="[1, 20]" autocomplete="off">'+
+                                        '<input type="text" class="form-control inputnext" name="remision" id="remision" onkeyup="tipoLetra(this)" data-parsley-length="[1, 20]" autocomplete="off">'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Factura</label>'+
-                                        '<input type="text" class="form-control" name="factura" id="factura" required onkeyup="tipoLetra(this)" data-parsley-length="[1, 20]" autocomplete="off">'+
+                                        '<input type="text" class="form-control inputnext" name="factura" id="factura" required onkeyup="tipoLetra(this)" data-parsley-length="[1, 20]" autocomplete="off">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+    
@@ -1960,7 +1959,7 @@ function obtenerdatos(compramodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<label>Pesos</label>'+
-                                                    '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="pesosmoneda" id="pesosmoneda" value="1.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                                    '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="pesosmoneda" id="pesosmoneda" value="1.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                                 '</td>'+
                                             '</tr>'+
                                         '</table>'+
@@ -2004,22 +2003,22 @@ function obtenerdatos(compramodificar){
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Emisor R.F.C.</label>'+
-                                        '<input type="text" class="form-control" name="emisorrfc" id="emisorrfc"  required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                        '<input type="text" class="form-control inputnexttabem" name="emisorrfc" id="emisorrfc"  required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                         '<input type="hidden" class="form-control" name="emisorrfcdb" id="emisorrfcdb"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                       '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Emisor Nombre</label>'+
-                                        '<input type="text" class="form-control" name="emisornombre" id="emisornombre" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnexttabem" name="emisornombre" id="emisornombre" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                         '<input type="hidden" class="form-control" name="emisornombredb" id="emisornombredb" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Receptor R.F.C.</label>'+
-                                        '<input type="text" class="form-control" name="receptorrfc" id="receptorrfc"  required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                        '<input type="text" class="form-control inputnexttabem" name="receptorrfc" id="receptorrfc"  required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                         '<input type="hidden" class="form-control" name="receptorrfcxml" id="receptorrfcxml" required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Receptor Nombre</label>'+
-                                        '<input type="text" class="form-control" name="receptornombre" id="receptornombre" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnexttabem" name="receptornombre" id="receptornombre" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                         '<input type="hidden" class="form-control" name="receptornombrexml" id="receptornombrexml" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                 '</div>'+
@@ -2084,7 +2083,7 @@ function obtenerdatos(compramodificar){
                                 '<div class="row">'+
                                   '<div class="col-md-6">'+   
                                       '<label>Observaciones</label>'+
-                                      '<textarea class="form-control" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
+                                      '<textarea class="form-control inputnext" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
                                   '</div>'+ 
                                   '<div class="col-md-3 col-md-offset-3">'+
                                         '<table class="table table-striped table-hover">'+
@@ -2178,7 +2177,7 @@ function obtenerdatos(compramodificar){
         break;
       case 'TOT':
         //colocar required a campo orden
-        $("#ordentrabajo").attr('required', 'required');
+        $("#ordentrabajo").attr('required', 'required').addClass('inputnext');
         $("#ordentrabajoanterior").attr('required', 'required');
         //desabilitar almacen
         $("#numeroalmacen").val(0).attr('readonly', 'readonly');
@@ -2246,14 +2245,6 @@ function obtenerdatos(compramodificar){
           obtenerproductoporcodigo();
         }
     });
-    //siguiente input despues de remision
-    $('#remision').on('keypress', function(e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        enterinputremision();
-      }
-    });
     //regresar numero
     $('#numeroproveedor').on('change', function(e) {
       regresarnumeroproveedor();
@@ -2261,6 +2252,24 @@ function obtenerdatos(compramodificar){
     //regresar numero
     $('#numeroalmacen').on('change', function(e) {
       regresarnumeroalmacen();
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        var index = $(this).index(".inputnext");          
+        $(".inputnext").eq(index + 1).focus(); 
+      }
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB EMISOR RECEPTOR
+    $(".inputnexttabem").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        var index = $(this).index(".inputnexttabem");          
+        $(".inputnexttabem").eq(index + 1).focus(); 
+      }
     });
     //asignar el tipo de operacion que se realizara
     $("#tipooperacion").val("modificacion");

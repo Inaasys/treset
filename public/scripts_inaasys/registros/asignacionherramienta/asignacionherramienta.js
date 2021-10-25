@@ -714,7 +714,7 @@ function alta(){
               '<div class="row">'+
                 '<div class="col-md-3">'+
                   '<label>Asignación <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
-                  '<input type="text" class="form-control" name="folio" id="folio" required readonly>'+
+                  '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly>'+
                   '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                   '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
                   '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
@@ -728,7 +728,7 @@ function alta(){
                       '</td>'+
                       '<td>'+
                         '<div class="form-line">'+
-                          '<input type="text" class="form-control" name="numeropersonalrecibe" id="numeropersonalrecibe" required data-parsley-type="integer" autocomplete="off">'+
+                          '<input type="text" class="form-control inputnext" name="numeropersonalrecibe" id="numeropersonalrecibe" required data-parsley-type="integer" autocomplete="off">'+
                           '<input type="hidden" class="form-control" name="numeropersonalrecibeanterior" id="numeropersonalrecibeanterior" required data-parsley-type="integer">'+
                           '<input type="hidden" class="form-control" name="personalrecibe" id="personalrecibe" required readonly>'+
                         '</div>'+
@@ -745,7 +745,7 @@ function alta(){
                       '</td>'+
                       '<td>'+    
                         '<div class="form-line">'+
-                          '<input type="text" class="form-control" name="numeropersonalentrega" id="numeropersonalentrega" required data-parsley-type="integer" autocomplete="off">'+
+                          '<input type="text" class="form-control inputnext" name="numeropersonalentrega" id="numeropersonalentrega" required data-parsley-type="integer" autocomplete="off">'+
                           '<input type="hidden" class="form-control" name="numeropersonalentregaanterior" id="numeropersonalentregaanterior" required data-parsley-type="integer">'+
                           '<input type="hidden" class="form-control" name="personalentrega" id="personalentrega" required readonly>'+
                         '</div>'+
@@ -755,7 +755,7 @@ function alta(){
                 '</div>'+   
                 '<div class="col-md-3">'+
                   '<label>Fecha</label>'+
-                  '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" >'+
+                  '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();" >'+
                   '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                 '</div>'+
               '</div>'+
@@ -820,7 +820,7 @@ function alta(){
                   '<div class="row">'+
                     '<div class="col-md-6">'+   
                       '<label>Observaciones</label>'+
-                      '<textarea class="form-control" name="observaciones" id="observaciones" rows="2" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
+                      '<textarea class="form-control inputnext" name="observaciones" id="observaciones" rows="2" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
                     '</div>'+ 
                     '<div class="col-md-3 col-md-offset-3">'+
                       '<table class="table table-striped table-hover">'+
@@ -882,6 +882,15 @@ function alta(){
   //regresar numero
   $('#numeropersonalentrega').on('change', function(e) {
     regresarnumeropersonalentrega();
+  });
+  //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+  $(".inputnext").keypress(function (e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      var index = $(this).index(".inputnext");          
+      $(".inputnext").eq(index + 1).focus(); 
+    }
   });
   $("#ModalAlta").modal('show');
 }
@@ -1045,7 +1054,7 @@ function obtenerdatos(asignacionmodificar){
                 '<div class="row">'+
                   '<div class="col-md-3">'+
                     '<label>Asignación <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
-                    '<input type="text" class="form-control" name="folio" id="folio" required readonly>'+
+                    '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly>'+
                     '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                     '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
                     '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
@@ -1059,7 +1068,7 @@ function obtenerdatos(asignacionmodificar){
                         '</td>'+
                         '<td>'+
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control" name="numeropersonalrecibe" id="numeropersonalrecibe" required data-parsley-type="integer" autocomplete="off">'+
+                            '<input type="text" class="form-control inputnext" name="numeropersonalrecibe" id="numeropersonalrecibe" required data-parsley-type="integer" autocomplete="off">'+
                             '<input type="hidden" class="form-control" name="numeropersonalrecibeanterior" id="numeropersonalrecibeanterior" required data-parsley-type="integer">'+
                             '<input type="hidden" class="form-control" name="personalrecibe" id="personalrecibe" required readonly>'+
                           '</div>'+
@@ -1076,7 +1085,7 @@ function obtenerdatos(asignacionmodificar){
                         '</td>'+
                         '<td>'+    
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control" name="numeropersonalentrega" id="numeropersonalentrega" required data-parsley-type="integer" autocomplete="off">'+
+                            '<input type="text" class="form-control inputnext" name="numeropersonalentrega" id="numeropersonalentrega" required data-parsley-type="integer" autocomplete="off">'+
                             '<input type="hidden" class="form-control" name="numeropersonalentregaanterior" id="numeropersonalentregaanterior" required data-parsley-type="integer">'+
                             '<input type="hidden" class="form-control" name="personalentrega" id="personalentrega" required readonly>'+
                           '</div>'+
@@ -1086,7 +1095,7 @@ function obtenerdatos(asignacionmodificar){
                   '</div>'+   
                   '<div class="col-md-3">'+
                     '<label>Fecha</label>'+
-                    '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" >'+
+                    '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();" >'+
                     '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                   '</div>'+
                 '</div>'+
@@ -1141,7 +1150,7 @@ function obtenerdatos(asignacionmodificar){
                     '<div class="row">'+
                       '<div class="col-md-6">'+   
                         '<label>Observaciones</label>'+
-                        '<textarea class="form-control" name="observaciones" id="observaciones" rows="2" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
+                        '<textarea class="form-control inputnext" name="observaciones" id="observaciones" rows="2" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
                       '</div>'+ 
                       '<div class="col-md-3 col-md-offset-3">'+
                         '<table class="table table-striped table-hover">'+
@@ -1198,6 +1207,15 @@ function obtenerdatos(asignacionmodificar){
     //regresar numero
     $('#numeropersonalentrega').on('change', function(e) {
       regresarnumeropersonalentrega();
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        var index = $(this).index(".inputnext");          
+        $(".inputnext").eq(index + 1).focus(); 
+      }
     });
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
     $('.page-loader-wrapper').css('display', 'none');

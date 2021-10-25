@@ -344,6 +344,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
+                                                            <!--
                                                             <tr>
                                                                 <td class="col-md-1">1</td>
                                                                 <td class="col-md-2">Sistema</td>
@@ -371,6 +372,7 @@
                                                                     </div>
                                                                 </td>
                                                             </tr>
+                                                            -->
                                                             <tr>
                                                                 <td class="col-md-1">3</td>
                                                                 <td class="col-md-2">Sistema</td>
@@ -416,6 +418,7 @@
                                                                     </div>
                                                                 </td>
                                                             </tr>
+                                                            <!--
                                                             <tr>
                                                                 <td class="col-md-1">6</td>
                                                                 <td class="col-md-2">Sistema</td>
@@ -501,6 +504,7 @@
                                                                     </div>
                                                                 </td>
                                                             </tr>
+                                                            -->
                                                             <tr>
                                                                 <td class="col-md-1">13</td>
                                                                 <td class="col-md-2">Ventas</td>
@@ -513,6 +517,7 @@
                                                                     </select>
                                                                 </td>
                                                             </tr>
+                                                            <!--
                                                             <tr>
                                                                 <td class="col-md-1">14</td>
                                                                 <td class="col-md-2">Productos</td>
@@ -596,6 +601,7 @@
                                                                     </div>
                                                                 </td>
                                                             </tr>
+                                                            -->
                                                         </tbody>
                                                     </table>
                                                 </div>
