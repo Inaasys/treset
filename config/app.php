@@ -204,7 +204,6 @@ return [
         Jenssegers\Date\DateServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
         SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,
-        NikKanetiya\LaravelColorPalette\ColorPaletteServiceProvider::class,
         LynX39\LaraPdfMerger\PdfMergerServiceProvider::class,
         Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class,
 
@@ -278,7 +277,6 @@ return [
         'Date' => Jenssegers\Date\Date::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class,
-        'ColorPalette' => NikKanetiya\LaravelColorPalette\ColorPaletteFacade::class,
         'PdfMerger' => LynX39\LaraPdfMerger\Facades\PdfMerger::class,
 
     ],

@@ -538,14 +538,16 @@ function generar_reporte(){
 function generar_formato_excel(){
     var form = $("#formreporte");
     if (form.parsley().isValid()){
-        var numeroproveedor = $("#numeroproveedor").val();
-        var numeroalmacen = $("#numeroalmacen").val();
         var fechainicialreporte = $("#fechainicialreporte").val();
         var fechafinalreporte = $("#fechafinalreporte").val();
+        var reporte = $("#reporte").val();
+        var numerocliente = $("#numerocliente").val();
+        var numeroagente = $("#numeroagente").val();
+        var claveserie = $("#claveserie").val();
+        var claveformapago = $("#claveformapago").val();
         var tipo = $("#tipo").val();
         var status = $("#status").val();
-        var reporte = $("#reporte").val();
-        $("#btnGenerarFormatoReporteExcel").attr("href", urlgenerarformatoexcel+'?fechainicialreporte='+fechainicialreporte+'&fechafinalreporte='+fechafinalreporte+'&numeroproveedor='+numeroproveedor+'&numeroalmacen='+numeroalmacen+'&tipo='+tipo+'&status='+status+'&reporte='+reporte);
+        $("#btnGenerarFormatoReporteExcel").attr("href", urlgenerarformatoexcel+'?fechainicialreporte='+fechainicialreporte+'&fechafinalreporte='+fechafinalreporte+'&numerocliente='+numerocliente+'&numeroagente='+numeroagente+'&claveserie='+claveserie+'&claveformapago='+claveformapago+'&tipo='+tipo+'&status='+status+'&reporte='+reporte);
         $("#btnGenerarFormatoReporteExcel").click();
     }else{
         form.parsley().validate();
@@ -554,7 +556,6 @@ function generar_formato_excel(){
 //listar tabla reporte
 function listar(){
     var reporte = $("#reporte").val();
-
     switch(reporte){
         case "UTILIDAD":
             break;
@@ -574,7 +575,7 @@ function listar(){
             var columnas = new Array("Cliente", "Nombre", "Importe", "Descuento", 'SubTotal', 'Iva', 'Total', 'Costo', 'Utilidad', 'PorcentajeUtilidad');
             break;
         case "MENSUAL":
-            var columnas = new Array("Cliente", "NombreCliente", "SubTotal", "Utilidad %");
+            var columnas = new Array("Cliente", "NombreCliente", "SubTotal", "Utilidad");
             break;
         case "POTENCIALES":
             var columnas = new Array("Numero", "Nombre", "Plazo", "TotalRemisiones");

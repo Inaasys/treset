@@ -752,11 +752,11 @@ function seleccionarfoliofiscal(Serie, Esquema){
 }
 //obtener por numero
 function obtenerclientepornumero(){
-    $('.page-loader-wrapper').css('display', 'block');
     var numeroclienteanterior = $("#numeroclienteanterior").val();
     var numerocliente = $("#numerocliente").val();
     if(numeroclienteanterior != numerocliente){
         if($("#numerocliente").parsley().isValid()){
+            $('.page-loader-wrapper').css('display', 'block');
             var tipooperacion = $("#tipooperacion").val();
             $.get(cuentas_por_cobrar_obtener_cliente_por_numero, {numerocliente:numerocliente,tipooperacion:tipooperacion}, function(data){
                 $("#numerocliente").val(data.numero);

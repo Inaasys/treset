@@ -34,7 +34,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/enviar_msj_whatsapp', 'PruebaController@enviar_msj_whatsapp')->name('enviar_msj_whatsapp');
     Route::get('/pruebas_vocales', 'PruebaController@pruebas_vocales')->name('pruebas_vocales');
     Route::get('/prueba_diferencias_arrays', 'PruebaController@prueba_diferencias_arrays')->name('prueba_diferencias_arrays');
-    Route::get('/matchar_compras', 'PruebaController@matchar_compras')->name('matchar_compras');
     Route::get('/artisan', function () { 
         //return Artisan::call('config:cache');
     });

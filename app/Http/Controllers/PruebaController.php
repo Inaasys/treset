@@ -22,7 +22,6 @@ use App\CuentaXPagarDetalle;
 use App\OrdenCompraDetalle;
 use App\Proveedor;
 use Mail;
-use ColorPalette;
 use App\Configuracion_Tabla;
 
 class PruebaController extends ConfiguracionSistemaController{
@@ -126,33 +125,6 @@ class PruebaController extends ConfiguracionSistemaController{
         //dd(Helpers::convertirvalorcorrecto("-1"));
 
     }
-
-    public function matchar_compras(){
-        /*$ArrayCompras = Array('27907-A');
-        foreach($ArrayCompras as $compra){
-            $cuentasporpagar = CuentaXPagarDetalle::where('Compra', $compra)->get();
-            dd($cuentasporpagar);
-        }*/
-
-        
-        //$nombre_original = '1597445761Logo_UTP.png';
-        //$nombre_original = '1614380729Logotipo.jpg';
-        //$nombre_original = 'default_logo.png';
-        $nombre_original = 'logo_calytrabe.png';
-        //$nombre_original = 'logo_socasa.jpg';
-        //$nombre_original = 'logo_treset.png';
-
-        $imagen = public_path().'/logotipo_empresa/'.$nombre_original;
-        
-        $colors = ColorPalette::getPalette( $imagen );
-        foreach($colors as $color) {
-            echo '<div style="background-color:'.$color.'">'.$color.' </div>';   
-            echo '<br>';   
-        }
-        
-
-    }
-
 
     public function asignar_valores_por_defecto_busquedas_y_ordenamiento(){
         //tabla ordenes compra

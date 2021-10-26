@@ -352,7 +352,6 @@ class ReportesRemisionesController extends ConfiguracionSistemaController{
                 ->make(true);
                 break;
             case "MENSUAL":
-                /*
                 $data = DB::table("Clientes as c")
                 ->select('c.Numero AS Cliente', 'c.Nombre AS NombreCliente')
                             ->addselect([
@@ -395,8 +394,7 @@ class ReportesRemisionesController extends ConfiguracionSistemaController{
 														->limit(1)
                             ])
 							->addselect([
-                                'Utilidad' => Remision::select(DB::raw("
-																		CASE
+                                'Utilidad' => Remision::select(DB::raw("CASE
 																		WHEN SUM(SubTotal) = 0 THEN 0 ELSE
 																		SUM(Utilidad)*100/SUM(SubTotal)
 																		END"))->whereColumn('Cliente', 'c.Numero')
@@ -437,10 +435,12 @@ class ReportesRemisionesController extends ConfiguracionSistemaController{
 														})
 														->limit(1)
                             ])
-                
                 ->orderby('c.Numero', 'ASC')
                 ->get();
-                */
+                return DataTables::of($data)
+                ->addColumn('SubTotal', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->SubTotal), $this->numerodecimales); })
+                ->addColumn('Utilidad', function($data){ return Helpers::convertirvalorcorrecto($data->Utilidad); })
+                ->make(true);
                 break;
             case "POTENCIALES":
                 $data = DB::table('Remisiones as r')
@@ -491,65 +491,12 @@ class ReportesRemisionesController extends ConfiguracionSistemaController{
                 ->make(true);
                 break;
             case "CORTE":
-                $data = DB::table('Remisiones as r')
-                ->whereBetween('r.Fecha', [$fechainicio, $fechaterminacion])
-                ->where(function($q) use ($numerocliente) {
-                    if($numerocliente != ""){
-                        $q->where('r.Cliente', $numerocliente);
-                    }
-                })
-                ->where(function($q) use ($numeroagente) {
-                    if($numeroagente != ""){
-                        $q->where('r.Agente', $numeroagente);
-                    }
-                })
-                ->where(function($q) use ($claveserie) {
-                    if($claveserie != ""){
-                        $q->where('r.Serie', $claveserie);
-                    }
-                })
-                ->where(function($q) use ($claveformapago) {
-                    if($claveformapago != ""){
-                        $q->where('r.FormaPago', $claveformapago);
-                    }
-                })
-                ->where(function($q) use ($tipo) {
-                    if($tipo != 'TODOS'){
-                        $q->where('r.Tipo', $tipo);
-                    }
-                })
-                ->where(function($q) use ($status) {
-                    if($status != 'TODOS'){
-                        if($status == 'FACTURADOS'){
-                            $q->where('r.Status', 'like', '%-%');
-                        }else{
-                            $q->where('r.Status', $status);
-                        }
-                    }
-                })
-                ->orderby('r.Serie', 'ASC')
-                ->orderby('r.Folio', 'ASC')
-                ->get();
-                return DataTables::of($data)
-                ->addColumn('Importe', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Importe), $this->numerodecimales); })
-                ->addColumn('Descuento', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Descuento), $this->numerodecimales); })
-                ->addColumn('SubTotal', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->SubTotal), $this->numerodecimales); })
-                ->addColumn('Iva', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Iva), $this->numerodecimales); })
-                ->addColumn('Total', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Total), $this->numerodecimales); })
-                ->addColumn('Costo', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Costo), $this->numerodecimales); })
-                ->addColumn('Comision', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Comision), $this->numerodecimales); })
-                ->addColumn('Utilidad', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Utilidad), $this->numerodecimales); })
-                ->addColumn('Obs', function($data){ return substr($data->Obs, 0, 30); })
-                ->addColumn('Corte', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Corte), $this->numerodecimales); })
-                ->addColumn('SuPago', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->SuPago), $this->numerodecimales); })
-                ->addColumn('EnEfectivo', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->EnEfectivo), $this->numerodecimales); })
-                ->addColumn('EnTarjetas', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->EnTarjetas), $this->numerodecimales); })
-                ->addColumn('EnVales', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->EnVales), $this->numerodecimales); })
-                ->addColumn('EnCheque', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->EnCheque), $this->numerodecimales); })
-                ->make(true);
                 break;
         }
     }
-
+    //generar reporte en excel
+    public function reporte_relacion_remisiones_generar_formato_excel(Request $request){
+        return Excel::download(new ReportesRelacionRemisionesExport($request->fechainicialreporte, $request->fechafinalreporte, $request->numerocliente, $request->numeroagente, $request->claveserie, $request->claveformapago, $request->tipo, $request->status, $request->reporte, $this->numerodecimales, $this->empresa), "formatorelacionremisiones-".$request->reporte.".xlsx"); 
+    }
 
 }

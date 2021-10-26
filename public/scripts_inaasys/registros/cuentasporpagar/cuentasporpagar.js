@@ -362,11 +362,11 @@ function seleccionarbanco(Numero, Nombre, ultimatransferencia){
 }
 //obtener por numero
 function obtenerproveedorpornumero(){
-    $('.page-loader-wrapper').css('display', 'block');
     var numeroproveedoranterior = $("#numeroproveedoranterior").val();
     var numeroproveedor = $("#numeroproveedor").val();
     if(numeroproveedoranterior != numeroproveedor){
         if($("#numeroproveedor").parsley().isValid()){
+            $('.page-loader-wrapper').css('display', 'block');
             $.get(cuentas_por_pagar_obtener_proveedor_por_numero, {numeroproveedor:numeroproveedor}, function(data){
                 $("#numeroproveedor").val(data.numero);
                 $("#numeroproveedoranterior").val(data.numero);
