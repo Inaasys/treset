@@ -1019,6 +1019,8 @@ function permisos(id){
                                         '<label for="idmenureporterelacionfacturasventasagentes">Relación Ventas Agentes</label>'+
                                         '&nbsp;&nbsp;<input type="checkbox" name="menureporterelacionfacturasventasmarcas" id="idmenureporterelacionfacturasventasmarcas" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
                                         '<label for="idmenureporterelacionfacturasventasmarcas">Relación Ventas Marcas</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="menureportefacturasantiguedadsaldos" id="idmenureportefacturasantiguedadsaldos" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenureportefacturasantiguedadsaldos">Antiguedad Saldos</label>'+
                                         '&nbsp;&nbsp;<input type="checkbox" name="menureportesfacturasventasdiarias" id="idmenureportesfacturasventasdiarias" class="filled-in submenu accesoreportes" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
                                         '<label for="idmenureportesfacturasventasdiarias">Ventas Diarias</label>'+                                     
                                     '</div>'+

@@ -212,16 +212,16 @@
               <a class="test"  href="#">Facturas <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a  href="{{route('reporte_diario_ventas')}}" id="menureportesfacturasventasdiarias">Ventas Diarias</a></li>
-                <li><a  href="#" id="menureporterelacionfacturasventasclientes">Relación de Ventas por Clientes</a></li>
+                <li><a  href="{{route('reporte_facturas_ventas_cliente')}}" id="menureporterelacionfacturasventasclientes">Relación de Ventas por Clientes</a></li>
                 <li><a  href="#" id="menureporterelacionfacturasventasagentes">Relación de Ventas por Agentes</a></li>
                 <li><a  href="#" id="menureporterelacionfacturasventasmarcas">Relación de Ventas por Marcas</a></li>                       
                 <!--<li><a  href="#">Proyección de Cobranza a Clientes</a></li>
                 <li><a  href="#">Cartera Vencida de Clientes</a></li>                        
                 <li><a  href="#">Productos + Vendidos</a></li>                        
                 <li><a  href="#">Ventas Servicio</a></li>                       
-                <li><a  href="#">Ventas Perdidas</a></li>                       
-                <li><a  href="#">Antiguedad de Saldos</a></li>                     
-                <li><a  href="#">Estado de Cuenta de Clientes</a></li>                   
+                <li><a  href="#">Ventas Perdidas</a></li>   -->                    
+                <li><a  href="{{route('reporte_antiguedad_saldos')}}" id="menureportefacturasantiguedadsaldos">Antiguedad de Saldos</a></li>                     
+                <!--<li><a  href="#">Estado de Cuenta de Clientes</a></li>                   
                 <li><a  href="#">Facturas Liquidadas para Comisiones</a></li>-->
               </ul>
             </li>            

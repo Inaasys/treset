@@ -92,15 +92,6 @@ $(document).ready(function() {
             e.preventDefault();
         }
     });
-    //activar busqueda
-    $('#claveformapago').on('keypress', function(e) {
-        //recomentable para mayor compatibilidad entre navegadores.
-        var code = (e.keyCode ? e.keyCode : e.which);
-        if(code==13){
-            obtenerformapagoporclave();
-            e.preventDefault();
-        }
-    });
     //regresar numero
     $('#numerocliente').on('change', function(e) {
         regresarnumerocliente();
@@ -113,14 +104,10 @@ $(document).ready(function() {
     $('#claveserie').on('change', function(e) {
         regresarclaveserie();
     });
-    //regresar numero
-    $('#claveformapago').on('change', function(e) {
-        regresarclaveformapago();
-    });
 });
 //obtener tipos ordenes de compra
 function obtenertiposordenescompra(){
-    $.get(reporte_relacion_remisiones_obtener_tipos_ordenes_compra, function(select_tipos_ordenes_compra){
+    $.get(reporte_facturas_ventas_cliente_obtener_tipos_ordenes_compra, function(select_tipos_ordenes_compra){
       $("#tipo").html(select_tipos_ordenes_compra);
     })  
 }
@@ -167,7 +154,7 @@ function obtenerclientes(){
             },
             serverSide: true,
             ajax: {
-                url: reporte_relacion_remisiones_obtener_clientes
+                url: reporte_facturas_ventas_cliente_obtener_clientes
             },
             columns: [
                 { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
@@ -229,7 +216,7 @@ function obteneragentes(){
         },
         serverSide: true,
         ajax: {
-            url: reporte_relacion_remisiones_obtener_agentes,
+            url: reporte_facturas_ventas_cliente_obtener_agentes,
         },
         columns: [
             { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
@@ -289,7 +276,7 @@ function obtenerseries(){
         },
         serverSide: true,
         ajax: {
-            url: reporte_relacion_remisiones_obtener_series,
+            url: reporte_facturas_ventas_cliente_obtener_series,
         },
         columns: [
             { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
@@ -301,69 +288,6 @@ function obtenerseries(){
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
                     $('#tbllistadoserie').DataTable().search( this.value ).draw();
-                }
-            });
-        },    
-    }); 
-} 
-//obtener registros de formas pago
-function obtenerformaspago(){ 
-    $("#ModalFormulario").modal('show');
-    $("#contenidomodaltablas").show();
-    $("#formulario").hide();
-    var tablaformaspago ='<div class="modal-header '+background_forms_and_modals+'">'+
-                            '<h4 class="modal-title">Formas Pago</h4>'+
-                        '</div>'+
-                        '<div class="modal-body">'+
-                            '<div class="row">'+
-                                '<div class="col-md-12">'+
-                                    '<div class="table-responsive ">'+
-                                        '<table id="tbllistadoformapago" class="tbllistadoformapago table table-bordered table-striped table-hover" style="width:100% !important">'+
-                                            '<thead class="'+background_tables+'">'+
-                                                '<tr>'+
-                                                    '<th>Operaciones</th>'+
-                                                    '<th>Clave</th>'+
-                                                    '<th>Nombre</th>'+
-                                                    '<th>Descripción</th>'+
-                                                '</tr>'+
-                                            '</thead>'+
-                                            '<tbody></tbody>'+
-                                        '</table>'+
-                                    '</div>'+
-                                '</div>'+   
-                            '</div>'+
-                        '</div>'+
-                        '<div class="modal-footer">'+
-                            '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                        '</div>';
-    $("#contenidomodaltablas").html(tablaformaspago);
-    $('#tbllistadoformapago').DataTable({
-        "lengthMenu": [ 10, 50, 100, 250, 500 ],
-        "pageLength": 250,
-        "sScrollX": "110%",
-        "sScrollY": "370px",
-        "bScrollCollapse": true,
-        processing: true,
-        'language': {
-            'loadingRecords': '&nbsp;',
-            'processing': '<div class="spinner"></div>'
-        },
-        serverSide: true,
-        ajax: {
-            url: reporte_relacion_remisiones_obtener_formaspago,
-        },
-        columns: [
-            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
-            { data: 'Clave', name: 'Clave' },
-            { data: 'Nombre', name: 'Nombre' },
-            { data: 'Descripcion', name: 'Descripcion' }
-        ],
-        "initComplete": function() {
-            var $buscar = $('div.dataTables_filter input');
-            $buscar.unbind();
-            $buscar.bind('keyup change', function(e) {
-                if(e.keyCode == 13 || this.value == "") {
-                    $('#tbllistadoformapago').DataTable().search( this.value ).draw();
                 }
             });
         },    
@@ -391,7 +315,7 @@ function seleccionaragente(Numero, Nombre){
         $("#numeroagenteanterior").val(Numero);
         $("#agente").val(Nombre);
         if(Nombre != null){
-            $("#textonombreagente").attr('style', 'font-size:8px').html(Nombre.substring(0, 45));
+            $("#textonombreagente").attr('style', 'font-size:8px').html(Nombre.substring(0, 25));
         }
         generar_reporte();
         $("#ModalFormulario").modal('hide');
@@ -411,27 +335,13 @@ function seleccionarserie(Serie){
         $("#ModalFormulario").modal('hide');
     }
 }
-function seleccionarformapago(Clave, Nombre){
-    var claveformapagoanterior = $("#claveformapagoanterior").val();
-    var claveformapago = Clave;
-    if(claveformapagoanterior != claveformapago){
-        $("#claveformapago").val(Clave);
-        $("#claveformapagoanterior").val(Clave);
-        $("#formapago").val(Nombre);
-        if(Nombre != null){
-            $("#textonombreformapago").attr('style', 'font-size:8px').html(Nombre.substring(0, 45));
-        }
-        generar_reporte();
-        $("#ModalFormulario").modal('hide');
-    }
-}
 //obtener por numero
 function obtenerclientepornumero(){
     var numeroclienteanterior = $("#numeroclienteanterior").val();
     var numerocliente = $("#numerocliente").val();
     if(numeroclienteanterior != numerocliente){
         if($("#numerocliente").parsley().isValid()){
-            $.get(reporte_relacion_remisiones_obtener_cliente_por_numero, {numerocliente:numerocliente}, function(data){
+            $.get(reporte_facturas_ventas_cliente_obtener_cliente_por_numero, {numerocliente:numerocliente}, function(data){
                 $("#numerocliente").val(data.numero);
                 $("#numeroclienteanterior").val(data.numero);
                 $("#cliente").val(data.nombre);
@@ -454,12 +364,12 @@ function obteneragentepornumero(){
     var numeroagente = $("#numeroagente").val();
     if(numeroagenteanterior != numeroagente){
         if($("#numeroagente").parsley().isValid()){
-            $.get(reporte_relacion_remisiones_obtener_agente_por_numero, {numeroagente:numeroagente}, function(data){
+            $.get(reporte_facturas_ventas_cliente_obtener_agente_por_numero, {numeroagente:numeroagente}, function(data){
                 $("#numeroagente").val(data.numero);
                 $("#numeroagenteanterior").val(data.numero);
                 $("#almacen").val(data.nombre);
                 if(data.nombre != null){
-                    $("#textonombreagente").attr('style', 'font-size:8px').html(data.nombre.substring(0, 45));
+                    $("#textonombreagente").attr('style', 'font-size:8px').html(data.nombre.substring(0, 25));
                 }
                 generar_reporte();
             })  
@@ -477,7 +387,7 @@ function obtenerserieporclave(){
     var claveserie = $("#claveserie").val();
     if(claveserieanterior != claveserie){
         if($("#claveserie").parsley().isValid()){
-            $.get(reporte_relacion_remisiones_obtener_serie_por_clave, {claveserie:claveserie}, function(data){
+            $.get(reporte_facturas_ventas_cliente_obtener_serie_por_clave, {claveserie:claveserie}, function(data){
                 $("#claveserie").val(data.claveserie);
                 $("#claveserieanterior").val(data.claveserie);
                 $("#serie").val(data.claveserie);
@@ -493,29 +403,6 @@ function obtenerserieporclave(){
 function regresarclaveserie(){
     var claveserieanterior = $("#claveserieanterior").val();
     $("#claveserie").val(claveserieanterior);
-}
-//obtener por numero
-function obtenerformapagoporclave(){
-    var claveformapagoanterior = $("#claveformapagoanterior").val();
-    var claveformapago = $("#claveformapago").val();
-    if(claveformapagoanterior != claveformapago){
-        if($("#claveformapago").parsley().isValid()){
-            $.get(reporte_relacion_remisiones_obtener_formapago_por_clave, {claveformapago:claveformapago}, function(data){
-                $("#claveformapago").val(data.clave);
-                $("#claveformapagoanterior").val(data.clave);
-                $("#formapago").val(data.nombre);
-                if(data.nombre != null){
-                    $("#textonombreformapago").attr('style', 'font-size:8px').html(data.nombre.substring(0, 45));
-                }
-                generar_reporte();
-            })  
-        }
-    }
-}
-//regresar numero
-function regresarclaveformapago(){
-    var claveformapagoanterior = $("#claveformapagoanterior").val();
-    $("#claveformapago").val(claveformapagoanterior);
 }
 //actualizar reporte
 function generar_reporte(){
@@ -544,14 +431,15 @@ function generar_formato_excel(){
     if (form.parsley().isValid()){
         var fechainicialreporte = $("#fechainicialreporte").val();
         var fechafinalreporte = $("#fechafinalreporte").val();
-        var reporte = $("#reporte").val();
         var numerocliente = $("#numerocliente").val();
         var numeroagente = $("#numeroagente").val();
         var claveserie = $("#claveserie").val();
-        var claveformapago = $("#claveformapago").val();
         var tipo = $("#tipo").val();
+        var departamento = $("#departamento").val();
+        var documentos = $("#documentos").val();
         var status = $("#status").val();
-        $("#btnGenerarFormatoReporteExcel").attr("href", urlgenerarformatoexcel+'?fechainicialreporte='+fechainicialreporte+'&fechafinalreporte='+fechafinalreporte+'&numerocliente='+numerocliente+'&numeroagente='+numeroagente+'&claveserie='+claveserie+'&claveformapago='+claveformapago+'&tipo='+tipo+'&status='+status+'&reporte='+reporte);
+        var reporte = $("#reporte").val();
+        $("#btnGenerarFormatoReporteExcel").attr("href", urlgenerarformatoexcel+'?fechainicialreporte='+fechainicialreporte+'&fechafinalreporte='+fechafinalreporte+'&numerocliente='+numerocliente+'&numeroagente='+numeroagente+'&claveserie='+claveserie+'&tipo='+tipo+'&departamento='+departamento+'&documentos='+documentos+'&status='+status+'&reporte='+reporte);
         $("#btnGenerarFormatoReporteExcel").click();
     }else{
         form.parsley().validate();
@@ -564,16 +452,16 @@ function listar(){
         case "UTILIDAD":
             break;
         case "GENERAL":
-            var columnas = new Array("Remision", "Serie", "Folio", "Cliente", "Agente", "Fecha", "Plazo", "Tipo", "Unidad", "Pedido", "Solicita", "Referencia", "Destino", "Almacen", "TeleMarketing", "Os", "Eq", "Rq", "Importe", "Descuento", "SubTotal", "Iva", "Total", "Costo", "Comision", "Utilidad", "FormaPago", "Obs", "TipoCambio", "Hora", "Facturada", "Corte", "SuPago", "EnEfectivo", "EnTarjetas", "EnVales", "EnCheque", "Lugar", "Personas", "Status", "MotivoBaja", "Equipo", "Usuario", "Periodo");
+            var columnas = new Array("Factura", "Serie", "Folio", "Depto", "Tipo", "Cliente", "NombreCliente", "Agente", "NombreAgente", "Fecha", "Plazo", "Pedido", "Importe", "Descuento", "SubTotal", "Iva", "Total", "Abonos", "Descuentos", "Saldo", "Costo", "Utilidad", "Moneda", "TipoCambio", "Obs", "Status", "MotivoBaja", "Usuario");
             break;
         case "PRODUCTOS":
-            var columnas = new Array("Remision", "Fecha", "Cliente", "NombreCliente", "Agente", "NombreAgente", "Plazo", "Codigo", "Descripcion", "Unidad", "Cantidad", "Precio", "Importe", "Dcto %", "Descuento", "SubTotal", "Impuesto", "Iva", "Total", "Costo", "CostoTotal", "Utilidad", "Item");
+            var columnas = new Array("Factura", "Fecha", "Cliente", "NombreCliente", "Agente", "Tipo", "NombreAgente", "Plazo", "Codigo", "Descripcion", "Unidad", "Cantidad", "Precio", "Importe", "Dcto", "Descuento", "SubTotal", "Impuesto", "Iva", "Total", "Costo", "CostoTotal", "Utilidad", "Facturar", "Remision", "Orden", "Departamento", "Cargo", "Almacen", "Partida", "Item");
             break;
         case "VENTAS":
             break;
         case "PAGOS":
             break;
-        case "REMISIONES":
+        case "FACTURAS":
             break;
         case "RESUMEN":
             var columnas = new Array("Cliente", "Nombre", "Importe", "Descuento", 'SubTotal', 'Iva', 'Total', 'Costo', 'Utilidad', 'PorcentajeUtilidad');
@@ -582,10 +470,42 @@ function listar(){
             var columnas = new Array("Cliente", "NombreCliente", "SubTotal", "Utilidad");
             break;
         case "POTENCIALES":
-            var columnas = new Array("Numero", "Nombre", "Plazo", "TotalRemisiones");
+            var columnas = new Array("Numero", "Nombre", "Plazo", "Credito", "Bloquear", "Saldo", "TotalFacturas");
             break;
-        case "CORTE":
-            var columnas = new Array("Remision", "Serie", "Folio", "Cliente", "Agente", "Fecha", "Plazo", "Tipo", "Unidad", "Pedido", "Solicita", "Referencia", "Destino", "Almacen", "TeleMarketing", "Os", "Eq", "Rq", "Importe", "Descuento", "SubTotal", "Iva", "Total", "Costo", "Comision", "Utilidad", "FormaPago", "Obs", "TipoCambio", "Hora", "Facturada", "Corte", "SuPago", "EnEfectivo", "EnTarjetas", "EnVales", "EnCheque", "Lugar", "Personas", "Status", "MotivoBaja", "Equipo", "Usuario", "Periodo");
+        case "COMPARATIVO MENSUAL":
+            var columnas = new Array("Cliente", "NombreCliente");
+            var todaslasfechas = new Array();
+            var fechaInicio = new Date($("#fechainicialreporte").val());
+            var fechaFin    = new Date($("#fechafinalreporte").val()); 
+            while(fechaFin.getTime() >= fechaInicio.getTime()){
+                fechaInicio.setDate(fechaInicio.getDate() + 1);
+                var fecha = fechaInicio.getFullYear() + '-' + ('0' + (fechaInicio.getMonth()+1)).slice(-2);
+                if(todaslasfechas.indexOf(fecha) == -1){
+                    todaslasfechas.push(fecha);
+                    columnas.push("SubTotal"+fecha);
+                    columnas.push("Utilidad"+fecha);
+                    columnas.push("PorcentajeUtilidad"+fecha);
+                }
+            }
+            break;
+        case "COMPARATIVO ANUAL":
+            var columnas = new Array("Cliente", "NombreCliente");
+            var todaslasfechas = new Array();
+            var fechaInicio = new Date($("#fechainicialreporte").val());
+            var fechaFin    = new Date($("#fechafinalreporte").val()); 
+            while(fechaFin.getTime() >= fechaInicio.getTime()){
+                fechaInicio.setDate(fechaInicio.getDate() + 1);
+                var fecha = fechaInicio.getFullYear();
+                if(todaslasfechas.indexOf(fecha) == -1){
+                    todaslasfechas.push(fecha);
+                    columnas.push("Facturado"+fecha);
+                }
+            }
+            break;
+        case "NOTAS DE CREDITO":
+            var columnas = new Array("Comprobante", "Documento", "Fecha", "SubTotal", "Iva", "Total");
+            break;
+        case "NO FACTURADOS":
             break;
     }
     var campos_tabla  = [];
@@ -601,6 +521,18 @@ function listar(){
     }
     $("#cabecerastablareporte").html(cabecerastablareporte);
     tabla=$('#tbllistado').DataTable({
+        /*
+        "columnDefs": [{
+            "targets": [2],
+            "render": function(data, type, row) {
+                return Number(data).toLocaleString('en-US', {
+                    maximumFractionDigits: numerodecimales,
+                    style: 'currency',
+                    currency: 'USD'
+                });
+            }
+        }],
+        */
         "lengthMenu": [ 500, 1000 ],
         "sScrollX": "110%",
         "sScrollY": "300px",
@@ -619,16 +551,17 @@ function listar(){
         serverSide: true,
         ajax: {
             headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-            url: reporte_relacion_remisiones_generar_reporte,
+            url: reporte_facturas_ventas_cliente_generar_reporte,
             method: 'POST',
             data: function (d) {
                 d.numerocliente = $("#numerocliente").val();
                 d.numeroagente = $("#numeroagente").val();
                 d.claveserie = $("#claveserie").val();
-                d.claveformapago = $("#claveformapago").val();
                 d.fechainicialreporte = $("#fechainicialreporte").val();
                 d.fechafinalreporte = $("#fechafinalreporte").val();
                 d.tipo = $("#tipo").val();
+                d.departamento = $("#departamento").val();
+                d.documentos = $("#documentos").val();
                 d.status = $("#status").val();
                 d.reporte = $("#reporte").val();
             }

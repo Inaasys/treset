@@ -96,11 +96,6 @@ class ProveedorController extends ConfiguracionSistemaController{
     } 
     //guardar en catalogo
     public function proveedores_guardar(Request $request){
-	    $rfc=$request->rfc;
-	    $ExisteProveedor = Proveedor::where('Rfc', $rfc )->first();
-	    if($ExisteProveedor == true){
-	        $Proveedor = 1;
-	    }else{
             //obtener el ultimo id de la tabla
             $id = Helpers::ultimoidtabla('App\Proveedor');
 		    $Proveedor = new Proveedor;
@@ -117,7 +112,7 @@ class ProveedorController extends ConfiguracionSistemaController{
             $Proveedor->SolicitarXML = $request->solicitarxmlencompras;
             Log::channel('proveedor')->info('Se registro un nuevo proveedor: '.$Proveedor.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
 		    $Proveedor->save();
-      	}
+      	
         return response()->json($Proveedor); 
     } 
     //dar de baja o alta en catalogo
@@ -144,12 +139,7 @@ class ProveedorController extends ConfiguracionSistemaController{
     }  
     //modificar en catalogo
     public function proveedores_guardar_modificacion(Request $request){
-        $rfc=$request->rfc;
         $numeroproveedor= $request->numero;
-	    $ExisteProveedor = Proveedor::where('Numero','<>', $numeroproveedor)->where('Rfc', $rfc )->first();
-	    if($ExisteProveedor == true){
-            $Proveedor = 1;
-	    }else{
             //modificar registro
             $Proveedor = Proveedor::where('Numero', $numeroproveedor )->first();
 		    $Proveedor->Nombre=$request->nombre;
@@ -163,7 +153,6 @@ class ProveedorController extends ConfiguracionSistemaController{
             $Proveedor->SolicitarXML = $request->solicitarxmlencompras;
             Log::channel('proveedor')->info('Se modifico el proveedor: '.$Proveedor.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());	      
 		    $Proveedor->save();
-      	}
     	return response()->json($Proveedor); 
     } 
     //exportar a excel

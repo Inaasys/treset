@@ -103,10 +103,10 @@ class ReportesRemisionesController extends ConfiguracionSistemaController{
     //obtener series
     public function reporte_relacion_remisiones_obtener_series(Request $request){
         if($request->ajax()){
-            $data = Serie::where('Documento', 'Remisiones')->get();
+            $data = Remision::select('Serie')->groupby('Serie')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarserie(\''.$data->Serie .'\',\''.$data->Nombre.'\')">Seleccionar</div>';
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarserie(\''.$data->Serie .'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->rawColumns(['operaciones'])
@@ -116,16 +116,14 @@ class ReportesRemisionesController extends ConfiguracionSistemaController{
     //obtener serie por clave
     public function reporte_relacion_remisiones_obtener_serie_por_clave(Request $request){
         $claveserie = '';
-        $nombre = '';
-        $existeserie = Serie::where('Serie', $request->claveserie)->where('Documento', 'Remisiones')->count();
+        $existeserie = Remision::select('Serie')->where('Serie', $request->claveserie)->groupby('Serie')->count();
+
         if($existeserie > 0){
-            $serie = Serie::where('Serie', $request->claveserie)->where('Documento', 'Remisiones')->first();
+            $serie = Remision::select('Serie')->where('Serie', $request->claveserie)->groupby('Serie')->first();
             $claveserie = $serie->Serie;
-            $nombre = $serie->Nombre;
         }
         $data = array(
             'claveserie' => $claveserie,
-            'nombre' => $nombre,
         );
         return response()->json($data);
     }

@@ -13,7 +13,6 @@ function listar(){
     var campos_busqueda = campos_busquedas.split(",");
     // armar columas para datatable se arma desde funcionesglobales.js
     var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
-    console.log(campos_tabla);
     tabla=$('#tbllistado').DataTable({
         "lengthMenu": [ 100, 250, 500, 1000 ],
         "pageLength": 500,

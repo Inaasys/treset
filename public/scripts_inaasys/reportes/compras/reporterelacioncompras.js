@@ -9,6 +9,12 @@ function init(){
   activarrelistarreporteenterfechafinal();
   listar();
 }
+//mostrar formulario
+function mostrarformulario(){
+    $("#ModalFormulario").modal('hide');
+    $("#contenidomodaltablas").hide();
+    $("#formulario").hide();
+}
 //listar todos los registros de la tabla
 function asignarfechaactual(){
   var fechahoy = new Date();
@@ -375,7 +381,9 @@ function listar(){
         },
         serverSide: true,
         ajax: {
+            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
             url: reporte_relacion_compras_generar_reporte,
+            method: 'POST',
             data: function (d) {
                 d.numeroproveedor = $("#numeroproveedor").val();
                 d.numeroalmacen = $("#numeroalmacen").val();
