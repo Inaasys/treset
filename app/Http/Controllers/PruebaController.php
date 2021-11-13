@@ -21,6 +21,7 @@ use App\CuentaXPagar;
 use App\CuentaXPagarDetalle;
 use App\OrdenCompraDetalle;
 use App\Proveedor;
+use App\Producto;
 use Mail;
 use App\Configuracion_Tabla;
 
@@ -106,23 +107,8 @@ class PruebaController extends ConfiguracionSistemaController{
     }
 
     public function prueba_diferencias_arrays(){
-        /*$ArrayDetallesTraspasoAnterior = Array();
-
-        $ArrayDetallesTraspasoNuevo = Array('20725387');
-
-        //$clave = array_search('verde', $array); // $clave = 2;
-        //echo $clave;
-        $diferencias_arreglos = array_diff($ArrayDetallesTraspasoAnterior, $ArrayDetallesTraspasoNuevo);
-        dd($diferencias_arreglos);
-        */
-/*
-        if(count($diferencias_arreglos) > 0){
-            foreach($diferencias_arreglos as $eliminapartida){
-                echo $eliminapartida."<br>";
-            }
-        }*/
-
-        //dd(Helpers::convertirvalorcorrecto("-1"));
+        $sales = DB::connection('sqlsrv2')->select("Select * from Clientes");
+        dd($sales);
 
     }
 
@@ -431,5 +417,13 @@ class PruebaController extends ConfiguracionSistemaController{
             'columnas_ordenadas'=>'Pago,Status,Fecha,Proveedor,Banco,NombreProveedor,Transferencia,Abono,Compras,Periodo',
         ]);
         
+    }
+
+    public function modificar_valores_en_bd_para_actualizacion_rama20211101correciones(){
+        //Configuracion columnas tabla CuentasPorPagar       
+        Producto::where('Status', 'ALTA')
+        ->update([
+            'TipoProd'=>'REFACCION',
+        ]);
     }
 }

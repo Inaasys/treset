@@ -81,7 +81,8 @@ class ReportesCotizacionesController extends ConfiguracionSistemaController{
             $data = DB::table('Cotizaciones as co')
             ->leftjoin('Clientes as c', 'co.Cliente', '=', 'c.Numero')
             ->select('co.Cotizacion', 'co.Cliente', 'c.Nombre', 'co.Fecha', 'co.Plazo', 'co.Tipo', 'co.Referencia', 'co.Importe', 'co.Descuento', 'co.SubTotal', 'co.Iva', 'co.Total', 'co.Obs', 'co.Status', 'co.MotivoBaja', 'co.Usuario')
-            ->whereBetween('co.Fecha', [$fechainicio, $fechaterminacion])
+            //->whereBetween('co.Fecha', [$fechainicio, $fechaterminacion])
+            ->whereDate('co.Fecha', '>=', $fechainicio)->whereDate('co.Fecha', '<=', $fechaterminacion)
             ->where(function($q) use ($numerocliente) {
                 if($numerocliente != ""){
                     $q->where('co.Cliente', $numerocliente);
@@ -115,7 +116,8 @@ class ReportesCotizacionesController extends ConfiguracionSistemaController{
             ->leftjoin('Clientes as c', 'co.Cliente', '=', 'c.Numero')
             ->leftjoin('Cotizaciones Detalles as cod', 'co.Cotizacion', '=', 'cod.Cotizacion')
             ->select('co.Cotizacion', 'co.Cliente', 'c.Nombre', 'co.Fecha', 'co.Plazo', 'co.Tipo', 'co.Referencia', 'cod.Codigo', 'cod.Descripcion', 'cod.Unidad', 'cod.Cantidad', 'cod.Precio', 'cod.Importe', 'cod.Descuento', 'cod.SubTotal', 'cod.Iva', 'cod.Total', 'co.Obs', 'co.Status', 'co.MotivoBaja', 'co.Usuario')
-            ->whereBetween('co.Fecha', [$fechainicio, $fechaterminacion])
+            //->whereBetween('co.Fecha', [$fechainicio, $fechaterminacion])
+            ->whereDate('co.Fecha', '>=', $fechainicio)->whereDate('co.Fecha', '<=', $fechaterminacion)
             ->where(function($q) use ($numerocliente) {
                 if($numerocliente != ""){
                     $q->where('co.Cliente', $numerocliente);

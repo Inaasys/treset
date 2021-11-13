@@ -32,13 +32,11 @@
                                                         Excel
                                                     </a>
                                                 </td>
-                                                @if(Auth::user()->role_id == 1)
                                                 <td>
                                                     <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
                                                         Configurar Tabla
                                                     </div>
                                                 </td>
-                                                @endif
                                             </tr>
                                         </table>
                                     </div>
@@ -57,6 +55,14 @@
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                                                <th id="th{{$co}}">{{$co}}</th>
+                                            @endforeach
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
                         </div>
@@ -148,8 +154,10 @@
         var campos_busquedas = '{{$configuracion_tabla->campos_busquedas}}';
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
-        var background_tables = '{{$empresa->background_tables}}';
+        var background_tables = '{{$empresa->background_tables}}';       
+        var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var proveedores_obtener = '{!!URL::to('proveedores_obtener')!!}';
+        var proveedores_buscar_rfc_en_tabla = '{!!URL::to('proveedores_buscar_rfc_en_tabla')!!}';
         var proveedores_obtener_ultimo_numero = '{!!URL::to('proveedores_obtener_ultimo_numero')!!}';
         var proveedores_obtener_codigos_postales = '{!!URL::to('proveedores_obtener_codigos_postales')!!}';
         var proveedores_guardar = '{!!URL::to('proveedores_guardar')!!}';

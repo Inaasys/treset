@@ -4,7 +4,7 @@
     <div class="navbar-header">
       <a href="javascript:void(0);" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false"></a>
       <a href="javascript:void(0);" class="bars"></a>
-      <a class="navbar-brand" href="{{ route('empresa') }}"><img id="navbarlogotipoempresa" src="logotipo_empresa/{{$empresa->Logo}}" width="125" height="50"></a>
+      <a class="navbar-brand" href="#"><img id="navbarlogotipoempresa" src="logotipo_empresa/{{$empresa->Logo}}" width="125" height="50"></a>
     </div>
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="navbar-collapse">
@@ -349,8 +349,8 @@
               </ul>
             </li>                 
             <li><a href="#">Generar Pólizas</a></li>-->
-            <li><a href="{{ route('empresa') }}">Empresa</a></li>
             @if(Auth::user()->role_id == 1)
+              <li><a href="{{ route('empresa') }}">Empresa</a></li>
               <li><a href="{{ route('errors_inaasys') }}"><b>LOGS-ERRORS</b></a></li>
             @endif
             <li class="bg-deep-orange">

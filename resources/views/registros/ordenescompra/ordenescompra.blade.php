@@ -47,13 +47,11 @@
                                                         Excel
                                                     </a>
                                                 </td>
-                                                @if(Auth::user()->role_id == 1)
                                                 <td>
                                                     <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
                                                         Configurar Tabla
                                                     </div>
                                                 </td>
-                                                @endif
                                             </tr>
                                         </table>
                                     </div>
@@ -84,6 +82,14 @@
                                         </tr>
                                     </thead>
                                     <tbody ></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                                                <th id="th{{$co}}">{{$co}}</th>
+                                            @endforeach
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
                         </div>
@@ -132,6 +138,32 @@
                 <div id="contenidomodaltablas">
                     <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
                 </div> 
+            </div>
+        </div>
+    </div>
+    <!-- Modal Alta/Codigo Productos-->
+    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="ModalFormularioProducto" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div id="formularioproducto">
+                    <div class="modal-header {{$empresa->background_forms_and_modals}}">
+                        <h4 class="modal-title" >Alta Producto</h4>
+                    </div>
+                    <form id="formparsleyproducto" action="#">
+                        <div class="modal-body">
+                            <div class="col-md-12" id="tabsformproducto">
+                                
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger btn-sm" onclick="mostrarformularioorden();">Salir</button>
+                            <button type="button" class="btn btn-success btn-sm" id="btnGuardarProducto">Guardar Producto</button>
+                        </div>
+                    </form> 
+                </div>
+                <div id="contenidomodaltablasproducto">
+                    <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
+                </div>     
             </div>
         </div>
     </div>
@@ -217,6 +249,7 @@
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';
         var urlgenerarplantilla = '{{$urlgenerarplantilla}}';
+        var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var ordenes_compra_obtener = '{!!URL::to('ordenes_compra_obtener')!!}';
         var ordenes_compra_descargar_plantilla = '{!!URL::to('ordenes_compra_descargar_plantilla')!!}';
         var ordenes_compra_cargar_partidas_excel = '{!!URL::to('ordenes_compra_cargar_partidas_excel')!!}';
@@ -245,6 +278,12 @@
         var ordenes_compra_obtener_datos_envio_email = '{!!URL::to('ordenes_compra_obtener_datos_envio_email')!!}';
         var ordenes_compra_enviar_pdfs_email = '{!!URL::to('ordenes_compra_enviar_pdfs_email')!!}';
         var ordenes_compra_buscar_folio_string_like = '{!!URL::to('ordenes_compra_buscar_folio_string_like')!!}';
+        //alta PROD
+        var ordenes_compra_obtener_claves_productos = '{!!URL::to('ordenes_compra_obtener_claves_productos')!!}';
+        var ordenes_compra_obtener_claves_unidades = '{!!URL::to('ordenes_compra_obtener_claves_unidades')!!}';
+        var ordenes_compra_obtener_marcas = '{!!URL::to('ordenes_compra_obtener_marcas')!!}';
+        var ordenes_compra_obtener_lineas = '{!!URL::to('ordenes_compra_obtener_lineas')!!}';
+        var ordenes_compra_guardar_producto = '{!!URL::to('ordenes_compra_guardar_producto')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="scripts_inaasys/registros/ordenescompra/ordenescompra.js"></script>

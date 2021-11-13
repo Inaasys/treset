@@ -45,6 +45,13 @@ function ocultarformulario(){
 }
 //listar todos los registros de la tabla
 function listar(){
+    //agregar inputs de busqueda por columna
+    $('#tbllistado tfoot th').each( function () {
+      var title = $(this).text();
+      if(title != 'Operaciones'){
+        $(this).html( '<input type="text" placeholder="Buscar en columna '+title+'" />' );
+      }
+    });
     tabla=$('#tbllistado').DataTable({
       "lengthMenu": [ 100, 250, 500, 1000 ],
       "pageLength": 1000,
@@ -61,11 +68,21 @@ function listar(){
             { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
             { data: 'id', name: 'id', orderable: false, searchable: true },
             { data: 'nombre', name: 'nombre', orderable: false, searchable: true },
-            { data: 'fecha_ingreso', name: 'fecha_ingreso', orderable: false, searchable: false },
-            { data: 'tipo_personal', name: 'tipo_personal', orderable: false, searchable: false },
+            { data: 'fecha_ingreso', name: 'fecha_ingreso', orderable: false, searchable: true },
+            { data: 'tipo_personal', name: 'tipo_personal', orderable: false, searchable: true },
             { data: 'status', name: 'status', orderable: false, searchable: true }
         ],
-        "initComplete": function() {
+        initComplete: function () {
+          // Aplicar busquedas por columna
+          this.api().columns().every( function () {
+            var that = this;
+            $('input',this.footer()).on( 'change', function(){
+              if(that.search() !== this.value){
+                that.search(this.value).draw();
+              }
+            });
+          });
+          //Aplicar busqueda general
           var $buscar = $('div.dataTables_filter input');
           $buscar.unbind();
           $buscar.bind('keyup change', function(e) {

@@ -54,6 +54,13 @@ function ocultarformulario(){
 }
 //listar todos los registros de la tabla
 function listar(){
+    //agregar inputs de busqueda por columna
+    $('#tbllistado tfoot th').each( function () {
+      var title = $(this).text();
+      if(title != 'Operaciones'){
+        $(this).html( '<input type="text" placeholder="Buscar en columna '+title+'" />' );
+      }
+    });
     tabla=$('#tbllistado').DataTable({
         "lengthMenu": [ 100, 250, 500, 1000 ],
         "pageLength": 1000,
@@ -71,17 +78,27 @@ function listar(){
             { data: 'id', name: 'id', orderable: false, searchable: true },
             { data: 'name', name: 'name', orderable: false, searchable: true },
             { data: 'email', name: 'email', orderable: false, searchable: true },
-            { data: 'user', name: 'user', orderable: false, searchable: false  },
-            { data: 'role_id', name: 'role_id', orderable: false, searchable: false  }
+            { data: 'user', name: 'user', orderable: false, searchable: true  },
+            { data: 'role_id', name: 'role_id', orderable: false, searchable: true  }
         ],
-        "initComplete": function() {
-            var $buscar = $('div.dataTables_filter input');
-            $buscar.unbind();
-            $buscar.bind('keyup change', function(e) {
-                if(e.keyCode == 13 || this.value == "") {
-                    $('#tbllistado').DataTable().search( this.value ).draw();
-                }
+        initComplete: function () {
+          // Aplicar busquedas por columna
+          this.api().columns().every( function () {
+            var that = this;
+            $('input',this.footer()).on( 'change', function(){
+              if(that.search() !== this.value){
+                that.search(this.value).draw();
+              }
             });
+          });
+          //Aplicar busqueda general
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistado').DataTable().search( this.value ).draw();
+              }
+          });
         }
     });
     //modificacion al dar doble click

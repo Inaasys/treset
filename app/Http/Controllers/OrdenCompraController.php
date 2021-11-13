@@ -28,6 +28,9 @@ use App\Marca;
 use App\Configuracion_Tabla;
 use App\VistaOrdenCompra;
 use App\VistaObtenerExistenciaProducto;
+use App\ClaveProdServ;
+use App\ClaveUnidad;
+use App\Linea;
 use Config;
 use Mail;
 use Schema;
@@ -129,9 +132,39 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                 }else{
                     $codigoabuscar = $partida[0];
                     $cantidadpartida = $partida[1];
-                    $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', ''.$codigoabuscar.'')->count();
+                    switch ($request->tipo) {
+                        case "GASTOS":
+                            $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', ''.$codigoabuscar.'')->where('TipoProd', 'GASTOS')->count();
+                            break;
+                        case "TOT":
+                            $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', ''.$codigoabuscar.'')->where('TipoProd', 'TOT')->count();
+                            break;
+                        default:
+                            $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', ''.$codigoabuscar.'')
+                            ->where(
+                                function($query) {
+                                return $query
+                                        ->where('TipoProd', 'REFACCION')
+                                        ->orWhereNull('TipoProd');
+                            })->count();
+                    } 
                     if($contarproductos > 0){
-                        $producto = VistaObtenerExistenciaProducto::where('Codigo', ''.$codigoabuscar.'')->first();
+                        switch ($request->tipo) {
+                            case "GASTOS":
+                                $producto = VistaObtenerExistenciaProducto::where('Codigo', ''.$codigoabuscar.'')->where('TipoProd', 'GASTOS')->first();
+                                break;
+                            case "TOT":
+                                $producto = VistaObtenerExistenciaProducto::where('Codigo', ''.$codigoabuscar.'')->where('TipoProd', 'TOT')->first();
+                                break;
+                            default:
+                                $producto = VistaObtenerExistenciaProducto::where('Codigo', ''.$codigoabuscar.'')
+                                ->where(
+                                    function($query) {
+                                    return $query
+                                            ->where('TipoProd', 'REFACCION')
+                                            ->orWhereNull('TipoProd');
+                                })->first();
+                        } 
                         if(Helpers::convertirvalorcorrecto($cantidadpartida) == 0){
                             $cantidad = 1;
                         }else{
@@ -152,11 +185,11 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                         '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                             '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]">'.$producto->Codigo.'</td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'.htmlspecialchars($producto->Producto, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'.htmlspecialchars($producto->Producto, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'.$producto->Unidad.'" readonly data-parsley-length="[1, 5]">'.$producto->Unidad.'</td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm porsurtirpartida" name="porsurtirpartida[]" id="porsurtirpartida[]" value="'.Helpers::convertirvalorcorrecto($cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($cantidad).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" id="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($preciopartida).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($cantidad).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" id="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($preciopartida).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" id="importepartida[]" value="'.Helpers::convertirvalorcorrecto($importepartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" id="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('.$contadorfilas.');"></td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" id="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentoporcentajepartida('.$contadorfilas.');"></td>'.
@@ -300,7 +333,23 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             $codigoabuscar = $request->codigoabuscar;
             $tipooperacion = $request->tipooperacion;
             $numeroalmacen = $request->numeroalmacen;
-            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%');
+            switch ($request->tipo) {
+                case "GASTOS":
+                    $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->where('TipoProd', 'GASTOS');
+                    break;
+                case "TOT":
+                    $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->where('TipoProd', 'TOT');
+                    break;
+                default:
+                    $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')
+                    ->where(
+                        function($query) {
+                        return $query
+                                ->where('TipoProd', 'REFACCION')
+                                ->orWhereNull('TipoProd');
+                    });
+                    //->where('TipoProd', '<>', 'GASTOS')->Where('TipoProd', '<>', 'TOT');
+            } 
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($tipooperacion, $numeroalmacen){
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.$tipooperacion.'\')">Seleccionar</div>';
@@ -322,9 +371,40 @@ class OrdenCompraController extends ConfiguracionSistemaController{
     //obtener producto por codigo
     public function ordenes_compra_obtener_producto_por_codigo(Request $request){
         $codigoabuscar = $request->codigoabuscar;
-        $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->count();
+        switch ($request->tipo) {
+            case "GASTOS":
+                $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('TipoProd', 'GASTOS')->count();
+                break;
+            case "TOT":
+                $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('TipoProd', 'TOT')->count();
+                break;
+            default:
+                $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)
+                ->where(
+                    function($query) {
+                    return $query
+                            ->where('TipoProd', 'REFACCION')
+                            ->orWhereNull('TipoProd');
+                })->count();
+        } 
         if($contarproductos > 0){
-            $producto = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->first();
+            switch ($request->tipo) {
+                case "GASTOS":
+                    $producto = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('TipoProd', 'GASTOS')->first();
+                    break;
+                case "TOT":
+                    $producto = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('TipoProd', 'TOT')->first();
+                    break;
+                default:
+                    $producto = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)
+                    ->where(
+                        function($query) {
+                        return $query
+                                ->where('TipoProd', 'REFACCION')
+                                ->orWhereNull('TipoProd');
+                    })->first();
+            } 
+
             $data = array(
                 'Codigo' => $producto->Codigo,
                 'Producto' => htmlspecialchars($producto->Producto, ENT_QUOTES),
@@ -569,12 +649,12 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$doc->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$doc->Codigo.'" readonly data-parsley-length="[1, 20]">'.$doc->Codigo.'</td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" value="'.htmlspecialchars($doc->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" value="'.htmlspecialchars($doc->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$doc->Unidad.'" readonly data-parsley-length="[1, 5]">'.$doc->Unidad.'</td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm porsurtirpartida"  name="porsurtirpartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Surtir).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida"  name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Cantidad).'" data-parsley-min="'.Helpers::convertirvalorcorrecto($cantidadyasurtidapartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculartotalesfilasordencompra('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo .'\');formatocorrectoinputcantidades(this);" ></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida"  name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Cantidad).'" data-parsley-min="'.Helpers::convertirvalorcorrecto($cantidadyasurtidapartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculartotalesfilasordencompra('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo .'\');formatocorrectoinputcantidades(this);" ></td>'.
                     '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadyasurtidapartida"  name="cantidadyasurtidapartida[]" value="'.Helpers::convertirvalorcorrecto($cantidadyasurtidapartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" ></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartida"  name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Precio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculartotalesfilasordencompra('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo .'\');formatocorrectoinputcantidades(this);"></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida"  name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Precio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculartotalesfilasordencompra('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo .'\');formatocorrectoinputcantidades(this);"></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida"  name="importepartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Importe).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentoporcentajepartida"  name="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Dcto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculardescuentopesospartida('.$contadorfilas.');formatocorrectoinputcantidades(this);" ></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentopesospartida"  name="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Descuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculardescuentoporcentajepartida('.$contadorfilas.');formatocorrectoinputcantidades(this);" ></td>'.
@@ -974,6 +1054,12 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             if($request->email3cc != ""){
                 array_push($arraycc, $request->email3cc);
             }
+            if($this->correodefault1enviodocumentos != ""){
+                array_push($arraycc, $this->correodefault1enviodocumentos);
+            }
+            if($this->correodefault2enviodocumentos != ""){
+                array_push($arraycc, $this->correodefault2enviodocumentos);
+            }
             $correos = [$request->emailpara,$request->email2cc,$request->email3cc];
             $asunto = $request->emailasunto;
             $emaildocumento = $request->emaildocumento;
@@ -1033,5 +1119,118 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         ]);
         return redirect()->route('ordenes_compra');
     }
+
+    //obtener claves productos
+    public function ordenes_compra_obtener_claves_productos(Request $request){
+        if($request->ajax()){
+            $data = ClaveProdServ::query();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarclaveproducto(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }        
+    }
+    //obtener claves unidades
+    public function ordenes_compra_obtener_claves_unidades(Request $request){
+        if($request->ajax()){
+            $data = ClaveUnidad::where('Clave', 'H87')->orwhere('Clave', 'HUR');
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarclaveunidad(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }        
+    } 
+    //obtener marcas
+    public function ordenes_compra_obtener_marcas(Request $request){
+        if($request->ajax()){
+            $data = Marca::where('Status', 'ALTA')->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarmarca('.$data->Numero.',\''.$data->Nombre .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->addColumn('Utilidad1', function($data){
+                        $utilidad1 = Helpers::convertirvalorcorrecto($data->Utilidad1);
+                        return $utilidad1;
+                    })
+                    ->addColumn('Utilidad2', function($data){
+                        $utilidad2 = Helpers::convertirvalorcorrecto($data->Utilidad2);
+                        return $utilidad2;
+                    })
+                    ->addColumn('Utilidad3', function($data){
+                        $utilidad3 = Helpers::convertirvalorcorrecto($data->Utilidad3);
+                        return $utilidad3;
+                    })
+                    ->addColumn('Utilidad4', function($data){
+                        $utilidad4 = Helpers::convertirvalorcorrecto($data->Utilidad4);
+                        return $utilidad4;
+                    })
+                    ->addColumn('Utilidad5', function($data){
+                        $utilidad5 = Helpers::convertirvalorcorrecto($data->Utilidad5);
+                        return $utilidad5;
+                    })
+                    ->rawColumns(['operaciones','Utilidad1','Utilidad2','Utilidad3','Utilidad4','Utilidad5'])
+                    ->make(true);
+        }        
+    }    
+    //obtener lineas
+    public function ordenes_compra_obtener_lineas(Request $request){
+        if($request->ajax()){
+            $data = Linea::where('Status', 'ALTA')->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarlinea('.$data->Numero.',\''.$data->Nombre .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }        
+    } 
+    //guardar en catalogo
+    public function ordenes_compra_guardar_producto(Request $request){
+        $codigo=$request->codigo;
+	    $ExisteProducto = Producto::where('Codigo', $codigo )->first();
+	    if($ExisteProducto == true){
+	        $Producto = 1;
+	    }else{        
+            $marca = Marca::where('Numero', $request->marca)->first();
+            $utilidadrestante = Helpers::convertirvalorcorrecto(100) - $marca->Utilidad1;
+            $subtotalpesos = $request->costo / ($utilidadrestante/100);
+            $utilidadpesos = $subtotalpesos - $request->costo;
+            $ivapesos = $subtotalpesos * ($request->impuesto/100);
+            $totalpesos = $subtotalpesos + $ivapesos;
+            $Producto = new Producto;
+            $Producto->Codigo=$request->codigo;
+            $Producto->ClaveProducto=$request->claveproducto;
+            $Producto->ClaveUnidad=$request->claveunidad;
+            $Producto->Producto=$request->producto;
+            $Producto->Unidad=$request->unidad;
+            $Producto->Marca=$request->marca;
+            $Producto->Linea=$request->linea;
+            $Producto->Impuesto=$request->impuesto;
+            $Producto->Costo=$request->costo;
+            $Producto->Precio=$request->precio;
+            $Producto->Utilidad=$marca->Utilidad1;
+            $Producto->SubTotal=$subtotalpesos;
+            $Producto->Iva=$ivapesos;
+            $Producto->Total=$totalpesos;
+            $Producto->Ubicacion=$request->ubicacion;
+            $Producto->TipoProd = $request->tipoproducto;
+            $Producto->Status='ALTA';
+            $Producto->CostoDeLista=$request->costo;
+            $Producto->Moneda='MXN';
+            $Producto->CostoDeVenta=$request->costo;
+            $Producto->Precio1=$request->precio;
+            Log::channel('producto')->info('Se registro un nuevo producto: '.$Producto.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
+            $Producto->save();
+        }    
+        return response()->json($Producto); 
+    } 
     
 }

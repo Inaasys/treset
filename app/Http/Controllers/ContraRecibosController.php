@@ -153,15 +153,19 @@ class ContraRecibosController extends ConfiguracionSistemaController{
                             '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm totalcompra" name="totalcompra[]" value="'.Helpers::convertirvalorcorrecto($c->Total).'" readonly>'.Helpers::convertirvalorcorrecto($c->Total).'</td>'.
                             '<td class="tdmod text-center">'.
                                 '<input type="checkbox" name="contrarecibocompra[]" id="idcontrarecibocompra'.$contadorfilas.'" class="contrarecibocompra filled-in" value="0" onchange="calculartotalcontrarecibo(\''.$tipo .'\');" required>'.
-                                '<label for="idcontrarecibocompra'.$contadorfilas.'" ></label>'.
+                                '<label for="idcontrarecibocompra'.$contadorfilas.'" class="inputnext"></label>'.
                             '</td>'.
                         '</tr>';
                         $contadorfilas++;
                 }
             }
         }       
+        $fechahoy = Carbon::now()->toDateTimeString();
+        $fechahoyespanol = Helpers::fecha_espanol(Carbon::now()->toDateTimeString());
         $data = array(
-            "filascompras" => $filascompras
+            "filascompras" => $filascompras,
+            'fechahoy' => $fechahoy,
+            'fechahoyespanol' => $fechahoyespanol
         );
         return response()->json($data);
     }
@@ -195,7 +199,7 @@ class ContraRecibosController extends ConfiguracionSistemaController{
                                 '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm totalcompra" name="totalcompra[]" value="'.Helpers::convertirvalorcorrecto($c->Total).'" readonly>'.Helpers::convertirvalorcorrecto($c->Total).'</td>'.
                                 '<td class="tdmod text-center">'.
                                     '<input type="checkbox" name="contrarecibocompra[]" id="idcontrarecibocompra'.$contadorfilas.'" class="contrarecibocompra filled-in" value="0" onchange="calculartotalcontrarecibo(\''.$tipo .'\');" required>'.
-                                    '<label for="idcontrarecibocompra'.$contadorfilas.'" ></label>'.
+                                    '<label for="idcontrarecibocompra'.$contadorfilas.'" class="inputnext"></label>'.
                                 '</td>'.
                             '</tr>';
                             $contadorfilas++;
@@ -626,6 +630,12 @@ class ContraRecibosController extends ConfiguracionSistemaController{
             }
             if($request->email3cc != ""){
                 array_push($arraycc, $request->email3cc);
+            }
+            if($this->correodefault1enviodocumentos != ""){
+                array_push($arraycc, $this->correodefault1enviodocumentos);
+            }
+            if($this->correodefault2enviodocumentos != ""){
+                array_push($arraycc, $this->correodefault2enviodocumentos);
             }
             $correos = [$request->emailpara];
             $asunto = $request->emailasunto;

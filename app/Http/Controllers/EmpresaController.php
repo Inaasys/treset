@@ -17,6 +17,7 @@ use App\Municipio;
 use App\c_RegimenFiscal;
 use App\CodigoPostal;
 use App\Moneda;
+use App\User;
 use Facturapi\Facturapi;
 
 class EmpresaController extends ConfiguracionSistemaController{
@@ -43,6 +44,19 @@ class EmpresaController extends ConfiguracionSistemaController{
     }
     public function empresa(){
         return view('empresa.empresa');
+    }
+    //obtener usuarios
+    public function empresa_obtener_usuarios_a_modificar_insumos(Request $request){
+        $usuarios = User::all();
+        $select_usuarios = "<option disabled hidden>Selecciona...</option>";
+        foreach($usuarios as $usuario){
+            if (in_array(strtoupper($usuario->user), explode(",",$this->usuariosamodificarinsumos))) {
+                $select_usuarios = $select_usuarios."<option value='".$usuario->user."' selected>".$usuario->user."</option>"; 
+            }else{
+                $select_usuarios = $select_usuarios."<option value='".$usuario->user."'>".$usuario->user."</option>";
+            }
+        }
+        return response()->json($select_usuarios);
     }
     //obtener paises
     public function empresa_obtener_paises(Request $request){
@@ -92,9 +106,6 @@ class EmpresaController extends ConfiguracionSistemaController{
                     ->make(true);
         }  
     } 
-
-
-
     //obtener lugares expedicion
     public function empresa_obtener_lugares_expedicion(Request $request){
         if($request->ajax()){
@@ -134,7 +145,6 @@ class EmpresaController extends ConfiguracionSistemaController{
                     ->make(true);
         }  
     } 
-
     //guardar cambios en domicilio fiscal
     public function empresa_guardar_modificacion_domicilio_fiscal(Request $request){
         $Empresa = Empresa::where('Numero', 1)->first();
@@ -169,13 +179,21 @@ class EmpresaController extends ConfiguracionSistemaController{
     }
     //guar cambiar configurar
     public function empresa_guardar_modificacion_configurar(Request $request){
+        if ($request->has("usuariosmodificacioninsumo")){
+            $usuariosamodificarinsumos = implode(",", $request->usuariosmodificacioninsumo);
+        }else{
+            $usuariosamodificarinsumos = "";
+        }
         $Empresa = Empresa::where('Numero', 1)->first();
         Empresa::where('Numero', 1)
         ->update([
             'Numero_Decimales' => $request->numerodecimalessistema,
             'Numero_Decimales_En_Documentos' => $request->numerodecilamesdocumentospdfsistema,
             'Mayusculas_Sistema' => $request->utilizarmayusculasistema,
-            'Tipo_De_Utilidad' => $request->tipoutilidadventa
+            'Tipo_De_Utilidad' => $request->tipoutilidadventa,
+            'CorreoDefault1EnvioDocumentos' => $request->correodefault1enviodocumentos,
+            'CorreoDefault2EnvioDocumentos' => $request->correodefault2enviodocumentos,
+            'UsuariosModificarInsumo' => $usuariosamodificarinsumos,
         ]);
         return response()->json($request->all());
     }

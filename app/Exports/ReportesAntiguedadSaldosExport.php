@@ -163,7 +163,7 @@ class ReportesAntiguedadSaldosExport implements FromCollection,WithHeadings,With
             case "DETALLES":
                 $data = DB::table('Facturas as f')
                 ->leftjoin('Clientes as c', 'f.Cliente', '=', 'c.Numero')
-                ->select("f.Factura", "f.Fecha", "f.Plazo", "f.Cliente AS Cliente", "c.Nombre AS NombreCliente", DB::raw("SUM(f.Total) AS TotalFactura"), 
+                ->select("f.Factura", DB::raw("FORMAT(f.Fecha, 'yyyy-MM-dd') as Fecha"), "f.Plazo", "f.Cliente AS Cliente", "c.Nombre AS NombreCliente", DB::raw("SUM(f.Total) AS TotalFactura"), 
                             DB::raw("isnull((select sum(abono) from [cxc detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0) as AbonosCXC"),
                             DB::raw("isnull((select sum(total) from [notas cliente detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0) as DescuentosNotasCredito"),
                             DB::raw("isnull((select sum(abono) from [cxc detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0) + isnull((select sum(total) from [notas cliente detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0) as TotalPagos"),

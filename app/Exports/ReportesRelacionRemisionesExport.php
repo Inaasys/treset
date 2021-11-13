@@ -164,7 +164,9 @@ class ReportesRelacionRemisionesExport implements FromCollection,WithHeadings,Wi
                 break;
             case "GENERAL":
                 $data = DB::table('Remisiones as r')
-                ->whereBetween('r.Fecha', [$fechainicio, $fechaterminacion])
+                ->select('Remision', 'Serie', 'Folio', 'Cliente', 'Agente', 'Fecha', DB::raw("FORMAT(Fecha, 'yyyy-MM-dd') as Fecha"), 'Plazo', 'Tipo', 'Unidad', 'Pedido', 'Solicita', 'Referencia', 'Destino', 'Almacen', 'TeleMarketing', 'Os', 'Eq', 'Rq', 'Importe', 'Descuento', 'SubTotal', 'Iva', 'Total', 'Costo', 'Comision', 'Utilidad', 'FormaPago', 'Obs', 'TipoCambio', 'Hora', 'Facturada', 'Corte', 'SuPago', 'EnEfectivo', 'EnTarjetas', 'EnVales', 'EnCheque', 'Lugar', 'Personas', 'Status', 'MotivoBaja', 'Equipo', 'Usuario', 'Periodo')
+                //->whereBetween('r.Fecha', [$fechainicio, $fechaterminacion])
+                ->whereDate('r.Fecha', '>=', $fechainicio)->whereDate('r.Fecha', '<=', $fechaterminacion)
                 ->where(function($q) use ($numerocliente) {
                     if($numerocliente != ""){
                         $q->where('r.Cliente', $numerocliente);
@@ -208,8 +210,9 @@ class ReportesRelacionRemisionesExport implements FromCollection,WithHeadings,Wi
                 ->leftjoin('Clientes as c', 'r.Cliente', '=', 'c.Numero')
                 ->leftjoin('Agentes as a', 'r.Agente', '=', 'a.Numero')
                 ->leftjoin('Remisiones Detalles as rd', 'r.Remision', '=', 'rd.Remision')
-                ->select('r.Remision', 'r.Fecha', 'r.Cliente', 'c.Nombre AS NombreCliente', 'r.Agente', "a.Nombre AS NombreAgente", 'r.Plazo', 'rd.Codigo', 'rd.Descripcion', 'rd.Unidad', 'rd.Cantidad', 'rd.Precio', 'rd.Importe', 'rd.Dcto AS Dcto %', 'rd.Descuento', 'rd.SubTotal', 'rd.Impuesto', 'rd.Iva', 'rd.Total', 'rd.Costo', 'rd.CostoTotal', 'rd.Utilidad', 'rd.Item')
-                ->whereBetween('r.Fecha', [$fechainicio, $fechaterminacion])
+                ->select('r.Remision', DB::raw("FORMAT(r.Fecha, 'yyyy-MM-dd') as Fecha"), 'r.Cliente', 'c.Nombre AS NombreCliente', 'r.Agente', "a.Nombre AS NombreAgente", 'r.Plazo', 'rd.Codigo', 'rd.Descripcion', 'rd.Unidad', 'rd.Cantidad', 'rd.Precio', 'rd.Importe', 'rd.Dcto AS Dcto %', 'rd.Descuento', 'rd.SubTotal', 'rd.Impuesto', 'rd.Iva', 'rd.Total', 'rd.Costo', 'rd.CostoTotal', 'rd.Utilidad', 'rd.Item')
+                //->whereBetween('r.Fecha', [$fechainicio, $fechaterminacion])
+                ->whereDate('r.Fecha', '>=', $fechainicio)->whereDate('r.Fecha', '<=', $fechaterminacion)
                 ->where(function($q) use ($numerocliente) {
                     if($numerocliente != ""){
                         $q->where('r.Cliente', $numerocliente);
@@ -259,7 +262,8 @@ class ReportesRelacionRemisionesExport implements FromCollection,WithHeadings,Wi
                 $data = DB::table('Remisiones as r')
                 ->leftjoin('Clientes as c', 'r.Cliente', '=', 'c.Numero')
                 ->select('r.Cliente', 'c.Nombre', DB::raw("SUM(r.Importe) as Importe"), DB::raw("SUM(r.Descuento) as Descuento"), DB::raw("SUM(r.SubTotal) as SubTotal"), DB::raw("SUM(r.Iva) as Iva"), DB::raw("SUM(r.Total) as Total"), DB::raw("SUM(r.Costo) as Costo"), DB::raw("SUM(r.Utilidad) as Utilidad"), DB::raw("case sum(r.SubTotal) when 0 then 0 else sum(r.Utilidad)*100/sum(r.SubTotal) end as PorcentajeUtilidad"))
-                ->whereBetween('r.Fecha', [$fechainicio, $fechaterminacion])
+                //->whereBetween('r.Fecha', [$fechainicio, $fechaterminacion])
+                ->whereDate('r.Fecha', '>=', $fechainicio)->whereDate('r.Fecha', '<=', $fechaterminacion)
                 ->where(function($q) use ($numerocliente) {
                     if($numerocliente != ""){
                         $q->where('r.Cliente', $numerocliente);
@@ -304,7 +308,8 @@ class ReportesRelacionRemisionesExport implements FromCollection,WithHeadings,Wi
                 ->select('c.Numero AS Cliente', 'c.Nombre AS NombreCliente')
                             ->addselect([
                                 'SubTotal' => Remision::select(DB::raw("SUM(SubTotal)"))->whereColumn('Cliente', 'c.Numero')
-														->whereBetween('Fecha', [$fechainicio, $fechaterminacion])
+														//->whereBetween('Fecha', [$fechainicio, $fechaterminacion])
+                                                        ->whereDate('Fecha', '>=', $fechainicio)->whereDate('Fecha', '<=', $fechaterminacion)
 														->where(function($q) use ($numerocliente) {
 															if($numerocliente != ""){
 																$q->where('Cliente', $numerocliente);
@@ -346,7 +351,8 @@ class ReportesRelacionRemisionesExport implements FromCollection,WithHeadings,Wi
 																		WHEN SUM(SubTotal) = 0 THEN 0 ELSE
 																		SUM(Utilidad)*100/SUM(SubTotal)
 																		END"))->whereColumn('Cliente', 'c.Numero')
-														->whereBetween('Fecha', [$fechainicio, $fechaterminacion])
+														//->whereBetween('Fecha', [$fechainicio, $fechaterminacion])
+                                                        ->whereDate('Fecha', '>=', $fechainicio)->whereDate('Fecha', '<=', $fechaterminacion)
 														->where(function($q) use ($numerocliente) {
 															if($numerocliente != ""){
 																$q->where('Cliente', $numerocliente);
@@ -390,7 +396,8 @@ class ReportesRelacionRemisionesExport implements FromCollection,WithHeadings,Wi
                 $data = DB::table('Remisiones as r')
                 ->leftjoin('Clientes as c', 'r.Cliente', '=', 'c.Numero')
                 ->select('c.Numero', 'c.Nombre', 'r.Plazo', DB::raw("SUM(r.Total) as TotalRemisiones"))
-                ->whereBetween('r.Fecha', [$fechainicio, $fechaterminacion])
+                //->whereBetween('r.Fecha', [$fechainicio, $fechaterminacion])
+                ->whereDate('r.Fecha', '>=', $fechainicio)->whereDate('r.Fecha', '<=', $fechaterminacion)
                 ->where(function($q) use ($numerocliente) {
                     if($numerocliente != ""){
                         $q->where('c.Numero', $numerocliente);

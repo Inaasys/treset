@@ -27,11 +27,19 @@ function setvaluesselects(){
     $("#selectcolorformsandmodals option[value='"+colormodalsandforms+"']").attr("selected", true);
     $("#selectcolortables option[value='"+colortables+"']").attr("selected", true);
     //tab configurar
+    obtenerusuarios();
     $("#numerodecimalessistema").val(numerodecimales).trigger("change");
     $("#numerodecilamesdocumentospdfsistema").val(numerodecimalesendocumentos).trigger("change");
-    $("input[name=utilizarmayusculasistema][value='"+mayusculas_sistema+"']").prop("checked",true);   
-    //tipo utilidad
+    $("input[name=utilizarmayusculasistema][value='"+mayusculas_sistema+"']").prop("checked",true);  
     $("#tipoutilidadventa").val(tipo_de_utilidad).trigger("change");
+    $("#correodefault1enviodocumentos").val(correodefault1enviodocumentos);
+    $("#correodefault2enviodocumentos").val(correodefault2enviodocumentos);
+}
+//obtener ususarios
+function obtenerusuarios(){
+  $.get(empresa_obtener_usuarios_a_modificar_insumos, function(select_usuarios){
+    $("#usuariosmodificacioninsumo").html(select_usuarios);
+  }) 
 }
 //ocultar modal formulario
 function ocultarmodaltablaseleccion(){

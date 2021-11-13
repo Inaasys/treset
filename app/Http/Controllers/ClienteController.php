@@ -92,6 +92,11 @@ class ClienteController extends ConfiguracionSistemaController{
                     ->make(true);
         } 
     }
+    //obtener codigo
+    public function clientes_buscar_rfc_en_tabla(Request $request){
+        $existerfc = Cliente::where('Rfc', $request->rfc)->count();
+        return response()->json($existerfc);
+    }
     //obtener ultimo numero de tabla
     public function clientes_obtener_ultimo_numero(){
         $id = Helpers::ultimoidtabla('App\Cliente');
@@ -144,7 +149,25 @@ class ClienteController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         }  
-    }    
+    }  
+    
+    
+    //obtener datos direccion
+    public function clientes_obtener_datos_direccion(Request $request){
+        $cp = CodigoPostal::where('Clave', $request->Clave )->first();
+        $mun = Municipio::where('Clave', $cp->Municipio)->first();
+        $est = Estado::where('Clave', $mun->Estado)->first();
+        $pais = Pais::where('Clave', $est->Pais)->first();
+        $datos = array(
+            'cp' => $cp,
+            'mun' => $mun,
+            'est' => $est,
+            'pais' => $pais
+        );
+        return response()->json($datos);
+
+    }
+
     //obtener municipios
     public function clientes_obtener_municipios(Request $request){
         if($request->ajax()){

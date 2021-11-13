@@ -533,7 +533,15 @@ function msjremisionyautilizada(){
 }
 //mensaje error se require al menos una entrada de una partida
 function msj_erroralmenosunaentrada(){
-	toastr.error( "Aviso, se requiere la entrada de al menos una partida", "Mensaje", {
+	toastr.error( "Aviso, para guardar documento se requiere al menos 1 partida capturada y no exceder las 500 partidas", "Mensaje", {
+            "timeOut": "6000",
+            "progressBar": true,
+            "extendedTImeout": "6000"
+    });
+}
+//mensaje error partidas maximas permitidas 500
+function msj_errorpartidaspermitidasexcedidas(){
+	toastr.error( "Aviso, las partidas maximas permitidas son 500", "Mensaje", {
             "timeOut": "6000",
             "progressBar": true,
             "extendedTImeout": "6000"
@@ -820,7 +828,7 @@ function armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbus
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
-                            '<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">'+
+                            '<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" id="divorderbystabla" hidden>'+
                                 '<div class="card">'+
                                     '<div class="header">'+
                                         '<h2>'+

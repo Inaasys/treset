@@ -42,13 +42,11 @@
                                                         Excel
                                                     </a>
                                                 </td>
-                                                @if(Auth::user()->role_id == 1)
                                                 <td>
                                                     <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
                                                         Configurar Tabla
                                                     </div>
                                                 </td>
-                                                @endif
                                             </tr>
                                         </table>
                                     </div>
@@ -79,6 +77,14 @@
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                                                <th id="th{{$co}}">{{$co}}</th>
+                                            @endforeach
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
                         </div>
@@ -252,7 +258,8 @@
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';
-        var urlgenerarplantilla = '{{$urlgenerarplantilla}}';
+        var urlgenerarplantilla = '{{$urlgenerarplantilla}}';       
+        var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var asignacion_herramienta_obtener = '{!!URL::to('asignacion_herramienta_obtener')!!}';
         var asignacion_herramienta_descargar_plantilla = '{!!URL::to('asignacion_herramienta_descargar_plantilla')!!}';
         var asignacion_herramienta_cargar_partidas_excel = '{!!URL::to('asignacion_herramienta_cargar_partidas_excel')!!}';
@@ -265,6 +272,7 @@
         var asignacion_herramienta_obtener_personal_entrega = '{!!URL::to('asignacion_herramienta_obtener_personal_entrega')!!}';
         var asignacion_herramienta_obtener_personal_entrega_por_numero = '{!!URL::to('asignacion_herramienta_obtener_personal_entrega_por_numero')!!}';
         var asignacion_herramienta_obtener_herramienta = '{!!URL::to('asignacion_herramienta_obtener_herramienta')!!}';
+        var asignacion_herramienta_obtener_selectalmacenes = '{!!URL::to('asignacion_herramienta_obtener_selectalmacenes')!!}';
         var asignacion_herramienta_obtener_herramienta_por_codigo = '{!!URL::to('asignacion_herramienta_obtener_herramienta_por_codigo')!!}';
         var asignacion_herramienta_obtener_existencias_almacen = '{!!URL::to('asignacion_herramienta_obtener_existencias_almacen')!!}';
         var asignacion_herramienta_guardar = '{!!URL::to('asignacion_herramienta_guardar')!!}';

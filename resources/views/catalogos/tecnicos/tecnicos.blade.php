@@ -46,12 +46,22 @@
                                             <th><div style="width:100px !important;">Operaciones</div></th>
                                             <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Número</th>
                     						<th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Nombre</th>
-                                            <th>Objetivo</th>
-                                            <th>Planeación</th>
+                                            <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Objetivo</th>
+                                            <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Planeación</th>
                                             <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
+                    						<th>Número</th>
+                                            <th>Nombre</th>
+                                            <th>Objetivo</th>
+                                            <th>Planeación</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
                         </div>

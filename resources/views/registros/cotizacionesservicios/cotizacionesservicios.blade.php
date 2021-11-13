@@ -37,13 +37,11 @@
                                                         Excel
                                                     </a>
                                                 </td>
-                                                @if(Auth::user()->role_id == 1)
                                                 <td>
                                                     <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
                                                         Configurar Tabla
                                                     </div>
                                                 </td>
-                                                @endif
                                             </tr>
                                         </table>
                                     </div>
@@ -74,6 +72,14 @@
                                         </tr>
                                     </thead>
                                     <tbody ></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                                                <th id="th{{$co}}">{{$co}}</th>
+                                            @endforeach
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
                         </div>
@@ -187,7 +193,8 @@
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';
         var urlgenerarplantillaser = '{{$urlgenerarplantillaser}}';
-        var urlgenerarplantillaref = '{{$urlgenerarplantillaref}}';
+        var urlgenerarplantillaref = '{{$urlgenerarplantillaref}}';       
+        var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var cotizaciones_servicios_obtener = '{!!URL::to('cotizaciones_servicios_obtener')!!}';
         var cotizaciones_servicios_descargar_plantillaser = '{!!URL::to('cotizaciones_servicios_descargar_plantillaser')!!}';
         var cotizaciones_servicios_cargar_partidas_excelser = '{!!URL::to('cotizaciones_servicios_cargar_partidas_excelser')!!}';

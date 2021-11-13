@@ -38,13 +38,11 @@
                                                         Excel
                                                     </a>
                                                 </td>
-                                                @if(Auth::user()->role_id == 1)
                                                 <td>
                                                     <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
                                                         Configurar Tabla
                                                     </div>
                                                 </td>
-                                                @endif
                                             </tr>
                                         </table>
                                     </div>
@@ -75,6 +73,14 @@
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                                                <th id="th{{$co}}">{{$co}}</th>
+                                            @endforeach
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
                         </div>
@@ -169,7 +175,8 @@
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
-        var background_tables = '{{$empresa->background_tables}}';
+        var background_tables = '{{$empresa->background_tables}}';       
+        var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var cuentas_por_pagar_obtener = '{!!URL::to('cuentas_por_pagar_obtener')!!}';
         var cuentas_por_pagar_obtener_series_documento = '{!!URL::to('cuentas_por_pagar_obtener_series_documento')!!}';
         var cuentas_por_pagar_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('cuentas_por_pagar_obtener_ultimo_folio_serie_seleccionada')!!}';
@@ -178,6 +185,7 @@
         var cuentas_por_pagar_obtener_proveedores = '{!!URL::to('cuentas_por_pagar_obtener_proveedores')!!}';
         var cuentas_por_pagar_obtener_proveedor_por_numero = '{!!URL::to('cuentas_por_pagar_obtener_proveedor_por_numero')!!}';
         var cuentas_por_pagar_obtener_bancos = '{!!URL::to('cuentas_por_pagar_obtener_bancos')!!}';
+        var cuentas_por_pagar_obtener_ultima_transferencia = '{!!URL::to('cuentas_por_pagar_obtener_ultima_transferencia')!!}';
         var cuentas_por_pagar_obtener_banco_por_numero = '{!!URL::to('cuentas_por_pagar_obtener_banco_por_numero')!!}';
         var cuentas_por_pagar_obtener_compras_proveedor = '{!!URL::to('cuentas_por_pagar_obtener_compras_proveedor')!!}';
         var cuentas_por_pagar_guardar = '{!!URL::to('cuentas_por_pagar_guardar')!!}';

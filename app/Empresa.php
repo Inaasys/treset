@@ -126,6 +126,9 @@ class Empresa extends Model
         'background_navbar',
         'background_forms_and_modals',
         'background_tables',
-        'IdFacturapi'
+        'IdFacturapi',
+        'CorreoDefault1EnvioDocumentos',
+        'CorreoDefault2EnvioDocumentos',
+        'UsuariosModificarInsumo',
     ];
 }

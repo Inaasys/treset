@@ -32,13 +32,11 @@
                                                         Excel
                                                     </a>
                                                 </td>
-                                                @if(Auth::user()->role_id == 1)
                                                 <td>
                                                     <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
                                                         Configurar Tabla
                                                     </div>
                                                 </td>
-                                                @endif
                                             </tr>
                                         </table>
                                     </div>
@@ -57,6 +55,14 @@
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                                                <th id="th{{$co}}">{{$co}}</th>
+                                            @endforeach
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
                         </div>
@@ -79,7 +85,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <label>Código<b style="color:#F44336 !important;">*</b></label>
-                                    <input type="text" class="form-control" name="codigo" id="codigo" required data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">
+                                    <input type="text" class="form-control" name="codigo" id="codigo" required data-parsley-length="[1, 20]" onchange="buscarcodigoencatalogo();" onkeyup="tipoLetra(this);">
                                 </div>   
                                 <div class="col-md-4">
                                     <label>Clave Producto<b style="color:#F44336 !important;">*</b></label>
@@ -272,8 +278,10 @@
         var campos_busquedas = '{{$configuracion_tabla->campos_busquedas}}';
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
-        var background_tables = '{{$empresa->background_tables}}';
+        var background_tables = '{{$empresa->background_tables}}';       
+        var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var productos_obtener = '{!!URL::to('productos_obtener')!!}';
+        var productos_buscar_codigo_en_tabla = '{!!URL::to('productos_buscar_codigo_en_tabla')!!}';
         var productos_obtener_claves_productos = '{!!URL::to('productos_obtener_claves_productos')!!}';
         var productos_obtener_claves_unidades = '{!!URL::to('productos_obtener_claves_unidades')!!}';
         var productos_obtener_marcas = '{!!URL::to('productos_obtener_marcas')!!}';
@@ -283,15 +291,13 @@
         var productos_obtener_existencias_almacenes = '{!!URL::to('productos_obtener_existencias_almacenes')!!}';
         var productos_obtener_clientes = '{!!URL::to('productos_obtener_clientes')!!}';
         var productos_obtener_productos_consumos = '{!!URL::to('productos_obtener_productos_consumos')!!}';
+        var productos_obtener_tipos_prod = '{!!URL::to('productos_obtener_tipos_prod')!!}';
         var productos_obtener_kardex = '{!!URL::to('productos_obtener_kardex')!!}';
         var productos_guardar = '{!!URL::to('productos_guardar')!!}';
         var productos_alta_o_baja = '{!!URL::to('productos_alta_o_baja')!!}'; 
         var productos_obtener_producto = '{!!URL::to('productos_obtener_producto')!!}'; 
         var productos_guardar_modificacion = '{!!URL::to('productos_guardar_modificacion')!!}';
-
-
         //compras
-        
         var compras_obtener_tipos_ordenes_compra = '{!!URL::to('compras_obtener_tipos_ordenes_compra')!!}';
         var compras_cargar_xml_alta = '{!!URL::to('compras_cargar_xml_alta')!!}';
         var compras_obtener_proveedores = '{!!URL::to('compras_obtener_proveedores')!!}';
@@ -310,9 +316,6 @@
         var compras_obtener_existencias_almacen = '{!!URL::to('compras_obtener_existencias_almacen')!!}';
         var compras_obtener_valor_modificacionpermitida = '{!!URL::to('compras_obtener_valor_modificacionpermitida')!!}';
         var compras_guardar_modificacion = '{!!URL::to('compras_guardar_modificacion')!!}';
-
-
-
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="scripts_inaasys/catalogos/productos/productos.js"></script>

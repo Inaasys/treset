@@ -159,6 +159,11 @@ return [
     'regimenfiscal' => '',//regimen fiscal
     //tipo de utilidad
     'tipodeutilidad' => '',
+    //correo por default en envios de documentos
+    'correodefault1enviodocumentos' => '',
+    'correodefault2enviodocumentos' => '',
+    //usuariis que puedes modificar insumos
+    'usuariosamodificarinsumos' => '',
 
     /*
     |--------------------------------------------------------------------------

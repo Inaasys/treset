@@ -170,6 +170,12 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
         }
     }
 
+    //obtener ultima transferencia
+    public function cuentas_por_pagar_obtener_ultima_transferencia(Request $request){
+        $ultimatransferencia = VistaCuentaPorPagar::select("Transferencia")->where('Banco', $request->Numero)->orderBy("Transferencia", "DESC")->take(1)->get();
+        return response($ultimatransferencia);
+    }
+
     //obtener banco por numero
     public function cuentas_por_pagar_obtener_banco_por_numero(Request $request){
         $numero = '';
@@ -685,6 +691,12 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
             }
             if($request->email3cc != ""){
                 array_push($arraycc, $request->email3cc);
+            }
+            if($this->correodefault1enviodocumentos != ""){
+                array_push($arraycc, $this->correodefault1enviodocumentos);
+            }
+            if($this->correodefault2enviodocumentos != ""){
+                array_push($arraycc, $this->correodefault2enviodocumentos);
             }
             $correos = [$request->emailpara];
             $asunto = $request->emailasunto;

@@ -55,6 +55,14 @@ function listar(){
   //Campos ordenados a mostras
   var campos = columnas_ordenadas.split(",");
   var campos_busqueda = campos_busquedas.split(",");
+  //agregar inputs de busqueda por columna
+  $('#tbllistado tfoot th').each( function () {
+    var titulocolumnatfoot = $(this).text();
+    var valor_encontrado_en_array = campos_busqueda.indexOf(titulocolumnatfoot); 
+    if(valor_encontrado_en_array >= 0){
+      $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
+    }
+  });
   // armar columas para datatable se arma desde funcionesglobales.js
   var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
     tabla=$('#tbllistado').DataTable({
@@ -70,7 +78,17 @@ function listar(){
         serverSide: true,
         ajax: proveedores_obtener,
         columns: campos_tabla,
-        "initComplete": function() {
+        initComplete: function () {
+          // Aplicar busquedas por columna
+          this.api().columns().every( function () {
+            var that = this;
+            $('input',this.footer()).on( 'change', function(){
+              if(that.search() !== this.value){
+                that.search(this.value).draw();
+              }
+            });
+          });
+          //Aplicar busqueda general
           var $buscar = $('div.dataTables_filter input');
           $buscar.unbind();
           $buscar.bind('keyup change', function(e) {
@@ -147,6 +165,15 @@ function seleccionarcodigopostal(Clave){
     $("#codigopostal").val(Clave);
     mostrarformulario();
 }
+//buscar si el rfc escrito ya esta en catalogo
+function buscarrfcencatalogo(){
+  var rfc = $("#rfc").val();
+  $.get(proveedores_buscar_rfc_en_tabla,{rfc:rfc },function(existerfc){
+      if(existerfc > 0){
+        msj_errorrfcexistente();
+      }
+  });
+}
 //alta
 function alta(){
   $("#titulomodal").html('Alta Proveedor');
@@ -163,7 +190,7 @@ function alta(){
                   '<div class="row">'+
                       '<div class="col-md-4">'+
                           '<label>RFC</label>'+
-                          '<input type="text" class="form-control" name="rfc" id="rfc" required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                          '<input type="text" class="form-control" name="rfc" id="rfc" required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 60]" onchange="buscarrfcencatalogo();" onkeyup="tipoLetra(this);mayusculas(this);">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Código Postal</label>'+
@@ -445,6 +472,9 @@ function configurar_tabla(){
   //formulario configuracion tablas se arma desde funcionesglobales.js
   var tabs = armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbusquedas);
   $("#tabsconfigurartabla").html(tabs);
+  if(rol_usuario_logueado == 1){
+    $("#divorderbystabla").show();
+  }
   $("#string_datos_ordenamiento_columnas").val(columnas_ordenadas);
   $("#string_datos_tabla_true").val(campos_activados);
   $("#string_datos_tabla_false").val(campos_desactivados);

@@ -51,6 +51,13 @@ function ocultarformulario(){
 }
 //listar todos los registros de la tabla
 function listar(){
+    //agregar inputs de busqueda por columna
+    $('#tbllistado tfoot th').each( function () {
+      var title = $(this).text();
+      if(title != 'Operaciones'){
+        $(this).html( '<input type="text" placeholder="Buscar en columna '+title+'" />' );
+      }
+    });
     tabla=$('#tbllistado').DataTable({
         "lengthMenu": [ 100, 250, 500, 1000 ],
         "pageLength": 1000,
@@ -68,22 +75,32 @@ function listar(){
             { data: 'Numero', name: 'Numero', orderable: false, searchable: true },
             { data: 'Serie', name: 'Serie', orderable: false, searchable: true },
             { data: 'Esquema', name: 'Esquema', orderable: false, searchable: true },
-            { data: 'FolioInicial', name: 'FolioInicial', orderable: false, searchable: false },
-            { data: 'Titulo', name: 'Titulo', orderable: false, searchable: false },
-            { data: 'ValidoDesde', name: 'ValidoDesde', orderable: false, searchable: false },
-            { data: 'ValidoHasta', name: 'ValidoHasta', orderable: false, searchable: false },
-            { data: 'Empresa', name: 'Empresa', orderable: false, searchable: false },
-            { data: 'Predeterminar', name: 'Predeterminar', orderable: false, searchable: false },
+            { data: 'FolioInicial', name: 'FolioInicial', orderable: false, searchable: true },
+            { data: 'Titulo', name: 'Titulo', orderable: false, searchable: true },
+            { data: 'ValidoDesde', name: 'ValidoDesde', orderable: false, searchable: true },
+            { data: 'ValidoHasta', name: 'ValidoHasta', orderable: false, searchable: true },
+            { data: 'Empresa', name: 'Empresa', orderable: false, searchable: true },
+            { data: 'Predeterminar', name: 'Predeterminar', orderable: false, searchable: true },
             { data: 'Status', name: 'Status', orderable: false, searchable: true }
         ],
-        "initComplete": function() {
-            var $buscar = $('div.dataTables_filter input');
-            $buscar.unbind();
-            $buscar.bind('keyup change', function(e) {
-                if(e.keyCode == 13 || this.value == "") {
-                    $('#tbllistado').DataTable().search( this.value ).draw();
-                }
+        initComplete: function () {
+          // Aplicar busquedas por columna
+          this.api().columns().every( function () {
+            var that = this;
+            $('input',this.footer()).on( 'change', function(){
+              if(that.search() !== this.value){
+                that.search(this.value).draw();
+              }
             });
+          });
+          //Aplicar busqueda general
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistado').DataTable().search( this.value ).draw();
+              }
+          });
         }
     });
     //modificacion al dar doble click

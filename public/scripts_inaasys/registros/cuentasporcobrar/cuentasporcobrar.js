@@ -83,6 +83,14 @@ function listar(){
     //Campos ordenados a mostras
     var campos = columnas_ordenadas.split(",");
     var campos_busqueda = campos_busquedas.split(",");
+    //agregar inputs de busqueda por columna
+    $('#tbllistado tfoot th').each( function () {
+      var titulocolumnatfoot = $(this).text();
+      var valor_encontrado_en_array = campos_busqueda.indexOf(titulocolumnatfoot); 
+      if(valor_encontrado_en_array >= 0){
+        $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
+      }
+    });
     // armar columas para datatable se arma desde funcionesglobales.js
     var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
     tabla=$('#tbllistado').DataTable({
@@ -107,14 +115,24 @@ function listar(){
             else{ $(row).addClass(''); }
         },
         columns: campos_tabla,
-        "initComplete": function() {
-            var $buscar = $('div.dataTables_filter input');
-            $buscar.unbind();
-            $buscar.bind('keyup change', function(e) {
-                if(e.keyCode == 13 || this.value == "") {
-                $('#tbllistado').DataTable().search( this.value ).draw();
-                }
+        initComplete: function () {
+          // Aplicar busquedas por columna
+          this.api().columns().every( function () {
+            var that = this;
+            $('input',this.footer()).on( 'change', function(){
+              if(that.search() !== this.value){
+                that.search(this.value).draw();
+              }
             });
+          });
+          //Aplicar busqueda general
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistado').DataTable().search( this.value ).draw();
+              }
+          });
         }
     });
     //modificacion al dar doble click
@@ -156,7 +174,7 @@ function obtenerclientes(){
                         '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                       '</div>';
     $("#contenidomodaltablas").html(tablaclientes);
-    $('#tbllistadocliente').DataTable({
+    var tcli = $('#tbllistadocliente').DataTable({
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -189,8 +207,12 @@ function obtenerclientes(){
                     $('#tbllistadocliente').DataTable().search( this.value ).draw();
                     }
                 });
-            },
-            
+            }, 
+    }); 
+    //seleccionar registro al dar doble click
+    $('#tbllistadocliente tbody').on('dblclick', 'tr', function () {
+        var data = tcli.row( this ).data();
+        seleccionarcliente(data.Numero, data.Nombre, data.Plazo, data.Rfc, data.ClaveFormaPago, data.NombreFormaPago, data.ClaveMetodoPago, data.NombreMetodoPago, data.ClaveUsoCfdi, data.NombreUsoCfdi, "", "");
     }); 
 } 
 //seleccionar cliente
@@ -253,7 +275,7 @@ function obtenerbancos(){
                             '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                         '</div>';
       $("#contenidomodaltablas").html(tablabancos);
-      $('#tbllistadobanco').DataTable({
+      var tban = $('#tbllistadobanco').DataTable({
             "lengthMenu": [ 10, 50, 100, 250, 500 ],
             "pageLength": 250,
             "sScrollX": "110%",
@@ -278,12 +300,16 @@ function obtenerbancos(){
               $buscar.unbind();
               $buscar.bind('keyup change', function(e) {
                   if(e.keyCode == 13 || this.value == "") {
-                  $('#tbllistadoalmacen').DataTable().search( this.value ).draw();
+                  $('#tbllistadobanco').DataTable().search( this.value ).draw();
                   }
               });
           },
-          
       }); 
+      //seleccionar registro al dar doble click
+      $('#tbllistadobanco tbody').on('dblclick', 'tr', function () {
+        var data = tban.row( this ).data();
+        seleccionarbanco(data.Numero, data.Nombre);
+      });
 } 
 function seleccionarbanco(Numero, Nombre){
     var numerobancoanterior = $("#numerobancoanterior").val();
@@ -327,7 +353,7 @@ function obtenerlugaresexpedicion(){
                                   '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                                 '</div>';  
     $("#contenidomodaltablas").html(tablacodigospostales);
-    $('#tbllistadocodigopostal').DataTable({
+    var tcodpost = $('#tbllistadocodigopostal').DataTable({
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -360,8 +386,12 @@ function obtenerlugaresexpedicion(){
               }
           });
         },
-        
     });
+    //seleccionar registro al dar doble click
+    $('#tbllistadocodigopostal tbody').on('dblclick', 'tr', function () {
+        var data = tcodpost.row( this ).data();
+        seleccionarlugarexpedicion(data.Clave);
+    }); 
 } 
 //seleccionar lugar expedicion
 function seleccionarlugarexpedicion(Clave){
@@ -406,7 +436,7 @@ function obtenerregimenesfiscales(){
                                   '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                                 '</div>';  
     $("#contenidomodaltablas").html(tablaregimenesfiscales);
-    $('#tbllistadoregimenfiscal').DataTable({
+    var tregfis = $('#tbllistadoregimenfiscal').DataTable({
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -437,8 +467,12 @@ function obtenerregimenesfiscales(){
               }
           });
         },
-        
     });
+    //seleccionar registro al dar doble click
+    $('#tbllistadoregimenfiscal tbody').on('dblclick', 'tr', function () {
+        var data = tregfis.row( this ).data();
+        seleccionarregimenfiscal(data.Clave, data.Nombre);
+    }); 
 } 
 //seleccionar lugar expedicion
 function seleccionarregimenfiscal(Clave, Nombre){
@@ -482,7 +516,7 @@ function obtenertiposrelaciones(){
                                   '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                                 '</div>';  
     $("#contenidomodaltablas").html(tablatiposrelaciones);
-    $('#tbllistadotiporelacion').DataTable({
+    var ttiprel = $('#tbllistadotiporelacion').DataTable({
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -511,8 +545,12 @@ function obtenertiposrelaciones(){
               }
           });
         },
-        
     });
+    //seleccionar registro al dar doble click
+    $('#tbllistadotiporelacion tbody').on('dblclick', 'tr', function () {
+        var data = ttiprel.row( this ).data();
+        seleccionartiporelacion(data.Clave, data.Nombre);
+    }); 
 } 
 //seleccionar lugar expedicion
 function seleccionartiporelacion(Clave, Nombre){
@@ -557,7 +595,7 @@ function obtenerformaspago(){
                                   '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                                 '</div>';  
     $("#contenidomodaltablas").html(tablaformaspago);
-    $('#tbllistadoformapago').DataTable({
+    var tforpag = $('#tbllistadoformapago').DataTable({
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -587,8 +625,12 @@ function obtenerformaspago(){
               }
           });
         },
-        
     });
+    //seleccionar registro al dar doble click
+    $('#tbllistadoformapago tbody').on('dblclick', 'tr', function () {
+        var data = tforpag.row( this ).data();
+        seleccionarformapago(data.Clave, data.Nombre);
+    }); 
 } 
 //seleccionar forma pago
 function seleccionarformapago(Clave, Nombre){
@@ -632,7 +674,7 @@ function listarmetodospago(fila){
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                             '</div>';   
     $("#contenidomodaltablas").html(tablametodospago);
-    $('#tbllistadometodopago').DataTable({
+    var tmetpag = $('#tbllistadometodopago').DataTable({
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -664,8 +706,12 @@ function listarmetodospago(fila){
                 }
             });
         },
-        
     });
+    //seleccionar registro al dar doble click
+    $('#tbllistadometodopago tbody').on('dblclick', 'tr', function () {
+        var data = tmetpag.row( this ).data();
+        seleccionarmetodopago(data.Clave, data.Nombre);
+    }); 
 }
 //seleccion de metodo de pago
 function seleccionarmetodopago(Clave, Nombre, fila){
@@ -700,7 +746,7 @@ function obtenerfoliosnotas(){
                                   '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                                 '</div>';  
     $("#contenidomodaltablas").html(tablafoliosfiscales);
-    $('#tbllistadofoliofiscal').DataTable({
+    var tfolfis = $('#tbllistadofoliofiscal').DataTable({
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -729,8 +775,12 @@ function obtenerfoliosnotas(){
               }
           });
         },
-        
     });  
+    //seleccionar registro al dar doble click
+    $('#tbllistadofoliofiscal tbody').on('dblclick', 'tr', function () {
+        var data = tfolfis.row( this ).data();
+        seleccionarfoliofiscal(data.Serie, data.Esquema);
+    }); 
 }
 function seleccionarfoliofiscal(Serie, Esquema){
     var numerofilas = $("#numerofilas").val()
@@ -937,7 +987,7 @@ function listarfacturas (){
                             '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                         '</div>';
       $("#contenidomodaltablas").html(tablafacturas);
-      $('#tbllistadofactura').DataTable({
+      var tfact = $('#tbllistadofactura').DataTable({
             "lengthMenu": [ 10, 50, 100, 250, 500 ],
             "pageLength": 250,
             "sScrollX": "110%",
@@ -977,8 +1027,12 @@ function listarfacturas (){
                     }
                 });
             },
-          
       });  
+      //seleccionar registro al dar doble click
+      $('#tbllistadofactura tbody').on('dblclick', 'tr', function () {
+        var data = tfact.row( this ).data();
+        seleccionarfactura(data.Folio, data.Factura);
+      });
 } 
 //obtener todos los datos de la orden de compra seleccionada
 var contadorproductos=0;
@@ -1434,7 +1488,7 @@ function alta(){
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
         var index = $(this).index(".inputnext");          
-        $(".inputnext").eq(index + 1).focus(); 
+        $(".inputnext").eq(index + 1).focus().select(); 
       }
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB EMISOR
@@ -1443,7 +1497,7 @@ function alta(){
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
         var index = $(this).index(".inputnexttabem");          
-        $(".inputnexttabem").eq(index + 1).focus(); 
+        $(".inputnexttabem").eq(index + 1).focus().select(); 
       }
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB RECEPTOR
@@ -1452,7 +1506,7 @@ function alta(){
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
         var index = $(this).index(".inputnexttabre");          
-        $(".inputnexttabre").eq(index + 1).focus(); 
+        $(".inputnexttabre").eq(index + 1).focus().select(); 
       }
     });
 }
@@ -1969,7 +2023,7 @@ function obtenerdatos(cxcmodificar){
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
         var index = $(this).index(".inputnext");          
-        $(".inputnext").eq(index + 1).focus(); 
+        $(".inputnext").eq(index + 1).focus().select(); 
       }
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB EMISOR
@@ -1978,7 +2032,7 @@ function obtenerdatos(cxcmodificar){
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
         var index = $(this).index(".inputnexttabem");          
-        $(".inputnexttabem").eq(index + 1).focus(); 
+        $(".inputnexttabem").eq(index + 1).focus().select(); 
       }
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB RECEPTOR
@@ -1987,7 +2041,7 @@ function obtenerdatos(cxcmodificar){
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
         var index = $(this).index(".inputnexttabre");          
-        $(".inputnexttabre").eq(index + 1).focus(); 
+        $(".inputnexttabre").eq(index + 1).focus().select(); 
       }
     });
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
@@ -2283,6 +2337,9 @@ function configurar_tabla(){
     //formulario configuracion tablas se arma desde funcionesglobales.js
     var tabs = armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbusquedas);
     $("#tabsconfigurartabla").html(tabs);
+    if(rol_usuario_logueado == 1){
+      $("#divorderbystabla").show();
+    }
     $("#string_datos_ordenamiento_columnas").val(columnas_ordenadas);
     $("#string_datos_tabla_true").val(campos_activados);
     $("#string_datos_tabla_false").val(campos_desactivados);

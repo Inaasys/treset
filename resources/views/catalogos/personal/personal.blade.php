@@ -48,12 +48,22 @@
                                             <th><div style="width:100px !important;">Operaciones</div></th>
                                             <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">id</th>
                     						<th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">nombre</th>
-                                            <th>fecha_ingreso</th>
-                                            <th>tipo_personal</th>
+                                            <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">fecha_ingreso</th>
+                                            <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">tipo_personal</th>
                                             <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">status</th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
+                    						<th>id</th>
+                                            <th>nombre</th>
+                                            <th>fecha_ingreso</th>
+                                            <th>tipo_personal</th>
+                                            <th>status</th>
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
                         </div>

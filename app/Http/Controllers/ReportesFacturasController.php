@@ -150,7 +150,8 @@ class ReportesFacturasController extends ConfiguracionSistemaController{
                 ->leftjoin('Clientes as c', 'f.Cliente', '=', 'c.Numero')
                 ->leftjoin('Agentes as a', 'f.Agente', '=', 'a.Numero')
                 ->select("f.Factura", "f.Serie", "f.Folio", "f.Depto", "f.Tipo", "f.Cliente", "c.Nombre as NombreCliente", "f.Agente", "a.Nombre as NombreAgente", "f.Fecha", "f.Plazo", "f.Pedido", "f.Importe", "f.Descuento", "f.SubTotal", "f.Iva", "f.Total", "f.Abonos", "f.Descuentos", "f.Saldo", "f.Costo", "f.Utilidad", "f.Moneda", "f.TipoCambio", "f.Obs", "f.Status", "f.MotivoBaja", "f.Usuario")
-                ->whereBetween('f.Fecha', [$fechainicio, $fechaterminacion])
+                //->whereBetween('f.Fecha', [$fechainicio, $fechaterminacion])
+                ->whereDate('f.Fecha', '>=', $fechainicio)->whereDate('f.Fecha', '<=', $fechaterminacion)
                 ->where(function($q) use ($numerocliente) {
                     if($numerocliente != ""){
                         $q->where('f.Cliente', $numerocliente);
@@ -217,7 +218,8 @@ class ReportesFacturasController extends ConfiguracionSistemaController{
                 ->leftjoin('Agentes as a', 'f.Agente', '=', 'a.Numero')
                 ->leftjoin('Facturas Detalles as fd', 'f.Factura', '=', 'fd.Factura')
                 ->select("f.Factura", "f.Fecha", "f.Cliente", "c.Nombre as NombreCliente", "f.Agente", "c.Tipo", "a.Nombre as NombreAgente", "f.Plazo", "fd.Codigo", "fd.Descripcion", "fd.Unidad", "fd.Cantidad", "fd.Precio", "fd.Importe", "fd.Dcto", "fd.Descuento", "fd.SubTotal", "fd.Impuesto", "fd.Iva", "fd.Total", "fd.Costo", "fd.CostoTotal", "fd.Utilidad", "fd.Facturar", "fd.Remision", "fd.Orden", "fd.Departamento", "fd.Cargo", "fd.Almacen", "fd.Partida", "fd.Item")
-                ->whereBetween('f.Fecha', [$fechainicio, $fechaterminacion])
+                //->whereBetween('f.Fecha', [$fechainicio, $fechaterminacion])
+                ->whereDate('f.Fecha', '>=', $fechainicio)->whereDate('f.Fecha', '<=', $fechaterminacion)
                 ->where(function($q) use ($numerocliente) {
                     if($numerocliente != ""){
                         $q->where('f.Cliente', $numerocliente);
@@ -290,7 +292,8 @@ class ReportesFacturasController extends ConfiguracionSistemaController{
                 $data = DB::table('Facturas as f')
                 ->leftjoin('Clientes as c', 'f.Cliente', '=', 'c.Numero')
                 ->select('f.Cliente', 'c.Nombre', DB::raw("SUM(f.Importe) as Importe"), DB::raw("SUM(f.Descuento) as Descuento"), DB::raw("SUM(f.SubTotal) as SubTotal"), DB::raw("SUM(f.Iva) as Iva"), DB::raw("SUM(f.Total) as Total"), DB::raw("SUM(f.Costo) as Costo"), DB::raw("SUM(f.Utilidad) as Utilidad"), DB::raw("case sum(f.SubTotal) when 0 then 0 else sum(f.Utilidad)*100/sum(f.SubTotal) end as PorcentajeUtilidad"))
-                ->whereBetween('f.Fecha', [$fechainicio, $fechaterminacion])
+                //->whereBetween('f.Fecha', [$fechainicio, $fechaterminacion])
+                ->whereDate('f.Fecha', '>=', $fechainicio)->whereDate('f.Fecha', '<=', $fechaterminacion)
                 ->where(function($q) use ($numerocliente) {
                     if($numerocliente != ""){
                         $q->where('f.Cliente', $numerocliente);
@@ -352,7 +355,8 @@ class ReportesFacturasController extends ConfiguracionSistemaController{
                 ->select('c.Numero AS Cliente', 'c.Nombre AS NombreCliente')
                             ->addselect([
                                 'SubTotal' => Factura::select(DB::raw("SUM(SubTotal)"))->whereColumn('Cliente', 'c.Numero')
-														->whereBetween('Fecha', [$fechainicio, $fechaterminacion])
+														//->whereBetween('Fecha', [$fechainicio, $fechaterminacion])
+                                                        ->whereDate('Fecha', '>=', $fechainicio)->whereDate('Fecha', '<=', $fechaterminacion)
                                                         ->where(function($q) use ($numerocliente) {
                                                             if($numerocliente != ""){
                                                                 $q->where('Cliente', $numerocliente);
@@ -400,7 +404,8 @@ class ReportesFacturasController extends ConfiguracionSistemaController{
 																		WHEN SUM(SubTotal) = 0 THEN 0 ELSE
 																		SUM(Utilidad)*100/SUM(SubTotal)
 																		END"))->whereColumn('Cliente', 'c.Numero')
-														->whereBetween('Fecha', [$fechainicio, $fechaterminacion])
+														//->whereBetween('Fecha', [$fechainicio, $fechaterminacion])
+                                                        ->whereDate('Fecha', '>=', $fechainicio)->whereDate('Fecha', '<=', $fechaterminacion)
                                                         ->where(function($q) use ($numerocliente) {
                                                             if($numerocliente != ""){
                                                                 $q->where('Cliente', $numerocliente);
@@ -454,7 +459,8 @@ class ReportesFacturasController extends ConfiguracionSistemaController{
                 $data = DB::table('Facturas as f')
                 ->leftjoin('Clientes as c', 'f.Cliente', '=', 'c.Numero')
                 ->select('c.Numero', 'c.Nombre', 'f.Plazo', 'c.Credito', 'c.Bloquear', 'c.Saldo', DB::raw("SUM(f.Total) as TotalFacturas"))
-                ->whereBetween('f.Fecha', [$fechainicio, $fechaterminacion])
+                //->whereBetween('f.Fecha', [$fechainicio, $fechaterminacion])
+                ->whereDate('f.Fecha', '>=', $fechainicio)->whereDate('f.Fecha', '<=', $fechaterminacion)
                 ->where(function($q) use ($numerocliente) {
                     if($numerocliente != ""){
                         $q->where('f.Cliente', $numerocliente);
@@ -614,10 +620,12 @@ class ReportesFacturasController extends ConfiguracionSistemaController{
             case "NOTAS DE CREDITO":
                 $facturas = DB::table('Facturas')
                                 ->select(DB::raw("'Ingreso' as Comprobante"), 'Factura as Documento', 'Fecha', 'SubTotal', 'Iva', 'Total')
-                                ->whereBetween('Fecha', [$fechainicio, $fechaterminacion]);
+                                //->whereBetween('Fecha', [$fechainicio, $fechaterminacion])
+                                ->whereDate('Fecha', '>=', $fechainicio)->whereDate('Fecha', '<=', $fechaterminacion);
                 $data = DB::table('Notas Cliente')
                             ->select(DB::raw("'Egreso' as Comprobante"), 'Nota as Documento', 'Fecha', DB::raw("-SubTotal AS SubTotal"), DB::raw("-Iva AS Iva"), DB::raw("-Total AS Total"))
-                            ->whereBetween('Fecha', [$fechainicio, $fechaterminacion])
+                            //->whereBetween('Fecha', [$fechainicio, $fechaterminacion])
+                            ->whereDate('Fecha', '>=', $fechainicio)->whereDate('Fecha', '<=', $fechaterminacion)
                             ->union($facturas)
                             ->orderby('Fecha', 'ASC')
                             ->get();

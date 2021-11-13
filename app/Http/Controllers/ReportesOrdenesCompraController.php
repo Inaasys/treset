@@ -113,7 +113,8 @@ class ReportesOrdenesCompraController extends ConfiguracionSistemaController{
             $data = DB::table('Ordenes de Compra as oc')
             ->leftjoin('Proveedores as p', 'oc.Proveedor', '=', 'p.Numero')
             ->select('oc.Orden', 'oc.Proveedor', 'p.Nombre', 'oc.Fecha', 'oc.Plazo', 'oc.Almacen', 'oc.Tipo', 'oc.Referencia', 'oc.Importe', 'oc.Descuento', 'oc.SubTotal', 'oc.Iva', 'oc.Total', 'oc.Obs', 'oc.Status', 'oc.MotivoBaja', 'oc.Usuario')
-            ->whereBetween('oc.Fecha', [$fechainicio, $fechaterminacion])
+            //->whereBetween('oc.Fecha', [$fechainicio, $fechaterminacion])
+            ->whereDate('oc.Fecha', '>=', $fechainicio)->whereDate('oc.Fecha', '<=', $fechaterminacion)
             ->where(function($q) use ($numeroproveedor) {
                 if($numeroproveedor != ""){
                     $q->where('oc.Proveedor', $numeroproveedor);
@@ -152,7 +153,8 @@ class ReportesOrdenesCompraController extends ConfiguracionSistemaController{
             ->leftjoin('Proveedores as p', 'oc.Proveedor', '=', 'p.Numero')
             ->leftjoin('Ordenes de Compra Detalles as ocd', 'oc.Orden', '=', 'ocd.Orden')
             ->select('oc.Orden', 'oc.Proveedor', 'p.Nombre', 'oc.Fecha', 'oc.Plazo', 'oc.Almacen', 'oc.Tipo', 'oc.Referencia', 'ocd.Codigo', 'ocd.Descripcion', 'ocd.Unidad', 'ocd.Surtir as Por Surtir', 'ocd.Cantidad', 'ocd.Precio', 'ocd.Importe', 'ocd.Descuento', 'ocd.SubTotal', 'ocd.Iva', 'ocd.Total', 'oc.Obs', 'oc.Status', 'oc.MotivoBaja', 'oc.Usuario')
-            ->whereBetween('oc.Fecha', [$fechainicio, $fechaterminacion])
+            //->whereBetween('oc.Fecha', [$fechainicio, $fechaterminacion])
+            ->whereDate('oc.Fecha', '>=', $fechainicio)->whereDate('oc.Fecha', '<=', $fechaterminacion)
             ->where(function($q) use ($numeroproveedor) {
                 if($numeroproveedor != ""){
                     $q->where('oc.Proveedor', $numeroproveedor);

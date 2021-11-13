@@ -45,6 +45,13 @@ function ocultarformulario(){
 }
 //listar todos los registros de la tabla
 function listar(){
+    //agregar inputs de busqueda por columna
+    $('#tbllistado tfoot th').each( function () {
+      var title = $(this).text();
+      if(title != 'Operaciones'){
+        $(this).html( '<input type="text" placeholder="Buscar en columna '+title+'" />' );
+      }
+    });
     tabla=$('#tbllistado').DataTable({
         "lengthMenu": [ 100, 250, 500, 1000 ],
         "pageLength": 1000,
@@ -61,25 +68,35 @@ function listar(){
             { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
             { data: 'Codigo', name: 'Codigo', orderable: false, searchable: true },
             { data: 'Servicio', name: 'Servicio', orderable: false, searchable: true },
-            { data: 'Unidad', name: 'Unidad', orderable: false, searchable: false },
-            { data: 'NumeroFamilia', name: 'NumeroFamilia', orderable: false, searchable: false },
-            { data: 'Familia', name: 'Familia', orderable: false, searchable: false },
-            { data: 'Costo', name: 'Costo', orderable: false, searchable: false },
-            { data: 'Venta', name: 'Venta', orderable: false, searchable: false },
-            { data: 'Cantidad', name: 'Cantidad', orderable: false, searchable: false },
-            { data: 'ClaveProducto', name: 'ClaveProducto', orderable: false, searchable: false },
-            { data: 'ClaveUnidad', name: 'ClaveUnidad', orderable: false, searchable: false },
+            { data: 'Unidad', name: 'Unidad', orderable: false, searchable: true },
+            { data: 'NumeroFamilia', name: 'NumeroFamilia', orderable: false, searchable: true },
+            { data: 'Familia', name: 'Familia', orderable: false, searchable: true },
+            { data: 'Costo', name: 'Costo', orderable: false, searchable: true },
+            { data: 'Venta', name: 'Venta', orderable: false, searchable: true },
+            { data: 'Cantidad', name: 'Cantidad', orderable: false, searchable: true },
+            { data: 'ClaveProducto', name: 'ClaveProducto', orderable: false, searchable: true },
+            { data: 'ClaveUnidad', name: 'ClaveUnidad', orderable: false, searchable: true },
             { data: 'Status', name: 'Status', orderable: false, searchable: true }
         ],
-        "initComplete": function() {
-            var $buscar = $('div.dataTables_filter input');
-            $buscar.unbind();
-            $buscar.bind('keyup change', function(e) {
-                if(e.keyCode == 13 || this.value == "") {
-                  $('#tbllistado').DataTable().search( this.value ).draw();
-                }
+        initComplete: function () {
+          // Aplicar busquedas por columna
+          this.api().columns().every( function () {
+            var that = this;
+            $('input',this.footer()).on( 'change', function(){
+              if(that.search() !== this.value){
+                that.search(this.value).draw();
+              }
             });
-          }
+          });
+          //Aplicar busqueda general
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistado').DataTable().search( this.value ).draw();
+              }
+          });
+        }
     });
     //modificacion al dar doble click
     $('#tbllistado tbody').on('dblclick', 'tr', function () {

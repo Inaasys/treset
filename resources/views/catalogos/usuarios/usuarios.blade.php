@@ -42,11 +42,21 @@
                                             <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Número</th>
                                             <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Nombre</th>
                     						<th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Correo</th>
-                    						<th>Usuario</th>
-                    						<th>Rol</th>
+                    						<th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Usuario</th>
+                    						<th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Rol</th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
+                    						<th>Número</th>
+                                            <th>Nombre</th>
+                                            <th>Correo</th>
+                                            <th>Usuario</th>
+                                            <th>Rol</th>
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
                         </div>

@@ -47,13 +47,11 @@
                                                         Excel
                                                     </a>
                                                 </td>
-                                                @if(Auth::user()->role_id == 1)
                                                 <td>
                                                     <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
                                                         Configurar Tabla
                                                     </div>
                                                 </td>
-                                                @endif
                                             </tr>
                                         </table>
                                     </div>
@@ -84,8 +82,17 @@
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                                                <th id="th{{$co}}">{{$co}}</th>
+                                            @endforeach
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -235,7 +242,8 @@
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
-        var background_tables = '{{$empresa->background_tables}}';
+        var background_tables = '{{$empresa->background_tables}}';       
+        var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var compras_obtener = '{!!URL::to('compras_obtener')!!}';
         var compras_obtener_series_documento = '{!!URL::to('compras_obtener_series_documento')!!}';
         var compras_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('compras_obtener_ultimo_folio_serie_seleccionada')!!}';

@@ -88,6 +88,14 @@ function listar(){
   //Campos ordenados a mostras
   var campos = columnas_ordenadas.split(",");
   var campos_busqueda = campos_busquedas.split(",");
+  //agregar inputs de busqueda por columna
+  $('#tbllistado tfoot th').each( function () {
+    var titulocolumnatfoot = $(this).text();
+    var valor_encontrado_en_array = campos_busqueda.indexOf(titulocolumnatfoot); 
+    if(valor_encontrado_en_array >= 0){
+      $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
+    }
+  });
   // armar columas para datatable se arma desde funcionesglobales.js
   var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
   tabla=$('#tbllistado').DataTable({
@@ -111,14 +119,24 @@ function listar(){
         if( data.status ==  `BAJA`){ $(row).addClass('bg-orange');}
     },
     columns: campos_tabla,
-    "initComplete": function() {
-        var $buscar = $('div.dataTables_filter input');
-        $buscar.unbind();
-        $buscar.bind('keyup change', function(e) {
-            if(e.keyCode == 13 || this.value == "") {
-              $('#tbllistado').DataTable().search( this.value ).draw();
-            }
+    initComplete: function () {
+      // Aplicar busquedas por columna
+      this.api().columns().every( function () {
+        var that = this;
+        $('input',this.footer()).on( 'change', function(){
+          if(that.search() !== this.value){
+            that.search(this.value).draw();
+          }
         });
+      });
+      //Aplicar busqueda general
+      var $buscar = $('div.dataTables_filter input');
+      $buscar.unbind();
+      $buscar.bind('keyup change', function(e) {
+          if(e.keyCode == 13 || this.value == "") {
+            $('#tbllistado').DataTable().search( this.value ).draw();
+          }
+      });
     }
   });
   //modificacion al dar doble click
@@ -293,6 +311,15 @@ function seleccionarremision(Folio, Remision){
         $("#numerofilas").val(data.numerodetallesremision);
       }
       $('.page-loader-wrapper').css('display', 'none');
+      //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+      $(".inputnextdet").keypress(function (e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+          var index = $(this).index(".inputnextdet");          
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+        }
+      });
     }) 
 }
 //calcular total de cada fila
@@ -370,22 +397,22 @@ function alta(){
               '<div class="row">'+
                 '<div class="col-md-3">'+
                   '<label>Cotización <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
-                  '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                  '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                   '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                   '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
                   '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
                 '</div>'+ 
                 '<div class="col-md-3">'+
                   '<label>OT Tecnodiesel</label>'+
-                  '<input type="text" class="form-control" name="ottecnodiesel" id="ottecnodiesel"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
+                  '<input type="text" class="form-control inputnext" name="ottecnodiesel" id="ottecnodiesel"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                 '</div>'+
                 '<div class="col-md-3">'+
                   '<label>OT TyT</label>'+
-                  '<input type="text" class="form-control" name="ottyt" id="ottyt" required data-parsley-length="[0, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                  '<input type="text" class="form-control inputnext" name="ottyt" id="ottyt" required data-parsley-length="[0, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                 '</div>'+ 
                 '<div class="col-md-3">'+
                   '<label>Fecha </label>'+
-                  '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" onkeyup="tipoLetra(this);">'+
+                  '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();">'+
                   '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="{{$periodohoy}}">'+
                 '</div>'+
               '</div>'+
@@ -400,7 +427,7 @@ function alta(){
                       '<td>'+
                         '<div class="form-line">'+
                           '<input type="hidden" class="form-control" name="numeroremision" id="numeroremision" required readonly onkeyup="tipoLetra(this)" autocomplete="off">'+
-                          '<input type="text" class="form-control" name="remision" id="remision" required readonly>'+
+                          '<input type="text" class="form-control inputnext" name="remision" id="remision" required readonly>'+
                         '</div>'+
                       '</td>'+
                     '</tr>'+   
@@ -408,11 +435,11 @@ function alta(){
                 '</div>'+
                 '<div class="col-md-3">'+
                   '<label>Equipo</label>'+
-                  '<input type="text" class="form-control" name="equipo" id="equipo" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
+                  '<input type="text" class="form-control inputnext" name="equipo" id="equipo" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                 '</div>'+ 
                 '<div class="col-md-3">'+
                   '<label>Requisición</label>'+
-                  '<input type="text" class="form-control" name="requisicion" id="requisicion" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
+                  '<input type="text" class="form-control inputnext" name="requisicion" id="requisicion" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                 '</div>'+  
               '</div>'+
             '</div>'+
@@ -472,6 +499,24 @@ function alta(){
   obtenultimonumero();
   asignarfechaactual();
   $("#ModalAlta").modal('show');
+  //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+  $(".inputnext").keypress(function (e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      var index = $(this).index(".inputnext");          
+      $(".inputnext").eq(index + 1).focus().select(); 
+    }
+  });
+  //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+  $(".inputnextdet").keypress(function (e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      var index = $(this).index(".inputnextdet");          
+      $(".inputnextdet").eq(index + 1).focus().select(); 
+    }
+  });
 }
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
@@ -587,22 +632,22 @@ function obtenerdatos(cotizacionmodificar){
                 '<div class="row">'+
                   '<div class="col-md-3">'+
                     '<label>Cotización <b style="color:#F44336 !important;" id="serietexto"> Serie: </b></label>'+
-                    '<input type="text" class="form-control" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                    '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                     '<input type="hidden" class="form-control" name="serie" id="serie" required readonly data-parsley-length="[1, 10]">'+
                     '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
                     '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
                   '</div>'+ 
                   '<div class="col-md-3">'+
                     '<label>OT Tecnodiesel</label>'+
-                    '<input type="text" class="form-control" name="ottecnodiesel" id="ottecnodiesel"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
+                    '<input type="text" class="form-control inputnext" name="ottecnodiesel" id="ottecnodiesel"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                   '</div>'+
                   '<div class="col-md-3">'+
                     '<label>OT TyT</label>'+
-                    '<input type="text" class="form-control" name="ottyt" id="ottyt" required data-parsley-length="[0, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                    '<input type="text" class="form-control inputnext" name="ottyt" id="ottyt" required data-parsley-length="[0, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                   '</div>'+ 
                   '<div class="col-md-3">'+
                     '<label>Fecha </label>'+
-                    '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required onchange="validasolomesactual();" onkeyup="tipoLetra(this);">'+
+                    '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();">'+
                     '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy">'+
                   '</div>'+
                 '</div>'+
@@ -617,7 +662,7 @@ function obtenerdatos(cotizacionmodificar){
                         '<td>'+
                           '<div class="form-line">'+
                             '<input type="hidden" class="form-control" name="numeroremision" id="numeroremision" required readonly onkeyup="tipoLetra(this)" autocomplete="off">'+
-                            '<input type="text" class="form-control" name="remision" id="remision" required readonly>'+
+                            '<input type="text" class="form-control inputnext" name="remision" id="remision" required readonly>'+
                           '</div>'+
                         '</td>'+
                       '</tr>'+   
@@ -625,11 +670,11 @@ function obtenerdatos(cotizacionmodificar){
                   '</div>'+
                   '<div class="col-md-3">'+
                     '<label>Equipo</label>'+
-                    '<input type="text" class="form-control" name="equipo" id="equipo" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
+                    '<input type="text" class="form-control inputnext" name="equipo" id="equipo" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                   '</div>'+ 
                   '<div class="col-md-3">'+
                     '<label>Requisición</label>'+
-                    '<input type="text" class="form-control" name="requisicion" id="requisicion" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
+                    '<input type="text" class="form-control inputnext" name="requisicion" id="requisicion" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                   '</div>'+  
                 '</div>'+
               '</div>'+
@@ -706,6 +751,24 @@ function obtenerdatos(cotizacionmodificar){
     $("#numerofilas").val(data.numerodetallescotizacion);
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
     $('.page-loader-wrapper').css('display', 'none');
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        var index = $(this).index(".inputnext");          
+        $(".inputnext").eq(index + 1).focus().select(); 
+      }
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnextdet").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        var index = $(this).index(".inputnextdet");          
+        $(".inputnextdet").eq(index + 1).focus().select(); 
+      }
+    });
   }).fail( function() {
     msj_errorajax();
     $('.page-loader-wrapper').css('display', 'none');
@@ -818,6 +881,9 @@ function configurar_tabla(){
   //formulario configuracion tablas se arma desde funcionesglobales.js
   var tabs = armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbusquedas);
   $("#tabsconfigurartabla").html(tabs);
+  if(rol_usuario_logueado == 1){
+    $("#divorderbystabla").show();
+  }
   $("#string_datos_ordenamiento_columnas").val(columnas_ordenadas);
   $("#string_datos_tabla_true").val(campos_activados);
   $("#string_datos_tabla_false").val(campos_desactivados);

@@ -50,6 +50,14 @@
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
+                    						<th>Número</th>
+                                            <th>Nombre</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
                         </div>

@@ -34,6 +34,9 @@ class ConfiguracionSistemaController extends Controller
         config(['app.lugarexpedicion' => $this->empresa->LugarExpedicion]);
         config(['app.regimenfiscal' => $this->empresa->RegimenFiscal]);
         config(['app.tipodeutilidad' => $this->empresa->Tipo_De_Utilidad]);
+        config(['app.correodefault1enviodocumentos' => $this->empresa->CorreoDefault1EnvioDocumentos]);
+        config(['app.correodefault2enviodocumentos' => $this->empresa->CorreoDefault2EnvioDocumentos]);
+        config(['app.usuariosamodificarinsumos' => $this->empresa->UsuariosModificarInsumo]);
         ////////////OBTENER CONFIGURACIONES DEL SISTEMA////////////////
         $this->numerocerosconfigurados = Helpers::numerocerosconfiguracion(); //obtienes los ceros que se deben colocar con base a los decimales configurados en el sistemas ejemplo decimales para el sistema = 3 numero de ceros = 000
         $this->numerocerosconfiguradosinputnumberstep = Helpers::numerocerosconfiguracioninputnumberstep(); //obtienes los ceros que se deben colocar en los input type number con base a los decimales configurados en el sistemas ejemplo decimales para el sistema = 3 numero de ceros = 001
@@ -61,6 +64,11 @@ class ConfiguracionSistemaController extends Controller
         $this->regimenfiscal = config('app.regimenfiscal');//obtiene el regimen fiscal
         //tipo utilidad
         $this->tipodeutilidad = config('app.tipodeutilidad');
+        //correo por default en envios de documentos
+        $this->correodefault1enviodocumentos = config('app.correodefault1enviodocumentos');
+        $this->correodefault2enviodocumentos = config('app.correodefault2enviodocumentos');
+        //usuarios ue puedes modificar isnumos 
+        $this->usuariosamodificarinsumos = config('app.usuariosamodificarinsumos');
         //obtener o actualizar el valor del dolar segun sea el caso
         $fechahoy = Carbon::now()->toDateString();
         $dia=date("w", strtotime($fechahoy));
@@ -128,6 +136,10 @@ class ConfiguracionSistemaController extends Controller
         View::share ( 'lugarexpedicion', $this->lugarexpedicion);
         View::share ( 'regimenfiscal', $this->regimenfiscal);
         View::share ( 'tipodeutilidad', $this->tipodeutilidad);
+        View::share ( 'correodefault1enviodocumentos', $this->correodefault1enviodocumentos);
+        View::share ( 'correodefault2enviodocumentos', $this->correodefault2enviodocumentos);
+        View::share ( 'usuariosamodificarinsumos', $this->usuariosamodificarinsumos);
+
         //View::share ( 'array', ['name'=>'Franky','address'=>'Mars'] );
     } 
 }

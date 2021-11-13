@@ -27,6 +27,7 @@ use App\Existencia;
 use App\Configuracion_Tabla;
 use App\VistaProducto;
 use App\ContraReciboDetalle;
+use App\TipoOrdenCompra;
 use GuzzleHttp\Client;
 use PDF;
 use Mail;
@@ -111,6 +112,11 @@ class ProductoController extends ConfiguracionSistemaController{
                     ->make(true);
         } 
     }  
+    //obtener codigo
+    public function productos_buscar_codigo_en_tabla(Request $request){
+        $existecodigo = Producto::where('Codigo', $request->codigo)->count();
+        return response()->json($existecodigo);
+    }
     //obtener claves productos
     public function productos_obtener_claves_productos(Request $request){
         if($request->ajax()){
@@ -353,6 +359,17 @@ class ProductoController extends ConfiguracionSistemaController{
                     ->make(true);
         }        
     } 
+
+    //obtener tipos prod
+    public function productos_obtener_tipos_prod(){
+        $tipos_ordenes_compra = TipoOrdenCompra::where('Nombre', 'GASTOS')->orWhere('Nombre', 'TOT')->get();
+        $select_tipos_ordenes_compra = "<option value='REFACCION'>REFACCION</option>";
+        foreach($tipos_ordenes_compra as $tipo){
+            $select_tipos_ordenes_compra = $select_tipos_ordenes_compra."<option value='".$tipo->Nombre."'>".$tipo->Nombre."</option>";
+        }
+        return response()->json($select_tipos_ordenes_compra);
+    }
+
     //obtener productos consumos
     public function productos_obtener_productos_consumos(Request $request){
         if($request->ajax()){
@@ -394,7 +411,6 @@ class ProductoController extends ConfiguracionSistemaController{
 	    if($ExisteProducto == true){
 	        $Producto = 1;
 	    }else{        
-            $costodeventa = $request->costo;
             $marca = Marca::where('Numero', $request->marca)->first();
             $utilidadrestante = Helpers::convertirvalorcorrecto(100) - $marca->Utilidad1;
             $subtotalpesos = $request->costo / ($utilidadrestante/100);
@@ -412,18 +428,22 @@ class ProductoController extends ConfiguracionSistemaController{
             $Producto->Impuesto=$request->impuesto;
             $Producto->Costo=$request->costo;
             $Producto->Precio=$request->precio;
-            $Producto->CostoDeVenta=$costodeventa;
             $Producto->Utilidad=$marca->Utilidad1;
             $Producto->SubTotal=$subtotalpesos;
             $Producto->Iva=$ivapesos;
             $Producto->Total=$totalpesos;
             $Producto->Ubicacion=$request->ubicacion;
+            $Producto->TipoProd = $request->tipo;
             $Producto->Codigo1=$request->codigo1;
             $Producto->Codigo2=$request->codigo2;
             $Producto->Codigo3=$request->codigo3;
             $Producto->Codigo4=$request->codigo4;
             $Producto->Codigo5=$request->codigo5;
             $Producto->Status='ALTA';
+            $Producto->CostoDeLista=$request->costo;
+            $Producto->Moneda='MXN';
+            $Producto->CostoDeVenta=$request->costo;
+            $Producto->Precio1=$request->precio;
             Log::channel('producto')->info('Se registro un nuevo producto: '.$Producto.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
             $Producto->save();
         }    
@@ -567,6 +587,7 @@ class ProductoController extends ConfiguracionSistemaController{
         $Producto->Iva=$ivapesos;
         $Producto->Total=$totalpesos;
         $Producto->Ubicacion=$request->ubicacion;
+        $Producto->TipoProd = $request->tipo;
         $Producto->CostoDeLista=$request->costodelista;
         $Producto->Moneda=$request->moneda;
         //tabs codigos alternos
@@ -586,7 +607,10 @@ class ProductoController extends ConfiguracionSistemaController{
         $Producto->Zona=$request->fechaszonadeimpresion;
         $Producto->ProductoPeligroso=$request->fechasproductopeligroso;
         $Producto->Supercedido=$request->fechassupercedido;
-        $Producto->Insumo=$request->fechasinsumo;
+        //solo si el usuario esta autorizado en modificar el dato insumo
+        if (in_array(strtoupper(Auth::user()->user), explode(",",$this->usuariosamodificarinsumos))) {
+            $Producto->Insumo=$request->fechasinsumo;
+        }
         $Producto->Descripcion=$request->fechasdescripcion;
         //tabs lpa
         $Producto->Lpa1Subir=$request->lpasubircodigo;

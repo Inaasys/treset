@@ -32,13 +32,11 @@
                                                         Excel
                                                     </a>
                                                 </td>
-                                                @if(Auth::user()->role_id == 1)
                                                 <td>
                                                     <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
                                                         Configurar Tabla
                                                     </div>
                                                 </td>
-                                                @endif
                                             </tr>
                                         </table>
                                     </div>
@@ -57,6 +55,14 @@
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th><div style="width:100px !important;">Operaciones</div></th>
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                                                <th id="th{{$co}}">{{$co}}</th>
+                                            @endforeach
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
                         </div>
@@ -148,12 +154,15 @@
         var campos_busquedas = '{{$configuracion_tabla->campos_busquedas}}';
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
-        var background_tables = '{{$empresa->background_tables}}';
+        var background_tables = '{{$empresa->background_tables}}';       
+        var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var clientes_obtener = '{!!URL::to('clientes_obtener')!!}';
+        var clientes_buscar_rfc_en_tabla = '{!!URL::to('clientes_buscar_rfc_en_tabla')!!}';
         var clientes_obtener_ultimo_numero = '{!!URL::to('clientes_obtener_ultimo_numero')!!}';
         var clientes_guardar = '{!!URL::to('clientes_guardar')!!}';
         var clientes_obtener_paises = '{!!URL::to('clientes_obtener_paises')!!}';
         var clientes_obtener_codigos_postales = '{!!URL::to('clientes_obtener_codigos_postales')!!}';
+        var clientes_obtener_datos_direccion = '{!!URL::to('clientes_obtener_datos_direccion')!!}';
         var clientes_obtener_estados = '{!!URL::to('clientes_obtener_estados')!!}';
         var clientes_obtener_municipios = '{!!URL::to('clientes_obtener_municipios')!!}';
         var clientes_obtener_agentes = '{!!URL::to('clientes_obtener_agentes')!!}';

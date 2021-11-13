@@ -111,6 +111,14 @@ function listar(){
     //Campos ordenados a mostras
     var campos = columnas_ordenadas.split(",");
     var campos_busqueda = campos_busquedas.split(",");
+    //agregar inputs de busqueda por columna
+    $('#tbllistado tfoot th').each( function () {
+      var titulocolumnatfoot = $(this).text();
+      var valor_encontrado_en_array = campos_busqueda.indexOf(titulocolumnatfoot); 
+      if(valor_encontrado_en_array >= 0){
+        $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
+      }
+    });
     // armar columas para datatable se arma desde funcionesglobales.js
     var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
   tabla=$('#tbllistado').DataTable({
@@ -135,14 +143,24 @@ function listar(){
         else if( data.Status ==  `POR COBRAR`){ $(row).addClass('bg-red');}
     },
     columns: campos_tabla,
-    "initComplete": function() {
-        var $buscar = $('div.dataTables_filter input');
-        $buscar.unbind();
-        $buscar.bind('keyup change', function(e) {
-            if(e.keyCode == 13 || this.value == "") {
-              $('#tbllistado').DataTable().search( this.value ).draw();
-            }
+    initComplete: function () {
+      // Aplicar busquedas por columna
+      this.api().columns().every( function () {
+        var that = this;
+        $('input',this.footer()).on( 'change', function(){
+          if(that.search() !== this.value){
+            that.search(this.value).draw();
+          }
         });
+      });
+      //Aplicar busqueda general
+      var $buscar = $('div.dataTables_filter input');
+      $buscar.unbind();
+      $buscar.bind('keyup change', function(e) {
+          if(e.keyCode == 13 || this.value == "") {
+            $('#tbllistado').DataTable().search( this.value ).draw();
+          }
+      });
     }
   });
   //modificacion al dar doble click
@@ -195,6 +213,15 @@ $("#btnenviarpartidasexcel").on('click', function(e){
       comprobarfilas();
       calculartotal();
       $("#codigoabuscar").val("");
+      //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+      $(".inputnextdet").keypress(function (e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+          var index = $(this).index(".inputnextdet");          
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+        }
+      });
     },
     error: function (data) {
       console.log(data);
@@ -234,7 +261,7 @@ function obtenerclientes(){
                       '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                     '</div>';
     $("#contenidomodaltablas").html(tablaclientes);
-    $('#tbllistadocliente').DataTable({
+    var tcli = $('#tbllistadocliente').DataTable({
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -268,6 +295,11 @@ function obtenerclientes(){
                 }
             });
         },
+    }); 
+    //seleccionar registro al dar doble click
+    $('#tbllistadocliente tbody').on('dblclick', 'tr', function () {
+        var data = tcli.row( this ).data();
+        seleccionarcliente(data.Numero, data.Nombre, data.Plazo, data.Rfc, data.ClaveFormaPago, data.NombreFormaPago, data.ClaveMetodoPago, data.NombreMetodoPago, data.ClaveUsoCfdi, data.NombreUsoCfdi, "", "", data.Agente, data.Credito, data.Saldo);
     }); 
 } 
 //seleccionar cliente
@@ -377,7 +409,7 @@ function obteneragentes(){
                             '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                         '</div>';
       $("#contenidomodaltablas").html(tablaagentes);
-      $('#tbllistadoagente').DataTable({
+      var tagen = $('#tbllistadoagente').DataTable({
           "lengthMenu": [ 10, 50, 100, 250, 500 ],
           "pageLength": 250,
           "sScrollX": "110%",
@@ -407,6 +439,11 @@ function obteneragentes(){
                   }
               });
           },
+      });  
+      //seleccionar registro al dar doble click
+      $('#tbllistadoagente tbody').on('dblclick', 'tr', function () {
+          var data = tagen.row( this ).data();
+          seleccionaragente(data.Numero, data.Nombre, data.Rfc);
       }); 
 } 
 //seleccionar almacen
@@ -453,7 +490,7 @@ function obtenerlugaresexpedicion(){
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                               '</div>';  
   $("#contenidomodaltablas").html(tablacodigospostales);
-  $('#tbllistadocodigopostal').DataTable({
+  var tcodpost = $('#tbllistadocodigopostal').DataTable({
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -486,7 +523,12 @@ function obtenerlugaresexpedicion(){
             }
         });
       }, 
-  });
+  }); 
+  //seleccionar registro al dar doble click
+  $('#tbllistadocodigopostal tbody').on('dblclick', 'tr', function () {
+      var data = tcodpost.row( this ).data();
+      seleccionarlugarexpedicion(data.Clave, data.Estado);
+  }); 
 } 
 //seleccionar lugar expedicion
 function seleccionarlugarexpedicion(Clave, Estado){
@@ -529,7 +571,7 @@ function obtenerregimenesfiscales(){
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                               '</div>';  
   $("#contenidomodaltablas").html(tablaregimenesfiscales);
-  $('#tbllistadoregimenfiscal').DataTable({
+  var tregfis = $('#tbllistadoregimenfiscal').DataTable({
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -561,6 +603,11 @@ function obtenerregimenesfiscales(){
         });
       }, 
   });
+  //seleccionar registro al dar doble click
+  $('#tbllistadoregimenfiscal tbody').on('dblclick', 'tr', function () {
+      var data = tregfis.row( this ).data();
+      seleccionarregimenfiscal(data.Clave, data.Nombre);
+  }); 
 } 
 //seleccionar lugar expedicion
 function seleccionarregimenfiscal(Clave, Nombre){
@@ -604,7 +651,7 @@ function obtenertiposrelaciones(){
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                               '</div>';  
   $("#contenidomodaltablas").html(tablatiposrelaciones);
-  $('#tbllistadotiporelacion').DataTable({
+  var ttiprel = $('#tbllistadotiporelacion').DataTable({
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -634,6 +681,11 @@ function obtenertiposrelaciones(){
         });
       },
   });
+  //seleccionar registro al dar doble click
+  $('#tbllistadotiporelacion tbody').on('dblclick', 'tr', function () {
+      var data = ttiprel.row( this ).data();
+      seleccionartiporelacion(data.Clave, data.Nombre);
+  }); 
 } 
 //seleccionar lugar expedicion
 function seleccionartiporelacion(Clave, Nombre){
@@ -678,7 +730,7 @@ function obtenerformaspago(){
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                               '</div>';  
   $("#contenidomodaltablas").html(tablaformaspago);
-  $('#tbllistadoformapago').DataTable({
+  var tforpag = $('#tbllistadoformapago').DataTable({
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -709,6 +761,11 @@ function obtenerformaspago(){
         });
       }, 
   });
+  //seleccionar registro al dar doble click
+  $('#tbllistadoformapago tbody').on('dblclick', 'tr', function () {
+      var data = tforpag.row( this ).data();
+      seleccionarformapago(data.Clave, data.Nombre);
+  }); 
 } 
 //seleccionar forma pago
 function seleccionarformapago(Clave, Nombre){
@@ -752,7 +809,7 @@ function obtenermetodospago(){
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                               '</div>';  
   $("#contenidomodaltablas").html(tablametodospago);
-  $('#tbllistadometodopago').DataTable({
+  var tmetpag = $('#tbllistadometodopago').DataTable({
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -782,6 +839,11 @@ function obtenermetodospago(){
         });
       }, 
   });
+  //seleccionar registro al dar doble click
+  $('#tbllistadometodopago tbody').on('dblclick', 'tr', function () {
+      var data = tmetpag.row( this ).data();
+      seleccionarmetodopago(data.Clave, data.Nombre);
+  }); 
 } 
 //seleccionar metodo pago
 function seleccionarmetodopago(Clave, Nombre){
@@ -827,7 +889,7 @@ function obtenerusoscfdi(){
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                               '</div>';  
   $("#contenidomodaltablas").html(tablausoscfdi);
-  $('#tbllistadousocfdi').DataTable({
+  var tusocfdi = $('#tbllistadousocfdi').DataTable({
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -859,6 +921,11 @@ function obtenerusoscfdi(){
         });
       }, 
   });
+  //seleccionar registro al dar doble click
+  $('#tbllistadousocfdi tbody').on('dblclick', 'tr', function () {
+      var data = tusocfdi.row( this ).data();
+      seleccionarusocfdi(data.Clave, data.Nombre);
+  }); 
 } 
 //seleccionar uso cfdi
 function seleccionarusocfdi(Clave, Nombre){
@@ -902,7 +969,7 @@ function obtenerresidenciasfiscales(){
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                               '</div>';  
   $("#contenidomodaltablas").html(tablaresidenciasfiscales);
-  $('#tbllistadoresidencialfiscal').DataTable({
+  var tresfis = $('#tbllistadoresidencialfiscal').DataTable({
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -932,6 +999,11 @@ function obtenerresidenciasfiscales(){
         });
       },
   });
+  //seleccionar registro al dar doble click
+  $('#tbllistadoresidencialfiscal tbody').on('dblclick', 'tr', function () {
+      var data = tresfis.row( this ).data();
+      seleccionarresidenciafiscal(data.Clave, data.Nombre);
+  }); 
 } 
 //seleccionar residencia fiscal
 function seleccionarresidenciafiscal(Clave, Nombre){
@@ -976,7 +1048,7 @@ function obtenerfoliosfacturas(){
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                               '</div>';  
   $("#contenidomodaltablas").html(tablafoliosfiscales);
-  $('#tbllistadofoliofiscal').DataTable({
+  var tfolfis = $('#tbllistadofoliofiscal').DataTable({
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -1006,6 +1078,11 @@ function obtenerfoliosfacturas(){
             }
         });
       },
+  }); 
+  //seleccionar registro al dar doble click
+  $('#tbllistadofoliofiscal tbody').on('dblclick', 'tr', function () {
+      var data = tfolfis.row( this ).data();
+      seleccionarfoliofiscal(data.Serie, data.Esquema, data.Depto);
   });  
 }
 function seleccionarfoliofiscal(Serie, Esquema, Depto){
@@ -1285,6 +1362,15 @@ function seleccionarremisionasync(Remision){
         contadorfilas = data.contadorfilas;
         partida = data.partida;
         remisionagregadacorrectamente();
+        //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+        $(".inputnextdet").keypress(function (e) {
+          //recomentable para mayor compatibilidad entre navegadores.
+          var code = (e.keyCode ? e.keyCode : e.which);
+          if(code==13){
+            var index = $(this).index(".inputnextdet");          
+            $(".inputnextdet").eq(index + 1).focus().select(); 
+          }
+        });
       });
       return ejecuta(fila);
     },1500);
@@ -1364,6 +1450,15 @@ function cargarremisionesseleccionadas(){
     //cargar datos cliente
     $("#numerocliente").val(data.cliente);
     obtenerclientepornumero();
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnextdet").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        var index = $(this).index(".inputnextdet");          
+        $(".inputnextdet").eq(index + 1).focus().select(); 
+      }
+    });
   })
 }
 //eliminar todas las filas de la remision que se deselecciono
@@ -1548,6 +1643,15 @@ function cargarserviciosseleccionadas(){
     //cargar datos cliente
     $("#numerocliente").val(data.cliente);
     obtenerclientepornumero();
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnextdet").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        var index = $(this).index(".inputnextdet");          
+        $(".inputnextdet").eq(index + 1).focus().select(); 
+      }
+    });
   })
 }
 //eliminar todas las filas de la orden que se deselecciono
@@ -1885,7 +1989,7 @@ function listarproductos(){
                         '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                       '</div>';   
   $("#contenidomodaltablas").html(tablaproductos);
-  $('#tbllistadoproducto').DataTable({
+  var tprod = $('#tbllistadoproducto').DataTable({
     "lengthMenu": [ 10, 50, 100, 250, 500 ],
     "pageLength": 250,
     "sScrollX": "110%",
@@ -1924,7 +2028,12 @@ function listarproductos(){
         }
       });
     },
-    
+  });
+  //seleccionar registro al dar doble click
+  $('#tbllistadoproducto tbody').on('dblclick', 'tr', function () {
+      var data = tprod.row( this ).data();
+      var tipooperacion = $("#tipooperacion").val();
+      agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, data.SubTotal, tipooperacion, data.Insumo, data.ClaveProducto, data.ClaveUnidad, data.NombreClaveProducto, data.NombreClaveUnidad, data.CostoDeLista);
   });
 }
 function obtenerproductoporcodigo(){
@@ -1966,7 +2075,7 @@ function listarclavesproductos(fila){
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                             '</div>';   
   $("#contenidomodaltablas").html(tablaclavesproducto);
-  $('#tbllistadoclaveproducto').DataTable({
+  var tclavprod = $('#tbllistadoclaveproducto').DataTable({
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -1998,7 +2107,11 @@ function listarclavesproductos(fila){
               }
           });
       },
-      
+  });
+  //seleccionar registro al dar doble click
+  $('#tbllistadoclaveproducto tbody').on('dblclick', 'tr', function () {
+      var data = tclavprod.row( this ).data();
+      seleccionarclaveproducto(data.Clave, data.Nombre, fila);
   });
 }
 //seleccion de clave producto
@@ -2035,7 +2148,7 @@ function listarclavesunidades(fila){
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                             '</div>';   
   $("#contenidomodaltablas").html(tablaclavesunidades);
-  $('#tbllistadoclaveunidad').DataTable({
+  var tclavuni = $('#tbllistadoclaveunidad').DataTable({
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -2067,6 +2180,11 @@ function listarclavesunidades(fila){
               }
           });
       },
+  });
+  //seleccionar registro al dar doble click
+  $('#tbllistadoclaveunidad tbody').on('dblclick', 'tr', function () {
+      var data = tclavuni.row( this ).data();
+      seleccionarclaveunidad(data.Clave, data.Nombre, fila);
   });
 }
 //seleccion de clave unidad
@@ -2109,7 +2227,7 @@ function listaruuidrelacionados(){
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                             '</div>';   
   $("#contenidomodaltablas").html(tablafacturasrel);
-  $('#tbllistadofacturarel').DataTable({
+  var tfacrel = $('#tbllistadofacturarel').DataTable({
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -2146,6 +2264,11 @@ function listaruuidrelacionados(){
               }
           });
       },
+  });
+  //seleccionar registro al dar doble click
+  $('#tbllistadofacturarel tbody').on('dblclick', 'tr', function () {
+      var data = tfacrel.row( this ).data();
+      seleccionarfacturarel(data.UUID, data.Factura);
   });
 }
 function seleccionarfacturarel(UUID, Factura){
@@ -2199,16 +2322,16 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
         var fila= '<tr class="filasproductos" id="filaproducto'+contadorfilas+'">'+
                     '<td class="tdmod"><div class="numeropartida">'+partida+'</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
                     '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'+Producto+'" data-parsley-length="[1, 255]" autocomplete="off"></td>'+
+                    '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'+Producto+'" data-parsley-length="[1, 255]" autocomplete="off"></td>'+
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="'+Unidad+'" data-parsley-length="[1, 5]" autocomplete="off"></td>'+
                     '<td class="tdmod">'+
-                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');">'+
+                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');">'+
                         '<input type="hidden" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="1.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly>'+
                         '<input type="hidden" class="form-control cantidadincorrecta" name="cantidadincorrecta[]" >'+
                         '<input type="hidden" class="form-control realizarbusquedaexistencias" name="realizarbusquedaexistencias[]" value="1" >'+
                         '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'+
                     '</td>'+
-                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" value="'+preciopartida+'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');"></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'+preciopartida+'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');"></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('+contadorfilas+');"></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentoporcentajepartida('+contadorfilas+');"></td>'+
@@ -2268,6 +2391,15 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
         comprobarfilas();
         calculartotal();
         $("#codigoabuscar").val("");
+        //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+        $(".inputnextdet").keypress(function (e) {
+          //recomentable para mayor compatibilidad entre navegadores.
+          var code = (e.keyCode ? e.keyCode : e.which);
+          if(code==13){
+            var index = $(this).index(".inputnextdet");          
+            $(".inputnextdet").eq(index + 1).focus().select(); 
+          }
+        });
         $('.page-loader-wrapper').css('display', 'none');
     }else{
         msj_errorproductoyaagregado();
@@ -2556,7 +2688,7 @@ function alta(){
                               '</div>'+
                               '<div class="col-md-3">'+
                                 '<label>Condiciones de Pago </label>'+
-                                '<input type="text" class="form-control inputnexttabre" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required readonly data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                                '<input type="text" class="form-control inputnexttabre" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                               '</div>'+
                               '<div class="col-md-3">'+
                                 '<label>Uso CFDI <span class="label label-danger" id="textonombreusocfdi"></span></label>'+
@@ -2711,7 +2843,7 @@ function alta(){
                         '<div class="row">'+
                           '<div class="col-md-6">'+   
                             '<label>Observaciones</label>'+
-                            '<textarea class="form-control inputnext" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
+                            '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
                           '</div>'+ 
                           '<div class="col-md-3">'+
                             '<table class="table table-striped table-hover">'+
@@ -2915,7 +3047,7 @@ function alta(){
     var code = (e.keyCode ? e.keyCode : e.which);
     if(code==13){
       var index = $(this).index(".inputnext");          
-      $(".inputnext").eq(index + 1).focus(); 
+      $(".inputnext").eq(index + 1).focus().select(); 
     }
   });
   //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB EMISOR
@@ -2924,7 +3056,7 @@ function alta(){
     var code = (e.keyCode ? e.keyCode : e.which);
     if(code==13){
       var index = $(this).index(".inputnexttabem");          
-      $(".inputnexttabem").eq(index + 1).focus(); 
+      $(".inputnexttabem").eq(index + 1).focus().select(); 
     }
   });
   //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB RECEPTOR
@@ -2933,7 +3065,7 @@ function alta(){
     var code = (e.keyCode ? e.keyCode : e.which);
     if(code==13){
       var index = $(this).index(".inputnexttabre");          
-      $(".inputnexttabre").eq(index + 1).focus(); 
+      $(".inputnexttabre").eq(index + 1).focus().select(); 
     }
   });
   //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB OTROS
@@ -2942,7 +3074,16 @@ function alta(){
     var code = (e.keyCode ? e.keyCode : e.which);
     if(code==13){
       var index = $(this).index(".inputnexttabot");          
-      $(".inputnexttabot").eq(index + 1).focus(); 
+      $(".inputnexttabot").eq(index + 1).focus().select(); 
+    }
+  });
+  //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+  $(".inputnextdet").keypress(function (e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      var index = $(this).index(".inputnextdet");          
+      $(".inputnextdet").eq(index + 1).focus().select(); 
     }
   });
   $("#ModalAlta").modal('show');
@@ -3253,7 +3394,7 @@ $("#btnGuardar").on('click', function (e) {
     var credito = $("#credito").val();
     if(parseFloat(saldo) <= parseFloat(credito)){
       var numerofilas = $("#numerofilas").val();
-      if(parseInt(numerofilas) > 0){
+      if(parseInt(numerofilas) > 0  && parseInt(numerofilas) < 500){
           $('.page-loader-wrapper').css('display', 'block');
           $.ajax({
             headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
@@ -3717,7 +3858,7 @@ function obtenerdatos(facturamodificar){
                   '<div class="row">'+
                     '<div class="col-md-6">'+   
                       '<label>Observaciones</label>'+
-                      '<textarea class="form-control inputnext" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
+                      '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
                     '</div>'+ 
                     '<div class="col-md-3">'+
                       '<table class="table table-striped table-hover">'+
@@ -3998,7 +4139,7 @@ function obtenerdatos(facturamodificar){
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
         var index = $(this).index(".inputnext");          
-        $(".inputnext").eq(index + 1).focus(); 
+        $(".inputnext").eq(index + 1).focus().select(); 
       }
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB EMISOR
@@ -4007,7 +4148,7 @@ function obtenerdatos(facturamodificar){
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
         var index = $(this).index(".inputnexttabem");          
-        $(".inputnexttabem").eq(index + 1).focus(); 
+        $(".inputnexttabem").eq(index + 1).focus().select(); 
       }
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB RECEPTOR
@@ -4016,7 +4157,7 @@ function obtenerdatos(facturamodificar){
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
         var index = $(this).index(".inputnexttabre");          
-        $(".inputnexttabre").eq(index + 1).focus(); 
+        $(".inputnexttabre").eq(index + 1).focus().select(); 
       }
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB OTROS
@@ -4025,7 +4166,16 @@ function obtenerdatos(facturamodificar){
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
         var index = $(this).index(".inputnexttabot");          
-        $(".inputnexttabot").eq(index + 1).focus(); 
+        $(".inputnexttabot").eq(index + 1).focus().select(); 
+      }
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnextdet").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        var index = $(this).index(".inputnextdet");          
+        $(".inputnextdet").eq(index + 1).focus().select(); 
       }
     });
     renumerarfilasuuid();
@@ -4046,7 +4196,7 @@ $("#btnGuardarModificacion").on('click', function (e) {
     var credito = $("#credito").val();
     if(parseFloat(saldo) <= parseFloat(credito)){
       var numerofilas = $("#numerofilas").val();
-      if(parseInt(numerofilas) > 0){
+      if(parseInt(numerofilas) > 0  && parseInt(numerofilas) < 500){
         $('.page-loader-wrapper').css('display', 'block');
         $.ajax({
           headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
@@ -4446,6 +4596,9 @@ function configurar_tabla(){
   //formulario configuracion tablas se arma desde funcionesglobales.js
   var tabs = armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbusquedas);
   $("#tabsconfigurartabla").html(tabs);
+  if(rol_usuario_logueado == 1){
+    $("#divorderbystabla").show();
+  }
   $("#string_datos_ordenamiento_columnas").val(columnas_ordenadas);
   $("#string_datos_tabla_true").val(campos_activados);
   $("#string_datos_tabla_false").val(campos_desactivados);

@@ -6,6 +6,9 @@ function init(){
     campos_a_filtrar_en_busquedas();
     listar();
 }
+function retraso(){
+  return new Promise(resolve => setTimeout(resolve, 1000));
+}
 //cerrar modales
 function limpiarmodales(){
   $("#tabsform").empty();
@@ -49,6 +52,14 @@ function listar(){
     //Campos ordenados a mostras
     var campos = columnas_ordenadas.split(",");
     var campos_busqueda = campos_busquedas.split(",");
+    //agregar inputs de busqueda por columna
+    $('#tbllistado tfoot th').each( function () {
+      var titulocolumnatfoot = $(this).text();
+      var valor_encontrado_en_array = campos_busqueda.indexOf(titulocolumnatfoot); 
+      if(valor_encontrado_en_array >= 0){
+        $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
+      }
+    });
     // armar columas para datatable se arma desde funcionesglobales.js
     var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
     tabla=$('#tbllistado').DataTable({
@@ -64,14 +75,24 @@ function listar(){
         serverSide: true,
         ajax: productos_obtener,
         columns: campos_tabla,
-        "initComplete": function() {
-            var $buscar = $('div.dataTables_filter input');
-            $buscar.unbind();
-            $buscar.bind('keyup change', function(e) {
-                if(e.keyCode == 13 || this.value == "") {
-                  $('#tbllistado').DataTable().search( this.value ).draw();
-                }
+        initComplete: function () {
+          // Aplicar busquedas por columna
+          this.api().columns().every( function () {
+            var that = this;
+            $('input',this.footer()).on( 'change', function(){
+              if(that.search() !== this.value){
+                that.search(this.value).draw();
+              }
             });
+          });
+          //Aplicar busqueda general
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistado').DataTable().search( this.value ).draw();
+              }
+          });
         }
     });
     //modificacion al dar doble click
@@ -79,6 +100,12 @@ function listar(){
       var data = tabla.row( this ).data();
       obtenerdatos(data.Codigo);
     }); 
+}
+//obtener tipos prod
+function obtenertipos(){
+    $.get(productos_obtener_tipos_prod, function(select_tipos){
+      $("#tipo").html(select_tipos);
+    })  
 }
 //listar claves productos
 function listarclavesproductos(){
@@ -637,6 +664,15 @@ function comprobarfilasconsumos(){
     var numerofilas = $("#tablaconsumosproductoterminado tbody tr").length;
     $("#numerofilasconsumosproductoterminado").val(numerofilas);
 }
+//buscar si el codigo escrito ya esta en catalogo
+function buscarcodigoencatalogo(){
+    var codigo = $("#codigo").val();
+    $.get(productos_buscar_codigo_en_tabla,{codigo:codigo },function(existecodigo){
+        if(existecodigo > 0){
+            msj_errorcodigoexistente();
+        }
+    });
+}
 //alta
 function alta(){
     $("#titulomodal").html('Alta Producto');
@@ -688,21 +724,26 @@ function alta(){
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Impuesto % <b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="impuesto" id="impuesto" required value="16.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="impuesto" id="impuesto" required value="16.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+
                         '</div>'+   
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Costo (De última compra sin impuesto)</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="costo" id="costo" value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="costo" id="costo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Precio (Precio neto)</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="precio" id="precio" value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="precio" id="precio" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+
-                            '<div class="col-md-4">'+
+                            '<div class="col-md-2">'+
                                 '<label>Ubicación</label>'+
                                 '<input type="text" class="form-control " name="ubicacion" id="ubicacion" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this)">'+
+                            '</div>'+
+                            '<div class="col-md-2">'+
+                                '<label>Tipo Producto</label>'+
+                                '<select name="tipo" id="tipo" class="form-control select2" style="width:100% !important;" required>'+ 
+                                '</select>'+
                             '</div>'+
                         '</div>'+ 
                     '</div>'+
@@ -734,6 +775,7 @@ function alta(){
                     '</div>'+
                 '</div>';
   $("#tabsform").html(tabs);
+  obtenertipos();
   $("#codigo").removeAttr('readonly');
   seleccionarclaveunidad('H87','Pieza');
 }
@@ -878,23 +920,28 @@ function obtenerdatos(codigoproducto){
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Impuesto % <b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="impuesto" id="impuesto" required value="16.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onkeyup="tipoLetra(this);reiniciartablautilidades();" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="impuesto" id="impuesto" required value="16.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onkeyup="reiniciartablautilidades();" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+
                         '</div>'+   
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Costo (De última compra sin impuesto)</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="costo" id="costo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onkeyup="tipoLetra(this);reiniciartablautilidades();" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="costo" id="costo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onkeyup="reiniciartablautilidades();" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Ubicación</label>'+
                                 '<input type="text" class="form-control " name="ubicacion" id="ubicacion" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this)">'+
                             '</div>'+
+                            '<div class="col-md-2">'+
+                                '<label>Tipo Producto</label>'+
+                                '<select name="tipo" id="tipo" class="form-control select2" style="width:100% !important;" required>'+ 
+                                '</select>'+
+                            '</div>'+
                         '</div>'+ 
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Costo de Lista</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="costodelista" id="costodelista" value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="costodelista" id="costodelista" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Moneda</label>'+
@@ -1055,7 +1102,7 @@ function obtenerdatos(codigoproducto){
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Comisión %</label>'+
-                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="fechascomision" id="fechascomision" value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="fechascomision" id="fechascomision" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Descuento %</label>'+
@@ -1065,17 +1112,17 @@ function obtenerdatos(codigoproducto){
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Mínimos </label>'+
-                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="fechasminimos" id="fechasminimos" value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="fechasminimos" id="fechasminimos" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Máximos </label>'+
-                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="fechasmaximos" id="fechasmaximos" value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="fechasmaximos" id="fechasmaximos" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Costo Máximo </label>'+
-                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="fechascostomaximo" id="fechascostomaximo" value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="fechascostomaximo" id="fechascostomaximo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
@@ -1085,7 +1132,7 @@ function obtenerdatos(codigoproducto){
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Ultimo Costo $</label>'+
-                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="fechasultimocosto" id="fechasultimocosto" readonly value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="fechasultimocosto" id="fechasultimocosto" readonly value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
@@ -1095,7 +1142,7 @@ function obtenerdatos(codigoproducto){
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Ultima Venta $</label>'+
-                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="fechasultimaventa" id="fechasultimaventa" readonly value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="fechasultimaventa" id="fechasultimaventa" readonly value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
@@ -1143,7 +1190,7 @@ function obtenerdatos(codigoproducto){
                                     '</div>'+
                                     '<div class="col-md-4">'+
                                         '<label>Precio de Compra  = Costo</label>'+
-                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="lpapreciocompra" id="lpapreciocompra" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="lpapreciocompra" id="lpapreciocompra" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                     '</div>'+
                                     '<div class="col-md-4">'+
                                         '<label>Fecha Creación</label>'+
@@ -1179,6 +1226,8 @@ function obtenerdatos(codigoproducto){
                     '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
+    //obtener tipos
+    obtenertipos();
     //datos principales
     $("#codigo").val(codigoproducto);
     $("#codigo").attr('readonly', 'readonly');
@@ -1246,15 +1295,30 @@ function obtenerdatos(codigoproducto){
     $("#lpacodigocompra").val(data.producto.Lpa1CodigoCompra);
     listarutilidades();
     listarexistenciasalmacenes();
-    mostrarmodalformulario('MODIFICACION');
-    $('.page-loader-wrapper').css('display', 'none');
     activarbusquedaproducto();//importante activa la busqueda de productos por su codigo
     activarbusquedacliente();//importante activa la busqueda de clientes por su numero
+
+
+
+
+    seleccionartipo(data);
+
   }).fail( function() {
     msj_errorajax();
     $('.page-loader-wrapper').css('display', 'none');
   })
 }
+
+
+async function seleccionartipo(data){
+    await retraso();
+    $("#tipo").val(data.producto.TipoProd).change();
+    $("#tipo").select2();
+    
+    mostrarmodalformulario('MODIFICACION');
+    $('.page-loader-wrapper').css('display', 'none');
+  }
+
 //guardar el registro
 $("#btnGuardarModificacion").on('click', function (e) {
     e.preventDefault();
@@ -1409,6 +1473,9 @@ function configurar_tabla(){
     //formulario configuracion tablas se arma desde funcionesglobales.js
     var tabs = armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbusquedas);
         $("#tabsconfigurartabla").html(tabs);
+        if(rol_usuario_logueado == 1){
+          $("#divorderbystabla").show();
+        }
         $("#string_datos_ordenamiento_columnas").val(columnas_ordenadas);
         $("#string_datos_tabla_true").val(campos_activados);
         $("#string_datos_tabla_false").val(campos_desactivados);

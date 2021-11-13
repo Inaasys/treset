@@ -75,7 +75,12 @@ class ProveedorController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
-    }  
+    }   
+    //obtener codigo
+    public function proveedores_buscar_rfc_en_tabla(Request $request){
+        $existerfc = Proveedor::where('Rfc', $request->rfc)->count();
+        return response()->json($existerfc);
+    }
     //obtener ultimo numero de tabla
     public function proveedores_obtener_ultimo_numero(){
         $id = Helpers::ultimoidtabla('App\Proveedor');

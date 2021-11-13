@@ -110,8 +110,9 @@ class ReportesRelacionContraReciboExport implements FromCollection,WithHeadings,
             ->leftjoin('Proveedores as p', 'cr.Proveedor', '=', 'p.Numero')
             ->leftjoin('ContraRecibos Detalles as crd', 'cr.ContraRecibo', '=', 'crd.ContraRecibo')
             ->leftjoin('Compras as c', 'crd.Compra', '=', 'c.Compra')
-            ->select('cr.ContraRecibo', 'cr.Proveedor', 'p.Nombre', 'cr.Fecha', DB::raw("SUM(c.SubTotal) as SubTotal"), DB::raw("SUM(c.Iva) as Iva"), DB::raw("SUM(c.Total) as Total"), 'cr.Status')
-            ->whereBetween('cr.Fecha', [$fechainicio, $fechaterminacion])
+            ->select('cr.ContraRecibo', 'cr.Proveedor', 'p.Nombre', DB::raw("FORMAT(cr.Fecha, 'yyyy-MM-dd') as Fecha"), DB::raw("SUM(c.SubTotal) as SubTotal"), DB::raw("SUM(c.Iva) as Iva"), DB::raw("SUM(c.Total) as Total"), 'cr.Status')
+            //->whereBetween('cr.Fecha', [$fechainicio, $fechaterminacion])
+            ->whereDate('cr.Fecha', '>=', $fechainicio)->whereDate('cr.Fecha', '<=', $fechaterminacion)
             ->where(function($q) use ($numeroproveedor) {
                 if($numeroproveedor != ""){
                     $q->where('cr.Proveedor', $numeroproveedor);
@@ -125,8 +126,9 @@ class ReportesRelacionContraReciboExport implements FromCollection,WithHeadings,
             ->leftjoin('Proveedores as p', 'cr.Proveedor', '=', 'p.Numero')
             ->leftjoin('ContraRecibos Detalles as crd', 'cr.ContraRecibo', '=', 'crd.ContraRecibo')
             ->leftjoin('Compras as c', 'crd.Compra', '=', 'c.Compra')
-            ->select('cr.ContraRecibo', 'cr.Proveedor', 'p.Nombre', 'crd.Compra', 'c.Movimiento', 'cr.Fecha', 'c.Remision', 'c.Factura', 'crd.FechaAPagar', 'c.SubTotal', 'c.Iva', 'c.Total', 'cr.Status')
-            ->whereBetween('cr.Fecha', [$fechainicio, $fechaterminacion])
+            ->select('cr.ContraRecibo', 'cr.Proveedor', 'p.Nombre', 'crd.Compra', 'c.Movimiento', DB::raw("FORMAT(cr.Fecha, 'yyyy-MM-dd') as Fecha"), 'c.Remision', 'c.Factura', DB::raw("FORMAT(crd.FechaAPagar, 'yyyy-MM-dd') as FechaAPagar"), 'c.SubTotal', 'c.Iva', 'c.Total', 'cr.Status')
+            //->whereBetween('cr.Fecha', [$fechainicio, $fechaterminacion])
+            ->whereDate('cr.Fecha', '>=', $fechainicio)->whereDate('cr.Fecha', '<=', $fechaterminacion)
             ->where(function($q) use ($numeroproveedor) {
                 if($numeroproveedor != ""){
                     $q->where('cr.Proveedor', $numeroproveedor);

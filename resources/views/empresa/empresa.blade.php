@@ -602,6 +602,31 @@
                                                                 </td>
                                                             </tr>
                                                             -->
+                                                            <tr>
+                                                                <td class="col-md-1">22</td>
+                                                                <td class="col-md-2">Envio Documentos</td>
+                                                                <td class="col-md-5">Correo 1 por default al que se enviaran los documentos</td>
+                                                                <td class="col-md-4">
+                                                                    <input type="text" class="form-control" name="correodefault1enviodocumentos" id="correodefault1enviodocumentos" data-parsley-type="email">
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="col-md-1">23</td>
+                                                                <td class="col-md-2">Envio Documentos</td>
+                                                                <td class="col-md-5">Correo 2 por default al que se enviaran los documentos</td>
+                                                                <td class="col-md-4">
+                                                                    <input type="text" class="form-control" name="correodefault2enviodocumentos" id="correodefault2enviodocumentos" data-parsley-type="email">
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="col-md-1">24</td>
+                                                                <td class="col-md-2">Modificación Insumo</td>
+                                                                <td class="col-md-5">Usuarios que pueden modificar Insumos</td>
+                                                                <td class="col-md-4">
+                                                                    <select  name="usuariosmodificacioninsumo[]" id="usuariosmodificacioninsumo" class="form-control select2" multiple="multiple" style="width:100% !important;" >
+                                                                    </select>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1024,6 +1049,10 @@
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';
         var tipo_de_utilidad = '{{$empresa->Tipo_De_Utilidad}}';
+        var correodefault1enviodocumentos = '{{$empresa->CorreoDefault1EnvioDocumentos}}';
+        var correodefault2enviodocumentos = '{{$empresa->CorreoDefault2EnvioDocumentos}}';
+        var usuariosamodificarinsumos = '{{$empresa->UsuariosModificarInsumo}}';
+        var empresa_obtener_usuarios_a_modificar_insumos = '{!!URL::to('empresa_obtener_usuarios_a_modificar_insumos')!!}';
         var empresa_obtener_paises = '{!!URL::to('empresa_obtener_paises')!!}';
         var empresa_obtener_estados = '{!!URL::to('empresa_obtener_estados')!!}';
         var empresa_obtener_municipios = '{!!URL::to('empresa_obtener_municipios')!!}';

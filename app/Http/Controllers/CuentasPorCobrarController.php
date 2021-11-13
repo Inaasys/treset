@@ -1163,6 +1163,12 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             if($request->email3cc != ""){
                 array_push($arraycc, $request->email3cc);
             }
+            if($this->correodefault1enviodocumentos != ""){
+                array_push($arraycc, $this->correodefault1enviodocumentos);
+            }
+            if($this->correodefault2enviodocumentos != ""){
+                array_push($arraycc, $this->correodefault2enviodocumentos);
+            }
             $correos = [$request->emailpara];
             $asunto = $request->emailasunto;
             $emaildocumento = $request->emaildocumento;

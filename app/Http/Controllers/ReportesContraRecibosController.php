@@ -70,7 +70,8 @@ class ReportesContraRecibosController extends ConfiguracionSistemaController{
             ->leftjoin('ContraRecibos Detalles as crd', 'cr.ContraRecibo', '=', 'crd.ContraRecibo')
             ->leftjoin('Compras as c', 'crd.Compra', '=', 'c.Compra')
             ->select('cr.ContraRecibo', 'cr.Proveedor', 'p.Nombre', 'cr.Fecha', DB::raw("SUM(c.SubTotal) as SubTotal"), DB::raw("SUM(c.Iva) as Iva"), DB::raw("SUM(c.Total) as Total"), 'cr.Status')
-            ->whereBetween('cr.Fecha', [$fechainicio, $fechaterminacion])
+            //->whereBetween('cr.Fecha', [$fechainicio, $fechaterminacion])
+            ->whereDate('cr.Fecha', '>=', $fechainicio)->whereDate('cr.Fecha', '<=', $fechaterminacion)
             ->where(function($q) use ($numeroproveedor) {
                 if($numeroproveedor != ""){
                     $q->where('cr.Proveedor', $numeroproveedor);
@@ -91,7 +92,8 @@ class ReportesContraRecibosController extends ConfiguracionSistemaController{
             ->leftjoin('ContraRecibos Detalles as crd', 'cr.ContraRecibo', '=', 'crd.ContraRecibo')
             ->leftjoin('Compras as c', 'crd.Compra', '=', 'c.Compra')
             ->select('cr.ContraRecibo', 'cr.Proveedor', 'p.Nombre', 'crd.Compra', 'c.Movimiento', 'cr.Fecha', 'c.Remision', 'c.Factura', 'crd.FechaAPagar', 'c.SubTotal', 'c.Iva', 'c.Total', 'cr.Status')
-            ->whereBetween('cr.Fecha', [$fechainicio, $fechaterminacion])
+            //->whereBetween('cr.Fecha', [$fechainicio, $fechaterminacion])
+            ->whereDate('cr.Fecha', '>=', $fechainicio)->whereDate('cr.Fecha', '<=', $fechaterminacion)
             ->where(function($q) use ($numeroproveedor) {
                 if($numeroproveedor != ""){
                     $q->where('cr.Proveedor', $numeroproveedor);

@@ -91,6 +91,14 @@ function listar(){
     //Campos ordenados a mostras
     var campos = columnas_ordenadas.split(",");
     var campos_busqueda = campos_busquedas.split(",");
+    //agregar inputs de busqueda por columna
+    $('#tbllistado tfoot th').each( function () {
+      var titulocolumnatfoot = $(this).text();
+      var valor_encontrado_en_array = campos_busqueda.indexOf(titulocolumnatfoot); 
+      if(valor_encontrado_en_array >= 0){
+        $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
+      }
+    });
     // armar columas para datatable se arma desde funcionesglobales.js
     var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
     tabla=$('#tbllistado').DataTable({
@@ -115,14 +123,24 @@ function listar(){
             else{ $(row).addClass(''); }
         },
         columns: campos_tabla,
-        "initComplete": function() {
-            var $buscar = $('div.dataTables_filter input');
-            $buscar.unbind();
-            $buscar.bind('keyup change', function(e) {
-                if(e.keyCode == 13 || this.value == "") {
-                $('#tbllistado').DataTable().search( this.value ).draw();
-                }
+        initComplete: function () {
+          // Aplicar busquedas por columna
+          this.api().columns().every( function () {
+            var that = this;
+            $('input',this.footer()).on( 'change', function(){
+              if(that.search() !== this.value){
+                that.search(this.value).draw();
+              }
             });
+          });
+          //Aplicar busqueda general
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistado').DataTable().search( this.value ).draw();
+              }
+          });
         }
     });
     //modificacion al dar doble click
@@ -161,7 +179,7 @@ function obtenerseriesdocumento(){
                                     '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                                 '</div>';  
     $("#contenidomodaltablas").html(tablaseriesdocumento);
-    $('#tbllistadoseriedocumento').DataTable({
+    var tserdoc = $('#tbllistadoseriedocumento').DataTable({
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -191,7 +209,11 @@ function obtenerseriesdocumento(){
               }
           });
         },
-        
+    });  
+    //seleccionar registro al dar doble click
+    $('#tbllistadoseriedocumento tbody').on('dblclick', 'tr', function () {
+      var data = tserdoc.row( this ).data();
+      seleccionarseriedocumento(data.Serie);
     });  
 }
 function seleccionarseriedocumento(Serie){
@@ -234,7 +256,7 @@ function obtenerproveedores(){
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                             '</div>';
     $("#contenidomodaltablas").html(tablaproveedores);
-    $('#tbllistadoproveedor').DataTable({
+    var tprov = $('#tbllistadoproveedor').DataTable({
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -267,8 +289,12 @@ function obtenerproveedores(){
                 }
             });
         },
-        
-    }); 
+    });  
+    //seleccionar registro al dar doble click
+    $('#tbllistadoproveedor tbody').on('dblclick', 'tr', function () {
+            var data = tprov.row( this ).data();
+            seleccionarproveedor(data.Numero, data.Nombre, data.Plazo);
+    });  
 } 
 function seleccionarproveedor(Numero, Nombre, Plazo, fechahoy, fechahoyespanol){
     var numeroproveedoranterior = $("#numeroproveedoranterior").val();
@@ -285,7 +311,7 @@ function seleccionarproveedor(Numero, Nombre, Plazo, fechahoy, fechahoyespanol){
             $("#tabladetallecontrarecibos").html(data.filascompras);
             $("#totalcontrarecibos").val(number_format(round(0, numerodecimales), numerodecimales, '.', ''));
             //funcion asincrona para colocar la fecha actual si el usuario lo desea
-            cambiarfechaapagar(fechahoy, fechahoyespanol).then(resultado=>{})
+            cambiarfechaapagar(data.fechahoy, data.fechahoyespanol).then(resultado=>{})
             $('.page-loader-wrapper').css('display', 'none');
         });
         mostrarformulario();
@@ -444,7 +470,7 @@ function alta(){
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
         var index = $(this).index(".inputnext");          
-        $(".inputnext").eq(index + 1).focus(); 
+        $(".inputnext").eq(index + 1).focus().select(); 
       }
     });
 }
@@ -710,7 +736,7 @@ function obtenerdatos(contrarecibomodificar){
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
         var index = $(this).index(".inputnext");          
-        $(".inputnext").eq(index + 1).focus(); 
+        $(".inputnext").eq(index + 1).focus().select(); 
       }
     });
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
@@ -874,6 +900,9 @@ function configurar_tabla(){
     //formulario configuracion tablas se arma desde funcionesglobales.js
     var tabs = armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbusquedas);
     $("#tabsconfigurartabla").html(tabs);
+    if(rol_usuario_logueado == 1){
+      $("#divorderbystabla").show();
+    }
     $("#string_datos_ordenamiento_columnas").val(columnas_ordenadas);
     $("#string_datos_tabla_true").val(campos_activados);
     $("#string_datos_tabla_false").val(campos_desactivados);
