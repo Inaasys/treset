@@ -517,6 +517,7 @@ function alta(){
       $(".inputnextdet").eq(index + 1).focus().select(); 
     }
   });
+  setTimeout(function(){$("#folio").focus();},500);
 }
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
@@ -769,6 +770,7 @@ function obtenerdatos(cotizacionmodificar){
         $(".inputnextdet").eq(index + 1).focus().select(); 
       }
     });
+    setTimeout(function(){$("#folio").focus();},500);
   }).fail( function() {
     msj_errorajax();
     $('.page-loader-wrapper').css('display', 'none');

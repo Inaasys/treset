@@ -9,7 +9,9 @@ class Producto extends Model
 {
     public $timestamps = false;
     protected $table = 'Productos';
-    protected $primaryKey = 'Codigo';
+    //protected $primaryKey = 'Codigo';
+    protected $primaryKey = null;
+    public $incrementing = false;
     protected $fillable = [
         'Supercedido', 
         'Producto', 

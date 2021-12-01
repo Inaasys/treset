@@ -653,6 +653,26 @@ function permisos(id){
                                         '<label for="idregistros.notas.credito.proveedores.cambios">Cambios</label>'+ 
                                     '</div>'+
                                 '</div>'+
+
+
+
+                                '<div class="col-md-6">'+
+                                    '<label>Carta Porte</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="menuregistroscartasporte" id="idmenuregistroscartasporte" class="filled-in submenu accesoregistros" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenuregistroscartasporte">Acceso</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="registros.cartasporte.altas" id="idregistros.cartasporte.altas" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
+                                        '<label for="idregistros.cartasporte.altas">Altas</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="registros.cartasporte.bajas" id="idregistros.cartasporte.bajas" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
+                                        '<label for="idregistros.cartasporte.bajas">Bajas</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="registros.cartasporte.cambios" id="idregistros.cartasporte.cambios" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
+                                        '<label for="idregistros.cartasporte.cambios">Cambios</label>'+ 
+                                    '</div>'+
+                                '</div>'+
+
+                                
+                            '</div>'+
+                            '<div class="row">'+
                                 '<div class="col-md-6">'+
                                     '<label>Cíclicos</label>'+
                                     '<div class="col-md-12 form-check">'+
@@ -666,8 +686,6 @@ function permisos(id){
                                         '<label for="idregistros.ciclicos.cambios">Cambios</label>'+ 
                                     '</div>'+
                                 '</div>'+
-                            '</div>'+
-                            '<div class="row">'+
                                 '<div class="col-md-6">'+
                                     '<label>Ajustes de Inventario</label>'+
                                     '<div class="col-md-12 form-check">'+
@@ -681,6 +699,8 @@ function permisos(id){
                                         '<label for="idregistros.ajustes.inventario.cambios">Cambios</label>'+ 
                                     '</div>'+
                                 '</div>'+
+                            '</div>'+
+                            '<div class="row">'+
                                 '<div class="col-md-6">'+
                                     '<label>Asignación de Herramienta</label>'+
                                     '<div class="col-md-12 form-check">'+
@@ -698,8 +718,6 @@ function permisos(id){
                                         '<label for="idregistros.asignacion.herramienta.auditoria.altas">Auditoria</label>'+
                                     '</div>'+
                                 '</div>'+
-                            '</div>'+
-                            '<div class="row">'+
                                 '<div class="col-md-6">'+
                                     '<label>Prestamo de Herramienta</label>'+
                                     '<div class="col-md-12 form-check">'+
@@ -713,7 +731,6 @@ function permisos(id){
                                         '<label for="idregistros.prestamo.herramienta.cambios">Cambios</label>'+
                                         '&nbsp;&nbsp;<input type="checkbox" name="registros.prestamo.herramienta.terminar" id="idregistros.prestamo.herramienta.terminar" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
                                         '<label for="idregistros.prestamo.herramienta.terminar">Terminar</label>'+ 
-
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
@@ -945,6 +962,25 @@ function permisos(id){
                                         '<label for="idcatalogos.folios.fiscales.folios.pagos.cambios">Cambios</label>'+
                                     '</div>'+
                                 '</div>'+
+
+
+                                '<div class="col-md-6">'+
+                                    '<label>Folios Cartas Porte</label>'+
+                                    '<div class="col-md-12 form-check">'+ 
+                                        '<input type="checkbox" name="menucatalogofoliosfiscalesfolioscartasporte" id="idmenucatalogofoliosfiscalesfolioscartasporte" class="filled-in submenu accesocatalogos" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idmenucatalogofoliosfiscalesfolioscartasporte">Acceso</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="catalogos.folios.fiscales.folios.cartasporte.altas" id="idcatalogos.folios.fiscales.folios.cartasporte.altas" class="filled-in crudcatalogos permisoscrud" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idcatalogos.folios.fiscales.folios.cartasporte.altas">Altas</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="catalogos.folios.fiscales.folios.cartasporte.bajas" id="idcatalogos.folios.fiscales.folios.cartasporte.bajas" class="filled-in crudcatalogos permisoscrud" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idcatalogos.folios.fiscales.folios.cartasporte.bajas">Bajas</label>'+
+                                        '&nbsp;&nbsp;<input type="checkbox" name="catalogos.folios.fiscales.folios.cartasporte.cambios" id="idcatalogos.folios.fiscales.folios.cartasporte.cambios" class="filled-in crudcatalogos permisoscrud" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idcatalogos.folios.fiscales.folios.cartasporte.cambios">Cambios</label>'+
+                                    '</div>'+
+                                '</div>'+
+
+
+                            '</div>'+
+                            '<div class="row">'+
                                 '<div class="col-md-6">'+
                                     '<label>Personal</label>'+
                                     '<div class="col-md-12 form-check">'+ 
@@ -958,17 +994,12 @@ function permisos(id){
                                         '<label for="idcatalogos.personal.cambios">Cambios</label>'+
                                     '</div>'+
                                 '</div>'+
-                            '</div>'+
-                            '<div class="row">'+
                                 '<div class="col-md-6">'+
                                     '<label>Existencias</label>'+
                                     '<div class="col-md-12 form-check">'+ 
                                         '<input type="checkbox" name="menucatalogoexistencias" id="idmenucatalogoexistencias" class="filled-in submenu accesocatalogos" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
                                         '<label for="idmenucatalogoexistencias">Acceso</label>'+
                                     '</div>'+
-                                '</div>'+
-                                '<div class="col-md-6">'+
-                                   
                                 '</div>'+
                             '</div>'+
                             '<div class="row">'+
@@ -1186,6 +1217,25 @@ function permisos(id){
                                         '<label for="idregistros.cuentas.x.cobrar.cancelartimbres"></label>'+                                     
                                     '</div>'+
                                 '</div>'+
+
+
+
+                                '<div class="col-md-6">'+
+                                    '<label>Timbrar Cartas Porte</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="registros.cartasporte.timbrar" id="idregistros.cartasporte.timbrar" class="filled-in permisoscrud timbrardocumentos" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idregistros.cartasporte.timbrar"></label>'+                                     
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-md-6">'+
+                                    '<label>Cancelar Timbres Cartas Porte</label>'+
+                                    '<div class="col-md-12 form-check">'+
+                                        '<input type="checkbox" name="registros.cartasporte.cancelartimbres" id="idregistros.cartasporte.cancelartimbres" class="filled-in permisoscrud cancelartimbresdocumentos" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                        '<label for="idregistros.cartasporte.cancelartimbres"></label>'+                                     
+                                    '</div>'+
+                                '</div>'+
+
+
                             '</div>'+
                             '<div class="row">'+
                                 '<div class="col-md-6">'+

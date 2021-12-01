@@ -12,8 +12,8 @@
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Registros <span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="{{ route('ordenes_compra') }}" id="menuregistrosordenescompra">Ordenes de Compra</a></li>
-            <li><a href="{{ route('compras') }}" id="menuregistroscompras">Compras</a></li>
+            <li><a href="{{ route('ordenes_compra') }}" id="menuregistrosordenescompra">Ordenes de Compra <b>--> SHIFT+O</b></a></li>
+            <li><a href="{{ route('compras') }}" id="menuregistroscompras">Compras <b>--> CTRL+S</b></a></li>
             <li><a href="{{ route('contrarecibos') }}"  id="menuregistroscontrarecibos">ContraRecibos</a></li> 
             <li class="dropdown-submenu">
               <a class="test" href="#">Cotizaciones <span class="caret"></span></a>
@@ -24,45 +24,40 @@
               </ul>
             </li>  
             <!--<li><a href="#" id="menuregistrospedidos">Pedidos</a></li>-->
-            <li><a href="{{ route('remisiones') }}" id="menuregistrosremisiones">Remisiones</a></li>
-            <li><a href="{{ route('facturas') }}" id="menuregistrosfacturas">Facturas</a></li>         
+            <li><a href="{{ route('remisiones') }}" id="menuregistrosremisiones">Remisiones <b>--> CTRL+R</b></a></li>
+            <li><a href="{{ route('facturas') }}" id="menuregistrosfacturas">Facturas <b>--> CTRL+F</b></a></li>         
             
             <li class="dropdown-submenu">
-              <a class="test" href="#">Producción <span class="caret"></span></a>
+              <a class="test" href="#">Producción<span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a  href="{{ route('produccion') }}" id="menuregistrosproduccion">Producción</a></li>
+                <li><a  href="{{ route('produccion') }}" id="menuregistrosproduccion">Producción <b>--> SHIFT+P</b></a></li>
               </ul>
             </li> 
-            <li><a href="{{ route('requisiciones') }}" id="menuregistrosrequisiciones">Requisiciones</a></li> 
-
-            <li><a href="{{ route('traspasos') }}" id="menuregistrostraspasos">Traspasos</a></li>                    
-            <li><a href="{{ route('ordenes_trabajo') }}" id="menuregistrosordenestrabajo">Ordenes de Trabajo</a></li>
+            <li><a href="{{ route('requisiciones') }}" id="menuregistrosrequisiciones">Requisiciones <b>--> SHIFT+R</b></a></li> 
+            <li><a href="{{ route('traspasos') }}" id="menuregistrostraspasos">Traspasos <b>--> SHIFT+T</b></a></li>                    
+            <li><a href="{{ route('ordenes_trabajo') }}" id="menuregistrosordenestrabajo">Ordenes de Trabajo <b>--> ALT+O</b></a></li>
             <li><a href="{{ route('cuentas_por_pagar') }}" id="menuregistroscuentasxpagar">Cuentas por Pagar</a></li>
             <li><a href="{{ route('cuentas_por_cobrar') }}" id="menuregistroscuentasxcobrar">Cuentas por Cobrar</a></li>            
             <li><a href="{{ route('notas_credito_clientes') }}" id="menuregistrosnotascreditoclientes">Notas de Crédito Clientes</a></li>
             <li><a href="{{ route('notas_credito_proveedores') }}" id="menuregistrosnotascreditoproveedores">Notas de Crédito Proveedores</a></li>
+            <li><a href="{{ route('carta_porte') }}" id="menuregistroscartasporte">Cartas Porte</a></li>
             <!--<li><a href="#" id="menuregistrosciclicos">Cíclicos</a></li>-->
             <li><a href="{{ route('asignacionherramienta') }}" id="menuregistrosasignacionherramienta">Asignación Herramienta</a></li>
             <li><a href="{{ route('prestamoherramienta') }}" id="menuregistrosprestamoherramienta">Prestamo Herramienta</a></li>
-            <li><a href="{{ route('ajustesinventario') }}" id="menuregistrosajusteinventario">Ajustes de Inventario</a></li>
+            <li><a href="{{ route('ajustesinventario') }}" id="menuregistrosajusteinventario">Ajustes de Inventario <b>--> CTRL+A</b></a></li>
           </ul>
         </li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Catálogos <span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="{{ route('clientes') }}" id="menucatalogoclientes">Clientes</a></li>
+            <li><a href="{{ route('clientes') }}" id="menucatalogoclientes">Clientes <b>--> ALT+C</b></a></li>
             <li><a href="{{ route('agentes') }}" id="menucatalogoagentes">Agentes</a></li>
-            <li><a href="{{ route('proveedores') }}" id="menucatalogoproveedores">Proveedores</a></li>                  
+            <li><a href="{{ route('proveedores') }}" id="menucatalogoproveedores">Proveedores <b>--> ALT+P</b></a></li>                  
             <li><a href="{{ route('almacenes') }}" id="menucatalogoalmacenes">Almacenes</a></li>                   
             <li><a href="{{ route('marcas') }}" id="menucatalogomarcas">Marcas</a></li>
             <li><a href="{{ route('lineas') }}" id="menucatalogolineas">Lineas</a></li>
-            <li><a href="{{ route('productos') }}" id="menucatalogoproductos">Productos</a></li>
-            <li class="dropdown-submenu">
-              <a class="test" href="#">Existencias <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="{{ route('existencias') }}" id="menucatalogoexistencias">Existencias</a></li>
-              </ul>
-            </li>                
+            <li><a href="{{ route('productos') }}" id="menucatalogoproductos">Productos <b>--> CTRL+P</b></a></li>               
+            <li><a href="{{ route('existencias') }}" id="menucatalogoexistencias">Existencias <b>--> CTRL+E</b></a></li>              
             <li><a href="{{ route('bancos') }}" id="menucatalogobancos">Bancos</a></li>              
             <li><a href="{{ route('tecnicos') }}" id="menucatalogotecnicos">Técnicos</a></li>
             <li><a href="{{ route('servicios') }}" id="menucatalogoservicios">Servicios</a></li>
@@ -80,6 +75,7 @@
                 <li><a href="{{ route('folios_comprobantes_facturas') }}" id="menucatalogofoliosfiscalesfoliosfacturas">Folios Facturas</a></li>
                 <li><a href="{{ route('folios_comprobantes_notas') }}" id="menucatalogofoliosfiscalesfoliosnotas">Folios Notas de Crédito</a></li>
                 <li><a href="{{ route('folios_comprobantes_pagos') }}" id="menucatalogofoliosfiscalesfoliospagos">Folios Pagos</a></li>
+                <li><a href="{{ route('folios_comprobantes_cartasporte') }}" id="menucatalogofoliosfiscalesfolioscartasporte">Folios Cartas Porte</a></li>
               </ul>
             </li>
             <li><a href="{{ route('personal') }}" id="menucatalogopersonal">Personal</a></li>
@@ -359,16 +355,7 @@
               </a>
             </li>  
           </ul>
-        </li>              
-        <!--<li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Ventana <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="#">Cascada</a></li>
-            <li><a href="#">Horizontal</a></li>
-            <li><a href="#">Vertical</a></li>                 
-            <li><a href="#">Piensa</a></li>
-          </ul>
-        </li>-->
+        </li>      
       </ul>
       <ul class="nav navbar-nav navbar-right infousuario">
         <li class="dropdown">

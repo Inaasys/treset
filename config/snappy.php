@@ -41,7 +41,7 @@ return [
         'enabled' => true,
         'binary' => base_path('vendor/wemersonjanuario/wkhtmltopdf-windows/bin/64bit/wkhtmltopdf.exe'),
         //'binary' => base_path('vendor/h4cc/wkhtmltopdf-amd64/bin/wkhtmltopdf-amd64'),
-        'timeout' => false,
+        'timeout' => 3600,
         'options' => [],
         'env'     => [],
     ],

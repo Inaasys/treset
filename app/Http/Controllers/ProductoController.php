@@ -29,6 +29,8 @@ use App\VistaProducto;
 use App\ContraReciboDetalle;
 use App\TipoOrdenCompra;
 use GuzzleHttp\Client;
+use DNS1D;
+use DNS2D;
 use PDF;
 use Mail;
 
@@ -57,7 +59,9 @@ class ProductoController extends ConfiguracionSistemaController{
     public function productos(){
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('productos_guardar_configuracion_tabla');
-        return view('catalogos.productos.productos', compact('configuracion_tabla','rutaconfiguraciontabla'));
+        $rutacrearpdfcodigosdebarrascatalogo = route('productos_generar_codigos_barras_catalogo');
+        $rutacrearpdfcodigosdebarrasarray = route('productos_generar_codigos_barras_array');
+        return view('catalogos.productos.productos', compact('configuracion_tabla','rutaconfiguraciontabla','rutacrearpdfcodigosdebarrascatalogo','rutacrearpdfcodigosdebarrasarray'));
     }
     //obtener todos los registros
     public function productos_obtener(Request $request){
@@ -195,7 +199,7 @@ class ProductoController extends ConfiguracionSistemaController{
             $data = Moneda::orderBy('Clave', 'ASC')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarmoneda(\''.$data->Clave .'\')">Seleccionar</div>';
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarmoneda(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->rawColumns(['operaciones'])
@@ -203,13 +207,8 @@ class ProductoController extends ConfiguracionSistemaController{
         }        
     }    
     public function pruebas(){
-
-
         return view ('pruebas.pruebas');
-
-        
-
-/*
+        /*
         $endpoint = config('app.endpointapicurrencylayer');
         $access_key = config('app.keyapicurrencylayer');
         define('VT_URL', 'http://api.currencylayer.com/'.$endpoint.'?access_key='.$access_key.'&currencies=MXN');
@@ -220,8 +219,8 @@ class ProductoController extends ConfiguracionSistemaController{
         $resultado = json_decode($respuesta->getBody());
         //obtener valor del dolar
         $valor_dolar = $resultado->quotes->USDMXN;
-        dd($valor_dolar);*/
-
+        dd($valor_dolar);
+        */
 
 		/*
 		$nombre = 'Receptor envio de correos';
@@ -241,27 +240,30 @@ class ProductoController extends ConfiguracionSistemaController{
                     ->subject('Respaldo');
                     //->attach($urlinventarioactual)
                     //->attach($urlreporteventas);
-        });*/
-		
+        });
+        */
 
-        /*$pdf = \PDF::loadView('pruebas.pruebas');
+        /*
+        $pdf = \PDF::loadView('pruebas.pruebas');
         $pdf->setOption('enable-javascript', true);
         $pdf->setOption('javascript-delay', 15000);
         $pdf->setOption('enable-smart-shrinking', true);
         $pdf->setOption('no-stop-slow-scripts', true);
         $pdf->setOption('lowquality', false);
-        return $pdf->stream('graph.pdf');*/
+        return $pdf->stream('graph.pdf');
+        */
 
-/*
+        /*
         $pdf = PDF::loadView('welcome');
-
         $pdf->setOption('enable-javascript', true);
         $pdf->setOption('javascript-delay', 1000);
         $pdf->setOption('no-stop-slow-scripts', true);
         $pdf->setOption('enable-smart-shrinking', true);
-        return $pdf->download();*/
+        return $pdf->download();
+        */
 
-        /*$endpoint = config('app.endpointapicurrencylayer');
+        /*
+        $endpoint = config('app.endpointapicurrencylayer');
         $access_key = config('app.keyapicurrencylayer');
         define('VT_URL', 'http://api.currencylayer.com/'.$endpoint.'?access_key='.$access_key.'&currencies=MXN');
         //crear cliente Guzzle HTTP
@@ -271,7 +273,8 @@ class ProductoController extends ConfiguracionSistemaController{
         $resultado = json_decode($respuesta->getBody());
         //obtener valor del dolar
         $valor_dolar = $resultado->quotes->USDMXN;
-        dd($valor_dolar);*/
+        dd($valor_dolar);
+        */
 
     } 
     //obtener claves productos
@@ -359,6 +362,108 @@ class ProductoController extends ConfiguracionSistemaController{
                     ->make(true);
         }        
     } 
+    //obtener datos de cliente para agregar a la afila
+    public function productos_obtener_datos_cliente_agregar_fila(Request $request){
+        $numero = '';
+        $nombre = '';
+        $existecliente = Cliente::where('Numero', $request->numeroabuscar)->where('Status', 'ALTA')->count();
+        if($existecliente > 0){
+            $cliente = Cliente::where('Numero', $request->numeroabuscar)->first();
+            $numero = $cliente->Numero;
+            $nombre = $cliente->Nombre;
+        }
+        $data = array(
+            'existecliente' => $existecliente,
+            'numero' => $numero,
+            'nombre' => $nombre
+        );
+        return response()->json($data);
+    }
+
+    //obtener clave producto por clave
+    public function productos_obtener_clave_producto_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existeclaveproducto = ClaveProdServ::where('Clave', $request->claveproducto)->count();
+        if($existeclaveproducto > 0){
+            $claveproducto = ClaveProdServ::where('Clave', $request->claveproducto)->first();
+            $clave = $claveproducto->Clave;
+            $nombre = $claveproducto->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+    }
+
+    //obtener clave unidad por clave
+    public function productos_obtener_clave_unidad_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existeclaveunidad = ClaveUnidad::where('Clave', $request->claveunidad)->count();
+        if($existeclaveunidad > 0){
+            $claveunidad = ClaveUnidad::where('Clave', $request->claveunidad)->first();
+            $clave = $claveunidad->Clave;
+            $nombre = $claveunidad->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+    }
+
+    //obtener marca por numero
+    public function productos_obtener_marca_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $existemarca = Marca::where('Numero', $request->marca)->count();
+        if($existemarca > 0){
+            $marca = Marca::where('Numero', $request->marca)->first();
+            $numero = $marca->Numero;
+            $nombre = $marca->Nombre;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+    }
+
+    //obtener linea por numero
+    public function productos_obtener_linea_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $existelinea = Linea::where('Numero', $request->linea)->count();
+        if($existelinea > 0){
+            $linea = Linea::where('Numero', $request->linea)->first();
+            $numero = $linea->Numero;
+            $nombre = $linea->Nombre;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+    }
+
+    //obtener modenas por clave
+    public function productos_obtener_moneda_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existemoneda = Moneda::where('Clave', $request->moneda)->count();
+        if($existemoneda > 0){
+            $moneda = Moneda::where('Clave', $request->moneda)->first();
+            $clave = $moneda->Clave;
+            $nombre = $moneda->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+    }
 
     //obtener tipos prod
     public function productos_obtener_tipos_prod(){
@@ -404,6 +509,36 @@ class ProductoController extends ConfiguracionSistemaController{
                     ->make(true);
         } 
     }
+    //obtener datos de cliente para agregar a la afila
+    public function productos_obtener_datos_producto_agregar_fila(Request $request){
+        $codigo = '';
+        $nombreproducto = '';
+        $unidad = '';
+        $inventariable = '';
+        $costo = '';
+        $venta = '';
+        $existeproducto = Producto::where('Codigo', $request->codigoabuscar)->where('Status', 'ALTA')->count();
+        if($existeproducto > 0){
+            $producto = Producto::where('Codigo', $request->codigoabuscar)->where('Status', 'ALTA')->first();
+            $codigo = $producto->Codigo;
+            $nombreproducto = htmlspecialchars($producto->Producto, ENT_QUOTES);
+            $unidad = $producto->Unidad;
+            $inventariable = $producto->Inventariable;
+            $costo = Helpers::convertirvalorcorrecto($producto->Costo);
+            $venta = Helpers::convertirvalorcorrecto($producto->Venta);
+        }
+        $data = array(
+            'existeproducto' => $existeproducto,
+            'codigo' => $codigo,
+            'nombreproducto' => $nombreproducto,
+            'unidad' => $unidad,
+            'inventariable' => $inventariable,
+            'costo' => $costo,
+            'venta' => $venta
+        );
+        return response()->json($data);
+    }
+    
     //guardar en catalogo
     public function productos_guardar(Request $request){
         $codigo=$request->codigo;
@@ -466,6 +601,7 @@ class ProductoController extends ConfiguracionSistemaController{
     //obtener datos del catalogo
     public function productos_obtener_producto(Request $request){
         $producto = Producto::where('Codigo', $request->codigoproducto)->first();
+        $barcode = DNS1D::getBarcodeSVG($request->codigoproducto, 'C128', 1,55,'black', true);
         $valores_producto = Producto::where('Codigo', $request->codigoproducto)->get();
         $marca = Marca::where('Numero', $producto->Marca)->first();
         $linea = Linea::where('Numero', $producto->Linea)->first();
@@ -532,6 +668,7 @@ class ProductoController extends ConfiguracionSistemaController{
         }
         $data = array(
             "producto" => $producto,
+            "barcode" => $barcode,
             "pt" => $valores_producto[0]->Pt,
             "valores_producto" => $valores_producto,
             "marca" => $marca,
@@ -559,6 +696,69 @@ class ProductoController extends ConfiguracionSistemaController{
         );
         return response()->json($data);
     }  
+    //validar si existe codigo
+    public function productos_validar_si_existe_codigo(Request $request){
+        $resultado = Producto::where('Codigo', $request->valorgenerarcodigobarras)->count();
+        $producto = '';
+        if($resultado > 0){
+            $producto = DNS1D::getBarcodeSVG($request->valorgenerarcodigobarras, 'C128', 1,55,'black', true);
+        }
+        $data = array(
+            'resultado' => $resultado,
+            'producto' => $producto
+        );
+        return response()->json($data);
+    }
+    //generar codigos de barras de todos el catalogo
+    public function productos_generar_codigos_barras_catalogo(Request $request){
+        $tipoprod = $request->tipoprodcodigosbarras;
+        $status = $request->statuscodigosbarras;
+        $codigos = Producto::select('Codigo')
+        ->where(function($q) use ($tipoprod) {
+            if($tipoprod != "TODOS"){
+                $q->where('TipoProd', $tipoprod);
+            }
+        })
+        ->where(function($q) use ($status) {
+            if($status != "TODOS"){
+                $q->where('Status', $status);
+            }
+        })
+        ->get();
+        $tipo = 1;
+        $pdf = PDF::loadView('catalogos.productos.formato_pdf_codigos_de_barras', compact('codigos','tipo'))
+        ->setPaper('Letter')
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        return $pdf->stream();
+    }
+    //generar codigos de barras por array
+    public function productos_generar_codigos_barras_array(Request $request){
+        $stringcodigosparacodigosdebarras = $request->arraycodigosparacodigosdebarras;
+        $eliminarcoma = substr($stringcodigosparacodigosdebarras, 1);
+        $codigos = explode(",", $eliminarcoma);
+        $tipo = 2;
+        $pdf = PDF::loadView('catalogos.productos.formato_pdf_codigos_de_barras', compact('codigos','tipo'))
+        ->setPaper('Letter')
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        return $pdf->stream();
+    }
+    //generar codigo de barras por codigo desde modificiacion
+    public function productos_generar_pdf_codigo_barras(Request $request){
+        $numimpresiones = $request->numimpresiones;
+        $codigos = array();
+        array_push($codigos, $request->codigo);
+        $tipo = 3;
+        $pdf = PDF::loadView('catalogos.productos.formato_pdf_codigos_de_barras', compact('codigos','tipo','numimpresiones'))
+        ->setPaper('Letter')
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        return $pdf->stream();
+    }
     //modificar en catalogo
     public function productos_guardar_modificacion(Request $request){
         $codigo= $request->codigo;

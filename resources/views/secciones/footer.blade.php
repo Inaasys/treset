@@ -1,3 +1,21 @@
+    <!--RUTAS ATAJOS-->
+    <script>
+        var ordenes_compra = '{!!URL::to('ordenes_compra')!!}';
+        var compras = '{!!URL::to('compras')!!}';
+        var remisiones = '{!!URL::to('remisiones')!!}';
+        var facturas = '{!!URL::to('facturas')!!}';
+        var productos = '{!!URL::to('productos')!!}';
+        var existencias = '{!!URL::to('existencias')!!}';
+        var requisiciones = '{!!URL::to('requisiciones')!!}';
+        var produccion = '{!!URL::to('produccion')!!}';
+        var traspasos = '{!!URL::to('traspasos')!!}';
+        var ajustesinventario = '{!!URL::to('ajustesinventario')!!}';
+        var notas_credito_clientes = '{!!URL::to('notas_credito_clientes')!!}';
+        var notas_credito_proveedores = '{!!URL::to('notas_credito_proveedores')!!}';
+        var ordenes_trabajo = '{!!URL::to('ordenes_trabajo')!!}';
+        var clientes = '{!!URL::to('clientes')!!}';
+        var proveedores = '{!!URL::to('proveedores')!!}';
+    </script>
     <!-- Jquery Core Js -->
     <script src="plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap Core Js -->
@@ -12,6 +30,11 @@
     <script src="js/admin.js"></script>
     <!-- Demo Js 
     <script src="js/demo.js"></script>-->
+    <!-- Atajos teclas -->
+    <!--https://rawgit.com/jeresig/jquery.hotkeys/master/test-static-01.html-->
+    <!--https://github.com/jeresig/jquery.hotkeys-->
+
+    <script src="js/atajosteclas/jquery.hotkeys.js"></script>
     <!-- cargador de imagenes input file-->
     <script src="js/dropify/dropify.min.js"></script>
     <script src="js/dropify/forms_file_input.min.js"></script>   

@@ -9298,7 +9298,6 @@ html.ie11 .bs-searchbox .form-control {
   font-weight: 400;
   src: url(../fonts/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format('woff2');
 }
-
 .material-icons {
   font-family: 'Material Icons';
   font-weight: normal;
@@ -9343,14 +9342,12 @@ html.ie11 .bs-searchbox .form-control {
   height: 25px !important;
 }
 /*|||||||||FIN IMPORTANTE ESTILOS PARA INPUTS DE LOS DETALLES EN MODULOS||||||||*/
-
-
-
-
-
-
-
 /*||||||ESTILOS PARA QUE LAS TABLAS DE DETALLES TENGAN LA CABECERA FIJA|||||||*/
 .cabecerafija          { overflow-y: auto; height: 100px; }
 .cabecerafija thead th { position: sticky; top: 0; }
 /*|||||||||||||||||||||||||||||||||||||||||||||||*/
+/*COLOCAR EN NEGRITAS Y AUMENTAR EL TAMAÑO DEL MENSAJE EN LAS NOTIFICACIONES DE TODO EL SISTEMA TOASTR*/
+.toast-message { 
+  font-size: 13px !important;
+  font-weight: bold !important;
+}

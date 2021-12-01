@@ -1509,6 +1509,7 @@ function alta(){
         $(".inputnexttabre").eq(index + 1).focus().select(); 
       }
     });
+    setTimeout(function(){$("#folio").focus();},500);
 }
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
@@ -2044,6 +2045,7 @@ function obtenerdatos(cxcmodificar){
         $(".inputnexttabre").eq(index + 1).focus().select(); 
       }
     });
+    setTimeout(function(){$("#folio").focus();},500);
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {
@@ -2105,6 +2107,8 @@ function enviardocumentoemail(documento){
             $("#incluir_xml").attr('onclick','javascript: return false;');
         }
         $("#divincluirxml").show();
+        $(".dropify-clear").trigger("click");
+        $("#divadjuntararchivo").hide();
         $("#modalenviarpdfemail").modal('show');
     })   
 }

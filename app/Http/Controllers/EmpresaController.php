@@ -194,6 +194,7 @@ class EmpresaController extends ConfiguracionSistemaController{
             'CorreoDefault1EnvioDocumentos' => $request->correodefault1enviodocumentos,
             'CorreoDefault2EnvioDocumentos' => $request->correodefault2enviodocumentos,
             'UsuariosModificarInsumo' => $usuariosamodificarinsumos,
+            'VerificarPartidasRemisionEnOT' => $request->verificarpartidasremisionenot
         ]);
         return response()->json($request->all());
     }
@@ -227,6 +228,15 @@ class EmpresaController extends ConfiguracionSistemaController{
             'background_forms_and_modals' => $request->selectcolorformsandmodals,
             'background_tables' => $request->selectcolortables
         ]);
+        //actualizar logo en facturapi
+        if($this->empresa->IdFacturapi != ""){
+            $path = public_path('logotipo_empresa');
+            $urllogo = $path."\\".$nuevo_nombre_archivo;
+            $modificar_logo = $this->facturapi->Organizations->uploadLogo(
+                $this->empresa->IdFacturapi,
+                $urllogo
+            );
+        }
         return response()->json($nuevo_nombre_archivo);
     }
     //guardar registro de empresa en facturapi

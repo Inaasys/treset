@@ -27,7 +27,8 @@
         "rap2hpoutre/laravel-log-viewer": "^1.7",
         "simplesoftwareio/simple-qrcode": "~2",
         "wemersonjanuario/wkhtmltopdf-windows": "0.12.2.3",
-        "yajra/laravel-datatables-oracle": "~9.0"
+        "yajra/laravel-datatables-oracle": "~9.0",
+        "milon/barcode": "^6.0"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",

@@ -653,6 +653,102 @@ function regresarnumeroalmacen(){
     var numeroalmacenanterior = $("#numeroalmacenanterior").val();
     $("#numeroalmacen").val(numeroalmacenanterior);
 }
+//obtener por folio
+function obtenerordenporfolio(){
+    var ordenanterior = $("#ordenanterior").val();
+    var orden = $("#orden").val();
+    if(ordenanterior != orden){
+        if($("#orden").parsley().isValid()){
+            var codigos = new Array();
+            $("tr.filasproductos").each(function () {
+                codigos.push($('.codigoproductopartida', this).val());
+            }); 
+            var orden = $("#orden").val();
+            $.get(remisiones_revisar_insumos_orden_trabajo_por_folio, {orden:orden,codigos:codigos}, function(data){
+                if(data.numeroinsumosenorden > 0){
+                    toastr.info( data.insumos, "Mensaje", {
+                        "timeOut": "9000",
+                        "progressBar": true,
+                        "extendedTImeout": "9000"
+                    }); 
+                } 
+            }) 
+        }
+    }
+}
+//regresar folio
+function regresarfolioorden(){
+    var ordenanterior = $("#ordenanterior").val();
+    $("#orden").val(ordenanterior);
+}
+
+
+
+function listarseriesrequisiciones(){
+    ocultarformulario();
+    var tablaseriesrequisiciones = '<div class="modal-header '+background_forms_and_modals+'">'+
+                                        '<h4 class="modal-title">Series Requisiciones</h4>'+
+                                    '</div>'+
+                                    '<div class="modal-body">'+
+                                        '<div class="row">'+
+                                            '<div class="col-md-12">'+
+                                                '<div class="table-responsive">'+
+                                                    '<table id="tbllistadoserierequisicion" class="tbllistadoserierequisicion table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                                        '<thead class="'+background_tables+'">'+
+                                                            '<tr>'+
+                                                                '<th>Operaciones</th>'+
+                                                                '<th>Serie</th>'+
+                                                            '</tr>'+
+                                                        '</thead>'+
+                                                        '<tbody></tbody>'+
+                                                    '</table>'+
+                                                '</div>'+
+                                            '</div>'+   
+                                        '</div>'+
+                                    '</div>'+
+                                    '<div class="modal-footer">'+
+                                        '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                                    '</div>';
+    $("#contenidomodaltablas").html(tablaseriesrequisiciones);
+    var tcots = $('#tbllistadoserierequisicion').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,  
+        processing: true,
+        'language': {
+            'loadingRecords': '&nbsp;',
+            'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+            url: remisiones_obtener_series_requisiciones
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Serie', name: 'Serie' },
+        ],
+        "initComplete": function() {
+            var $buscar = $('div.dataTables_filter input');
+            $buscar.unbind();
+            $buscar.bind('keyup change', function(e) {
+                if(e.keyCode == 13 || this.value == "") {
+                    $('#tbllistadoserierequisicion').DataTable().search( this.value ).draw();
+                }
+            });
+        },
+    });    
+    //seleccionar registro al dar doble click
+    $('#tbllistadocotizacion tbody').on('dblclick', 'tr', function () {
+        var data = tcots.row( this ).data();
+        seleccionarcotizacion(data.Folio, data.Cotizacion);
+    }); 
+
+}
+
+
+
 //listar todas las cotizaciones
 function listarcotizaciones (){
     ocultarformulario();
@@ -1197,6 +1293,9 @@ function alta(){
                     '<li role="presentation">'+
                         '<a href="#pedidotab" data-toggle="tab">Pedido</a>'+
                     '</li>'+
+                    '<li role="presentation" id="tabrevisioninsumosottab">'+
+                        '<a href="#revisioninsumosottab" data-toggle="tab">Insumos carg. en OT</a>'+
+                    '</li>'+
                 '</ul>'+
                 '<div class="tab-content">'+
                     '<div role="tabpanel" class="tab-pane fade in active" id="remisiontab">'+
@@ -1328,8 +1427,41 @@ function alta(){
                                 '<input type="text" class="form-control inputnexttabpe" name="equipo" id="equipo" onkeyup="tipoLetra(this);"  data-parsley-length="[1, 20]" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-3">'+
-                                '<label>Requisición </label>'+
-                                '<input type="text" class="form-control inputnexttabpe" name="requisicion" id="requisicion"  onkeyup="tipoLetra(this);"  data-parsley-length="[1, 20]" autocomplete="off">'+
+                                '<label>Requisición</label>'+
+                                '<table class="col-md-12">'+
+                                    '<tr>'+
+                                        '<td>'+
+                                            '<div class="btn bg-blue waves-effect" id="btnobtenerproductos" onclick="listarseriesrequisiciones()">Series</div>'+
+                                        '</td>'+
+                                        '<td>'+ 
+                                            '<div class="form-line">'+
+                                            '<input type="text" class="form-control inputnext" name="serierequisicion" id="serierequisicion" placeholder="Serie" autocomplete="off">'+
+                                            '</div>'+
+                                        '</td>'+
+                                        '<td>'+ 
+                                            '<div class="form-line">'+
+                                            '<input type="text" class="form-control inputnext" name="requisicion" id="requisicion" placeholder="Número" autocomplete="off">'+
+                                            '</div>'+
+                                        '</td>'+
+                                    '</tr>'+    
+                                '</table>'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>'+
+                    '<div role="tabpanel" class="tab-pane fade" id="revisioninsumosottab" >'+
+                        '<div class="row">'+
+                            '<div class="col-md-3">'+
+                                '<label>Número O.T. <span class="label label-danger" id="textonombreorden"></span></label>'+
+                                '<table class="col-md-12">'+
+                                    '<tr>'+
+                                        '<td>'+
+                                            '<div class="form-line">'+
+                                                '<input type="text" class="form-control" name="orden" id="orden" autocomplete="off" onkeyup="tipoLetra(this);">'+
+                                                '<input type="hidden" class="form-control" name="ordenanterior" id="ordenanterior">'+
+                                            '</div>'+
+                                        '</td>'+
+                                    '</tr>'+    
+                                '</table>'+
                             '</div>'+
                         '</div>'+
                     '</div>'+
@@ -1462,6 +1594,11 @@ function alta(){
                 '</div>'+
             '</div>';
     $("#tabsform").html(tabs);
+    //ocultar tab de revision de insumos
+    if(verificarinsumosremisionenot == 'N'){
+        $("#revisioninsumosottab").hide();
+        $("#tabrevisioninsumosottab").hide();
+    }
     //mostrar mensaje de bajar plantilla
     $('[data-toggle="tooltip"]').tooltip({
       container: 'body'
@@ -1525,6 +1662,18 @@ function alta(){
     $('#numeroalmacen').on('change', function(e) {
         regresarnumeroalmacen();
     });
+    //activar busqueda para ordenes
+    $('#orden').on('keypress', function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        obtenerordenporfolio();
+      }
+    });
+    //regresar folio orden
+    $('#orden').on('change', function(e) {
+      regresarfolioorden();
+    });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
     $(".inputnext").keypress(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
@@ -1552,6 +1701,7 @@ function alta(){
         $(".inputnextdet").eq(index + 1).focus().select(); 
       }
     });
+    setTimeout(function(){$("#folio").focus();},500);
     $("#ModalAlta").modal('show');
 }
 //guardar el registro
@@ -1698,6 +1848,9 @@ function obtenerdatos(remisionmodificar){
                     '<li role="presentation">'+
                         '<a href="#pedidotab" data-toggle="tab">Pedido</a>'+
                     '</li>'+
+                    '<li role="presentation" id="tabrevisioninsumosottab">'+
+                        '<a href="#revisioninsumosottab" data-toggle="tab">Insumos carg. en OT</a>'+
+                    '</li>'+
                 '</ul>'+
                 '<div class="tab-content">'+
                     '<div role="tabpanel" class="tab-pane fade in active" id="remisiontab">'+
@@ -1830,6 +1983,23 @@ function obtenerdatos(remisionmodificar){
                             '</div>'+
                         '</div>'+
                     '</div>'+
+                    '<div role="tabpanel" class="tab-pane fade" id="revisioninsumosottab">'+
+                        '<div class="row">'+
+                            '<div class="col-md-3">'+
+                                '<label>Número O.T. <span class="label label-danger" id="textonombreorden"></span></label>'+
+                                '<table class="col-md-12">'+
+                                    '<tr>'+
+                                        '<td>'+
+                                            '<div class="form-line">'+
+                                                '<input type="text" class="form-control" name="orden" id="orden" autocomplete="off" onkeyup="tipoLetra(this);">'+
+                                                '<input type="hidden" class="form-control" name="ordenanterior" id="ordenanterior">'+
+                                            '</div>'+
+                                        '</td>'+
+                                    '</tr>'+    
+                                '</table>'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>'+
                 '</div>'+
             '</div>'+
             '<div class="col-md-12">'+
@@ -1949,6 +2119,11 @@ function obtenerdatos(remisionmodificar){
                 '</div>'+
             '</div>';
     $("#tabsform").html(tabs);
+    //ocultar tab de revision de insumos
+    if(verificarinsumosremisionenot == 'N'){
+        $("#revisioninsumosottab").hide();
+        $("#tabrevisioninsumosottab").hide();
+    }
     $("#periodohoy").val(data.remision.Periodo);
     $("#folio").val(data.remision.Folio);
     $("#serie").val(data.remision.Serie);
@@ -2048,6 +2223,18 @@ function obtenerdatos(remisionmodificar){
     $('#numeroalmacen').on('change', function(e) {
         regresarnumeroalmacen();
     });
+    //activar busqueda para ordenes
+    $('#orden').on('keypress', function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        obtenerordenporfolio();
+      }
+    });
+    //regresar folio orden
+    $('#orden').on('change', function(e) {
+      regresarfolioorden();
+    });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
     $(".inputnext").keypress(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
@@ -2077,6 +2264,7 @@ function obtenerdatos(remisionmodificar){
     });
     //asignar el tipo de operacion que se realizara
     $("#tipooperacion").val("modificacion");
+    setTimeout(function(){$("#folio").focus();},500);
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {
@@ -2143,6 +2331,8 @@ function enviardocumentoemail(documento){
       $("#email2cc").val(data.email2cc);
       $("#email3cc").val(data.email3cc);
       $("#emailasunto").val("REMISIÓN NO. " + documento +" DE "+ nombreempresa);
+      $(".dropify-clear").trigger("click");
+      $("#divadjuntararchivo").hide();
       $("#modalenviarpdfemail").modal('show');
     })   
 }

@@ -705,14 +705,13 @@ function obtenerproductoporcodigo(){
                       '</ul>'+
                       '<div class="tab-content">'+
                           '<div role="tabpanel" class="tab-pane fade in active" id="productotab">'+
-
                               '<div class="row">'+
                                   '<div class="col-md-4">'+
                                       '<label>Código<b style="color:#F44336 !important;">*</b></label>'+
-                                      '<input type="text" class="form-control" name="codigo" id="codigo" required readonly data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+
+                                      '<input type="text" class="form-control inputnexttabaddprod" name="codigo" id="codigo" required readonly data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+
                                   '</div>'+   
                                   '<div class="col-md-4">'+
-                                      '<label>Clave Producto<b style="color:#F44336 !important;">*</b></label>'+
+                                      '<label>Clave Producto<b style="color:#F44336 !important;">*</b></b><span class="label label-danger" id="textonombreclaveproducto"></span></label>'+
                                       '<div class="row">'+
                                           '<div class="col-md-4">'+
                                               '<span class="input-group-btn">'+
@@ -721,13 +720,14 @@ function obtenerproductoporcodigo(){
                                           '</div>'+  
                                           '<div class="col-md-8">'+
                                               '<div class="form-line">'+
-                                                  '<input type="text" class="form-control" name="claveproducto" id="claveproducto" required readonly data-parsley-length="[1, 20]">'+
+                                                  '<input type="text" class="form-control inputnexttabaddprod" name="claveproducto" id="claveproducto" required data-parsley-length="[1, 20]"  onkeyup="tipoLetra(this);">'+
+                                                  '<input type="hidden" class="form-control" name="claveproductoanterior" id="claveproductoanterior" required readonly data-parsley-length="[1, 20]">'+
                                               '</div>'+
                                           '</div>'+    
                                       '</div>'+
                                   '</div>'+
                                   '<div class="col-md-4">'+
-                                      '<label>Clave Unidad<b style="color:#F44336 !important;">*</b></label>'+
+                                      '<label>Clave Unidad<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombreclaveunidad"></span></label>'+
                                       '<div class="row">'+
                                           '<div class="col-md-4">'+
                                               '<span class="input-group-btn">'+
@@ -736,7 +736,8 @@ function obtenerproductoporcodigo(){
                                           '</div>'+  
                                           '<div class="col-md-8"> '+
                                               '<div class="form-line">'+
-                                                  '<input type="text" class="form-control" name="claveunidad" id="claveunidad" required readonly data-parsley-length="[1, 5]">'+
+                                                  '<input type="text" class="form-control inputnexttabaddprod" name="claveunidad" id="claveunidad" required data-parsley-length="[1, 5]"  onkeyup="tipoLetra(this);">'+
+                                                  '<input type="hidden" class="form-control" name="claveunidadanterior" id="claveunidadanterior" required readonly data-parsley-length="[1, 5]">'+
                                               '</div>'+
                                           '</div>'+    
                                       '</div>'+
@@ -745,17 +746,16 @@ function obtenerproductoporcodigo(){
                               '<div class="row">'+
                                   '<div class="col-md-8">'+
                                       '<label>Producto<b style="color:#F44336 !important;">*</b></label>'+
-                                      '<input type="text" class="form-control" name="producto" id="producto" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);">'+
+                                      '<input type="text" class="form-control inputnexttabaddprod" name="producto" id="producto" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);">'+
                                   '</div>'+
                                   '<div class="col-md-4">'+
                                       '<label>Unidad<b style="color:#F44336 !important;">*</b></label>'+
-                                      '<input type="text" class="form-control" name="unidad" id="unidad" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this);">'+
+                                      '<input type="text" class="form-control inputnexttabaddprod" name="unidad" id="unidad" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this);">'+
                                   '</div>'+
                               '</div>'+
-
                               '<div class="row">'+
                                   '<div class="col-md-4">'+
-                                      '<label>Marca<b style="color:#F44336 !important;">*</b></label>'+
+                                      '<label>Marca<b style="color:#F44336 !important;">*</b></b><span class="label label-danger" id="textonombremarca"></span></label>'+
                                       '<div class="row">'+
                                           '<div class="col-md-4">'+
                                               '<span class="input-group-btn">'+
@@ -764,14 +764,14 @@ function obtenerproductoporcodigo(){
                                           '</div>'+  
                                           '<div class="col-md-8">'+  
                                               '<div class="form-line">'+
-                                                  '<input type="hidden" class="form-control" name="marca" id="marca" required readonly>'+
-                                                  '<input type="text" class="form-control" name="nombremarca" id="nombremarca" required readonly>'+
+                                                  '<input type="text" class="form-control inputnexttabaddprod" name="marca" id="marca" required  onkeyup="tipoLetra(this);">'+
+                                                  '<input type="hidden" class="form-control" name="marcaanterior" id="marcaanterior" required readonly>'+
                                               '</div>'+
                                           '</div>'+     
                                       '</div>'+
                                   '</div>'+
                                   '<div class="col-md-4">'+
-                                      '<label>Linea<b style="color:#F44336 !important;">*</b></label>'+
+                                      '<label>Linea<b style="color:#F44336 !important;">*</b></b><span class="label label-danger" id="textonombrelinea"></span></label>'+
                                       '<div class="row">'+
                                           '<div class="col-md-4">'+
                                               '<span class="input-group-btn">'+
@@ -780,29 +780,29 @@ function obtenerproductoporcodigo(){
                                           '</div>'+  
                                           '<div class="col-md-8">'+  
                                               '<div class="form-line">'+
-                                                  '<input type="hidden" class="form-control" name="linea" id="linea" required readonly>'+
-                                                  '<input type="text" class="form-control" name="nombrelinea" id="nombrelinea" required readonly>'+
+                                                  '<input type="text" class="form-control inputnexttabaddprod" name="linea" id="linea" required  onkeyup="tipoLetra(this);">'+
+                                                  '<input type="hidden" class="form-control" name="lineaanterior" id="lineaanterior" required readonly>'+
                                               '</div>'+
                                           '</div>'+     
                                       '</div>'+
                                   '</div>'+
                                   '<div class="col-md-4">'+
                                       '<label>Impuesto % <b style="color:#F44336 !important;">*</b></label>'+
-                                      '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="impuesto" id="impuesto" required value="16.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                      '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabaddprod" name="impuesto" id="impuesto" required value="16.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                   '</div>'+
                               '</div>'+   
                               '<div class="row">'+
                                   '<div class="col-md-4">'+
                                       '<label>Costo (De última compra sin impuesto)</label>'+
-                                      '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="costo" id="costo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                      '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabaddprod" name="costo" id="costo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                   '</div>'+
                                   '<div class="col-md-4">'+
                                       '<label>Precio (Precio neto)</label>'+
-                                      '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="precio" id="precio" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                      '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabaddprod" name="precio" id="precio" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                   '</div>'+
                                   '<div class="col-md-2">'+
                                       '<label>Ubicación</label>'+
-                                      '<input type="text" class="form-control " name="ubicacion" id="ubicacion" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this)">'+
+                                      '<input type="text" class="form-control inputnexttabaddprod" name="ubicacion" id="ubicacion" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this)">'+
                                   '</div>'+
                                   '<div class="col-md-2">'+
                                       '<label>Tipo Producto</label>'+
@@ -818,6 +818,66 @@ function obtenerproductoporcodigo(){
           $("#ModalFormularioProducto").modal('show');
           $("#ModalFormularioProducto").css('overflow', 'auto');
           $("#ModalFormulario").modal('hide');
+          setTimeout(function(){$("#codigo").focus();},500);
+          //activar busqueda para clave producto
+          $('#claveproducto').on('keypress', function(e) {
+              //recomentable para mayor compatibilidad entre navegadores.
+              var code = (e.keyCode ? e.keyCode : e.which);
+              if(code==13){
+                  obtenerclaveproductoporclave();
+              }
+          });
+          //regresar clave
+          $('#claveproducto').on('change', function(e) {
+              regresarclaveproducto();
+          });
+          //activar busqueda para clave unidad
+          $('#claveunidad').on('keypress', function(e) {
+              //recomentable para mayor compatibilidad entre navegadores.
+              var code = (e.keyCode ? e.keyCode : e.which);
+              if(code==13){
+                  obtenerclaveunidadporclave();
+              }
+          });
+          //regresar clave
+          $('#claveunidad').on('change', function(e) {
+              regresarclaveunidad();
+          });
+          //activar busqueda para marca
+          $('#marca').on('keypress', function(e) {
+              //recomentable para mayor compatibilidad entre navegadores.
+              var code = (e.keyCode ? e.keyCode : e.which);
+              if(code==13){
+                  obtenermarcapornumero();
+              }
+          });
+          //regresar numero
+          $('#marca').on('change', function(e) {
+              regresarmarca();
+          });
+          //activar busqueda para linea
+          $('#linea').on('keypress', function(e) {
+              //recomentable para mayor compatibilidad entre navegadores.
+              var code = (e.keyCode ? e.keyCode : e.which);
+              if(code==13){
+                  obtenerlineapornumero();
+              }
+          });
+          //regresar numero
+          $('#linea').on('change', function(e) {
+              regresarlinea();
+          });
+          //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+          $(".inputnexttabaddprod").keypress(function (e) {
+              //recomentable para mayor compatibilidad entre navegadores.
+              var code = (e.keyCode ? e.keyCode : e.which);
+              if(code==13){
+              var index = $(this).index(".inputnexttabaddprod");          
+                  $(".inputnexttabaddprod").eq(index + 1).focus().select(); 
+              }
+          });
+
+
         }else{
           $("#codigoabuscar").val("");
         }
@@ -920,6 +980,33 @@ function listarclavesproductos(){
     seleccionarclaveproducto(data.Clave, data.Nombre);
   });
 }
+function seleccionarclaveproducto(Clave, Nombre){
+    $("#claveproducto").val(Clave);
+    $("#producto").val(Nombre);
+    $("#producto").keyup();
+    mostrarformularioproducto();
+}
+//obtener por clave
+function obtenerclaveproductoporclave(){
+    var claveproductoanterior = $("#claveproductoanterior").val();
+    var claveproducto = $("#claveproducto").val();
+    if(claveproductoanterior != claveproducto){
+        if($("#claveproducto").parsley().isValid()){
+            $.get(productos_obtener_clave_producto_por_clave, {claveproducto:claveproducto}, function(data){
+                $("#claveproducto").val(data.clave);
+                $("#claveproductoanterior").val(data.clave);
+                if(data.nombre != null){
+                    $("#textonombreclaveproducto").html(data.nombre.substring(0, 40));
+                }
+            }) 
+        }
+    }
+}
+//regresar clave
+function regresarclaveproducto(){
+    var claveproductoanterior = $("#claveproductoanterior").val();
+    $("#claveproducto").val(claveproductoanterior);
+}
 //listar claves unidades
 function listarclavesunidades(){
   ocultarformularioproducto();
@@ -984,6 +1071,33 @@ function listarclavesunidades(){
     var data = tclavuni.row( this ).data();
     seleccionarclaveunidad(data.Clave, data.Nombre);
   });
+}
+function seleccionarclaveunidad(Clave, Nombre){
+    $("#claveunidad").val(Clave);
+    $("#unidad").val(Nombre);
+    $("#unidad").keyup();
+    mostrarformularioproducto();
+}
+//obtener por clave
+function obtenerclaveunidadporclave(){
+    var claveunidadanterior = $("#claveunidadanterior").val();
+    var claveunidad = $("#claveunidad").val();
+    if(claveunidadanterior != claveunidad){
+        if($("#claveunidad").parsley().isValid()){
+            $.get(productos_obtener_clave_unidad_por_clave, {claveunidad:claveunidad}, function(data){
+                $("#claveunidad").val(data.clave);
+                $("#claveunidadanterior").val(data.clave);
+                if(data.nombre != null){
+                    $("#textonombreclaveunidad").html(data.nombre.substring(0, 40));
+                }
+            }) 
+        }
+    }
+}
+//regresar clave
+function regresarclaveunidad(){
+    var claveunidadanterior = $("#claveunidadanterior").val();
+    $("#claveunidad").val(claveunidadanterior);
 }
 //listar marcas
 function listarmarcas(){
@@ -1056,6 +1170,32 @@ function listarmarcas(){
     seleccionarmarca(data.Numero, data.Nombre);
   });
 }
+function seleccionarmarca(Numero, Nombre){
+    $("#marca").val(Numero);
+    $("#nombremarca").val(Nombre);
+    mostrarformularioproducto();
+}
+//obtener por numero
+function obtenermarcapornumero(){
+    var marcaanterior = $("#marcaanterior").val();
+    var marca = $("#marca").val();
+    if(marcaanterior != marca){
+        if($("#marca").parsley().isValid()){
+            $.get(productos_obtener_marca_por_numero, {marca:marca}, function(data){
+                $("#marca").val(data.numero);
+                $("#marcaanterior").val(data.numero);
+                if(data.nombre != null){
+                    $("#textonombremarca").html(data.nombre.substring(0, 40));
+                }
+            }) 
+        }
+    }
+}
+//regresar numero
+function regresarmarca(){
+    var marcaanterior = $("#marcaanterior").val();
+    $("#marca").val(marcaanterior);
+}
 //listar lineas
 function listarlineas(){
   ocultarformularioproducto();
@@ -1117,27 +1257,31 @@ function listarlineas(){
     seleccionarlinea(data.Numero, data.Nombre);
   });
 }
-function seleccionarclaveproducto(Clave, Nombre){
-    $("#claveproducto").val(Clave);
-    $("#producto").val(Nombre);
-    $("#producto").keyup();
-    mostrarformularioproducto();
-}
-function seleccionarclaveunidad(Clave, Nombre){
-    $("#claveunidad").val(Clave);
-    $("#unidad").val(Nombre);
-    $("#unidad").keyup();
-    mostrarformularioproducto();
-}
-function seleccionarmarca(Numero, Nombre){
-    $("#marca").val(Numero);
-    $("#nombremarca").val(Nombre);
-    mostrarformularioproducto();
-}
 function seleccionarlinea(Numero, Nombre){
     $("#linea").val(Numero);
     $("#nombrelinea").val(Nombre);
     mostrarformularioproducto();
+}
+//obtener por numero
+function obtenerlineapornumero(){
+    var lineaanterior = $("#lineaanterior").val();
+    var linea = $("#linea").val();
+    if(lineaanterior != linea){
+        if($("#linea").parsley().isValid()){
+            $.get(productos_obtener_linea_por_numero, {linea:linea}, function(data){
+                $("#linea").val(data.numero);
+                $("#lineaanterior").val(data.numero);
+                if(data.nombre != null){
+                    $("#textonombrelinea").html(data.nombre.substring(0, 40));
+                }
+            }) 
+        }
+    }
+}
+//regresar numero
+function regresarlinea(){
+    var lineaanterior = $("#lineaanterior").val();
+    $("#linea").val(lineaanterior);
 }
 //guardar el registro
 $("#btnGuardarProducto").on('click', function (e) {
@@ -1684,6 +1828,7 @@ function alta(tipoalta){
       $(".inputnext").eq(index + 1).focus().select(); 
     }
   });
+  setTimeout(function(){$("#folio").focus();},500);
   $("#ModalAlta").modal('show');
 }
 //guardar el registro
@@ -2218,6 +2363,7 @@ async function seleccionartipoordencompra(data){
   await retraso();
   $("#tipo").val(data.ordencompra.Tipo).change();
   $("#tipo").select2();
+  setTimeout(function(){$("#folio").focus();},500);
   mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
   $('.page-loader-wrapper').css('display', 'none');
 }
@@ -2274,6 +2420,8 @@ function enviardocumentoemail(documento){
     $("#email2cc").val(data.email2cc);
     $("#email3cc").val(data.email3cc);
     $("#emailasunto").val("ORDEN DE COMPRA NO. " + documento +" DE "+ nombreempresa);
+    $(".dropify-clear").trigger("click");
+    $("#divadjuntararchivo").show();
     $("#modalenviarpdfemail").modal('show');
   })   
 }

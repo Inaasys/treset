@@ -704,6 +704,26 @@ class FacturaController extends ConfiguracionSistemaController{
         return response()->json($folio);
     }
 
+    //obtener serie interna
+    public function facturas_obtener_serie_interna(){
+        $foliointernofactura = FolioComprobanteFactura::where('Esquema', 'INTERNA')->orderby('Numero', 'ASC')->take(1)->get();
+
+        $serieesquemainterno = Factura::select("Folio")->where('Serie', ''.$foliointernofactura[0]->Serie.'')->orderBy("Folio", "DESC")->take(1)->get();
+        
+        if(sizeof($serieesquemainterno) == 0 || sizeof($serieesquemainterno) == "" || sizeof($serieesquemainterno) == null){
+            $folio = 1;
+        }else{
+            $folio = $serieesquemainterno[0]->Folio+1;   
+        }
+        $data = array(
+            'Folio' => $folio,
+            'Serie' => $foliointernofactura[0]->Serie,
+            'Esquema' => $foliointernofactura[0]->Esquema,
+            'Depto' => $foliointernofactura[0]->Depto
+        );
+        return response()->json($data);
+    }
+
     //obtener remisiones del cliente
     public function facturas_obtener_remisiones(Request $request){
         if($request->ajax()){
@@ -2639,6 +2659,28 @@ class FacturaController extends ConfiguracionSistemaController{
             if($this->correodefault2enviodocumentos != ""){
                 array_push($arraycc, $this->correodefault2enviodocumentos);
             }
+            //subir archivo arjunto 1 en public/archivos_adjuntos para poder adjuntarlo en el correo
+            if($request->archivoadjunto != null) {
+                //archivos adjuntos
+                $mover_a_carpeta="archivos_adjuntos";
+                $archivoadjunto = $request->archivoadjunto;
+                $nombre_original_archivo_adjunto = $archivoadjunto->getClientOriginalName();
+                $nuevo_nombre_archivo_adjunto = time().$nombre_original_archivo_adjunto;
+                //guardar archivos en public/archivos_adjuntos
+                $archivoadjunto->move($mover_a_carpeta, $nuevo_nombre_archivo_adjunto);
+                $urlarchivoadjunto = public_path('archivos_adjuntos\\'.$nuevo_nombre_archivo_adjunto);
+            }
+            //subir archivo arjunto 2 en public/archivos_adjuntos para poder adjuntarlo en el correo
+            if($request->archivoadjunto2 != null) {
+                //archivos adjuntos
+                $mover_a_carpeta="archivos_adjuntos";
+                $archivoadjunto2 = $request->archivoadjunto2;
+                $nombre_original_archivo_adjunto2 = $archivoadjunto2->getClientOriginalName();
+                $nuevo_nombre_archivo_adjunto2 = time().$nombre_original_archivo_adjunto2;
+                //guardar archivos en public/archivos_adjuntos
+                $archivoadjunto2->move($mover_a_carpeta, $nuevo_nombre_archivo_adjunto2);
+                $urlarchivoadjunto2 = public_path('archivos_adjuntos\\'.$nuevo_nombre_archivo_adjunto2);
+            }
             $correos = [$request->emailpara];
             $asunto = $request->emailasunto;
             $emaildocumento = $request->emaildocumento;
@@ -2647,22 +2689,111 @@ class FacturaController extends ConfiguracionSistemaController{
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             if (file_exists($url_xml) != false) {
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento,$url_xml) {
-                    $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento,$url_xml)
-                            ->cc($arraycc)
-                            ->subject($asunto)
-                            ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf")
-                            ->attach($url_xml);
-                });
+                if($request->archivoadjunto != null && $request->archivoadjunto2 != null) {
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento) {
+                        $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                                ->cc($arraycc)
+                                ->subject($asunto)
+                                ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf")
+                                ->attach($url_xml)
+                                ->attach($urlarchivoadjunto)
+                                ->attach($urlarchivoadjunto2);
+                    });
+                    //eliminar xml de storage/xml_cargados
+                    if (file_exists($urlarchivoadjunto)) {
+                        unlink($urlarchivoadjunto);
+                    }
+                    //eliminar xml de storage/xml_cargados
+                    if (file_exists($urlarchivoadjunto2)) {
+                        unlink($urlarchivoadjunto2);
+                    }
+                }else if($request->archivoadjunto != null && $request->archivoadjunto2 == null){
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $correos, $asunto, $pdf, $emaildocumento) {
+                        $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                                ->cc($arraycc)
+                                ->subject($asunto)
+                                ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf")
+                                ->attach($url_xml)
+                                ->attach($urlarchivoadjunto);
+                    });
+                    //eliminar xml de storage/xml_cargados
+                    if (file_exists($urlarchivoadjunto)) {
+                        unlink($urlarchivoadjunto);
+                    }
+                }else if($request->archivoadjunto == null && $request->archivoadjunto2 != null){
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $urlarchivoadjunto2, $arraycc, $asunto, $pdf, $emaildocumento) {
+                        $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                                ->cc($arraycc)
+                                ->subject($asunto)
+                                ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf")
+                                ->attach($url_xml)
+                                ->attach($urlarchivoadjunto2);
+                    });
+                    //eliminar xml de storage/xml_cargados
+                    if (file_exists($urlarchivoadjunto2)) {
+                        unlink($urlarchivoadjunto2);
+                    }
+                }else{
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $arraycc, $asunto, $pdf, $emaildocumento) {
+                        $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                                ->cc($arraycc)
+                                ->subject($asunto)
+                                ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf")
+                                ->attach($url_xml);
+                    });
+                } 
                 //eliminar xml de storage/xml_cargados
                 unlink($url_xml);
             }else{
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
-                    $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
-                            ->cc($correos)
-                            ->subject($asunto)
-                            ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf");
-                });
+                if($request->archivoadjunto != null && $request->archivoadjunto2 != null) {
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento) {
+                        $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                                ->cc($arraycc)
+                                ->subject($asunto)
+                                ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf")
+                                ->attach($urlarchivoadjunto)
+                                ->attach($urlarchivoadjunto2);
+                    });
+                    //eliminar xml de storage/xml_cargados
+                    if (file_exists($urlarchivoadjunto)) {
+                        unlink($urlarchivoadjunto);
+                    }
+                    //eliminar xml de storage/xml_cargados
+                    if (file_exists($urlarchivoadjunto2)) {
+                        unlink($urlarchivoadjunto2);
+                    }
+                }else if($request->archivoadjunto != null && $request->archivoadjunto2 == null){
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $correos, $asunto, $pdf, $emaildocumento) {
+                        $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                                ->cc($arraycc)
+                                ->subject($asunto)
+                                ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf")
+                                ->attach($urlarchivoadjunto);
+                    });
+                    //eliminar xml de storage/xml_cargados
+                    if (file_exists($urlarchivoadjunto)) {
+                        unlink($urlarchivoadjunto);
+                    }
+                }else if($request->archivoadjunto == null && $request->archivoadjunto2 != null){
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $urlarchivoadjunto2, $arraycc, $asunto, $pdf, $emaildocumento) {
+                        $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                                ->cc($arraycc)
+                                ->subject($asunto)
+                                ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf")
+                                ->attach($urlarchivoadjunto2);
+                    });
+                    //eliminar xml de storage/xml_cargados
+                    if (file_exists($urlarchivoadjunto2)) {
+                        unlink($urlarchivoadjunto2);
+                    }
+                }else{
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $arraycc, $asunto, $pdf, $emaildocumento) {
+                        $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                                ->cc($arraycc)
+                                ->subject($asunto)
+                                ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf");
+                    });
+                } 
             }
         } catch(\Exception $e) {
             $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
@@ -3032,6 +3163,28 @@ class FacturaController extends ConfiguracionSistemaController{
             if($this->correodefault2enviodocumentos != ""){
                 array_push($arraycc, $this->correodefault2enviodocumentos);
             }
+            //subir archivo arjunto 1 en public/archivos_adjuntos para poder adjuntarlo en el correo
+            if($request->archivoadjunto != null) {
+                //archivos adjuntos
+                $mover_a_carpeta="archivos_adjuntos";
+                $archivoadjunto = $request->archivoadjunto;
+                $nombre_original_archivo_adjunto = $archivoadjunto->getClientOriginalName();
+                $nuevo_nombre_archivo_adjunto = time().$nombre_original_archivo_adjunto;
+                //guardar archivos en public/archivos_adjuntos
+                $archivoadjunto->move($mover_a_carpeta, $nuevo_nombre_archivo_adjunto);
+                $urlarchivoadjunto = public_path('archivos_adjuntos\\'.$nuevo_nombre_archivo_adjunto);
+            }
+            //subir archivo arjunto 2 en public/archivos_adjuntos para poder adjuntarlo en el correo
+            if($request->archivoadjunto2 != null) {
+                //archivos adjuntos
+                $mover_a_carpeta="archivos_adjuntos";
+                $archivoadjunto2 = $request->archivoadjunto2;
+                $nombre_original_archivo_adjunto2 = $archivoadjunto2->getClientOriginalName();
+                $nuevo_nombre_archivo_adjunto2 = time().$nombre_original_archivo_adjunto2;
+                //guardar archivos en public/archivos_adjuntos
+                $archivoadjunto2->move($mover_a_carpeta, $nuevo_nombre_archivo_adjunto2);
+                $urlarchivoadjunto2 = public_path('archivos_adjuntos\\'.$nuevo_nombre_archivo_adjunto2);
+            }
             $correos = [$request->emailpara];
             $asunto = $request->emailasunto;
             $emaildocumento = $request->emaildocumento;
@@ -3040,22 +3193,111 @@ class FacturaController extends ConfiguracionSistemaController{
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             if (file_exists($url_xml) != false) {
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento,$url_xml) {
-                    $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento,$url_xml)
-                            ->cc($arraycc)
-                            ->subject($asunto)
-                            ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf")
-                            ->attach($url_xml);
-                });
+                if($request->archivoadjunto != null && $request->archivoadjunto2 != null) {
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento) {
+                        $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                                ->cc($arraycc)
+                                ->subject($asunto)
+                                ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf")
+                                ->attach($url_xml)
+                                ->attach($urlarchivoadjunto)
+                                ->attach($urlarchivoadjunto2);
+                    });
+                    //eliminar xml de storage/xml_cargados
+                    if (file_exists($urlarchivoadjunto)) {
+                        unlink($urlarchivoadjunto);
+                    }
+                    //eliminar xml de storage/xml_cargados
+                    if (file_exists($urlarchivoadjunto2)) {
+                        unlink($urlarchivoadjunto2);
+                    }
+                }else if($request->archivoadjunto != null && $request->archivoadjunto2 == null){
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $correos, $asunto, $pdf, $emaildocumento) {
+                        $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                                ->cc($arraycc)
+                                ->subject($asunto)
+                                ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf")
+                                ->attach($url_xml)
+                                ->attach($urlarchivoadjunto);
+                    });
+                    //eliminar xml de storage/xml_cargados
+                    if (file_exists($urlarchivoadjunto)) {
+                        unlink($urlarchivoadjunto);
+                    }
+                }else if($request->archivoadjunto == null && $request->archivoadjunto2 != null){
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $urlarchivoadjunto2, $arraycc, $asunto, $pdf, $emaildocumento) {
+                        $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                                ->cc($arraycc)
+                                ->subject($asunto)
+                                ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf")
+                                ->attach($url_xml)
+                                ->attach($urlarchivoadjunto2);
+                    });
+                    //eliminar xml de storage/xml_cargados
+                    if (file_exists($urlarchivoadjunto2)) {
+                        unlink($urlarchivoadjunto2);
+                    }
+                }else{
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $arraycc, $asunto, $pdf, $emaildocumento) {
+                        $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                                ->cc($arraycc)
+                                ->subject($asunto)
+                                ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf")
+                                ->attach($url_xml);
+                    });
+                } 
                 //eliminar xml de storage/xml_cargados
                 unlink($url_xml);
             }else{
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
-                    $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
-                            ->cc($correos)
-                            ->subject($asunto)
-                            ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf");
-                });
+                if($request->archivoadjunto != null && $request->archivoadjunto2 != null) {
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento) {
+                        $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                                ->cc($arraycc)
+                                ->subject($asunto)
+                                ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf")
+                                ->attach($urlarchivoadjunto)
+                                ->attach($urlarchivoadjunto2);
+                    });
+                    //eliminar xml de storage/xml_cargados
+                    if (file_exists($urlarchivoadjunto)) {
+                        unlink($urlarchivoadjunto);
+                    }
+                    //eliminar xml de storage/xml_cargados
+                    if (file_exists($urlarchivoadjunto2)) {
+                        unlink($urlarchivoadjunto2);
+                    }
+                }else if($request->archivoadjunto != null && $request->archivoadjunto2 == null){
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $correos, $asunto, $pdf, $emaildocumento) {
+                        $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                                ->cc($arraycc)
+                                ->subject($asunto)
+                                ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf")
+                                ->attach($urlarchivoadjunto);
+                    });
+                    //eliminar xml de storage/xml_cargados
+                    if (file_exists($urlarchivoadjunto)) {
+                        unlink($urlarchivoadjunto);
+                    }
+                }else if($request->archivoadjunto == null && $request->archivoadjunto2 != null){
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $urlarchivoadjunto2, $arraycc, $asunto, $pdf, $emaildocumento) {
+                        $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                                ->cc($arraycc)
+                                ->subject($asunto)
+                                ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf")
+                                ->attach($urlarchivoadjunto2);
+                    });
+                    //eliminar xml de storage/xml_cargados
+                    if (file_exists($urlarchivoadjunto2)) {
+                        unlink($urlarchivoadjunto2);
+                    }
+                }else{
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $arraycc, $asunto, $pdf, $emaildocumento) {
+                        $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                                ->cc($arraycc)
+                                ->subject($asunto)
+                                ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf");
+                    });
+                } 
             }
         } catch(\Exception $e) {
             $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';

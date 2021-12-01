@@ -33,6 +33,11 @@
                                                     </a>
                                                 </td>
                                                 <td>
+                                                    <a class="btn bg-blue btn-xs waves-effect" onclick="generarcodigosbarras();">
+                                                        Generar Códigos de Barras
+                                                    </a>
+                                                </td>
+                                                <td>
                                                     <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
                                                         Configurar Tabla
                                                     </div>
@@ -85,10 +90,16 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <label>Código<b style="color:#F44336 !important;">*</b></label>
-                                    <input type="text" class="form-control" name="codigo" id="codigo" required data-parsley-length="[1, 20]" onchange="buscarcodigoencatalogo();" onkeyup="tipoLetra(this);">
-                                </div>   
+                                    <div class="row">
+                                        <div class="col-md-12"> 
+                                            <div class="form-line">
+                                                <input type="text" class="form-control inputnext" name="codigo" id="codigo" required data-parsley-length="[1, 20]" onchange="buscarcodigoencatalogo();" onkeyup="tipoLetra(this);">
+                                            </div>
+                                        </div>  
+                                    </div>
+                                </div>
                                 <div class="col-md-4">
-                                    <label>Clave Producto<b style="color:#F44336 !important;">*</b></label>
+                                    <label>Clave Producto<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombreclaveproducto"></span></label>
                                     <div class="row">
                                         <div class="col-md-4">
                                             <span class="input-group-btn">
@@ -97,13 +108,14 @@
                                         </div>  
                                         <div class="col-md-8"> 
                                             <div class="form-line">
-                                                <input type="text" class="form-control" name="claveproducto" id="claveproducto" required readonly data-parsley-length="[1, 20]">
+                                                <input type="text" class="form-control inputnext" name="claveproducto" id="claveproducto" required data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">
+                                                <input type="hidden" class="form-control" name="claveproductoanterior" id="claveproductoanterior" required readonly data-parsley-length="[1, 20]">
                                             </div>
                                         </div>    
                                     </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <label>Clave Unidad<b style="color:#F44336 !important;">*</b></label>
+                                    <label>Clave Unidad<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombreclaveunidad"></span></label>
                                     <div class="row">
                                         <div class="col-md-4">
                                             <span class="input-group-btn">
@@ -112,7 +124,8 @@
                                         </div>  
                                         <div class="col-md-8"> 
                                             <div class="form-line">
-                                                <input type="text" class="form-control" name="claveunidad" id="claveunidad" required readonly data-parsley-length="[1, 5]">
+                                                <input type="text" class="form-control inputnext" name="claveunidad" id="claveunidad" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this);">
+                                                <input type="hidden" class="form-control" name="claveunidadanterior" id="claveunidadanterior" required readonly data-parsley-length="[1, 5]">
                                             </div>
                                         </div>    
                                     </div>
@@ -121,11 +134,11 @@
                             <div class="row">
                                 <div class="col-md-8">
                                     <label>Producto<b style="color:#F44336 !important;">*</b></label>
-                                    <input type="text" class="form-control" name="producto" id="producto" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);">
+                                    <input type="text" class="form-control inputnext" name="producto" id="producto" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);">
                                 </div>
                                 <div class="col-md-4">
                                     <label>Unidad<b style="color:#F44336 !important;">*</b></label>
-                                    <input type="text" class="form-control" name="unidad" id="unidad" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this);">
+                                    <input type="text" class="form-control inputnext" name="unidad" id="unidad" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this);">
                                 </div>
                             </div>
                             <div class="col-md-12" id="tabsform">
@@ -226,8 +239,89 @@
             </div>
         </div>
     </div> 
-
-
+    <!-- Modal Códigos Barras-->
+    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="ModalCodigosBarras" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div id="contenidomodalcodigosbarras">
+                    <div class="modal-header {{$empresa->background_forms_and_modals}}">
+                        <h4 class="modal-title" >
+                            <div class="row">
+                                <div class="col-xs-10 col-sm-10 col-md-11">
+                                    <label >Generar Códigos de Barras</label>
+                                </div>
+                                <div class="col-xs-2 col-sm-2 col-md-1">
+                                    <button type="button" class="btn btn-link waves-effect" data-dismiss="modal">Cerrar</button>
+                                </div>
+                            </div>
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">                        
+                            <div class="col-md-12">
+                                <ul class="nav nav-tabs tab-col-blue-grey" role="tablist">
+                                    <li role="presentation" class="active">
+                                        <a href="#porcodigotab" data-toggle="tab">Seleccionar Códigos</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#porcatalogotab" data-toggle="tab">Todo el Catálogo Productos</a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div role="tabpanel" class="tab-pane fade in active" id="porcodigotab">
+                                        <form action='{{$rutacrearpdfcodigosdebarrasarray}}' method="POST" data-parsley-validate="" target="_blank">
+                                            @csrf
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <input type="text" class="form-control" name="valorgenerarcodigobarras" id="valorgenerarcodigobarras" placeholder="Escribe el código y presiona enter" >
+                                                    <input type="text" class="form-control" id="arraycodigosparacodigosdebarras" name="arraycodigosparacodigosdebarras" style="display:none;" required>
+                                                </div>
+                                                <div class="col-md-6" >
+                                                    <button type="submit" class="btn btn-success btn-sm">Imprimir Códigos de Barras 1</button>
+                                                </div>
+                                            </div><br>
+                                            <div class="row overflow-scroll" id="divcodigosbarras" style="height:400px;overflow-y: scroll;"></div>
+                                        </form>
+                                    </div>
+                                    <div role="tabpanel" class="tab-pane fade" id="porcatalogotab">
+                                        <form action='{{$rutacrearpdfcodigosdebarrascatalogo}}' method="POST" data-parsley-validate="" target="_blank">
+                                            @csrf
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label >Tipo</label>
+                                                    <select class="form-control select2" id="tipoprodcodigosbarras" name="tipoprodcodigosbarras" style="width:100%" required>
+                                                        <option value="TODOS" selected>TODOS</option>    
+                                                        <option value="REFACCION">REFACCION</option>
+                                                        <option value="GASTOS">GASTOS</option>
+                                                        <option value="TOT">TOT</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label >Status</label>
+                                                    <select class="form-control select2" id="statuscodigosbarras" name="statuscodigosbarras" style="width:100%" required>
+                                                        <option value="TODOS" selected>TODOS</option> 
+                                                        <option value="ALTA">ALTA</option>
+                                                        <option value="BAJA">BAJA</option>
+                                                    </select>
+                                                </div>
+                                            </div><br>
+                                            <div class="row">
+                                                <div class="col-md-12 text-right" >                                            
+                                                    <button type="submit" class="btn btn-success btn-sm">Imprimir Códigos de Barras</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer" id="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Modal Info Documentos-->
     <div class="modal fade" data-backdrop="static" data-keyboard="false" id="ModalFormulario1" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
@@ -254,7 +348,6 @@
             </div>
         </div>
     </div>
-
 <!-- modal para configuraciones de tablas-->
 @include('secciones.modalconfiguraciontablas')
 <!-- fin modal para configuraciones de tablas-->
@@ -283,19 +376,29 @@
         var productos_obtener = '{!!URL::to('productos_obtener')!!}';
         var productos_buscar_codigo_en_tabla = '{!!URL::to('productos_buscar_codigo_en_tabla')!!}';
         var productos_obtener_claves_productos = '{!!URL::to('productos_obtener_claves_productos')!!}';
+        var productos_obtener_clave_producto_por_clave = '{!!URL::to('productos_obtener_clave_producto_por_clave')!!}';
         var productos_obtener_claves_unidades = '{!!URL::to('productos_obtener_claves_unidades')!!}';
+        var productos_obtener_clave_unidad_por_clave = '{!!URL::to('productos_obtener_clave_unidad_por_clave')!!}';
         var productos_obtener_marcas = '{!!URL::to('productos_obtener_marcas')!!}';
+        var productos_obtener_marca_por_numero = '{!!URL::to('productos_obtener_marca_por_numero')!!}';
         var productos_obtener_lineas = '{!!URL::to('productos_obtener_lineas')!!}';
+        var productos_obtener_linea_por_numero = '{!!URL::to('productos_obtener_linea_por_numero')!!}';
         var productos_obtener_monedas = '{!!URL::to('productos_obtener_monedas')!!}';
+        var productos_obtener_moneda_por_clave = '{!!URL::to('productos_obtener_moneda_por_clave')!!}';
         var productos_obtener_utilidades = '{!!URL::to('productos_obtener_utilidades')!!}';
         var productos_obtener_existencias_almacenes = '{!!URL::to('productos_obtener_existencias_almacenes')!!}';
         var productos_obtener_clientes = '{!!URL::to('productos_obtener_clientes')!!}';
+        var productos_obtener_datos_cliente_agregar_fila = '{!!URL::to('productos_obtener_datos_cliente_agregar_fila')!!}';
         var productos_obtener_productos_consumos = '{!!URL::to('productos_obtener_productos_consumos')!!}';
+        var productos_obtener_datos_producto_agregar_fila = '{!!URL::to('productos_obtener_datos_producto_agregar_fila')!!}';
         var productos_obtener_tipos_prod = '{!!URL::to('productos_obtener_tipos_prod')!!}';
         var productos_obtener_kardex = '{!!URL::to('productos_obtener_kardex')!!}';
         var productos_guardar = '{!!URL::to('productos_guardar')!!}';
         var productos_alta_o_baja = '{!!URL::to('productos_alta_o_baja')!!}'; 
         var productos_obtener_producto = '{!!URL::to('productos_obtener_producto')!!}'; 
+        var productos_validar_si_existe_codigo = '{!!URL::to('productos_validar_si_existe_codigo')!!}'; 
+        var productos_generar_codigos_barras_catalogo = '{!!URL::to('productos_generar_codigos_barras_catalogo')!!}'; 
+        var productos_generar_pdf_codigo_barras = '{!!URL::to('productos_generar_pdf_codigo_barras')!!}'; 
         var productos_guardar_modificacion = '{!!URL::to('productos_guardar_modificacion')!!}';
         //compras
         var compras_obtener_tipos_ordenes_compra = '{!!URL::to('compras_obtener_tipos_ordenes_compra')!!}';

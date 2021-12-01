@@ -192,6 +192,7 @@
         var background_tables = '{{$empresa->background_tables}}';
         var urlgenerarplantilla = '{{$urlgenerarplantilla}}';       
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
+        var verificarinsumosremisionenot = '{{$empresa->VerificarPartidasRemisionEnOT}}';
         var remisiones_obtener = '{!!URL::to('remisiones_obtener')!!}';
         var remisiones_descargar_plantilla = '{!!URL::to('remisiones_descargar_plantilla')!!}';
         var remisiones_cargar_partidas_excel = '{!!URL::to('remisiones_cargar_partidas_excel')!!}';
@@ -213,6 +214,10 @@
         var remisiones_obtener_producto_por_codigo = '{!!URL::to('remisiones_obtener_producto_por_codigo')!!}';
         var remisiones_obtener_existencias_almacen = '{!!URL::to('remisiones_obtener_existencias_almacen')!!}';
         var remisiones_obtener_nuevo_saldo_cliente = '{!!URL::to('remisiones_obtener_nuevo_saldo_cliente')!!}';
+        var remisiones_revisar_insumos_orden_trabajo_por_folio = '{!!URL::to('remisiones_revisar_insumos_orden_trabajo_por_folio')!!}';
+        var remisiones_obtener_series_requisiciones = '{!!URL::to('remisiones_obtener_series_requisiciones')!!}';
+
+
         var remisiones_guardar = '{!!URL::to('remisiones_guardar')!!}';
         var remisiones_verificar_baja = '{!!URL::to('remisiones_verificar_baja')!!}';
         var remisiones_alta_o_baja = '{!!URL::to('remisiones_alta_o_baja')!!}'; 

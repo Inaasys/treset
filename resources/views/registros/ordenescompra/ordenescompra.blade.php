@@ -284,6 +284,10 @@
         var ordenes_compra_obtener_marcas = '{!!URL::to('ordenes_compra_obtener_marcas')!!}';
         var ordenes_compra_obtener_lineas = '{!!URL::to('ordenes_compra_obtener_lineas')!!}';
         var ordenes_compra_guardar_producto = '{!!URL::to('ordenes_compra_guardar_producto')!!}';
+        var productos_obtener_clave_producto_por_clave = '{!!URL::to('productos_obtener_clave_producto_por_clave')!!}';
+        var productos_obtener_clave_unidad_por_clave = '{!!URL::to('productos_obtener_clave_unidad_por_clave')!!}';
+        var productos_obtener_marca_por_numero = '{!!URL::to('productos_obtener_marca_por_numero')!!}';
+        var productos_obtener_linea_por_numero = '{!!URL::to('productos_obtener_linea_por_numero')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="scripts_inaasys/registros/ordenescompra/ordenescompra.js"></script>

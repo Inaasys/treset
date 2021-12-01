@@ -132,7 +132,8 @@ function listarcodigospostales(){
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Salir</button>'+
                               '</div>';
     $("#contenidomodaltablas").html(tablacodigospostales);
-    $('#tbllistadocodigopostal').DataTable({
+    var tcp = $('#tbllistadocodigopostal').DataTable({
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "300px",
         "bScrollCollapse": true,  
@@ -160,6 +161,11 @@ function listarcodigospostales(){
         },
         "iDisplayLength": 8,
     });
+    //seleccionar registro al dar doble click
+    $('#tbllistadocodigopostal tbody').on('dblclick', 'tr', function () {
+        var data = tcp.row( this ).data();
+        seleccionarcodigopostal(data.Clave);
+    }); 
 }
 function seleccionarcodigopostal(Clave){
     $("#codigopostal").val(Clave);
@@ -190,7 +196,7 @@ function alta(){
                   '<div class="row">'+
                       '<div class="col-md-4">'+
                           '<label>RFC</label>'+
-                          '<input type="text" class="form-control" name="rfc" id="rfc" required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 60]" onchange="buscarrfcencatalogo();" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                          '<input type="text" class="form-control inputnext" name="rfc" id="rfc" required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 60]" onchange="buscarrfcencatalogo();" onkeyup="tipoLetra(this);mayusculas(this);">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Código Postal</label>'+
@@ -202,30 +208,30 @@ function alta(){
                                 '</div>'+  
                                 '<div class="col-md-8">'+  
                                     '<div class="form-line">'+
-                                        '<input type="text" class="form-control" name="codigopostal" id="codigopostal" required data-parsley-codigopostal="^[0-9]{5}$">'+
+                                        '<input type="text" class="form-control inputnext" name="codigopostal" id="codigopostal" required data-parsley-codigopostal="^[0-9]{5}$">'+
                                     '</div>'+
                                 '</div>'+     
                             '</div>'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Teléfonos</label>'+
-                            '<input type="text" class="form-control" name="telefonos" id="telefonos" data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control inputnext" name="telefonos" id="telefonos" data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>E-mail 1</label>'+
-                            '<input type="text" class="form-control" name="email1" id="email1"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 100]">'+
+                            '<input type="text" class="form-control inputnext" name="email1" id="email1"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 100]">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>E-mail 2</label>'+
-                            '<input type="text" class="form-control" name="email2" id="email2"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 100]">'+
+                            '<input type="text" class="form-control inputnext" name="email2" id="email2"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 100]">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>E-mail 3</label>'+
-                            '<input type="text" class="form-control" name="email3" id="email3"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 100]">'+
+                            '<input type="text" class="form-control inputnext" name="email3" id="email3"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 100]">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Plazo</label>'+
-                            '<input type="number" class="form-control" name="plazo" id="plazo" required>'+
+                            '<input type="number" class="form-control inputnext" name="plazo" id="plazo" value="0" required>'+
                         '</div>'+
                         '<div class="col-md-4">'+
                           '<label class="col-red">Solicitar xml´s en compras</label>'+
@@ -241,6 +247,16 @@ function alta(){
   $("#tabsform").html(tabs);
   //inicializar los select con la libreria select2
   obtenultimonumero();
+  setTimeout(function(){$("#nombre").focus();},500);
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keypress(function (e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        var index = $(this).index(".inputnext");          
+            $(".inputnext").eq(index + 1).focus().select(); 
+        }
+    });
 }
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
@@ -336,7 +352,7 @@ function obtenerdatos(numeroproveedor){
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>RFC</label>'+
-                                '<input type="text" class="form-control" name="rfc" id="rfc" required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                '<input type="text" class="form-control inputnext" name="rfc" id="rfc" required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Código Postal</label>'+
@@ -348,30 +364,30 @@ function obtenerdatos(numeroproveedor){
                                     '</div>'+  
                                     '<div class="col-md-8">'+  
                                         '<div class="form-line">'+
-                                            '<input type="text" class="form-control" name="codigopostal" id="codigopostal" required data-parsley-codigopostal="^[0-9]{5}$">'+
+                                            '<input type="text" class="form-control inputnext" name="codigopostal" id="codigopostal" required data-parsley-codigopostal="^[0-9]{5}$">'+
                                         '</div>'+
                                     '</div>'+     
                                 '</div>'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Teléfonos</label>'+
-                                '<input type="text" class="form-control" name="telefonos" id="telefonos" onkeyup="tipoLetra(this);" data-parsley-length="[1, 100]">'+
+                                '<input type="text" class="form-control inputnext" name="telefonos" id="telefonos" onkeyup="tipoLetra(this);" data-parsley-length="[1, 100]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>E-mail 1</label>'+
-                                '<input type="text" class="form-control" name="email1" id="email1"  data-parsley-type="email" data-parsley-length="[1, 100]">'+
+                                '<input type="text" class="form-control inputnext" name="email1" id="email1"  data-parsley-type="email" data-parsley-length="[1, 100]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>E-mail 2</label>'+
-                                '<input type="text" class="form-control" name="email2" id="email2"  data-parsley-type="email" data-parsley-length="[1, 100]">'+
+                                '<input type="text" class="form-control inputnext" name="email2" id="email2"  data-parsley-type="email" data-parsley-length="[1, 100]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>E-mail 3</label>'+
-                                '<input type="text" class="form-control" name="email3" id="email3"  data-parsley-type="email" data-parsley-length="[1, 100]">'+
+                                '<input type="text" class="form-control inputnext" name="email3" id="email3"  data-parsley-type="email" data-parsley-length="[1, 100]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                               '<label>Plazo</label>'+
-                              '<input type="number" class="form-control" name="plazo" id="plazo" required>'+
+                              '<input type="number" class="form-control inputnext" name="plazo" id="plazo" required>'+
                             '</div>'+
                             '<div class="col-md-4">'+
                               '<label class="col-red">Solicitar xml´s en compras</label>'+
@@ -400,6 +416,16 @@ function obtenerdatos(numeroproveedor){
     }
     mostrarmodalformulario('MODIFICACION');
     $('.page-loader-wrapper').css('display', 'none');
+    setTimeout(function(){$("#nombre").focus();},500);
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keypress(function (e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        var index = $(this).index(".inputnext");          
+            $(".inputnext").eq(index + 1).focus().select(); 
+        }
+    });
   }).fail( function() {
     msj_errorajax();
     $('.page-loader-wrapper').css('display', 'none');

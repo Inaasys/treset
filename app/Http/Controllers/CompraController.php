@@ -868,21 +868,24 @@ class CompraController extends ConfiguracionSistemaController{
                 $Producto->save();
                 */
                 if($this->tipodeutilidad == 'Financiera'){
-                    $nuevosubtotalproducto = $request->preciopartida [$key]/(((100 - $Producto->Utilidad) / 100));
+                    //$nuevosubtotalproducto = $request->preciopartida [$key]/(((100 - $Producto->Utilidad) / 100));
+                    $nuevosubtotalproducto = ($request->subtotalpartida [$key] / $request->cantidadpartida [$key] )/(((100 - $Producto->Utilidad) / 100));
                 }else{
-                    //$nuevosubtotalproducto = $request->preciopartida [$key]*(1+($Producto->Utilidad/100));
-                    $multiplicacionnuevosubtotalproducto = $request->preciopartida [$key]*($Producto->Utilidad/Helpers::convertirvalorcorrecto(100));
-                    $nuevosubtotalproducto = $request->preciopartida [$key]+$multiplicacionnuevosubtotalproducto;
+                    //$nuevosubtotalproducto = $request->preciopartida [$key]*(1+($Producto->Utilidad/100)); //Ya estaba comentado
+                    //$multiplicacionnuevosubtotalproducto = $request->preciopartida [$key]*($Producto->Utilidad/Helpers::convertirvalorcorrecto(100));
+                    //$nuevosubtotalproducto = $request->preciopartida [$key]+$multiplicacionnuevosubtotalproducto;
+                    $multiplicacionnuevosubtotalproducto = ($request->subtotalpartida [$key] / $request->cantidadpartida [$key] )*($Producto->Utilidad/Helpers::convertirvalorcorrecto(100));
+                    $nuevosubtotalproducto = ($request->subtotalpartida [$key] / $request->cantidadpartida [$key] )+$multiplicacionnuevosubtotalproducto;
                 }
                 $nuevoivaproducto = $nuevosubtotalproducto*($Producto->Impuesto/Helpers::convertirvalorcorrecto(100));
                 $nuevototalproducto = $nuevosubtotalproducto + $nuevoivaproducto;
                 Producto::where('Codigo', $codigoproductopartida)
                 ->update([
                     'Fecha Ultima Compra' => Carbon::parse($request->fecha)->toDateTimeString(),
-                    'Costo' => $request->preciopartida [$key],
-                    'CostoDeLista' => $request->preciopartida [$key],
-                    'CostoDeVenta' => $request->preciopartida [$key],
-                    'Ultimo Costo' => $request->preciopartida [$key],
+                    'Costo' => ($request->subtotalpartida [$key] / $request->cantidadpartida [$key] ),
+                    'CostoDeLista' => ($request->subtotalpartida [$key] / $request->cantidadpartida [$key] ),
+                    'CostoDeVenta' => ($request->subtotalpartida [$key] / $request->cantidadpartida [$key] ),
+                    'Ultimo Costo' => ($request->subtotalpartida [$key] / $request->cantidadpartida [$key] ),
                     'SubTotal' => Helpers::convertirvalorcorrecto($nuevosubtotalproducto),
                     'Iva' => Helpers::convertirvalorcorrecto($nuevoivaproducto),
                     'Total' => Helpers::convertirvalorcorrecto($nuevototalproducto)
@@ -2085,6 +2088,28 @@ class CompraController extends ConfiguracionSistemaController{
             if($this->correodefault2enviodocumentos != ""){
                 array_push($arraycc, $this->correodefault2enviodocumentos);
             }
+            //subir archivo arjunto 1 en public/archivos_adjuntos para poder adjuntarlo en el correo
+            if($request->archivoadjunto != null) {
+                //archivos adjuntos
+                $mover_a_carpeta="archivos_adjuntos";
+                $archivoadjunto = $request->archivoadjunto;
+                $nombre_original_archivo_adjunto = $archivoadjunto->getClientOriginalName();
+                $nuevo_nombre_archivo_adjunto = time().$nombre_original_archivo_adjunto;
+                //guardar archivos en public/archivos_adjuntos
+                $archivoadjunto->move($mover_a_carpeta, $nuevo_nombre_archivo_adjunto);
+                $urlarchivoadjunto = public_path('archivos_adjuntos\\'.$nuevo_nombre_archivo_adjunto);
+            }
+            //subir archivo arjunto 2 en public/archivos_adjuntos para poder adjuntarlo en el correo
+            if($request->archivoadjunto2 != null) {
+                //archivos adjuntos
+                $mover_a_carpeta="archivos_adjuntos";
+                $archivoadjunto2 = $request->archivoadjunto2;
+                $nombre_original_archivo_adjunto2 = $archivoadjunto2->getClientOriginalName();
+                $nuevo_nombre_archivo_adjunto2 = time().$nombre_original_archivo_adjunto2;
+                //guardar archivos en public/archivos_adjuntos
+                $archivoadjunto2->move($mover_a_carpeta, $nuevo_nombre_archivo_adjunto2);
+                $urlarchivoadjunto2 = public_path('archivos_adjuntos\\'.$nuevo_nombre_archivo_adjunto2);
+            }
             $correos = [$request->emailpara];
             $asunto = $request->emailasunto;
             $emaildocumento = $request->emaildocumento;
@@ -2092,12 +2117,55 @@ class CompraController extends ConfiguracionSistemaController{
             $body = $request->emailasunto;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
-            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
-                $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
-                        ->cc($arraycc)
-                        ->subject($asunto)
-                        ->attachData($pdf->output(), "CompraNo".$emaildocumento.".pdf");
-            });
+            if($request->archivoadjunto != null && $request->archivoadjunto2 != null) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento) {
+                    $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                            ->cc($arraycc)
+                            ->subject($asunto)
+                            ->attachData($pdf->output(), "CompraNo".$emaildocumento.".pdf")
+                            ->attach($urlarchivoadjunto)
+                            ->attach($urlarchivoadjunto2);
+                });
+                //eliminar xml de storage/xml_cargados
+                if (file_exists($urlarchivoadjunto)) {
+                    unlink($urlarchivoadjunto);
+                }
+                //eliminar xml de storage/xml_cargados
+                if (file_exists($urlarchivoadjunto2)) {
+                    unlink($urlarchivoadjunto2);
+                }
+            }else if($request->archivoadjunto != null && $request->archivoadjunto2 == null){
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $correos, $asunto, $pdf, $emaildocumento) {
+                    $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                            ->cc($arraycc)
+                            ->subject($asunto)
+                            ->attachData($pdf->output(), "CompraNo".$emaildocumento.".pdf")
+                            ->attach($urlarchivoadjunto);
+                });
+                //eliminar xml de storage/xml_cargados
+                if (file_exists($urlarchivoadjunto)) {
+                    unlink($urlarchivoadjunto);
+                }
+            }else if($request->archivoadjunto == null && $request->archivoadjunto2 != null){
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento) {
+                    $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                            ->cc($arraycc)
+                            ->subject($asunto)
+                            ->attachData($pdf->output(), "CompraNo".$emaildocumento.".pdf")
+                            ->attach($urlarchivoadjunto2);
+                });
+                //eliminar xml de storage/xml_cargados
+                if (file_exists($urlarchivoadjunto2)) {
+                    unlink($urlarchivoadjunto2);
+                }
+            }else{
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
+                    $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
+                            ->cc($arraycc)
+                            ->subject($asunto)
+                            ->attachData($pdf->output(), "CompraNo".$emaildocumento.".pdf");
+                });
+            }
         } catch(\Exception $e) {
             $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
             $correos = ['osbaldo.anzaldo@utpcamiones.com.mx'];

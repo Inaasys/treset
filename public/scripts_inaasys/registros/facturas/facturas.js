@@ -314,69 +314,96 @@ function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapag
       var confirmacion = true;
     }
     if (confirmacion == true) { 
-      $("#tabladetallesfactura tbody").html("");
-      $("#numerocliente").val(Numero);
-      $("#numeroclienteanterior").val(Numero);
-      $("#cliente").val(Nombre);
-      if(Nombre != null){
-        $("#textonombrecliente").html(Nombre.substring(0, 40));
+      //validar si el RFC del cliente es igual al de la empresa si es asi la seria de la factura debe ser con el depto INTERNA 
+      var emisorrfc = $("#emisorrfc").val();
+      if(emisorrfc == Rfc){
+        var confirmacionrfcigual = confirm("El cliente seleccionado tiene el mismo RFC que el emisor de la FACTURA por lo tanto la serie debe ser INTERNA esta seguro de seguir con los cambios?"); 
       }
-      $("#rfccliente").val(Rfc);
-      $("#plazo").val(Plazo);
-      //credito y saldo
-      $("#credito").val(number_format(round(CreditoCliente, numerodecimales), numerodecimales, '.', ''));
-      $("#saldo").val(number_format(round(SaldoCliente, numerodecimales), numerodecimales, '.', ''));
-      //datos pestaña receptor o cliente
-      $("#receptorrfc").val(Rfc);
-      $("#receptornombre").val(Nombre);
-      $("#claveformapago").val(claveformapago);
-      $("#claveformapagoanterior").val(claveformapago);
-      $("#formapago").val(formapago);
-      if(formapago != null){
-        $("#textonombreformapago").html(formapago.substring(0, 40));
+      if(confirmacionrfcigual == true){
+          $.get(facturas_obtener_serie_interna, function(datos){
+            $("#tabladetallesfactura tbody").html("");
+            $("#folio").val(datos.Folio);
+            $("#serie").val(datos.Serie);
+            $("#esquema").val(datos.Esquema);
+            $("#depto").val(datos.Depto);
+            $("#serietexto").html("Serie: "+datos.Serie);
+            $("#esquematexto").html("Esquema: "+datos.Esquema);
+            comprobartiposerie(datos.Depto);
+            //comprobar numero de filas en la tabla
+            comprobarfilas();
+            //calcular totales compras nota proveedor
+            calculartotal();
+            //colocar strings vacios
+            $("#stringremisionesseleccionadas").val("");
+            $("#stringordenesseleccionadas").val("");
+            contadorproductos = 0;
+            contadorfilas = 0;
+            partida = 1;
+          }) 
       }
-      $("#clavemetodopago").val(clavemetodopago);
-      $("#clavemetodopagoanterior").val(clavemetodopago);
-      $("#metodopago").val(metodopago);
-      if(metodopago != null){
-        $("#textonombremetodopago").html(metodopago.substring(0, 40));
-      }
-      $("#claveusocfdi").val(claveusocfdi);
-      $("#claveusocfdianterior").val(claveusocfdi);
-      $("#usocfdi").val(usocfdi);
-      if(usocfdi != null){
-        $("#textonombreusocfdi").html(usocfdi.substring(0, 40));
-      }
-      $("#claveresidenciafiscal").val(claveresidenciafiscal);
-      $("#claveresidenciafiscalanterior").val(claveresidenciafiscal);
-      $("#residenciafiscal").val(residenciafiscal);
-      if(residenciafiscal != null){
-        $("#textonombreresidenciafiscal").html(residenciafiscal.substring(0, 40));
-      }
-      //datos agente
-      $.get(facturas_obtener_datos_agente, {NumeroAgente:NumeroAgente}, function(Agente){
-        $("#numeroagente").val(Agente.Numero);
-        $("#numeroagenteanterior").val(Agente.Numero);
-        $("#rfcagente").val(Agente.Rfc);
-        $("#agente").val(Agente.Nombre);
-        if(Agente.Nombre != null){
-          $("#textonombreagente").html(Agente.Nombre.substring(0, 40));
+        $("#tabladetallesfactura tbody").html("");
+        $("#numerocliente").val(Numero);
+        $("#numeroclienteanterior").val(Numero);
+        $("#cliente").val(Nombre);
+        if(Nombre != null){
+          $("#textonombrecliente").html(Nombre.substring(0, 40));
         }
-      }) 
-      //comprobar si mostrar botones
-      var Depto = $("#depto").val();
-      comprobartiposerie(Depto);
-      //comprobar numero de filas en la tabla
-      comprobarfilas();
-      //calcular totales compras nota proveedor
-      calculartotal();
-      //colocar strings vacios
-      $("#stringremisionesseleccionadas").val("");
-      $("#stringordenesseleccionadas").val("");
-      contadorproductos = 0;
-      contadorfilas = 0;
-      partida = 1;
-      mostrarformulario();
+        $("#rfccliente").val(Rfc);
+        $("#plazo").val(Plazo);
+        //credito y saldo
+        $("#credito").val(number_format(round(CreditoCliente, numerodecimales), numerodecimales, '.', ''));
+        $("#saldo").val(number_format(round(SaldoCliente, numerodecimales), numerodecimales, '.', ''));
+        //datos pestaña receptor o cliente
+        $("#receptorrfc").val(Rfc);
+        $("#receptornombre").val(Nombre);
+        $("#claveformapago").val(claveformapago);
+        $("#claveformapagoanterior").val(claveformapago);
+        $("#formapago").val(formapago);
+        if(formapago != null){
+          $("#textonombreformapago").html(formapago.substring(0, 40));
+        }
+        $("#clavemetodopago").val(clavemetodopago);
+        $("#clavemetodopagoanterior").val(clavemetodopago);
+        $("#metodopago").val(metodopago);
+        if(metodopago != null){
+          $("#textonombremetodopago").html(metodopago.substring(0, 40));
+        }
+        $("#claveusocfdi").val(claveusocfdi);
+        $("#claveusocfdianterior").val(claveusocfdi);
+        $("#usocfdi").val(usocfdi);
+        if(usocfdi != null){
+          $("#textonombreusocfdi").html(usocfdi.substring(0, 40));
+        }
+        $("#claveresidenciafiscal").val(claveresidenciafiscal);
+        $("#claveresidenciafiscalanterior").val(claveresidenciafiscal);
+        $("#residenciafiscal").val(residenciafiscal);
+        if(residenciafiscal != null){
+          $("#textonombreresidenciafiscal").html(residenciafiscal.substring(0, 40));
+        }
+        //datos agente
+        $.get(facturas_obtener_datos_agente, {NumeroAgente:NumeroAgente}, function(Agente){
+          $("#numeroagente").val(Agente.Numero);
+          $("#numeroagenteanterior").val(Agente.Numero);
+          $("#rfcagente").val(Agente.Rfc);
+          $("#agente").val(Agente.Nombre);
+          if(Agente.Nombre != null){
+            $("#textonombreagente").html(Agente.Nombre.substring(0, 40));
+          }
+        }) 
+        //comprobar si mostrar botones
+        var Depto = $("#depto").val();
+        comprobartiposerie(Depto);
+        //comprobar numero de filas en la tabla
+        comprobarfilas();
+        //calcular totales compras nota proveedor
+        calculartotal();
+        //colocar strings vacios
+        $("#stringremisionesseleccionadas").val("");
+        $("#stringordenesseleccionadas").val("");
+        contadorproductos = 0;
+        contadorfilas = 0;
+        partida = 1;
+        mostrarformulario();
     }
   }
 }
@@ -1700,6 +1727,33 @@ function obtenerclientepornumero(){
             var confirmacion = true;
           //}
           if (confirmacion == true) { 
+            //validar si el RFC del cliente es igual al de la empresa si es asi la seria de la factura debe ser con el depto INTERNA 
+            var emisorrfc = $("#emisorrfc").val();
+            if(emisorrfc == data.rfc){
+              var confirmacionrfcigual = confirm("El cliente seleccionado tiene el mismo RFC que el emisor de la FACTURA por lo tanto la serie debe ser INTERNA esta seguro de seguir con los cambios?"); 
+            }
+            if(confirmacionrfcigual == true){
+                $.get(facturas_obtener_serie_interna, function(datos){
+                  $("#tabladetallesfactura tbody").html("");
+                  $("#folio").val(datos.Folio);
+                  $("#serie").val(datos.Serie);
+                  $("#esquema").val(datos.Esquema);
+                  $("#depto").val(datos.Depto);
+                  $("#serietexto").html("Serie: "+datos.Serie);
+                  $("#esquematexto").html("Esquema: "+datos.Esquema);
+                  comprobartiposerie(datos.Depto);
+                  //comprobar numero de filas en la tabla
+                  comprobarfilas();
+                  //calcular totales compras nota proveedor
+                  calculartotal();
+                  //colocar strings vacios
+                  $("#stringremisionesseleccionadas").val("");
+                  $("#stringordenesseleccionadas").val("");
+                  contadorproductos = 0;
+                  contadorfilas = 0;
+                  partida = 1;
+                }) 
+            }
             //$("#tabladetallesfactura tbody").html("");
             $("#numerocliente").val(data.numero);
             $("#numeroclienteanterior").val(data.numero);
@@ -3086,6 +3140,7 @@ function alta(){
       $(".inputnextdet").eq(index + 1).focus().select(); 
     }
   });
+  setTimeout(function(){$("#folio").focus();},500);
   $("#ModalAlta").modal('show');
 }
 //Cada que se elija un archivo
@@ -4179,6 +4234,7 @@ function obtenerdatos(facturamodificar){
       }
     });
     renumerarfilasuuid();
+    setTimeout(function(){$("#folio").focus();},500);
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {
@@ -4357,6 +4413,8 @@ function enviardocumentoemail(documento, tipo){
       $("#incluir_xml").attr('onclick','javascript: return false;');
     }
     $("#divincluirxml").show();
+    $(".dropify-clear").trigger("click");
+    $("#divadjuntararchivo").show();
     $("#modalenviarpdfemail").modal('show');
   })   
 }

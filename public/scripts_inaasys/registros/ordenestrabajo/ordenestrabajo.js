@@ -1993,6 +1993,7 @@ function alta(){
   //se debe motrar el input para buscar los productos
   $("#divbuscarcodigoservicio").show();
   $("#ModalAlta").modal('show');
+  setTimeout(function(){$("#folio").focus();},500);
 }
 //eliminar una fila en la tabla
 function eliminarfila(numerofila){
@@ -2691,6 +2692,7 @@ async function selectsordentrabajo(data){
   $("#tipounidad").select2();
   //se debe esconder el input para buscar los productos porque en la modificacion no se permiten agregar productos
   $("#divbuscarcodigoservicio").show();
+  setTimeout(function(){$("#folio").focus();},500);
   mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
   $('.page-loader-wrapper').css('display', 'none');
 }
@@ -2795,6 +2797,8 @@ function enviardocumentoemail(documento){
     $("#email2cc").val(data.email2cc);
     $("#email3cc").val(data.email3cc);
     $("#emailasunto").val("ORDEN DE TRABAJO NO. " + documento +" DE "+ nombreempresa);
+    $(".dropify-clear").trigger("click");
+    $("#divadjuntararchivo").hide();
     $("#modalenviarpdfemail").modal('show');
   })   
 }

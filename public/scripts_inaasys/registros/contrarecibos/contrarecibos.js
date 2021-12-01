@@ -473,6 +473,7 @@ function alta(){
         $(".inputnext").eq(index + 1).focus().select(); 
       }
     });
+    setTimeout(function(){$("#folio").focus();},500);
 }
 function calculartotalcontrarecibo(tipo){
     var total = 0;
@@ -739,6 +740,7 @@ function obtenerdatos(contrarecibomodificar){
         $(".inputnext").eq(index + 1).focus().select(); 
       }
     });
+    setTimeout(function(){$("#folio").focus();},500);
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
     mostrarformulario();
     $('.page-loader-wrapper').css('display', 'none');
@@ -799,6 +801,8 @@ function enviardocumentoemail(documento){
       $("#email2cc").val(data.email2cc);
       $("#email3cc").val(data.email3cc);
       $("#emailasunto").val("CONTRARECIBO NO. " + documento +" DE "+ nombreempresa);
+      $(".dropify-clear").trigger("click");
+      $("#divadjuntararchivo").hide();
       $("#modalenviarpdfemail").modal('show');
     })   
 }

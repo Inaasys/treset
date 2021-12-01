@@ -1172,6 +1172,7 @@ function alta(){
         $(".inputnextdet").eq(index + 1).focus().select(); 
       }
     });
+    setTimeout(function(){$("#folio").focus();},500);
     $("#ModalAlta").modal('show');
 }
 //guardar el registro
@@ -1580,6 +1581,7 @@ async function seleccionartipoordencompra(data){
   await retraso();
   $("#tipo").val(data.cotizacion.Tipo).change();
   $("#tipo").select2();
+  setTimeout(function(){$("#folio").focus();},500);
   mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
   $('.page-loader-wrapper').css('display', 'none');
 }
@@ -1637,6 +1639,8 @@ function enviardocumentoemail(documento, tipo){
     $("#email2cc").val(data.email2cc);
     $("#email3cc").val(data.email3cc);
     $("#emailasunto").val("COTIZACIÓN PRODUCTO NO. " + documento +" DE "+ nombreempresa);
+    $(".dropify-clear").trigger("click");
+    $("#divadjuntararchivo").show();
     $("#modalenviarpdfemail").modal('show');
   })   
 }

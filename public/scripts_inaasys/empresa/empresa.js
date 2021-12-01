@@ -34,6 +34,7 @@ function setvaluesselects(){
     $("#tipoutilidadventa").val(tipo_de_utilidad).trigger("change");
     $("#correodefault1enviodocumentos").val(correodefault1enviodocumentos);
     $("#correodefault2enviodocumentos").val(correodefault2enviodocumentos);
+    $("input[name=verificarpartidasremisionenot][value='"+verificarinsumosremisionenot+"']").prop("checked",true);  
 }
 //obtener ususarios
 function obtenerusuarios(){

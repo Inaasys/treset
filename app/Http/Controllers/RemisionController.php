@@ -36,6 +36,8 @@ use App\VistaRemision;
 use App\VistaObtenerExistenciaProducto;
 use App\Cotizacion;
 use App\CotizacionDetalle;
+use App\OrdenTrabajo;
+use App\OrdenTrabajoDetalle;
 use Config;
 use Mail;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
@@ -568,6 +570,29 @@ class RemisionController extends ConfiguracionSistemaController{
             $Existencias = Helpers::convertirvalorcorrecto(0);
         }
         return response()->json($Existencias);
+    }
+
+    //verificar si las partidas de la remision ya estan en una OT
+    public function remisiones_revisar_insumos_orden_trabajo_por_folio(Request $request){
+        $insumos = "";
+        $numeroinsumosenorden=0;
+        foreach($request->codigos as $cod){
+            $insumoenorden = OrdenTrabajoDetalle::where('Orden', $request->orden)->where('Codigo', $cod)->count();
+            if($insumoenorden > 0){
+                $insumos = $insumos."Aviso la Orden No. ".$request->orden." ya tiene cargado el insumo: ".$cod."<br>";
+                $numeroinsumosenorden++;
+            }
+        }
+        $data = array(
+            'insumos' => $insumos,
+            'numeroinsumosenorden' => $numeroinsumosenorden
+        );
+        return response()->json($data);
+    }
+
+    //obtener series de requisiciones
+    public function remisiones_obtener_series_requisiciones(){
+        
     }
 
     //guardar

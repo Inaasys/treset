@@ -24,6 +24,9 @@ use App\Proveedor;
 use App\Producto;
 use Mail;
 use App\Configuracion_Tabla;
+use App\Imports\CatalogoSATc_ClaveProdServCPImport;
+use App\Imports\CatalogosSATImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PruebaController extends ConfiguracionSistemaController{
 
@@ -110,6 +113,306 @@ class PruebaController extends ConfiguracionSistemaController{
         $sales = DB::connection('sqlsrv2')->select("Select * from Clientes");
         dd($sales);
 
+    }
+
+    public function importSATClaveProdServCP(){        
+        /*
+        //CATALOGO c_ClaveProdServCP
+        $arrayexcel =  Excel::toArray(new CatalogoSATc_ClaveProdServCPImport, storage_path('c_ClaveProdServCP.xls'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 4){
+                $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[4]))->toDateTimeString();
+                DB::table('c_ClaveProdServCP')->insert(
+                    [
+                        'Clave' => $partida[0], 
+                        'Descripcion' => $partida[1],
+                        'PalabrasSimilares' => $partida[2],
+                        'MaterialPeligroso' => $partida[3],
+                        'FechaDeInicioDeVigencia' => $fecha,
+                        'FechaDeFinDeVigencia' => $partida[5],
+                        'Numero' => $numerofila,
+                    ]
+                );
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        */
+        /*
+        //CATALOGO c_ClaveUnidadPeso
+        $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('c_ClaveUnidadPeso.xls'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 4){
+                $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[4]))->toDateTimeString();
+                DB::table('c_ClaveUnidadPeso')->insert(
+                    [
+                        'Numero' => $numerofila,
+                        'Clave' => $partida[0], 
+                        'Nombre' => $partida[1],
+                        'Descripcion' => $partida[2],
+                        'Nota' => $partida[3],
+                        'FechaDeInicioDeVigencia' => $fecha,
+                        'FechaDeFinDeVigencia' => $partida[5],
+                        'Simbolo' => $partida[6],
+                        'Bandera' => $partida[7]
+                    ]
+                );
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        */
+        /*
+        //CATALOGO c_ConfigAutotransporte
+        $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('c_ConfigAutotransporte.xls'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 4){
+                $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[5]))->toDateTimeString();
+                DB::table('c_ConfigAutotransporte')->insert(
+                    [
+                        'Numero' => $numerofila,
+                        'Clave' => $partida[0], 
+                        'Descripcion' => $partida[1],
+                        'NumeroEjes' => $partida[2],
+                        'NumeroLlantas' => $partida[3],
+                        'Remolque' => $partida[4],
+                        'FechaDeInicioDeVigencia' => $fecha,
+                        'FechaDeFinDeVigencia' => $partida[6],
+                    ]
+                );
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        */
+        /*
+        //CATALOGO c_CveTransporte
+        $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('c_CveTransporte.xls'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 4){
+                $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[2]))->toDateTimeString();
+                DB::table('c_CveTransporte')->insert(
+                    [
+                        'Numero' => $numerofila,
+                        'Clave' => $partida[0], 
+                        'Descripcion' => $partida[1],
+                        'FechaDeInicioDeVigencia' => $fecha,
+                        'FechaDeFinDeVigencia' => $partida[3],
+                    ]
+                );
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        */
+        /*
+        //CATALOGO c_Estaciones 
+        $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('c_Estaciones.xls'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 4){
+                $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[6]))->toDateTimeString();
+                DB::table('c_Estaciones')->insert(
+                    [
+                        'Numero' => $numerofila,
+                        'Clave' => $partida[0], 
+                        'Descripcion' => $partida[1],
+                        'ClaveTransporte' => $partida[2],
+                        'Nacionalidad' => $partida[3],
+                        'DesignadorIATA' => $partida[4],
+                        'LineaFerrea' => $partida[5],
+                        'FechaDeInicioDeVigencia' => $fecha,
+                        'FechaDeFinDeVigencia' => $partida[7],
+                    ]
+                );
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        */
+        /*
+        //CATALOGO c_FiguraTransporte 
+        $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('c_FiguraTransporte.xls'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 4){
+                $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[2]))->toDateTimeString();
+                DB::table('c_FiguraTransporte')->insert(
+                    [
+                        'Numero' => $numerofila,
+                        'Clave' => $partida[0], 
+                        'Descripcion' => $partida[1],
+                        'FechaDeInicioDeVigencia' => $fecha,
+                        'FechaDeFinDeVigencia' => $partida[3],
+                    ]
+                );
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        */
+        /*
+        //CATALOGO c_MaterialPeligroso 
+        $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('c_MaterialPeligroso.xls'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 4){
+                $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[5]))->toDateTimeString();
+                DB::table('c_MaterialPeligroso')->insert(
+                    [
+                        'Numero' => $numerofila,
+                        'Clave' => $partida[0], 
+                        'Descripcion' => $partida[1],
+                        'ClaseODiv' => $partida[2],
+                        'PeligroSecundaria' => $partida[3],
+                        'NombreTecnico' => $partida[4],
+                        'FechaDeInicioDeVigencia' => $fecha,
+                        'FechaDeFinDeVigencia' => $partida[6],
+                    ]
+                );
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        */
+        /*
+        //CATALOGO c_ParteTransporte 
+        $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('c_ParteTransporte.xls'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 4){
+                $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[2]))->toDateTimeString();
+                DB::table('c_ParteTransporte')->insert(
+                    [
+                        'Numero' => $numerofila,
+                        'Clave' => $partida[0], 
+                        'Descripcion' => $partida[1],
+                        'FechaDeInicioDeVigencia' => $fecha,
+                        'FechaDeFinDeVigencia' => $partida[3],
+                    ]
+                );
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        */
+        /*
+        //CATALOGO  c_SubTipoRem 
+        $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('c_SubTipoRem.xls'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 4){
+                $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[2]))->toDateTimeString();
+                DB::table('c_SubTipoRem')->insert(
+                    [
+                        'Numero' => $numerofila,
+                        'Clave' => $partida[0], 
+                        'RemolqueOSemiremolque' => $partida[1],
+                        'FechaDeInicioDeVigencia' => $fecha,
+                        'FechaDeFinDeVigencia' => $partida[3],
+                    ]
+                );
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        */
+        /*
+        //CATALOGO  c_TipoEmbalaje 
+        $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('c_TipoEmbalaje.xls'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 4){
+                $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[2]))->toDateTimeString();
+                DB::table('c_TipoEmbalaje')->insert(
+                    [
+                        'Numero' => $numerofila,
+                        'Clave' => $partida[0], 
+                        'Descripcion' => $partida[1],
+                        'FechaDeInicioDeVigencia' => $fecha,
+                        'FechaDeFinDeVigencia' => $partida[3],
+                    ]
+                );
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        */
+        /*
+        //CATALOGO  c_TipoEstacion 
+        $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('c_TipoEstacion.xls'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 4){
+                $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[3]))->toDateTimeString();
+                DB::table('c_TipoEstacion')->insert(
+                    [
+                        'Numero' => $numerofila,
+                        'Clave' => $partida[0], 
+                        'Descripcion' => $partida[1],
+                        'ClaveTransporte' => $partida[2],
+                        'FechaDeInicioDeVigencia' => $fecha,
+                        'FechaDeFinDeVigencia' => $partida[4],
+                    ]
+                );
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        */
+        /*
+        //CATALOGO  c_TipoPermiso 
+        $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('c_TipoPermiso.xls'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 4){
+                $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[3]))->toDateTimeString();
+                DB::table('c_TipoPermiso')->insert(
+                    [
+                        'Numero' => $numerofila,
+                        'Clave' => $partida[0], 
+                        'Descripcion' => $partida[1],
+                        'ClaveTransporte' => $partida[2],
+                        'FechaDeInicioDeVigencia' => $fecha,
+                        'FechaDeFinDeVigencia' => $partida[4],
+                    ]
+                );
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        */
+
+        //return response()->json($rowexcel); 
+        
     }
 
     public function asignar_valores_por_defecto_busquedas_y_ordenamiento(){

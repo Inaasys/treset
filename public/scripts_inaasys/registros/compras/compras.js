@@ -1857,6 +1857,7 @@ function alta(tipoalta){
       $(".inputnexttabem").eq(index + 1).focus().select(); 
     }
   });
+  setTimeout(function(){$("#folio").focus();},500);
   $("#ModalAlta").modal('show');
 }
 //guardar el registro
@@ -2369,6 +2370,7 @@ async function seleccionartipocompra(data){
   //$("#tipo").select2({disabled: true});
   $("#tipo").select2();
   $("#moneda").select2();
+  setTimeout(function(){$("#folio").focus();},500);
   mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
   $('.page-loader-wrapper').css('display', 'none');
 }
@@ -2638,6 +2640,8 @@ function enviardocumentoemail(documento){
     $("#email2cc").val(data.email2cc);
     $("#email3cc").val(data.email3cc);
     $("#emailasunto").val("COMPRA NO. " + documento +" DE "+ nombreempresa);
+    $(".dropify-clear").trigger("click");
+    $("#divadjuntararchivo").show();
     $("#modalenviarpdfemail").modal('show');
   })   
 }

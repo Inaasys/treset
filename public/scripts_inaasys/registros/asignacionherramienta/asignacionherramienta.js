@@ -960,6 +960,7 @@ function alta(){
       $(".inputnextdet").eq(index + 1).focus().select(); 
     }
   });
+  setTimeout(function(){$("#folio").focus();},500);
   $("#ModalAlta").modal('show');
 }
 //guardar el registro
@@ -1294,6 +1295,7 @@ function obtenerdatos(asignacionmodificar){
         $(".inputnextdet").eq(index + 1).focus().select(); 
       }
     });
+    setTimeout(function(){$("#folio").focus();},500);
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {

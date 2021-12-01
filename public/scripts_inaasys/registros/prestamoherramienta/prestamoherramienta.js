@@ -719,7 +719,9 @@ function alta(){
   });
   //se debe motrar el input para buscar los productos
   $("#divbuscarcodigoproducto").show();
+  setTimeout(function(){$("#folio").focus();},500);
   $("#ModalAlta").modal('show');
+  
 }
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
@@ -1022,6 +1024,7 @@ async function seleccionarpersonalentrega(data){
   $("#personalherramientacomun").attr('disabled', 'disabled');
   //activar select2
   $("#personalherramientacomun").select2();
+  setTimeout(function(){$("#folio").focus();},500);
   mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
   $('.page-loader-wrapper').css('display', 'none');
 }

@@ -85,13 +85,13 @@
                         <div class="row">
                             <div class="col-md-3">
                                 <label>Número</label>
-                                <input type="text" class="form-control" name="numero" id="numero" required readonly onkeyup="tipoLetra(this);">
+                                <input type="text" class="form-control inputnext" name="numero" id="numero" required readonly onkeyup="tipoLetra(this);">
                             </div>   
                         </div>
                         <div class="row">
                             <div class="col-md-12">
                                 <label>Nombre</label>
-                                <input type="text" class="form-control" name="nombre" id="nombre" placeholder="1er Apellido, 2do Apellido, Nombre(s)" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">
+                                <input type="text" class="form-control inputnext" name="nombre" id="nombre" placeholder="1er Apellido, 2do Apellido, Nombre(s)" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">
                             </div>
                         </div>
                         <div class="col-md-12" id="tabsform">
@@ -161,15 +161,21 @@
         var clientes_obtener_ultimo_numero = '{!!URL::to('clientes_obtener_ultimo_numero')!!}';
         var clientes_guardar = '{!!URL::to('clientes_guardar')!!}';
         var clientes_obtener_paises = '{!!URL::to('clientes_obtener_paises')!!}';
+        var clientes_obtener_clave_pais_por_clave = '{!!URL::to('clientes_obtener_clave_pais_por_clave')!!}';
         var clientes_obtener_codigos_postales = '{!!URL::to('clientes_obtener_codigos_postales')!!}';
         var clientes_obtener_datos_direccion = '{!!URL::to('clientes_obtener_datos_direccion')!!}';
         var clientes_obtener_estados = '{!!URL::to('clientes_obtener_estados')!!}';
         var clientes_obtener_municipios = '{!!URL::to('clientes_obtener_municipios')!!}';
         var clientes_obtener_agentes = '{!!URL::to('clientes_obtener_agentes')!!}';
+        var clientes_obtener_agente_por_numero = '{!!URL::to('clientes_obtener_agente_por_numero')!!}';
         var clientes_obtener_formas_pago = '{!!URL::to('clientes_obtener_formas_pago')!!}';
+        var clientes_obtener_formapago_por_clave = '{!!URL::to('clientes_obtener_formapago_por_clave')!!}';
         var clientes_obtener_metodos_pago = '{!!URL::to('clientes_obtener_metodos_pago')!!}';
+        var clientes_obtener_metodopago_por_clave = '{!!URL::to('clientes_obtener_metodopago_por_clave')!!}';
         var clientes_obtener_uso_cfdi = '{!!URL::to('clientes_obtener_uso_cfdi')!!}';
+        var clientes_obtener_usocfdi_por_clave = '{!!URL::to('clientes_obtener_usocfdi_por_clave')!!}';
         var clientes_obtener_productos = '{!!URL::to('clientes_obtener_productos')!!}';
+        var clientes_obtener_datos_producto_agregar_fila = '{!!URL::to('clientes_obtener_datos_producto_agregar_fila')!!}';
         var clientes_alta_o_baja = '{!!URL::to('clientes_alta_o_baja')!!}'; 
         var clientes_obtener_cliente = '{!!URL::to('clientes_obtener_cliente')!!}'; 
         var clientes_guardar_modificacion = '{!!URL::to('clientes_guardar_modificacion')!!}';

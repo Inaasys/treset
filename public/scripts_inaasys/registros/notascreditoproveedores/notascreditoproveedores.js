@@ -1559,6 +1559,7 @@ function alta(){
       $(".inputnextdetcom").eq(index + 1).focus().select(); 
     }
   });
+  setTimeout(function(){$("#folio").focus();},500);
   $("#ModalAlta").modal('show');
 }
 //Cada que se elija un archivo
@@ -2416,6 +2417,7 @@ function obtenerdatos(notamodificar){
         $(".inputnextdetcom").eq(index + 1).focus().select(); 
       }
     });
+    setTimeout(function(){$("#folio").focus();},500);
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {
@@ -2560,6 +2562,8 @@ function enviardocumentoemail(documento){
     $("#email2cc").val(data.email2cc);
     $("#email3cc").val(data.email3cc);
     $("#emailasunto").val("NOTA DE CRÉDITO PROVEEDOR NO. " + documento +" DE "+ nombreempresa);
+    $(".dropify-clear").trigger("click");
+    $("#divadjuntararchivo").hide();
     $("#modalenviarpdfemail").modal('show');
   })   
 }

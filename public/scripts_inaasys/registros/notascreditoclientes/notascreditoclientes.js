@@ -2527,6 +2527,7 @@ function alta(){
       $(".inputnextdetfac").eq(index + 1).focus().select(); 
     }
   });
+  setTimeout(function(){$("#folio").focus();},500);
   $("#ModalAlta").modal('show');
 }
 //calcular total de la orden de compra
@@ -3503,6 +3504,7 @@ function obtenerdatos(notamodificar){
         $(".inputnextdetfac").eq(index + 1).focus().select(); 
       }
     });
+    setTimeout(function(){$("#folio").focus();},500);
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {
@@ -3645,6 +3647,8 @@ function enviardocumentoemail(documento){
       $("#incluir_xml").attr('onclick','javascript: return false;');
     }
     $("#divincluirxml").show();
+    $(".dropify-clear").trigger("click");
+    $("#divadjuntararchivo").show();
     $("#modalenviarpdfemail").modal('show');
   })   
 }

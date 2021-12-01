@@ -627,6 +627,19 @@
                                                                     </select>
                                                                 </td>
                                                             </tr>
+                                                            <tr>
+                                                                <td class="col-md-1">25</td>
+                                                                <td class="col-md-2">Remisiones</td>
+                                                                <td class="col-md-5">Verificar si los las partidas de la remisión ya fueron cargadas en una O.T.</td>
+                                                                <td class="col-md-4">
+                                                                    <div class="col-md-12 form-check">
+                                                                        <input type="radio" name="verificarpartidasremisionenot" id="verificarpartidasremisionenot" value="S">
+                                                                        <label for="verificarpartidasremisionenot">SI</label>
+                                                                        <input type="radio" name="verificarpartidasremisionenot" id="verificarpartidasremisionenot1" value="N">
+                                                                        <label for="verificarpartidasremisionenot1">NO</label>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -683,7 +696,7 @@
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <label>Cambiar Logotipo</label>
-                                                    <input type="file" name="logo" id="logo"  class="dropify" data-max-file-size="2M" data-allowed-file-extensions="png jpg jpeg gif"/>
+                                                    <input type="file" name="logo" id="logo"  class="dropify" data-max-file-size="1M" data-allowed-file-extensions="png jpg svg" data-min-width="200" data-min-height="200"/>
                                                 </div>
                                             </div> 
                                             <div class="row">
@@ -1052,6 +1065,7 @@
         var correodefault1enviodocumentos = '{{$empresa->CorreoDefault1EnvioDocumentos}}';
         var correodefault2enviodocumentos = '{{$empresa->CorreoDefault2EnvioDocumentos}}';
         var usuariosamodificarinsumos = '{{$empresa->UsuariosModificarInsumo}}';
+        var verificarinsumosremisionenot = '{{$empresa->VerificarPartidasRemisionEnOT}}';
         var empresa_obtener_usuarios_a_modificar_insumos = '{!!URL::to('empresa_obtener_usuarios_a_modificar_insumos')!!}';
         var empresa_obtener_paises = '{!!URL::to('empresa_obtener_paises')!!}';
         var empresa_obtener_estados = '{!!URL::to('empresa_obtener_estados')!!}';

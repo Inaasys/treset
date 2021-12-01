@@ -622,6 +622,7 @@ function alta(){
         $(".inputnext").eq(index + 1).focus().select(); 
       }
     });
+    setTimeout(function(){$("#folio").focus();},500);
 }
 function calcularnuevosaldo(fila){
     var cuentaFilas = 0;
@@ -945,6 +946,7 @@ function obtenerdatos(cxpmodificar){
         $(".inputnext").eq(index + 1).focus().select(); 
       }
     });
+    setTimeout(function(){$("#folio").focus();},500);
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {
@@ -1000,6 +1002,8 @@ function enviardocumentoemail(documento){
       $("#email2cc").val(data.email2cc);
       $("#email3cc").val(data.email3cc);
       $("#emailasunto").val("CUENTA POR PAGAR NO. " + documento +" DE "+ nombreempresa);
+      $(".dropify-clear").trigger("click");
+      $("#divadjuntararchivo").hide();
       $("#modalenviarpdfemail").modal('show');
     })   
 }

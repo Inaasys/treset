@@ -7,7 +7,7 @@ function init(){
     listar();
 }
 function retraso(){
-  return new Promise(resolve => setTimeout(resolve, 1000));
+  return new Promise(resolve => setTimeout(resolve, 5000));
 }
 //cerrar modales
 function limpiarmodales(){
@@ -136,7 +136,8 @@ function listarclavesproductos(){
                                     '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                                 '</div>';
     $("#contenidomodaltablas").html(tablaclavesproductos);
-    $('#tbllistadoclaveproducto').DataTable({
+    var tclavprod = $('#tbllistadoclaveproducto').DataTable({
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "300px",
         "bScrollCollapse": true,  
@@ -164,6 +165,44 @@ function listarclavesproductos(){
         },
         "iDisplayLength": 8,
     });
+    //seleccionar registro al dar doble click
+    $('#tbllistadoclaveproducto tbody').on('dblclick', 'tr', function () {
+        var data = tclavprod.row( this ).data();
+        seleccionarclaveproducto(data.Clave, data.Nombre);
+    }); 
+}
+function seleccionarclaveproducto(Clave, Nombre){
+    var claveproductoanterior = $("#claveproductoanterior").val();
+    var claveproducto = Clave;
+    if(claveproductoanterior != claveproducto){
+        $("#claveproducto").val(Clave);
+        $("#claveproductoanterior").val(Clave);
+        if(Nombre != null){
+        $("#textonombreclaveproducto").html(Nombre.substring(0, 40));
+        }
+        mostrarformulario();
+    }
+}
+//obtener por clave
+function obtenerclaveproductoporclave(){
+    var claveproductoanterior = $("#claveproductoanterior").val();
+    var claveproducto = $("#claveproducto").val();
+    if(claveproductoanterior != claveproducto){
+        if($("#claveproducto").parsley().isValid()){
+            $.get(productos_obtener_clave_producto_por_clave, {claveproducto:claveproducto}, function(data){
+                $("#claveproducto").val(data.clave);
+                $("#claveproductoanterior").val(data.clave);
+                if(data.nombre != null){
+                    $("#textonombreclaveproducto").html(data.nombre.substring(0, 40));
+                }
+            }) 
+        }
+    }
+}
+//regresar clave
+function regresarclaveproducto(){
+    var claveproductoanterior = $("#claveproductoanterior").val();
+    $("#claveproducto").val(claveproductoanterior);
 }
 //listar claves unidades
 function listarclavesunidades(){
@@ -195,7 +234,8 @@ function listarclavesunidades(){
                                     '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                                 '</div>';
     $("#contenidomodaltablas").html(tablaclavesunidades);
-    $('#tbllistadoclaveunidad').DataTable({
+    var tclavuni = $('#tbllistadoclaveunidad').DataTable({
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "300px",
         "bScrollCollapse": true,  
@@ -224,6 +264,44 @@ function listarclavesunidades(){
         },
         "iDisplayLength": 8,
     });
+    //seleccionar registro al dar doble click
+    $('#tbllistadoclaveunidad tbody').on('dblclick', 'tr', function () {
+        var data = tclavuni.row( this ).data();
+        seleccionarclaveunidad(data.Clave, data.Nombre);
+    }); 
+}
+function seleccionarclaveunidad(Clave, Nombre){
+    var claveunidadanterior = $("#claveunidadanterior").val();
+    var claveunidad = Clave;
+    if(claveunidadanterior != claveunidad){
+        $("#claveunidad").val(Clave);
+        $("#claveunidadanterior").val(Clave);
+        if(Nombre != null){
+        $("#textonombreclaveunidad").html(Nombre.substring(0, 40));
+        }
+        mostrarformulario();
+    }
+}
+//obtener por clave
+function obtenerclaveunidadporclave(){
+    var claveunidadanterior = $("#claveunidadanterior").val();
+    var claveunidad = $("#claveunidad").val();
+    if(claveunidadanterior != claveunidad){
+        if($("#claveunidad").parsley().isValid()){
+            $.get(productos_obtener_clave_unidad_por_clave, {claveunidad:claveunidad}, function(data){
+                $("#claveunidad").val(data.clave);
+                $("#claveunidadanterior").val(data.clave);
+                if(data.nombre != null){
+                    $("#textonombreclaveunidad").html(data.nombre.substring(0, 40));
+                }
+            }) 
+        }
+    }
+}
+//regresar clave
+function regresarclaveunidad(){
+    var claveunidadanterior = $("#claveunidadanterior").val();
+    $("#claveunidad").val(claveunidadanterior);
 }
 //listar marcas
 function listarmarcas(){
@@ -258,7 +336,8 @@ function listarmarcas(){
                             '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                         '</div>';
     $("#contenidomodaltablas").html(tablamarcas);
-    $('#tbllistadomarca').DataTable({
+    var tmarc = $('#tbllistadomarca').DataTable({
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "300px",
         "bScrollCollapse": true,  
@@ -290,6 +369,45 @@ function listarmarcas(){
         },
         "iDisplayLength": 8,
     });
+    //seleccionar registro al dar doble click
+    $('#tbllistadomarca tbody').on('dblclick', 'tr', function () {
+        var data = tmarc.row( this ).data();
+        seleccionarmarca(data.Numero, data.Nombre);
+    }); 
+}
+function seleccionarmarca(Numero, Nombre){
+    var marcaanterior = $("#marcaanterior").val();
+    var marca = Numero;
+    if(marcaanterior != marca){
+        $("#marca").val(Numero);
+        $("#marcaanterior").val(Numero);
+        if(Nombre != null){
+        $("#textonombremarca").html(Nombre.substring(0, 40));
+        }
+        mostrarformulario();
+        reiniciartablautilidades();
+    }
+}
+//obtener por numero
+function obtenermarcapornumero(){
+    var marcaanterior = $("#marcaanterior").val();
+    var marca = $("#marca").val();
+    if(marcaanterior != marca){
+        if($("#marca").parsley().isValid()){
+            $.get(productos_obtener_marca_por_numero, {marca:marca}, function(data){
+                $("#marca").val(data.numero);
+                $("#marcaanterior").val(data.numero);
+                if(data.nombre != null){
+                    $("#textonombremarca").html(data.nombre.substring(0, 40));
+                }
+            }) 
+        }
+    }
+}
+//regresar numero
+function regresarmarca(){
+    var marcaanterior = $("#marcaanterior").val();
+    $("#marca").val(marcaanterior);
 }
 //listar lineas
 function listarlineas(){
@@ -319,7 +437,8 @@ function listarlineas(){
                             '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                         '</div>';   
     $("#contenidomodaltablas").html(tablalineas);
-    $('#tbllistadolinea').DataTable({
+    var tlin = $('#tbllistadolinea').DataTable({
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "300px",
         "bScrollCollapse": true,  
@@ -346,6 +465,44 @@ function listarlineas(){
         },
         "iDisplayLength": 8,
     });
+    //seleccionar registro al dar doble click
+    $('#tbllistadolinea tbody').on('dblclick', 'tr', function () {
+        var data = tlin.row( this ).data();
+        seleccionarlinea(data.Numero, data.Nombre);
+    }); 
+}
+function seleccionarlinea(Numero, Nombre){
+    var lineaanterior = $("#lineaanterior").val();
+    var linea = Numero;
+    if(lineaanterior != linea){
+        $("#linea").val(Numero);
+        $("#lineaanterior").val(Numero);
+        if(Nombre != null){
+            $("#textonombrelinea").html(Nombre.substring(0, 40));
+        }
+        mostrarformulario();
+    }
+}
+//obtener por numero
+function obtenerlineapornumero(){
+    var lineaanterior = $("#lineaanterior").val();
+    var linea = $("#linea").val();
+    if(lineaanterior != linea){
+        if($("#linea").parsley().isValid()){
+            $.get(productos_obtener_linea_por_numero, {linea:linea}, function(data){
+                $("#linea").val(data.numero);
+                $("#lineaanterior").val(data.numero);
+                if(data.nombre != null){
+                    $("#textonombrelinea").html(data.nombre.substring(0, 40));
+                }
+            }) 
+        }
+    }
+}
+//regresar numero
+function regresarlinea(){
+    var lineaanterior = $("#lineaanterior").val();
+    $("#linea").val(lineaanterior);
 }
 //listar monedas
 function listarmonedas(){
@@ -375,7 +532,8 @@ function listarmonedas(){
                             '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                         '</div>';   
     $("#contenidomodaltablas").html(tablalineas);
-    $('#tbllistadomoneda').DataTable({
+    var tmon = $('#tbllistadomoneda').DataTable({
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "300px",
         "bScrollCollapse": true,  
@@ -402,28 +560,44 @@ function listarmonedas(){
         },
         "iDisplayLength": 8,
     });
+    //seleccionar registro al dar doble click
+    $('#tbllistadomoneda tbody').on('dblclick', 'tr', function () {
+        var data = tmon.row( this ).data();
+        seleccionarmoneda(data.Clave, data.Nombre);
+    }); 
 }
-//listar utilidades
-function listarutilidades(){
-    var numeromarca = $("#marca").val();
-    var costo = $("#costo").val();
-    var impuesto = $("#impuesto").val();
-    $.get(productos_obtener_utilidades,{numeromarca:numeromarca,costo:costo,impuesto:impuesto },function(filasutilidadesproducto){
-        $('#tbllistadoutilidades tbody').html(filasutilidadesproducto);
-    });
+function seleccionarmoneda(Clave, Nombre){
+    var monedaanterior = $("#monedaanterior").val();
+    var moneda = Clave;
+    if(monedaanterior != moneda){
+        $("#moneda").val(Clave);
+        $("#monedaanterior").val(Clave);
+        if(Nombre != null){
+            $("#textonombremoneda").html(Nombre.substring(0, 40));
+        }
+        mostrarformulario();
+    }
 }
-//reiniciar la tabla de utilidades
-function reiniciartablautilidades(){
-    listarutilidades();
-    //var tabla = $('.tbllistadoutilidades').DataTable();
-      //          tabla.ajax.reload();
+//obtener por clave
+function obtenermonedaporclave(){
+    var monedaanterior = $("#monedaanterior").val();
+    var moneda = $("#moneda").val();
+    if(monedaanterior != moneda){
+        if($("#moneda").parsley().isValid()){
+            $.get(productos_obtener_moneda_por_clave, {moneda:moneda}, function(data){
+                $("#moneda").val(data.clave);
+                $("#monedaanterior").val(data.clave);
+                if(data.nombre != null){
+                    $("#textonombremoneda").html(data.nombre.substring(0, 40));
+                }
+            }) 
+        }
+    }
 }
-//listar las existencias por almacen
-function listarexistenciasalmacenes(){
-    var codigo = $("#codigo").val();
-    $.get(productos_obtener_existencias_almacenes,{codigo:codigo },function(filasexistenciasalmacen){
-        $('#tbllistadoexistenciaalmacen').append(filasexistenciasalmacen);
-    });
+//regresar numero
+function regresarmoneda(){
+    var monedaanterior = $("#monedaanterior").val();
+    $("#moneda").val(monedaanterior);
 }
 //detectar cuando en el input de buscar por numero de cliente el usuario presione la tecla enter, si es asi se realizara la busqueda con el numero escrito
 function activarbusquedacliente(){
@@ -432,7 +606,7 @@ function activarbusquedacliente(){
     buscarnumerocliente.bind('keyup change', function(e) {
         var code = (e.keyCode ? e.keyCode : e.which);
         if(code==13){
-            listarclientes();
+            buscardatosfilacliente();
         }
     });
 }
@@ -467,6 +641,7 @@ function listarclientes(){
                         '</div>';   
     $("#contenidomodaltablas").html(tablaclientes);
     $('#tbllistadocliente').DataTable({
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "300px",
         "bScrollCollapse": true,  
@@ -501,6 +676,15 @@ function listarclientes(){
         "iDisplayLength": 8,
     });
 }
+function buscardatosfilacliente(){
+    var numeroabuscar = $("#numeroabuscar").val();
+    $.get(productos_obtener_datos_cliente_agregar_fila,{numeroabuscar:numeroabuscar}, function(data){
+        if(data.existecliente > 0){
+            agregarfilacliente(data.numero, data.nombre);
+        }
+        $("#numeroabuscar").val("");
+    })
+}
 //detectar cuando en el input de buscar por codigo de producto el usuario presione la tecla enter, si es asi se realizara la busqueda con el codigo escrito
 function activarbusquedaproducto(){
     var buscarcodigoproducto = $('#codigoabuscar');
@@ -508,7 +692,7 @@ function activarbusquedaproducto(){
     buscarcodigoproducto.bind('keyup change', function(e) {
         var code = (e.keyCode ? e.keyCode : e.which);
         if(code==13){
-          listarproductos();
+            buscardatosfilaproducto();
         }
     });
   }  
@@ -547,6 +731,7 @@ function listarproductos(){
                         '</div>';   
     $("#contenidomodaltablas").html(tablaconsumos);
     $('#tbllistadoconsumoproducto').DataTable({
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "300px",
         "bScrollCollapse": true,  
@@ -585,32 +770,35 @@ function listarproductos(){
         "iDisplayLength": 8,
     });
 }
-function seleccionarclaveproducto(Clave, Nombre){
-    $("#claveproducto").val(Clave);
-    $("#producto").val(Nombre);
-    $("#producto").keyup();
-    mostrarformulario();
+function buscardatosfilaproducto(){
+    var codigoabuscar = $("#codigoabuscar").val();
+    $.get(productos_obtener_datos_producto_agregar_fila,{codigoabuscar:codigoabuscar}, function(data){
+        if(data.existeproducto > 0){
+            agregarfilaconsumos(data.codigo, data.nombreproducto, data.unidad, data.inventariable, data.costo, data.venta);
+        }
+        $("#codigoabuscar").val("");
+    })
+
 }
-function seleccionarclaveunidad(Clave, Nombre){
-    $("#claveunidad").val(Clave);
-    $("#unidad").val(Nombre);
-    $("#unidad").keyup();
-    mostrarformulario();
+//listar utilidades
+function listarutilidades(){
+    var numeromarca = $("#marca").val();
+    var costo = $("#costo").val();
+    var impuesto = $("#impuesto").val();
+    $.get(productos_obtener_utilidades,{numeromarca:numeromarca,costo:costo,impuesto:impuesto },function(filasutilidadesproducto){
+        $('#tbllistadoutilidades tbody').html(filasutilidadesproducto);
+    });
 }
-function seleccionarmarca(Numero, Nombre){
-    $("#marca").val(Numero);
-    $("#nombremarca").val(Nombre);
-    mostrarformulario();
-    reiniciartablautilidades();
+//reiniciar la tabla de utilidades
+function reiniciartablautilidades(){
+    listarutilidades();
 }
-function seleccionarlinea(Numero, Nombre){
-    $("#linea").val(Numero);
-    $("#nombrelinea").val(Nombre);
-    mostrarformulario();
-}
-function seleccionarmoneda(Clave){
-    $("#moneda").val(Clave);
-    mostrarformulario();
+//listar las existencias por almacen
+function listarexistenciasalmacenes(){
+    var codigo = $("#codigo").val();
+    $.get(productos_obtener_existencias_almacenes,{codigo:codigo },function(filasexistenciasalmacen){
+        $('#tbllistadoexistenciaalmacen').append(filasexistenciasalmacen);
+    });
 }
 //agregar una fila en la tabla de precios clientes
 var contadorpreciosclientes=0;
@@ -691,7 +879,7 @@ function alta(){
                     '<div role="tabpanel" class="tab-pane fade in active" id="productotab">'+
                         '<div class="row">'+
                             '<div class="col-md-4">'+
-                                '<label>Marca<b style="color:#F44336 !important;">*</b></label>'+
+                                '<label>Marca<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombremarca"></span></label>'+
                                 '<div class="row">'+
                                     '<div class="col-md-4">'+
                                         '<span class="input-group-btn">'+
@@ -700,14 +888,14 @@ function alta(){
                                     '</div>'+  
                                     '<div class="col-md-8">'+  
                                         '<div class="form-line">'+
-                                            '<input type="hidden" class="form-control" name="marca" id="marca" required readonly>'+
-                                            '<input type="text" class="form-control" name="nombremarca" id="nombremarca" required readonly>'+
+                                            '<input type="text" class="form-control inputnext" name="marca" id="marca" required>'+
+                                            '<input type="hidden" class="form-control" name="marcaanterior" id="marcaanterior" required readonly>'+
                                         '</div>'+
                                     '</div>'+     
                                 '</div>'+
                             '</div>'+
                             '<div class="col-md-4">'+
-                                '<label>Linea<b style="color:#F44336 !important;">*</b></label>'+
+                                '<label>Linea<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombrelinea"></span></label>'+
                                 '<div class="row">'+
                                     '<div class="col-md-4">'+
                                         '<span class="input-group-btn">'+
@@ -716,29 +904,29 @@ function alta(){
                                     '</div>'+  
                                     '<div class="col-md-8">'+  
                                         '<div class="form-line">'+
-                                            '<input type="hidden" class="form-control" name="linea" id="linea" required readonly>'+
-                                            '<input type="text" class="form-control" name="nombrelinea" id="nombrelinea" required readonly>'+
+                                            '<input type="text" class="form-control inputnext" name="linea" id="linea" required>'+
+                                            '<input type="hidden" class="form-control" name="lineaanterior" id="lineaanterior" required readonly>'+
                                         '</div>'+
                                     '</div>'+     
                                 '</div>'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Impuesto % <b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="impuesto" id="impuesto" required value="16.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="impuesto" id="impuesto" required value="16.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+
                         '</div>'+   
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Costo (De última compra sin impuesto)</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="costo" id="costo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="costo" id="costo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Precio (Precio neto)</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="precio" id="precio" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="precio" id="precio" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+
                             '<div class="col-md-2">'+
                                 '<label>Ubicación</label>'+
-                                '<input type="text" class="form-control " name="ubicacion" id="ubicacion" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this)">'+
+                                '<input type="text" class="form-control inputnext" name="ubicacion" id="ubicacion" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this)">'+
                             '</div>'+
                             '<div class="col-md-2">'+
                                 '<label>Tipo Producto</label>'+
@@ -751,33 +939,100 @@ function alta(){
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Código 1</label>'+
-                                '<input type="text" class="form-control" name="codigo1" id="codigo1" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control inputnexttabca" name="codigo1" id="codigo1" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Código 2</label>'+
-                                '<input type="text" class="form-control" name="codigo2" id="codigo2" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control inputnexttabca" name="codigo2" id="codigo2" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Código 3</label>'+
-                                '<input type="text" class="form-control" name="codigo3" id="codigo3" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control inputnexttabca" name="codigo3" id="codigo3" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Código 4</label>'+
-                                '<input type="text" class="form-control" name="codigo4" id="codigo4" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control inputnexttabca" name="codigo4" id="codigo4" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Código 5</label>'+
-                                '<input type="text" class="form-control" name="codigo5" id="codigo5" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control inputnexttabca" name="codigo5" id="codigo5" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                         '</div>'+
                     '</div>'+
                 '</div>';
-  $("#tabsform").html(tabs);
-  obtenertipos();
-  $("#codigo").removeAttr('readonly');
-  seleccionarclaveunidad('H87','Pieza');
+    $("#tabsform").html(tabs);
+    obtenertipos();
+    $("#codigo").removeAttr('readonly');
+    setTimeout(function(){$("#codigo").focus();},500);
+    seleccionarclaveunidad('H87','Pieza');
+    //activar busqueda para clave producto
+    $('#claveproducto').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obtenerclaveproductoporclave();
+        }
+    });
+    //regresar clave
+    $('#claveproducto').on('change', function(e) {
+        regresarclaveproducto();
+    });
+    //activar busqueda para clave unidad
+    $('#claveunidad').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obtenerclaveunidadporclave();
+        }
+    });
+    //regresar clave
+    $('#claveunidad').on('change', function(e) {
+        regresarclaveunidad();
+    });
+    //activar busqueda para marca
+    $('#marca').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obtenermarcapornumero();
+        }
+    });
+    //regresar numero
+    $('#marca').on('change', function(e) {
+        regresarmarca();
+    });
+    //activar busqueda para linea
+    $('#linea').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obtenerlineapornumero();
+        }
+    });
+    //regresar numero
+    $('#linea').on('change', function(e) {
+        regresarlinea();
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keypress(function (e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        var index = $(this).index(".inputnext");          
+            $(".inputnext").eq(index + 1).focus().select(); 
+        }
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnexttabca").keypress(function (e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        var index = $(this).index(".inputnexttabca");          
+            $(".inputnexttabca").eq(index + 1).focus().select(); 
+        }
+    });
 }
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
@@ -873,21 +1128,15 @@ function obtenerdatos(codigoproducto){
                     '<li role="presentation" >'+
                         '<a href="#consumostab" data-toggle="tab">Consumos</a>'+
                     '</li>'+
-                    '<li role="presentation" style="display:none;">'+
-                        '<a href="#codigosalternostab" data-toggle="tab">Código Alternos</a>'+
-                    '</li>'+
                     '<li role="presentation" >'+
                         '<a href="#fechastab" data-toggle="tab">Fechas</a>'+
-                    '</li>'+
-                    '<li role="presentation" >'+
-                        '<a href="#lpatab" data-toggle="tab">Lpa</a>'+
                     '</li>'+
                 '</ul>'+
                 '<div class="tab-content">'+
                     '<div role="tabpanel" class="tab-pane fade in active" id="productotab">'+
                         '<div class="row">'+
                             '<div class="col-md-4">'+
-                                '<label>Marca<b style="color:#F44336 !important;">*</b></label>'+
+                                '<label>Marca<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombremarca"></span></label>'+
                                 '<div class="row">'+
                                     '<div class="col-md-4">'+
                                         '<span class="input-group-btn">'+
@@ -896,14 +1145,14 @@ function obtenerdatos(codigoproducto){
                                     '</div>'+  
                                     '<div class="col-md-8">'+  
                                         '<div class="form-line">'+
-                                            '<input type="hidden" class="form-control" name="marca" id="marca" required readonly>'+
-                                            '<input type="text" class="form-control" name="nombremarca" id="nombremarca" required readonly>'+
+                                            '<input type="text" class="form-control inputnext" name="marca" id="marca" required>'+
+                                            '<input type="hidden" class="form-control" name="marcaanterior" id="marcaanterior" required readonly>'+
                                         '</div>'+
                                     '</div>'+     
                                 '</div>'+
                             '</div>'+
                             '<div class="col-md-4">'+
-                                '<label>Linea<b style="color:#F44336 !important;">*</b></label>'+
+                                '<label>Linea<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombrelinea"></span></label>'+
                                 '<div class="row">'+
                                     '<div class="col-md-4">'+
                                         '<span class="input-group-btn">'+
@@ -912,39 +1161,39 @@ function obtenerdatos(codigoproducto){
                                     '</div>'+  
                                     '<div class="col-md-8">'+  
                                         '<div class="form-line">'+
-                                            '<input type="hidden" class="form-control" name="linea" id="linea" required readonly>'+
-                                            '<input type="text" class="form-control" name="nombrelinea" id="nombrelinea" required readonly>'+
+                                            '<input type="text" class="form-control inputnext" name="linea" id="linea" required>'+
+                                            '<input type="hidden" class="form-control" name="lineaanterior" id="lineaanterior" required readonly>'+
                                         '</div>'+
                                     '</div>'+     
                                 '</div>'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Impuesto % <b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="impuesto" id="impuesto" required value="16.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onkeyup="reiniciartablautilidades();" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="impuesto" id="impuesto" required value="16.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onkeyup="reiniciartablautilidades();" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+
                         '</div>'+   
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Costo (De última compra sin impuesto)</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="costo" id="costo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onkeyup="reiniciartablautilidades();" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="costo" id="costo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onkeyup="reiniciartablautilidades();" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Ubicación</label>'+
-                                '<input type="text" class="form-control " name="ubicacion" id="ubicacion" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this)">'+
+                                '<input type="text" class="form-control inputnext" name="ubicacion" id="ubicacion" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this)">'+
                             '</div>'+
                             '<div class="col-md-2">'+
                                 '<label>Tipo Producto</label>'+
-                                '<select name="tipo" id="tipo" class="form-control select2" style="width:100% !important;" required>'+ 
+                                '<select name="tipo" id="tipo" class="form-control select2 " style="width:100% !important;" required>'+ 
                                 '</select>'+
                             '</div>'+
                         '</div>'+ 
                         '<div class="row">'+
-                            '<div class="col-md-4">'+
+                            '<div class="col-md-3">'+
                                 '<label>Costo de Lista</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control " name="costodelista" id="costodelista" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="costodelista" id="costodelista" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+
-                            '<div class="col-md-4">'+
-                                '<label>Moneda</label>'+
+                            '<div class="col-md-3">'+
+                                '<label>Moneda<span class="label label-danger" id="textonombremoneda"></span></label>'+
                                 '<div class="row">'+
                                     '<div class="col-md-4">'+
                                         '<span class="input-group-btn">'+
@@ -953,10 +1202,22 @@ function obtenerdatos(codigoproducto){
                                     '</div>'+  
                                     '<div class="col-md-8">'+  
                                         '<div class="form-line">'+
-                                            '<input type="text" class="form-control" name="moneda" id="moneda" readonly data-parsley-length="[1, 5]">'+
+                                            '<input type="text" class="form-control inputnext" name="moneda" id="moneda" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this);">'+
+                                            '<input type="hidden" class="form-control" name="monedaanterior" id="monedaanterior" readonly required data-parsley-length="[1, 5]">'+
                                         '</div>'+
                                     '</div>'+     
                                 '</div>'+
+                            '</div>'+
+                            '<div class="col-md-2" id="divcodigodebarras">'+
+                                data.barcode+
+                            '</div>'+
+                            '<div class="col-md-2">'+
+                                '<label>Num. Impresiones</label>'+
+                                '<input type="number" class="form-control inputnext" name="numimpresiones" id="numimpresiones" value="1" >'+
+                            '</div>'+
+                            '<div class="col-md-2">'+
+                                '<label>Imprimir</label>'+
+                                '<div id="botoncambiardatosimprimircodigobarras" class="btn bg-blue btn-block waves-effect" onclick="imprimircodigosbarras();">Imprimir</div>'+       
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
@@ -1000,11 +1261,14 @@ function obtenerdatos(codigoproducto){
                     '<div role="tabpanel" class="tab-pane fade" id="precioclientestab">'+
                         '<div class="row">'+
                             '<div class="col-md-12">'+
-                                '<div class="col-md-6">'+
+                                '<div class="col-md-4">'+
                                     '<h5>PRECIOS A CLIENTES PARA ESTE PRODUCTO&nbsp;&nbsp;&nbsp;</h5>'+
                                 '</div>'+    
+                                '<div class="col-md-2">'+
+                                    '<div id="botonbuscarclientes" class="btn btn-block bg-blue waves-effect" onclick="listarclientes()">Ver Clientes</div>'+
+                                '</div>'+
                                 '<div class="col-md-6">'+
-                                    '<input type="text" class="form-control" name="numeroabuscar" id="numeroabuscar" placeholder="Escribe el número de cliente">'+
+                                    '<input type="text" class="form-control" name="numeroabuscar" id="numeroabuscar" placeholder="Escribe el número de cliente y presiona enter">'+
                                     '<input type="hidden" class="form-control" name="numerofilasprecioscliente" id="numerofilasprecioscliente">'+
                                 '</div>'+
                             '</div>'+
@@ -1040,11 +1304,14 @@ function obtenerdatos(codigoproducto){
                                 '</div>'+
                             '</div>'+
                             '<div class="col-md-12">'+
-                                '<div class="col-md-6">'+
+                                '<div class="col-md-4">'+
                                     '<h5>CONSUMOS DE PRODUCTO TERMINADO&nbsp;&nbsp;&nbsp;</h5>'+
                                 '</div>'+
+                                '<div class="col-md-2">'+
+                                    '<div id="botonbuscarproductos" class="btn btn-block bg-blue waves-effect" onclick="listarproductos()">Ver Productos</div>'+
+                                '</div>'+
                                 '<div class="col-md-6">'+    
-                                    '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto">'+
+                                    '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto y presiona enter" onkeyup="tipoLetra(this)">'+
                                     '<input type="hidden" class="form-control" name="numerofilasconsumosproductoterminado" id="numerofilasconsumosproductoterminado">'+
                                 '</div>'+
                             '</div>'+
@@ -1070,155 +1337,71 @@ function obtenerdatos(codigoproducto){
                             '</div>'+
                         '</div>'+
                     '</div>'+
-                    '<div role="tabpanel" class="tab-pane fade" id="codigosalternostab" style="display:none;">'+
-                        '<div class="row">'+
-                            '<div class="col-md-4">'+
-                                '<label>Código 1</label>'+
-                                '<input type="text" class="form-control" name="codigo1" id="codigo1" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
-                            '</div>'+
-                            '<div class="col-md-4">'+
-                                '<label>Código 2</label>'+
-                                '<input type="text" class="form-control" name="codigo2" id="codigo2" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
-                            '</div>'+
-                            '<div class="col-md-4">'+
-                                '<label>Código 3</label>'+
-                                '<input type="text" class="form-control" name="codigo3" id="codigo3" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
-                            '</div>'+
-                        '</div>'+
-                        '<div class="row">'+
-                            '<div class="col-md-4">'+
-                                '<label>Código 4</label>'+
-                                '<input type="text" class="form-control" name="codigo4" id="codigo4" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
-                            '</div>'+
-                            '<div class="col-md-4">'+
-                                '<label>Código 5</label>'+
-                                '<input type="text" class="form-control" name="codigo5" id="codigo5" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
-                            '</div>'+
-                        '</div>'+
-                    '</div>'+
                     '<div role="tabpanel" class="tab-pane fade" id="fechastab">'+
                         '<div class="row">'+
                             '<div class="col-md-6">'+
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Comisión %</label>'+
-                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="fechascomision" id="fechascomision" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabfe" name="fechascomision" id="fechascomision" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Descuento %</label>'+
-                                        '<input type="text" class="form-control" name="fechasdescuento" id="fechasdescuento" value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                        '<input type="text" class="form-control inputnexttabfe" name="fechasdescuento" id="fechasdescuento" value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Mínimos </label>'+
-                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="fechasminimos" id="fechasminimos" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabfe" name="fechasminimos" id="fechasminimos" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Máximos </label>'+
-                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="fechasmaximos" id="fechasmaximos" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabfe" name="fechasmaximos" id="fechasmaximos" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Costo Máximo </label>'+
-                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="fechascostomaximo" id="fechascostomaximo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabfe" name="fechascostomaximo" id="fechascostomaximo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Fecha Ultima Compra</label>'+
-                                        '<input type="date" class="form-control" name="fechasfechaultimacompra" id="fechasfechaultimacompra" readonly>'+
+                                        '<input type="date" class="form-control inputnexttabfe" name="fechasfechaultimacompra" id="fechasfechaultimacompra" readonly>'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Ultimo Costo $</label>'+
-                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="fechasultimocosto" id="fechasultimocosto" readonly value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabfe" name="fechasultimocosto" id="fechasultimocosto" readonly value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Fecha Ultima Venta</label>'+
-                                        '<input type="date" class="form-control" name="fechasfechaultimaventa" id="fechasfechaultimaventa" readonly>'+
+                                        '<input type="date" class="form-control inputnexttabfe" name="fechasfechaultimaventa" id="fechasfechaultimaventa" readonly>'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Ultima Venta $</label>'+
-                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="fechasultimaventa" id="fechasultimaventa" readonly value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabfe" name="fechasultimaventa" id="fechasultimaventa" readonly value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
                             '<div class="col-md-6">'+
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
-                                        '<label>Zona de impresión </label>'+
-                                        '<input type="text" class="form-control" name="fechaszonadeimpresion" id="fechaszonadeimpresion" value="ZONA00" data-parsley-length="[1, 8]" onkeyup="tipoLetra(this);">'+
-                                    '</div>'+
-                                    '<div class="col-md-6">'+
-                                        '<label>Producto PELIGROSO </label>'+
-                                        '<input type="text" class="form-control" name="fechasproductopeligroso" id="fechasproductopeligroso" data-parsley-length="[1, 1]" onkeyup="tipoLetra(this);">'+
-                                    '</div>'+
-                                '</div>'+
-                                '<div class="row">'+
-                                    '<div class="col-md-6">'+
                                         '<label>Supercedido </label>'+
-                                        '<input type="text" class="form-control" name="fechassupercedido" id="fechassupercedido" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" >'+
+                                        '<input type="text" class="form-control inputnexttabfe" name="fechassupercedido" id="fechassupercedido" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" >'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Insumo </label>'+
-                                        '<input type="text" class="form-control" name="fechasinsumo" id="fechasinsumo" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnexttabfe" name="fechasinsumo" id="fechasinsumo" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-md-12">'+
                                         '<label>Descripción </label>'+
-                                        '<textarea class="form-control" name="fechasdescripcion" id="fechasdescripcion" rows="4" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
-                                    '</div>'+
-                                '</div>'+
-                            '</div>'+
-                        '</div>'+
-                    '</div>'+
-                    '<div role="tabpanel" class="tab-pane fade" id="lpatab">'+
-                        '<div class="row">'+
-                            '<div class="col-md-12">'+
-                                '<small>Almacén REFACCIONES (UTPCAMIONES)</small>'+
-                                '<div class="row">'+
-                                    '<div class="col-md-4 form-check">'+
-                                        '<label>Subir Código al LPA</label>'+
-                                        '<input type="radio" name="lpasubircodigo" id="lpasubircodigo" value="S">'+
-                                        '<label for="lpasubircodigo">SI</label>'+
-                                        '<input type="radio" name="lpasubircodigo" id="lpasubircodigo1" value="N" checked>'+
-                                        '<label for="lpasubircodigo1">NO</label>'+
-                                    '</div>'+
-                                    '<div class="col-md-4">'+
-                                        '<label>Precio de Compra  = Costo</label>'+
-                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="lpapreciocompra" id="lpapreciocompra" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
-                                    '</div>'+
-                                    '<div class="col-md-4">'+
-                                        '<label>Fecha Creación</label>'+
-                                        '<input type="date" class="form-control" name="lpafechacreacion" id="lpafechacreacion" >'+
-                                    '</div>'+
-                                '</div>'+
-                                '<div class="row">'+    
-                                    '<div class="col-md-4">'+
-                                        '<label>Fecha Ultima Venta</label>'+
-                                        '<input type="date" class="form-control" name="lpafechaultimaventa" id="lpafechaultimaventa" >'+
-                                    '</div>'+
-                                    '<div class="col-md-4">'+
-                                        '<label>Fecha Ultima Compra</label>'+
-                                        '<input type="date" class="form-control" name="lpafechaultimacompra" id="lpafechaultimacompra" >'+
-                                    '</div>'+
-                                    '<div class="col-md-4">'+
-                                        '<label>Identificación</label>'+
-                                        '<input type="text" class="form-control" name="lpaidentificacion" id="lpaidentificacion" data-parsley-length="[1, 5]">'+
-                                    '</div>'+
-                                '</div>'+
-                                '<div class="row">'+    
-                                    '<div class="col-md-4">'+
-                                        '<label>Ubicación</label>'+
-                                        '<input type="text" class="form-control" name="lpaubicacion" id="lpaubicacion" data-parsley-length="[1, 60]">'+
-                                    '</div>'+
-                                    '<div class="col-md-8">'+
-                                        '<label>Código de Compra (0=surtir en automatico 6=bloqueado)</label>'+
-                                        '<input type="text" class="form-control" name="lpacodigocompra" id="lpacodigocompra" >'+
+                                        '<textarea class="form-control inputnexttabfe" name="fechasdescripcion" id="fechasdescripcion" rows="4" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
@@ -1232,28 +1415,23 @@ function obtenerdatos(codigoproducto){
     $("#codigo").val(codigoproducto);
     $("#codigo").attr('readonly', 'readonly');
     $("#claveproducto").val(data.producto.ClaveProducto);
+    obtenerclaveproductoporclave();
     $("#claveunidad").val(data.producto.ClaveUnidad);
+    obtenerclaveunidadporclave();
     $("#producto").val(data.producto.Producto);
     $("#unidad").val(data.producto.Unidad);
     //datos tab producto
     $("#marca").val(data.producto.Marca);
-    $("#nombremarca").val(data.marca.Nombre);
-    $("#nombremarca").keyup();
+    obtenermarcapornumero();
     $("#linea").val(data.producto.Linea);
-    $("#nombrelinea").val(data.linea.Nombre);
-    $("#nombrelinea").keyup();
+    obtenerlineapornumero();
     $("#impuesto").val(data.impuesto);
     $("#costo").val(data.costo);
     $("#precio").val(data.precio);
     $("#ubicacion").val(data.producto.Ubicacion);
     $("#costodelista").val(data.costodelista);
     $("#moneda").val(data.producto.Moneda);
-    //datos tab codigos alternos
-    $("#codigo1").val(data.producto.Codigo1);
-    $("#codigo2").val(data.producto.Codigo2);
-    $("#codigo3").val(data.producto.Codigo3);
-    $("#codigo4").val(data.producto.Codigo4);
-    $("#codigo5").val(data.producto.Codigo5);
+    obtenermonedaporclave();
     //datos tab precios clientes
     $("#tablapreciosclientes").append(data.filaspreciosclientes);
     $("#numerofilasprecioscliente").val(data.numerofilasprecioscliente);
@@ -1280,41 +1458,100 @@ function obtenerdatos(codigoproducto){
     $("#fechassupercedido").val(data.producto.Supercedido);
     $("#fechasinsumo").val(data.producto.Insumo);
     $("#fechasdescripcion").val(data.producto.Descripcion);
-    //tab lpa
-    $("#lpapreciocompra").val(data.costo);
-    if(data.producto.Lpa1Subir == ""){
-        $('input[name=lpasubircodigo1][value="N"]').attr('checked', 'checked');  
-    }else{
-        $('input[name=lpasubircodigo1][value='+data.producto.Lpa1Subir+']').attr('checked', 'checked');
-    }
-    $("#lpafechacreacion").val(data.lpafechacreacion);
-    $("#lpafechaultimaventa").val(data.lpafechaultimaventa);
-    $("#lpafechaultimacompra").val(data.lpafechaultimacompra);
-    $("#lpaidentificacion").val(data.producto.Lpa1Identificacion);
-    $("#lpaubicacion").val(data.producto.Lpa1Ubicacion);
-    $("#lpacodigocompra").val(data.producto.Lpa1CodigoCompra);
     listarutilidades();
     listarexistenciasalmacenes();
     activarbusquedaproducto();//importante activa la busqueda de productos por su codigo
     activarbusquedacliente();//importante activa la busqueda de clientes por su numero
-
-
-
-
+    //activar busqueda para clave producto
+    $('#claveproducto').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obtenerclaveproductoporclave();
+        }
+    });
+    //regresar clave
+    $('#claveproducto').on('change', function(e) {
+        regresarclaveproducto();
+    });
+    //activar busqueda para clave unidad
+    $('#claveunidad').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obtenerclaveunidadporclave();
+        }
+    });
+    //regresar clave
+    $('#claveunidad').on('change', function(e) {
+        regresarclaveunidad();
+    });
+    //activar busqueda para marca
+    $('#marca').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obtenermarcapornumero();
+        }
+    });
+    //regresar numero
+    $('#marca').on('change', function(e) {
+        regresarmarca();
+    });
+    //activar busqueda para linea
+    $('#linea').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obtenerlineapornumero();
+        }
+    });
+    //regresar numero
+    $('#linea').on('change', function(e) {
+        regresarlinea();
+    });
+    
+    //activar busqueda para moneda
+    $('#moneda').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obtenermonedaporclave();
+        }
+    });
+    //regresar clave
+    $('#moneda').on('change', function(e) {
+        regresarmoneda();
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keypress(function (e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        var index = $(this).index(".inputnext");          
+            $(".inputnext").eq(index + 1).focus().select(); 
+        }
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnexttabfe").keypress(function (e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        var index = $(this).index(".inputnexttabfe");          
+            $(".inputnexttabfe").eq(index + 1).focus().select(); 
+        }
+    });
     seleccionartipo(data);
-
   }).fail( function() {
     msj_errorajax();
     $('.page-loader-wrapper').css('display', 'none');
   })
 }
-
-
 async function seleccionartipo(data){
     await retraso();
     $("#tipo").val(data.producto.TipoProd).change();
     $("#tipo").select2();
-    
+    setTimeout(function(){$("#codigo").focus();},500);
     mostrarmodalformulario('MODIFICACION');
     $('.page-loader-wrapper').css('display', 'none');
   }
@@ -1398,7 +1635,46 @@ $("#almacenkardex").on('change', function (e) {
     var almacenkardex = $("#almacenkardex").val();
     obtenerkardex(codigokardex,almacenkardex);
 });
-
+function generarcodigosbarras(){
+    $("#ModalCodigosBarras").modal('show');
+    setTimeout(function(){$("#valorgenerarcodigobarras").focus();},500);
+    $("#divcodigosbarras").html("");
+    $("#valorgenerarcodigobarras").val("");
+    $("#arraycodigosparacodigosdebarras").val("");
+    $("#tipoprodcodigosbarras").val("TODOS").change();
+    $("#statuscodigosbarras").val("TODOS").change();
+    //activar busqueda para metodo pago
+    $('#valorgenerarcodigobarras').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            e.preventDefault();
+            var valorgenerarcodigobarras = $("#valorgenerarcodigobarras").val();
+            agregarcodigoenarraycodigosbarras(valorgenerarcodigobarras);
+        }
+    });
+}
+//agregar el codigo escrito en el array de generacion de codigos de barras
+function agregarcodigoenarraycodigosbarras(valorgenerarcodigobarras){
+    $.get(productos_validar_si_existe_codigo,{valorgenerarcodigobarras:valorgenerarcodigobarras}, function(data){
+        if(data.resultado > 0){
+            $("#divcodigosbarras").append('<div class="col-md-3 text-center">'+data.producto+'</div>');
+            var arraycodigosparacodigosdebarras = $("#arraycodigosparacodigosdebarras").val();
+            var newarraycodigosparacodigosdebarras = arraycodigosparacodigosdebarras + "," + valorgenerarcodigobarras;
+            $("#arraycodigosparacodigosdebarras").val(newarraycodigosparacodigosdebarras);
+        }
+        $("#valorgenerarcodigobarras").val("");
+    }) 
+}
+//funcion para mandar a imprimir el codigo de barras desde la modificacion
+function imprimircodigosbarras(){
+    var numimpresiones = $("#numimpresiones").val();
+    var codigo = $("#codigo").val();
+    window.open(
+        productos_generar_pdf_codigo_barras+'?numimpresiones='+numimpresiones+'&codigo='+codigo,
+        '_blank' // <- This is what makes it open in a new window.
+    );
+}
 //obtener documento
 function obtenerdocumento(documento,numerodocumento){
     //alert("numerodocumento: "+numerodocumento+ "documento:"+documento);

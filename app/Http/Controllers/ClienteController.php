@@ -108,13 +108,30 @@ class ClienteController extends ConfiguracionSistemaController{
             $data = Pais::orderBy("Numero", "ASC")->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarpais('.$data->Numero.',\''.$data->Clave .'\')">Seleccionar</div>';
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarpais(\''.$data->Nombre .'\',\''.$data->Clave.'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
         }  
     }
+    //obtener pais por clave
+    public function clientes_obtener_clave_pais_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existepais = Pais::where('Clave', $request->clavepais)->count();
+        if($existepais > 0){
+            $pais = Pais::where('Clave', $request->clavepais)->first();
+            $clave = $pais->Clave;
+            $nombre = $pais->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+    }
+
     //obtener estados
     public function clientes_obtener_estados(Request $request){
         if($request->ajax()){
@@ -151,7 +168,6 @@ class ClienteController extends ConfiguracionSistemaController{
         }  
     }  
     
-    
     //obtener datos direccion
     public function clientes_obtener_datos_direccion(Request $request){
         $cp = CodigoPostal::where('Clave', $request->Clave )->first();
@@ -165,7 +181,6 @@ class ClienteController extends ConfiguracionSistemaController{
             'pais' => $pais
         );
         return response()->json($datos);
-
     }
 
     //obtener municipios
@@ -198,6 +213,22 @@ class ClienteController extends ConfiguracionSistemaController{
                     ->make(true);
         }  
     }
+    ///obtener agente por numero
+    public function clientes_obtener_agente_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $existeagente = Agente::where('Numero', $request->agente)->count();
+        if($existeagente > 0){
+            $agente = Agente::where('Numero', $request->agente)->first();
+            $numero = $agente->Numero;
+            $nombre = $agente->Nombre;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+    }
     //obtener formas de pago
     public function clientes_obtener_formas_pago(Request $request){
         if($request->ajax()){
@@ -210,6 +241,22 @@ class ClienteController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         }
+    }
+    //obtener forma pago por clave
+    public function clientes_obtener_formapago_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existeformapago = FormaPago::where('Clave', $request->claveformapago)->count();
+        if($existeformapago > 0){
+            $formapago = FormaPago::where('Clave', $request->claveformapago)->first();
+            $clave = $agente->Clave;
+            $nombre = $agente->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
     }
     //obtener metodos de pago
     public function clientes_obtener_metodos_pago(Request $request){
@@ -224,6 +271,22 @@ class ClienteController extends ConfiguracionSistemaController{
                     ->make(true);
         }
     } 
+    //obtener metodo por clave
+    public function clientes_obtener_metodopago_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existemetodopago = MetodoPago::where('Clave', $request->clavemetodopago)->count();
+        if($existemetodopago > 0){
+            $metodopago = MetodoPago::where('Clave', $request->clavemetodopago)->first();
+            $clave = $metodopago->Clave;
+            $nombre = $metodopago->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+    }
     //obtener uso cfdi
     public function clientes_obtener_uso_cfdi(Request $request){
         if($request->ajax()){
@@ -237,6 +300,23 @@ class ClienteController extends ConfiguracionSistemaController{
                     ->make(true);
         }
     }   
+    //obtener uso cfdi por clave
+    public function clientes_obtener_usocfdi_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existeusocfdi = UsoCFDI::where('Clave', $request->claveusocfdi)->count();
+        if($existeusocfdi > 0){
+            $usocfdi = UsoCFDI::where('Clave', $request->claveusocfdi)->first();
+            $clave = $usocfdi->Clave;
+            $nombre = $usocfdi->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+    }
+    
     //obtener productos
     public function clientes_obtener_productos(Request $request){
         if($request->ajax()){
@@ -271,6 +351,24 @@ class ClienteController extends ConfiguracionSistemaController{
                     ->make(true);
         } 
     }     
+    //obtenr datos de prudcto para agregar fila
+    public function clientes_obtener_datos_producto_agregar_fila(Request $request){
+        $codigo = '';
+        $nombreproducto = '';
+        $existeproducto = Producto::where('Codigo', $request->codigoabuscar)->where('Status', 'ALTA')->count();
+        if($existeproducto > 0){
+            $producto = Producto::where('Codigo', $request->codigoabuscar)->where('Status', 'ALTA')->first();
+            $codigo = $producto->Codigo;
+            $nombreproducto = htmlspecialchars($producto->Producto, ENT_QUOTES);
+        }
+        $data = array(
+            'existeproducto' => $existeproducto,
+            'codigo' => $codigo,
+            'nombreproducto' => $nombreproducto,
+        );
+        return response()->json($data);
+
+    }
     //guardar en catalogo
     public function clientes_guardar(Request $request){
 	    $rfc=$request->rfc;
@@ -334,21 +432,21 @@ class ClienteController extends ConfiguracionSistemaController{
     public function clientes_obtener_cliente(Request $request){
         $cliente = Cliente::where('Numero', $request->numerocliente)->first();
         $clavepais = $cliente->Pais;
-        $pais = Pais::select('Numero', 'Clave')->where('Clave', $clavepais)->first();
+        $pais = Pais::where('Clave', $clavepais)->first();
         $nombreestado = $cliente->Estado;
-        $estado = Estado::select('Numero', 'Nombre')->where('Clave', mb_strtolower($nombreestado))->first(); 
+        $estado = Estado::where('Clave', mb_strtolower($nombreestado))->first(); 
         $nombremunicipio = $cliente->Municipio;
-        $municipio = Municipio::select('Nombre')->where('Estado', mb_strtolower($nombreestado))->where('Nombre', 'like', '%' . mb_strtolower($nombremunicipio) . '%')->first(); 
+        $municipio = Municipio::where('Estado', mb_strtolower($nombreestado))->where('Nombre', 'like', '%' . mb_strtolower($nombremunicipio) . '%')->first(); 
         $clavecodigopostal = $cliente->CodigoPostal;
-        $codigopostal = CodigoPostal::select('Clave')->where('Clave', $clavecodigopostal)->first();
+        $codigopostal = CodigoPostal::where('Clave', $clavecodigopostal)->first();
         $claveformadepago = $cliente->FormaPago;
-        $formadepago = FormaPago::select('Clave', 'Nombre')->where('Clave', $claveformadepago)->first();
+        $formadepago = FormaPago::where('Clave', $claveformadepago)->first();
         $clavemetododepago = $cliente->MetodoPago;
-        $metododepago = MetodoPago::select('Clave', 'Nombre')->where('Clave', $clavemetododepago)->first();
+        $metododepago = MetodoPago::where('Clave', $clavemetododepago)->first();
         $claveusocfdi = $cliente->UsoCfdi;
-        $usocfdi = UsoCFDI::select('Clave', 'Nombre')->where('Clave', $claveusocfdi)->first();
+        $usocfdi = UsoCFDI::where('Clave', $claveusocfdi)->first();
         $claveagente = $cliente->Agente;
-        $agente = Agente::select('Numero', 'Nombre')->where('Numero', $claveagente)->first();
+        $agente = Agente::where('Numero', $claveagente)->first();
         //tab utilidades
         $utilidadesmarcas = Marca::where('Status', 'ALTA')->get();
         $numerofilasutilidadesmarcas = Marca::where('Status', 'ALTA')->count();

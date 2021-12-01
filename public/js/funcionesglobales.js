@@ -894,3 +894,79 @@ function armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbus
     return tabs;
 }
 //////////////////////////////FIN FUNCIONES PARA CONFIGURACION DE COLUMNAS DE TABLAS/////////////////////////////////////////
+
+
+
+
+
+////////////////////////////////////////ATAJOS SISTEMA/////////////////////////////////////////////////
+//ordene compras
+$(document).bind('keydown', 'Shift+o', function(){
+    var win = window.open(ordenes_compra, '_blank');
+    win.focus();
+});
+//compras
+$(document).bind('keydown', 'ctrl+s', function(){
+    var win = window.open(compras, '_blank');
+    win.focus();
+});
+//remisiones
+$(document).bind('keydown', 'ctrl+r', function(){
+    var win = window.open(remisiones, '_blank');
+    win.focus();
+});
+//facturas
+$(document).bind('keydown', 'ctrl+f', function(){
+    var win = window.open(facturas, '_blank');
+    win.focus();
+});
+//productos
+$(document).bind('keydown', 'ctrl+p', function(){
+    var win = window.open(productos, '_blank');
+    win.focus();
+});
+//existencias
+$(document).bind('keydown', 'ctrl+e', function(){
+    var win = window.open(existencias, '_blank');
+    win.focus();
+});
+//requisiciones
+$(document).bind('keydown', 'Shift+r', function(){
+    var win = window.open(requisiciones, '_blank');
+    win.focus();
+});
+//produccion
+$(document).bind('keydown', 'Shift+p', function(){
+    var win = window.open(produccion, '_blank');
+    win.focus();
+});
+//traspasos
+$(document).bind('keydown', 'Shift+t', function(){
+    var win = window.open(traspasos, '_blank');
+    win.focus();
+});
+//ajustesinventario
+$(document).bind('keydown', 'Ctrl+a', function(){
+    var win = window.open(ajustesinventario, '_blank');
+    win.focus();
+});
+//ordenes_trabajo
+$(document).bind('keydown', 'Alt+o', function(){
+    var win = window.open(ordenes_trabajo, '_blank');
+    win.focus();
+});
+//clientes
+$(document).bind('keydown', 'Alt+c', function(){
+    var win = window.open(clientes, '_blank');
+    win.focus();
+});
+//proveedores
+$(document).bind('keydown', 'Alt+p', function(){
+    var win = window.open(proveedores, '_blank');
+    win.focus();
+});
+
+$(document).bind('keyup', 'insert', function(){
+    alta("");
+});
+////////////////////////////////////////FIN ATAJOS SISTEMA/////////////////////////////////////////////////

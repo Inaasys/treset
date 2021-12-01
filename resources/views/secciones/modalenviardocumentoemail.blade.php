@@ -11,34 +11,44 @@
 		        	<h5 id="textomodalenviarpdfemail"> </h5>
                     <div class="row">
                         <div class="col-md-12" hidden>
-                            <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;De:</label>
                             <div class="col-md-12 form-check">
+                                <label>De:</label>
                                 <input type="text" class="form-control" name="emailde" id="emailde" data-parsley-type="email" required>
                                 <input type="hidden" class="form-control" name="emaildocumento" id="emaildocumento" required>
                             </div>
                         </div>
                         <div class="col-md-12">
-                            <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Para:</label>
                             <div class="col-md-12 form-check">
+                                <label>Para:</label>
                                 <input type="text" class="form-control" name="emailpara" id="emailpara" data-parsley-type="email" required>
                             </div>
                         </div>
                         <div class="col-md-12">
-                            <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CC:</label>
                             <div class="col-md-12 form-check">
+                                <label>CC:</label>
                                 <input type="text" class="form-control" name="email2cc" id="email2cc" data-parsley-type="email">
                             </div>
                         </div>
                         <div class="col-md-12">
-                            <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CC:</label>
                             <div class="col-md-12 form-check">
+                                <label>CC:</label>
                                 <input type="text" class="form-control" name="email3cc" id="email3cc" data-parsley-type="email">
                             </div>
                         </div>
                         <div class="col-md-12">
-                            <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Asunto:</label>
                             <div class="col-md-12 form-check">
+                                <label>Asunto:</label>
                                 <textarea class="form-control" name="emailasunto" id="emailasunto"  required rows="4" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-12" id="divadjuntararchivo">
+                            <div class="col-md-6 form-check">
+                                <label>Adjuntar Archivo 1</label>
+                                <input type="file" name="archivoadjunto" id="archivoadjunto"  class="dropify" data-max-file-size="2M" data-allowed-file-extensions="pdf xlsx xls csv xml docx"  data-height="100"/>
+                            </div>
+                            <div class="col-md-6 form-check">
+                                <label>Adjuntar Archivo 2</label>
+                                <input type="file" name="archivoadjunto2" id="archivoadjunto2"  class="dropify" data-max-file-size="2M" data-allowed-file-extensions="pdf xlsx xls csv xml docx"  data-height="100"/>
                             </div>
                         </div>
                         <div class="col-md-12" id="divincluirxml" hidden>
