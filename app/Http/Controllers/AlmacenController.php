@@ -92,9 +92,13 @@ class AlmacenController extends ConfiguracionSistemaController{
         $numeroalmacen= $request->numero;
         //modificar registro
         $Almacen = Almacen::where('Numero', $numeroalmacen )->first();
-        $Almacen->Nombre=$request->nombre;    
+        Almacen::where('Numero', $numeroalmacen)
+                    ->update([
+                        'Nombre'=>$request->nombre
+                    ]);
+        //$Almacen->Nombre=$request->nombre;    
         Log::channel('almacen')->info('Se modifico el almacen: '.$Almacen.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
-		$Almacen->save();
+		//$Almacen->save();
     	return response()->json($Almacen); 
     }  
     //exportar a excel

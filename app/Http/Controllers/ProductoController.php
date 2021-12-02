@@ -769,6 +769,55 @@ class ProductoController extends ConfiguracionSistemaController{
         $utilidadpesos = $subtotalpesos - $request->costo;
         $ivapesos = $subtotalpesos * ($request->impuesto/100);
         $totalpesos = $subtotalpesos + $ivapesos;
+        $Producto = Producto::where('Codigo', $codigo )->first();
+        Producto::where('Codigo', $codigo)
+        ->update([
+            //datos producto
+            'ClaveProducto' => $request->claveproducto,
+            'ClaveUnidad' => $request->claveunidad,
+            'Producto' => $request->producto,
+            'Unidad' => $request->unidad,
+            //tabs producto
+            'Marca' => $request->marca,
+            'Linea' => $request->linea,
+            'Impuesto' => $request->impuesto,
+            'Costo' => $request->costo,
+            'CostoDeVenta' => $costodeventa,
+            'Utilidad' => $marca->Utilidad1,
+            'SubTotal' => $subtotalpesos,
+            'Iva' => $ivapesos,
+            'Total' => $totalpesos,
+            'Ubicacion' => $request->ubicacion,
+            'TipoProd' => $request->tipo,
+            'CostoDeLista' => $request->costodelista,
+            'Moneda' => $request->moneda,
+            //tabs codigos alternos
+            'Codigo1' => $request->codigo1,
+            'Codigo2' => $request->codigo2,
+            'Codigo3' => $request->codigo3,
+            'Codigo4' => $request->codigo4,
+            'Codigo5' => $request->codigo5,   
+            //tabs consumo
+            'Pt' => $request->consumosproductoterminado,
+            //tabs fechas
+            'Comision' => $request->fechascomision,
+            'Descuento' => $request->fechasdescuento,
+            'Min' => $request->fechasminimos,
+            'Max' => $request->fechasmaximos,
+            'CostoMaximo' => $request->fechascostomaximo,
+            'Zona' => $request->fechaszonadeimpresion,
+            'ProductoPeligroso' => $request->fechasproductopeligroso,
+            'Supercedido' => $request->fechassupercedido,
+            'Descripcion' => $request->fechasdescripcion
+        ]);
+        //solo si el usuario esta autorizado en modificar el dato insumo
+        if (in_array(strtoupper(Auth::user()->user), explode(",",$this->usuariosamodificarinsumos))) {
+            Producto::where('Codigo', $codigo)
+                    ->update([
+                        'Insumo'=>$request->fechasinsumo
+                    ]);
+        }
+        /*
         //modificar registro Tabla Productos
         $Producto = Producto::where('Codigo', $codigo )->first();
         //datos producto
@@ -827,8 +876,9 @@ class ProductoController extends ConfiguracionSistemaController{
         $Producto->Lpa2Ubicacion=$request->lpaubicacion;
         $Producto->Lpa1CodigoCompra=$request->lpacodigocompra;
         $Producto->Lpa2CodigoCompra=$request->lpacodigocompra;
+        */
         Log::channel('producto')->info('Se modifico el producto: '.$Producto.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
-        $Producto->save();
+        //$Producto->save();
         //Tabla Productos Precios
         $eliminarpreciosproductos = ProductoPrecio::where('Codigo', $codigo)->forceDelete();
         if($request->numerofilasprecioscliente > 0){

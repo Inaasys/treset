@@ -348,6 +348,7 @@
             @if(Auth::user()->role_id == 1)
               <li><a href="{{ route('empresa') }}">Empresa</a></li>
               <li><a href="{{ route('errors_inaasys') }}"><b>LOGS-ERRORS</b></a></li>
+              <li><a href="{{ route('sesiones') }}"><b>SESIONES</b></a></li>
             @endif
             <li class="bg-deep-orange">
               <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -364,12 +365,76 @@
           </a>
         </li>    
         <!-- Notificaciones -->
-        <li class="dropdown" style="display:none">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
-            <i class="material-icons">notifications</i>
-            <span class="label-count">7</span>
-          </a>
-        </li>              
+                    <li class="dropdown">
+                        <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button">
+                            <i class="material-icons">info</i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="header">NOTIFICATIONS</li>
+                            <li class="body">
+                                <ul class="menu">
+                                    <li>
+                                        <a href="javascript:void(0);">
+                                            <div class="icon-circle bg-light-green">
+                                                <i class="material-icons">description</i>
+                                            </div>
+                                            <div class="menu-info">
+                                                <h4>Timbres Ingreso - Facturas</h4>
+                                                <p>
+                                                    <i class="material-icons">check_box</i>Activos {{$timbresingresofacturastotalesactivosfacturapi}}
+                                                    <i class="material-icons">indeterminate_check_box</i>Cancelados {{$timbresingresofacturascanceladastotalesactivosfacturapi}}
+
+
+                                                </p>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0);">
+                                            <div class="icon-circle bg-cyan">
+                                                <i class="material-icons">description</i>
+                                            </div>
+                                            <div class="menu-info">
+                                                <h4>Timbres Egreso - Notas</h4>
+                                                <p>
+                                                    <i class="material-icons">check_box</i>Activos {{$timbresegresonotastotalesactivosfacturapi}}
+                                                    <i class="material-icons">indeterminate_check_box</i>Cancelados {{$timbresegresonotascanceladastotalesactivosfacturapi}}
+                                                </p>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0);">
+                                            <div class="icon-circle bg-red">
+                                                <i class="material-icons">description</i>
+                                            </div>
+                                            <div class="menu-info">
+                                                <h4><b>Timbres Pago - CXC</b></h4>
+                                                <p>
+                                                    <i class="material-icons">check_box</i>Activos {{$timbrespagocxctotalesactivosfacturapi}}
+                                                    <i class="material-icons">indeterminate_check_box</i>Cancelados {{$timbrespagocxccanceladastotalesactivosfacturapi}}
+                                                </p>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0);">
+                                            <div class="icon-circle bg-orange">
+                                                <i class="material-icons">description</i>
+                                            </div>
+                                            <div class="menu-info">
+                                                <h4><b>Totales</b></h4>
+                                                <p>
+                                                    <i class="material-icons">check_box</i>Activos {{$timbrestotalesactivosfacturapi}}
+                                                    <i class="material-icons">indeterminate_check_box</i>Cancelados {{$timbrestotalescanceladosfacturapi}}
+                                                </p>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>            
         <li class="text-center">
           <div class="name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ Auth::user()->name }}</div>
           <div class="btn-group user-helper-dropdown">

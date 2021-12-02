@@ -1417,23 +1417,71 @@ function dividirtiemposiguales(){
   if( $('#idasignaciontecnicosdividirtiemposiguales').prop('checked') ) {
     var asignaciontecnicostotalhorasfacturacion = $("#asignaciontecnicostotalhorasfacturacion").val();
     var horastrabajadasportecnico= new Decimal(asignaciontecnicostotalhorasfacturacion).dividedBy(parseInt(contadortecnicos)-parseInt(1));
+    var totalhorastrabajadastecnicos = 0;
     $("tr.filastecnicos").each(function () {
       $('.horastecnicopartida', this).val(number_format(round(horastrabajadasportecnico, numerodecimales), numerodecimales, '.', '')).attr('readonly', 'readonly');
+      totalhorastrabajadastecnicos = new Decimal(totalhorastrabajadastecnicos).plus(horastrabajadasportecnico);
     });
+
+
+
+    
+
+
+
   }else{
     $("tr.filastecnicos").each(function () {
       $('.horastecnicopartida', this).val(number_format(round(horastrabajadasportecnico, numerodecimales), numerodecimales, '.', '')).removeAttr('readonly');
     });
   }
-  sumarhorastrabajadastecnicos();
+  sumarhorastrabajadastecnicos(asignaciontecnicostotalhorasfacturacion);
 }
 //sumar las horas trabajadas por los técnicos
-function sumarhorastrabajadastecnicos(){
+function sumarhorastrabajadastecnicos(asignaciontecnicostotalhorasfacturacion){
   var sumahorastrabajadastecnicos = 0;
   $("tr.filastecnicos").each(function () {
     sumahorastrabajadastecnicos= new Decimal(sumahorastrabajadastecnicos).plus($(".horastecnicopartida", this).val());
   }); 
   $("#asignaciontecnicostotalhorastecnicos").val(number_format(round(sumahorastrabajadastecnicos, numerodecimales), numerodecimales, '.', ''));
+  //obtener el total de horas tecnicos
+  var asignaciontecnicostotalhorastecnicos = $("#asignaciontecnicostotalhorastecnicos").val();
+  if(parseFloat(asignaciontecnicostotalhorasfacturacion) > parseFloat(asignaciontecnicostotalhorastecnicos)){
+    //si el total de horas tecnico es menor se le suma mas 1 al primer tecnico para machar totales
+    //horaspartida1
+    var contadorasignartiemposiguales = 0;
+    $("tr.filastecnicos").each(function () {
+      if(contadorasignartiemposiguales == 0){
+        var horastrabajadasportecnico = $('.horastecnicopartida', this).val();
+        var nuevotiempotecnico = new Decimal(horastrabajadasportecnico).plus(parseFloat('0.'+numerocerosconfiguradosinputnumberstep));
+        $('.horastecnicopartida', this).val(number_format(round(nuevotiempotecnico, numerodecimales), numerodecimales, '.', '')).attr('readonly', 'readonly');
+      }
+      contadorasignartiemposiguales++;
+    });
+    var sumahorastrabajadastecnicos = 0;
+    //renumerar filas
+    $("tr.filastecnicos").each(function () {
+      sumahorastrabajadastecnicos= new Decimal(sumahorastrabajadastecnicos).plus($(".horastecnicopartida", this).val());
+    }); 
+    $("#asignaciontecnicostotalhorastecnicos").val(number_format(round(sumahorastrabajadastecnicos, numerodecimales), numerodecimales, '.', ''));
+  }else if(parseFloat(asignaciontecnicostotalhorasfacturacion) < parseFloat(asignaciontecnicostotalhorastecnicos)){
+    //si el total de horas tecnico es mayor se le resta mas 1 al primer tecnico para machar totales
+    //horaspartida1
+    var contadorasignartiemposiguales = 0;
+    $("tr.filastecnicos").each(function () {
+      if(contadorasignartiemposiguales == 0){
+        var horastrabajadasportecnico = $('.horastecnicopartida', this).val();
+        var nuevotiempotecnico = new Decimal(horastrabajadasportecnico).minus(parseFloat('0.'+numerocerosconfiguradosinputnumberstep));
+        $('.horastecnicopartida', this).val(number_format(round(nuevotiempotecnico, numerodecimales), numerodecimales, '.', '')).attr('readonly', 'readonly');
+      }
+      contadorasignartiemposiguales++;
+    });
+    var sumahorastrabajadastecnicos = 0;
+    //renumerar filas
+    $("tr.filastecnicos").each(function () {
+      sumahorastrabajadastecnicos= new Decimal(sumahorastrabajadastecnicos).plus($(".horastecnicopartida", this).val());
+    }); 
+    $("#asignaciontecnicostotalhorastecnicos").val(number_format(round(sumahorastrabajadastecnicos, numerodecimales), numerodecimales, '.', ''));
+  }
 }
 //eliminar fila de la tabla de tecnicos
 function eliminarfilatecnico(numerofila){

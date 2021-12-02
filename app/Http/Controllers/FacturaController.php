@@ -2690,7 +2690,7 @@ class FacturaController extends ConfiguracionSistemaController{
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             if (file_exists($url_xml) != false) {
                 if($request->archivoadjunto != null && $request->archivoadjunto2 != null) {
-                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento) {
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento, $url_xml) {
                         $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                                 ->cc($arraycc)
                                 ->subject($asunto)
@@ -2708,7 +2708,7 @@ class FacturaController extends ConfiguracionSistemaController{
                         unlink($urlarchivoadjunto2);
                     }
                 }else if($request->archivoadjunto != null && $request->archivoadjunto2 == null){
-                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $correos, $asunto, $pdf, $emaildocumento) {
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $correos, $asunto, $pdf, $emaildocumento, $url_xml) {
                         $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                                 ->cc($arraycc)
                                 ->subject($asunto)
@@ -2721,7 +2721,7 @@ class FacturaController extends ConfiguracionSistemaController{
                         unlink($urlarchivoadjunto);
                     }
                 }else if($request->archivoadjunto == null && $request->archivoadjunto2 != null){
-                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $urlarchivoadjunto2, $arraycc, $asunto, $pdf, $emaildocumento) {
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $urlarchivoadjunto2, $arraycc, $asunto, $pdf, $emaildocumento, $url_xml) {
                         $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                                 ->cc($arraycc)
                                 ->subject($asunto)
@@ -2734,7 +2734,7 @@ class FacturaController extends ConfiguracionSistemaController{
                         unlink($urlarchivoadjunto2);
                     }
                 }else{
-                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $arraycc, $asunto, $pdf, $emaildocumento) {
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $arraycc, $asunto, $pdf, $emaildocumento, $url_xml) {
                         $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                                 ->cc($arraycc)
                                 ->subject($asunto)
@@ -3194,7 +3194,7 @@ class FacturaController extends ConfiguracionSistemaController{
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             if (file_exists($url_xml) != false) {
                 if($request->archivoadjunto != null && $request->archivoadjunto2 != null) {
-                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento) {
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento, $url_xml) {
                         $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                                 ->cc($arraycc)
                                 ->subject($asunto)
@@ -3212,7 +3212,7 @@ class FacturaController extends ConfiguracionSistemaController{
                         unlink($urlarchivoadjunto2);
                     }
                 }else if($request->archivoadjunto != null && $request->archivoadjunto2 == null){
-                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $correos, $asunto, $pdf, $emaildocumento) {
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $correos, $asunto, $pdf, $emaildocumento, $url_xml) {
                         $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                                 ->cc($arraycc)
                                 ->subject($asunto)
@@ -3225,7 +3225,7 @@ class FacturaController extends ConfiguracionSistemaController{
                         unlink($urlarchivoadjunto);
                     }
                 }else if($request->archivoadjunto == null && $request->archivoadjunto2 != null){
-                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $urlarchivoadjunto2, $arraycc, $asunto, $pdf, $emaildocumento) {
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $urlarchivoadjunto2, $arraycc, $asunto, $pdf, $emaildocumento, $url_xml) {
                         $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                                 ->cc($arraycc)
                                 ->subject($asunto)
@@ -3238,7 +3238,7 @@ class FacturaController extends ConfiguracionSistemaController{
                         unlink($urlarchivoadjunto2);
                     }
                 }else{
-                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $arraycc, $asunto, $pdf, $emaildocumento) {
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $arraycc, $asunto, $pdf, $emaildocumento, $url_xml) {
                         $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                                 ->cc($arraycc)
                                 ->subject($asunto)

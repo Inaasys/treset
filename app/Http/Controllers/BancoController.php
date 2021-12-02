@@ -95,10 +95,17 @@ class BancoController extends ConfiguracionSistemaController{
         $numerobanco= $request->numero;
         //modificar registro
         $Banco = Banco::where('Numero', $numerobanco )->first();
+        Banco::where('Numero', $numerobanco)
+                    ->update([
+                        'Nombre'=>$request->nombre,
+                        'Cuenta'=>$request->cuenta,
+                    ]);
+        /*
         $Banco->Nombre=$request->nombre;   
-        $Banco->Cuenta=$request->cuenta; 
+        $Banco->Cuenta=$request->cuenta;
+        */ 
         Log::channel('banco')->info('Se modifico el banco: '.$Banco.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
-		$Banco->save();
+		//$Banco->save();
     	return response()->json($Banco); 
     }
     //exportar a excel

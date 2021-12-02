@@ -1165,8 +1165,14 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
     //terminar orden de trabajo
     public function ordenes_trabajo_terminar_orden(Request $request){
         $OrdenTrabajo = OrdenTrabajo::where('Orden', $request->ordenterminar)->first();
+        OrdenTrabajo::where('Orden', $request->ordenterminar)
+            ->update([
+                'Status' => 'CERRADA'
+            ]);
+        /*
         $OrdenTrabajo->Status = 'CERRADA';
         $OrdenTrabajo->save();
+        */
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
         $BitacoraDocumento->Documento = "ORDENES DE TRABAJO";

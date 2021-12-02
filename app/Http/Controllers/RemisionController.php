@@ -684,10 +684,17 @@ class RemisionController extends ConfiguracionSistemaController{
                 $RemisionDetalle->Item = $item;
                 $RemisionDetalle->save();
                 //modificar fechaultimaventa y ultimocosto
+                /*
                 $Producto = Producto::where('Codigo', $codigoproductopartida)->first();
                 $Producto->{'Fecha Ultima Venta'} = Carbon::parse($request->fecha)->toDateTimeString();
                 $Producto->{'Ultima Venta'} = $request->preciopartida [$key];
                 $Producto->save();
+                */
+                Producto::where('Codigo', $codigoproductopartida)
+                ->update([
+                    'Fecha Ultima Venta' => Carbon::parse($request->fecha)->toDateTimeString(),
+                    'Ultima Venta' => $request->preciopartida [$key]
+                ]);
                 //restar existencias del almacen 
                 $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
                 if($ContarExistenciaAlmacen > 0){

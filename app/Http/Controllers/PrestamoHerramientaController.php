@@ -470,6 +470,19 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
         //Modificar prestamo
         $prestamo = $request->folio.'-'.$request->serie;
         $Prestamo_Herramienta = Prestamo_Herramienta::where('prestamo', $prestamo)->first();
+        Prestamo_Herramienta::where('prestamo', $prestamo)
+        ->update([
+            'termino_prestamo' => $request->terminoprestamo,
+            'correo' => $request->correo,
+            'observaciones' => $request->observaciones
+        ]);
+        if($Prestamo_Herramienta->termino_prestamo < $request->terminoprestamo){
+            Prestamo_Herramienta::where('prestamo', $prestamo)
+            ->update([
+                'correo_enviado' => NULL
+            ]);
+        }
+        /*
         if($Prestamo_Herramienta->termino_prestamo < $request->terminoprestamo){
             $Prestamo_Herramienta->correo_enviado = NULL;
         }
@@ -477,6 +490,7 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
         $Prestamo_Herramienta->correo=$request->correo;
         $Prestamo_Herramienta->observaciones=$request->observaciones;
         $Prestamo_Herramienta->save();
+        */
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
         $BitacoraDocumento->Documento = "PRESTAMO DE HERRAMIENTA";

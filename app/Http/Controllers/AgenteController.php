@@ -136,6 +136,23 @@ class AgenteController extends ConfiguracionSistemaController{
 	    }else{
             //modificar registro
             $Agente = Agente::where('Numero', $numeroagente )->first();
+            Agente::where('Numero', $numeroagente)
+            ->update([
+                'Nombre'=> $request->nombre,
+                'Direccion'=> $request->direccion,
+                'Colonia'=> $request->colonia,
+                'Ciudad'=> $request->ciudad,
+                'Cp'=> $request->codigopostal,
+                'Rfc'=> $request->rfc,
+                'Contacto'=> $request->contacto,
+                'Telefonos'=> $request->telefonos,
+                'Email'=> $request->email,   
+                'Cuenta'=> $request->cuenta,
+                'Almacen'=> $request->almacen,
+                'Comision'=> $request->comision,
+                'Anotaciones'=> $request->anotacione,
+            ]);
+            /*
 		    $Agente->Nombre=$request->nombre;
 		    $Agente->Direccion=$request->direccion;
 		    $Agente->Colonia=$request->colonia;
@@ -149,8 +166,9 @@ class AgenteController extends ConfiguracionSistemaController{
             $Agente->Almacen=$request->almacen;
             $Agente->Comision=$request->comision;
             $Agente->Anotaciones=$request->anotaciones;	
+            */
             Log::channel('agente')->info('Se modifico el agente: '.$Agente.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());	    
-		    $Agente->save();
+		    //$Agente->save();
       	}
     	return response()->json($Agente); 
     }  

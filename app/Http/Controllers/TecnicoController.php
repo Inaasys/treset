@@ -114,11 +114,19 @@ class TecnicoController extends ConfiguracionSistemaController{
         $numerotecnico= $request->numero;
         //modificar registro
         $Tecnico = Tecnico::where('Numero', $numerotecnico )->first();
+        Tecnico::where('Numero', $numerotecnico)
+                    ->update([
+                        'Nombre' => $request->nombre,
+                        'Objetivo' => $request->objetivo,
+                        'Planeacion' => $request->planeacion
+                    ]);
+        /*
         $Tecnico->Nombre=$request->nombre;   
         $Tecnico->Objetivo=$request->objetivo; 
         $Tecnico->Planeacion=$request->planeacion;
+        */
         Log::channel('tecnico')->info('Se modifico el tecnico: '.$Tecnico.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
-		$Tecnico->save();
+		//$Tecnico->save();
     	return response()->json($Tecnico); 
     }
     //exportar a excel

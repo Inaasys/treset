@@ -568,9 +568,16 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
     //autorizar asignacion herramienta
     public function asignacion_herramienta_autorizar(Request $request){
         $Asignacion_Herramienta = Asignacion_Herramienta::where('asignacion', $request->asignacionautorizar)->first();
+        Asignacion_Herramienta::where('asignacion', $request->asignacionautorizar)
+        ->update([
+            'autorizado_por' => Auth::user()->user,
+            'fecha_autorizacion' => Helpers::fecha_exacta_accion_datetimestring()
+        ]);
+        /*
         $Asignacion_Herramienta->autorizado_por = Auth::user()->user; 
         $Asignacion_Herramienta->fecha_autorizacion = Helpers::fecha_exacta_accion_datetimestring();
         $Asignacion_Herramienta->save();
+        */
         //restar la cantidad asignada al codigo en la tabla de existencias
         $Asignacion_Herramienta_Detalle = Asignacion_Herramienta_Detalle::where('asignacion', $request->asignacionautorizar)->get();
         $existencias = array();
@@ -926,9 +933,16 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
     public function asignacion_herramienta_guardar_auditoria(Request $request){
         foreach ($request->asignacionpartida as $key => $iddetalleasignacion){   
             $Asignacion_Herramienta_Detalle = Asignacion_Herramienta_Detalle::where('id', $iddetalleasignacion)->first();
+            Asignacion_Herramienta_Detalle::where('id', $iddetalleasignacion)
+            ->update([
+                'estado_auditoria' => $request->estadoauditoria  [$key],
+                'cantidad_auditoria' => $request->cantidadauditoriapartida [$key]
+            ]);
+            /*
             $Asignacion_Herramienta_Detalle->estado_auditoria =  $request->estadoauditoria  [$key];
             $Asignacion_Herramienta_Detalle->cantidad_auditoria =  $request->cantidadauditoriapartida [$key];
             $Asignacion_Herramienta_Detalle->save();
+            */
         }
     	return response()->json($Asignacion_Herramienta_Detalle);
     }

@@ -536,9 +536,16 @@ class OrdenCompraController extends ConfiguracionSistemaController{
     //autorizar una orden de compra
     public function ordenes_compra_autorizar(Request $request){
         $OrdenCompra = OrdenCompra::where('Orden', $request->ordenautorizar)->first();
+        OrdenCompra::where('Orden', $request->ordenautorizar)
+            ->update([
+                'AutorizadoPor' => Auth::user()->user,
+                'AutorizadoFecha' => Helpers::fecha_exacta_accion_datetimestring()
+            ]);
+        /*
         $OrdenCompra->AutorizadoPor = Auth::user()->user; 
         $OrdenCompra->AutorizadoFecha = Helpers::fecha_exacta_accion_datetimestring();
         $OrdenCompra->save();
+        */
         return response()->json($OrdenCompra);
     }
     //verificar si se puede quitar auotizacion a orden compra
@@ -839,8 +846,14 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         //Cerrar la orden de compra si todas sus partidas tienen cero en por surtir
         if($detallesporsurtir == 0){
             $OrdenCompra = OrdenCompra::where('Orden', $orden)->first();
+            OrdenCompra::where('Orden', $orden)
+            ->update([
+                'Status' => 'SURTIDO'
+            ]);
+            /*
             $OrdenCompra->Status='SURTIDO';
             $OrdenCompra->save();
+            */
         }
     	return response()->json($OrdenCompra);     
     }

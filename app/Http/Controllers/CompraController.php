@@ -857,7 +857,6 @@ class CompraController extends ConfiguracionSistemaController{
                 $CompraDetalle->Item = $item;
                 $CompraDetalle->save();
                 //modificar fechaultimacompra y ultimocosto
-                
                 $Producto = Producto::where('Codigo', $codigoproductopartida)->first();
                 /*
                 $Producto->{'Fecha Ultima Compra'} = Carbon::parse($request->fecha)->toDateTimeString();
@@ -1373,6 +1372,7 @@ class CompraController extends ConfiguracionSistemaController{
                     }else{
                         $ultimoitem = 1;
                     }
+                    $CompraDetalle=new CompraDetalle;
                     $CompraDetalle->Compra = $compra;
                     $CompraDetalle->Proveedor = $request->numeroproveedor;
                     $CompraDetalle->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
@@ -1401,9 +1401,16 @@ class CompraController extends ConfiguracionSistemaController{
                     $CompraDetalle->save();
                     //modificar fechaultimacompra y ultimocosto
                     $Producto = Producto::where('Codigo', $codigoproductopartida)->first();
+                    Producto::where('Codigo', $codigoproductopartida)
+                    ->update([
+                        'Fecha Ultima Compra' => Carbon::parse($request->fecha)->toDateTimeString(),
+                        'Ultimo Costo' => $request->preciopartida [$key]
+                    ]);
+                    /*
                     $Producto->{'Fecha Ultima Compra'} = Carbon::parse($request->fecha)->toDateTimeString();
                     $Producto->{'Ultimo Costo'} = $request->preciopartida [$key];
                     $Producto->save();
+                    */
                     //modificar faltante por surtir detalle orden de compra
                     $OrdenCompraDetalle = OrdenCompraDetalle::where('Orden', $request->ordenpartida [$key])->where('Codigo', $codigoproductopartida)->first();
                     $Surtir = $OrdenCompraDetalle->Surtir-$request->cantidadpartida  [$key];

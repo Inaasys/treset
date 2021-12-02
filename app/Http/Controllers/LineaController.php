@@ -92,10 +92,14 @@ class LineaController extends ConfiguracionSistemaController{
         $numerolinea= $request->numero;
         //modificar registro
         $LineaAnterior = Linea::where('Numero', $numerolinea )->first();
+        Linea::where('Numero', $numerolinea)
+                    ->update([
+                        'Nombre'=>$request->nombre,
+                    ]);
+        //$Linea->Nombre=$request->nombre;    
         $Linea = Linea::where('Numero', $numerolinea )->first();
-        $Linea->Nombre=$request->nombre;    
         Log::channel('linea')->info('Se modifico una linea, Linea Anterior: '.$LineaAnterior.' Linea Actualizada: '.$Linea.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
-		$Linea->save();
+		//$Linea->save();
     	return response()->json($Linea); 
     }
     //exportar a excel

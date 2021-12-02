@@ -119,6 +119,18 @@ class VineController extends ConfiguracionSistemaController{
         $numerovin= $request->vin;
         //modificar registro
         $Vin = Vine::where('Vin', $numerovin )->first();
+        Vine::where('Vin', $numerovin)
+                    ->update([
+                        'Economico' => $request->economico,
+                        'Cliente' => $request->cliente,
+                        'Placas' => $request->placas,
+                        'Motor' => $request->motor,
+                        'Marca' => $request->marca,
+                        'Modelo' => $request->modelo,
+                        'Año' => $request->ano,
+                        'Color' => $request->color
+                    ]);
+        /*
         $Vin->Economico=$request->economico;
         $Vin->Cliente=$request->cliente;
         $Vin->Placas=$request->placas;
@@ -126,9 +138,10 @@ class VineController extends ConfiguracionSistemaController{
         $Vin->Marca=$request->marca;
         $Vin->Modelo=$request->modelo;
         $Vin->Año=$request->ano;
-        $Vin->Color=$request->color;	  
+        $Vin->Color=$request->color;	
+        */  
         Log::channel('vin')->info('Se modifico el vin: '.$Vin.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());	      
-		$Vin->save();
+		//$Vin->save();
     	return response()->json($Vin); 
     }
     //exportar a excel

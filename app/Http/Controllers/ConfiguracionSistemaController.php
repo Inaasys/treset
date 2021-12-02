@@ -8,6 +8,7 @@ use Helpers;
 use Carbon\Carbon;
 use App\Empresa;
 use App\TipoDeCambio;
+use DB;
 
 class ConfiguracionSistemaController extends Controller
 {
@@ -109,6 +110,54 @@ class ConfiguracionSistemaController extends Controller
             $valor_dolar_dof = $tipodecambio->TipoCambioDOF;
         }
         $this->valor_dolar_hoy = $valor_dolar_dof;
+        //timbres ingreso - facturas totales activos utilizados
+        $this->timbresingresofacturastotalesactivosfacturapi = DB::table('Comprobantes')
+                        ->where('Comprobante', 'Factura')
+                        ->where('Tipo', 'I')
+                        ->where('IdFacturapi', '<>', NULL)
+                        ->count();
+        //timbres ingreso - facturas totales canceladas utilizados
+        $this->timbresingresofacturascanceladastotalesactivosfacturapi = DB::table('Comprobantes')
+                        ->where('Comprobante', 'Factura')
+                        ->where('Tipo', 'I')
+                        ->where('IdFacturapi', '<>', NULL)
+                        ->where('FechaCancelacion', '<>', NULL)
+                        ->count();
+        //timbres egreso - notas totales activos utilizados
+        $this->timbresegresonotastotalesactivosfacturapi = DB::table('Comprobantes')
+                        ->where('Comprobante', 'Nota')
+                        ->where('Tipo', 'E')
+                        ->where('IdFacturapi', '<>', NULL)
+                        ->count();
+        //timbres egreso - notas totales canceladas utilizados
+        $this->timbresegresonotascanceladastotalesactivosfacturapi = DB::table('Comprobantes')
+                        ->where('Comprobante', 'Nota')
+                        ->where('Tipo', 'E')
+                        ->where('IdFacturapi', '<>', NULL)
+                        ->where('FechaCancelacion', '<>', NULL)
+                        ->count();
+        //timbres pago - cxc totales activos utilizados
+        $this->timbrespagocxctotalesactivosfacturapi = DB::table('Comprobantes')
+                        ->where('Comprobante', 'Pago')
+                        ->where('Tipo', 'P')
+                        ->where('IdFacturapi', '<>', NULL)
+                        ->count();
+        //timbres pago - cxc totales canceladas utilizados
+        $this->timbrespagocxccanceladastotalesactivosfacturapi = DB::table('Comprobantes')
+                        ->where('Comprobante', 'Pago')
+                        ->where('Tipo', 'P')
+                        ->where('IdFacturapi', '<>', NULL)
+                        ->where('FechaCancelacion', '<>', NULL)
+                        ->count();
+        //timbres totales activos utilizados
+        $this->timbrestotalesactivosfacturapi = DB::table('Comprobantes')
+                        ->where('IdFacturapi', '<>', NULL)
+                        ->count();
+        //timbres totales cancelados
+        $this->timbrestotalescanceladosfacturapi = DB::table('Comprobantes')
+                        ->where('IdFacturapi', '<>', NULL)
+                        ->where('FechaCancelacion', '<>', NULL)
+                        ->count();
         ////////////FIN OBTENER CONFIGURACIONES DEL SISTEMA////////////////
         ///////////COMPARTIR CONFIGURACIONES EN TODAS LAS VISTAS ///////////
         View::share ( 'mayusculas_sistema', $this->mayusculas_sistema );
@@ -139,6 +188,16 @@ class ConfiguracionSistemaController extends Controller
         View::share ( 'correodefault1enviodocumentos', $this->correodefault1enviodocumentos);
         View::share ( 'correodefault2enviodocumentos', $this->correodefault2enviodocumentos);
         View::share ( 'usuariosamodificarinsumos', $this->usuariosamodificarinsumos);
+
+        View::share ( 'timbresingresofacturastotalesactivosfacturapi', $this->timbresingresofacturastotalesactivosfacturapi);
+        View::share ( 'timbresingresofacturascanceladastotalesactivosfacturapi', $this->timbresingresofacturascanceladastotalesactivosfacturapi);
+        View::share ( 'timbresegresonotastotalesactivosfacturapi', $this->timbresegresonotastotalesactivosfacturapi);
+        View::share ( 'timbresegresonotascanceladastotalesactivosfacturapi', $this->timbresegresonotascanceladastotalesactivosfacturapi);
+        View::share ( 'timbrespagocxctotalesactivosfacturapi', $this->timbrespagocxctotalesactivosfacturapi);
+        View::share ( 'timbrespagocxccanceladastotalesactivosfacturapi', $this->timbrespagocxccanceladastotalesactivosfacturapi);
+        View::share ( 'timbrestotalesactivosfacturapi', $this->timbrestotalesactivosfacturapi);
+        View::share ( 'timbrestotalescanceladosfacturapi', $this->timbrestotalescanceladosfacturapi);
+
 
         //View::share ( 'array', ['name'=>'Franky','address'=>'Mars'] );
     } 

@@ -35,11 +35,17 @@ class EmpresaController extends ConfiguracionSistemaController{
         //guardar xml en public/xml_cargados
         $logotipo->move($mover_a_carpeta, $nuevo_nombre_archivo);
         $Empresa = Empresa::where('Numero', 1)->first();
+        Empresa::where('Numero', 1)
+        ->update([
+            'Logo' => $nuevo_nombre_archivo
+        ]);
+        /*
         //eliminar logotipo anterior
         //$eliminar_logotipo_anterior = public_path().'/logotipo_empresa/'.$Empresa->Logo;
         //unlink($eliminar_logotipo_anterior);
         $Empresa->Logo = $nuevo_nombre_archivo;
         $Empresa->save();
+        */
         return response()->json($logotipo);
     }
     public function empresa(){

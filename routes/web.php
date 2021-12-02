@@ -1012,13 +1012,9 @@ Route::group(['middleware' => ['auth']], function () {
     /*---------------------------------------|||||||||||||||||||MANEJO DE ERRORES LOGS|||||||||||||||||||||------------------------------------------*/
     Route::get('errors_inaasys', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index')->name('errors_inaasys');
     /*---------------------------------------|||||||||||||||||||FIN MANEJO DE ERRORES LOGS|||||||||||||||||||||------------------------------------------*/
+    /*---------------------------------------|||||||||||||||||||MANEJO DE SESIONES|||||||||||||||||||||------------------------------------------*/
+    Route::get('/sesiones', 'SesionController@sesiones')->name('sesiones');
+    Route::post('/eliminar_session', 'SesionController@eliminar_session')->name('eliminar_session');
+    /*---------------------------------------|||||||||||||||||||FIN MANEJO DE SESIONES|||||||||||||||||||||------------------------------------------*/
+
 });
-
-
-
-
-
-
-
-
-

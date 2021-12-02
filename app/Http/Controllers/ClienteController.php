@@ -515,6 +515,39 @@ class ClienteController extends ConfiguracionSistemaController{
 	    if($ExisteCliente == true){
             $Cliente = 1;
 	    }else{
+            $Cliente = Cliente::where('Numero', $numerocliente )->first();
+            Cliente::where('Numero', $numerocliente)
+            ->update([
+                'Nombre' => $request->nombre,
+                'Rfc' => $request->rfc,
+                'Calle' => $request->calle,
+                'noExterior' => $request->noexterior,
+                'noInterior' => $request->nointerior,
+                'Colonia' => $request->colonia,
+                'Localidad' => $request->localidad,
+                'Referencia' => $request->referencia,
+                'Pais' => $request->clavepais,
+                'Estado' => $request->estado,
+                'Municipio' => $request->municipio,  
+                'CodigoPostal' => $request->codigopostal,
+                'Plazo' => $request->plazo,
+                'Agente' => $request->agente,
+                'FormaPago' => $request->claveformapago,
+                'MetodoPago' => $request->clavemetodopago,
+                'UsoCfdi' => $request->claveusocfdi,
+                'Tipo' => $request->tipo,
+                'Credito' => $request->creditomaximo,
+                'Contacto' => $request->contacto,
+                'Telefonos' => $request->telefonos,
+                'Celular' => $request->celular,
+                'Email1' => $request->email1,
+                'Email2' => $request->email2,
+                'Email3' => $request->email3,
+                'Cuenta' => $request->cuentaref,
+                'CuentaServicio' => $request->cuentaser,
+                'Anotaciones' => $request->anotaciones
+            ]);
+            /*
             //modificar registro
             $Cliente = Cliente::where('Numero', $numerocliente )->first();
 		    $Cliente->Nombre=$request->nombre;
@@ -545,8 +578,9 @@ class ClienteController extends ConfiguracionSistemaController{
             $Cliente->Cuenta=$request->cuentaref;
             $Cliente->CuentaServicio=$request->cuentaser;
             $Cliente->Anotaciones=$request->anotaciones;
+            */
             Log::channel('cliente')->info('Se modifico el cliente: '.$Cliente.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
-            $Cliente->save();
+            //$Cliente->save();
             //Tabla Precios Productos
             $eliminarpreciosproductos = ProductoPrecio::where('Cliente', $numerocliente)->forceDelete();
             if($request->numerofilaspreciosproducto > 0){

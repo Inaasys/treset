@@ -188,12 +188,21 @@ class UserController extends ConfiguracionSistemaController
 	    }else{
             //modificar registro
             $Usuario = User::where('id', $request->numero )->first();
+            User::where('id', $request->numero)
+            ->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'user' => $request->user,
+                'role_id' => $request->rol
+            ]);
+            /*
             $Usuario->name=$request->name;
             $Usuario->email=$request->email;
             //$Usuario->password=Hash::make($request->pass);
             $Usuario->user=$request->user;
             $Usuario->role_id=$request->rol;
             $Usuario->save();
+            */
       	}
     	return response()->json($Usuario); 
     }
@@ -369,9 +378,16 @@ class UserController extends ConfiguracionSistemaController
     //cambiar la contraseña asignada por default del usuario al primer logueo del sistema
     public function cambiar_contrasena(Request $request){
         $User = User::where('id', Auth::user()->id)->first();
+        User::where('id', Auth::user()->id)
+        ->update([
+            'password' => Hash::make($request->pass),
+            'first_login' => 1
+        ]);
+        /*
         $User->password=Hash::make($request->pass);
         $User->first_login=1;
         $User->save();
+        */
         return redirect('inicio')->with('success','Contraseña Cambiada Correctamente');
     }
 }

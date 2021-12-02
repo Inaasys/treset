@@ -122,14 +122,25 @@ class MarcaController extends ConfiguracionSistemaController{
         $numeromarca= $request->numero;
         //modificar registro
         $Marca = Marca::where('Numero', $numeromarca )->first();
+        Marca::where('Numero', $numeromarca)
+                    ->update([
+                        'Nombre'=>$request->nombre,
+                        'Utilidad1'=>$request->utilidad1,
+                        'Utilidad2'=>$request->utilidad2,
+                        'Utilidad3'=>$request->utilidad3,
+                        'Utilidad4'=>$request->utilidad4,
+                        'Utilidad5'=>$request->utilidad5  
+                    ]);
+        /*
         $Marca->Nombre=$request->nombre;
         $Marca->Utilidad1=$request->utilidad1;
         $Marca->Utilidad2=$request->utilidad2;
         $Marca->Utilidad3=$request->utilidad3;
         $Marca->Utilidad4=$request->utilidad4;
-        $Marca->Utilidad5=$request->utilidad5;    
+        $Marca->Utilidad5=$request->utilidad5;  
+        */
         Log::channel('marca')->info('Se modifico la marca: '.$Marca.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
-		$Marca->save();
+		//$Marca->save();
     	return response()->json($Marca); 
     }
     //exportar a excel

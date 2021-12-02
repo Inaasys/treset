@@ -143,9 +143,16 @@ class PersonalController extends ConfiguracionSistemaController{
         $idpersonal= $request->id;
         //modificar registro
         $Personal = Personal::where('id', $idpersonal )->first();
+        Personal::where('id', $idpersonal)
+                    ->update([
+                        'nombre' => $request->nombre,
+                        'tipo_personal' => $request->tipopersonal
+                    ]);
+        /*
         $Personal->nombre=$request->nombre;   
         $Personal->tipo_personal=$request->tipopersonal; 
 		$Personal->save();
+        */
     	return response()->json($Personal); 
     }
     //exportar en excel el personal

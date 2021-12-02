@@ -147,6 +147,25 @@ class ProveedorController extends ConfiguracionSistemaController{
         $numeroproveedor= $request->numero;
             //modificar registro
             $Proveedor = Proveedor::where('Numero', $numeroproveedor )->first();
+            Proveedor::where('Numero', $numeroproveedor)
+            ->update([
+                'Nombre'=>$request->nombre,
+                'Rfc'=>$request->rfc,
+                'CodigoPostal'=>$request->codigopostal,
+                'Email1'=>$request->email1,
+                'Email2'=>$request->email2,
+                'Email3'=>$request->email3,
+                'Plazo'=>$request->plazo,
+                'Telefonos'=>$request->telefonos	
+            ]);
+            //si es admin modificar la casilla solicitar xml	      
+            if(Auth::user()->role_id == 1){
+                Proveedor::where('Numero', $numeroproveedor)
+                        ->update([
+                            'SolicitarXML' => $request->solicitarxmlencompras,
+                        ]);
+            }
+            /*
 		    $Proveedor->Nombre=$request->nombre;
 		    $Proveedor->Rfc=$request->rfc;
             $Proveedor->CodigoPostal=$request->codigopostal;
@@ -158,8 +177,9 @@ class ProveedorController extends ConfiguracionSistemaController{
             if(Auth::user()->role_id == 1){
                 $Proveedor->SolicitarXML = $request->solicitarxmlencompras;
             }
+            */
             Log::channel('proveedor')->info('Se modifico el proveedor: '.$Proveedor.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());	      
-		    $Proveedor->save();
+		    //$Proveedor->save();
     	return response()->json($Proveedor); 
     } 
     //exportar a excel
