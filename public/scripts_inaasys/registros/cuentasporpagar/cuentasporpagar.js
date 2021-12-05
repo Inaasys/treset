@@ -505,7 +505,7 @@ function alta(){
                     '</div>'+    
                     '<div class="col-md-2">'+ 
                         '<label>Fecha</label>'+
-                        '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" onchange="validasolomesactual();" required>'+ 
+                        '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" onchange="validasolomesactual(1);" required>'+ 
                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+ 
                     '</div>'+ 
                     '</div>'+ 

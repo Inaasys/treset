@@ -343,16 +343,12 @@
         var facturas_obtener_residencia_fiscal_por_clave = '{!!URL::to('facturas_obtener_residencia_fiscal_por_clave')!!}';
         var facturas_obtener_folios_fiscales = '{!!URL::to('facturas_obtener_folios_fiscales')!!}';
         var facturas_obtener_ultimo_folio_serie_seleccionada  = '{!!URL::to('facturas_obtener_ultimo_folio_serie_seleccionada')!!}';
-
         var facturas_obtener_serie_interna  = '{!!URL::to('facturas_obtener_serie_interna')!!}';
-
         var facturas_obtener_datos_agente  = '{!!URL::to('facturas_obtener_datos_agente')!!}';
         var facturas_obtener_remisiones = '{!!URL::to('facturas_obtener_remisiones')!!}';
         var facturas_obtener_remisiones_por_pedido  = '{!!URL::to('facturas_obtener_remisiones_por_pedido')!!}';
         var facturas_obtener_remisiones_pedido  = '{!!URL::to('facturas_obtener_remisiones_pedido')!!}'; 
-
         var facturas_obtener_total_a_facturar  = '{!!URL::to('facturas_obtener_total_a_facturar')!!}'; 
-
         var facturas_obtener_remision = '{!!URL::to('facturas_obtener_remision')!!}';
         var facturas_obtener_ordenes = '{!!URL::to('facturas_obtener_ordenes')!!}';
         var facturas_obtener_orden = '{!!URL::to('facturas_obtener_orden')!!}';

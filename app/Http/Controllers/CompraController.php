@@ -1808,7 +1808,7 @@ class CompraController extends ConfiguracionSistemaController{
                             ->update([
                                 'Cantidad' => '0.000000',
                                 'Importe' => '0.000000',
-                                'Dcto' => '0.000000',
+                                //'Dcto' => '0.000000',
                                 'Descuento' => '0.000000',
                                 'ImporteDescuento' => '0.000000',
                                 'Ieps' => '0.000000',

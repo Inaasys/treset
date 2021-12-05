@@ -97,17 +97,29 @@ function regresarbusquedadatatableprincipal(){
 }
 //FIN VOLVER A APLICAR CONFIGURACION A DATATABLE PRINCIPAL PARA QUE SE REALIZE LA BUSQUEDA CON LA TECLA ENTER
 //VALIDAR EN TODOS LOS MODULOS QUE LA FECHA DE ALTA SOLO SE DE EN EL MES ACTUAL
-function validasolomesactual(){
+function validasolomesactual(permitirmesanterior){
     var fechaseleccionada = $("#fecha").val().split("-");
     var messeleccionado = fechaseleccionada[1];
     var anoseleccionado = fechaseleccionada[0];
-    if(messeleccionado != meshoy || anoseleccionado != periodohoy){
-      $("#fecha").val("");
-      toastr.error( "Error la fecha debe ser del mes y año en curso", "Mensaje", {
-        "timeOut": "9500",
-        "progressBar": true,
-        "extendedTImeout": "5000"
-      });
+    if(permitirmesanterior == 1){
+        var diferenciasmeses = new Decimal(meshoy).minus(messeleccionado);
+        if(diferenciasmeses >= 2){
+            $("#fecha").val("");
+            toastr.error( "Error la fecha de captura solo puede ser del mes actual o un mes anterior al actual", "Mensaje", {
+                "timeOut": "9500",
+                "progressBar": true,
+                "extendedTImeout": "5000"
+            });
+        }
+    }else{
+        if(messeleccionado != meshoy || anoseleccionado != periodohoy){
+            $("#fecha").val("");
+            toastr.error( "Error la fecha debe ser del mes y año en curso", "Mensaje", {
+                "timeOut": "9500",
+                "progressBar": true,
+                "extendedTImeout": "5000"
+            });
+        }
     }
 }
 //FIN VALIDAR EN TODOS LOS MODULOS QUE LA FECHA DE ALTA SOLO SE DE EN EL MES ACTUAL

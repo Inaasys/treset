@@ -8510,7 +8510,7 @@ fieldset[disabled] .form-control {
     text-align: center;
     padding: 4px 0 6px 0; }
   .dropdown-menu ul.menu {
-    padding-left: 0; }
+    padding-left: 15px; }
     .dropdown-menu ul.menu.tasks h4 {
       color: #333;
       font-size: 13px;
