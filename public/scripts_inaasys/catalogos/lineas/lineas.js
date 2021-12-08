@@ -125,6 +125,7 @@ function alta(){
               '</div>';
   $("#tabsform").html(tabs);
   obtenultimonumero();
+  setTimeout(function(){$("#nombre").focus();},500);  
 }
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
@@ -225,6 +226,7 @@ function obtenerdatos(numerolinea){
     //boton formulario 
     $("#numero").val(numerolinea);
     $("#nombre").val(data.linea.Nombre);
+    setTimeout(function(){$("#nombre").focus();},500);  
     mostrarmodalformulario('MODIFICACION');
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {

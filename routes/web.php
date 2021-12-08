@@ -61,9 +61,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/clientes_obtener_uso_cfdi', 'ClienteController@clientes_obtener_uso_cfdi')->name('clientes_obtener_uso_cfdi')->middleware('revisaraccesomenu:menucatalogoclientes');
     Route::get('/clientes_obtener_usocfdi_por_clave', 'ClienteController@clientes_obtener_usocfdi_por_clave')->name('clientes_obtener_usocfdi_por_clave')->middleware('revisaraccesomenu:menucatalogoclientes');
     Route::get('/clientes_obtener_productos', 'ClienteController@clientes_obtener_productos')->name('clientes_obtener_productos')->middleware('revisaraccesomenu:menucatalogoclientes');
-    
     Route::get('/clientes_obtener_datos_producto_agregar_fila', 'ClienteController@clientes_obtener_datos_producto_agregar_fila')->name('clientes_obtener_datos_producto_agregar_fila')->middleware('revisaraccesomenu:menucatalogoclientes');
-    
     Route::post('/clientes_guardar', 'ClienteController@clientes_guardar')->name('clientes_guardar')->middleware('revisarpermisos:catalogos.clientes.altas');
     Route::post('/clientes_alta_o_baja', 'ClienteController@clientes_alta_o_baja')->name('clientes_alta_o_baja')->middleware('revisarpermisos:catalogos.clientes.bajas');
     Route::get('/clientes_obtener_cliente', 'ClienteController@clientes_obtener_cliente')->name('clientes_obtener_cliente')->middleware('revisaraccesomenu:menucatalogoclientes');
@@ -75,6 +73,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/agentes_obtener', 'AgenteController@agentes_obtener')->name('agentes_obtener')->middleware('revisaraccesomenu:menucatalogoagentes');
     Route::get('/agentes_obtener_ultimo_numero', 'AgenteController@agentes_obtener_ultimo_numero')->name('agentes_obtener_ultimo_numero')->middleware('revisaraccesomenu:menucatalogoagentes');
     Route::get('/agentes_obtener_almacenes', 'AgenteController@agentes_obtener_almacenes')->name('agentes_obtener_almacenes')->middleware('revisaraccesomenu:menucatalogoagentes');
+    Route::get('/agentes_obtener_almacen_por_numero', 'AgenteController@agentes_obtener_almacen_por_numero')->name('agentes_obtener_almacen_por_numero')->middleware('revisaraccesomenu:menucatalogoagentes');
     Route::post('/agentes_guardar', 'AgenteController@agentes_guardar')->name('agentes_guardar')->middleware('revisarpermisos:catalogos.agentes.altas');
     Route::post('/agentes_alta_o_baja', 'AgenteController@agentes_alta_o_baja')->name('agentes_alta_o_baja')->middleware('revisarpermisos:catalogos.agentes.bajas');
     Route::get('/agentes_obtener_agente', 'AgenteController@agentes_obtener_agente')->name('agentes_obtener_agente')->middleware('revisaraccesomenu:menucatalogoagentes');
@@ -172,9 +171,12 @@ Route::group(['middleware' => ['auth']], function () {
     //Servicios
     Route::get('/servicios', 'ServicioController@servicios')->name('servicios')->middleware('revisaraccesomenu:menucatalogoservicios');
     Route::get('/servicios_obtener', 'ServicioController@servicios_obtener')->name('servicios_obtener')->middleware('revisaraccesomenu:menucatalogoservicios');
-    Route::get('/servicios_obtener_familias', 'ServicioController@servicios_obtener_familias')->name('servicios_obtener_familias')->middleware('revisaraccesomenu:menucatalogoservicios');
+    Route::get('/servicios_obtener_familias', 'ServicioController@servicios_obtener_familias')->name('servicios_obtener_familias')->middleware('revisaraccesomenu:menucatalogoservicios');    
+    Route::get('/servicios_obtener_familia_por_numero', 'ServicioController@servicios_obtener_familia_por_numero')->name('servicios_obtener_familia_por_numero')->middleware('revisaraccesomenu:menucatalogoservicios');
     Route::get('/servicios_obtener_claves_productos', 'ServicioController@servicios_obtener_claves_productos')->name('servicios_obtener_claves_productos')->middleware('revisaraccesomenu:menucatalogoservicios');
+    Route::get('/servicios_obtener_clave_producto_por_clave', 'ServicioController@servicios_obtener_clave_producto_por_clave')->name('servicios_obtener_clave_producto_por_clave')->middleware('revisaraccesomenu:menucatalogoservicios');
     Route::get('/servicios_obtener_claves_unidades', 'ServicioController@servicios_obtener_claves_unidades')->name('servicios_obtener_claves_unidades')->middleware('revisaraccesomenu:menucatalogoservicios');
+    Route::get('/servicios_obtener_clave_unidad_por_clave', 'ServicioController@servicios_obtener_clave_unidad_por_clave')->name('servicios_obtener_clave_unidad_por_clave')->middleware('revisaraccesomenu:menucatalogoservicios');
     Route::post('/servicios_guardar', 'ServicioController@servicios_guardar')->name('servicios_guardar')->middleware('revisarpermisos:catalogos.servicios.altas');
     Route::post('/servicios_alta_o_baja', 'ServicioController@servicios_alta_o_baja')->name('servicios_alta_o_baja')->middleware('revisarpermisos:catalogos.servicios.bajas');
     Route::get('/servicios_obtener_servicio', 'ServicioController@servicios_obtener_servicio')->name('servicios_obtener_servicio')->middleware('revisaraccesomenu:menucatalogoservicios');
@@ -184,6 +186,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/vines', 'VineController@vines')->name('vines')->middleware('revisaraccesomenu:menucatalogovines');
     Route::get('/vines_obtener', 'VineController@vines_obtener')->name('vines_obtener')->middleware('revisaraccesomenu:menucatalogovines');
     Route::get('/vines_obtener_clientes', 'VineController@vines_obtener_clientes')->name('vines_obtener_clientes')->middleware('revisaraccesomenu:menucatalogovines');
+    Route::get('/vines_obtener_cliente_por_numero', 'VineController@vines_obtener_cliente_por_numero')->name('vines_obtener_cliente_por_numero')->middleware('revisaraccesomenu:menucatalogovines');  
     Route::post('/vines_guardar', 'VineController@vines_guardar')->name('vines_guardar')->middleware('revisarpermisos:catalogos.vines.altas');
     Route::post('/vines_alta_o_baja', 'VineController@vines_alta_o_baja')->name('vines_alta_o_baja')->middleware('revisarpermisos:catalogos.vines.bajas');
     Route::get('/vines_obtener_vine', 'VineController@vines_obtener_vine')->name('vines_obtener_vine')->middleware('revisaraccesomenu:menucatalogovines');
@@ -1014,7 +1017,10 @@ Route::group(['middleware' => ['auth']], function () {
     /*---------------------------------------|||||||||||||||||||FIN MANEJO DE ERRORES LOGS|||||||||||||||||||||------------------------------------------*/
     /*---------------------------------------|||||||||||||||||||MANEJO DE SESIONES|||||||||||||||||||||------------------------------------------*/
     Route::get('/sesiones', 'SesionController@sesiones')->name('sesiones');
+    Route::get('/sesiones_obtener', 'SesionController@sesiones_obtener')->name('sesiones_obtener');
     Route::post('/eliminar_session', 'SesionController@eliminar_session')->name('eliminar_session');
+    Route::post('/sesiones_eliminar_sesiones_activas', 'SesionController@sesiones_eliminar_sesiones_activas')->name('sesiones_eliminar_sesiones_activas');
+    Route::post('/sesiones_eliminar_sesiones_sin_login', 'SesionController@sesiones_eliminar_sesiones_sin_login')->name('sesiones_eliminar_sesiones_sin_login');
     /*---------------------------------------|||||||||||||||||||FIN MANEJO DE SESIONES|||||||||||||||||||||------------------------------------------*/
 
 });

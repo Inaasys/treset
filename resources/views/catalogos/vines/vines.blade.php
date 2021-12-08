@@ -140,6 +140,7 @@
         var background_tables = '{{$empresa->background_tables}}';
         var vines_obtener = '{!!URL::to('vines_obtener')!!}';
         var vines_obtener_clientes = '{!!URL::to('vines_obtener_clientes')!!}';
+        var vines_obtener_cliente_por_numero = '{!!URL::to('vines_obtener_cliente_por_numero')!!}';
         var vines_guardar = '{!!URL::to('vines_guardar')!!}';
         var vines_alta_o_baja = '{!!URL::to('vines_alta_o_baja')!!}'; 
         var vines_obtener_vine = '{!!URL::to('vines_obtener_vine')!!}'; 

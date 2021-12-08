@@ -868,13 +868,19 @@ class CompraController extends ConfiguracionSistemaController{
                 */
                 if($this->tipodeutilidad == 'Financiera'){
                     //$nuevosubtotalproducto = $request->preciopartida [$key]/(((100 - $Producto->Utilidad) / 100));
-                    $nuevosubtotalproducto = ($request->subtotalpartida [$key] / $request->cantidadpartida [$key] )/(((100 - $Producto->Utilidad) / 100));
+                    //$nuevosubtotalproducto = ($request->subtotalpartida [$key] / $request->cantidadpartida [$key] )/(((100 - $Producto->Utilidad) / 100));
+                    $restautilidad = Helpers::convertirvalorcorrecto(100) - $Producto->Utilidad;
+                    $divisionutilidad = $restautilidad / Helpers::convertirvalorcorrecto(100);
+                    $nuevosubtotalproducto = ($request->subtotalpartida [$key] / $request->cantidadpartida [$key]) / $divisionutilidad;
                 }else{
                     //$nuevosubtotalproducto = $request->preciopartida [$key]*(1+($Producto->Utilidad/100)); //Ya estaba comentado
                     //$multiplicacionnuevosubtotalproducto = $request->preciopartida [$key]*($Producto->Utilidad/Helpers::convertirvalorcorrecto(100));
                     //$nuevosubtotalproducto = $request->preciopartida [$key]+$multiplicacionnuevosubtotalproducto;
-                    $multiplicacionnuevosubtotalproducto = ($request->subtotalpartida [$key] / $request->cantidadpartida [$key] )*($Producto->Utilidad/Helpers::convertirvalorcorrecto(100));
-                    $nuevosubtotalproducto = ($request->subtotalpartida [$key] / $request->cantidadpartida [$key] )+$multiplicacionnuevosubtotalproducto;
+                    //$multiplicacionnuevosubtotalproducto = ($request->subtotalpartida [$key] / $request->cantidadpartida [$key] )*($Producto->Utilidad/Helpers::convertirvalorcorrecto(100));
+                    //$nuevosubtotalproducto = ($request->subtotalpartida [$key] / $request->cantidadpartida [$key] )+$multiplicacionnuevosubtotalproducto;
+                    $sumautilidad = Helpers::convertirvalorcorrecto(100) + $Producto->Utilidad;
+                    $divisionutilidad = $sumautilidad / Helpers::convertirvalorcorrecto(100);
+                    $nuevosubtotalproducto = ($request->subtotalpartida [$key] / $request->cantidadpartida [$key] ) * $divisionutilidad;
                 }
                 $nuevoivaproducto = $nuevosubtotalproducto*($Producto->Impuesto/Helpers::convertirvalorcorrecto(100));
                 $nuevototalproducto = $nuevosubtotalproducto + $nuevoivaproducto;

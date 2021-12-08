@@ -133,7 +133,8 @@ function listarclientes(){
                             '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                         '</div>';
     $("#contenidomodaltablas").html(tablaclientes);
-    $('#tbllistadocliente').DataTable({
+    var tcli = $('#tbllistadocliente').DataTable({
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "300px",
         "bScrollCollapse": true,  
@@ -163,12 +164,44 @@ function listarclientes(){
         },
         "iDisplayLength": 8,
     });
+    //seleccionar registro al dar doble click
+    $('#tbllistadocliente tbody').on('dblclick', 'tr', function () {
+        var data = tcli.row( this ).data();
+        seleccionarcliente(data.Numero, data.Nombre);
+    });
 }
 function seleccionarcliente(Numero, Nombre){
-    $("#cliente").val(Numero);
-    $("#nombrecliente").val(Nombre);
-    $("#nombrecliente").keyup();
-    mostrarformulario();
+    var clienteanterior = $("#clienteanterior").val();
+    var cliente = Numero;
+    if(clienteanterior != cliente){
+        $("#cliente").val(Numero);
+        $("#clienteanterior").val(Numero);
+        if(Nombre != null){
+        $("#textonombrecliente").html(Nombre.substring(0, 40));
+        }
+        mostrarformulario();
+    }
+}
+//obtener por numero
+function obtenerclientepornumero(){
+    var clienteanterior = $("#clienteanterior").val();
+    var cliente = $("#cliente").val();
+    if(clienteanterior != cliente){
+        if($("#cliente").parsley().isValid()){
+            $.get(vines_obtener_cliente_por_numero, {cliente:cliente}, function(data){
+                $("#cliente").val(data.numero);
+                $("#clienteanterior").val(data.numero);
+                if(data.nombre != null){
+                    $("#textonombrecliente").html(data.nombre.substring(0, 40));
+                }
+            }) 
+        }
+    }
+}
+//regresar numero
+function regresarnumerocliente(){
+    var clienteanterior = $("#clienteanterior").val();
+    $("#cliente").val(clienteanterior);
 }
 //alta
 function alta(){
@@ -185,7 +218,7 @@ function alta(){
                     '<div role="tabpanel" class="tab-pane fade in active" id="datosgenerales">'+
                         '<div class="row">'+
                             '<div class="col-md-6">'+
-                                '<label>Cliente</label>'+
+                                '<label>Cliente<span class="label label-danger" id="textonombrecliente"></span></label>'+
                                 '<div class="row">'+
                                     '<div class="col-md-3">'+
                                         '<span class="input-group-btn">'+
@@ -194,54 +227,77 @@ function alta(){
                                     '</div>'+  
                                     '<div class="col-md-9">'+  
                                         '<div class="form-line">'+
-                                            '<input type="hidden" class="form-control" name="cliente" id="cliente" required onkeyup="tipoLetra(this);">'+
-                                            '<input type="text" class="form-control" name="nombrecliente" id="nombrecliente" required onkeyup="tipoLetra(this);">'+
+                                            '<input type="text" class="form-control inputnext" name="cliente" id="cliente" required onkeyup="tipoLetra(this)">'+
+                                            '<input type="hidden" class="form-control" name="clienteanterior" id="clienteanterior" required>'+
+                                            '<input type="hidden" class="form-control" name="nombrecliente" id="nombrecliente" readonly>'+
                                         '</div>'+
                                     '</div>'+     
                                 '</div>'+
                             '</div>'+
                             '<div class="col-md-6">'+
                                 '<label>Económico</label>'+
-                                '<input type="text" class="form-control" name="economico" id="economico" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="economico" id="economico" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Vin</label>'+
-                                '<input type="text" class="form-control" name="vin" id="vin" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="vin" id="vin" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Placas</label>'+
-                                '<input type="text" class="form-control" name="placas" id="placas" required data-parsley-length="[1, 10]"  onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="placas" id="placas" required data-parsley-length="[1, 10]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Motor</label>'+
-                                '<input type="text" class="form-control" name="motor" id="motor" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="motor" id="motor" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Marca</label>'+
-                                '<input type="text" class="form-control" name="marca" id="marca" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="marca" id="marca" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Modelo</label>'+
-                                '<input type="text" class="form-control" name="modelo" id="modelo" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="modelo" id="modelo" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Año</label>'+
-                                '<input type="text" class="form-control" name="ano" id="ano" data-parsley-type="integer" required data-parsley-length="[4, 4]"  onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="ano" id="ano" data-parsley-type="integer" required data-parsley-length="[4, 4]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Color</label>'+
-                                '<input type="text" class="form-control" name="color" id="color" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="color" id="color" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                         '</div>' 
                     '</div>'+
                 '</div>';
-  $("#tabsform").html(tabs);
+    $("#tabsform").html(tabs);    
+    setTimeout(function(){$("#cliente").focus();},500);  
+    //activar busqueda
+    $('#cliente').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obtenerclientepornumero();
+        }
+    });
+    //regresar clave
+    $('#cliente').on('change', function(e) {
+            regresarnumerocliente();
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keypress(function (e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            var index = $(this).index(".inputnext");          
+            $(".inputnext").eq(index + 1).focus().select(); 
+        }
+    });  
 }
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
@@ -336,7 +392,7 @@ function obtenerdatos(numerovin){
                     '<div role="tabpanel" class="tab-pane fade in active" id="datosgenerales">'+
                         '<div class="row">'+
                             '<div class="col-md-6">'+
-                                '<label>Cliente</label>'+
+                                '<label>Cliente<span class="label label-danger" id="textonombrecliente"></span></label>'+
                                 '<div class="row">'+
                                     '<div class="col-md-3">'+
                                         '<span class="input-group-btn">'+
@@ -345,58 +401,61 @@ function obtenerdatos(numerovin){
                                     '</div>'+  
                                     '<div class="col-md-9">'+  
                                         '<div class="form-line">'+
-                                            '<input type="hidden" class="form-control" name="cliente" id="cliente" required onkeyup="tipoLetra(this);">'+
-                                            '<input type="text" class="form-control" name="nombrecliente" id="nombrecliente" required onkeyup="tipoLetra(this);">'+
+                                            '<input type="text" class="form-control inputnext" name="cliente" id="cliente" required onkeyup="tipoLetra(this)">'+
+                                            '<input type="hidden" class="form-control" name="clienteanterior" id="clienteanterior" required>'+
+                                            '<input type="hidden" class="form-control" name="nombrecliente" id="nombrecliente" readonly>'+
                                         '</div>'+
                                     '</div>'+     
                                 '</div>'+
                             '</div>'+
                             '<div class="col-md-6">'+
                                 '<label>Económico</label>'+
-                                '<input type="text" class="form-control" name="economico" id="economico" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);" readonly>'+
+                                '<input type="text" class="form-control inputnext" name="economico" id="economico" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);" readonly>'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Vin</label>'+
-                                '<input type="text" class="form-control" name="vin" id="vin" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);" readonly>'+
+                                '<input type="text" class="form-control inputnext" name="vin" id="vin" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);" readonly>'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Placas</label>'+
-                                '<input type="text" class="form-control" name="placas" id="placas" required data-parsley-length="[1, 10]"  onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="placas" id="placas" required data-parsley-length="[1, 10]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Motor</label>'+
-                                '<input type="text" class="form-control" name="motor" id="motor" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="motor" id="motor" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Marca</label>'+
-                                '<input type="text" class="form-control" name="marca" id="marca" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="marca" id="marca" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Modelo</label>'+
-                                '<input type="text" class="form-control" name="modelo" id="modelo" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="modelo" id="modelo" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Año</label>'+
-                                '<input type="text" class="form-control" name="ano" id="ano" data-parsley-type="integer"  data-parsley-length="[4, 4]" required onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="ano" id="ano" data-parsley-type="integer"  data-parsley-length="[4, 4]" required onkeyup="tipoLetra(this);">'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Color</label>'+
-                                '<input type="text" class="form-control" name="color" id="color" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="color" id="color" required data-parsley-length="[1, 30]"  onkeyup="tipoLetra(this);">'+
                             '</div>'+
                         '</div>' 
                     '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
     //boton formulario 
-    $("#cliente").val(data.cliente.Numero);
-    $("#nombrecliente").val(data.cliente.Nombre);
-    $("#nombrecliente").keyup();
+    if(data.cliente != null){
+        $("#cliente").val(data.cliente.Numero);
+        $("#nombrecliente").val(data.cliente.Nombre);
+        $("#textonombrecliente").html(data.cliente.Nombre.substring(0, 40));
+    }
     $("#economico").val(data.vin.Economico);
     $("#vin").val(data.vin.Vin);
     $("#placas").val(data.vin.Placas);
@@ -404,7 +463,29 @@ function obtenerdatos(numerovin){
     $("#marca").val(data.vin.Marca);
     $("#modelo").val(data.vin.Modelo);
     $("#ano").val(data.vin.Año);
-    $("#color").val(data.vin.Color);
+    $("#color").val(data.vin.Color); 
+    setTimeout(function(){$("#cliente").focus();},500);  
+    //activar busqueda
+    $('#cliente').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obtenerclientepornumero();
+        }
+    });
+    //regresar clave
+    $('#cliente').on('change', function(e) {
+            regresarnumerocliente();
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keypress(function (e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            var index = $(this).index(".inputnext");          
+            $(".inputnext").eq(index + 1).focus().select(); 
+        }
+    });  
     mostrarmodalformulario('MODIFICACION');
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {

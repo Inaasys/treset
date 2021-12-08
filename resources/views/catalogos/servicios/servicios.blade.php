@@ -96,7 +96,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <label>Código<b style="color:#F44336 !important;">*</b></label>
-                                <input type="text" class="form-control" name="codigo" id="codigo" required data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">
+                                <input type="text" class="form-control inputnext" name="codigo" id="codigo" required data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">
                             </div>
                         </div>
                         <div class="col-md-12" id="tabsform">
@@ -149,8 +149,11 @@
         var background_tables = '{{$empresa->background_tables}}';
         var servicios_obtener = '{!!URL::to('servicios_obtener')!!}';
         var servicios_obtener_familias = '{!!URL::to('servicios_obtener_familias')!!}';
+        var servicios_obtener_familia_por_numero = '{!!URL::to('servicios_obtener_familia_por_numero')!!}';
         var servicios_obtener_claves_productos = '{!!URL::to('servicios_obtener_claves_productos')!!}';
+        var servicios_obtener_clave_producto_por_clave = '{!!URL::to('servicios_obtener_clave_producto_por_clave')!!}';
         var servicios_obtener_claves_unidades = '{!!URL::to('servicios_obtener_claves_unidades')!!}';
+        var servicios_obtener_clave_unidad_por_clave = '{!!URL::to('servicios_obtener_clave_unidad_por_clave')!!}';
         var servicios_guardar = '{!!URL::to('servicios_guardar')!!}';
         var servicios_alta_o_baja = '{!!URL::to('servicios_alta_o_baja')!!}'; 
         var servicios_obtener_servicio = '{!!URL::to('servicios_obtener_servicio')!!}'; 

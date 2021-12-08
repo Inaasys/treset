@@ -212,6 +212,7 @@ return [
         LynX39\LaraPdfMerger\PdfMergerServiceProvider::class,
         Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class,
         Milon\Barcode\BarcodeServiceProvider::class,
+        Jenssegers\Agent\AgentServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -286,6 +287,7 @@ return [
         'PdfMerger' => LynX39\LaraPdfMerger\Facades\PdfMerger::class,
         'DNS1D' => Milon\Barcode\Facades\DNS1DFacade::class,
         'DNS2D' => Milon\Barcode\Facades\DNS2DFacade::class,
+        'Agent' => Jenssegers\Agent\Facades\Agent::class,
 
     ],
 

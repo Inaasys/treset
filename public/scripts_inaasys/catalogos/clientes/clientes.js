@@ -517,7 +517,7 @@ function seleccionaragente(Numero, Nombre){
   var agente = Numero;
   if(agenteanterior != agente){
       $("#agente").val(Numero);
-      $("#estadoanterior").val(Numero);
+      $("#agenteanterior").val(Numero);
       if(Nombre != null){
       $("#textonombreagente").html(Nombre.substring(0, 40));
       }

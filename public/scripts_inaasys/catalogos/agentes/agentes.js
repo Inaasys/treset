@@ -130,7 +130,8 @@ function listaralmacenes(){
                           '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                         '</div>';
   $("#contenidomodaltablas").html(tablaalmacenes);
-  $('#tbllistadoalmacen').DataTable({
+  var talm = $('#tbllistadoalmacen').DataTable({
+      "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "300px",
       "bScrollCollapse": true,  
@@ -156,12 +157,45 @@ function listaralmacenes(){
         });
       },
       "iDisplayLength": 8,
+  }); 
+  //seleccionar registro al dar doble click
+  $('#tbllistadoalmacen tbody').on('dblclick', 'tr', function () {
+      var data = talm.row( this ).data();
+      seleccionaralmacen(data.Numero, data.Nombre);
   });
 }
 function seleccionaralmacen(Numero, Nombre){
-  $("#almacen").val(Numero);
-  $("#nombrealmacen").val(Nombre);
-  mostrarformulario();
+  var almacenanterior = $("#almacenanterior").val();
+  var almacen = Numero;
+  if(almacenanterior != almacen){
+      $("#almacen").val(Numero);
+      $("#almacenanterior").val(Numero);
+      if(Nombre != null){
+      $("#textonombrealmacen").html(Nombre.substring(0, 40));
+      }
+      mostrarformulario();
+  }
+}
+//obtener por clave
+function obteneralmacenpornumero(){
+  var almacenanterior = $("#almacenanterior").val();
+  var almacen = $("#almacen").val();
+  if(almacenanterior != almacen){
+      if($("#almacen").parsley().isValid()){
+          $.get(agentes_obtener_almacen_por_numero, {almacen:almacen}, function(data){
+              $("#almacen").val(data.numero);
+              $("#almacenanterior").val(data.numero);
+              if(data.nombre != null){
+                  $("#textonombrealmacen").html(data.nombre.substring(0, 40));
+              }
+          }) 
+      }
+  }
+}
+//regresar clave
+function regresarnumeroalmacen(){
+  var almacenanterior = $("#almacenanterior").val();
+  $("#almacen").val(almacenanterior);
 }
 //alta clientes
 function alta(){
@@ -179,48 +213,48 @@ function alta(){
                   '<div class="row">'+
                       '<div class="col-md-4">'+
                           '<label>Dirección</label>'+
-                          '<input type="text" class="form-control" name="direccion" id="direccion"  data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
+                          '<input type="text" class="form-control inputnext" name="direccion" id="direccion"  data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                       '<div class="col-md-4">'+
                           '<label>Colonia</label>'+
-                          '<input type="text" class="form-control" name="colonia" id="colonia"  data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
+                          '<input type="text" class="form-control inputnext" name="colonia" id="colonia"  data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                       '<div class="col-md-4">'+
                           '<label>Ciudad</label>'+
-                          '<input type="text" class="form-control" name="ciudad" id="ciudad"  data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
+                          '<input type="text" class="form-control inputnext" name="ciudad" id="ciudad"  data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                     '</div>'+
                     '<div class="row">'+
                       '<div class="col-md-4">'+
                           '<label>Codigo Postal</label>'+
-                          '<input type="text" class="form-control" name="codigopostal" id="codigopostal"  data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
+                          '<input type="text" class="form-control inputnext" name="codigopostal" id="codigopostal"  data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                       '<div class="col-md-4">'+
                           '<label>RFC</label>'+
-                          '<input type="text" class="form-control" name="rfc" id="rfc" required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                          '<input type="text" class="form-control inputnext" name="rfc" id="rfc" required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                       '</div>'+
                       '<div class="col-md-4">'+
                           '<label>Contacto</label>'+
-                          '<input type="text" class="form-control" name="contacto" id="contacto" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
+                          '<input type="text" class="form-control inputnext" name="contacto" id="contacto" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                     '</div>'+
                     '<div class="row">'+    
                       '<div class="col-md-4">'+
                           '<label>Teléfonos</label>'+
-                          '<input type="text" class="form-control" name="telefonos" id="telefonos" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
+                          '<input type="text" class="form-control inputnext" name="telefonos" id="telefonos" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                       '<div class="col-md-4">'+
                           '<label>Email</label>'+
-                          '<input type="text" class="form-control" name="email" id="email" data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 60]">'+
+                          '<input type="text" class="form-control inputnext" name="email" id="email" data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 60]">'+
                       '</div>'+
                       '<div class="col-md-4">'+
                           '<label>Cuenta</label>'+
-                          '<input type="text" class="form-control" name="cuenta" id="cuenta" data-parsley-length="[1, 25]" onkeyup="tipoLetra(this);">'+
+                          '<input type="text" class="form-control inputnext" name="cuenta" id="cuenta" data-parsley-length="[1, 25]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                     '</div>'+
                     '<div class="row">'+ 
                       '<div class="col-md-4">'+
-                        '<label>Almacén</label>'+
+                        '<label>Almacén<span class="label label-danger" id="textonombrealmacen"></span></label>'+
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<span class="input-group-btn">'+
@@ -229,25 +263,49 @@ function alta(){
                             '</div>'+  
                             '<div class="col-md-8">'+  
                                 '<div class="form-line">'+
-                                    '<input type="hidden" class="form-control" name="almacen" id="almacen" value="1" required readonly>'+
-                                    '<input type="text" class="form-control" name="nombrealmacen" id="nombrealmacen" value="REFACCIONES" required readonly onkeyup="tipoLetra(this);">'+
+                                  '<input type="text" class="form-control inputnext" name="almacen" id="almacen" value="1" required onkeyup="tipoLetra(this)">'+
+                                    '<input type="hidden" class="form-control" name="almacenanterior" id="almacenanterior" required readonly>'+
+                                    '<input type="hidden" class="form-control" name="nombrealmacen" id="nombrealmacen" value="REFACCIONES" required readonly onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                             '</div>'+     
                         '</div>'+
                       '</div>'+
                       '<div class="col-md-4">'+
                           '<label>Comisión  %</label>'+
-                          '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="comision" id="comision" value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" onchange="formatocorrectoinputcantidades(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" >'+
+                          '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="comision" id="comision" value="0.'+numerocerosconfigurados+'" onchange="formatocorrectoinputcantidades(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" >'+
                       '</div>'+
                       '<div class="col-md-4">'+
                             '<label>Anotaciones</label>'+
-                            '<textarea class="form-control" name="anotaciones" id="anotaciones" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
+                            '<textarea class="form-control inputnext" name="anotaciones" id="anotaciones" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
                       '</div>'+
                     '</div>'+   
                 '</div>'+
               '</div>';
   $("#tabsform").html(tabs);
   obtenultimonumero();
+  obteneralmacenpornumero();
+  setTimeout(function(){$("#nombre").focus();},500);
+    //activar busqueda
+    $('#almacen').on('keypress', function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+          obteneralmacenpornumero();
+      }
+    });
+    //regresar clave
+    $('#almacen').on('change', function(e) {
+        regresarnumeroalmacen();
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+      var index = $(this).index(".inputnext");          
+          $(".inputnext").eq(index + 1).focus().select(); 
+      }
+    });
 }
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
@@ -343,48 +401,48 @@ function obtenerdatos(numeroagente){
                     '<div class="row">'+
                         '<div class="col-md-4">'+
                             '<label>Dirección</label>'+
-                            '<input type="text" class="form-control" name="direccion" id="direccion" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control inputnext" name="direccion" id="direccion" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Colonia</label>'+
-                            '<input type="text" class="form-control" name="colonia" id="colonia" data-parsley-length="[1, 60]"  onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control inputnext" name="colonia" id="colonia" data-parsley-length="[1, 60]"  onkeyup="tipoLetra(this);">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Ciudad</label>'+
-                            '<input type="text" class="form-control" name="ciudad" id="ciudad" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control inputnext" name="ciudad" id="ciudad" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
                         '</div>'+
                         '<div class="row">'+
                         '<div class="col-md-4">'+
                             '<label>Codigo Postal</label>'+
-                            '<input type="text" class="form-control" name="codigopostal" id="codigopostal" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control inputnext" name="codigopostal" id="codigopostal" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>RFC</label>'+
-                            '<input type="text" class="form-control" name="rfc" id="rfc" required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                            '<input type="text" class="form-control inputnext" name="rfc" id="rfc" required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Contacto</label>'+
-                            '<input type="text" class="form-control" name="contacto" id="contacto" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control inputnext" name="contacto" id="contacto" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
                         '</div>'+
                         '<div class="row">'+    
                         '<div class="col-md-4">'+
                             '<label>Teléfonos</label>'+
-                            '<input type="text" class="form-control" name="telefonos" id="telefonos" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control inputnext" name="telefonos" id="telefonos" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Email</label>'+
-                            '<input type="text" class="form-control" name="email" id="email" data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 60]">'+
+                            '<input type="text" class="form-control inputnext" name="email" id="email" data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 60]">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Cuenta</label>'+
-                            '<input type="text" class="form-control" name="cuenta" id="cuenta" data-parsley-length="[1, 25]" onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control inputnext" name="cuenta" id="cuenta" data-parsley-length="[1, 25]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
                         '</div>'+
                         '<div class="row">'+ 
                           '<div class="col-md-4">'+
-                            '<label>Almacén</label>'+
+                            '<label>Almacén<span class="label label-danger" id="textonombrealmacen"></span></label>'+
                             '<div class="row">'+
                                 '<div class="col-md-4">'+
                                     '<span class="input-group-btn">'+
@@ -393,19 +451,20 @@ function obtenerdatos(numeroagente){
                                 '</div>'+  
                                 '<div class="col-md-8">'+  
                                     '<div class="form-line">'+
-                                        '<input type="hidden" class="form-control" name="almacen" id="almacen" value="1" required readonly>'+
-                                        '<input type="text" class="form-control" name="nombrealmacen" id="nombrealmacen" value="REFACCIONES" required readonly onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnext" name="almacen" id="almacen" value="1" required onkeyup="tipoLetra(this)">'+
+                                        '<input type="hidden" class="form-control" name="almacenanterior" id="almacenanterior" value="1" required readonly>'+
+                                        '<input type="hidden" class="form-control" name="nombrealmacen" id="nombrealmacen" value="REFACCIONES" required readonly >'+
                                     '</div>'+
                                 '</div>'+     
                             '</div>'+
                           '</div>'+
                           '<div class="col-md-4">'+
                               '<label>Comisión  %</label>'+
-                              '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="comision" id="comision" value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" onchange="formatocorrectoinputcantidades(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" >'+
+                              '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="comision" id="comision" value="0.'+numerocerosconfigurados+'" onchange="formatocorrectoinputcantidades(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" >'+
                           '</div>'+
                           '<div class="col-md-4">'+
                                   '<label>Anotaciones</label>'+
-                                  '<textarea class="form-control" name="anotaciones" id="anotaciones" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
+                                  '<textarea class="form-control inputnext" name="anotaciones" id="anotaciones" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
                           '</div>'+
                         '</div>'+   
                     '</div>'+
@@ -427,8 +486,31 @@ function obtenerdatos(numeroagente){
     $("#comision").val(data.comision);
     $("#anotaciones").val(data.agente.Anotaciones);
     $("#almacen").val(data.almacen.Numero); 
-    $("#nombrealmacen").val(data.almacen.Nombre);
-    $("#nombrealmacen").keyup(); 
+    if(data.almacen.Nombre != null){
+      $("#textonombrealmacen").html(data.almacen.Nombre.substring(0, 40));
+    }
+    setTimeout(function(){$("#nombre").focus();},500);    
+    //activar busqueda
+    $('#almacen').on('keypress', function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+          obteneralmacenpornumero();
+      }
+    });
+    //regresar clave
+    $('#almacen').on('change', function(e) {
+        regresarnumeroalmacen();
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+      var index = $(this).index(".inputnext");          
+          $(".inputnext").eq(index + 1).focus().select(); 
+      }
+    });
     mostrarmodalformulario('MODIFICACION');
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {

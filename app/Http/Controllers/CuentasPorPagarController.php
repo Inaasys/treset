@@ -161,8 +161,14 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
             $data = Banco::where('Status', 'ALTA')->orderBy("Numero", "ASC")->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        $ultimatransferencia = VistaCuentaPorPagar::select("Transferencia")->where('Banco', $data->Numero)->orderBy("Transferencia", "DESC")->take(1)->get();
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarbanco('.$data->Numero.',\''.$data->Nombre .'\','.$ultimatransferencia[0]->Transferencia.')">Seleccionar</div>';
+                        $contarultimatransferencia = VistaCuentaPorPagar::select("Transferencia")->where('Banco', $data->Numero)->orderBy("Transferencia", "DESC")->take(1)->count();
+                        if($contarultimatransferencia > 0){
+                            $ultimatransferencia = VistaCuentaPorPagar::select("Transferencia")->where('Banco', $data->Numero)->orderBy("Transferencia", "DESC")->take(1)->get();
+                            $transferencia = $ultimatransferencia[0]->Transferencia;
+                        }else{
+                            $transferencia = 0;
+                        }                        
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarbanco('.$data->Numero.',\''.$data->Nombre .'\','.$transferencia.')">Seleccionar</div>';
                         return $boton;
                     })
                     ->rawColumns(['operaciones'])
@@ -184,8 +190,14 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
         $existebanco = Banco::where('Numero', $request->numerobanco)->where('Status', 'ALTA')->count();
         if($existebanco > 0){
             $banco = Banco::where('Numero', $request->numerobanco)->where('Status', 'ALTA')->first();
-            $ultimatransferencia = VistaCuentaPorPagar::select("Transferencia")->where('Banco', $request->numerobanco)->orderBy("Transferencia", "DESC")->take(1)->get();
-            $transferencia = $ultimatransferencia[0]->Transferencia;
+            
+            $contarultimatransferencia = VistaCuentaPorPagar::select("Transferencia")->where('Banco', $request->numerobanco)->orderBy("Transferencia", "DESC")->take(1)->count();
+            if($contarultimatransferencia > 0){
+                $ultimatransferencia = VistaCuentaPorPagar::select("Transferencia")->where('Banco', $request->numerobanco)->orderBy("Transferencia", "DESC")->take(1)->get();
+                $transferencia = $ultimatransferencia[0]->Transferencia;
+            }else{
+                $transferencia = 0;
+            }      
             $numero = $banco->Numero;
             $nombre = $banco->Nombre;
         }

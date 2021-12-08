@@ -74,6 +74,22 @@ class ServicioController extends ConfiguracionSistemaController{
                     ->make(true);
         }        
     } 
+    //obtener familias por numero
+    public function servicios_obtener_familia_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $existefamilia = Familia::where('Numero', $request->familia)->count();
+        if($existefamilia > 0){
+            $familia = Familia::where('Numero', $request->familia)->first();
+            $numero = $familia->Numero;
+            $nombre = $familia->Nombre;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+    }
     //obtener claves productos
     public function servicios_obtener_claves_productos(Request $request){
         if($request->ajax()){
@@ -87,6 +103,22 @@ class ServicioController extends ConfiguracionSistemaController{
                     ->make(true);
         }        
     }
+    //obtener clave producto por clave
+    public function servicios_obtener_clave_producto_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existeclaveproducto = ClaveProdServ::where('Clave', $request->claveproducto)->count();
+        if($existeclaveproducto > 0){
+            $claveproducto = ClaveProdServ::where('Clave', $request->claveproducto)->first();
+            $clave = $claveproducto->Clave;
+            $nombre = $claveproducto->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+    }
     //obtener claves unidades
     public function servicios_obtener_claves_unidades(Request $request){
         if($request->ajax()){
@@ -99,7 +131,23 @@ class ServicioController extends ConfiguracionSistemaController{
                     ->rawColumns(['operaciones'])
                     ->make(true);
         }        
-    }     
+    }   
+    //obtener clave unidad por clave
+    public function servicios_obtener_clave_unidad_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existeclaveunidad = ClaveUnidad::where('Clave', $request->claveunidad)->count();
+        if($existeclaveunidad > 0){
+            $claveunidad = ClaveUnidad::where('Clave', $request->claveunidad)->first();
+            $clave = $claveunidad->Clave;
+            $nombre = $claveunidad->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+    }  
     //guardar en catalogo
     public function servicios_guardar(Request $request){
 	    $codigo=$request->codigo;

@@ -120,23 +120,33 @@ function alta(){
                   '<div class="row">'+
                     '<div class="col-md-12">'+
                       '<label>Nombre</label>'+
-                      '<input type="text" class="form-control" name="nombre" id="nombre" required data-parsley-length="[1, 30]" onkeyup="tipoLetra(this);">'+
+                      '<input type="text" class="form-control inputnext" name="nombre" id="nombre" required data-parsley-length="[1, 30]" onkeyup="tipoLetra(this);">'+
                     '</div>'+
                   '</div>'+
                   '<div class="row">'+
                     '<div class="col-md-6">'+
                       '<label>Objetivo (Horas X Mes)</label>'+
-                      '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="objetivo" id="objetivo" required value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                      '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="objetivo" id="objetivo" required value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                     '</div>'+
                     '<div class="col-md-6">'+
                       '<label>Planeación</label>'+
-                      '<input type="text" class="form-control" name="planeacion" id="planeacion" value="N" required data-parsley-length="[1, 1]" onkeyup="tipoLetra(this);">'+
+                      '<input type="text" class="form-control inputnext" name="planeacion" id="planeacion" value="N" required data-parsley-length="[1, 1]" onkeyup="tipoLetra(this);">'+
                     '</div>'+
                   '</div>'+
                 '</div>'+
               '</div>';
   $("#tabsform").html(tabs);
   obtenultimonumero();
+  setTimeout(function(){$("#nombre").focus();},500);   
+  //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+  $(".inputnext").keypress(function (e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+    var index = $(this).index(".inputnext");          
+        $(".inputnext").eq(index + 1).focus().select(); 
+    }
+  });  
 }
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
@@ -228,17 +238,17 @@ function obtenerdatos(numerotecnico){
                     '<div class="row">'+
                       '<div class="col-md-12">'+
                         '<label>Nombre</label>'+
-                        '<input type="text" class="form-control" name="nombre" id="nombre" required data-parsley-length="[1, 30]" onkeyup="tipoLetra(this);">'+
+                        '<input type="text" class="form-control inputnext" name="nombre" id="nombre" required data-parsley-length="[1, 30]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                     '</div>'+
                     '<div class="row">'+
                       '<div class="col-md-6">'+
                         '<label>Objetivo (Horas X Mes)</label>'+
-                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="objetivo" id="objetivo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="objetivo" id="objetivo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                       '</div>'+
                       '<div class="col-md-6">'+
                         '<label>Planeación</label>'+
-                        '<input type="text" class="form-control" name="planeacion" id="planeacion" value="N" required data-parsley-length="[1, 1]" onkeyup="tipoLetra(this);">'+
+                        '<input type="text" class="form-control inputnext" name="planeacion" id="planeacion" value="N" required data-parsley-length="[1, 1]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                     '</div>'+
                   '</div>'+
@@ -249,6 +259,16 @@ function obtenerdatos(numerotecnico){
     $("#nombre").val(data.tecnico.Nombre);
     $("#objetivo").val(data.objetivo);
     $("#planeacion").val(data.tecnico.Planeacion);
+    setTimeout(function(){$("#nombre").focus();},500);   
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+      var index = $(this).index(".inputnext");          
+          $(".inputnext").eq(index + 1).focus().select(); 
+      }
+    });  
     mostrarmodalformulario('MODIFICACION');
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {

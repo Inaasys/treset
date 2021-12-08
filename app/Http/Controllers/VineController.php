@@ -26,10 +26,13 @@ class VineController extends ConfiguracionSistemaController{
     //obtener todos los registros
     public function vines_obtener(Request $request){
         if($request->ajax()){
+            /*
             $data = DB::table('Vines AS v')
             ->leftJoin('Clientes AS c', 'c.Numero', '=', 'v.Cliente')
-            ->select('c.Nombre AS Cliente', 'v.Economico AS Economico', 'v.Vin AS Vin', 'v.Placas AS Placas', 'v.Marca AS Marca', 'v.Modelo AS Modelo', 'v.Motor AS Motor', 'v.Año AS Año', 'v.Color AS Color', 'v.Status AS Status')
+            ->select('c.Nombre AS Cliente', 'v.Economico', 'v.Vin', 'v.Placas', 'v.Marca', 'v.Modelo', 'v.Motor', 'v.Año', 'v.Color', 'v.Status')
             ->get();
+            */
+            $data = Vine::select('Cliente', 'Economico', 'Vin', 'Placas', 'Marca', 'Modelo', 'Motor', 'Año', 'Color', 'Status');
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
                         $operaciones = '<div class="dropdown">'.
@@ -67,6 +70,22 @@ class VineController extends ConfiguracionSistemaController{
                     ->make(true);
         }        
     } 
+    //obtener cliente por numero
+    public function vines_obtener_cliente_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $existecliente = Cliente::where('Numero', $request->cliente)->count();
+        if($existecliente > 0){
+            $cliente = Cliente::where('Numero', $request->cliente)->first();
+            $numero = $cliente->Numero;
+            $nombre = $cliente->Nombre;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+    }
     //guardar en catalogo
     public function vines_guardar(Request $request){
 	    $vin=$request->vin;

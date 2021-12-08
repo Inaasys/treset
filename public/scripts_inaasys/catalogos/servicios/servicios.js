@@ -131,7 +131,8 @@ function listarfamilias(){
                             '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                         '</div>';
     $("#contenidomodaltablas").html(tablafamilias);
-    $('#tbllistadofamilia').DataTable({
+    var tfam = $('#tbllistadofamilia').DataTable({
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "300px",
         "bScrollCollapse": true,  
@@ -158,6 +159,44 @@ function listarfamilias(){
         },
         "iDisplayLength": 8,
     });
+    //seleccionar registro al dar doble click
+    $('#tbllistadofamilia tbody').on('dblclick', 'tr', function () {
+        var data = tfam.row( this ).data();
+        seleccionarfamilia(data.Numero, data.Nombre);
+    });
+}
+function seleccionarfamilia(Numero, Nombre){
+    var familiaanterior = $("#familiaanterior").val();
+    var familia = Numero;
+    if(familiaanterior != familia){
+        $("#familia").val(Numero);
+        $("#familiaanterior").val(Numero);
+        if(Nombre != null){
+        $("#textonombrefamilia").html(Nombre.substring(0, 40));
+        }
+        mostrarformulario();
+    }
+}
+//obtener por numero
+function obtenerfamiliapornumero(){
+    var familiaanterior = $("#familiaanterior").val();
+    var familia = $("#familia").val();
+    if(familiaanterior != familia){
+        if($("#familia").parsley().isValid()){
+            $.get(servicios_obtener_familia_por_numero, {familia:familia}, function(data){
+                $("#familia").val(data.numero);
+                $("#familiaanterior").val(data.numero);
+                if(data.nombre != null){
+                    $("#textonombrefamilia").html(data.nombre.substring(0, 40));
+                }
+            }) 
+        }
+    }
+}
+//regresar numero 
+function regresarnumerofamilia(){
+    var familiaanterior = $("#familiaanterior").val();
+    $("#familia").val(familiaanterior);
 }
 //listar claves productos
 function listarclavesproductos(){
@@ -188,7 +227,8 @@ function listarclavesproductos(){
                                     '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                                 '</div>';
     $("#contenidomodaltablas").html(tablaclavesproductos);
-    $('#tbllistadoclaveproducto').DataTable({
+    var tclavprod = $('#tbllistadoclaveproducto').DataTable({
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "300px",
         "bScrollCollapse": true,  
@@ -216,6 +256,48 @@ function listarclavesproductos(){
         },
         "iDisplayLength": 8,
     });
+    //seleccionar registro al dar doble click
+    $('#tbllistadoclaveproducto tbody').on('dblclick', 'tr', function () {
+        var data = tclavprod.row( this ).data();
+        seleccionarclaveproducto(data.Clave, data.Nombre);
+    });
+}
+function seleccionarclaveproducto(Clave, Nombre){
+    var claveproductoanterior = $("#claveproductoanterior").val();
+    var claveproducto = Clave;
+    if(claveproductoanterior != claveproducto){
+        $("#claveproducto").val(Clave);
+        $("#claveproductoanterior").val(Clave);
+        if(Nombre != null){
+        $("#textonombreclaveproducto").html(Nombre.substring(0, 40));
+        }
+        mostrarformulario();
+    }
+    $("#claveproducto").val(Clave);
+    $("#nombreclaveproducto").val(Nombre);
+    $("#nombreclaveproducto").keyup();
+    mostrarformulario();
+}
+//obtener por clave 
+function obtenerclaveproductoporclave(){
+    var claveproductoanterior = $("#claveproductoanterior").val();
+    var claveproducto = $("#claveproducto").val();
+    if(claveproductoanterior != claveproducto){
+        if($("#claveproducto").parsley().isValid()){
+            $.get(servicios_obtener_clave_producto_por_clave, {claveproducto:claveproducto}, function(data){
+                $("#claveproducto").val(data.clave);
+                $("#claveproductoanterior").val(data.clave);
+                if(data.nombre != null){
+                    $("#textonombreclaveproducto").html(data.nombre.substring(0, 40));
+                }
+            }) 
+        }
+    }
+}
+//regresar clave 
+function regresarclaveproducto(){
+    var claveproductoanterior = $("#claveproductoanterior").val();
+    $("#claveproducto").val(claveproductoanterior);
 }
 //listar claves unidades
 function listarclavesunidades(){
@@ -247,7 +329,8 @@ function listarclavesunidades(){
                                     '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                                 '</div>';
     $("#contenidomodaltablas").html(tablaclavesunidades);
-    $('#tbllistadoclaveunidad').DataTable({
+    var tclavuni = $('#tbllistadoclaveunidad').DataTable({
+        "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "300px",
         "bScrollCollapse": true,  
@@ -276,25 +359,46 @@ function listarclavesunidades(){
         },
         "iDisplayLength": 8,
     });
-}
-function seleccionarfamilia(Numero, Nombre){
-    $("#familia").val(Numero);
-    $("#nombrefamilia").val(Nombre);
-    $("#nombrefamilia").keyup();
-    mostrarformulario();
-}
-function seleccionarclaveproducto(Clave, Nombre){
-    $("#claveproducto").val(Clave);
-    $("#nombreclaveproducto").val(Nombre);
-    $("#nombreclaveproducto").keyup();
-    mostrarformulario();
+    //seleccionar registro al dar doble click
+    $('#tbllistadoclaveunidad tbody').on('dblclick', 'tr', function () {
+        var data = tclavuni.row( this ).data();
+        seleccionarclaveunidad(data.Clave, data.Nombre);
+    });
 }
 function seleccionarclaveunidad(Clave, Nombre){
-    $("#claveunidad").val(Clave);
-    $("#nombreclaveunidad").val(Nombre);
-    $("#nombreclaveunidad").keyup();
-    mostrarformulario();
+    var claveunidadanterior = $("#claveunidadanterior").val();
+    var claveunidad = Clave;
+    if(claveunidadanterior != claveunidad){
+        $("#claveunidad").val(Clave);
+        $("#claveunidadanterior").val(Clave);
+        if(Nombre != null){
+        $("#textonombreclaveunidad").html(Nombre.substring(0, 40));
+        }
+        mostrarformulario();
+    }
 }
+//obtener por clave 
+function obtenerclaveunidadporclave(){
+    var claveunidadanterior = $("#claveunidadanterior").val();
+    var claveunidad = $("#claveunidad").val();
+    if(claveunidadanterior != claveunidad){
+        if($("#claveunidad").parsley().isValid()){
+            $.get(servicios_obtener_clave_unidad_por_clave, {claveunidad:claveunidad}, function(data){
+                $("#claveunidad").val(data.clave);
+                $("#claveunidadanterior").val(data.clave);
+                if(data.nombre != null){
+                    $("#textonombreclaveunidad").html(data.nombre.substring(0, 40));
+                }
+            }) 
+        }
+    }
+}
+//regresar clave
+function regresarclaveunidad(){
+    var claveunidadanterior = $("#claveunidadanterior").val();
+    $("#claveunidad").val(claveunidadanterior);
+}
+
 //alta
 function alta(){
     $("#titulomodal").html('Alta Servicio');
@@ -310,7 +414,7 @@ function alta(){
                     '<div role="tabpanel" class="tab-pane fade in active" id="datosgenerales">'+
                         '<div class="row">'+
                             '<div class="col-md-6">'+
-                                '<label>Familia<b style="color:#F44336 !important;">*</b></label>'+
+                                '<label>Familia<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombrefamilia"></span></label>'+
                                 '<div class="row">'+
                                     '<div class="col-md-3">'+
                                         '<span class="input-group-btn">'+
@@ -319,14 +423,15 @@ function alta(){
                                     '</div>'+  
                                     '<div class="col-md-9">'+ 
                                         '<div class="form-line">'+
-                                            '<input type="text" class="form-control" name="nombrefamilia" id="nombrefamilia" value="0" required readonly onkeyup="tipoLetra(this);">'+
-                                            '<input type="hidden" class="form-control" name="familia" id="familia" value="0" required readonly onkeyup="tipoLetra(this);">'+
+                                            '<input type="text" class="form-control inputnext" name="familia" id="familia" required onkeyup="tipoLetra(this)">'+
+                                            '<input type="hidden" class="form-control" name="nombrefamilia" id="nombrefamilia" readonly>'+
+                                            '<input type="hidden" class="form-control" name="familiaanterior" id="familiaanterior" required>'+
                                         '</div>'+
                                     '</div>'+    
                                 '</div>'+
                             '</div>'+
                             '<div class="col-md-6">'+
-                                '<label>Clave Producto<b style="color:#F44336 !important;">*</b></label>'+
+                                '<label>Clave Producto<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombreclaveproducto"></span></label>'+
                                 '<div class="row">'+
                                     '<div class="col-md-3">'+
                                         '<span class="input-group-btn">'+
@@ -335,8 +440,9 @@ function alta(){
                                     '</div>'+  
                                     '<div class="col-md-9">'+  
                                         '<div class="form-line">'+
-                                            '<input type="hidden" class="form-control" name="claveproducto" id="claveproducto" required data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+
-                                            '<input type="text" class="form-control" name="nombreclaveproducto" id="nombreclaveproducto" required onkeyup="tipoLetra(this);">'+
+                                            '<input type="text" class="form-control inputnext" name="claveproducto" id="claveproducto" required onkeyup="tipoLetra(this)">'+
+                                            '<input type="hidden" class="form-control" name="claveproductoanterior" id="claveproductoanterior" required data-parsley-length="[1, 20]">'+
+                                            '<input type="hidden" class="form-control" name="nombreclaveproducto" id="nombreclaveproducto" readonly>'+
                                         '</div>'+
                                     '</div>'+     
                                 '</div>'+
@@ -344,7 +450,7 @@ function alta(){
                         '</div>'+  
                         '<div class="row">'+ 
                             '<div class="col-md-6">'+
-                                '<label>Clave Unidad<b style="color:#F44336 !important;">*</b></label>'+
+                                '<label>Clave Unidad<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombreclaveunidad"></span></label>'+
                                 '<div class="row">'+
                                     '<div class="col-md-3">'+
                                         '<span class="input-group-btn">'+
@@ -353,38 +459,86 @@ function alta(){
                                     '</div>'+  
                                     '<div class="col-md-9">'+  
                                         '<div class="form-line">'+
-                                            '<input type="hidden" class="form-control" name="claveunidad" id="claveunidad" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this);">'+
-                                            '<input type="text" class="form-control" name="nombreclaveunidad" id="nombreclaveunidad" required onkeyup="tipoLetra(this);">'+
+                                            '<input type="text" class="form-control inputnext" name="claveunidad" id="claveunidad" required onkeyup="tipoLetra(this)">'+
+                                            '<input type="hidden" class="form-control" name="claveunidadanterior" id="claveunidadanterior" required data-parsley-length="[1, 5]" >'+
+                                            '<input type="hidden" class="form-control" name="nombreclaveunidad" id="nombreclaveunidad" readonly>'+
                                         '</div>'+
                                     '</div>'+     
                                 '</div>'+
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Servicio<b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="text" class="form-control" name="servicio" id="servicio" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="servicio" id="servicio" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Unidad<b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="text" class="form-control" name="unidad" id="unidad" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="unidad" id="unidad" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this);">'+
                             '</div>'+
                         '</div>'+  
                         '<div class="row">'+   
                             '<div class="col-md-4">'+
                                 '<label>Cantidad</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="cantidad" id="cantidad" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="cantidad" id="cantidad" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Costo</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="costo" id="costo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="costo" id="costo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+  
                             '<div class="col-md-4">'+
                                 '<label>Venta</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="venta" id="venta" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="venta" id="venta" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+
                         '</div>'+  
                     '</div>'+
                 '</div>';
-  $("#tabsform").html(tabs);
+    $("#tabsform").html(tabs);
+    setTimeout(function(){$("#codigo").focus();},500);  
+    $("#codigo").removeAttr('readonly');
+    //activar busqueda
+    $('#familia').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obtenerfamiliapornumero();
+        }
+    });
+    //regresar clave
+    $('#familia').on('change', function(e) {
+          regresarnumerofamilia();
+    });
+    //activar busqueda
+    $('#claveproducto').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obtenerclaveproductoporclave();
+        }
+    });
+    //regresar clave
+    $('#claveproducto').on('change', function(e) {
+          regresarclaveproducto();
+    });
+    //activar busqueda
+    $('#claveunidad').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obtenerclaveunidadporclave();
+        }
+    });
+    //regresar clave
+    $('#claveunidad').on('change', function(e) {
+          regresarclaveunidad();
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keypress(function (e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            var index = $(this).index(".inputnext");          
+            $(".inputnext").eq(index + 1).focus().select(); 
+        }
+    });  
 }
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
@@ -479,7 +633,7 @@ function obtenerdatos(codigoservicio){
                     '<div role="tabpanel" class="tab-pane fade in active" id="datosgenerales">'+
                         '<div class="row">'+
                             '<div class="col-md-6">'+
-                                '<label>Familia<b style="color:#F44336 !important;">*</b></label>'+
+                                '<label>Familia<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombrefamilia"></span></label>'+
                                 '<div class="row">'+
                                     '<div class="col-md-3">'+
                                         '<span class="input-group-btn">'+
@@ -488,14 +642,15 @@ function obtenerdatos(codigoservicio){
                                     '</div>'+  
                                     '<div class="col-md-9">'+ 
                                         '<div class="form-line">'+
-                                            '<input type="text" class="form-control" name="nombrefamilia" id="nombrefamilia" value="0" required readonly onkeyup="tipoLetra(this);">'+
-                                            '<input type="hidden" class="form-control" name="familia" id="familia" value="0" required readonly onkeyup="tipoLetra(this);">'+
+                                            '<input type="text" class="form-control inputnext" name="familia" id="familia" required onkeyup="tipoLetra(this)">'+
+                                            '<input type="hidden" class="form-control" name="nombrefamilia" id="nombrefamilia" readonly>'+
+                                            '<input type="hidden" class="form-control" name="familiaanterior" id="familiaanterior" required readonly>'+
                                         '</div>'+
                                     '</div>'+    
                                 '</div>'+
                             '</div>'+
                             '<div class="col-md-6">'+
-                                '<label>Clave Producto<b style="color:#F44336 !important;">*</b></label>'+
+                                '<label>Clave Producto<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombreclaveproducto"></span></label>'+
                                 '<div class="row">'+
                                     '<div class="col-md-3">'+
                                         '<span class="input-group-btn">'+
@@ -504,8 +659,9 @@ function obtenerdatos(codigoservicio){
                                     '</div>'+  
                                     '<div class="col-md-9">'+  
                                         '<div class="form-line">'+
-                                            '<input type="hidden" class="form-control" name="claveproducto" id="claveproducto" required data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+
-                                            '<input type="text" class="form-control" name="nombreclaveproducto" id="nombreclaveproducto" required onkeyup="tipoLetra(this);">'+
+                                            '<input type="text" class="form-control inputnext" name="claveproducto" id="claveproducto" required onkeyup="tipoLetra(this);">'+
+                                            '<input type="hidden" class="form-control" name="claveproductoanterior" id="claveproductoanterior" required data-parsley-length="[1, 20]">'+
+                                            '<input type="hidden" class="form-control" name="nombreclaveproducto" id="nombreclaveproducto" readonly>'+
                                         '</div>'+
                                     '</div>'+     
                                 '</div>'+
@@ -513,7 +669,7 @@ function obtenerdatos(codigoservicio){
                         '</div>'+  
                         '<div class="row">'+ 
                             '<div class="col-md-6">'+
-                                '<label>Clave Unidad<b style="color:#F44336 !important;">*</b></label>'+
+                                '<label>Clave Unidad<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombreclaveunidad"></span></label>'+
                                 '<div class="row">'+
                                     '<div class="col-md-3">'+
                                         '<span class="input-group-btn">'+
@@ -522,39 +678,39 @@ function obtenerdatos(codigoservicio){
                                     '</div>'+  
                                     '<div class="col-md-9">'+  
                                         '<div class="form-line">'+
-                                            '<input type="hidden" class="form-control" name="claveunidad" id="claveunidad" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this);">'+
-                                            '<input type="text" class="form-control" name="nombreclaveunidad" id="nombreclaveunidad" required onkeyup="tipoLetra(this);">'+
+                                            '<input type="text" class="form-control inputnext" name="claveunidad" id="claveunidad" required onkeyup="tipoLetra(this)">'+
+                                            '<input type="hidden" class="form-control" name="claveunidadanterior" id="claveunidadanterior" required data-parsley-length="[1, 5]">'+
+                                            '<input type="hidden" class="form-control" name="nombreclaveunidad" id="nombreclaveunidad" readonly>'+
                                         '</div>'+
                                     '</div>'+     
                                 '</div>'+
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Servicio<b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="text" class="form-control" name="servicio" id="servicio" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="servicio" id="servicio" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Unidad<b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="text" class="form-control" name="unidad" id="unidad" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="unidad" id="unidad" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this);">'+
                             '</div>'+
                         '</div>'+  
                         '<div class="row">'+   
                             '<div class="col-md-4">'+
                                 '<label>Cantidad</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="cantidad" id="cantidad" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="cantidad" id="cantidad" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Costo</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="costo" id="costo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="costo" id="costo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+  
                             '<div class="col-md-4">'+
                                 '<label>Venta</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" name="venta" id="venta" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="venta" id="venta" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                             '</div>'+
                         '</div>'+  
                     '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
-    console.log(data);
     //boton formulario 
     $("#codigo").val(codigoservicio);
     $("#servicio").val(data.servicio.Servicio);
@@ -565,15 +721,66 @@ function obtenerdatos(codigoservicio){
     if(data.familia != null){
         $("#familia").val(data.familia.Numero);
         $("#nombrefamilia").val(data.familia.Nombre);
-        $("#nombrefamilia").keyup();
+        $("#textonombrealmacen").html(data.familia.Nombre.substring(0, 40));
     }
-    $("#claveproducto").val(data.claveproducto.Clave);
-    $("#nombreclaveproducto").val(data.claveproducto.Nombre);
-    $("#nombreclaveproducto").keyup();
-    $("#claveunidad").val(data.claveunidad.Clave);
-    $("#nombreclaveunidad").val(data.claveunidad.Nombre);
-    $("#nombreclaveunidad").keyup();
-    mostrarmodalformulario('MODIFICACION');
+    if(data.claveproducto != null){
+        $("#claveproducto").val(data.claveproducto.Clave);
+        $("#nombreclaveproducto").val(data.claveproducto.Nombre);
+        $("#textonombrealmacen").html(data.claveproducto.Nombre.substring(0, 40));
+    }
+    if(data.claveunidad != null){
+        $("#claveunidad").val(data.claveunidad.Clave);
+        $("#nombreclaveunidad").val(data.claveunidad.Nombre);
+        $("#textonombrealmacen").html(data.claveunidad.Nombre.substring(0, 40));
+    }
+    setTimeout(function(){$("#codigo").focus();},500); 
+    $("#codigo").attr('readonly', 'readonly') 
+    //activar busqueda
+    $('#familia').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obtenerfamiliapornumero();
+        }
+    });
+    //regresar clave
+    $('#familia').on('change', function(e) {
+          regresarnumerofamilia();
+    });
+    //activar busqueda
+    $('#claveproducto').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obtenerclaveproductoporclave();
+        }
+    });
+    //regresar clave
+    $('#claveproducto').on('change', function(e) {
+          regresarclaveproducto();
+    });
+    //activar busqueda
+    $('#claveunidad').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obtenerclaveunidadporclave();
+        }
+    });
+    //regresar clave
+    $('#claveunidad').on('change', function(e) {
+          regresarclaveunidad();
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+      var index = $(this).index(".inputnext");          
+          $(".inputnext").eq(index + 1).focus().select(); 
+      }
+    });
+    mostrarmodalformulario('MODIFICACION');  
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {
     msj_errorajax();

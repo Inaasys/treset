@@ -90,13 +90,13 @@
                         <div class="row">
                             <div class="col-md-3">
                                 <label>Número</label>
-                                <input type="text" class="form-control" name="numero" id="numero" required readonly onkeyup="tipoLetra(this);">
+                                <input type="text" class="form-control inputnext" name="numero" id="numero" required readonly onkeyup="tipoLetra(this);">
                             </div>   
                         </div>
                         <div class="row">
                             <div class="col-md-12">
                                 <label>Nombre</label>
-                                <input type="text" class="form-control" name="nombre" id="nombre" required data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">
+                                <input type="text" class="form-control inputnext" name="nombre" id="nombre" required data-parsley-length="[1, 60]" onkeyup="tipoLetra(this);">
                             </div>
                         </div>
                         <div class="col-md-12" id="tabsform">

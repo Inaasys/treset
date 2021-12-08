@@ -373,6 +373,7 @@
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';       
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
+        var tipodeutilidad = '{{$tipodeutilidad}}';
         var productos_obtener = '{!!URL::to('productos_obtener')!!}';
         var productos_buscar_codigo_en_tabla = '{!!URL::to('productos_buscar_codigo_en_tabla')!!}';
         var productos_obtener_claves_productos = '{!!URL::to('productos_obtener_claves_productos')!!}';

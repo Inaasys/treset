@@ -68,6 +68,22 @@ class AgenteController extends ConfiguracionSistemaController{
                     ->make(true);
         } 
     } 
+    //obtener almacen por numero
+    public function agentes_obtener_almacen_por_numero(Request $request){
+        $numero = '';
+        $nombre = '';
+        $existealmacen = Almacen::where('Numero', $request->almacen)->count();
+        if($existealmacen > 0){
+            $almacen = Almacen::where('Numero', $request->almacen)->first();
+            $numero = $almacen->Numero;
+            $nombre = $almacen->Nombre;
+        }
+        $data = array(
+            'numero' => $numero,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+    }
     //guardar en catalogo
     public function agentes_guardar(Request $request){
 	    $rfc=$request->rfc;

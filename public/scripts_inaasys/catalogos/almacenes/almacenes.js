@@ -125,6 +125,7 @@ function alta(){
               '</div>';
   $("#tabsform").html(tabs);
   obtenultimonumero();
+  setTimeout(function(){$("#nombre").focus();},500);    
 }
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
@@ -226,6 +227,7 @@ function obtenerdatos(numeroalmacen){
     $("#numero").val(numeroalmacen);
     $("#nombre").val(data.almacen.Nombre);
     mostrarmodalformulario('MODIFICACION');
+    setTimeout(function(){$("#nombre").focus();},500);    
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {
     msj_errorajax();

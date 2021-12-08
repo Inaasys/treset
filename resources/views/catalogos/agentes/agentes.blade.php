@@ -82,13 +82,13 @@
                         <div class="row">
                             <div class="col-md-3">
                                 <label>Número</label>
-                                <input type="text" class="form-control" name="numero" id="numero" required readonly onkeyup="tipoLetra(this);">
+                                <input type="text" class="form-control inputnext" name="numero" id="numero" required readonly onkeyup="tipoLetra(this);">
                             </div>   
                         </div>
                         <div class="row">
                             <div class="col-md-12">
                                 <label>Nombre</label>
-                                <input type="text" class="form-control" name="nombre" id="nombre" placeholder="1er Apellido, 2do Apellido, Nombre(s)" required data-parsley-length="[1, 80]" onkeyup="tipoLetra(this);">
+                                <input type="text" class="form-control inputnext" name="nombre" id="nombre" placeholder="1er Apellido, 2do Apellido, Nombre(s)" required data-parsley-length="[1, 80]" onkeyup="tipoLetra(this);">
                             </div>
                         </div>
                         <div class="col-md-12" id="tabsform">
@@ -142,6 +142,7 @@
         var agentes_obtener = '{!!URL::to('agentes_obtener')!!}';
         var agentes_obtener_ultimo_numero = '{!!URL::to('agentes_obtener_ultimo_numero')!!}';
         var agentes_obtener_almacenes = '{!!URL::to('agentes_obtener_almacenes')!!}';
+        var agentes_obtener_almacen_por_numero = '{!!URL::to('agentes_obtener_almacen_por_numero')!!}';
         var agentes_guardar = '{!!URL::to('agentes_guardar')!!}';
         var agentes_alta_o_baja = '{!!URL::to('agentes_alta_o_baja')!!}'; 
         var agentes_obtener_agente = '{!!URL::to('agentes_obtener_agente')!!}'; 

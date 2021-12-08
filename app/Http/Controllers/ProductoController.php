@@ -292,11 +292,17 @@ class ProductoController extends ConfiguracionSistemaController{
             $filasutilidadesproducto = '';
                 foreach($utilidades as $utilidad){
                     if($this->tipodeutilidad == 'Financiera'){
-                        $subtotalpesos = $utilidad["costo"]/(((100 - $utilidad["utilidad"]/Helpers::convertirvalorcorrecto(100)) / 100));
+                        //$subtotalpesos = $utilidad["costo"]/(((100 - $utilidad["utilidad"]/Helpers::convertirvalorcorrecto(100)) / 100));
+                        $restautilidad = Helpers::convertirvalorcorrecto(100) - $utilidad["utilidad"];
+                        $divisionutilidad = $restautilidad / Helpers::convertirvalorcorrecto(100);
+                        $subtotalpesos = $utilidad["costo"] / $divisionutilidad;
                     }else{
                         //$nuevosubtotalproducto = $request->preciopartida [$key]*(1+($Producto->Utilidad/100));
-                        $multiplicacionsubtotalpesos = $utilidad["costo"]*($utilidad["utilidad"]/Helpers::convertirvalorcorrecto(100));
-                        $subtotalpesos = $utilidad["costo"]+$multiplicacionsubtotalpesos;
+                        //$multiplicacionsubtotalpesos = $utilidad["costo"]*($utilidad["utilidad"]/Helpers::convertirvalorcorrecto(100));
+                        //$subtotalpesos = $utilidad["costo"]+$multiplicacionsubtotalpesos;
+                        $sumautilidad = Helpers::convertirvalorcorrecto(100) + $utilidad["utilidad"];
+                        $divisionutilidad = $sumautilidad / Helpers::convertirvalorcorrecto(100);
+                        $subtotalpesos = $utilidad["costo"] * $divisionutilidad;
                     }
                     $utilidadpesos = $subtotalpesos - $utilidad["costo"];
                     $ivapesos = $subtotalpesos*($utilidad["impuesto"]/Helpers::convertirvalorcorrecto(100));

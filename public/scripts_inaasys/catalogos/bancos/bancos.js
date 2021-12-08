@@ -121,19 +121,29 @@ function alta(){
                   '<div class="row">'+
                     '<div class="col-md-12">'+
                       '<label>Banco</label>'+
-                      '<input type="text" class="form-control" name="nombre" id="nombre" required data-parsley-length="[1, 30]" onkeyup="tipoLetra(this);">'+
+                      '<input type="text" class="form-control inputnext" name="nombre" id="nombre" required data-parsley-length="[1, 30]" onkeyup="tipoLetra(this);">'+
                     '</div>'+
                   '</div>'+
                   '<div class="row">'+
                     '<div class="col-md-12">'+
                       '<label>Cuenta Contable</label>'+
-                      '<input type="text" class="form-control" name="cuenta" id="cuenta" required data-parsley-length="[1, 25]" onkeyup="tipoLetra(this);">'+
+                      '<input type="text" class="form-control inputnext" name="cuenta" id="cuenta" required data-parsley-length="[1, 25]" onkeyup="tipoLetra(this);">'+
                     '</div>'+
                   '</div>'+   
                 '</div>'+
               '</div>';
   $("#tabsform").html(tabs);
   obtenultimonumero();
+  setTimeout(function(){$("#nombre").focus();},500);   
+  //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+  $(".inputnext").keypress(function (e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+    var index = $(this).index(".inputnext");          
+        $(".inputnext").eq(index + 1).focus().select(); 
+    }
+  });  
 }
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
@@ -225,13 +235,13 @@ function obtenerdatos(numerobanco){
                     '<div class="row">'+
                       '<div class="col-md-12">'+
                         '<label>Banco</label>'+
-                        '<input type="text" class="form-control" name="nombre" id="nombre" required data-parsley-length="[1, 30]" onkeyup="tipoLetra(this);">'+
+                        '<input type="text" class="form-control inputnext" name="nombre" id="nombre" required data-parsley-length="[1, 30]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                     '</div>'+
                     '<div class="row">'+
                       '<div class="col-md-12">'+
                         '<label>Cuenta Contable</label>'+
-                        '<input type="text" class="form-control" name="cuenta" id="cuenta" required data-parsley-length="[1, 25]" onkeyup="tipoLetra(this);">'+
+                        '<input type="text" class="form-control inputnext" name="cuenta" id="cuenta" required data-parsley-length="[1, 25]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                     '</div>'+   
                   '</div>'+
@@ -241,6 +251,16 @@ function obtenerdatos(numerobanco){
     $("#numero").val(numerobanco);
     $("#nombre").val(data.banco.Nombre);
     $("#cuenta").val(data.banco.Cuenta);
+    setTimeout(function(){$("#nombre").focus();},500);   
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+      var index = $(this).index(".inputnext");          
+          $(".inputnext").eq(index + 1).focus().select(); 
+      }
+    });  
     mostrarmodalformulario('MODIFICACION');
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {

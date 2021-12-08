@@ -1222,7 +1222,7 @@ function obtenerdatos(codigoproducto){
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-7">'+
-                                '<label>UTILIDADES</label>'+   
+                                '<label>UTILIDADES '+tipodeutilidad+'</label>'+   
                                 '<div class="table-container" style="height: 14em !important;">'+
                                     '<table id="tbllistadoutilidades" class="scroll tbllistadoutilidades">'+
                                         '<thead class="'+background_tables+'">'+

@@ -188,7 +188,6 @@ class ConfiguracionSistemaController extends Controller
         View::share ( 'correodefault1enviodocumentos', $this->correodefault1enviodocumentos);
         View::share ( 'correodefault2enviodocumentos', $this->correodefault2enviodocumentos);
         View::share ( 'usuariosamodificarinsumos', $this->usuariosamodificarinsumos);
-
         View::share ( 'timbresingresofacturastotalesactivosfacturapi', $this->timbresingresofacturastotalesactivosfacturapi);
         View::share ( 'timbresingresofacturascanceladastotalesactivosfacturapi', $this->timbresingresofacturascanceladastotalesactivosfacturapi);
         View::share ( 'timbresegresonotastotalesactivosfacturapi', $this->timbresegresonotastotalesactivosfacturapi);
@@ -197,8 +196,6 @@ class ConfiguracionSistemaController extends Controller
         View::share ( 'timbrespagocxccanceladastotalesactivosfacturapi', $this->timbrespagocxccanceladastotalesactivosfacturapi);
         View::share ( 'timbrestotalesactivosfacturapi', $this->timbrestotalesactivosfacturapi);
         View::share ( 'timbrestotalescanceladosfacturapi', $this->timbrestotalescanceladosfacturapi);
-
-
         //View::share ( 'array', ['name'=>'Franky','address'=>'Mars'] );
     } 
 }
