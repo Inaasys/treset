@@ -1026,7 +1026,7 @@ function listarservicios(){
   $('#tbllistadoservicio tbody').on('dblclick', 'tr', function () {
       var data = tserv.row( this ).data();
       var tipooperacion = $("#tipooperacion").val();
-      agregarfilaservicio(data.Codigo, data.Servicio, data.Unidad, data.Costo, data.Venta, data.Cantidad, data.ClaveProducto, data.ClaveUnidad, tipooperacion);
+      agregarfilaservicio(data.Codigo, data.Servicio, data.Unidad, number_format(round(data.Costo, numerodecimales), numerodecimales, '.', ''), data.Venta, data.Cantidad, data.ClaveProducto, data.ClaveUnidad, tipooperacion);
   });
 }
 function obtenerservicioporcodigo(){

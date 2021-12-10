@@ -667,7 +667,7 @@ function listarinsumospt(){
     $('#tbllistadoproductoinsumo tbody').on('dblclick', 'tr', function () {
         var data = tinsupt.row( this ).data();
         var tipooperacion = $("#tipooperacion").val();
-        agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, data.SubTotal, data.Existencias, tipooperacion, data.Insumo, data.ClaveProducto, data.ClaveUnidad, data.CostoDeLista);
+        agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, number_format(round(data.Impuesto, numerodecimales), numerodecimales, '.', ''), data.SubTotal, data.Existencias, tipooperacion, data.Insumo, data.ClaveProducto, data.ClaveUnidad, number_format(round(data.CostoDeLista, numerodecimales), numerodecimales, '.', ''));
     });
 }
 //obtener insumo pt por codigo

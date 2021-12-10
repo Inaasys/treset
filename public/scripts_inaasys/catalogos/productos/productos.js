@@ -1211,11 +1211,18 @@ function obtenerdatos(codigoproducto){
                             '<div class="col-md-2" id="divcodigodebarras">'+
                                 data.barcode+
                             '</div>'+
-                            '<div class="col-md-2">'+
-                                '<label>Num. Impresiones</label>'+
+                            '<div class="col-md-1">'+
+                                '<label>Num. Impre.</label>'+
                                 '<input type="number" class="form-control inputnext" name="numimpresiones" id="numimpresiones" value="1" >'+
                             '</div>'+
                             '<div class="col-md-2">'+
+                                '<label>Tamaño Etiquetas</label>'+
+                                '<select id="tamanoetiquetas" name="tamanoetiquetas" class="form-control">'+
+                                    '<option value="chica">chica</option>'+
+                                    '<option value="grande">grande</option>'+
+                                '</select>'+
+                            '</div>'+
+                            '<div class="col-md-1">'+
                                 '<label>Imprimir</label>'+
                                 '<div id="botoncambiardatosimprimircodigobarras" class="btn bg-blue btn-block waves-effect" onclick="imprimircodigosbarras();">Imprimir</div>'+       
                             '</div>'+
@@ -1670,8 +1677,11 @@ function agregarcodigoenarraycodigosbarras(valorgenerarcodigobarras){
 function imprimircodigosbarras(){
     var numimpresiones = $("#numimpresiones").val();
     var codigo = $("#codigo").val();
+    var producto = $("#producto").val();
+    var ubicacion = $("#ubicacion").val();
+    var tamanoetiquetas = $("#tamanoetiquetas").val();
     window.open(
-        productos_generar_pdf_codigo_barras+'?numimpresiones='+numimpresiones+'&codigo='+codigo,
+        productos_generar_pdf_codigo_barras+'?numimpresiones='+numimpresiones+'&codigo='+codigo+'&producto='+producto+'&ubicacion='+ubicacion+'&tamanoetiquetas='+tamanoetiquetas,
         '_blank' // <- This is what makes it open in a new window.
     );
 }

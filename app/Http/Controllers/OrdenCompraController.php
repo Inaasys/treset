@@ -531,7 +531,19 @@ class OrdenCompraController extends ConfiguracionSistemaController{
     //verificar autorizacion
     public function ordenes_compra_verificar_autorizacion(Request $request){
         $OrdenCompra = OrdenCompra::where('Orden', $request->ordenautorizar)->first();
-        return response()->json($OrdenCompra);
+        $Detalles = OrdenCompraDetalle::select('Codigo')->where('Orden', $request->ordenautorizar)->get();
+        $msjsurtimiento = '';
+        foreach($Detalles as $d){
+            $DetallesConSurtimientoPendiente = OrdenCompraDetalle::where('Codigo', $d->Codigo)->where('Orden', '<>', $request->ordenautorizar)->where('Surtir', '>', 0)->get();
+            foreach($DetallesConSurtimientoPendiente as $dcsp){
+                $msjsurtimiento = $msjsurtimiento.'<br> Codigo :'.$dcsp->Codigo.' Pendiente por surtir:'.$dcsp->Surtir.' En orden:'.$dcsp->Orden;
+            }
+        }
+        $data = array(
+            'OrdenCompra' => $OrdenCompra,
+            'msjsurtimiento' => $msjsurtimiento
+        );
+        return response()->json($data);
     }
     //autorizar una orden de compra
     public function ordenes_compra_autorizar(Request $request){

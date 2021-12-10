@@ -111,6 +111,7 @@ class ReporteAntiguedadSaldosController extends ConfiguracionSistemaController{
                                 DB::raw("isnull((select sum(total) from [notas cliente detalles] where cliente = f.cliente group by cliente ),0) as DescuentosNotasCredito"),
                                 DB::raw("isnull((select sum(abono) from [cxc detalles] where cliente = f.cliente group by cliente ),0) + isnull((select sum(total) from [notas cliente detalles] where cliente = f.cliente group by cliente ),0) as TotalPagos"),
                                 DB::raw("sum(f.total) - (isnull((select sum(abono) from [cxc detalles] where cliente = f.cliente group by cliente ),0) + isnull((select sum(total) from [notas cliente detalles] where cliente = f.cliente group by cliente ),0)) as SaldoFacturado "))
+                    ->where('f.Status', '<>', 'BAJA')
                     ->where(function($q) use ($numerocliente) {
                         if($numerocliente != ""){
                             $q->where('f.Cliente', $numerocliente);
@@ -118,7 +119,7 @@ class ReporteAntiguedadSaldosController extends ConfiguracionSistemaController{
                     })
                     ->where(function($q) use ($saldomayor) {
                         if($saldomayor > 0){
-                            $q->where('c.Saldo', '>', 0);
+                            $q->where('c.Saldo', '>', 0.1);
                         }
                     })
                     ->orderby('f.Cliente')
@@ -133,6 +134,7 @@ class ReporteAntiguedadSaldosController extends ConfiguracionSistemaController{
                                 DB::raw("isnull((select sum(abono) from [cxc detalles] where cliente = f.cliente and fecha <= '".$fechacorte."' group by cliente ),0) + isnull((select sum(total) from [notas cliente detalles] where cliente = f.cliente and fecha <= '".$fechacorte."' group by cliente ),0) as TotalPagos"),
                                 DB::raw("sum(f.total) - (isnull((select sum(abono) from [cxc detalles] where cliente = f.cliente and fecha <= '".$fechacorte."' group by cliente ),0) + isnull((select sum(total) from [notas cliente detalles] where cliente = f.cliente and fecha <= '".$fechacorte."' group by cliente ),0)) as SaldoFacturado "))
                     ->where('f.Fecha', '<=', $fechacorte)
+                    ->where('f.Status', '<>', 'BAJA')
                     ->where(function($q) use ($numerocliente) {
                         if($numerocliente != ""){
                             $q->where('f.Cliente', $numerocliente);
@@ -140,7 +142,7 @@ class ReporteAntiguedadSaldosController extends ConfiguracionSistemaController{
                     })
                     ->where(function($q) use ($saldomayor) {
                         if($saldomayor > 0){
-                            $q->where('c.Saldo', '>', 0);
+                            $q->where('c.Saldo', '>', 0.1);
                         }
                     })
                     ->where(function($q) use ($departamento) {
@@ -170,6 +172,7 @@ class ReporteAntiguedadSaldosController extends ConfiguracionSistemaController{
                             DB::raw("isnull((select sum(abono) from [cxc detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0) + isnull((select sum(total) from [notas cliente detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0) as TotalPagos"),
                             DB::raw("sum(f.total) - (isnull((select sum(abono) from [cxc detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0) + isnull((select sum(total) from [notas cliente detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0)) as SaldoFacturado "))
                 ->where('f.Fecha', '<=', $fechacorte)
+                ->where('f.Status', '<>', 'BAJA')
                 ->where(function($q) use ($numerocliente) {
                     if($numerocliente != ""){
                         $q->where('f.Cliente', $numerocliente);
@@ -177,7 +180,7 @@ class ReporteAntiguedadSaldosController extends ConfiguracionSistemaController{
                 })
                 ->where(function($q) use ($saldomayor) {
                     if($saldomayor > 0){
-                        $q->where('f.Saldo', '>', 0);
+                        $q->where('f.Saldo', '>', 0.1);
                     }
                 })
                 ->where(function($q) use ($departamento) {

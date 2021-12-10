@@ -608,6 +608,8 @@ class ProductoController extends ConfiguracionSistemaController{
     public function productos_obtener_producto(Request $request){
         $producto = Producto::where('Codigo', $request->codigoproducto)->first();
         $barcode = DNS1D::getBarcodeSVG($request->codigoproducto, 'C128', 1,55,'black', true);
+        //$barcode = DNS2D::getBarcodeSVG($request->codigoproducto, 'QRCODE', 2, 2, true);
+
         $valores_producto = Producto::where('Codigo', $request->codigoproducto)->get();
         $marca = Marca::where('Numero', $producto->Marca)->first();
         $linea = Linea::where('Numero', $producto->Linea)->first();
@@ -717,9 +719,10 @@ class ProductoController extends ConfiguracionSistemaController{
     }
     //generar codigos de barras de todos el catalogo
     public function productos_generar_codigos_barras_catalogo(Request $request){
+        $tamanoetiquetas = $request->tamanoetiquetascatalogocodigosbarras;
         $tipoprod = $request->tipoprodcodigosbarras;
         $status = $request->statuscodigosbarras;
-        $codigos = Producto::select('Codigo')
+        $codigos = Producto::select('Codigo','Producto','Ubicacion')
         ->where(function($q) use ($tipoprod) {
             if($tipoprod != "TODOS"){
                 $q->where('TipoProd', $tipoprod);
@@ -732,37 +735,84 @@ class ProductoController extends ConfiguracionSistemaController{
         })
         ->get();
         $tipo = 1;
-        $pdf = PDF::loadView('catalogos.productos.formato_pdf_codigos_de_barras', compact('codigos','tipo'))
-        ->setPaper('Letter')
-        ->setOption('margin-left', 2)
-        ->setOption('margin-right', 2)
-        ->setOption('margin-bottom', 10);
+        if($tamanoetiquetas == 'chica'){
+            $pdf = PDF::loadView('catalogos.productos.formato_pdf_codigos_de_barras', compact('codigos','tipo','tamanoetiquetas'))
+            ->setPaper('Letter')
+            ->setOption('margin-left', 5)
+            ->setOption('margin-right', 0)
+            ->setOption('margin-bottom', 9)
+            ->setOption('margin-top', 15);
+        }else{
+            $pdf = PDF::loadView('catalogos.productos.formato_pdf_codigos_de_barras', compact('codigos','tipo','tamanoetiquetas'))
+            ->setPaper('Letter')
+            ->setOption('margin-left', 0)
+            ->setOption('margin-right', 0)
+            ->setOption('margin-bottom', 1)
+            ->setOption('margin-top', 18);
+        }
         return $pdf->stream();
     }
     //generar codigos de barras por array
     public function productos_generar_codigos_barras_array(Request $request){
+        $tamanoetiquetas = $request->tamanoetiquetasarraycodigosbarras;
         $stringcodigosparacodigosdebarras = $request->arraycodigosparacodigosdebarras;
         $eliminarcoma = substr($stringcodigosparacodigosdebarras, 1);
-        $codigos = explode(",", $eliminarcoma);
+        $codigosexplode = explode(",", $eliminarcoma);
+        $codigos = array();
+        foreach($codigosexplode  as $ce){
+            $p = Producto::where('Codigo', $ce)->first();
+            $datos = array(
+                'codigo' => $p->Codigo,
+                'producto' => $p->Producto,
+                'ubicacion' => $p->Ubicacion
+            );
+            array_push($codigos, $datos);
+        }
         $tipo = 2;
-        $pdf = PDF::loadView('catalogos.productos.formato_pdf_codigos_de_barras', compact('codigos','tipo'))
-        ->setPaper('Letter')
-        ->setOption('margin-left', 2)
-        ->setOption('margin-right', 2)
-        ->setOption('margin-bottom', 10);
+        if($tamanoetiquetas == 'chica'){
+            $pdf = PDF::loadView('catalogos.productos.formato_pdf_codigos_de_barras', compact('codigos','tipo','tamanoetiquetas'))
+            ->setPaper('Letter')
+            ->setOption('margin-left', 5)
+            ->setOption('margin-right', 0)
+            ->setOption('margin-bottom', 9)
+            ->setOption('margin-top', 15);
+        }else{
+            $pdf = PDF::loadView('catalogos.productos.formato_pdf_codigos_de_barras', compact('codigos','tipo','tamanoetiquetas'))
+            ->setPaper('Letter')
+            ->setOption('margin-left', 0)
+            ->setOption('margin-right', 0)
+            ->setOption('margin-bottom', 1)
+            ->setOption('margin-top', 18);
+        }
         return $pdf->stream();
     }
     //generar codigo de barras por codigo desde modificiacion
     public function productos_generar_pdf_codigo_barras(Request $request){
         $numimpresiones = $request->numimpresiones;
+        $tamanoetiquetas = $request->tamanoetiquetas;
         $codigos = array();
-        array_push($codigos, $request->codigo);
+        $datos = array(
+            'codigo' => $request->codigo,
+            'producto' => $request->producto,
+            'ubicacion' => $request->ubicacion
+        );
+        array_push($codigos, $datos);
         $tipo = 3;
-        $pdf = PDF::loadView('catalogos.productos.formato_pdf_codigos_de_barras', compact('codigos','tipo','numimpresiones'))
-        ->setPaper('Letter')
-        ->setOption('margin-left', 2)
-        ->setOption('margin-right', 2)
-        ->setOption('margin-bottom', 10);
+        if($tamanoetiquetas == 'chica'){
+            $pdf = PDF::loadView('catalogos.productos.formato_pdf_codigos_de_barras', compact('codigos','tipo','numimpresiones','tamanoetiquetas'))
+            ->setPaper('Letter')
+            ->setOption('margin-left', 5)
+            ->setOption('margin-right', 0)
+            ->setOption('margin-bottom', 9)
+            ->setOption('margin-top', 15);
+        }else{
+            $pdf = PDF::loadView('catalogos.productos.formato_pdf_codigos_de_barras', compact('codigos','tipo','numimpresiones','tamanoetiquetas'))
+            ->setPaper('Letter')
+            ->setOption('margin-left', 0)
+            ->setOption('margin-right', 0)
+            ->setOption('margin-bottom', 1)
+            ->setOption('margin-top', 18);
+        }
         return $pdf->stream();
     }
     //modificar en catalogo

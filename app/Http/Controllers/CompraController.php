@@ -14,6 +14,7 @@ use DB;
 use PDF;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ComprasExport;
+use App\Exports\PlantillaCompraExport;
 use App\Compra;
 use App\CompraDetalle;
 use App\TipoOrdenCompra;
@@ -104,6 +105,7 @@ class CompraController extends ConfiguracionSistemaController{
                                         '<li><a href="javascript:void(0);" onclick="movimientoscompra(\''.$data->Compra.'\')">Movimientos</a></li>'.
                                         '<li><a href="'.route('compras_generar_pdfs_indiv',$data->Compra).'" target="_blank">Ver Documento PDF</a></li>'.
                                         '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Compra .'\')">Enviar Documento por Correo</a></li>'.
+                                        '<li><a href="'.route('compras_generar_excel_indiv',$data->Compra).'" target="_blank">Generar Excel</a></li>'.
                                     '</ul>'.
                                 '</div>';
                         return $operaciones;
@@ -2197,6 +2199,11 @@ class CompraController extends ConfiguracionSistemaController{
         ini_set('memory_limit', '-1');
         return Excel::download(new ComprasExport($this->campos_consulta,$request->periodo), "compras-".$request->periodo.".xlsx");   
    
+    }
+    //generar excel compras individual
+    public function compras_generar_excel_indiv($documento){
+        return Excel::download(new PlantillaCompraExport($documento), "compra-".$documento.".xlsx");   
+
     }
     //configuracion tabla
     public function compras_guardar_configuracion_tabla(Request $request){

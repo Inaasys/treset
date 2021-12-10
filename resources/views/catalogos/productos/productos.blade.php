@@ -273,13 +273,23 @@
                                             @csrf
                                             <div class="row">
                                                 <div class="col-md-6">
+                                                    <label for="">Código</label>
                                                     <input type="text" class="form-control" name="valorgenerarcodigobarras" id="valorgenerarcodigobarras" placeholder="Escribe el código y presiona enter" >
-                                                    <input type="text" class="form-control" id="arraycodigosparacodigosdebarras" name="arraycodigosparacodigosdebarras" style="display:none;" required>
+                                                    <input type="hidden" class="form-control" id="arraycodigosparacodigosdebarras" name="arraycodigosparacodigosdebarras" required>
                                                 </div>
-                                                <div class="col-md-6" >
-                                                    <button type="submit" class="btn btn-success btn-sm">Imprimir Códigos de Barras 1</button>
+                                                <div class="col-md-6">
+                                                    <label for="">Tamaño Etiquetas</label>
+                                                    <select name="tamanoetiquetasarraycodigosbarras" id="tamanoetiquetasarraycodigosbarras" class="form-control select2" style="width:100%">
+                                                        <option value="chica">chica</option>
+                                                        <option value="grande">grande</option>
+                                                    </select>
                                                 </div>
                                             </div><br>
+                                            <div class="row">
+                                                <div class="col-md-12 text-right" >                                            
+                                                    <button type="submit" class="btn btn-success btn-sm">Imprimir Códigos de Barras</button>
+                                                </div>
+                                            </div>
                                             <div class="row overflow-scroll" id="divcodigosbarras" style="height:400px;overflow-y: scroll;"></div>
                                         </form>
                                     </div>
@@ -296,12 +306,19 @@
                                                         <option value="TOT">TOT</option>
                                                     </select>
                                                 </div>
-                                                <div class="col-md-6">
+                                                <div class="col-md-3">
                                                     <label >Status</label>
                                                     <select class="form-control select2" id="statuscodigosbarras" name="statuscodigosbarras" style="width:100%" required>
                                                         <option value="TODOS" selected>TODOS</option> 
                                                         <option value="ALTA">ALTA</option>
                                                         <option value="BAJA">BAJA</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label for="">Tamaño Etiquetas</label>
+                                                    <select name="tamanoetiquetascatalogocodigosbarras" id="tamanoetiquetascatalogocodigosbarras" class="form-control select2" style="width:100%">
+                                                        <option value="chica">chica</option>
+                                                        <option value="grande">grande</option>
                                                     </select>
                                                 </div>
                                             </div><br>

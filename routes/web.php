@@ -333,6 +333,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/compras_obtener_datos_envio_email', 'CompraController@compras_obtener_datos_envio_email')->name('compras_obtener_datos_envio_email')->middleware('revisaraccesomenu:menuregistroscompras');
     Route::post('/compras_enviar_pdfs_email', 'CompraController@compras_enviar_pdfs_email')->name('compras_enviar_pdfs_email')->middleware('revisaraccesomenu:menuregistroscompras');
     Route::get('/compras_generar_pdfs_indiv/{documento}', 'CompraController@compras_generar_pdfs_indiv')->name('compras_generar_pdfs_indiv')->middleware('revisaraccesomenu:menuregistroscompras');
+    Route::get('/compras_generar_excel_indiv/{documento}', 'CompraController@compras_generar_excel_indiv')->name('compras_generar_excel_indiv')->middleware('revisaraccesomenu:menuregistroscompras');
     Route::get('/compras_exportar_excel', 'CompraController@compras_exportar_excel')->name('compras_exportar_excel')->middleware('revisaraccesomenu:menuregistroscompras');
     Route::post('/compras_guardar_configuracion_tabla', 'CompraController@compras_guardar_configuracion_tabla')->name('compras_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistroscompras');
     //Ordenes de Trabajo
@@ -812,6 +813,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/facturas_obtener_orden', 'FacturaController@facturas_obtener_orden')->name('facturas_obtener_orden')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_productos', 'FacturaController@facturas_obtener_productos')->name('facturas_obtener_productos')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_producto_por_codigo', 'FacturaController@facturas_obtener_producto_por_codigo')->name('facturas_obtener_producto_por_codigo')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    
+    Route::get('/facturas_obtener_productos_gastos', 'FacturaController@facturas_obtener_productos_gastos')->name('facturas_obtener_productos_gastos')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_producto_gasto_por_codigo', 'FacturaController@facturas_obtener_producto_gasto_por_codigo')->name('facturas_obtener_producto_gasto_por_codigo')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    
     Route::get('/facturas_obtener_claves_productos', 'FacturaController@facturas_obtener_claves_productos')->name('facturas_obtener_claves_productos')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_claves_unidades', 'FacturaController@facturas_obtener_claves_unidades')->name('facturas_obtener_claves_unidades')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_facturas_relacionadas', 'FacturaController@facturas_obtener_facturas_relacionadas')->name('facturas_obtener_facturas_relacionadas')->middleware('revisaraccesomenu:menuregistrosfacturas');

@@ -148,9 +148,9 @@ class RemisionController extends ConfiguracionSistemaController{
                 }else{
                     $codigoabuscar = $partida[0];
                     $cantidadpartida = $partida[1];
-                    $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', ''.$codigoabuscar.'')->count();
+                    $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', ''.$codigoabuscar.'')->where('TipoProd', 'REFACCION')->count();
                     if($contarproductos > 0){
-                        $producto = VistaObtenerExistenciaProducto::where('Codigo', ''.$codigoabuscar.'')->first();
+                        $producto = VistaObtenerExistenciaProducto::where('Codigo', ''.$codigoabuscar.'')->where('TipoProd', 'REFACCION')->first();
                         $contarexistencia = Existencia::where('Codigo', ''.$codigoabuscar.'')->where('Almacen', $numeroalmacen)->count();
                         if($contarexistencia > 0){
                             $Existencia = Existencia::where('Codigo', ''.$codigoabuscar.'')->where('Almacen', $numeroalmacen)->first();
@@ -163,8 +163,10 @@ class RemisionController extends ConfiguracionSistemaController{
                         }else{
                             $cantidad = $cantidadpartida;
                         }
+                        //dd(Helpers::convertirvalorcorrecto($cantidad));
                         //precio de la partida
-                        $preciopartida = $producto->SubTotal;
+                        //$preciopartida = $producto->SubTotal;
+                        $preciopartida = $partida[2];
                         //importe de la partida
                         $importepartida = $cantidad*$preciopartida;
                         //subtotal de la partida
@@ -497,7 +499,7 @@ class RemisionController extends ConfiguracionSistemaController{
             $codigoabuscar = $request->codigoabuscar;
             $numeroalmacen = $request->numeroalmacen;
             $tipooperacion = $request->tipooperacion;
-            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->where('Almacen', $numeroalmacen);
+            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->where('TipoProd', 'REFACCION')->where('Almacen', $numeroalmacen);
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($tipooperacion, $numeroalmacen){
                         if($data->Almacen == $numeroalmacen){
@@ -524,9 +526,9 @@ class RemisionController extends ConfiguracionSistemaController{
     public function remisiones_obtener_producto_por_codigo(Request $request){
         $codigoabuscar = $request->codigoabuscar;
         $numeroalmacen = $request->numeroalmacen;
-        $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('Almacen', $numeroalmacen)->count();
+        $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('TipoProd', 'REFACCION')->where('Almacen', $numeroalmacen)->count();
         if($contarproductos > 0){
-            $producto = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('Almacen', $numeroalmacen)->first();
+            $producto = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('TipoProd', 'REFACCION')->where('Almacen', $numeroalmacen)->first();
             $data = array(
                 'Codigo' => $producto->Codigo,
                 'Producto' => htmlspecialchars($producto->Producto, ENT_QUOTES),

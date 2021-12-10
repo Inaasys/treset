@@ -175,13 +175,24 @@
                     <h5 class="modal-title" id="exampleModalLabel">Aviso</h5>
                 </div>
                 <div class="modal-body">
-                    <form id="formautorizar" action="#">
-                        <h5 id="textomodalautorizar">Estas seguro de autorizar la orden de compra?</h5>
-                        <input type="hidden" id="ordenautorizar" name="ordenautorizar">
-                        <input type="hidden" id="ordenquitarautorizacion" name="ordenquitarautorizacion">
-                    </form>	
+                    <div id="divformautorizar">
+                        <form id="formautorizar" action="#">
+                            <h5 id="textomodalautorizar">Estas seguro de autorizar la orden de compra?</h5>
+                            <input type="hidden" id="ordenautorizar" name="ordenautorizar">
+                            <input type="hidden" id="ordenquitarautorizacion" name="ordenquitarautorizacion">
+                        </form>	
+                    </div>
+                    <div id="divmsjsurtimiento">
+                        <h5 id="textomsjsurtimiento"></h5>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
+                                <button type="button" class="btn btn-success btn-sm" id="btncontinuarautorizacion" onclick="continuarconautorizacion();">Contirnuar con Autorización</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer" id="footermodalautorizacion">
                     <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
                     <button type="button" class="btn btn-success btn-sm" id="btnautorizar">Confirmar Autorización</button>
                     <button type="button" class="btn btn-success btn-sm" id="btnquitarautorizacion">Quitar Autorización</button>

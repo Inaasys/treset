@@ -213,6 +213,7 @@ $("#btnenviarpartidasexcel").on('click', function(e){
       comprobarfilas();
       calculartotal();
       $("#codigoabuscar").val("");
+      $("#codigogastoabuscar").val("");
       //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
       $(".inputnextdet").keypress(function (e) {
         //recomentable para mayor compatibilidad entre navegadores.
@@ -1147,18 +1148,26 @@ function seleccionarfoliofiscal(Serie, Esquema, Depto){
 function comprobartiposerie(Depto){
   //var cliente = $("#cliente").val();
   //if(cliente != ""){
+    var esquema = $("#esquema").val();
     if(Depto == 'PRODUCTOS'){
       $("#divlistarremisiones").show();
+      if(esquema == 'INTERNA'){
+        $("#divbuscarcodigosgastos").show();
+      }else{
+        $("#divbuscarcodigosgastos").hide();
+      }
       $("#divlistarservicios").hide();
       $("#divbuscarcodigos").hide();
       $("#divimportarpartidas").hide();
     }else if(Depto == 'SERVICIO'){
       $("#divlistarremisiones").hide();
+      $("#divbuscarcodigosgastos").hide();
       $("#divlistarservicios").show();
       $("#divbuscarcodigos").hide();
       $("#divimportarpartidas").hide();
     }else{
       $("#divlistarremisiones").hide();
+      $("#divbuscarcodigosgastos").hide();
       $("#divlistarservicios").hide();
       $("#divbuscarcodigos").show();
       $("#divimportarpartidas").show();
@@ -1712,6 +1721,13 @@ $(document).ready(function(){
         listarproductos();
       }
   });
+  $("#codigogastoabuscar").keypress(function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      listarproductosgastos();
+    }
+});
 });
 //obtener por numero
 function obtenerclientepornumero(){
@@ -2087,13 +2103,109 @@ function listarproductos(){
   $('#tbllistadoproducto tbody').on('dblclick', 'tr', function () {
       var data = tprod.row( this ).data();
       var tipooperacion = $("#tipooperacion").val();
-      agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, data.SubTotal, tipooperacion, data.Insumo, data.ClaveProducto, data.ClaveUnidad, data.NombreClaveProducto, data.NombreClaveUnidad, data.CostoDeLista);
+      agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, number_format(round(data.Impuesto, numerodecimales), numerodecimales, '.', ''), data.SubTotal, tipooperacion, data.Insumo, data.ClaveProducto, data.ClaveUnidad, data.NombreClaveProducto, data.NombreClaveUnidad, number_format(round(data.CostoDeLista, numerodecimales), numerodecimales, '.', ''));
   });
 }
 function obtenerproductoporcodigo(){
   var codigoabuscar = $("#codigoabuscar").val();
   var tipooperacion = $("#tipooperacion").val();
   $.get(facturas_obtener_producto_por_codigo,{codigoabuscar:codigoabuscar}, function(data){
+    if(parseInt(data.contarproductos) > 0){
+      agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, data.SubTotal, tipooperacion, data.Insumo, data.ClaveProducto, data.ClaveUnidad, data.NombreClaveProducto, data.NombreClaveUnidad, data.CostoDeLista);
+    }else{
+      msjnoseencontroningunproducto();
+    }
+  }) 
+}
+
+
+
+
+//listar productos para tab consumos
+function listarproductosgastos(){
+  ocultarformulario();
+  var tablaproductosgastos ='<div class="modal-header '+background_forms_and_modals+'">'+
+                        '<h4 class="modal-title">Productos Gastos</h4>'+
+                      '</div>'+
+                      '<div class="modal-body">'+
+                        '<div class="row">'+
+                          '<div class="col-md-12">'+
+                            '<div class="table-responsive">'+
+                              '<table id="tbllistadoproductogasto" class="tbllistadoproductogasto table table-bordered table-striped table-hover" style="width:100% !important">'+
+                                '<thead class="'+background_tables+'">'+
+                                  '<tr>'+
+                                    '<th>Operaciones</th>'+
+                                    '<th>Código</th>'+
+                                    '<th>Marca</th>'+
+                                    '<th>Producto</th>'+
+                                    '<th>Ubicación</th>'+
+                                    '<th>Existencias</th>'+
+                                    '<th>Almacen</th>'+
+                                    '<th>Costo $</th>'+
+                                    '<th>Sub Total $</th>'+
+                                  '</tr>'+
+                                '</thead>'+
+                                '<tbody></tbody>'+
+                              '</table>'+
+                            '</div>'+
+                          '</div>'+  
+                        '</div>'+
+                      '</div>'+
+                      '<div class="modal-footer">'+
+                        '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                      '</div>';   
+  $("#contenidomodaltablas").html(tablaproductosgastos);
+  var tprodgast = $('#tbllistadoproductogasto').DataTable({
+    "lengthMenu": [ 10, 50, 100, 250, 500 ],
+    "pageLength": 250,
+    "sScrollX": "110%",
+    "sScrollY": "370px",
+    "bScrollCollapse": true,
+    processing: true,
+      'language': {
+        'loadingRecords': '&nbsp;',
+        'processing': '<div class="spinner"></div>'
+      },
+    serverSide: true,
+    ajax: {
+      url: facturas_obtener_productos_gastos,
+      data: function (d) {
+        d.codigogastoabuscar = $("#codigogastoabuscar").val();
+        d.tipooperacion = $("#tipooperacion").val();
+      }
+    },
+    columns: [
+      { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false  },
+      { data: 'Codigo', name: 'Codigo' },
+      { data: 'Marca', name: 'Marca', orderable: false, searchable: false  },
+      { data: 'Producto', name: 'Producto' },
+      { data: 'Ubicacion', name: 'Ubicacion', orderable: false, searchable: false  },
+      { data: 'Existencias', name: 'Existencias', orderable: false, searchable: false  },
+      { data: 'Almacen', name: 'Almacen', orderable: false, searchable: false  },
+      { data: 'Costo', name: 'Costo', orderable: false, searchable: false  },
+      { data: 'SubTotal', name: 'SubTotal', orderable: false, searchable: false  } 
+    ],
+    "initComplete": function() {
+      var $buscar = $('div.dataTables_filter input');
+      $buscar.unbind();
+      $buscar.bind('keyup change', function(e) {
+        if(e.keyCode == 13 || this.value == "") {
+          $('#tbllistadoproductogasto').DataTable().search( this.value ).draw();
+        }
+      });
+    },
+  });
+  //seleccionar registro al dar doble click
+  $('#tbllistadoproductogasto tbody').on('dblclick', 'tr', function () {
+      var data = tprodgast.row( this ).data();
+      var tipooperacion = $("#tipooperacion").val();
+      agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, number_format(round(data.Impuesto, numerodecimales), numerodecimales, '.', ''), data.SubTotal, tipooperacion, data.Insumo, data.ClaveProducto, data.ClaveUnidad, data.NombreClaveProducto, data.NombreClaveUnidad, number_format(round(data.CostoDeLista, numerodecimales), numerodecimales, '.', ''));
+  });
+}
+function obtenerproductogastoporcodigo(){
+  var codigogastoabuscar = $("#codigogastoabuscar").val();
+  var tipooperacion = $("#tipooperacion").val();
+  $.get(facturas_obtener_producto_gasto_por_codigo,{codigogastoabuscar:codigogastoabuscar}, function(data){
     if(parseInt(data.contarproductos) > 0){
       agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, data.SubTotal, tipooperacion, data.Insumo, data.ClaveProducto, data.ClaveUnidad, data.NombreClaveProducto, data.NombreClaveUnidad, data.CostoDeLista);
     }else{
@@ -2445,6 +2557,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
         comprobarfilas();
         calculartotal();
         $("#codigoabuscar").val("");
+        $("#codigogastoabuscar").val("");
         //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
         $(".inputnextdet").keypress(function (e) {
           //recomentable para mayor compatibilidad entre navegadores.
@@ -2566,17 +2679,17 @@ function alta(){
                                 '<label>Pedido</label>'+
                                 '<input type="text" class="form-control inputnext" name="pedido" id="pedido" data-parsley-length="[1, 50]" autocomplete="off">'+
                               '</div>'+  
-                              '<div class="col-md-2">'+
+                              '<div class="col-md-1">'+
                                 '<label>Tipo</label>'+
                                 '<select id="tipo" name="tipo" class="form-control select2" style="width:100%">'+
                                 '</select>'+
                               '</div>'+  
-                              '<div class="col-md-2">'+
+                              '<div class="col-md-1">'+
                                 '<label>Unidad</label>'+
                                 '<select id="tipounidad" name="tipounidad" class="form-control select2" style="width:100%">'+
                                 '</select>'+
                               '</div>'+   
-                              '<div class="col-md-4" id="divbuscarcodigos" hidden>'+
+                              '<div class="col-md-3" id="divbuscarcodigos" hidden>'+
                                 '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
                                 '<table class="col-md-12">'+
                                   '<tr>'+
@@ -2585,20 +2698,35 @@ function alta(){
                                     '</td>'+
                                     '<td>'+ 
                                       '<div class="form-line">'+
-                                        '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                                        '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off" onkeyup="tipoLetra(this);">'+
                                       '</div>'+
                                     '</td>'+
                                   '</tr>'+    
                                 '</table>'+
                               '</div>'+
-                              '<div class="col-md-4" id="divlistarremisiones"  style="display:none">'+
+                              '<div class="col-md-3" id="divlistarremisiones"  style="display:none">'+
                                 '<label>Remisiones</label>'+
                                 '<div class="btn btn-block bg-blue waves-effect" id="btnlistarremisiones" onclick="listarremisiones()">Agregar Remisiones</div>'+
                               '</div>'+ 
-                              '<div class="col-md-4" id="divlistarservicios"  style="display:none">'+
+                              '<div class="col-md-3" id="divlistarservicios"  style="display:none">'+
                                 '<label>Servicios</label>'+
                                 '<div class="btn btn-block bg-blue waves-effect" id="btnlistarservicios" onclick="listarordenes()">Agregar Servicios</div>'+
                               '</div>'+ 
+                              '<div class="col-md-3" id="divbuscarcodigosgastos" hidden>'+
+                                '<label>Escribe el código gastos a buscar y presiona ENTER</label>'+
+                                '<table class="col-md-12">'+
+                                  '<tr>'+
+                                    '<td>'+
+                                      '<div class="btn bg-blue waves-effect" id="btnobtenerproductosgastos" onclick="listarproductosgastos()">Ver Gastos</div>'+
+                                    '</td>'+
+                                    '<td>'+ 
+                                      '<div class="form-line">'+
+                                        '<input type="text" class="form-control" name="codigogastoabuscar" id="codigogastoabuscar" placeholder="Escribe el código gasto" autocomplete="off" onkeyup="tipoLetra(this);">'+
+                                      '</div>'+
+                                    '</td>'+
+                                  '</tr>'+    
+                                '</table>'+
+                              '</div>'+
                             '</div>'+
                           '</div>'+   
                           '<div role="tabpanel" class="tab-pane fade" id="emisortab">'+
@@ -2985,6 +3113,13 @@ function alta(){
     var code = (e.keyCode ? e.keyCode : e.which);
     if(code==13){
       obtenerproductoporcodigo();
+    }
+  });
+  $("#codigogastoabuscar").keypress(function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      obtenerproductogastoporcodigo();
     }
   });
   //activar busqueda para clientes
@@ -3595,17 +3730,17 @@ function obtenerdatos(facturamodificar){
                           '<label>Pedido</label>'+
                           '<input type="text" class="form-control inputnext" name="pedido" id="pedido" data-parsley-length="[1, 50]" autocomplete="off">'+
                         '</div>'+  
-                        '<div class="col-md-2">'+
+                        '<div class="col-md-1">'+
                           '<label>Tipo</label>'+
                           '<select id="tipo" name="tipo" class="form-control select2" style="width:100%">'+
                           '</select>'+
                         '</div>'+  
-                        '<div class="col-md-2">'+
+                        '<div class="col-md-1">'+
                           '<label>Unidad</label>'+
                           '<select id="tipounidad" name="tipounidad" class="form-control select2" style="width:100%">'+
                           '</select>'+
                         '</div>'+   
-                        '<div class="col-md-4" id="divbuscarcodigos" hidden>'+
+                        '<div class="col-md-3" id="divbuscarcodigos" hidden>'+
                           '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
                           '<table class="col-md-12">'+
                             '<tr>'+
@@ -3614,20 +3749,35 @@ function obtenerdatos(facturamodificar){
                               '</td>'+
                               '<td>'+ 
                                 '<div class="form-line">'+
-                                  '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                                  '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off"  onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                               '</td>'+
                             '</tr>'+    
                           '</table>'+
                         '</div>'+ 
-                        '<div class="col-md-4" id="divlistarremisiones"  style="display:none">'+
+                        '<div class="col-md-3" id="divlistarremisiones"  style="display:none">'+
                           '<label>Remisiones</label>'+
                           '<div class="btn btn-block bg-blue waves-effect" id="btnlistarremisiones" onclick="listarremisiones()">Agregar Remisiones</div>'+
                         '</div>'+ 
-                        '<div class="col-md-4" id="divlistarservicios"  style="display:none">'+
+                        '<div class="col-md-3" id="divlistarservicios"  style="display:none">'+
                           '<label>Servicios</label>'+
                           '<div class="btn btn-block bg-blue waves-effect" id="btnlistarservicios" onclick="listarordenes()">Agregar Servicios</div>'+
                         '</div>'+ 
+                        '<div class="col-md-3" id="divbuscarcodigosgastos" hidden>'+
+                          '<label>Escribe el código gastos a buscar y presiona ENTER</label>'+
+                          '<table class="col-md-12">'+
+                            '<tr>'+
+                              '<td>'+
+                                '<div class="btn bg-blue waves-effect" id="btnobtenerproductosgastos" onclick="listarproductosgastos()">Ver Gastos</div>'+
+                              '</td>'+
+                              '<td>'+ 
+                                '<div class="form-line">'+
+                                  '<input type="text" class="form-control" name="codigogastoabuscar" id="codigogastoabuscar" placeholder="Escribe el código gasto" autocomplete="off" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                              '</td>'+
+                            '</tr>'+    
+                          '</table>'+
+                        '</div>'+
                       '</div>'+
                     '</div>'+   
                     '<div role="tabpanel" class="tab-pane fade" id="emisortab">'+
@@ -4086,6 +4236,13 @@ function obtenerdatos(facturamodificar){
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
         obtenerproductoporcodigo();
+      }
+    });
+    $("#codigogastoabuscar").keypress(function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        obtenerproductogastoporcodigo();
       }
     });
     //regresar numero cliente

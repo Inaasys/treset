@@ -509,7 +509,7 @@ function listarproductos(){
     $('#tbllistadoproducto tbody').on('dblclick', 'tr', function () {
         var data = tprod.row( this ).data();
         var tipooperacion = $("#tipooperacion").val();
-        agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, tipooperacion);
+        agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, number_format(round(data.Impuesto, numerodecimales), numerodecimales, '.', ''), tipooperacion);
     });
   }
   function obtenerproductoporcodigo(){

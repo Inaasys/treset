@@ -683,7 +683,7 @@ function listarproductos(){
   $('#tbllistadoproducto tbody').on('dblclick', 'tr', function () {
     var data = tprod.row( this ).data();
     var tipooperacion = $("#tipooperacion").val();
-    agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, tipooperacion);
+    agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, number_format(round(data.Impuesto, numerodecimales), numerodecimales, '.', ''), tipooperacion);
   });
 }
 function obtenerproductoporcodigo(){
@@ -1877,8 +1877,18 @@ $("#btnGuardar").on('click', function (e) {
 //autorizar orden de compra
 function autorizarordencompra(ordenautorizar){
   $.get(ordenes_compra_verificar_autorizacion,{ordenautorizar:ordenautorizar}, function(data){
-    console.log(data);
-    if(data.AutorizadoPor == ''){
+    if(data.msjsurtimiento != ''){
+      $("#footermodalautorizacion").hide();
+      $("#divformautorizar").hide();
+      $("#divmsjsurtimiento").show();
+      $("#textomsjsurtimiento").html("Esta seguro de autorizar la orden de compra?, ya que algunas de sus partidas ya las tiene cargadas en otras Ordenes de Compra y aun estan pendientes por surtir.<br>"+ data.msjsurtimiento);
+    }else{
+      $("#footermodalautorizacion").show();
+      $("#divformautorizar").show();
+      $("#divmsjsurtimiento").hide();
+      $("#textomsjsurtimiento").html("");
+    }
+    if(data.OrdenCompra.AutorizadoPor == ''){
       $("#ordenautorizar").val(ordenautorizar);
       $("#ordenquitarautorizacion").val("");
       $("#textomodalautorizar").html("Estas seguro de autorizar la orden de compra? No."+ ordenautorizar);
@@ -1894,6 +1904,13 @@ function autorizarordencompra(ordenautorizar){
       $('#autorizarorden').modal('show');
     }
   });
+}
+//continuar con autorizacion
+function continuarconautorizacion(){
+  $("#footermodalautorizacion").show();
+  $("#divformautorizar").show();
+  $("#divmsjsurtimiento").hide();
+  $("#textomsjsurtimiento").html("");
 }
 $("#btnautorizar").on('click', function(e){
   e.preventDefault();
