@@ -51,8 +51,18 @@ class ReporteCajaChicaController extends ConfiguracionSistemaController{
     } 
     //generar reporte caja chica
     public function generar_reporte_caja_chica(Request $request){
+        $fechainicio = date($request->fechainicialreporte);
+        $fechaterminacion = date($request->fechafinalreporte);
+        $status = $request->statuscompra;
         $fechahoy = Carbon::parse($request->fechafinalreporte);//fecha de la que se realizar el reporte
-        $compras = Compra::whereBetween('Fecha', [$request->fechainicialreporte, $request->fechafinalreporte])->where('Tipo', 'CAJA CHICA')->where('Status', $request->statuscompra)->get();
+        $compras = Compra::whereDate('Fecha', '>=', $fechainicio)->whereDate('Fecha', '<=', $fechaterminacion)
+                            ->where('Tipo', 'CAJA CHICA')
+                            ->where(function($q) use ($status) {
+                                if($status != 'TODOS'){
+                                    $q->where('Status', $status);
+                                }
+                            })
+                            ->get();
         $data=array();
         $sumasubtotal = 0;
         $sumaiva = 0;

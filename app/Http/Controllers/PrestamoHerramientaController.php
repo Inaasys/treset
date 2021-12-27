@@ -457,6 +457,7 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
             "contadorfilas" => $contadorfilas,
             "modificacionpermitida" => $modificacionpermitida,
             "fecha" => Helpers::formatoinputdatetime($Prestamo_Herramienta->fecha),
+            "fechasdisponiblesenmodificacion" => Helpers::obtenerfechasdisponiblesenmodificacion($Prestamo_Herramienta->fecha),
             "total" => Helpers::convertirvalorcorrecto($Prestamo_Herramienta->total),
             "personalrecibe" => $personalrecibe,
             "personalentrega" => $personalentrega,

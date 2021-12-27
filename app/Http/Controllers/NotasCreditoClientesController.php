@@ -1225,6 +1225,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             "descuentofacturas" => Helpers::convertirvalorcorrecto($descuentofacturas),
             "diferencia" => Helpers::convertirvalorcorrecto($diferencia),
             "fecha" => Helpers::formatoinputdatetime($notacliente->Fecha),
+            "fechasdisponiblesenmodificacion" => Helpers::obtenerfechasdisponiblesenmodificacion($notacliente->Fecha),
             "importe" => Helpers::convertirvalorcorrecto($notacliente->Importe),
             "descuento" => Helpers::convertirvalorcorrecto($notacliente->Descuento),
             "ieps" => Helpers::convertirvalorcorrecto($notacliente->Ieps),
@@ -1799,6 +1800,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $url_xml = "";
         }
         try{
+            $datosdocumento = NotaCliente::where('Nota', $request->emaildocumento)->first();
             //enviar correo electrónico	
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
@@ -1847,7 +1849,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             if (file_exists($url_xml) != false) {
                 if($request->archivoadjunto != null && $request->archivoadjunto2 != null) {
-                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento, $url_xml) {
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento, $url_xml) {
                         $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                                 ->cc($arraycc)
                                 ->subject($asunto)
@@ -1865,7 +1867,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                         unlink($urlarchivoadjunto2);
                     }
                 }else if($request->archivoadjunto != null && $request->archivoadjunto2 == null){
-                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $correos, $asunto, $pdf, $emaildocumento, $url_xml) {
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $correos, $asunto, $pdf, $emaildocumento, $url_xml) {
                         $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                                 ->cc($arraycc)
                                 ->subject($asunto)
@@ -1878,7 +1880,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                         unlink($urlarchivoadjunto);
                     }
                 }else if($request->archivoadjunto == null && $request->archivoadjunto2 != null){
-                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $urlarchivoadjunto2, $arraycc, $asunto, $pdf, $emaildocumento, $url_xml) {
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $correos, $urlarchivoadjunto2, $arraycc, $asunto, $pdf, $emaildocumento, $url_xml) {
                         $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                                 ->cc($arraycc)
                                 ->subject($asunto)
@@ -1891,7 +1893,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                         unlink($urlarchivoadjunto2);
                     }
                 }else{
-                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $arraycc, $asunto, $pdf, $emaildocumento, $url_xml) {
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $correos, $arraycc, $asunto, $pdf, $emaildocumento, $url_xml) {
                         $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                                 ->cc($arraycc)
                                 ->subject($asunto)
@@ -1903,7 +1905,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                 unlink($url_xml);
             }else{
                 if($request->archivoadjunto != null && $request->archivoadjunto2 != null) {
-                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento) {
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento) {
                         $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                                 ->cc($arraycc)
                                 ->subject($asunto)
@@ -1920,7 +1922,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                         unlink($urlarchivoadjunto2);
                     }
                 }else if($request->archivoadjunto != null && $request->archivoadjunto2 == null){
-                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $correos, $asunto, $pdf, $emaildocumento) {
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $correos, $asunto, $pdf, $emaildocumento) {
                         $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                                 ->cc($arraycc)
                                 ->subject($asunto)
@@ -1932,7 +1934,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                         unlink($urlarchivoadjunto);
                     }
                 }else if($request->archivoadjunto == null && $request->archivoadjunto2 != null){
-                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $urlarchivoadjunto2, $arraycc, $asunto, $pdf, $emaildocumento) {
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $correos, $urlarchivoadjunto2, $arraycc, $asunto, $pdf, $emaildocumento) {
                         $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                                 ->cc($arraycc)
                                 ->subject($asunto)
@@ -1944,7 +1946,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                         unlink($urlarchivoadjunto2);
                     }
                 }else{
-                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $arraycc, $asunto, $pdf, $emaildocumento) {
+                    Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $correos, $arraycc, $asunto, $pdf, $emaildocumento) {
                         $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                                 ->cc($arraycc)
                                 ->subject($asunto)

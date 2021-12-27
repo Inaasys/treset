@@ -10,17 +10,9 @@ function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1000));
 }
 function asignarfechaactual(){
-    /*
-    var fechahoy = new Date();
-    var dia = ("0" + fechahoy.getDate()).slice(-2);
-    var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
-    var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia) ;
-    $('#fecha').val(hoy);
-    $('#fechaapagar').val(hoy);
-    */
-    $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechadatetimelocal){
-        $("#fecha").val(fechadatetimelocal);
-        $('#fechaapagar').val(fechadatetimelocal);
+    $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechas){
+        $("#fecha").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
+        $('#fechaapagar').val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
     }) 
 }
 //obtener el ultimo id de la tabla
@@ -394,12 +386,12 @@ function alta(){
                         '</div>'+
                         '<div class="col-md-3">'+
                             '<label>Fecha Contrarecibo</label>'+
-                            '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" onchange="validasolomesactual();asignafechapagoproveedor();" required>'+
+                            '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" onchange="asignafechapagoproveedor();" data-parsley-excluded="true" onkeydown="return false" required>'+
                             '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="{{$periodohoy}}">'+
                         '</div>'+
                         '<div class="col-md-3">'+
                             '<label>Fecha del Pago al Proveedor</label>'+
-                            '<input type="datetime-local" class="form-control inputnext" name="fechaapagar" id="fechaapagar" required readonly>'+
+                            '<input type="datetime-local" class="form-control inputnext" name="fechaapagar" id="fechaapagar" data-parsley-excluded="true" onkeydown="return false" required readonly>'+
                         '</div>'+
                     '</div>'+
                 '</div>'+
@@ -650,12 +642,12 @@ function obtenerdatos(contrarecibomodificar){
                         '</div>'+
                         '<div class="col-md-3">'+
                             '<label>Fecha Contrarecibo</label>'+
-                            '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" onchange="validasolomesactual();asignafechapagoproveedor();" required>'+
+                            '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" onchange="asignafechapagoproveedor();" data-parsley-excluded="true" onkeydown="return false" required>'+
                             '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy">'+
                         '</div>'+
                         '<div class="col-md-3">'+
                             '<label>Fecha del Pago al Proveedor</label>'+
-                            '<input type="datetime-local" class="form-control inputnext" name="fechaapagar" id="fechaapagar" required readonly>'+
+                            '<input type="datetime-local" class="form-control inputnext" name="fechaapagar" id="fechaapagar" data-parsley-excluded="true" onkeydown="return false" required readonly>'+
                         '</div>'+
                     '</div>'+
                 '</div>'+
@@ -717,7 +709,7 @@ function obtenerdatos(contrarecibomodificar){
         $("#textonombreproveedor").html(data.proveedor.Nombre.substring(0, 60));
     }
     $("#btnobtenerproveedores").hide();
-    $("#fecha").val(data.fecha);
+    $("#fecha").val(data.fecha).attr('min', data.fechasdisponiblesenmodificacion.fechamin).attr('max', data.fechasdisponiblesenmodificacion.fechamax);
     $("#fechaapagar").val(data.fecha);
     $("#observaciones").val(data.contrarecibo.Obs);
     $("#totalcontrarecibos").val(data.total);

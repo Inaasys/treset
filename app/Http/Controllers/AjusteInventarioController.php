@@ -385,6 +385,31 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
             $AjusteInventarioDetalle->Item = $item;
             $AjusteInventarioDetalle->save();
             $item++;
+            //modificar ultimocosto
+            if($request->entradaspartida [$key] > 0){
+                $Producto = Producto::where('Codigo', $codigoproductopartida)->first();
+                if($this->tipodeutilidad == 'Financiera'){
+                    $restautilidad = Helpers::convertirvalorcorrecto(100) - $Producto->Utilidad;
+                    $divisionutilidad = $restautilidad / Helpers::convertirvalorcorrecto(100);
+                    $nuevosubtotalproducto = $request->costopartida [$key] / $divisionutilidad;
+                }else{
+                    $sumautilidad = Helpers::convertirvalorcorrecto(100) + $Producto->Utilidad;
+                    $divisionutilidad = $sumautilidad / Helpers::convertirvalorcorrecto(100);
+                    $nuevosubtotalproducto = $request->costopartida [$key] * $divisionutilidad;
+                }
+                $nuevoivaproducto = $nuevosubtotalproducto*($Producto->Impuesto/Helpers::convertirvalorcorrecto(100));
+                $nuevototalproducto = $nuevosubtotalproducto + $nuevoivaproducto;
+                Producto::where('Codigo', $codigoproductopartida)
+                ->update([
+                    'Costo' => $request->costopartida [$key],
+                    'CostoDeLista' => $request->costopartida [$key],
+                    'CostoDeVenta' => $request->costopartida [$key],
+                    'Ultimo Costo' => $request->costopartida [$key],
+                    'SubTotal' => Helpers::convertirvalorcorrecto($nuevosubtotalproducto),
+                    'Iva' => Helpers::convertirvalorcorrecto($nuevoivaproducto),
+                    'Total' => Helpers::convertirvalorcorrecto($nuevototalproducto)
+                ]);
+            }
             //modificar las existencias del código en la tabla de existencias
             $ContarExistencia = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
             if($ContarExistencia > 0){
@@ -597,6 +622,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
             "contadorproductos" => $contadorproductos,
             "contadorfilas" => $contadorfilas,
             "fecha" => Helpers::formatoinputdatetime($ajuste->Fecha),
+            "fechasdisponiblesenmodificacion" => Helpers::obtenerfechasdisponiblesenmodificacion($ajuste->Fecha),
             "total" => Helpers::convertirvalorcorrecto($ajuste->Total),
             "modificacionpermitida" => $modificacionpermitida
         );
@@ -1012,6 +1038,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
         ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
         try{
+            $datosdocumento = AjusteInventario::where('Ajuste', $request->emaildocumento)->first();
             //enviar correo electrónico	
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
@@ -1036,7 +1063,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
             $body = $request->emailasunto;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
-            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
+            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
                 $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                         ->cc($arraycc)
                         ->subject($asunto)

@@ -46,6 +46,7 @@
                                     <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
                                         <label>Status Compra</label>
                                         <select class="form-control select2" name="statuscompra" id="statuscompra" onchange="generar_reporte()"  required>
+                                            <option value="TODOS">TODOS</option>    
                                             <option value="LIQUIDADA">LIQUIDADA</option>
                                             <option value="POR PAGAR">POR PAGAR</option>
                                         </select>
@@ -57,7 +58,7 @@
                                 </div>
                             </form>
                             <div class="table-responsive">
-                                <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover" style="width:100% !important;">
+                                <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap" style="width:100% !important;">
                                     <thead class="customercolor">
                                         <tr>
                                             <th>OPERACIONES</th>

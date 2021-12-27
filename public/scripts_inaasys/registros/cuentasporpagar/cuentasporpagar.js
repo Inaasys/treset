@@ -10,16 +10,9 @@ function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1000));
 }
 function asignarfechaactual(){
-    /*
-    var fechahoy = new Date();
-    var dia = ("0" + fechahoy.getDate()).slice(-2);
-    var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
-    var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia) ;
-    $('#fecha').val(hoy).css('font-size', '12px');
-    */
-    $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechadatetimelocal){
-        $("#fecha").val(fechadatetimelocal);
-    }) 
+  $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechas){
+    $("#fecha").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
+  }) 
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
@@ -505,7 +498,7 @@ function alta(){
                     '</div>'+    
                     '<div class="col-md-2">'+ 
                         '<label>Fecha</label>'+
-                        '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" onchange="validasolomesactual(1);" required>'+ 
+                        '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  data-parsley-excluded="true" onkeydown="return false" required>'+ 
                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+ 
                     '</div>'+ 
                     '</div>'+ 
@@ -774,6 +767,7 @@ function obtenerdatos(cxpmodificar){
   $.get(cuentas_por_pagar_obtener_cuenta_por_pagar,{cxpmodificar:cxpmodificar },function(data){
     $("#titulomodal").html('Modificación Cuenta por Pagar --- STATUS : ' + data.CuentaXPagar.Status);
     //formulario modificacion
+    var tabladetcxp = 'tabladetcxp';
     var tabs =  '<div class="col-md-12">'+    
                     '<div class="row">'+ 
                         '<div class="col-md-2">'+ 
@@ -817,7 +811,7 @@ function obtenerdatos(cxpmodificar){
                         '</div>'+    
                         '<div class="col-md-2">'+ 
                             '<label>Fecha</label>'+
-                            '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" onchange="validasolomesactual();" required>'+ 
+                            '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  data-parsley-excluded="true" onkeydown="return false" required>'+ 
                             '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+ 
                         '</div>'+ 
                         '</div>'+ 
@@ -856,23 +850,29 @@ function obtenerdatos(cxpmodificar){
                         '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
                             '<div class="row">'+
                                 '<div class="col-md-12 table-responsive cabecerafija" style="height: 225px;overflow-y: scroll;padding: 0px 0px;">'+
-                                    '<table class="table table-bordered">'+
+                                    '<table class="table table-bordered tabladetallesmodulo">'+
                                         '<thead class="'+background_tables+'">'+
                                             '<tr>'+
                                             '<th class="'+background_tables+'">#</th>'+
-                                            '<th class="'+background_tables+'">Compra</th>'+
-                                            '<th class="'+background_tables+'">Factura</th>'+
-                                            '<th class="'+background_tables+'">Fecha</th>'+
-                                            '<th class="'+background_tables+'">Plazo</th>'+
-                                            '<th class="'+background_tables+'">Vence</th>'+
-                                            '<th class="'+background_tables+'">Total $</th>'+
-                                            '<th class="'+background_tables+'">Abonos $</th>'+
-                                            '<th class="'+background_tables+'">Notas Crédito $</th>'+
-                                            '<th class="customercolortheadth">Abono</th>'+
-                                            '<th class="'+background_tables+'">Saldo $ (DOBLE CLICK)</th>'+
+                                            '<th class="'+background_tables+'" ondblclick="construirtabladinamicaporcolumna(\'compra\',\'Compra\');">Compra</th>'+
+                                            '<th class="'+background_tables+'" ondblclick="construirtabladinamicaporcolumna(\'facturacompra\',\'Factura\');">Factura</th>'+
+                                            '<th class="'+background_tables+'" ondblclick="construirtabladinamicaporcolumna(\'fechacompra\',\'Fecha\');">Fecha</th>'+
+                                            '<th class="'+background_tables+'" ondblclick="construirtabladinamicaporcolumna(\'plazocompra\',\'Plazo\');">Plazo</th>'+
+                                            '<th class="'+background_tables+'" ondblclick="construirtabladinamicaporcolumna(\'vencecompra\',\'Vence\');">Vence</th>'+
+                                            '<th class="'+background_tables+'" ondblclick="construirtabladinamicaporcolumna(\'totalcompra\',\'Total $\');">Total $</th>'+
+                                            '<th class="'+background_tables+'" ondblclick="construirtabladinamicaporcolumna(\'abonoscompra\',\'Abonos $\');">Abonos $</th>'+
+                                            '<th class="'+background_tables+'" ondblclick="construirtabladinamicaporcolumna(\'notascreditocompra\',\'Notas Crédito $\');">Notas Crédito $</th>'+
+                                            '<th class="customercolortheadth"  ondblclick="construirtabladinamicaporcolumna(\'abonocompra\',\'Abono\');">Abono</th>'+
+                                            '<th class="'+background_tables+'" ondblclick="construirtabladinamicaporcolumna(\'saldocomprainicial\',\'Saldo $\');">Saldo $ (DOBLE CLICK)</th>'+
                                             '</tr>'+
                                         '</thead>'+
                                         '<tbody id="tabladetallecuentasporpagar">'+           
+                                        '</tbody>'+
+                                    '</table>'+
+                                    '<table class="table table-bordered tabladinamicaacopiar" hidden>'+
+                                        '<thead class="'+background_tables+'" id="theadtabladinamicaacopiar">'+
+                                        '</thead>'+
+                                        '<tbody id="tbodytabladinamicaacopiar">'+           
                                         '</tbody>'+
                                     '</table>'+
                                 '</div>'+
@@ -911,7 +911,7 @@ function obtenerdatos(cxpmodificar){
     if(data.banco.Nombre != null){
         $("#textonombrebanco").html(data.banco.Nombre.substring(0, 40));
     }
-    $("#fecha").val(data.fecha);
+    $("#fecha").val(data.fecha).attr('min', data.fechasdisponiblesenmodificacion.fechamin).attr('max', data.fechasdisponiblesenmodificacion.fechamax);
     $("#transferencia").val(data.CuentaXPagar.Transferencia)
     $("#cheque").val(data.CuentaXPagar.Cheque);
     $("#beneficiario").val(data.CuentaXPagar.Beneficiario);
@@ -946,6 +946,33 @@ function obtenerdatos(cxpmodificar){
         $(".inputnext").eq(index + 1).focus().select(); 
       }
     });
+    //copiar detalles tabla modulo
+    const btnCopyTable = document.querySelector('table.tabladinamicaacopiar');
+    const elTable = document.querySelector('table.tabladinamicaacopiar');
+    const copyEl = (elToBeCopied) => {
+       let range, sel;
+       // Ensure that range and selection are supported by the browsers
+       if (document.createRange && window.getSelection) {
+           console.log(elToBeCopied);
+           range = document.createRange();
+           sel = window.getSelection();
+           // unselect any element in the page
+           sel.removeAllRanges();
+           try {
+               range.selectNodeContents(elToBeCopied);
+               sel.addRange(range);
+           } catch (e) {
+               range.selectNode(elToBeCopied);
+               sel.addRange(range);
+           }
+           document.execCommand('copy');
+       }
+       sel.removeAllRanges();
+       msj_tablacopiadacorrectamente(); 
+    };
+    //btnCopyText.addEventListener('click', () => copyEl(elText));
+    btnCopyTable.addEventListener('dblclick', () => copyEl(elTable));
+    //fin copias tabla detalles modulo
     setTimeout(function(){$("#folio").focus();},500);
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
     $('.page-loader-wrapper').css('display', 'none');
@@ -1140,4 +1167,9 @@ function configurar_tabla(){
         $("#columnasnestable").append(columna);
     }
   }
+
+
+
+ 
+
 init();

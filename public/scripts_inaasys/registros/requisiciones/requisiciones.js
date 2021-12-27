@@ -10,16 +10,9 @@ function retraso(){
     return new Promise(resolve => setTimeout(resolve, 1000));
 }
 function asignarfechaactual(){
-    /*
-    var fechahoy = new Date();
-    var dia = ("0" + fechahoy.getDate()).slice(-2);
-    var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
-    var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia);
-    $('#fecha').val(hoy);
-    */
-    $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechadatetimelocal){
-        $("#fecha").val(fechadatetimelocal);
-    }) 
+  $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechas){
+    $("#fecha").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
+  }) 
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
@@ -784,7 +777,7 @@ function alta(){
                   '</div>'+
                   '<div class="col-md-3">'+
                     '<label>Fecha </label>'+
-                    '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();" >'+
+                    '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required data-parsley-excluded="true" onkeydown="return false">'+
                     '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                   '</div>'+
                 '</div>'+
@@ -1127,7 +1120,7 @@ function obtenerdatos(requisicionmodificar){
                   '</div>'+
                   '<div class="col-md-3">'+
                     '<label>Fecha </label>'+
-                    '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();" >'+
+                    '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required data-parsley-excluded="true" onkeydown="return false">'+
                     '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                   '</div>'+
                 '</div>'+
@@ -1269,7 +1262,7 @@ function obtenerdatos(requisicionmodificar){
     $("#folio").val(data.requisicion.Folio);
     $("#serie").val(data.requisicion.Serie);
     $("#serietexto").html("Serie: "+data.requisicion.Serie);
-    $("#fecha").val(data.fecha);
+    $("#fecha").val(data.fecha).attr('min', data.fechasdisponiblesenmodificacion.fechamin).attr('max', data.fechasdisponiblesenmodificacion.fechamax);
     if(data.ordentrabajo != ""){
       $("#orden").val(data.ordentrabajo.Orden).attr('required', 'required');
       $("#ordenanterior").val(data.ordentrabajo.Orden).attr('required', 'required');

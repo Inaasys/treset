@@ -684,6 +684,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
             "contadorfilas" => $contadorfilas,
             "modificacionpermitida" => $modificacionpermitida,
             "fecha" => Helpers::formatoinputdatetime($Asignacion_Herramienta->fecha),
+            "fechasdisponiblesenmodificacion" => Helpers::obtenerfechasdisponiblesenmodificacion($Asignacion_Herramienta->fecha),
             "total" => Helpers::convertirvalorcorrecto($Asignacion_Herramienta->total),
             "personalrecibe" => $personalrecibe,
             "personalentrega" => $personalentrega

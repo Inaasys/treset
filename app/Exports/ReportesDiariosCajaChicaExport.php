@@ -43,8 +43,22 @@ class ReportesDiariosCajaChicaExport implements FromView,WithTitle
         foreach(explode(",", $this->string_compras) as $compra){
             array_push($compras, $compra);
         }
+
+
+        $fechainicio = date($this->fechainicialreporte);
+        $fechaterminacion = date($this->fechafinalreporte);
+        $status = $this->statuscompra;
+
         $fechahoy = Carbon::parse($this->fechafinalreporte);//fecha de la que se realizar el reporte
-        $compras = Compra::whereBetween('Fecha', [$this->fechainicialreporte, $this->fechafinalreporte])->whereIn('Compra', $compras)->where('Tipo', 'CAJA CHICA')->where('Status', $this->statuscompra)->get();
+        $compras = Compra::whereDate('Fecha', '>=', $fechainicio)->whereDate('Fecha', '<=', $fechaterminacion)
+                            ->whereIn('Compra', $compras)
+                            ->where('Tipo', 'CAJA CHICA')
+                            ->where(function($q) use ($status) {
+                                if($status != 'TODOS'){
+                                    $q->where('Status', $status);
+                                }
+                            })
+                            ->get();
         $data=array();
         $sumasubtotal = 0;
         $sumaiva = 0;

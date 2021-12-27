@@ -366,6 +366,7 @@ class ContraRecibosController extends ConfiguracionSistemaController{
             "detallescontrarecibo" => $detallescontrarecibo,
             "proveedor" => $proveedor,
             "fecha" => Helpers::formatoinputdatetime($contrarecibo->Fecha),
+            "fechasdisponiblesenmodificacion" => Helpers::obtenerfechasdisponiblesenmodificacion($contrarecibo->Fecha),
             "total" => Helpers::convertirvalorcorrecto($contrarecibo->Total),
             "filasdetallescontrarecibo" => $filasdetallescontrarecibo,
             "modificacionpermitida" => $modificacionpermitida
@@ -620,6 +621,7 @@ class ContraRecibosController extends ConfiguracionSistemaController{
         ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
         try{
+            $datosdocumento = ContraRecibo::where('ContraRecibo', $request->emaildocumento)->first();
             //enviar correo electrónico	
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
@@ -644,7 +646,7 @@ class ContraRecibosController extends ConfiguracionSistemaController{
             $body = $request->emailasunto;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
-            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
+            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
                 $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                         ->cc($arraycc)
                         ->subject($asunto)

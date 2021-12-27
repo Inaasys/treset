@@ -577,6 +577,7 @@ class RequisicionController extends ConfiguracionSistemaController{
             "contadorproductos" => $contadorproductos,
             "contadorfilas" => $contadorfilas,
             "fecha" => Helpers::formatoinputdatetime($requisicion->Fecha),
+            "fechasdisponiblesenmodificacion" => Helpers::obtenerfechasdisponiblesenmodificacion($requisicion->Fecha),
             "fechaorden" => $fechaorden,
             "importe" => Helpers::convertirvalorcorrecto($requisicion->Importe),
             "descuento" => Helpers::convertirvalorcorrecto($requisicion->Descuento),
@@ -937,6 +938,7 @@ class RequisicionController extends ConfiguracionSistemaController{
         ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
         try{
+            $datosdocumento = Requisicion::where('Requisicion', $request->emaildocumento)->first();
             //enviar correo electrónico	
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
@@ -961,7 +963,7 @@ class RequisicionController extends ConfiguracionSistemaController{
             $body = $request->emailasunto;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
-            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
+            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
                 $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                         ->cc($arraycc)
                         ->subject($asunto)

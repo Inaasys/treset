@@ -11,18 +11,10 @@ function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1500));
 }
 function asignarfechaactual(){
-  /*
-    var fechahoy = new Date();
-    var dia = ("0" + fechahoy.getDate()).slice(-2);
-    var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
-    var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia) ;
-    $('#fecha').val(hoy);
-    $('input[type=datetime-local]').val(new Date().toJSON().slice(0,19));
-  */
-  $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechadatetimelocal){
-    $("#fecha").val(fechadatetimelocal);
-    $('input[type=datetime-local]').val(fechadatetimelocal);
-  }) 
+    $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechas){
+      $("#fecha").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
+      $("#fechasalida").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
+    }) 
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
@@ -2005,7 +1997,7 @@ function alta(){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Fecha</label>'+
-                                        '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" required onchange="validasolomesactual();">'+
+                                        '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" required  onkeydown="return false">'+
                                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                         '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
                                     '</div>'+   
@@ -2040,7 +2032,7 @@ function alta(){
                                     '</div>'+
                                     '<div class="col-md-2">'+
                                         '<label>Fecha y Hora Salida</label>'+
-                                        '<input type="datetime-local" class="form-control inputnext" name="fechasalida" id="fechasalida" required onchange="validasolomesactual();">'+
+                                        '<input type="datetime-local" class="form-control inputnext" name="fechasalida" id="fechasalida" required  onkeydown="return false">'+
                                     '</div>'+
                                     '<div class="col-md-4">'+
                                         '<label>Calle</label>'+
@@ -2096,7 +2088,7 @@ function alta(){
                                   '</div>'+
                                   '<div class="col-md-2">'+
                                       '<label>Fecha y Hora Llegada</label>'+
-                                      '<input type="datetime-local" class="form-control inputnext" name="fechallegada" id="fechallegada" required onchange="validasolomesactual();">'+
+                                      '<input type="datetime-local" class="form-control inputnext" name="fechallegada" id="fechallegada" required  onkeydown="return false">'+
                                   '</div>'+
                                   '<div class="col-md-4">'+
                                       '<label>Calle</label>'+
@@ -2898,7 +2890,7 @@ function obtenerdatos(notamodificar){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Fecha</label>'+
-                                        '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" required onchange="validasolomesactual();">'+
+                                        '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" required  onkeydown="return false">'+
                                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                         '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
                                     '</div>'+   

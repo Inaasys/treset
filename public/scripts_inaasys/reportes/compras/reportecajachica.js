@@ -95,7 +95,7 @@ function generar_formato_excel(){
 function listar(){
     tabla=$('#tbllistado').DataTable({
         "sScrollX": "110%",
-        "sScrollY": "350px",
+        "sScrollY": "390px",
         "bScrollCollapse": true,  
         "paging":   false,
         "ordering": false,

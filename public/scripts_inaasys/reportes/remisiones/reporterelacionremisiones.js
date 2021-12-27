@@ -587,6 +587,9 @@ function listar(){
         case "CORTE":
             var columnas = new Array("Remision", "Serie", "Folio", "Cliente", "Agente", "Fecha", "Plazo", "Tipo", "Unidad", "Pedido", "Solicita", "Referencia", "Destino", "Almacen", "TeleMarketing", "Os", "Eq", "Rq", "Importe", "Descuento", "SubTotal", "Iva", "Total", "Costo", "Comision", "Utilidad", "FormaPago", "Obs", "TipoCambio", "Hora", "Facturada", "Corte", "SuPago", "EnEfectivo", "EnTarjetas", "EnVales", "EnCheque", "Lugar", "Personas", "Status", "MotivoBaja", "Equipo", "Usuario", "Periodo");
             break;
+        case "LISTADO":
+            var columnas = new Array("Listado", "Requisicion", "Insumo", "NumeroParte", "Descripcion", "NumeroEquipo", "PrecioVenta", "FechaDeVentaListado", "PrecioUltimaCompra", "FechaUltimaCompra");
+            break;
     }
     var campos_tabla  = [];
     var cabecerastablareporte = "";

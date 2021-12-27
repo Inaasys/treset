@@ -10,9 +10,9 @@ function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1000));
 }
 function asignarfechaactual(){
-  $.get(ordenes_trabajo_obtener_fecha_actual_datetimelocal, function(fechadatetimelocal){
-    $("#fecha").val(fechadatetimelocal);
-    $("#fechaentregapromesa").val(fechadatetimelocal);
+  $.get(ordenes_trabajo_obtener_fecha_actual_datetimelocal, function(fechas){
+    $("#fecha").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
+    $("#fechaentregapromesa").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
   }) 
 }
 //obtener el ultimo id de la tabla
@@ -1179,7 +1179,7 @@ function agregarfilaservicio(Codigo, Servicio, Unidad, Costo, Venta, Cantidad, C
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'+number_format(round(importepartida, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)" readonly></td>'+
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxs departamentopartida" name="departamentopartida[]" value="SERVICIO" readonly data-parsley-length="[1, 20]"></td>'+
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxs cargopartida" name="cargopartida[]" value="SERVICIO" readonly data-parsley-length="[1, 20]"></td>'+
-                        '<td class="tdmod"><input type="datetime-local" class="form-control divorinputmodxl fechapartida" name="fechapartida[]" value="'+hoy+'" readonly></td>'+
+                        '<td class="tdmod"><input type="datetime-local" class="form-control divorinputmodxl fechapartida" name="fechapartida[]" value="'+hoy+'" readonly data-parsley-excluded="true" onkeydown="return false"></td>'+
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxs traspasopartida" name="traspasopartida[]" readonly></td>'+
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxs comprapartida" name="comprapartida[]" readonly data-parsley-length="[1, 20]"></td>'+
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxs usuariopartida" name="usuariopartida[]" value="'+usuario+'" readonly></td>'+
@@ -1599,12 +1599,12 @@ function alta(){
                     '</div>'+
                     '<div class="col-md-3">'+
                       '<label>Fecha</label>'+
-                      '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();">'+
+                      '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required data-parsley-excluded="true" onkeydown="return false">'+
                       '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                     '</div>'+
                     '<div class="col-md-3">'+
                       '<label>Entrega Promesa</label>'+
-                      '<input type="datetime-local" class="form-control inputnext" name="fechaentregapromesa" id="fechaentregapromesa"  required onchange="validasolomesactual();">'+
+                      '<input type="datetime-local" class="form-control inputnext" name="fechaentregapromesa" id="fechaentregapromesa"  required  data-parsley-excluded="true" onkeydown="return false">'+
                     '</div>'+
                   '</div>'+
                   '<div class="row">'+
@@ -2260,12 +2260,12 @@ function obtenerdatos(ordenmodificar){
                       '</div>'+
                       '<div class="col-md-3">'+
                         '<label>Fecha</label>'+
-                        '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();" >'+
+                        '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required data-parsley-excluded="true" onkeydown="return false">'+
                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                       '</div>'+
                       '<div class="col-md-3">'+
                         '<label>Entrega Promesa</label>'+
-                        '<input type="datetime-local" class="form-control inputnext" name="fechaentregapromesa" id="fechaentregapromesa"  required onchange="validasolomesactual();" >'+
+                        '<input type="datetime-local" class="form-control inputnext" name="fechaentregapromesa" id="fechaentregapromesa"  required data-parsley-excluded="true" onkeydown="return false">'+
                       '</div>'+
                     '</div>'+
                     '<div class="row">'+
@@ -2579,7 +2579,7 @@ function obtenerdatos(ordenmodificar){
     $("#serietexto").html("Serie: "+data.ordentrabajo.Serie);
     $("#numerofilastablaservicios").val(data.numerodetallesordentrabajo);
     $("#numerofilas").val(data.numerodetallesordentrabajo);
-    $("#fecha").val(data.fecha);
+    $("#fecha").val(data.fecha).attr('min', data.fechasdisponiblesenmodificacion.fechamin).attr('max', data.fechasdisponiblesenmodificacion.fechamax);
     $("#fechaentregapromesa").val(data.fechaentrega);
     $("#numeroclientefacturaa").val(data.cliente.Numero);
     $("#numeroclientefacturaaanterior").val(data.cliente.Numero);

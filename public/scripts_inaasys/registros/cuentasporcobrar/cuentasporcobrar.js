@@ -11,9 +11,8 @@ function retraso(){
 }
 //obtener fecha date time
 function asignarfechaactual(){
-    $.get(cuentas_por_cobrar_obtener_fecha_datetime, function(fecha){
-        //$('input[type=datetime-local]').val(fecha);
-        $("#fecha").val(fecha);
+    $.get(cuentas_por_cobrar_obtener_fecha_datetime, function(fechas){
+        $("#fecha").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
     }) 
 }
 //obtener el ultimo id de la tabla
@@ -1207,7 +1206,7 @@ function alta(){
                                 '</div>'+ 
                                 '<div class="col-md-3">'+
                                     '<label>Fecha</label>'+
-                                    '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" required onchange="validasolomesactual();">'+
+                                    '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" required data-parsley-excluded="true" onkeydown="return false">'+
                                     '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                     '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
                                 '</div>'+   
@@ -1233,7 +1232,7 @@ function alta(){
                                 '</div>'+ 
                                 '<div class="col-md-3">'+
                                     '<label>Fecha aplicación pagos</label>'+
-                                    '<input type="datetime-local" class="form-control inputnext" name="fechaaplicacionpagos" id="fechaaplicacionpagos" required>'+
+                                    '<input type="datetime-local" class="form-control inputnext" name="fechaaplicacionpagos" id="fechaaplicacionpagos"  data-parsley-excluded="true" onkeydown="return false" required>'+
                                 '</div>'+
                                 '<div class="col-md-3" hidden>'+
                                         '<label>Cargar Facturas</label>'+
@@ -1697,7 +1696,7 @@ function obtenerdatos(cxcmodificar){
                                     '</div>'+ 
                                     '<div class="col-md-3">'+
                                         '<label>Fecha</label>'+
-                                        '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" required onchange="validasolomesactual();">'+
+                                        '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" required data-parsley-excluded="true" onkeydown="return false">'+
                                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                         '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
                                     '</div>'+   
@@ -1723,7 +1722,7 @@ function obtenerdatos(cxcmodificar){
                                     '</div>'+ 
                                     '<div class="col-md-3">'+
                                         '<label>Fecha aplicación pagos</label>'+
-                                        '<input type="datetime-local" class="form-control inputnext" name="fechaaplicacionpagos" id="fechaaplicacionpagos" required>'+
+                                        '<input type="datetime-local" class="form-control inputnext" name="fechaaplicacionpagos" id="fechaaplicacionpagos" required data-parsley-excluded="true" onkeydown="return false">'+
                                     '</div>'+
                                     '<div class="col-md-3" hidden>'+
                                             '<label>Cargar Facturas</label>'+
@@ -1838,32 +1837,38 @@ function obtenerdatos(cxcmodificar){
                             '<div role="tabpanel" class="tab-pane fade in active" id="facturastab">'+
                                 '<div class="row">'+
                                     '<div class="col-md-12 table-responsive cabecerafija" style="height: 250px;overflow-y: scroll;padding: 0px 0px;">'+
-                                        '<table id="tabladetallesfacturas" class="table table-bordered tabladetallesfacturas">'+
+                                        '<table id="tabladetallesfacturas" class="table table-bordered tabladetallesfacturas tabladetallesmodulo">'+
                                             '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
                                                 '<th class="'+background_tables+'">#</th>'+
-                                                '<th class="'+background_tables+'">Factura</th>'+
-                                                '<th class="'+background_tables+'"><div class="divorinputmodsm">Fecha</div></th>'+
-                                                '<th class="'+background_tables+'">Plazo</th>'+
-                                                '<th class="'+background_tables+'"><div class="divorinputmodsm">Vence</div></th>'+
-                                                '<th class="'+background_tables+'">Total $</th>'+
-                                                '<th class="'+background_tables+'">Abonos $</th>'+
-                                                '<th class="'+background_tables+'">Notas Crédito $</th>'+
-                                                '<th class="customercolortheadth">Abono $</th>'+
-                                                '<th class="'+background_tables+'">Saldo $ (DOBLE CLICK)</th>'+
-                                                '<th class="'+background_tables+'"><div class="divorinputmodxl">idDocumento</div></th>'+
-                                                '<th class="'+background_tables+'">Serie</th>'+
-                                                '<th class="'+background_tables+'">Folio</th>'+
-                                                '<th class="'+background_tables+'">MonedaDR</th>'+
-                                                '<th class="'+background_tables+'">TipoCambioDR</th>'+
-                                                '<th class="'+background_tables+'">MetodoDePagoDR</th>'+
-                                                '<th class="'+background_tables+'">NumParcialidad</th>'+
-                                                '<th class="'+background_tables+'">ImpSaldoAnt</th>'+
-                                                '<th class="'+background_tables+'">ImpPagado</th>'+
-                                                '<th class="'+background_tables+'">ImpSaldoInsoluto</th>'+
+                                                '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'facturaaplicarpartida\',\'Compra\');">Factura</th>'+
+                                                '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'fechafacturapartida\',\'Fecha\');"><div class="divorinputmodsm">Fecha</div></th>'+
+                                                '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'plazofacturapartida\',\'Plazo\');">Plazo</th>'+
+                                                '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'vencefacturapartida\',\'Vence\');"><div class="divorinputmodsm">Vence</div></th>'+
+                                                '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'totalpesosfacturapartida\',\'Total $\');">Total $</th>'+
+                                                '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'abonosfacturapartida\',\'Abonos $\');">Abonos $</th>'+
+                                                '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'notascreditofacturapartida\',\'Notas Crédito $\');">Notas Crédito $</th>'+
+                                                '<th class="customercolortheadth"   ondblclick="construirtabladinamicaporcolumna(\'abonopesosfacturapartida\',\'Abono $\');">Abono $</th>'+
+                                                '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'saldofacturapartida\',\'Saldo $\');">Saldo $ (DOBLE CLICK)</th>'+
+                                                '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'uuidfacturapartida\',\'IdDocumento\');"><div class="divorinputmodxl">idDocumento</div></th>'+
+                                                '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'seriefacturapartida\',\'Serie\');">Serie</th>'+
+                                                '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'foliofacturapartida\',\'Folio\');">Folio</th>'+
+                                                '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'monedadrfacturapartida\',\'MonedaDR\');">MonedaDR</th>'+
+                                                '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'tipocambiodrfacturapartida\',\'TipoCambioDR\');">TipoCambioDR</th>'+
+                                                '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'metodopagodrfacturapartida\',\'MetodoDePagoDR\');">MetodoDePagoDR</th>'+
+                                                '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'numparcialidadfacturapartida\',\'NumParcialidad\');">NumParcialidad</th>'+
+                                                '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'impsaldoantfacturapartida\',\'ImpSaldoAnt\');">ImpSaldoAnt</th>'+
+                                                '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'imppagadofacturapartida\',\'ImpPagado\');">ImpPagado</th>'+
+                                                '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'impsaldoinsolutofacturapartida\',\'ImpSaldoInsoluto\');">ImpSaldoInsoluto</th>'+
                                                 '</tr>'+
                                             '</thead>'+
                                             '<tbody>'+           
+                                            '</tbody>'+
+                                        '</table>'+
+                                        '<table class="table table-bordered tabladinamicaacopiar" hidden>'+
+                                            '<thead class="'+background_tables+'" id="theadtabladinamicaacopiar">'+
+                                            '</thead>'+
+                                            '<tbody id="tbodytabladinamicaacopiar">'+           
                                             '</tbody>'+
                                         '</table>'+
                                     '</div>'+
@@ -1901,7 +1906,7 @@ function obtenerdatos(cxcmodificar){
     $("#pago").val(data.cuentaxcobrar.Pago);
     $("#stringfacturasseleccionadas").val(data.arrayfacturas);
     $("#numerofilas").val(data.numerocuentaxcobrardetalle);
-    $("#fecha").val(data.fecha);
+    $("#fecha").val(data.fecha).attr('min', data.fechasdisponiblesenmodificacion.fechamin).attr('max', data.fechasdisponiblesenmodificacion.fechamax);
     $("#fechaaplicacionpagos").val(data.fechapago);
     $("#cliente").val(data.cliente.Nombre);
     if(data.cliente.Nombre != null){
@@ -2045,6 +2050,37 @@ function obtenerdatos(cxcmodificar){
         $(".inputnexttabre").eq(index + 1).focus().select(); 
       }
     });
+
+
+    //copiar detalles tabla modulo
+    const btnCopyTable = document.querySelector('table.tabladinamicaacopiar');
+    const elTable = document.querySelector('table.tabladinamicaacopiar');
+    const copyEl = (elToBeCopied) => {
+       let range, sel;
+       // Ensure that range and selection are supported by the browsers
+       if (document.createRange && window.getSelection) {
+           console.log(elToBeCopied);
+           range = document.createRange();
+           sel = window.getSelection();
+           // unselect any element in the page
+           sel.removeAllRanges();
+           try {
+               range.selectNodeContents(elToBeCopied);
+               sel.addRange(range);
+           } catch (e) {
+               range.selectNode(elToBeCopied);
+               sel.addRange(range);
+           }
+           document.execCommand('copy');
+       }
+       sel.removeAllRanges();
+       msj_tablacopiadacorrectamente(); 
+    };
+    //btnCopyText.addEventListener('click', () => copyEl(elText));
+    btnCopyTable.addEventListener('dblclick', () => copyEl(elTable));
+    //fin copias tabla detalles modulo
+
+
     setTimeout(function(){$("#folio").focus();},500);
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
     $('.page-loader-wrapper').css('display', 'none');

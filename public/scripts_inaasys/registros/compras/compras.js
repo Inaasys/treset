@@ -10,17 +10,9 @@ function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1500));
 }
 function asignarfechaactual(){
-    /*
-    var fechahoy = new Date();
-    var dia = ("0" + fechahoy.getDate()).slice(-2);
-    var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
-    var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia) ;
-    $('#fecha').val(hoy);
-    $('input[type=datetime-local]').val(new Date().toJSON().slice(0,19));
-    */
-    $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechadatetimelocal){
-      $("#fecha").val(fechadatetimelocal);
-      $('input[type=datetime-local]').val(fechadatetimelocal);
+    $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechas){
+      $("#fecha").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
+      $("#fechaemitida").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
     }) 
 }
 //obtener el ultimo id de la tabla
@@ -1517,13 +1509,13 @@ function alta(tipoalta){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Fecha</label>'+
-                                        '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();validarmescompra();" style="min-width:95%;">'+
+                                        '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required style="min-width:95%;" data-parsley-excluded="true" onkeydown="return false">'+
                                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                         '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
                                     '</div>'+   
                                     '<div class="col-md-3">'+
                                         '<label>Emitida</label>'+
-                                        '<input type="datetime-local" class="form-control inputnext" name="fechaemitida" id="fechaemitida"  required readonly>'+
+                                        '<input type="datetime-local" class="form-control inputnext" name="fechaemitida" id="fechaemitida" data-parsley-excluded="true" onkeydown="return false" required readonly>'+
                                         '<input type="hidden" class="form-control" name="fechatimbrado" id="fechatimbrado" >'+
                                     '</div>'+
                                 '</div>'+
@@ -1958,13 +1950,13 @@ function obtenerdatos(compramodificar){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Fecha</label>'+
-                                        '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();validarmescompra();" style="min-width:95%;">'+
+                                        '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required style="min-width:95%;" data-parsley-excluded="true" onkeydown="return false">'+
                                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                         '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
                                     '</div>'+   
                                     '<div class="col-md-3">'+
                                         '<label>Emitida</label>'+
-                                        '<input type="datetime-local" class="form-control inputnext" name="fechaemitida" id="fechaemitida"  required readonly>'+
+                                        '<input type="datetime-local" class="form-control inputnext" name="fechaemitida" id="fechaemitida" data-parsley-excluded="true" onkeydown="return false" required readonly>'+
                                         '<input type="hidden" class="form-control" name="fechatimbrado" id="fechatimbrado" >'+
                                     '</div>'+
                                 '</div>'+
@@ -2228,7 +2220,7 @@ function obtenerdatos(compramodificar){
     $("#uuidxml").val(data.compra.UUID);
     $("#uuid").val(data.compra.UUID);
     $("#plazo").val(data.compra.Plazo);
-    $("#fecha").val(data.fecha);
+    $("#fecha").val(data.fecha).attr('min', data.fechasdisponiblesenmodificacion.fechamin).attr('max', data.fechasdisponiblesenmodificacion.fechamax);
     $("#fechaemitida").val(data.fechaemitida);
     $("#fechatimbrado").val(data.fechatimbrado);
     $("#ordentrabajo").val(data.compra.OrdenTrabajo);

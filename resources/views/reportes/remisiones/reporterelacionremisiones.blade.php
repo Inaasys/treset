@@ -140,6 +140,7 @@
                                             <option value="MENSUAL">MENSUAL</option>
                                             <option value="POTENCIALES">POTENCIALES</option>
                                             <!--<option value="CORTE">CORTE</option>-->
+                                            <option value="LISTADO">LISTADO</option>
                                         </select>
                                     </div>
                                 </div>

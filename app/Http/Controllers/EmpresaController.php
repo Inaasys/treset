@@ -223,6 +223,11 @@ class EmpresaController extends ConfiguracionSistemaController{
             if (file_exists($eliminar_logotipo_anterior)) {
                 unlink($eliminar_logotipo_anterior);
             }
+            //copiar archivo subido para colocar el logo en correos
+            $nuevo_nombre_archivo_logotipo_correos = 'logoempresacorreos.jpg';
+            $file = public_path().'/logotipo_empresa/'.$nuevo_nombre_archivo;
+            $newfile = public_path().'/logotipo_empresa/'.$nuevo_nombre_archivo_logotipo_correos;
+            if (!copy($file, $newfile)) { echo "failed to copy";}
         }else{
             $Empresa = Empresa::where('Numero', 1)->first();
             $nuevo_nombre_archivo = $Empresa->Logo;

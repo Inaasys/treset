@@ -91,8 +91,48 @@ class Helpers{
         Carbon::setLocale(config('app.locale'));
         Carbon::setUTF8(true);
         setlocale(LC_TIME, 'es_Es');
-        $fecha = Carbon::now()->format('Y-m-d')."T".Carbon::now()->format('H:i');
-        return $fecha;
+        $fecha = '';
+        $fechamax = '';
+        $fechamin = '';
+        //$fecha = Carbon::now()->format('Y-m-d')."T".Carbon::now()->format('H:i');
+        //$date = Carbon::parse('2021-12-02');
+        $date = Carbon::now();
+        if($date->day <= 3){
+            $fecha = Carbon::now()->format('Y-m-d')."T".Carbon::now()->format('H:i');
+            $ultimodiamesactual = Carbon::now()->endOfMonth()->toDateString();
+            $fechamax = Carbon::parse($ultimodiamesactual)->format('Y-m-d')."T23:59";
+            $primerdiamesanterior = new Carbon('first day of last month');
+            $fechamin = Carbon::parse($primerdiamesanterior)->format('Y-m-d')."T00:00";
+        }else{
+            $fecha = Carbon::now()->format('Y-m-d')."T".Carbon::now()->format('H:i');
+            $ultimodiamesactual = Carbon::now()->endOfMonth()->toDateString();
+            $fechamax = Carbon::parse($ultimodiamesactual)->format('Y-m-d')."T23:59";
+            $primerdiamesactual = new Carbon('first day of this month');
+            $fechamin = Carbon::parse($primerdiamesactual)->format('Y-m-d')."T00:00";
+        }
+        $data = array(
+            'fecha' => $fecha,
+            'fechamax' => $fechamax,
+            'fechamin' => $fechamin
+        );
+        return $data;
+    }
+
+    //se obtienes los intervalos de min y max para el input de fecha en los modulos
+    public static function obtenerfechasdisponiblesenmodificacion($fechadocumento){
+        Carbon::setLocale(config('app.locale'));
+        Carbon::setUTF8(true);
+        setlocale(LC_TIME, 'es_Es');
+        $fecha = Carbon::parse($fechadocumento);
+        $primerdia = $fecha->firstOfMonth()->toDateString();
+        $ultimodia = $fecha->endOfMonth()->toDateString();
+        $fechamax = Carbon::parse($ultimodia)->format('Y-m-d')."T23:59";
+        $fechamin = Carbon::parse($primerdia)->format('Y-m-d')."T00:00";
+        $data = array(
+            'fechamax' => $fechamax,
+            'fechamin' => $fechamin
+        );
+        return $data;
     }
 
     //dar formato correcto a la fecha para input type date en vista

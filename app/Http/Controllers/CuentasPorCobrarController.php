@@ -746,16 +746,19 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         $banco = Banco::where('Numero', $cuentaxcobrar->Banco)->first();
         $filasdetallecuentasporcobrar = '';
         $contadorfilas = 0;
+        $numerodetalle = 1;
         $contadorproductos = 0;
         $arrayfacturas = array();
         if($numerocuentaxcobrardetalle > 0){
             foreach($cuentaxcobrardetalle as $cxcd){
                 array_push($arrayfacturas, $cxcd->Factura);
                 $factura = Factura::where('Factura', $cxcd->Factura)->first();
+                $encabezadostablaacopiar = '#,Factura,Fecha,Plazo,Vence,Total $,Abonos $,Notas Crédito $,Abono,Saldo $,idDocumento,Serie,Folio,MonedaDR,TipoCambioDR,MetodoDePagoDR,NumParcialidad,ImpSaldoAnt,ImpPagado,ImpSaldoInsoluto';
+                $clasecolumnaobtenervalor = '.numerodetalle,.facturaaplicarpartida,.fechafacturapartida,.plazofacturapartida,.vencefacturapartida,.totalpesosfacturapartida,.abonosfacturapartida,.notascreditofacturapartida,.abonopesosfacturapartida,.saldofacturapartida,.uuidfacturapartida,.seriefacturapartida,.foliofacturapartida,.monedadrfacturapartida,.tipocambiodrfacturapartida,.metodopagodrfacturapartida,.numparcialidadfacturapartida,.impsaldoantfacturapartida,.imppagadofacturapartida,.impsaldoinsolutofacturapartida';
                 $filasdetallecuentasporcobrar= $filasdetallecuentasporcobrar.
-                '<tr class="filasfacturas" id="filafactura'.$contadorfilas.'">'.
-                    '<td class="tdmod"><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control facturaaplicarpartida" name="facturaaplicarpartida[]" value="'.$factura->Factura.'" readonly>'.$factura->Factura.'</td>'.
+                '<tr class="filasfacturas filafactura'.$contadorfilas.'" id="filafactura'.$contadorfilas.'">'.
+                    '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm numerodetalle" name="numerodetalle[]" value="'.$numerodetalle.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly>'.$numerodetalle.'</td>'.
+                    '<td class="tdmod" ondblclick="construirtabladinamicaporfila('.$contadorfilas.',\'tr.filasfacturas\',\''.$encabezadostablaacopiar.'\',\''.$clasecolumnaobtenervalor.'\')"><input type="hidden" class="form-control facturaaplicarpartida" name="facturaaplicarpartida[]" value="'.$factura->Factura.'" readonly>'.$factura->Factura.'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control fechafacturapartida" name="fechafacturapartida[]" value="'.Helpers::fecha_espanol($factura->Fecha).'" readonly>'.Helpers::fecha_espanol($factura->Fecha).'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control plazofacturapartida" name="plazofacturapartida[]" value="'.$factura->Plazo.'" readonly>'.$factura->Plazo.'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control vencefacturapartida" name="vencefacturapartida[]" value="'.Helpers::fecha_espanol(Carbon::parse($factura->Fecha)->addDays($factura->Plazo)->toDateTimeString()).'" readonly>'.Helpers::fecha_espanol(Carbon::parse($factura->Fecha)->addDays($factura->Plazo)->toDateTimeString()).'</td>'.
@@ -788,6 +791,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                 '</tr>';
                 $contadorfilas++;
                 $contadorproductos++;
+                $numerodetalle++;
             }
         }
         //permitir o no modificar registro
@@ -818,6 +822,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             'contadorfilas' => $contadorfilas,
             'fecha' => Helpers::formatoinputdatetime($cuentaxcobrar->Fecha),
             'fechapago' => Helpers::formatoinputdatetime($cuentaxcobrar->FechaPago),
+            "fechasdisponiblesenmodificacion" => Helpers::obtenerfechasdisponiblesenmodificacion($cuentaxcobrar->Fecha),
             'cliente' => $cliente,
             'regimenfiscal' => $regimenfiscal,
             'tiporelacion' => $tiporelacion,
@@ -1152,6 +1157,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $url_xml = "";
         }
         try{
+            $datosdocumento = CuentaXCobrar::where('Pago', $request->emaildocumento)->first();
             //enviar correo electrónico	
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
@@ -1177,7 +1183,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             if (file_exists($url_xml) != false) {
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento,$url_xml) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento,$url_xml) {
                     $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento,$url_xml)
                             ->cc($arraycc)
                             ->subject($asunto)
@@ -1187,7 +1193,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                 //eliminar xml de storage/xml_cargados
                 unlink($url_xml);
             }else{
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
                     $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                             ->cc($correos)
                             ->subject($asunto)

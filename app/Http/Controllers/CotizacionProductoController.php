@@ -656,6 +656,7 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
             "contadorproductos" => $contadorproductos,
             "contadorfilas" => $contadorfilas,
             "fecha" => Helpers::formatoinputdatetime($cotizacion->Fecha),
+            "fechasdisponiblesenmodificacion" => Helpers::obtenerfechasdisponiblesenmodificacion($cotizacion->Fecha),
             "importe" => Helpers::convertirvalorcorrecto($cotizacion->Importe),
             "descuento" => Helpers::convertirvalorcorrecto($cotizacion->Descuento),
             "subtotal" => Helpers::convertirvalorcorrecto($cotizacion->SubTotal),
@@ -1003,6 +1004,7 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
         ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
         try{
+            $datosdocumento = CotizacionProducto::where('Cotizacion', $request->emaildocumento)->first();
             //enviar correo electrónico	
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
@@ -1050,7 +1052,7 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             if($request->archivoadjunto != null && $request->archivoadjunto2 != null) {
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento) {
                     $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                             ->cc($arraycc)
                             ->subject($asunto)
@@ -1067,7 +1069,7 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
                     unlink($urlarchivoadjunto2);
                 }
             }else if($request->archivoadjunto != null && $request->archivoadjunto2 == null){
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $correos, $asunto, $pdf, $emaildocumento) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $correos, $asunto, $pdf, $emaildocumento) {
                     $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                             ->cc($arraycc)
                             ->subject($asunto)
@@ -1079,7 +1081,7 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
                     unlink($urlarchivoadjunto);
                 }
             }else if($request->archivoadjunto == null && $request->archivoadjunto2 != null){
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $urlarchivoadjunto2, $arraycc, $asunto, $pdf, $emaildocumento) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $correos, $urlarchivoadjunto2, $arraycc, $asunto, $pdf, $emaildocumento) {
                     $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                             ->cc($arraycc)
                             ->subject($asunto)
@@ -1091,7 +1093,7 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
                     unlink($urlarchivoadjunto2);
                 }
             }else{
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $arraycc, $asunto, $pdf, $emaildocumento) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $correos, $arraycc, $asunto, $pdf, $emaildocumento) {
                     $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                             ->cc($arraycc)
                             ->subject($asunto)
@@ -1205,6 +1207,7 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
         ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
         try{
+            $datosdocumento = CotizacionProducto::where('Cotizacion', $request->emaildocumento)->first();
             //enviar correo electrónico	
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
@@ -1252,7 +1255,7 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             if($request->archivoadjunto != null && $request->archivoadjunto2 != null) {
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento) {
                     $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                             ->cc($arraycc)
                             ->subject($asunto)
@@ -1269,7 +1272,7 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
                     unlink($urlarchivoadjunto2);
                 }
             }else if($request->archivoadjunto != null && $request->archivoadjunto2 == null){
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $correos, $asunto, $pdf, $emaildocumento) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $correos, $asunto, $pdf, $emaildocumento) {
                     $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                             ->cc($arraycc)
                             ->subject($asunto)
@@ -1281,7 +1284,7 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
                     unlink($urlarchivoadjunto);
                 }
             }else if($request->archivoadjunto == null && $request->archivoadjunto2 != null){
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $urlarchivoadjunto2, $arraycc, $asunto, $pdf, $emaildocumento) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $correos, $urlarchivoadjunto2, $arraycc, $asunto, $pdf, $emaildocumento) {
                     $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                             ->cc($arraycc)
                             ->subject($asunto)
@@ -1293,7 +1296,7 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
                     unlink($urlarchivoadjunto2);
                 }
             }else{
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $correos, $arraycc, $asunto, $pdf, $emaildocumento) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $correos, $arraycc, $asunto, $pdf, $emaildocumento) {
                     $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                             ->cc($arraycc)
                             ->subject($asunto)

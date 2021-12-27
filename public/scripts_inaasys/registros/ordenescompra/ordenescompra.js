@@ -10,16 +10,8 @@ function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1000));
 }
 function asignarfechaactual(){
-    /*
-    var fechahoy = new Date();
-    var dia = ("0" + fechahoy.getDate()).slice(-2);
-    var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
-    var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia) ;
-    $('#fecha').val(hoy);
-    $('input[type=datetime-local]').val(new Date().toJSON().slice(0,19));
-    */
-  $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechadatetimelocal){
-    $("#fecha").val(fechadatetimelocal);
+  $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechas){
+    $("#fecha").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
   }) 
 }
 //obtener el ultimo id de la tabla
@@ -1586,7 +1578,7 @@ function alta(tipoalta){
                 '</div>'+
                 '<div class="col-xs-12 col-sm-12 col-md-3">'+
                   '<label>Fecha</label>'+
-                  '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();" style="min-width:95%;">'+
+                  '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required  style="min-width:95%;" data-parsley-excluded="true" onkeydown="return false">'+
                   '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                 '</div>'+
               '</div>'+
@@ -2099,7 +2091,7 @@ function obtenerdatos(ordenmodificar){
                   '</div>'+
                   '<div class="col-xs-12 col-sm-12 col-md-3">'+
                     '<label>Fecha</label>'+
-                    '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" required onchange="validasolomesactual();" style="min-width:95%;">'+
+                    '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" required style="min-width:95%;" data-parsley-excluded="true" onkeydown="return false">'+
                     '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy">'+
                   '</div>'+
                 '</div>'+
@@ -2183,27 +2175,33 @@ function obtenerdatos(ordenmodificar){
                   '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
                     '<div class="row">'+
                       '<div class="col-md-12 table-responsive cabecerafija" style="height: 175px;overflow-y: scroll;padding: 0px 0px;">'+
-                        '<table id="tablaproductodordencompra" class="table table-bordered tablaproductodordencompra">'+
+                        '<table id="tablaproductodordencompra" class="table table-bordered tablaproductodordencompra tabladetallesmodulo">'+
                           '<thead class="'+background_tables+'">'+
                             '<tr>'+
                               '<th class="'+background_tables+'">#</th>'+
-                              '<th class="customercolortheadth">Código</th>'+
-                              '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
-                              '<th class="customercolortheadth">Unidad</th>'+
-                              '<th class="'+background_tables+'">Por Surtir</th>'+
-                              '<th class="customercolortheadth">Cantidad</th>'+
-                              '<th class="customercolortheadth">Precio $</th>'+
-                              '<th class="'+background_tables+'">Importe $</th>'+
-                              '<th class="customercolortheadth">Dcto %</th>'+
-                              '<th class="customercolortheadth">Dcto $</th>'+
-                              '<th class="'+background_tables+'">SubTotal $</th>'+
-                              '<th class="customercolortheadth">Iva %</th>'+
-                              '<th class="'+background_tables+'">Iva $</th>'+
-                              '<th class="'+background_tables+'">Total $</th>'+
+                              '<th class="customercolortheadth" ondblclick="construirtabladinamicaporcolumna(\'codigoproductopartida\',\'Codigo\');">Código</th>'+
+                              '<th class="customercolortheadth" ondblclick="construirtabladinamicaporcolumna(\'nombreproductopartida\',\'Descripción\');"><div style="width:200px !important;">Descripción</div></th>'+
+                              '<th class="customercolortheadth" ondblclick="construirtabladinamicaporcolumna(\'unidadproductopartida\',\'Unidad\');">Unidad</th>'+
+                              '<th class="'+background_tables+'" ondblclick="construirtabladinamicaporcolumna(\'porsurtirpartida\',\'Por Surtir\');">Por Surtir</th>'+
+                              '<th class="customercolortheadth" ondblclick="construirtabladinamicaporcolumna(\'cantidadpartida\',\'Cantidad\');">Cantidad</th>'+
+                              '<th class="customercolortheadth" ondblclick="construirtabladinamicaporcolumna(\'preciopartida\',\'Precio $\');">Precio $</th>'+
+                              '<th class="'+background_tables+'" ondblclick="construirtabladinamicaporcolumna(\'importepartida\',\'Importe $\');">Importe $</th>'+
+                              '<th class="customercolortheadth" ondblclick="construirtabladinamicaporcolumna(\'descuentoporcentajepartida\',\'Dcto %\');">Dcto %</th>'+
+                              '<th class="customercolortheadth" ondblclick="construirtabladinamicaporcolumna(\'descuentopesospartida\',\'Dcto $\');">Dcto $</th>'+
+                              '<th class="'+background_tables+'" ondblclick="construirtabladinamicaporcolumna(\'subtotalpartida\',\'SubTotal $\');">SubTotal $</th>'+
+                              '<th class="customercolortheadth" ondblclick="construirtabladinamicaporcolumna(\'ivaporcentajepartida\',\'Iva %\');">Iva %</th>'+
+                              '<th class="'+background_tables+'" ondblclick="construirtabladinamicaporcolumna(\'ivapesospartida\',\'Iva $\');">Iva $</th>'+
+                              '<th class="'+background_tables+'" ondblclick="construirtabladinamicaporcolumna(\'totalpesospartida\',\'Total $\');">Total $</th>'+
                             '</tr>'+
                           '</thead>'+
                           '<tbody>'+       
                           '</tbody>'+
+                        '</table>'+
+                        '<table class="table table-bordered tabladinamicaacopiar" hidden>'+
+                            '<thead class="'+background_tables+'" id="theadtabladinamicaacopiar">'+
+                            '</thead>'+
+                            '<tbody id="tbodytabladinamicaacopiar">'+           
+                            '</tbody>'+
                         '</table>'+
                       '</div>'+
                     '</div>'+ 
@@ -2252,7 +2250,7 @@ function obtenerdatos(ordenmodificar){
     $("#serietexto").html("Serie: "+data.ordencompra.Serie);
     $("#plazo").val(data.ordencompra.Plazo);
     $("#referencia").val(data.ordencompra.Referencia);
-    $("#fecha").val(data.fecha);
+    $("#fecha").val(data.fecha).attr('min', data.fechasdisponiblesenmodificacion.fechamin).attr('max', data.fechasdisponiblesenmodificacion.fechamax);
     $("#numeroproveedor").val(data.proveedor.Numero);
     $("#numeroproveedoranterior").val(data.proveedor.Numero);
     $("#proveedor").val(data.proveedor.Nombre);
@@ -2369,6 +2367,33 @@ function obtenerdatos(ordenmodificar){
         $(".inputnextdet").eq(index + 1).focus().select(); 
       }
     });
+    //copiar detalles tabla modulo
+    const btnCopyTable = document.querySelector('table.tabladinamicaacopiar');
+    const elTable = document.querySelector('table.tabladinamicaacopiar');
+    const copyEl = (elToBeCopied) => {
+       let range, sel;
+       // Ensure that range and selection are supported by the browsers
+       if (document.createRange && window.getSelection) {
+           console.log(elToBeCopied);
+           range = document.createRange();
+           sel = window.getSelection();
+           // unselect any element in the page
+           sel.removeAllRanges();
+           try {
+               range.selectNodeContents(elToBeCopied);
+               sel.addRange(range);
+           } catch (e) {
+               range.selectNode(elToBeCopied);
+               sel.addRange(range);
+           }
+           document.execCommand('copy');
+       }
+       sel.removeAllRanges();
+       msj_tablacopiadacorrectamente(); 
+    };
+    //btnCopyText.addEventListener('click', () => copyEl(elText));
+    btnCopyTable.addEventListener('dblclick', () => copyEl(elTable));
+    //fin copias tabla detalles modulo
     obtenertiposordenescompra(data.ordencompra.Tipo);
     seleccionartipoordencompra(data);
   }).fail( function() {

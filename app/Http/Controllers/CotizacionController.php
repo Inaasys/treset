@@ -377,6 +377,7 @@ class CotizacionController extends ConfiguracionSistemaController{
             "contadorproductos" => $contadorproductos,
             "contadorfilas" => $contadorfilas,
             "fecha" => Helpers::formatoinputdatetime($cotizacion->fecha),
+            "fechasdisponiblesenmodificacion" => Helpers::obtenerfechasdisponiblesenmodificacion($cotizacion->fecha),
             "subtotal" => Helpers::convertirvalorcorrecto($cotizacion->subtotal),
             "iva" => Helpers::convertirvalorcorrecto($cotizacion->iva),
             "total" => Helpers::convertirvalorcorrecto($cotizacion->total),

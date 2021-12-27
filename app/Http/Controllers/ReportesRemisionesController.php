@@ -496,6 +496,60 @@ class ReportesRemisionesController extends ConfiguracionSistemaController{
                 break;
             case "CORTE":
                 break;
+
+
+            case "LISTADO":
+                $data = DB::table('Remisiones as r')
+                ->leftjoin('Clientes as c', 'r.Cliente', '=', 'c.Numero')
+                ->leftjoin('Agentes as a', 'r.Agente', '=', 'a.Numero')
+                ->leftjoin('Remisiones Detalles as rd', 'r.Remision', '=', 'rd.Remision')
+                ->leftJoin('Productos as p', 'rd.Codigo', 'p.Codigo')
+                ->select('r.Referencia as Listado', 'r.Rq as Requisicion', 'p.Insumo', 'rd.Codigo AS NumeroParte', 'rd.Descripcion', "r.Equipo AS NumeroEquipo", 'rd.Precio as PrecioVenta', 'r.Fecha as FechaDeVentaListado', 'p.Ultimo Costo as PrecioUltimaCompra', 'p.Fecha Ultima Compra as FechaUltimaCompra')
+                ->whereDate('r.Fecha', '>=', $fechainicio)->whereDate('r.Fecha', '<=', $fechaterminacion)
+                ->where(function($q) use ($numerocliente) {
+                    if($numerocliente != ""){
+                        $q->where('r.Cliente', $numerocliente);
+                    }
+                })
+                ->where(function($q) use ($numeroagente) {
+                    if($numeroagente != ""){
+                        $q->where('r.Agente', $numeroagente);
+                    }
+                })
+                ->where(function($q) use ($claveserie) {
+                    if($claveserie != ""){
+                        $q->where('r.Serie', $claveserie);
+                    }
+                })
+                ->where(function($q) use ($claveformapago) {
+                    if($claveformapago != ""){
+                        $q->where('r.FormaPago', $claveformapago);
+                    }
+                })
+                ->where(function($q) use ($tipo) {
+                    if($tipo != 'TODOS'){
+                        $q->where('r.Tipo', $tipo);
+                    }
+                })
+                ->where(function($q) use ($status) {
+                    if($status != 'TODOS'){
+                        if($status == 'FACTURADOS'){
+                            $q->where('r.Status', 'like', '%-%');
+                        }else{
+                            $q->where('r.Status', $status);
+                        }
+                    }
+                })
+                ->orderby('r.Remision', 'ASC')
+                ->orderby('r.Fecha', 'ASC')
+                ->orderby('rd.Item', 'ASC')
+                ->get();
+                return DataTables::of($data)
+                ->addColumn('PrecioVenta', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->PrecioVenta), $this->numerodecimales); })
+                ->addColumn('PrecioUltimaCompra', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->PrecioUltimaCompra), $this->numerodecimales); })
+                ->make(true);
+                break;
+
         }
     }
     //generar reporte en excel

@@ -10,9 +10,9 @@ function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1000));
 }
 function asignarfechaactual(){
-    $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechadatetimelocal){
-        $("#fecha").val(fechadatetimelocal);
-    }) 
+  $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechas){
+    $("#fecha").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
+  }) 
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
@@ -875,7 +875,7 @@ function alta(){
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Fecha </label>'+
-                                '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();" >'+
+                                '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required data-parsley-excluded="true" onkeydown="return false">'+
                                 '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                             '</div>'+
                         '</div>'+
@@ -1279,7 +1279,7 @@ function obtenerdatos(produccionmodificar){
                                 '</div>'+
                                 '<div class="col-md-3">'+
                                     '<label>Fecha </label>'+
-                                    '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();" >'+
+                                    '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required data-parsley-excluded="true" onkeydown="return false">'+
                                     '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                 '</div>'+
                             '</div>'+
@@ -1379,7 +1379,7 @@ function obtenerdatos(produccionmodificar){
     $("#folio").val(data.produccion.Folio);
     $("#serie").val(data.produccion.Serie);
     $("#serietexto").html("Serie: "+data.produccion.Serie);
-    $("#fecha").val(data.fecha);
+    $("#fecha").val(data.fecha).attr('min', data.fechasdisponiblesenmodificacion.fechamin).attr('max', data.fechasdisponiblesenmodificacion.fechamax);
     $("#cliente").val(data.cliente.Nombre);
     if(data.cliente.Nombre != null){
         $("#textonombrecliente").html(data.cliente.Nombre.substring(0, 40));

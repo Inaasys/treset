@@ -388,6 +388,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
         $Banco = Banco::where('Numero', $CuentaXPagar->Banco)->first();
         $filasdetallecuentasporpagar = '';
         $contadorfilas = 0;
+        $numerodetalle = 1;
         foreach($CuentaXPagarDetalle as $cxpd){
             //obtener nota de credito proveedor
             $detallenotacredito = 0;
@@ -399,10 +400,13 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                 }
             }
             $c = Compra::where('Compra', $cxpd->Compra)->first();
+            //importante para copiar tabla
+            $encabezadostablaacopiar = '#,Compra,Factura,Fecha,Plazo,Vence,Total $,Abonos $,Notas Crédito $,Abono,Saldo $';
+            $clasecolumnaobtenervalor = '.numerodetalle,.compra,.facturacompra,.fechacompra,.plazocompra,.vencecompra,.totalcompra,.abonoscompra,.notascreditocompra,.abonocompra,.saldocomprainicial';
             $filasdetallecuentasporpagar= $filasdetallecuentasporpagar.
-                '<tr class="filascompras" id="filacompra'.$contadorfilas.'">'.
-                    '<td class="tdmod"></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm compra" name="compra[]" value="'.$c->Compra.'" readonly>'.$c->Compra.'</td>'.
+                '<tr class="filascompras  filacompra'.$contadorfilas.'" id="filacompra'.$contadorfilas.'">'.
+                    '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm numerodetalle" name="numerodetalle[]" value="'.$numerodetalle.'" readonly>'.$numerodetalle.'</td>'.
+                    '<td class="tdmod" ondblclick="construirtabladinamicaporfila('.$contadorfilas.',\'tr.filascompras\',\''.$encabezadostablaacopiar.'\',\''.$clasecolumnaobtenervalor.'\')"><input type="hidden" class="form-control divorinputmodsm compra" name="compra[]" value="'.$c->Compra.'" readonly>'.$c->Compra.'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm facturacompra" name="facturacompra[]" value="'.$c->Factura.'" readonly>'.$c->Factura.'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm fechacompra" name="fechacompra[]" value="'.Helpers::fecha_espanol($c->Fecha).'" readonly>'.Helpers::fecha_espanol($c->Fecha).'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm plazocompra" name="plazocompra[]" value="'.$c->Plazo.'" readonly>'.$c->Plazo.'</td>'.
@@ -414,7 +418,10 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm saldocomprainicial" name="saldocomprainicial[]" value="'.Helpers::convertirvalorcorrecto($c->Saldo).'" readonly><input type="hidden" class="form-control divorinputmodsm saldocompra" name="saldocompra[]" value="'.Helpers::convertirvalorcorrecto($c->Saldo).'" readonly>'.Helpers::convertirvalorcorrecto($c->Saldo).'</td>'.
                 '</tr>';
                 $contadorfilas++;
+                $numerodetalle++;
         }
+        $filasdetallecuentasporpagar= $filasdetallecuentasporpagar.'<tr></tr>';
+
         //permitir o no modificar registro
         if(Auth::user()->role_id == 1){
             if($CuentaXPagar->Status == 'BAJA'){
@@ -439,6 +446,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
             'CuentaXPagar' => $CuentaXPagar,
             'CuentaXPagarDetalle' => $CuentaXPagarDetalle,
             'fecha' => Helpers::formatoinputdatetime($CuentaXPagar->Fecha),
+            "fechasdisponiblesenmodificacion" => Helpers::obtenerfechasdisponiblesenmodificacion($CuentaXPagar->Fecha),
             'proveedor' => $Proveedor,
             'banco' => $Banco,
             'filasdetallecuentasporpagar' => $filasdetallecuentasporpagar,
@@ -693,6 +701,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
         ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
         try{
+            $datosdocumento = CuentaXPagar::where('Pago', $request->emaildocumento)->first();
             //enviar correo electrónico	
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
@@ -717,7 +726,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
             $body = $request->emailasunto;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
-            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
+            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
                 $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                         ->cc($arraycc)
                         ->subject($asunto)

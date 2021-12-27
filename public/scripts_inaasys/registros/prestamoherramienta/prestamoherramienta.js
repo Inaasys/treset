@@ -12,14 +12,10 @@ function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1000));
 }
 function asignarfechaactual(){
-  $.get(prestamo_herramienta_obtener_fecha_datetimelocal, function(data){
-    /*var fechahoy = new Date();
-    var dia = ("0" + fechahoy.getDate()).slice(-2);
-    var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
-    var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia) ;*/
-    $('#fecha').val(data);
-    $("#inicioprestamo").val(data);
-    $("#terminoprestamo").val(data);
+  $.get(prestamo_herramienta_obtener_fecha_datetimelocal, function(fechas){
+    $('#fecha').val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
+    $("#inicioprestamo").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
+    $("#terminoprestamo").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
   });
 }
 //comparar si la fecha de termino del prestamo es menor a la fecha de inicio
@@ -603,18 +599,18 @@ function alta(){
                 '</div>'+
                 '<div class="col-md-3">'+
                   '<label>Fecha</label>'+
-                  '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();">'+
+                  '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required data-parsley-excluded="true" onkeydown="return false">'+
                   '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                 '</div>'+
               '</div>'+
               '<div class="row">'+
                 '<div class="col-md-3">'+
                   '<label>Inicio Prestamo</label>'+
-                  '<input type="datetime-local" class="form-control inicioprestamo inputnext" name="inicioprestamo" id="inicioprestamo" onchange="compararterminoprestamo()" required>'+
+                  '<input type="datetime-local" class="form-control inicioprestamo inputnext" name="inicioprestamo" id="inicioprestamo" onchange="compararterminoprestamo()" data-parsley-excluded="true" onkeydown="return false" required>'+
                 '</div>'+
                 '<div class="col-md-3">'+
                   '<label>Termino Prestamo</label>'+
-                  '<input type="datetime-local" class="form-control terminoprestamo inputnext" name="terminoprestamo" id="terminoprestamo" onchange="compararterminoprestamo()" required >'+
+                  '<input type="datetime-local" class="form-control terminoprestamo inputnext" name="terminoprestamo" id="terminoprestamo" onchange="compararterminoprestamo()" data-parsley-excluded="true" onkeydown="return false" required >'+
                 '</div>'+
                 '<div class="col-md-4">'+
                   '<label >correo notificaciones</label>'+
@@ -889,18 +885,18 @@ function obtenerdatos(prestamomodificar){
                   '</div>'+
                   '<div class="col-md-3">'+
                     '<label>Fecha</label>'+
-                    '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required onchange="validasolomesactual();">'+
+                    '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required data-parsley-excluded="true" onkeydown="return false">'+
                     '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                   '</div>'+
                 '</div>'+
                 '<div class="row">'+
                   '<div class="col-md-3">'+
                     '<label>Inicio Prestamo</label>'+
-                    '<input type="datetime-local" class="form-control inicioprestamo inputnext" name="inicioprestamo" id="inicioprestamo" onchange="compararterminoprestamo()" required>'+
+                    '<input type="datetime-local" class="form-control inicioprestamo inputnext" name="inicioprestamo" id="inicioprestamo" onchange="compararterminoprestamo()"  data-parsley-excluded="true" onkeydown="return false" required>'+
                   '</div>'+
                   '<div class="col-md-3">'+
                     '<label>Termino Prestamo</label>'+
-                    '<input type="datetime-local" class="form-control terminoprestamo inputnext" name="terminoprestamo" id="terminoprestamo" onchange="compararterminoprestamo()" required >'+
+                    '<input type="datetime-local" class="form-control terminoprestamo inputnext" name="terminoprestamo" id="terminoprestamo" onchange="compararterminoprestamo()"  data-parsley-excluded="true" onkeydown="return false" required >'+
                   '</div>'+
                   '<div class="col-md-4">'+
                     '<label >correo notificaciones</label>'+
@@ -964,7 +960,7 @@ function obtenerdatos(prestamomodificar){
     if(data.personalrecibe.nombre != null){
       $("#textonombrepersonalrecibe").html(data.personalrecibe.nombre.substring(0, 40));
     }
-    $("#fecha").val(data.fecha);
+    $("#fecha").val(data.fecha).attr('min', data.fechasdisponiblesenmodificacion.fechamin).attr('max', data.fechasdisponiblesenmodificacion.fechamax);
     $("#fecha").attr('readonly', 'readonly');
     $("#inicioprestamo").val(data.Prestamo_Herramienta.inicio_prestamo);
     $("#inicioprestamo").attr('readonly', 'readonly');

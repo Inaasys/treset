@@ -250,14 +250,24 @@ class CompraController extends ConfiguracionSistemaController{
             foreach($namespaces->Conceptos->Concepto as $concepto){
                 //obtener datos generales del xml nodo hijo traslado del nodo padre Concepto
                 $array_traslados = array();
-                $atributos_traslado = $concepto->Impuestos->Traslados->Traslado->attributes();
-                $array_traslados[] = array(
-                    "Base" => $atributos_traslado['Base'],
-                    "Impuesto" => $atributos_traslado['Impuesto'],
-                    "TipoFactor" => $atributos_traslado['TipoFactor'],
-                    "TasaOCuota" => $atributos_traslado['TasaOCuota'],
-                    "Importe" => $atributos_traslado['Importe']
-                );
+                if(isset($concepto->Impuestos->Traslados->Traslado)){
+                    $atributos_traslado = $concepto->Impuestos->Traslados->Traslado->attributes();
+                    $array_traslados[] = array(
+                        "Base" => $atributos_traslado['Base'],
+                        "Impuesto" => $atributos_traslado['Impuesto'],
+                        "TipoFactor" => $atributos_traslado['TipoFactor'],
+                        "TasaOCuota" => $atributos_traslado['TasaOCuota'],
+                        "Importe" => $atributos_traslado['Importe']
+                    );
+                }else{
+                    $array_traslados[] = array(
+                        "Base" => '0.00',
+                        "Impuesto" => '0.00',
+                        "TipoFactor" => '0.00',
+                        "TasaOCuota" => '0.00',
+                        "Importe" => '0.00'
+                    );
+                }
                 //obtener datos generales del xml nodo Concepto
                 $atributos_concepto = $concepto->attributes();
                 $array_conceptos[] = array(
@@ -1157,6 +1167,7 @@ class CompraController extends ConfiguracionSistemaController{
             "almacen" => $almacen,
             "proveedor" => $proveedor,
             "fecha" => Helpers::formatoinputdatetime($compra->Fecha),
+            "fechasdisponiblesenmodificacion" => Helpers::obtenerfechasdisponiblesenmodificacion($compra->Fecha),
             "fechaemitida" => Helpers::formatoinputdatetime($compra->FechaEmitida),
             "fechatimbrado" => Helpers::formatoinputdatetime($compra->FechaTimbrado),
             "importe" => Helpers::convertirvalorcorrecto($compra->Importe),
@@ -2086,6 +2097,7 @@ class CompraController extends ConfiguracionSistemaController{
         ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
         try{
+            $datosdocumento = Compra::where('Compra', $request->emaildocumento)->first();
             //enviar correo electrónico	
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
@@ -2133,7 +2145,7 @@ class CompraController extends ConfiguracionSistemaController{
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             if($request->archivoadjunto != null && $request->archivoadjunto2 != null) {
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento) {
                     $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                             ->cc($arraycc)
                             ->subject($asunto)
@@ -2150,7 +2162,7 @@ class CompraController extends ConfiguracionSistemaController{
                     unlink($urlarchivoadjunto2);
                 }
             }else if($request->archivoadjunto != null && $request->archivoadjunto2 == null){
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $correos, $asunto, $pdf, $emaildocumento) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $correos, $asunto, $pdf, $emaildocumento) {
                     $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                             ->cc($arraycc)
                             ->subject($asunto)
@@ -2162,7 +2174,7 @@ class CompraController extends ConfiguracionSistemaController{
                     unlink($urlarchivoadjunto);
                 }
             }else if($request->archivoadjunto == null && $request->archivoadjunto2 != null){
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento) {
                     $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                             ->cc($arraycc)
                             ->subject($asunto)
@@ -2174,7 +2186,7 @@ class CompraController extends ConfiguracionSistemaController{
                     unlink($urlarchivoadjunto2);
                 }
             }else{
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
                     $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                             ->cc($arraycc)
                             ->subject($asunto)

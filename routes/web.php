@@ -20,7 +20,6 @@ Route::group(['middleware' => 'guest'], function () {
         $piensa = App\Piensa::all()->random(1);
         return view('auth.login', compact('piensa','fechaaccionespanol'));
     });
-
 });
 //si el usuario esta logueado
 Auth::routes();
@@ -813,10 +812,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/facturas_obtener_orden', 'FacturaController@facturas_obtener_orden')->name('facturas_obtener_orden')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_productos', 'FacturaController@facturas_obtener_productos')->name('facturas_obtener_productos')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_producto_por_codigo', 'FacturaController@facturas_obtener_producto_por_codigo')->name('facturas_obtener_producto_por_codigo')->middleware('revisaraccesomenu:menuregistrosfacturas');
-    
     Route::get('/facturas_obtener_productos_gastos', 'FacturaController@facturas_obtener_productos_gastos')->name('facturas_obtener_productos_gastos')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_producto_gasto_por_codigo', 'FacturaController@facturas_obtener_producto_gasto_por_codigo')->name('facturas_obtener_producto_gasto_por_codigo')->middleware('revisaraccesomenu:menuregistrosfacturas');
-    
     Route::get('/facturas_obtener_claves_productos', 'FacturaController@facturas_obtener_claves_productos')->name('facturas_obtener_claves_productos')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_claves_unidades', 'FacturaController@facturas_obtener_claves_unidades')->name('facturas_obtener_claves_unidades')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_facturas_relacionadas', 'FacturaController@facturas_obtener_facturas_relacionadas')->name('facturas_obtener_facturas_relacionadas')->middleware('revisaraccesomenu:menuregistrosfacturas');
@@ -1027,5 +1024,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/sesiones_eliminar_sesiones_activas', 'SesionController@sesiones_eliminar_sesiones_activas')->name('sesiones_eliminar_sesiones_activas');
     Route::post('/sesiones_eliminar_sesiones_sin_login', 'SesionController@sesiones_eliminar_sesiones_sin_login')->name('sesiones_eliminar_sesiones_sin_login');
     /*---------------------------------------|||||||||||||||||||FIN MANEJO DE SESIONES|||||||||||||||||||||------------------------------------------*/
+    /*----------------------------------------|||||||||||||||||||||||AYUDA SISTEMA|||||||||||||||||||||||||-------------------------------------------*/
+    Route::get('/ayuda', 'AyudaController@ayuda')->name('ayuda');
+    /*----------------------------------------|||||||||||||||||||||||FIN AYUDA SISTEMA|||||||||||||||||||||||||-------------------------------------------*/
 
 });

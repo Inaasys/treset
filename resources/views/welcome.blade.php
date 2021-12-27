@@ -11,7 +11,15 @@
         <div class="block-header">
             <h2>
                 INICIO - BIENVENIDO
-            </h2>
+            </h2><br>
+            <div class="col-md-12">
+                <a href="{{route('ayuda')}}">
+                    <button type="button" class="btn btn-warning waves-effect">
+                        <i class="material-icons">help</i>
+                        <span>IR A PANEL DE AYUDA</span>
+                    </button>
+                </a>
+            </div>
             @if(\Session::has('success'))
                 <div class="alert bg-green alert-dismissible" role="alert">
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>

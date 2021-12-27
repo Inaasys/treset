@@ -1068,6 +1068,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             "diferencia" => Helpers::convertirvalorcorrecto($diferencia),
             "fecha" => Helpers::formatoinputdatetime($notaproveedor->Fecha),
             "fechaemitida" => Helpers::formatoinputdatetime($notaproveedor->FechaEmitida),
+            "fechasdisponiblesenmodificacion" => Helpers::obtenerfechasdisponiblesenmodificacion($notaproveedor->Fecha),
             "importe" => Helpers::convertirvalorcorrecto($notaproveedor->Importe),
             "descuento" => Helpers::convertirvalorcorrecto($notaproveedor->Descuento),
             "ieps" => Helpers::convertirvalorcorrecto($notaproveedor->Ieps),
@@ -1587,6 +1588,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
         ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
         try{
+            $datosdocumento = NotaProveedor::where('Nota', $request->emaildocumento)->first();
             //enviar correo electrónico	
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
@@ -1611,7 +1613,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             $body = $request->emailasunto;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
-            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
+            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
                 $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                         ->cc($arraycc)
                         ->subject($asunto)

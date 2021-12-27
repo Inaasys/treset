@@ -101,7 +101,7 @@ class RemisionController extends ConfiguracionSistemaController{
                                                 '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Remision .'\')">Bajas</a></li>'.
                                                 '<li><a href="'.route('remisiones_generar_pdfs_indiv',$data->Remision).'" target="_blank">Ver Documento PDF</a></li>'.
                                                 '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Remision .'\')">Enviar Documento por Correo</a></li>'.
-                                                '<li><a href="'.route('remisiones_generar_pdfs_indiv_requisicion_tyt',$data->Remision).'" target="_blank">Ver Documento PDF Requisición TYT</a></li>'.
+                                                '<li><a href="'.route('remisiones_generar_pdfs_indiv_requisicion_tyt',$data->Remision).'" target="_blank">Generar Formato Requisición TYT</a></li>'.
 
                                             '</ul>'.
                                         '</div>';
@@ -454,7 +454,7 @@ class RemisionController extends ConfiguracionSistemaController{
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Utilidad).'" data-parsley-utilidad="0.'.$this->numerocerosconfiguradosinputnumberstep.'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm monedapartida" name="monedapartida[]" value="'.$dc->Moneda.'" readonly data-parsley-length="[1, 3]"></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costolistapartida" name="costolistapartida[]" value="'.Helpers::convertirvalorcorrecto($dc->CostoDeLista).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm tipocambiopartida" name="tipocambiopartida[]" value="'.$dc->TipoDeCambio.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm tipocambiopartida" name="tipocambiopartida[]" value="'.Helpers::convertirvalorcorrecto($dc->TipoDeCambio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm cotizacionpartida" name="cotizacionpartida[]" value="'.$dc->Cotizacion.'" readonly data-parsley-length="[1, 20]"></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'.$producto->Insumo.'" readonly data-parsley-length="[1, 20]"></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveprodutopartida" name="claveprodutopartida[]" value="'.$producto->ClaveProducto.'" readonly required></td>'.
@@ -918,6 +918,7 @@ class RemisionController extends ConfiguracionSistemaController{
             "contadorproductos" => $contadorproductos,
             "contadorfilas" => $contadorfilas,
             "fecha" => Helpers::formatoinputdatetime($remision->Fecha),
+            "fechasdisponiblesenmodificacion" => Helpers::obtenerfechasdisponiblesenmodificacion($remision->Fecha),
             "importe" => Helpers::convertirvalorcorrecto($remision->Importe),
             "descuento" => Helpers::convertirvalorcorrecto($remision->Descuento),
             "subtotal" => Helpers::convertirvalorcorrecto($remision->SubTotal),
@@ -1356,6 +1357,7 @@ class RemisionController extends ConfiguracionSistemaController{
         ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
         try{
+            $datosdocumento = Remision::where('Remision', $request->emaildocumento)->first();
             //enviar correo electrónico	
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
@@ -1380,7 +1382,7 @@ class RemisionController extends ConfiguracionSistemaController{
             $body = $request->emailasunto;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
-            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
+            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
                 $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                         ->cc($arraycc)
                         ->subject($asunto)

@@ -215,6 +215,70 @@ function validarrangofechascreaciondocumentos(){
     }
 }
 //FIN FUNCIONES EXPORTACION DE PDF EN MODULOS
+//FINCOPIADO DE TABLAS CON DOBLE CLICK
+function copiarfilatabla(objeto){   
+    //copiar detalles tabla modulo
+    const btnCopyRowTable = document.querySelector(objeto);
+    const elRowTable = document.querySelector(objeto);
+    const copyElRow = (elRowToBeCopied) => {  
+        let rangerow, selrow;
+        // Ensure that range and selection are supported by the browsers
+        if (document.createRange && window.getSelection) {
+            rangerow = document.createRange();
+            selrow = window.getSelection();
+            // unselect any element in the page
+            selrow.removeAllRanges();
+            try {
+                rangerow.selectNodeContents(elRowToBeCopied);
+                selrow.addRange(rangerow);
+            } catch (e) {
+                rangerow.selectNode(elRowToBeCopied);
+                selrow.addRange(rangerow);
+            }
+            document.execCommand('copy');
+        }
+        selrow.removeAllRanges();
+        msj_tablacopiadacorrectamente(); 
+    };
+    btnCopyRowTable.addEventListener('dblclick', () => copyElRow(elRowTable));
+    //fin copias tabla detalles modulo
+}
+function construirtabladinamicaporcolumna(Columna, ColumnaEncabezado){
+    $(".tabladinamicaacopiar").show();
+    var datoscolumna = '';
+    $("#theadtabladinamicaacopiar").html('<tr><td>'+ColumnaEncabezado+'</td></tr>');
+    lista = document.getElementsByClassName(Columna);
+    for (var i = 0; i < lista.length; i++) {
+      datoscolumna = datoscolumna + '<tr><td>'+lista[i].value+'</td></tr>';
+    }
+    $("#tbodytabladinamicaacopiar").html(datoscolumna);    
+    document.getElementsByClassName('tabladinamicaacopiar')[0].dispatchEvent(new MouseEvent('dblclick', {'bubbles': true}));
+    $(".tabladinamicaacopiar").hide();
+}
+function construirtabladinamicaporfila(fila, claseeach, encabezadostablaacopiar, clasecolumnaobtenervalor){
+    $(".tabladinamicaacopiar").show();
+    var encabezados = '';
+    var arrayencabezados = encabezadostablaacopiar.split(",");
+    for (var i = 0; i < arrayencabezados.length; i++) {   
+        encabezados = encabezados+'<td>'+arrayencabezados[i]+'</td>';
+    }
+    $("#theadtabladinamicaacopiar").html('<tr>'+encabezados+'</tr>');
+    var datosfila = '';
+    var cuentaFilas = 0;
+    $(claseeach).each(function () {
+        if(fila === cuentaFilas){   
+            var arrayvalorescolumnas = clasecolumnaobtenervalor.split(",");
+            for (var i = 0; i < arrayvalorescolumnas.length; i++) {   
+                datosfila = datosfila+'<td>'+$(arrayvalorescolumnas[i], this).val()+'</td>';
+            }
+        }  
+        cuentaFilas++;
+    }); 
+    $("#tbodytabladinamicaacopiar").html('<tr>'+datosfila+'</tr>');  
+    document.getElementsByClassName('tabladinamicaacopiar')[0].dispatchEvent(new MouseEvent('dblclick', {'bubbles': true}));  
+    $(".tabladinamicaacopiar").hide();  
+}
+//FINCOPIADO DE TABLAS CON DOBLE CLICK
 ////////////////////////////////////////MENSAJES TOASTR.JS INAASYS//////////////////////////////////////////
 //error en permisos del usuario
 function msj_errorenpermisos(){
@@ -708,6 +772,14 @@ function msj_timbrecanceladocorrectamente(){
         "timeOut": "6000",
         "progressBar": true,
         "extendedTImeout": "6000"
+    });  
+}
+//mensaje tabla copiada correctamente
+function msj_tablacopiadacorrectamente(){
+    toastr.success( "Copiado correctamente", "Mensaje", {
+        "timeOut": "3000",
+        "progressBar": true,
+        "extendedTImeout": "3000"
     });  
 }
 //|||||FIN MENSAJES API FACTURAPI |||||||

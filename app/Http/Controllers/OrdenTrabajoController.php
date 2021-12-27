@@ -907,6 +907,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             "fecha" => Helpers::formatoinputdatetime($ordentrabajo->Fecha),
             "fechaentrega" => Helpers::formatoinputdatetime($ordentrabajo->Entrega),
             "fecharecordatoriocliente" => Helpers::formatoinputdate($ordentrabajo->FechaRecordatorio),
+            "fechasdisponiblesenmodificacion" => Helpers::obtenerfechasdisponiblesenmodificacion($ordentrabajo->Fecha),
             "kilometros" => Helpers::convertirvalorcorrecto($ordentrabajo->Kilometros),
             "horasreales" => Helpers::convertirvalorcorrecto($ordentrabajo->HorasReales),
             "kmproximoservicio" => Helpers::convertirvalorcorrecto($ordentrabajo->KmProximoServicio),
@@ -1382,6 +1383,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
         try{
+            $datosdocumento = OrdenTrabajo::where('Orden', $request->emaildocumento)->first();
             //enviar correo electrónico	
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
@@ -1406,7 +1408,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             $body = $request->emailasunto;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
-            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
+            Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
                 $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                         ->cc($arraycc)
                         ->subject($asunto)

@@ -286,7 +286,8 @@
                             <tr>
                                 <td style="padding: 0 2.5em; text-align: left;">
                                     <div class="text">
-                                        <h3>{{$body}} </h3>
+                                        <h2>Estimado cliente,</h2>
+                                        <h3>{{$datoscliente->Nombre}} </h3>
                                     </div>
                                 </td>
                             </tr>
@@ -299,10 +300,11 @@
                             <td valign="middle" width="100%" style="text-align:left; padding: 0 2.5em;">
                                 <div class="product-entry">
                                     <div class="text" style="text-align:center; padding: 1em 2.5em;">
-                                        <h3>Se ha generado un nuevo documento desde nuestro sistema Inassys con el Folio: {{$datosdocumento->Folio}} y Serie: {{$datosdocumento->Serie}}. Puedes encontrarlo adjunto a este correo en formato PDF.</h3>
+                                        <h3>Se ha generado un nuevo comprobante desde nuestro sistema Inassys con el Folio: {{$datosfactura->Folio}} y Serie: {{$datosfactura->Serie}}. Puedes encontrarlo adjunto a este correo en los formatos PDF y XML.</h3>
                                         <span style="color:black;">Atte,</span>
                                         <p style="color:black;">{{$empresa->Empresa}}</p>
-                                        <p style="text-align:justify; font-size:9px; color:black; padding: 1em 2.5em;">Documento generado por {{$empresa->Empresa}}, Si encuentras algun problema con este documento, contactanos al siguiente correo</p>
+                                        <p style="color:black;">¡Gracias por tu preferencia!</p>
+                                        <p style="text-align:justify; font-size:9px; color:black; padding: 1em 2.5em;">Estas recibiendo este correo porque hiciste una compra en {{$empresa->Empresa}} Si encuentras algun problema con este documento, contactanos al siguiente correo</p>
                                     </div>
                                 </div>
                             </td>

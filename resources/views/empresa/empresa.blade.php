@@ -696,7 +696,7 @@
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <label>Cambiar Logotipo</label>
-                                                    <input type="file" name="logo" id="logo"  class="dropify" data-max-file-size="1M" data-allowed-file-extensions="png jpg svg" data-min-width="200" data-min-height="200"/>
+                                                    <input type="file" name="logo" id="logo"  class="dropify" data-max-file-size="1M" data-allowed-file-extensions="jpg" data-min-width="200" data-min-height="200"/>
                                                 </div>
                                             </div> 
                                             <div class="row">

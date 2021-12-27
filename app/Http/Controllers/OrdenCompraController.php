@@ -239,8 +239,9 @@ class OrdenCompraController extends ConfiguracionSistemaController{
     }
     //obtener fecha date time actual
     public function ordenes_compra_obtener_fecha_actual_datetimelocal(Request $request){
-        $fechadatetimelocal = Helpers::fecha_exacta_accion_datetimelocal();
-        return response()->json($fechadatetimelocal);
+        $fechas = Helpers::fecha_exacta_accion_datetimelocal();
+        
+        return response()->json($fechas);
     }
     //obtener tipos ordenes de compra
     public function ordenes_compra_obtener_tipos_ordenes_compra(Request $request){
@@ -665,10 +666,13 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             $tipo = "modificacion";
             foreach($detallesordencompra as $doc){
                 $cantidadyasurtidapartida = $doc->Cantidad - $doc->Surtir;
+                //importante para copiar tabla
+                $encabezadostablaacopiar = '#,Codigo,Descripcion,Unidad,Por Surtir,Cantidad,Precio $,Importe $,Dcto %,Dcto $,Subtotal $,Iva %, Iva $, Total $';
+                $clasecolumnaobtenervalor = '.numerodetalle,.codigoproductopartida,.nombreproductopartida,.unidadproductopartida,.porsurtirpartida,.cantidadpartida,.preciopartida,.importepartida,.descuentoporcentajepartida,.descuentopesospartida,.subtotalpartida,.ivaporcentajepartida,.ivapesospartida,.totalpesospartida';
                 $filasdetallesordencompra= $filasdetallesordencompra.
-                '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
+                '<tr class="filasproductos filaproducto'.$contadorproductos.'" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$doc->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$doc->Codigo.'" readonly data-parsley-length="[1, 20]">'.$doc->Codigo.'</td>'.
+                    '<td class="tdmod" ondblclick="construirtabladinamicaporfila('.$contadorfilas.',\'tr.filasproductos\',\''.$encabezadostablaacopiar.'\',\''.$clasecolumnaobtenervalor.'\')"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$doc->Codigo.'" readonly data-parsley-length="[1, 20]">'.$doc->Codigo.'</td>'.
                     '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" value="'.htmlspecialchars($doc->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$doc->Unidad.'" readonly data-parsley-length="[1, 5]">'.$doc->Unidad.'</td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm porsurtirpartida"  name="porsurtirpartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Surtir).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
@@ -723,6 +727,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             "proveedor" => $proveedor,
             "almacen" => $almacen,
             "fecha" => Helpers::formatoinputdatetime($ordencompra->Fecha),
+            "fechasdisponiblesenmodificacion" => Helpers::obtenerfechasdisponiblesenmodificacion($ordencompra->Fecha),
             "importe" => Helpers::convertirvalorcorrecto($ordencompra->Importe),
             "descuento" => Helpers::convertirvalorcorrecto($ordencompra->Descuento),
             "subtotal" => Helpers::convertirvalorcorrecto($ordencompra->SubTotal),
@@ -1070,6 +1075,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         ->setOption('margin-bottom', 10);
         try{
             //enviar correo electrónico	
+            $datosdocumento = OrdenCompra::where('Orden', $request->emaildocumento)->first();
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
             $arraycc = array();
@@ -1116,7 +1122,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             if($request->archivoadjunto != null && $request->archivoadjunto2 != null) {
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol','datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento) {
                     $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                             ->cc($arraycc)
                             ->subject($asunto)
@@ -1133,7 +1139,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     unlink($urlarchivoadjunto2);
                 }
             }else if($request->archivoadjunto != null && $request->archivoadjunto2 == null){
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $correos, $asunto, $pdf, $emaildocumento) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol','datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto, $correos, $asunto, $pdf, $emaildocumento) {
                     $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                             ->cc($arraycc)
                             ->subject($asunto)
@@ -1145,7 +1151,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     unlink($urlarchivoadjunto);
                 }
             }else if($request->archivoadjunto == null && $request->archivoadjunto2 != null){
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol','datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $urlarchivoadjunto2, $correos, $asunto, $pdf, $emaildocumento) {
                     $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                             ->cc($arraycc)
                             ->subject($asunto)
@@ -1157,7 +1163,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     unlink($urlarchivoadjunto2);
                 }
             }else{
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol','datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
                     $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
                             ->cc($arraycc)
                             ->subject($asunto)

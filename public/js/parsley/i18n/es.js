@@ -13,7 +13,7 @@ Parsley.addMessages('es', {
     alphanum:         "Este valor debe ser alfanumérico."
   },
   notblank:           "Este valor no debe estar en blanco.",
-  required:           "Este valor es requerido.",
+  required:           "Dato Obligatorio.",
   pattern:            "Este valor es incorrecto.",
   regexrfc:           "El RFC no es correcto XAX010101X1X",
   regexpureza:        "La pureza solo debe tener un decimal",
