@@ -674,9 +674,18 @@ function regresarfolioorden(){
     var ordenanterior = $("#ordenanterior").val();
     $("#orden").val(ordenanterior);
 }
-
-
-
+//activar busqueda
+function obtenerserierqporserie(){
+    var serierequisicionanterior = $("#serierequisicionanterior").val();
+    var serierequisicion = $("#serierequisicion").val();
+    if(serierequisicionanterior != serierequisicion){
+        $.get(remisiones_obtener_serierq_por_serie, {serierequisicion:serierequisicion}, function(ultimonumero){
+            $("#serierequisicion").val(serierequisicion);
+            $("#requisicion").val(ultimonumero);
+        }) 
+    }
+}
+//listar todas las series de las requisiciones
 function listarseriesrequisiciones(){
     ocultarformulario();
     var tablaseriesrequisiciones = '<div class="modal-header '+background_forms_and_modals+'">'+
@@ -703,7 +712,7 @@ function listarseriesrequisiciones(){
                                         '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                                     '</div>';
     $("#contenidomodaltablas").html(tablaseriesrequisiciones);
-    var tcots = $('#tbllistadoserierequisicion').DataTable({
+    var tserrq = $('#tbllistadoserierequisicion').DataTable({
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -720,7 +729,7 @@ function listarseriesrequisiciones(){
         },
         columns: [
             { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
-            { data: 'Serie', name: 'Serie' },
+            { data: 'SerieRq', name: 'SerieRq' },
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
@@ -733,15 +742,19 @@ function listarseriesrequisiciones(){
         },
     });    
     //seleccionar registro al dar doble click
-    $('#tbllistadocotizacion tbody').on('dblclick', 'tr', function () {
-        var data = tcots.row( this ).data();
-        seleccionarcotizacion(data.Folio, data.Cotizacion);
+    $('#tbllistadoserierequisicion tbody').on('dblclick', 'tr', function () {
+        var data = tserrq.row( this ).data();
+        seleccionarserierq(data.SerieRq);
     }); 
-
 }
-
-
-
+//selecciones serie requisicion
+function seleccionarserierq(SerieRq){
+    $.get(remisiones_obtener_ultimo_numero_serierq_seleccionada, {SerieRq:SerieRq}, function(ultimonumero){
+        $("#serierequisicion").val(SerieRq);
+        $("#requisicion").val(ultimonumero);
+        mostrarformulario();
+    });
+}
 //listar todas las cotizaciones
 function listarcotizaciones (){
     ocultarformulario();
@@ -1428,7 +1441,8 @@ function alta(){
                                         '</td>'+
                                         '<td>'+ 
                                             '<div class="form-line">'+
-                                            '<input type="text" class="form-control inputnext" name="serierequisicion" id="serierequisicion" placeholder="Serie" autocomplete="off">'+
+                                                '<input type="text" class="form-control inputnext" name="serierequisicion" id="serierequisicion" placeholder="Serie" autocomplete="off" onkeyup="tipoLetra(this);">'+
+                                                '<input type="hidden" class="form-control inputnext" name="serierequisicionanterior" id="serierequisicionanterior" placeholder="Serie" autocomplete="off" onkeyup="tipoLetra(this);">'+
                                             '</div>'+
                                         '</td>'+
                                         '<td>'+ 
@@ -1666,6 +1680,17 @@ function alta(){
     //regresar folio orden
     $('#orden').on('change', function(e) {
       regresarfolioorden();
+    });
+    //activar busqueda
+    $('#serierequisicion').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+          obtenerserierqporserie();
+        }
+    });
+    $('#serierequisicion').on('change', function(e) {
+        obtenerserierqporserie();
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
     $(".inputnext").keypress(function (e) {
@@ -1970,10 +1995,31 @@ function obtenerdatos(remisionmodificar){
                                 '<label>Equipo </label>'+
                                 '<input type="text" class="form-control inputnexttabpe" name="equipo" id="equipo" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]" autocomplete="off">'+
                             '</div>'+
+
+
                             '<div class="col-md-3">'+
-                                '<label>Requisición </label>'+
-                                '<input type="text" class="form-control inputnexttabpe" name="requisicion" id="requisicion"  onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]" autocomplete="off">'+
+                                '<label>Requisición</label>'+
+                                '<table class="col-md-12">'+
+                                    '<tr>'+
+                                        '<td>'+
+                                            '<div class="btn bg-blue waves-effect" id="btnobtenerproductos" onclick="listarseriesrequisiciones()">Series</div>'+
+                                        '</td>'+
+                                        '<td>'+ 
+                                            '<div class="form-line">'+
+                                                '<input type="text" class="form-control inputnext" name="serierequisicion" id="serierequisicion" placeholder="Serie" autocomplete="off" onkeyup="tipoLetra(this);">'+
+                                                '<input type="hidden" class="form-control inputnext" name="serierequisicionanterior" id="serierequisicionanterior" placeholder="Serie" autocomplete="off" onkeyup="tipoLetra(this);">'+
+                                            '</div>'+
+                                        '</td>'+
+                                        '<td>'+ 
+                                            '<div class="form-line">'+
+                                            '<input type="text" class="form-control inputnext" name="requisicion" id="requisicion" placeholder="Número" autocomplete="off">'+
+                                            '</div>'+
+                                        '</td>'+
+                                    '</tr>'+    
+                                '</table>'+
                             '</div>'+
+
+
                         '</div>'+
                     '</div>'+
                     '<div role="tabpanel" class="tab-pane fade" id="revisioninsumosottab">'+
@@ -2149,6 +2195,7 @@ function obtenerdatos(remisionmodificar){
     $("#referencia").val(data.remision.Referencia);
     $("#ordenservicio").val(data.remision.Os);
     $("#equipo").val(data.remision.Eq);
+    $("#serierequisicion").val(data.remision.SerieRq);
     $("#requisicion").val(data.remision.Rq);
     $("#observaciones").val(data.remision.Obs);
     $("#importe").val(data.importe);
@@ -2227,6 +2274,17 @@ function obtenerdatos(remisionmodificar){
     //regresar folio orden
     $('#orden').on('change', function(e) {
       regresarfolioorden();
+    });
+    //activar busqueda
+    $('#serierequisicion').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+          obtenerserierqporserie();
+        }
+    });
+    $('#serierequisicion').on('change', function(e) {
+        obtenerserierqporserie();
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
     $(".inputnext").keypress(function (e) {

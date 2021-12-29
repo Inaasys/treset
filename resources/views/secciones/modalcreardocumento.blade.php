@@ -10,7 +10,7 @@
                     @csrf
 		        	<h5 id="textomodalgenerarpdf"> </h5>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Generar Documento en PDF por:</label>
                             <div class="col-md-12 form-check">
                                 <input type="radio" name="tipogeneracionpdf" id="tipogeneracionpdf" value="0" onchange="mostrartipogeneracionpdf()" required>
@@ -19,7 +19,7 @@
                                 <label for="tipogeneracionpdf1">Filtrado de Fechas</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label > Número Decimales en Documento:</label>
                             <select name="numerodecimalesdocumento" id="numerodecimalesdocumento" class="form-control select2" required>
                                 <option selected disabled hidden>Selecciona...</option>
@@ -29,6 +29,13 @@
                                 <option value="4">4</option>
                                 <option value="5">5</option>
                                 <option value="6">6</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4" id="divseleccionartipoformatocxc" hidden>
+                            <label > Tipo de formato que desea generar:</label>
+                            <select name="tipoformatocxc" id="tipoformatocxc" class="form-control select2">
+                                <option value="0">Normal</option>
+                                <option value="1">Poliza de Ingreso</option>
                             </select>
                         </div>
                     </div>

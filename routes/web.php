@@ -429,7 +429,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/cuentas_por_cobrar_generar_pdfs', 'CuentasPorCobrarController@cuentas_por_cobrar_generar_pdfs')->name('cuentas_por_cobrar_generar_pdfs')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
     Route::get('/cuentas_por_cobrar_obtener_datos_envio_email', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_datos_envio_email')->name('cuentas_por_cobrar_obtener_datos_envio_email')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
     Route::post('/cuentas_por_cobrar_enviar_pdfs_email', 'CuentasPorCobrarController@cuentas_por_cobrar_enviar_pdfs_email')->name('cuentas_por_cobrar_enviar_pdfs_email')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
-    Route::get('/cuentas_por_cobrar_generar_pdfs_indiv/{documento}', 'CuentasPorCobrarController@cuentas_por_cobrar_generar_pdfs_indiv')->name('cuentas_por_cobrar_generar_pdfs_indiv')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');    
+    Route::get('/cuentas_por_cobrar_generar_pdfs_indiv/{documento}/{tipodocumento}', 'CuentasPorCobrarController@cuentas_por_cobrar_generar_pdfs_indiv')->name('cuentas_por_cobrar_generar_pdfs_indiv')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');    
+    
+    
     Route::get('/cuentas_por_cobrar_exportar_excel', 'CuentasPorCobrarController@cuentas_por_cobrar_exportar_excel')->name('cuentas_por_cobrar_exportar_excel')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
     Route::post('/cuentas_por_cobrar_guardar_configuracion_tabla', 'CuentasPorCobrarController@cuentas_por_cobrar_guardar_configuracion_tabla')->name('cuentas_por_cobrar_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
     //---///---///---///---///---/// INTEGRACION FACTURAPI ////----/////----/////----/////_----/////-----/////
@@ -760,6 +762,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/remisiones_obtener_nuevo_saldo_cliente', 'RemisionController@remisiones_obtener_nuevo_saldo_cliente')->name('remisiones_obtener_nuevo_saldo_cliente')->middleware('revisaraccesomenu:menuregistrosremisiones');
     Route::get('/remisiones_revisar_insumos_orden_trabajo_por_folio', 'RemisionController@remisiones_revisar_insumos_orden_trabajo_por_folio')->name('remisiones_revisar_insumos_orden_trabajo_por_folio')->middleware('revisaraccesomenu:menuregistrosremisiones');
     Route::get('/remisiones_obtener_series_requisiciones', 'RemisionController@remisiones_obtener_series_requisiciones')->name('remisiones_obtener_series_requisiciones')->middleware('revisaraccesomenu:menuregistrosremisiones');
+    Route::get('/remisiones_obtener_ultimo_numero_serierq_seleccionada', 'RemisionController@remisiones_obtener_ultimo_numero_serierq_seleccionada')->name('remisiones_obtener_ultimo_numero_serierq_seleccionada')->middleware('revisaraccesomenu:menuregistrosremisiones');
+    Route::get('/remisiones_obtener_serierq_por_serie', 'RemisionController@remisiones_obtener_serierq_por_serie')->name('remisiones_obtener_serierq_por_serie')->middleware('revisaraccesomenu:menuregistrosremisiones');
     Route::post('/remisiones_guardar', 'RemisionController@remisiones_guardar')->name('remisiones_guardar')->middleware('revisarpermisos:registros.remisiones.altas');
     Route::get('/remisiones_verificar_baja', 'RemisionController@remisiones_verificar_baja')->name('remisiones_verificar_baja')->middleware('revisaraccesomenu:menuregistrosremisiones');
     Route::post('/remisiones_alta_o_baja', 'RemisionController@remisiones_alta_o_baja')->name('remisiones_alta_o_baja')->middleware('revisarpermisos:registros.remisiones.bajas');
@@ -1013,6 +1017,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/modificar_valores_en_bd_para_actualizacion_rama20210924correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20210924correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20210924correciones');
     Route::get('/modificar_valores_en_bd_para_actualizacion_rama20211001correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20211001correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20211001correciones');
     Route::get('/modificar_valores_en_bd_para_actualizacion_rama20211101correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20211101correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20211101correciones');
+    Route::get('/modificar_valores_en_bd_para_actualizacion_rama20211227correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20211227correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20211227correciones');
     /* -----------------------------------||||||||||||||||||||FIN CONFIGURACIONES Y PRUEBAS||||||||||||||||||||||-------------------------------------*/
     /*---------------------------------------|||||||||||||||||||MANEJO DE ERRORES LOGS|||||||||||||||||||||------------------------------------------*/
     Route::get('errors_inaasys', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index')->name('errors_inaasys');

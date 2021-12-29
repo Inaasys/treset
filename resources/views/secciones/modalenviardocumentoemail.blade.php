@@ -57,6 +57,9 @@
                             <input type="checkbox" name="incluir_xml" id="incluir_xml" class="filled-in" value="1"/>
                             <label for="incluir_xml"></label>
                         </div>
+                        <div class="col-md-12">
+                            <input type="hidden" name="tipoformato" id="tipoformato" value="N/A">
+                        </div>
                     </div>
                     <div class="modal-footer">
 	        	        <div class="btn btn-danger btn-sm" data-dismiss="modal">Salir</div>

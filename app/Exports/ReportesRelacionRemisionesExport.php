@@ -68,6 +68,9 @@ class ReportesRelacionRemisionesExport implements FromCollection,WithHeadings,Wi
             case "CORTE":
                 $this->campos_consulta = array("Remision", "Serie", "Folio", "Cliente", "Agente", "Fecha", "Plazo", "Tipo", "Unidad", "Pedido", "Solicita", "Referencia", "Destino", "Almacen", "TeleMarketing", "Os", "Eq", "Rq", "Importe", "Descuento", "SubTotal", "Iva", "Total", "Costo", "Comision", "Utilidad", "FormaPago", "Obs", "TipoCambio", "Hora", "Facturada", "Corte", "SuPago", "EnEfectivo", "EnTarjetas", "EnVales", "EnCheque", "Lugar", "Personas", "Status", "MotivoBaja", "Equipo", "Usuario", "Periodo");
                 break;
+            case "LISTADO":
+                $this->campos_consulta = array("Listado", "Requisicion", "Insumo", "NumeroParte", "Descripcion", "NumeroEquipo", "PrecioVenta", "FechaDeVentaListado", "PrecioUltimaCompra", "FechaUltimaCompra");
+                break;
         }
         $this->fechainicialreporte = $fechainicialreporte;
         $this->fechafinalreporte = $fechafinalreporte;
@@ -438,6 +441,53 @@ class ReportesRelacionRemisionesExport implements FromCollection,WithHeadings,Wi
                 ->get();
                 break;
             case "CORTE":
+                break;
+            case "LISTADO":
+                $data = DB::table('Remisiones as r')
+                ->leftjoin('Clientes as c', 'r.Cliente', '=', 'c.Numero')
+                ->leftjoin('Agentes as a', 'r.Agente', '=', 'a.Numero')
+                ->leftjoin('Remisiones Detalles as rd', 'r.Remision', '=', 'rd.Remision')
+                ->leftJoin('Productos as p', 'rd.Codigo', 'p.Codigo')
+                ->select('r.Referencia as Listado', 'r.Rq as Requisicion', 'p.Insumo', 'rd.Codigo AS NumeroParte', 'rd.Descripcion', "r.Equipo AS NumeroEquipo", 'rd.Precio as PrecioVenta', 'r.Fecha as FechaDeVentaListado', 'p.Ultimo Costo as PrecioUltimaCompra', 'p.Fecha Ultima Compra as FechaUltimaCompra')
+                ->whereDate('r.Fecha', '>=', $fechainicio)->whereDate('r.Fecha', '<=', $fechaterminacion)
+                ->where(function($q) use ($numerocliente) {
+                    if($numerocliente != ""){
+                        $q->where('r.Cliente', $numerocliente);
+                    }
+                })
+                ->where(function($q) use ($numeroagente) {
+                    if($numeroagente != ""){
+                        $q->where('r.Agente', $numeroagente);
+                    }
+                })
+                ->where(function($q) use ($claveserie) {
+                    if($claveserie != ""){
+                        $q->where('r.Serie', $claveserie);
+                    }
+                })
+                ->where(function($q) use ($claveformapago) {
+                    if($claveformapago != ""){
+                        $q->where('r.FormaPago', $claveformapago);
+                    }
+                })
+                ->where(function($q) use ($tipo) {
+                    if($tipo != 'TODOS'){
+                        $q->where('r.Tipo', $tipo);
+                    }
+                })
+                ->where(function($q) use ($status) {
+                    if($status != 'TODOS'){
+                        if($status == 'FACTURADOS'){
+                            $q->where('r.Status', 'like', '%-%');
+                        }else{
+                            $q->where('r.Status', $status);
+                        }
+                    }
+                })
+                ->orderby('r.Remision', 'ASC')
+                ->orderby('r.Fecha', 'ASC')
+                ->orderby('rd.Item', 'ASC')
+                ->get();
                 break;
         }
         return $data;

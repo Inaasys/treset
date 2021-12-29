@@ -118,8 +118,10 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                                         '<ul class="dropdown-menu">'.
                                             '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Pago .'\')">Cambios</a></li>'.
                                             '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Pago .'\')">Bajas</a></li>'.
-                                            '<li><a href="'.route('cuentas_por_cobrar_generar_pdfs_indiv',$data->Pago).'" target="_blank">Ver Documento PDF</a></li>'.
-                                            '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Pago .'\')">Enviar Documento por Correo</a></li>'.
+                                            '<li><a href="'.route('cuentas_por_cobrar_generar_pdfs_indiv',['documento'=>$data->Pago,'tipodocumento'=>0]).'" target="_blank">Ver Documento Normal PDF</a></li>'.
+                                            '<li><a href="'.route('cuentas_por_cobrar_generar_pdfs_indiv',['documento'=>$data->Pago,'tipodocumento'=>1]).'" target="_blank">Ver Documento Poliza de Ingreso PDF</a></li>'.
+                                            '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Pago .'\')">Enviar Documento Normal por Correo</a></li>'.
+                                            '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Pago.'\',1)">Enviar Documento Poliza de Ingreso por Correo</a></li>'.
                                             //'<li><a href="javascript:void(0);" onclick="timbrarpago(\''.$data->Pago .'\')">Timbrar Pago</a></li>'.
                                             //'<li><a href="javascript:void(0);" onclick="cancelartimbre(\''.$data->Pago .'\')">Cancelar Timbre</a></li>'.
                                         '</ul>'.
@@ -937,6 +939,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $comprobante = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->first();
             $formatter = new NumeroALetras;
             $totalletras = $formatter->toInvoice($cxc->Abono, 2, 'M.N.');
+            $banco = Banco::where('Numero', $cxc->Banco)->first();
             $data[]=array(
                         "cuentaporcobrar"=>$cxc,
                         "fechaespanolcuentaporcobrar"=>Helpers::fecha_espanol($cxc->Fecha),
@@ -950,6 +953,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                         "regimenfiscal"=> $regimenfiscal,
                         "cliente" => $cliente,
                         "estadocliente" => $estadocliente,
+                        "banco"=> $banco,
                         "datadetalle" => $datadetalle,
                         "tipocambiocxc"=>Helpers::convertirvalorcorrecto($cxc->TipoCambio),
                         "totalletras"=>$totalletras,
@@ -957,16 +961,28 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             );        
             ini_set('max_execution_time', 300); // 5 minutos
             ini_set('memory_limit', '-1');
-            $pdf = PDF::loadView('registros.cuentasporcobrar.formato_pdf_cuentasporcobrar', compact('data'))
-            ->setPaper('Letter')
-            ->setOption('footer-left', 'Este pago es una representación impresa de un CFDi')
-            ->setOption('footer-center', 'Página [page] de [toPage]')
-            //->setOption('footer-right', ''.$fechaformato.'')
-            ->setOption('footer-font-size', 7)
-            ->setOption('margin-left', 2)
-            ->setOption('margin-right', 2)
-            ->setOption('margin-bottom', 10);
-            //return $pdf->stream();
+
+
+
+            if($request->tipoformatocxc == 1){
+                $pdf = PDF::loadView('registros.cuentasporcobrar.formato_poliza_ingreso_pdf_cuentasporcobrar', compact('data'))
+                        ->setPaper('Letter')
+                        ->setOption('footer-font-size', 7)
+                        ->setOption('margin-left', 2)
+                        ->setOption('margin-right', 2)
+                        ->setOption('margin-bottom', 10);
+            }else{
+                $pdf = PDF::loadView('registros.cuentasporcobrar.formato_pdf_cuentasporcobrar', compact('data'))
+                        ->setPaper('Letter')
+                        ->setOption('footer-left', 'Este pago es una representación impresa de un CFDi')
+                        ->setOption('footer-center', 'Página [page] de [toPage]')
+                        //->setOption('footer-right', ''.$fechaformato.'')
+                        ->setOption('footer-font-size', 7)
+                        ->setOption('margin-left', 2)
+                        ->setOption('margin-right', 2)
+                        ->setOption('margin-bottom', 10);
+            }
+
             $ArchivoPDF = "PDF".$cxc->Pago.".pdf";
             $pdf->save(storage_path('archivos_pdf_documentos_generados/'.$ArchivoPDF));
         }
@@ -982,7 +998,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
     }
 
     //generacion de formato en PDF
-    public function cuentas_por_cobrar_generar_pdfs_indiv($documento){
+    public function cuentas_por_cobrar_generar_pdfs_indiv($documento,$tipodocumento){
         $cuentasporcobrar = CuentaXCobrar::where('Pago', $documento)->get(); 
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
@@ -1024,6 +1040,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $comprobante = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->first();
             $formatter = new NumeroALetras;
             $totalletras = $formatter->toInvoice($cxc->Abono, 2, 'M.N.');
+            $banco = Banco::where('Numero', $cxc->Banco)->first();
             $data[]=array(
                         "cuentaporcobrar"=>$cxc,
                         "fechaespanolcuentaporcobrar"=>Helpers::fecha_espanol($cxc->Fecha),
@@ -1037,6 +1054,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                         "regimenfiscal"=> $regimenfiscal,
                         "cliente" => $cliente,
                         "estadocliente" => $estadocliente,
+                        "banco"=> $banco,
                         "datadetalle" => $datadetalle,
                         "tipocambiocxc"=>Helpers::convertirvalorcorrecto($cxc->TipoCambio),
                         "totalletras"=>$totalletras,
@@ -1045,15 +1063,24 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         }
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
-        $pdf = PDF::loadView('registros.cuentasporcobrar.formato_pdf_cuentasporcobrar', compact('data'))
-        ->setPaper('Letter')
-        ->setOption('footer-left', 'Este pago es una representación impresa de un CFDi')
-        ->setOption('footer-center', 'Página [page] de [toPage]')
-        //->setOption('footer-right', ''.$fechaformato.'')
-        ->setOption('footer-font-size', 7)
-        ->setOption('margin-left', 2)
-        ->setOption('margin-right', 2)
-        ->setOption('margin-bottom', 10);
+        if($tipodocumento == 1){
+            $pdf = PDF::loadView('registros.cuentasporcobrar.formato_poliza_ingreso_pdf_cuentasporcobrar', compact('data'))
+                    ->setPaper('Letter')
+                    ->setOption('footer-font-size', 7)
+                    ->setOption('margin-left', 2)
+                    ->setOption('margin-right', 2)
+                    ->setOption('margin-bottom', 10);
+        }else{
+            $pdf = PDF::loadView('registros.cuentasporcobrar.formato_pdf_cuentasporcobrar', compact('data'))
+                    ->setPaper('Letter')
+                    ->setOption('footer-left', 'Este pago es una representación impresa de un CFDi')
+                    ->setOption('footer-center', 'Página [page] de [toPage]')
+                    //->setOption('footer-right', ''.$fechaformato.'')
+                    ->setOption('footer-font-size', 7)
+                    ->setOption('margin-left', 2)
+                    ->setOption('margin-right', 2)
+                    ->setOption('margin-bottom', 10);
+        }
         return $pdf->stream();
     }
 
@@ -1115,6 +1142,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $comprobante = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->first();
             $formatter = new NumeroALetras;
             $totalletras = $formatter->toInvoice($cxc->Abono, 2, 'M.N.');
+            $banco = Banco::where('Numero', $cxc->Banco)->first();
             $data[]=array(
                         "cuentaporcobrar"=>$cxc,
                         "fechaespanolcuentaporcobrar"=>Helpers::fecha_espanol($cxc->Fecha),
@@ -1128,6 +1156,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                         "regimenfiscal"=> $regimenfiscal,
                         "cliente" => $cliente,
                         "estadocliente" => $estadocliente,
+                        "banco"=> $banco,
                         "datadetalle" => $datadetalle,
                         "tipocambiocxc"=>Helpers::convertirvalorcorrecto($cxc->TipoCambio),
                         "totalletras"=>$totalletras,
@@ -1136,15 +1165,24 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         }
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
-        $pdf = PDF::loadView('registros.cuentasporcobrar.formato_pdf_cuentasporcobrar', compact('data'))
-        ->setPaper('Letter')
-        ->setOption('footer-left', 'Este pago es una representación impresa de un CFDi')
-        ->setOption('footer-center', 'Página [page] de [toPage]')
-        //->setOption('footer-right', ''.$fechaformato.'')
-        ->setOption('footer-font-size', 7)
-        ->setOption('margin-left', 2)
-        ->setOption('margin-right', 2)
-        ->setOption('margin-bottom', 10);
+        if($request->tipoformato == 1){
+            $pdf = PDF::loadView('registros.cuentasporcobrar.formato_poliza_ingreso_pdf_cuentasporcobrar', compact('data'))
+                    ->setPaper('Letter')
+                    ->setOption('footer-font-size', 7)
+                    ->setOption('margin-left', 2)
+                    ->setOption('margin-right', 2)
+                    ->setOption('margin-bottom', 10);
+        }else{
+            $pdf = PDF::loadView('registros.cuentasporcobrar.formato_pdf_cuentasporcobrar', compact('data'))
+                    ->setPaper('Letter')
+                    ->setOption('footer-left', 'Este pago es una representación impresa de un CFDi')
+                    ->setOption('footer-center', 'Página [page] de [toPage]')
+                    //->setOption('footer-right', ''.$fechaformato.'')
+                    ->setOption('footer-font-size', 7)
+                    ->setOption('margin-left', 2)
+                    ->setOption('margin-right', 2)
+                    ->setOption('margin-bottom', 10);
+        }
         //obtener XML
         if($request->incluir_xml == 1){
             $cxc = CuentaXCobrar::where('Pago', $request->emaildocumento)->first(); 

@@ -2127,9 +2127,20 @@ $("#btnGuardarModificacion").on('click', function (e) {
     //validar formulario
     form.parsley().validate();
 });
+
+
+
+
+
+
+
+
+
+
+
 //obtener datos para el envio del documento por email
-function enviardocumentoemail(documento){
-    $.get(cuentas_por_cobrar_obtener_datos_envio_email,{documento:documento}, function(data){
+function enviardocumentoemail(documento,tipoformato){
+    $.get(cuentas_por_cobrar_obtener_datos_envio_email,{documento:documento,tipoformato:tipoformato}, function(data){
         $("#textomodalenviarpdfemail").html("Enviar email Cuenta Por Cobrar No." + documento);
         $("#emaildocumento").val(documento);
         $("#emailde").val(data.emailde);
@@ -2146,6 +2157,11 @@ function enviardocumentoemail(documento){
         $(".dropify-clear").trigger("click");
         $("#divadjuntararchivo").hide();
         $("#modalenviarpdfemail").modal('show');
+        if(tipoformato == 1){
+            $("#tipoformato").val(tipoformato);
+        }else{
+            $("#tipoformato").val("N/A");
+        }
     })   
 }
 //enviar documento pdf por email

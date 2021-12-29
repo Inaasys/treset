@@ -729,4 +729,15 @@ class PruebaController extends ConfiguracionSistemaController{
             'TipoProd'=>'REFACCION',
         ]);
     }
+
+    public function modificar_valores_en_bd_para_actualizacion_rama20211227correciones(){
+        //Configuracion columnas tabla Remisiones       
+        Configuracion_Tabla::where('tabla', 'Remisiones')
+        ->update([
+            'campos_activados'=>'Remision,Serie,Folio,Fecha,Status,Cliente,NombreCliente,Pedido,Os,Eq,SerieRq,Rq,Agente,NombreAgente,Tipo,Almacen,NombreAlmacen,SubTotal,Iva,Total,Equipo,Usuario,MotivoBaja,Periodo',
+            'campos_desactivados'=>'Referencia,Plazo,Unidad,Solicita,Destino,TeleMarketing,Importe,Descuento,Costo,Comision,Utilidad,FormaPago,Obs,TipoCambio,Hora,Facturada,Corte,SuPago,EnEfectivo,EnTarjetas,EnVales,EnCheque,Lugar,Personas',
+            'columnas_ordenadas'=>'Remision,Serie,Folio,Fecha,Status,Cliente,NombreCliente,Pedido,Os,Eq,SerieRq,Rq,Agente,NombreAgente,Tipo,Almacen,NombreAlmacen,SubTotal,Iva,Total,Equipo,Usuario,MotivoBaja,Periodo',
+        ]);
+    }
+
 }

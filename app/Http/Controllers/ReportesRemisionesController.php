@@ -496,8 +496,6 @@ class ReportesRemisionesController extends ConfiguracionSistemaController{
                 break;
             case "CORTE":
                 break;
-
-
             case "LISTADO":
                 $data = DB::table('Remisiones as r')
                 ->leftjoin('Clientes as c', 'r.Cliente', '=', 'c.Numero')
@@ -549,7 +547,6 @@ class ReportesRemisionesController extends ConfiguracionSistemaController{
                 ->addColumn('PrecioUltimaCompra', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->PrecioUltimaCompra), $this->numerodecimales); })
                 ->make(true);
                 break;
-
         }
     }
     //generar reporte en excel

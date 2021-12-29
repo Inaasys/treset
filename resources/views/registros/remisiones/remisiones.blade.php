@@ -216,7 +216,8 @@
         var remisiones_obtener_nuevo_saldo_cliente = '{!!URL::to('remisiones_obtener_nuevo_saldo_cliente')!!}';
         var remisiones_revisar_insumos_orden_trabajo_por_folio = '{!!URL::to('remisiones_revisar_insumos_orden_trabajo_por_folio')!!}';
         var remisiones_obtener_series_requisiciones = '{!!URL::to('remisiones_obtener_series_requisiciones')!!}';
-
+        var remisiones_obtener_ultimo_numero_serierq_seleccionada = '{!!URL::to('remisiones_obtener_ultimo_numero_serierq_seleccionada')!!}';
+        var remisiones_obtener_serierq_por_serie = '{!!URL::to('remisiones_obtener_serierq_por_serie')!!}';
 
         var remisiones_guardar = '{!!URL::to('remisiones_guardar')!!}';
         var remisiones_verificar_baja = '{!!URL::to('remisiones_verificar_baja')!!}';

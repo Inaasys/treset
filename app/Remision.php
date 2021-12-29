@@ -54,7 +54,8 @@ class Remision extends Model
         'Equipo',
         'Usuario',
         'Periodo',
-        'FormaPago'
+        'FormaPago',
+        'SerieRq'
     ];
 
     //subtotal

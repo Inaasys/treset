@@ -593,8 +593,40 @@ class RemisionController extends ConfiguracionSistemaController{
     }
 
     //obtener series de requisiciones
-    public function remisiones_obtener_series_requisiciones(){
-        
+    public function remisiones_obtener_series_requisiciones(Request $request){
+        if($request->ajax()){
+            $data = Remision::select('SerieRq')->where('SerieRq', '<>', '')->groupby('SerieRq')->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarserierq(\''.$data->SerieRq.'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }         
+    }
+
+    //obtener ultimo numero de serie de requisicon seleccionada
+    public function remisiones_obtener_ultimo_numero_serierq_seleccionada(Request $request){
+        $ultimonumero = Remision::select("Rq")->where('SerieRq', $request->SerieRq)->orderBy("Rq", "DESC")->take(1)->get();
+        if(sizeof($ultimonumero) == 0 || sizeof($ultimonumero) == "" || sizeof($ultimonumero) == null){
+            $numerorequisicion = 1;
+        }else{
+            $numerorequisicion = $ultimonumero[0]->Rq+1;   
+        }
+        return response()->json($numerorequisicion);
+    }
+
+    //obtener serie rq por serie
+    public function remisiones_obtener_serierq_por_serie(Request $request){
+        $ultimonumero = Remision::select("Rq")->where('SerieRq', $request->serierequisicion)->orderBy("Rq", "DESC")->take(1)->get();
+        if(sizeof($ultimonumero) == 0 || sizeof($ultimonumero) == "" || sizeof($ultimonumero) == null){
+            $numerorequisicion = 1;
+        }else{
+            $numerorequisicion = $ultimonumero[0]->Rq+1;   
+        }
+        return response()->json($numerorequisicion);
+   
     }
 
     //guardar
@@ -627,6 +659,7 @@ class RemisionController extends ConfiguracionSistemaController{
             $Remision->Os=$request->ordenservicio;
             $Remision->Eq=$request->equipo;
             $Remision->Rq=$request->requisicion;
+            $Remision->SerieRq=$request->serierequisicion;
             $Remision->Importe=$request->importe;
             $Remision->Descuento=$request->descuento;
             $Remision->SubTotal=$request->subtotal;
@@ -991,6 +1024,7 @@ class RemisionController extends ConfiguracionSistemaController{
             'Destino' => $request->destinodelpedido,
             'Os' => $request->ordenservicio,
             'Eq' => $request->equipo,
+            'SerieRq' => $request->serierequisicion,
             'Rq' => $request->requisicion,
             'Obs' => $request->observaciones,
             'Importe' => $request->importe,
@@ -1279,6 +1313,9 @@ class RemisionController extends ConfiguracionSistemaController{
             $data[]=array(
                       "remision"=>$r,
                       "fechaformato"=> $fechaformato,
+                      "dia" => Carbon::parse($r->Fecha)->format('d'),
+                      "mes" => Carbon::parse($r->Fecha)->format('m'),
+                      "anio" => Carbon::parse($r->Fecha)->format('Y'),
                       "datadetalle" => $datadetalle,
                       "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
             );
