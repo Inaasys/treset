@@ -24,7 +24,7 @@
                             <h5>RFC:{{$empresa->Rfc}}</h5>
                         </div>
                     </div>
-                    <div class="card card-about-me">
+                    <div class="card card-about-me" hidden>
                         <div class="header text-center {{$empresa->background_forms_and_modals}}" id="infoprofile1">
                             <h5>INFORMACIÓN</h5>
                         </div>
@@ -260,7 +260,7 @@
                                                     </div>  
                                                     <div class="col-md-8">  
                                                         <div class="form-line">
-                                                        <input type="text" class="form-control" name="empresamoneda" id="empresamoneda" value="{{$municipioempresa}}" required readonly onkeyup="tipoLetra(this)">
+                                                        <input type="text" class="form-control" name="empresamoneda" id="empresamoneda" value="{{$empresa->Moneda}}" required readonly onkeyup="tipoLetra(this)">
                                                         </div>
                                                     </div>     
                                                     </div>
@@ -337,44 +337,13 @@
                                                     <table class="scroll">
                                                         <thead class="{{$empresa->background_tables}}">
                                                             <tr>
-                                                                <th class="col-md-1">#</th>
                                                                 <th class="col-md-2">Módulos</th>
                                                                 <th class="col-md-5">Configurar Sistema</th>
                                                                 <th class="col-md-4">Opción</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <!--
                                                             <tr>
-                                                                <td class="col-md-1">1</td>
-                                                                <td class="col-md-2">Sistema</td>
-                                                                <td class="col-md-5">¿ Definir Paquete Sistema a Utilizar ?</td>
-                                                                <td class="col-md-4">
-                                                                    <select class="form-control select2" name="tipopaquetesistema" id="tipopaquetesistema" style="width: 100% !important;">
-                                                                        <option selected disabled hidden>Selecciona</option>
-                                                                        <option value="Administración">Administración</option>
-                                                                        <option value="Facturación">Facturación</option>
-                                                                        <option value="Punto de Venta">Punto de Venta</option>
-                                                                        <option value="Automotríz" >Automotríz</option>
-                                                                    </select>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="col-md-1">2</td>
-                                                                <td class="col-md-2">Sistema</td>
-                                                                <td class="col-md-5">¿ Visualizar Logotipo en los Documentos ?</td>
-                                                                <td  class="col-md-4">
-                                                                    <div class="col-md-12 form-check">
-                                                                        <input type="radio" name="visualizarlogotipoendocumentos" id="visualizarlogotipoendocumentos" value="S">
-                                                                        <label for="visualizarlogotipoendocumentos">SI</label>
-                                                                        <input type="radio" name="visualizarlogotipoendocumentos" id="visualizarlogotipoendocumentos1" value="N">
-                                                                        <label for="visualizarlogotipoendocumentos1">NO</label>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                            -->
-                                                            <tr>
-                                                                <td class="col-md-1">3</td>
                                                                 <td class="col-md-2">Sistema</td>
                                                                 <td class="col-md-5">¿ Numero de Decimales ?</td>
                                                                 <td class="col-md-4">
@@ -390,7 +359,6 @@
                                                                 </td>
                                                             </tr>
                                                             <tr>
-                                                                <td class="col-md-1">4</td>
                                                                 <td class="col-md-2">Sistema</td>
                                                                 <td class="col-md-5">¿ Numero de Decimales en Documentos PDF ?</td>
                                                                 <td class="col-md-4">
@@ -406,7 +374,6 @@
                                                                 </td>
                                                             </tr>
                                                             <tr>
-                                                                <td class="col-md-1">5</td>
                                                                 <td class="col-md-2">Sistema</td>
                                                                 <td class="col-md-5">¿ Utilizar Mayúsculas en el Sistema ?</td>
                                                                 <td class="col-md-4">
@@ -418,95 +385,7 @@
                                                                     </div>
                                                                 </td>
                                                             </tr>
-                                                            <!--
                                                             <tr>
-                                                                <td class="col-md-1">6</td>
-                                                                <td class="col-md-2">Sistema</td>
-                                                                <td class="col-md-5">¿ Unidad de Medidad en el Sistema (PIEZA, METRO, KILO, LITRO, PAR, PARES, ACT, NA) etc ?</td>
-                                                                <td class="col-md-4">
-                                                                    <input type="text" class="form-control" name="unidaddemedidasistema" id="unidaddemedidasistema">
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="col-md-1">7</td>
-                                                                <td class="col-md-2">Sistema</td>
-                                                                <td class="col-md-5">¿ Búsqueda de Tipo de Cambio en Banamex y DOF (Diario Oficial de la Federación) del Valor Dolar y Conversión a Moneda Predeterminada ?</td>
-                                                                <td class="col-md-4">
-                                                                    <div class="col-md-12 form-check">
-                                                                        <input type="radio" name="busquedavalordolar" id="busquedavalordolar" value="S">
-                                                                        <label for="busquedavalordolar">SI</label>
-                                                                        <input type="radio" name="busquedavalordolar" id="busquedavalordolar1" value="N">
-                                                                        <label for="busquedavalordolar1">NO</label>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="col-md-1">8</td>
-                                                                <td class="col-md-2">Compras</td>
-                                                                <td class="col-md-5">¿ Modificar el Costo en Productos de Ultima Compra ?</td>
-                                                                <td class="col-md-4">
-                                                                    <div class="col-md-12 form-check">
-                                                                        <input type="radio" name="modificarcostoproductoultimacompra" id="modificarcostoproductoultimacompra" value="S">
-                                                                        <label for="modificarcostoproductoultimacompra">SI</label>
-                                                                        <input type="radio" name="modificarcostoproductoultimacompra" id="modificarcostoproductoultimacompra1" value="N">
-                                                                        <label for="modificarcostoproductoultimacompra1">NO</label>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="col-md-1">9</td>
-                                                                <td class="col-md-2">Compras</td>
-                                                                <td class="col-md-5">¿ Tipo de Costo de la Compra por Guardar en el Catálogo de Productos (Costo Más Alto o Ultimo Costo) ?</td>
-                                                                <td class="col-md-4">
-                                                                    <select class="form-control select2" name="tipodecostoaguardarencatalogoproductos" id="tipodecostoaguardarencatalogoproductos" style="width: 100% !important;">
-                                                                        <option selected disabled hidden>Selecciona</option>    
-                                                                        <option value="UltimoCosto">UltimoCosto</option>
-                                                                        <option value="CostoMasAlto">CostoMasAlto</option>
-                                                                    </select>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="col-md-1">10</td>
-                                                                <td class="col-md-2">Compras</td>
-                                                                <td class="col-md-5">¿ Obligar UUID en documentos de Compras y Notas de Proveedor ?</td>
-                                                                <td class="col-md-4">
-                                                                    <div class="col-md-12 form-check">
-                                                                        <input type="radio" name="obligaruuidendocumentoscompras" id="obligaruuidendocumentoscompras" value="S">
-                                                                        <label for="obligaruuidendocumentoscompras">SI</label>
-                                                                        <input type="radio" name="obligaruuidendocumentoscompras" id="obligaruuidendocumentoscompras1" value="N">
-                                                                        <label for="obligaruuidendocumentoscompras1">NO</label>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="col-md-1">11</td>
-                                                                <td class="col-md-2">Compras</td>
-                                                                <td class="col-md-5">¿ Obligar CONTRARECIBO en pagos ?</td>
-                                                                <td class="col-md-4">
-                                                                    <div class="col-md-12 form-check">
-                                                                        <input type="radio" name="obligarcontrareciboenpagos" id="obligarcontrareciboenpagos" value="S">
-                                                                        <label for="obligarcontrareciboenpagos">SI</label>
-                                                                        <input type="radio" name="obligarcontrareciboenpagos" id="obligarcontrareciboenpagos1" value="N">
-                                                                        <label for="obligarcontrareciboenpagos1">NO</label>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="col-md-1">12</td>
-                                                                <td class="col-md-2">Ventas</td>
-                                                                <td class="col-md-5">¿ Proteger la Utilidad de Venta Relacionado con Porcentajes de Marcas y NO Permitir Guardar Costo Cero en Documentos (remisiones, facturas, etc...) ?</td>
-                                                                <td class="col-md-4">
-                                                                    <div class="col-md-12 form-check">
-                                                                        <input type="radio" name="protegerutilidadventa" id="protegerutilidadventa" value="S">
-                                                                        <label for="protegerutilidadventa">SI</label>
-                                                                        <input type="radio" name="protegerutilidadventa" id="protegerutilidadventa1" value="N">
-                                                                        <label for="protegerutilidadventa1">NO</label>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                            -->
-                                                            <tr>
-                                                                <td class="col-md-1">13</td>
                                                                 <td class="col-md-2">Ventas</td>
                                                                 <td class="col-md-5">¿ Tipo de Utilidad para Venta en Documentos (Financiera o Aritmética) ?</td>
                                                                 <td class="col-md-4">
@@ -517,93 +396,7 @@
                                                                     </select>
                                                                 </td>
                                                             </tr>
-                                                            <!--
                                                             <tr>
-                                                                <td class="col-md-1">14</td>
-                                                                <td class="col-md-2">Productos</td>
-                                                                <td class="col-md-5">¿ Utilizar Consecutivo de Códigos en Productos ?</td>
-                                                                <td class="col-md-4">
-                                                                    <div class="col-md-12 form-check">
-                                                                        <input type="radio" name="guardardocumentossinexistencias" id="guardardocumentossinexistencias" value="S">
-                                                                        <label for="guardardocumentossinexistencias">SI</label>
-                                                                        <input type="radio" name="guardardocumentossinexistencias" id="guardardocumentossinexistencias1" value="N">
-                                                                        <label for="guardardocumentossinexistencias1">NO</label>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="col-md-1">15</td>
-                                                                <td class="col-md-2">Productos</td>
-                                                                <td class="col-md-5">¿ Guardar Documentos SIN Existencias ?</td>
-                                                                <td class="col-md-4">
-                                                                    <div class="col-md-12 form-check">
-                                                                        <input type="radio" name="guardardocumentossinexistencias" id="guardardocumentossinexistencias" value="S">
-                                                                        <label for="guardardocumentossinexistencias">SI</label>
-                                                                        <input type="radio" name="guardardocumentossinexistencias" id="guardardocumentossinexistencias1" value="N">
-                                                                        <label for="guardardocumentossinexistencias1">NO</label>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="col-md-1">16</td>
-                                                                <td class="col-md-2">Facturas</td>
-                                                                <td class="col-md-5">¿ Aplicar una Sola Nota de Crédito por Factura ?</td>
-                                                                <td class="col-md-4">
-                                                                    <div class="col-md-12 form-check">
-                                                                        <input type="radio" name="aplicarsolounanotadecredito" id="aplicarsolounanotadecredito" value="S">
-                                                                        <label for="aplicarsolounanotadecredito">SI</label>
-                                                                        <input type="radio" name="aplicarsolounanotadecredito" id="aplicarsolounanotadecredito1" value="N">
-                                                                        <label for="aplicarsolounanotadecredito1">NO</label>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="col-md-1">17</td>
-                                                                <td class="col-md-2">Facturas</td>
-                                                                <td class="col-md-5">¿ Liberar Facturas Vencidas de Clientes ?</td>
-                                                                <td class="col-md-4">
-                                                                    <div class="col-md-12 form-check">
-                                                                        <input type="radio" name="liberarfacturasvencidasdeclientes" id="liberarfacturasvencidasdeclientes" value="S">
-                                                                        <label for="liberarfacturasvencidasdeclientes">SI</label>
-                                                                        <input type="radio" name="liberarfacturasvencidasdeclientes" id="liberarfacturasvencidasdeclientes1" value="N">
-                                                                        <label for="liberarfacturasvencidasdeclientes1">NO</label>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="col-md-1">18</td>
-                                                                <td class="col-md-2">Contrarecibos</td>
-                                                                <td class="col-md-5">Para las Facturas: Favor de Realizar Pago o Transferencia En</td>
-                                                                <td class="col-md-4"></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="col-md-1">19</td>
-                                                                <td class="col-md-2">En Documentos</td>
-                                                                <td class="col-md-5">Cuando se Ingresa un Precio en Cotizaciones, Pedidos, Remisiones y Facturas, dicho Precio Desglosa el Iva, Ejemplo 100/1.16 = 86.2068, ¿ Utilizar Precios Netos ?</td>
-                                                                <td class="col-md-4"></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="col-md-1">20</td>
-                                                                <td class="col-md-2">En Documentos</td>
-                                                                <td class="col-md-5">¿ Precios Libre (No con Utilidad de Marcas) ?</td>
-                                                                <td class="col-md-4"></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="col-md-1">21</td>
-                                                                <td class="col-md-2">En Documentos</td>
-                                                                <td class="col-md-5">¿ Modificar Registro de Cualquier Fecha ?</td>
-                                                                <td class="col-md-4">
-                                                                    <div class="col-md-12 form-check">
-                                                                        <input type="radio" name="modificarregistrodecualquierfecha" id="modificarregistrodecualquierfecha" value="S">
-                                                                        <label for="modificarregistrodecualquierfecha">SI</label>
-                                                                        <input type="radio" name="modificarregistrodecualquierfecha" id="modificarregistrodecualquierfecha1" value="N">
-                                                                        <label for="modificarregistrodecualquierfecha1">NO</label>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                            -->
-                                                            <tr>
-                                                                <td class="col-md-1">22</td>
                                                                 <td class="col-md-2">Envio Documentos</td>
                                                                 <td class="col-md-5">Correo 1 por default al que se enviaran los documentos</td>
                                                                 <td class="col-md-4">
@@ -611,7 +404,6 @@
                                                                 </td>
                                                             </tr>
                                                             <tr>
-                                                                <td class="col-md-1">23</td>
                                                                 <td class="col-md-2">Envio Documentos</td>
                                                                 <td class="col-md-5">Correo 2 por default al que se enviaran los documentos</td>
                                                                 <td class="col-md-4">
@@ -619,7 +411,6 @@
                                                                 </td>
                                                             </tr>
                                                             <tr>
-                                                                <td class="col-md-1">24</td>
                                                                 <td class="col-md-2">Modificación Insumo</td>
                                                                 <td class="col-md-5">Usuarios que pueden modificar Insumos</td>
                                                                 <td class="col-md-4">
@@ -628,7 +419,6 @@
                                                                 </td>
                                                             </tr>
                                                             <tr>
-                                                                <td class="col-md-1">25</td>
                                                                 <td class="col-md-2">Remisiones</td>
                                                                 <td class="col-md-5">Verificar si los las partidas de la remisión ya fueron cargadas en una O.T.</td>
                                                                 <td class="col-md-4">
@@ -637,6 +427,54 @@
                                                                         <label for="verificarpartidasremisionenot">SI</label>
                                                                         <input type="radio" name="verificarpartidasremisionenot" id="verificarpartidasremisionenot1" value="N">
                                                                         <label for="verificarpartidasremisionenot1">NO</label>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="col-md-2">Ordenes Compra</td>
+                                                                <td class="col-md-5">Al enviar documento por email agregar en asunto la Referencia de la Orden de Compra</td>
+                                                                <td class="col-md-4">
+                                                                    <div class="col-md-12 form-check">
+                                                                        <input type="radio" name="agregarreferenciaenasuntocorreo" id="agregarreferenciaenasuntocorreo" value="S">
+                                                                        <label for="agregarreferenciaenasuntocorreo">SI</label>
+                                                                        <input type="radio" name="agregarreferenciaenasuntocorreo" id="agregarreferenciaenasuntocorreo1" value="N">
+                                                                        <label for="agregarreferenciaenasuntocorreo1">NO</label>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="col-md-2">Remisiones</td>
+                                                                <td class="col-md-5">Controlar consecutivo de número de requisciones</td>
+                                                                <td class="col-md-4">
+                                                                    <div class="col-md-12 form-check">
+                                                                        <input type="radio" name="controlarconsecutivonumrequisicion" id="controlarconsecutivonumrequisicion" value="S">
+                                                                        <label for="controlarconsecutivonumrequisicion">SI</label>
+                                                                        <input type="radio" name="controlarconsecutivonumrequisicion" id="controlarconsecutivonumrequisicion1" value="N">
+                                                                        <label for="controlarconsecutivonumrequisicion1">NO</label>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="col-md-2">Facturas</td>
+                                                                <td class="col-md-5">Colocar las observaciones de la remisión en la factura</td>
+                                                                <td class="col-md-4">
+                                                                    <div class="col-md-12 form-check">
+                                                                        <input type="radio" name="colocarobservacionesremisionenfactura" id="colocarobservacionesremisionenfactura" value="S">
+                                                                        <label for="colocarobservacionesremisionenfactura">SI</label>
+                                                                        <input type="radio" name="colocarobservacionesremisionenfactura" id="colocarobservacionesremisionenfactura1" value="N">
+                                                                        <label for="colocarobservacionesremisionenfactura1">NO</label>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="col-md-2">Facturas</td>
+                                                                <td class="col-md-5">Pedir obligatoriamente una observación</td>
+                                                                <td class="col-md-4">
+                                                                    <div class="col-md-12 form-check">
+                                                                        <input type="radio" name="pedirobligatoriamenteobservacionenfactura" id="pedirobligatoriamenteobservacionenfactura" value="S">
+                                                                        <label for="pedirobligatoriamenteobservacionenfactura">SI</label>
+                                                                        <input type="radio" name="pedirobligatoriamenteobservacionenfactura" id="pedirobligatoriamenteobservacionenfactura1" value="N">
+                                                                        <label for="pedirobligatoriamenteobservacionenfactura1">NO</label>
                                                                     </div>
                                                                 </td>
                                                             </tr>
@@ -1066,6 +904,11 @@
         var correodefault2enviodocumentos = '{{$empresa->CorreoDefault2EnvioDocumentos}}';
         var usuariosamodificarinsumos = '{{$empresa->UsuariosModificarInsumo}}';
         var verificarinsumosremisionenot = '{{$empresa->VerificarPartidasRemisionEnOT}}';
+        var empresa = '{{$empresa}}';
+        var agregarreferenciaenasuntocorreo = '{{$empresa->AgregarReferenciaOrdenCompraEnAsuntoCorreo}}';
+        var controlarconsecutivonumrequisicion = '{{$empresa->ControlarConsecutivoNumeroRequisicionEnRemisiones}}';
+        var colocarobservacionesremisionenfactura = '{{$empresa->ColocarObservacionesDeRemisionEnFactura}}';
+        var pedirobligatoriamenteobservacionenfactura = '{{$empresa->PedirObligatoriamenteObservacionEnFactura}}';
         var empresa_obtener_usuarios_a_modificar_insumos = '{!!URL::to('empresa_obtener_usuarios_a_modificar_insumos')!!}';
         var empresa_obtener_paises = '{!!URL::to('empresa_obtener_paises')!!}';
         var empresa_obtener_estados = '{!!URL::to('empresa_obtener_estados')!!}';

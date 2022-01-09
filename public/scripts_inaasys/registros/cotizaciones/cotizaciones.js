@@ -405,7 +405,7 @@ function alta(){
                 '</div>'+ 
                 '<div class="col-md-3">'+
                   '<label>Fecha </label>'+
-                  '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required  data-parsley-excluded="true" onkeydown="return false">'+
+                  '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required  data-parsley-excluded="true" onkeydown="return false">'+
                   '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="{{$periodohoy}}">'+
                 '</div>'+
               '</div>'+
@@ -641,7 +641,7 @@ function obtenerdatos(cotizacionmodificar){
                   '</div>'+ 
                   '<div class="col-md-3">'+
                     '<label>Fecha </label>'+
-                    '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required  data-parsley-excluded="true" onkeydown="return false">'+
+                    '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required  data-parsley-excluded="true" onkeydown="return false">'+
                     '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy">'+
                   '</div>'+
                 '</div>'+

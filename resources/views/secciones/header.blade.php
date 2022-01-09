@@ -16,11 +16,18 @@
             <li><a href="{{ route('compras') }}" id="menuregistroscompras">Compras <b>--> CTRL+S</b></a></li>
             <li><a href="{{ route('contrarecibos') }}"  id="menuregistroscontrarecibos">ContraRecibos</a></li> 
             <li class="dropdown-submenu">
+              <a class="test" href="#">Cotizador TYT <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ route('cotizaciones') }}" id="menuregistroscotizaciones">Cotizaciones</a></li>
+                <li><a  href="{{ route('lista_precios_volvo') }}" id="menuregistroslistapreciosvolvo">Lista Precio Volvo</a></li>
+                <li><a  href="{{ route('lista_precios_cummins') }}" id="menuregistroslistaprecioscummins">Lista Precio Cummins</a></li>
+              </ul>
+            </li>  
+            <li class="dropdown-submenu">
               <a class="test" href="#">Cotizaciones <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a  href="{{ route('cotizaciones_productos') }}" id="menuregistroscotizacionesproductos">Cotizaciones Productos</a></li>
                 <li><a  href="{{ route('cotizaciones_servicios') }}" id="menuregistroscotizacionesservicios">Cotizaciones Servicios</a></li>
-                <li><a href="{{ route('cotizaciones') }}" id="menuregistroscotizaciones">Cotizaciones</a></li>
               </ul>
             </li>  
             <!--<li><a href="#" id="menuregistrospedidos">Pedidos</a></li>-->
@@ -45,6 +52,7 @@
             <li><a href="{{ route('asignacionherramienta') }}" id="menuregistrosasignacionherramienta">Asignación Herramienta</a></li>
             <li><a href="{{ route('prestamoherramienta') }}" id="menuregistrosprestamoherramienta">Prestamo Herramienta</a></li>
             <li><a href="{{ route('ajustesinventario') }}" id="menuregistrosajusteinventario">Ajustes de Inventario <b>--> CTRL+A</b></a></li>
+            <li><a href="{{ route('firmardocumentos') }}" id="menuregistrosajusteinventario">Firmar Documentos </a></li>
           </ul>
         </li>
         <li class="dropdown">
@@ -61,14 +69,7 @@
             <li><a href="{{ route('bancos') }}" id="menucatalogobancos">Bancos</a></li>              
             <li><a href="{{ route('tecnicos') }}" id="menucatalogotecnicos">Técnicos</a></li>
             <li><a href="{{ route('servicios') }}" id="menucatalogoservicios">Servicios</a></li>
-            <li><a href="{{ route('vines') }}" id="menucatalogovines">Vines</a></li>
-            <!--<li class="dropdown-submenu">
-              <a class="test" href="#">Encuestas <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="#"  id="menucatalogoencuentascrearencuesta">Crear Encuesta</a></li>
-                <li><a href="#">Realizar Encuesta</a></li>
-              </ul>
-            </li>  -->              
+            <li><a href="{{ route('vines') }}" id="menucatalogovines">Vines</a></li>           
             <li class="dropdown-submenu">
               <a class="test" href="#">Folios Fiscales<span class="caret"></span></a>
               <ul class="dropdown-menu">
@@ -192,12 +193,6 @@
                 <li><a  href="{{route('reporte_relacion_cotizaciones')}}" id="menureporterelacioncotizaciones">Relación de Cotizaciones</a></li>
               </ul>
             </li>
-            <!--<li class="dropdown-submenu">
-              <a class="test"  href="#">Pedidos <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a  href="#">Relación de Pedidos</a></li>
-              </ul>
-            </li>-->
             <li class="dropdown-submenu">
               <a class="test"  href="#">Remisiones <span class="caret"></span></a>
               <ul class="dropdown-menu">
@@ -217,8 +212,7 @@
                 <li><a  href="#">Ventas Servicio</a></li>                       
                 <li><a  href="#">Ventas Perdidas</a></li>   -->                    
                 <li><a  href="{{route('reporte_antiguedad_saldos')}}" id="menureportefacturasantiguedadsaldos">Antiguedad de Saldos</a></li>                     
-                <!--<li><a  href="#">Estado de Cuenta de Clientes</a></li>                   
-                <li><a  href="#">Facturas Liquidadas para Comisiones</a></li>-->
+                <!--<li><a  href="#">Estado de Cuenta de Clientes</a></li> -->
               </ul>
             </li>            
             <li class="dropdown-submenu">
@@ -244,23 +238,12 @@
               <ul class="dropdown-menu">
                 <!--<li><a  href="#">Avance Unidades en Reparación</a></li>-->
                 <li><a  href="{{route('reporte_ordenes_trabajo_horas_tecnico')}}" id="menureportesordenestrabajohorastecnico">Horas Técnico</a></li>
-                <!--<li><a  href="#">Unidades Servicio</a></li>
+                <!--
+                <li><a  href="#">Unidades Servicio</a></li>
                 <li><a  href="#">Relación de Encuestas</a></li>
-                <li><a  href="#">Precios Mano de Obra</a></li>
-                <li><a  href="#">Planeación del Taller Entradas y Salidas</a></li>
-                <li><a  href="#">Planeación del Taller Bahías Disponibles</a></li>
-                <li><a  href="#">Planeación del Taller Técnicos Disponibles</a></li>-->
+                <li><a  href="#">Precios Mano de Obra</a></li> --> 
               </ul>
-            </li>
-            <!--<li class="dropdown-submenu">
-              <a class="test"  href="#">Estado Financiero CABS <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a  href="#">Antiguedad del Inventario</a></li>
-                <li><a  href="#">Montos Facturación Servicio</a></li>
-                <li><a  href="#">Montos Facturación Refacciones</a></li>
-                <li><a  href="#">Horas Facturadas y Producidas</a></li>
-              </ul>
-            </li>   -->              
+            </li>             
             <li class="dropdown-submenu">
               <a class="test"  href="#">Cuentas x Cobrar <span class="caret"></span></a>
               <ul class="dropdown-menu">
@@ -321,9 +304,6 @@
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Utilerias <span class="caret"></span></a>
           <ul class="dropdown-menu">
             <!--<li><a href="#">Visor de Archivos XML</a></li>       
-            <li><a href="#">Abrir Carpeta de Archivos XML</a></li>
-            <li><a href="#">Abrir Carpeta de Archivos Excel</a></li>     
-            <li><a href="#">Timbres Disponibles</a></li>              
             <li class="dropdown-submenu">
               <a class="test"  href="#">Importar y Predeterminar <span class="caret"></span></a>
               <ul class="dropdown-menu">
@@ -343,13 +323,13 @@
                 <li><a  href="#">Actualizar Precios Netos a Usar en Punto de Venta de Utilidad Marcas</a></li>
                 <li><a  href="#">Ingresar Precios Netos a Usar en Punto de Venta</a></li>
               </ul>
-            </li>                 
-            <li><a href="#">Generar Pólizas</a></li>-->
+            </li>-->
             @if(Auth::user()->role_id == 1)
               <li><a href="{{ route('empresa') }}">Empresa</a></li>
               <li><a href="{{ route('errors_inaasys') }}"><b>LOGS-ERRORS</b></a></li>
               <li><a href="{{ route('sesiones') }}"><b>SESIONES</b></a></li>
             @endif
+            <li><a href="{{ route('ayuda') }}">Ayuda</a></li>
             <li class="bg-deep-orange">
               <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                 <b>CERRAR SESIÓN</b>
@@ -358,18 +338,46 @@
           </ul>
         </li>      
       </ul>
-      <ul class="nav navbar-nav navbar-right infousuario">
+      <ul class="nav navbar-nav navbar-right infousuario">  
+        <!-- Valores Dolar -->
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
-            Valor Dolar DOF: <b>{{$valor_dolar_hoy}}</b>
+          <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button">
+            <i class="material-icons">attach_money</i>
           </a>
-        </li>    
-        <!-- Ayuda -->
-        <li class="dropdown">
-          <a href="{{route('ayuda')}}" class="dropdown-toggle" data-toggle="dropdown" role="button">
-            <i class="material-icons">help</i>
-          </a>
-        </li>
+          <ul class="dropdown-menu">
+            <li class="header">VALOR DOLAR</li>
+            <li class="body">
+              <ul class="menu">
+                <li>
+                  <a href="javascript:void(0);">
+                    <div class="icon-circle bg-grey">
+                      <i class="material-icons">attach_money</i>
+                    </div>
+                    <div class="menu-info">
+                      <h4 style="font-size:11px;">Valor Dolar Volvo : $ {{$ultimo_valor_tipo_cambio_volvo}}</h4>
+                      <p style="font-size:9px;">
+                        <i class="material-icons">update</i>Ultima Actualización {{$ultima_fecha_actualización_tipo_cambio_volvo}}
+                      </p>
+                    </div>
+                  </a>
+                </li>
+                <li>
+                  <a href="javascript:void(0);">
+                    <div class="icon-circle bg-red">
+                      <i class="material-icons">attach_money</i>
+                    </div>
+                    <div class="menu-info">
+                      <h4 style="font-size:11px;">Valor Dolar Cummins : $ 20.589000</h4>
+                      <p style="font-size:9px;">
+                        <i class="material-icons">update</i>Ultima Actualización {{$timbresegresonotastotalesactivosfacturapi}}
+                      </p>
+                    </div>
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li> 
         <!-- Notificaciones -->
         <li class="dropdown">
           <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button">
@@ -438,7 +446,7 @@
               </ul>
             </li>
           </ul>
-        </li>            
+        </li>   
         <li class="text-center">
           <div class="name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ Auth::user()->name }}</div>
           <div class="btn-group user-helper-dropdown">

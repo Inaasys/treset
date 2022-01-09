@@ -32,6 +32,7 @@ use App\Cliente;
 use App\Configuracion_Tabla;
 use App\VistaTraspaso;
 use App\VistaObtenerExistenciaProducto;
+use App\Firma_Rel_Documento;
 use Config;
 use Mail;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
@@ -1407,17 +1408,12 @@ class TraspasoController extends ConfiguracionSistemaController{
     public function traspasos_buscar_folio_string_like(Request $request){
         if($request->ajax()){
             $string = $request->string;
-            $data = Traspaso::where('Traspaso', 'like', '%' . $string . '%')->orderBy('Folio', 'ASC')->take(3)->get();
+            $data = VistaTraspaso::orderBy('Folio', 'ASC')->get();
             return DataTables::of($data)
-                ->addColumn('operaciones', function($data){
-                    $boton =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Agregar para generar PDF" onclick="agregararraypdf(\''.$data->Traspaso .'\')"><i class="material-icons">done</i></div> ';
-                    return $boton;
-                })
                 ->addColumn('Total', function($data){
                     $total = Helpers::convertirvalorcorrecto($data->Total);
                     return $total;
                 })
-                ->rawColumns(['operaciones','Total'])
                 ->make(true);
         } 
     }
@@ -1460,8 +1456,19 @@ class TraspasoController extends ConfiguracionSistemaController{
                 $almacenforaneo = Almacen::where('Numero', $t->A)->first();
                 $almacena = $almacenforaneo->Nombre.' ('.$almacenforaneo->Numero.')';
             }
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'Traspasos')->where('Documento', $t->Traspaso)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'Traspasos')
+            ->where('frd.Documento', $t->Traspaso)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "traspaso"=>$t,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "descuentotraspaso"=>Helpers::convertirvalorcorrecto($t->Descuento),
                       "subtotaltraspaso"=>Helpers::convertirvalorcorrecto($t->SubTotal),
                       "ivatraspaso"=>Helpers::convertirvalorcorrecto($t->Iva),
@@ -1528,8 +1535,19 @@ class TraspasoController extends ConfiguracionSistemaController{
                 $almacenforaneo = Almacen::where('Numero', $t->A)->first();
                 $almacena = $almacenforaneo->Nombre.' ('.$almacenforaneo->Numero.')';
             }
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'Traspasos')->where('Documento', $t->Traspaso)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'Traspasos')
+            ->where('frd.Documento', $t->Traspaso)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "traspaso"=>$t,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "descuentotraspaso"=>Helpers::convertirvalorcorrecto($t->Descuento),
                       "subtotaltraspaso"=>Helpers::convertirvalorcorrecto($t->SubTotal),
                       "ivatraspaso"=>Helpers::convertirvalorcorrecto($t->Iva),
@@ -1597,8 +1615,19 @@ class TraspasoController extends ConfiguracionSistemaController{
                 $almacenforaneo = Almacen::where('Numero', $t->A)->first();
                 $almacena = $almacenforaneo->Nombre.' ('.$almacenforaneo->Numero.')';
             }
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'Traspasos')->where('Documento', $t->Traspaso)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'Traspasos')
+            ->where('frd.Documento', $t->Traspaso)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "traspaso"=>$t,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "descuentotraspaso"=>Helpers::convertirvalorcorrecto($t->Descuento),
                       "subtotaltraspaso"=>Helpers::convertirvalorcorrecto($t->SubTotal),
                       "ivatraspaso"=>Helpers::convertirvalorcorrecto($t->Iva),

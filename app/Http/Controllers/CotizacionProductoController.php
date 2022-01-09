@@ -30,6 +30,7 @@ use App\Configuracion_Tabla;
 use App\VistaCotizacionProducto;
 use App\VistaObtenerExistenciaProducto;
 use App\Existencia;
+use App\Firma_Rel_Documento;
 use Config;
 use Mail;
 use Schema;
@@ -201,6 +202,47 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm montointerespartida" name="montointerespartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
                         '</tr>';
                         array_push($arraycodigosyaagregados, $producto->Codigo);
+                        $contadorproductos++;
+                        $contadorfilas++;
+                    }else{
+                        //indice surtimiento partida
+                        $multiplicacionexistenciaporindicesurtimiento = 0 * 100;
+                        $indicesurtimientopartida = $multiplicacionexistenciaporindicesurtimiento / $cantidadpartida;
+                        $tipo = "alta";
+                        $filasdetallescotizacion= $filasdetallescotizacion.
+                        '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
+                            '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$codigoabuscar.'" readonly data-parsley-length="[1, 20]">'.$codigoabuscar.'</td>'.
+                            '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="PIEZA" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">PIEZA</td>'.
+                            '<td class="tdmod">'.
+                            '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($cantidadpartida).'"  data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodecantidadpartida('.$contadorfilas.',\''.$tipo .'\');">'.
+                            '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'.                           
+                            '</td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodepreciopartida('.$contadorfilas.',\''.$tipo .'\');"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('.$contadorfilas.');"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentoporcentajepartida('.$contadorfilas.');"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto(16).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm ivapesospartida" name="ivapesospartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm comisionporcentajepartida" name="comisionporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('.$contadorfilas.');" required></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm comisionespesospartida" name="comisionespesospartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-utilidad="0.'.$this->numerocerosconfiguradosinputnumberstep.'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm existenciaactualpartida" name="existenciaactualpartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodxl cantidadsolicitadapartida" name="cantidadsolicitadapartida[]" value="'.Helpers::convertirvalorcorrecto($cantidadpartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm indicesurtimientopartida" name="indicesurtimientopartida[]" value="'.Helpers::convertirvalorcorrecto($indicesurtimientopartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm monedapartida" name="monedapartida[]" value="MXN" readonly data-parsley-length="[1, 3]" autocomplete="off"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costolistapartida" name="costolistapartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm tipocambiopartida" name="tipocambiopartida[]" value="'.Helpers::convertirvalorcorrecto(1).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm mesespartida" name="mesespartida[]" value="0" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm tasainterespartida" name="tasainterespartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm montointerespartida" name="montointerespartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                        '</tr>';
+                        array_push($arraycodigosyaagregados, $codigoabuscar);
                         $contadorproductos++;
                         $contadorfilas++;
                     }
@@ -813,17 +855,12 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
     public function cotizaciones_productos_buscar_folio_string_like(Request $request){
         if($request->ajax()){
             $string = $request->string;
-            $data = CotizacionProducto::where('Cotizacion', 'like', '%' . $string . '%')->orderBy('Folio', 'ASC')->take(3)->get();
+            $data = VistaCotizacionProducto::orderBy('Folio', 'ASC')->get();
             return DataTables::of($data)
-                ->addColumn('operaciones', function($data){
-                    $boton =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Agregar para generar PDF" onclick="agregararraypdf(\''.$data->Cotizacion .'\')"><i class="material-icons">done</i></div> ';
-                    return $boton;
-                })
                 ->addColumn('Total', function($data){
                     $total = Helpers::convertirvalorcorrecto($data->Total);
                     return $total;
                 })
-                ->rawColumns(['operaciones','Total'])
                 ->make(true);
         } 
     }
@@ -845,21 +882,37 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
             $cotizacionesproductosdetalle = CotizacionProductoDetalle::where('Cotizacion', $cp->Cotizacion)->get();
             $datadetalle=array();
             foreach($cotizacionesproductosdetalle as $cpd){
-                $producto = Producto::where('Codigo', $cpd->Codigo)->first();
+                $ubicacion = "";
+                $contarproducto = Producto::where('Codigo', $cpd->Codigo)->count();
+                if($contarproducto > 0){
+                    $producto = Producto::where('Codigo', $cpd->Codigo)->first();
+                    $ubicacion = $producto->Ubicacion;
+                }
                 $datadetalle[]=array(
                     "cantidaddetalle"=> Helpers::convertirvalorcorrecto($cpd->Cantidad),
                     "codigodetalle"=>$cpd->Codigo,
                     "descripciondetalle"=>$cpd->Descripcion,
                     "existenciasdetalle"=>$cpd->Existencias,
-                    "ubicaciondetalle"=>$producto->Ubicacion,
+                    "ubicaciondetalle"=>$ubicacion,
                     "preciodetalle" => Helpers::convertirvalorcorrecto($cpd->Precio),
                     "descuentodetalle" => Helpers::convertirvalorcorrecto($cpd->Dcto),
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($cpd->SubTotal)
                 );
             } 
             $cliente = Cliente::where('Numero', $cp->Cliente)->first();
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'CotizacionesProductos')->where('Documento', $cp->Cotizacion)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'CotizacionesProductos')
+            ->where('frd.Documento', $cp->Cotizacion)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "cotizacionproducto"=>$cp,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "descuentocotizacionproducto"=>Helpers::convertirvalorcorrecto($cp->Descuento),
                       "subtotalcotizacionproducto"=>Helpers::convertirvalorcorrecto($cp->SubTotal),
                       "ivacotizacionproducto"=>Helpers::convertirvalorcorrecto($cp->Iva),
@@ -904,21 +957,37 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
             $cotizacionesproductosdetalle = CotizacionProductoDetalle::where('Cotizacion', $cp->Cotizacion)->get();
             $datadetalle=array();
             foreach($cotizacionesproductosdetalle as $cpd){
-                $producto = Producto::where('Codigo', $cpd->Codigo)->first();
+                $ubicacion = "";
+                $contarproducto = Producto::where('Codigo', $cpd->Codigo)->count();
+                if($contarproducto > 0){
+                    $producto = Producto::where('Codigo', $cpd->Codigo)->first();
+                    $ubicacion = $producto->Ubicacion;
+                }
                 $datadetalle[]=array(
                     "cantidaddetalle"=> Helpers::convertirvalorcorrecto($cpd->Cantidad),
                     "codigodetalle"=>$cpd->Codigo,
                     "descripciondetalle"=>$cpd->Descripcion,
                     "existenciasdetalle"=>$cpd->Existencias,
-                    "ubicaciondetalle"=>$producto->Ubicacion,
+                    "ubicaciondetalle"=>$ubicacion,
                     "preciodetalle" => Helpers::convertirvalorcorrecto($cpd->Precio),
                     "descuentodetalle" => Helpers::convertirvalorcorrecto($cpd->Dcto),
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($cpd->SubTotal)
                 );
             } 
             $cliente = Cliente::where('Numero', $cp->Cliente)->first();
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'CotizacionesProductos')->where('Documento', $cp->Cotizacion)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'CotizacionesProductos')
+            ->where('frd.Documento', $cp->Cotizacion)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "cotizacionproducto"=>$cp,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "descuentocotizacionproducto"=>Helpers::convertirvalorcorrecto($cp->Descuento),
                       "subtotalcotizacionproducto"=>Helpers::convertirvalorcorrecto($cp->SubTotal),
                       "ivacotizacionproducto"=>Helpers::convertirvalorcorrecto($cp->Iva),
@@ -967,21 +1036,37 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
             $cotizacionesproductosdetalle = CotizacionProductoDetalle::where('Cotizacion', $cp->Cotizacion)->get();
             $datadetalle=array();
             foreach($cotizacionesproductosdetalle as $cpd){
-                $producto = Producto::where('Codigo', $cpd->Codigo)->first();
+                $ubicacion = "";
+                $contarproducto = Producto::where('Codigo', $cpd->Codigo)->count();
+                if($contarproducto > 0){
+                    $producto = Producto::where('Codigo', $cpd->Codigo)->first();
+                    $ubicacion = $producto->Ubicacion;
+                }
                 $datadetalle[]=array(
                     "cantidaddetalle"=> Helpers::convertirvalorcorrecto($cpd->Cantidad),
                     "codigodetalle"=>$cpd->Codigo,
                     "descripciondetalle"=>$cpd->Descripcion,
                     "existenciasdetalle"=>$cpd->Existencias,
-                    "ubicaciondetalle"=>$producto->Ubicacion,
+                    "ubicaciondetalle"=>$ubicacion,
                     "preciodetalle" => Helpers::convertirvalorcorrecto($cpd->Precio),
                     "descuentodetalle" => Helpers::convertirvalorcorrecto($cpd->Dcto),
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($cpd->SubTotal)
                 );
             } 
             $cliente = Cliente::where('Numero', $cp->Cliente)->first();
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'CotizacionesProductos')->where('Documento', $cp->Cotizacion)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'CotizacionesProductos')
+            ->where('frd.Documento', $cp->Cotizacion)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "cotizacionproducto"=>$cp,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "descuentocotizacionproducto"=>Helpers::convertirvalorcorrecto($cp->Descuento),
                       "subtotalcotizacionproducto"=>Helpers::convertirvalorcorrecto($cp->SubTotal),
                       "ivacotizacionproducto"=>Helpers::convertirvalorcorrecto($cp->Iva),
@@ -1122,21 +1207,37 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
             $cotizacionesproductosdetalle = CotizacionProductoDetalle::where('Cotizacion', $cp->Cotizacion)->get();
             $datadetalle=array();
             foreach($cotizacionesproductosdetalle as $cpd){
-                $producto = Producto::where('Codigo', $cpd->Codigo)->first();
+                $ubicacion = "";
+                $contarproducto = Producto::where('Codigo', $cpd->Codigo)->count();
+                if($contarproducto > 0){
+                    $producto = Producto::where('Codigo', $cpd->Codigo)->first();
+                    $ubicacion = $producto->Ubicacion;
+                }
                 $datadetalle[]=array(
                     "cantidaddetalle"=> Helpers::convertirvalorcorrecto($cpd->Cantidad),
                     "codigodetalle"=>$cpd->Codigo,
                     "descripciondetalle"=>$cpd->Descripcion,
                     "existenciasdetalle"=>$cpd->Existencias,
-                    "ubicaciondetalle"=>$producto->Ubicacion,
+                    "ubicaciondetalle"=>$ubicacion,
                     "preciodetalle" => Helpers::convertirvalorcorrecto($cpd->Precio),
                     "descuentodetalle" => Helpers::convertirvalorcorrecto($cpd->Dcto),
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($cpd->SubTotal)
                 );
             } 
             $cliente = Cliente::where('Numero', $cp->Cliente)->first();
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'CotizacionesProductos')->where('Documento', $cp->Cotizacion)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'CotizacionesProductos')
+            ->where('frd.Documento', $cp->Cotizacion)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                     "cotizacionproducto"=>$cp,
+                    "numerofirmas"=>$numerofirmas,
+                    "firmas"=>$firmas,
                     "descuentocotizacionproducto"=>Helpers::convertirvalorcorrecto($cp->Descuento),
                     "subtotalcotizacionproducto"=>Helpers::convertirvalorcorrecto($cp->SubTotal),
                     "ivacotizacionproducto"=>Helpers::convertirvalorcorrecto($cp->Iva),
@@ -1170,21 +1271,37 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
             $cotizacionesproductosdetalle = CotizacionProductoDetalle::where('Cotizacion', $cp->Cotizacion)->get();
             $datadetalle=array();
             foreach($cotizacionesproductosdetalle as $cpd){
-                $producto = Producto::where('Codigo', $cpd->Codigo)->first();
+                $ubicacion = "";
+                $contarproducto = Producto::where('Codigo', $cpd->Codigo)->count();
+                if($contarproducto > 0){
+                    $producto = Producto::where('Codigo', $cpd->Codigo)->first();
+                    $ubicacion = $producto->Ubicacion;
+                }
                 $datadetalle[]=array(
                     "cantidaddetalle"=> Helpers::convertirvalorcorrecto($cpd->Cantidad),
                     "codigodetalle"=>$cpd->Codigo,
                     "descripciondetalle"=>$cpd->Descripcion,
                     "existenciasdetalle"=>$cpd->Existencias,
-                    "ubicaciondetalle"=>$producto->Ubicacion,
+                    "ubicaciondetalle"=>$ubicacion,
                     "preciodetalle" => Helpers::convertirvalorcorrecto($cpd->Precio),
                     "descuentodetalle" => Helpers::convertirvalorcorrecto($cpd->Dcto),
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($cpd->SubTotal)
                 );
             } 
             $cliente = Cliente::where('Numero', $cp->Cliente)->first();
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'CotizacionesProductos')->where('Documento', $cp->Cotizacion)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'CotizacionesProductos')
+            ->where('frd.Documento', $cp->Cotizacion)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                     "cotizacionproducto"=>$cp,
+                    "numerofirmas"=>$numerofirmas,
+                    "firmas"=>$firmas,
                     "descuentocotizacionproducto"=>Helpers::convertirvalorcorrecto($cp->Descuento),
                     "subtotalcotizacionproducto"=>Helpers::convertirvalorcorrecto($cp->SubTotal),
                     "ivacotizacionproducto"=>Helpers::convertirvalorcorrecto($cp->Iva),

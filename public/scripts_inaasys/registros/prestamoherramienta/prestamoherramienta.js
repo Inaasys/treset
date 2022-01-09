@@ -599,18 +599,18 @@ function alta(){
                 '</div>'+
                 '<div class="col-md-3">'+
                   '<label>Fecha</label>'+
-                  '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required data-parsley-excluded="true" onkeydown="return false">'+
+                  '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required data-parsley-excluded="true" onkeydown="return false">'+
                   '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                 '</div>'+
               '</div>'+
               '<div class="row">'+
                 '<div class="col-md-3">'+
                   '<label>Inicio Prestamo</label>'+
-                  '<input type="datetime-local" class="form-control inicioprestamo inputnext" name="inicioprestamo" id="inicioprestamo" onchange="compararterminoprestamo()" data-parsley-excluded="true" onkeydown="return false" required>'+
+                  '<input type="datetime-local" class="form-control inicioprestamo" name="inicioprestamo" id="inicioprestamo" onchange="compararterminoprestamo()" data-parsley-excluded="true" onkeydown="return false" required>'+
                 '</div>'+
                 '<div class="col-md-3">'+
                   '<label>Termino Prestamo</label>'+
-                  '<input type="datetime-local" class="form-control terminoprestamo inputnext" name="terminoprestamo" id="terminoprestamo" onchange="compararterminoprestamo()" data-parsley-excluded="true" onkeydown="return false" required >'+
+                  '<input type="datetime-local" class="form-control terminoprestamo" name="terminoprestamo" id="terminoprestamo" onchange="compararterminoprestamo()" data-parsley-excluded="true" onkeydown="return false" required >'+
                 '</div>'+
                 '<div class="col-md-4">'+
                   '<label >correo notificaciones</label>'+
@@ -885,18 +885,18 @@ function obtenerdatos(prestamomodificar){
                   '</div>'+
                   '<div class="col-md-3">'+
                     '<label>Fecha</label>'+
-                    '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required data-parsley-excluded="true" onkeydown="return false">'+
+                    '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required data-parsley-excluded="true" onkeydown="return false">'+
                     '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                   '</div>'+
                 '</div>'+
                 '<div class="row">'+
                   '<div class="col-md-3">'+
                     '<label>Inicio Prestamo</label>'+
-                    '<input type="datetime-local" class="form-control inicioprestamo inputnext" name="inicioprestamo" id="inicioprestamo" onchange="compararterminoprestamo()"  data-parsley-excluded="true" onkeydown="return false" required>'+
+                    '<input type="datetime-local" class="form-control inicioprestamo" name="inicioprestamo" id="inicioprestamo" onchange="compararterminoprestamo()"  data-parsley-excluded="true" onkeydown="return false" required>'+
                   '</div>'+
                   '<div class="col-md-3">'+
                     '<label>Termino Prestamo</label>'+
-                    '<input type="datetime-local" class="form-control terminoprestamo inputnext" name="terminoprestamo" id="terminoprestamo" onchange="compararterminoprestamo()"  data-parsley-excluded="true" onkeydown="return false" required >'+
+                    '<input type="datetime-local" class="form-control terminoprestamo" name="terminoprestamo" id="terminoprestamo" onchange="compararterminoprestamo()"  data-parsley-excluded="true" onkeydown="return false" required >'+
                   '</div>'+
                   '<div class="col-md-4">'+
                     '<label >correo notificaciones</label>'+

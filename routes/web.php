@@ -34,6 +34,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/pruebas_vocales', 'PruebaController@pruebas_vocales')->name('pruebas_vocales');
     Route::get('/prueba_diferencias_arrays', 'PruebaController@prueba_diferencias_arrays')->name('prueba_diferencias_arrays');
     Route::get('/importSATClaveProdServCP', 'PruebaController@importSATClaveProdServCP')->name('importSATClaveProdServCP');
+    Route::get('/obtener_datos_catalogo_productos_por_codigo', 'PruebaController@obtener_datos_catalogo_productos_por_codigo')->name('obtener_datos_catalogo_productos_por_codigo');
+    Route::get('/migrar_productos_utilizados_base_nueva', 'PruebaController@migrar_productos_utilizados_base_nueva')->name('migrar_productos_utilizados_base_nueva');
 
     Route::get('/artisan', function () { 
         //return Artisan::call('config:cache');
@@ -259,6 +261,27 @@ Route::group(['middleware' => ['auth']], function () {
     /* -----------------------------------||||||||||||||||||||FIN CATALOGOS||||||||||||||||||||||-------------------------------------*/
 
     /* -----------------------------------||||||||||||||||||||REGISTROS||||||||||||||||||||||-------------------------------------*/
+    //Firmar Documentos
+    Route::get('/firmardocumentos', 'FirmarDocumentoController@firmardocumentos')->name('firmardocumentos')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
+    Route::get('/firmardocumentos_obtener', 'FirmarDocumentoController@firmardocumentos_obtener')->name('firmardocumentos_obtener')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
+    Route::post('/firmardocumentos_guardar_configuracion_tabla', 'FirmarDocumentoController@firmardocumentos_guardar_configuracion_tabla')->name('firmardocumentos_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
+    Route::get('/firmardocumentos_obtener_tipos_documentos', 'FirmarDocumentoController@firmardocumentos_obtener_tipos_documentos')->name('firmardocumentos_obtener_tipos_documentos')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
+    Route::get('/firmardocumentos_obtener_folios_documento', 'FirmarDocumentoController@firmardocumentos_obtener_folios_documento')->name('firmardocumentos_obtener_folios_documento')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
+    Route::get('/firmardocumentos_obtener_documentos_a_firmar', 'FirmarDocumentoController@firmardocumentos_obtener_documentos_a_firmar')->name('firmardocumentos_obtener_documentos_a_firmar')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
+    Route::post('/firmardocumentosoc_guardar', 'FirmarDocumentoController@firmardocumentosoc_guardar')->name('firmardocumentosoc_guardar')->middleware('revisarpermisos:registros.ordenescompra.firmar');
+    Route::post('/firmardocumentoscom_guardar', 'FirmarDocumentoController@firmardocumentoscom_guardar')->name('firmardocumentoscom_guardar')->middleware('revisarpermisos:registros.compras.firmar');
+    Route::post('/firmardocumentosconrec_guardar', 'FirmarDocumentoController@firmardocumentosconrec_guardar')->name('firmardocumentosconrec_guardar')->middleware('revisarpermisos:registros.contrarecibos.firmar');
+    Route::post('/firmardocumentosrem_guardar', 'FirmarDocumentoController@firmardocumentosrem_guardar')->name('firmardocumentosrem_guardar')->middleware('revisarpermisos:registros.remisiones.firmar');
+    Route::post('/firmardocumentostras_guardar', 'FirmarDocumentoController@firmardocumentostras_guardar')->name('firmardocumentostras_guardar')->middleware('revisarpermisos:registros.traspasos.firmar');
+    Route::post('/firmardocumentosnp_guardar', 'FirmarDocumentoController@firmardocumentosnp_guardar')->name('firmardocumentosnp_guardar')->middleware('revisarpermisos:registros.notas.credito.proveedores.firmar');
+    Route::post('/firmardocumentosah_guardar', 'FirmarDocumentoController@firmardocumentosah_guardar')->name('firmardocumentosah_guardar')->middleware('revisarpermisos:registros.asignacion.herramienta.firmar');
+    Route::post('/firmardocumentosaji_guardar', 'FirmarDocumentoController@firmardocumentosaji_guardar')->name('firmardocumentosaji_guardar')->middleware('revisarpermisos:registros.ajustes.inventario.firmar');
+    Route::post('/firmardocumentoscp_guardar', 'FirmarDocumentoController@firmardocumentoscp_guardar')->name('firmardocumentoscp_guardar')->middleware('revisarpermisos:registros.cotizaciones.productos.firmar');
+    Route::post('/firmardocumentoscs_guardar', 'FirmarDocumentoController@firmardocumentoscs_guardar')->name('firmardocumentoscs_guardar')->middleware('revisarpermisos:registros.cotizaciones.servicios.firmar');
+    Route::post('/firmardocumentospro_guardar', 'FirmarDocumentoController@firmardocumentospro_guardar')->name('firmardocumentospro_guardar')->middleware('revisarpermisos:registros.produccion.firmar');
+    Route::post('/firmardocumentosreq_guardar', 'FirmarDocumentoController@firmardocumentosreq_guardar')->name('firmardocumentosreq_guardar')->middleware('revisarpermisos:registros.requisiciones.firmar');
+    Route::get('/firmardocumentos_verificar_uso_en_modulos', 'FirmarDocumentoController@firmardocumentos_verificar_uso_en_modulos')->name('firmardocumentos_verificar_uso_en_modulos')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
+    Route::post('/firmardocumentos_bajas', 'FirmarDocumentoController@firmardocumentos_bajas')->name('firmardocumentos_bajas')->middleware('revisaraccesomenu:menuregistrosajusteinventario');
     //Ordenes de Compra
     Route::get('/ordenes_compra', 'OrdenCompraController@ordenes_compra')->name('ordenes_compra')->middleware('revisaraccesomenu:menuregistrosordenescompra');
     Route::get('/ordenes_compra_obtener', 'OrdenCompraController@ordenes_compra_obtener')->name('ordenes_compra_obtener')->middleware('revisaraccesomenu:menuregistrosordenescompra');
@@ -430,8 +453,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/cuentas_por_cobrar_obtener_datos_envio_email', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_datos_envio_email')->name('cuentas_por_cobrar_obtener_datos_envio_email')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
     Route::post('/cuentas_por_cobrar_enviar_pdfs_email', 'CuentasPorCobrarController@cuentas_por_cobrar_enviar_pdfs_email')->name('cuentas_por_cobrar_enviar_pdfs_email')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
     Route::get('/cuentas_por_cobrar_generar_pdfs_indiv/{documento}/{tipodocumento}', 'CuentasPorCobrarController@cuentas_por_cobrar_generar_pdfs_indiv')->name('cuentas_por_cobrar_generar_pdfs_indiv')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');    
-    
-    
     Route::get('/cuentas_por_cobrar_exportar_excel', 'CuentasPorCobrarController@cuentas_por_cobrar_exportar_excel')->name('cuentas_por_cobrar_exportar_excel')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
     Route::post('/cuentas_por_cobrar_guardar_configuracion_tabla', 'CuentasPorCobrarController@cuentas_por_cobrar_guardar_configuracion_tabla')->name('cuentas_por_cobrar_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
     //---///---///---///---///---/// INTEGRACION FACTURAPI ////----/////----/////----/////_----/////-----/////
@@ -609,6 +630,14 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/cotizaciones_exportar_excel', 'CotizacionController@cotizaciones_exportar_excel')->name('cotizaciones_exportar_excel')->middleware('revisaraccesomenu:menuregistroscotizaciones');
     Route::get('/cotizaciones_crear_formato_excel/{cotizacion}', 'CotizacionController@cotizaciones_crear_formato_excel')->name('cotizaciones_crear_formato_excel')->middleware('revisaraccesomenu:menuregistroscotizaciones');
     Route::post('/cotizaciones_guardar_configuracion_tabla', 'CotizacionController@cotizaciones_guardar_configuracion_tabla')->name('cotizaciones_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistroscotizaciones');
+    //Lista Precios Volvo
+    Route::get('/lista_precios_volvo', 'ListaPrecioVolvoController@lista_precios_volvo')->name('lista_precios_volvo')->middleware('revisaraccesomenu:menuregistroslistapreciosvolvo');
+    Route::get('/lista_precios_volvo_obtener', 'ListaPrecioVolvoController@lista_precios_volvo_obtener')->name('lista_precios_volvo_obtener')->middleware('revisaraccesomenu:menuregistroslistapreciosvolvo');
+    Route::get('/lista_precios_volvo_obtener_valor_dolar_hoy_dof', 'ListaPrecioVolvoController@lista_precios_volvo_obtener_valor_dolar_hoy_dof')->name('lista_precios_volvo_obtener_valor_dolar_hoy_dof')->middleware('revisaraccesomenu:menuregistroslistapreciosvolvo');
+    Route::post('/lista_precios_volvo_guardar_valor_tipo_cambio', 'ListaPrecioVolvoController@lista_precios_volvo_guardar_valor_tipo_cambio')->name('lista_precios_volvo_guardar_valor_tipo_cambio')->middleware('revisaraccesomenu:menuregistroslistapreciosvolvo');
+    Route::post('/lista_precios_volvo_guardar_configuracion_tabla', 'ListaPrecioVolvoController@lista_precios_volvo_guardar_configuracion_tabla')->name('lista_precios_volvo_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistroslistapreciosvolvo');
+    //Lista Precios Cummins
+    Route::get('/lista_precios_cummins', 'ListaPrecioCumminsController@lista_precios_cummins')->name('lista_precios_cummins')->middleware('revisaraccesomenu:menuregistroslistaprecioscummins');
     //Cotizaciones Productos
     Route::get('/cotizaciones_productos', 'CotizacionProductoController@cotizaciones_productos')->name('cotizaciones_productos')->middleware('revisaraccesomenu:menuregistroscotizacionesproductos');
     Route::get('/cotizaciones_productos_obtener', 'CotizacionProductoController@cotizaciones_productos_obtener')->name('cotizaciones_productos_obtener')->middleware('revisaraccesomenu:menuregistroscotizacionesproductos');

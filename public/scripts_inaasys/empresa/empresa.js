@@ -35,6 +35,11 @@ function setvaluesselects(){
     $("#correodefault1enviodocumentos").val(correodefault1enviodocumentos);
     $("#correodefault2enviodocumentos").val(correodefault2enviodocumentos);
     $("input[name=verificarpartidasremisionenot][value='"+verificarinsumosremisionenot+"']").prop("checked",true);  
+    $("input[name=agregarreferenciaenasuntocorreo][value='"+agregarreferenciaenasuntocorreo+"']").prop("checked",true);  
+    $("input[name=controlarconsecutivonumrequisicion][value='"+controlarconsecutivonumrequisicion+"']").prop("checked",true);  
+    $("input[name=colocarobservacionesremisionenfactura][value='"+colocarobservacionesremisionenfactura+"']").prop("checked",true);  
+    $("input[name=pedirobligatoriamenteobservacionenfactura][value='"+pedirobligatoriamenteobservacionenfactura+"']").prop("checked",true);  
+
 }
 //obtener ususarios
 function obtenerusuarios(){

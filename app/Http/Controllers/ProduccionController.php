@@ -30,6 +30,7 @@ use App\Configuracion_Tabla;
 use App\VistaProduccion;
 use App\VistaObtenerExistenciaProducto;
 use App\Serie;
+use App\Firma_Rel_Documento;
 use Config;
 use Mail;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
@@ -750,17 +751,12 @@ class ProduccionController extends ConfiguracionSistemaController{
     public function produccion_buscar_folio_string_like(Request $request){
         if($request->ajax()){
             $string = $request->string;
-            $data = Produccion::where('Produccion', 'like', '%' . $string . '%')->orderBy('Folio', 'ASC')->take(3)->get();
+            $data = VistaProduccion::orderBy('Folio', 'ASC')->get();
             return DataTables::of($data)
-                ->addColumn('operaciones', function($data){
-                    $boton =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Agregar para generar PDF" onclick="agregararraypdf(\''.$data->Produccion .'\')"><i class="material-icons">done</i></div> ';
-                    return $boton;
-                })
                 ->addColumn('Total', function($data){
                     $total = Helpers::convertirvalorcorrecto($data->Total);
                     return $total;
                 })
-                ->rawColumns(['operaciones'])
                 ->make(true);
         } 
     }
@@ -806,8 +802,19 @@ class ProduccionController extends ConfiguracionSistemaController{
                 $almacen = Almacen::where('Numero', $p->Almacen)->first();
                 $nombrealmacen = $almacen->Nombre;
             }
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'Produccion')->where('Documento', $p->Produccion)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'Produccion')
+            ->where('frd.Documento', $p->Produccion)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "produccion"=>$p,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "cantidadproduccion"=>Helpers::convertirvalorcorrecto($p->Cantidad),
                       "costoproduccion"=>Helpers::convertirvalorcorrecto($p->Costo),
                       "totalproduccion"=>Helpers::convertirvalorcorrecto($p->Total),
@@ -875,8 +882,19 @@ class ProduccionController extends ConfiguracionSistemaController{
                 $almacen = Almacen::where('Numero', $p->Almacen)->first();
                 $nombrealmacen = $almacen->Nombre;
             }
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'Produccion')->where('Documento', $p->Produccion)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'Produccion')
+            ->where('frd.Documento', $p->Produccion)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "produccion"=>$p,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "cantidadproduccion"=>Helpers::convertirvalorcorrecto($p->Cantidad),
                       "costoproduccion"=>Helpers::convertirvalorcorrecto($p->Costo),
                       "totalproduccion"=>Helpers::convertirvalorcorrecto($p->Total),
@@ -945,8 +963,19 @@ class ProduccionController extends ConfiguracionSistemaController{
                 $almacen = Almacen::where('Numero', $p->Almacen)->first();
                 $nombrealmacen = $almacen->Nombre;
             }
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'Produccion')->where('Documento', $p->Produccion)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'Produccion')
+            ->where('frd.Documento', $p->Produccion)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "produccion"=>$p,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "cantidadproduccion"=>Helpers::convertirvalorcorrecto($p->Cantidad),
                       "costoproduccion"=>Helpers::convertirvalorcorrecto($p->Costo),
                       "totalproduccion"=>Helpers::convertirvalorcorrecto($p->Total),

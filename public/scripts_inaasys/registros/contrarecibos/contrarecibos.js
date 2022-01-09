@@ -386,12 +386,12 @@ function alta(){
                         '</div>'+
                         '<div class="col-md-3">'+
                             '<label>Fecha Contrarecibo</label>'+
-                            '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" onchange="asignafechapagoproveedor();" data-parsley-excluded="true" onkeydown="return false" required>'+
+                            '<input type="datetime-local" class="form-control" name="fecha" id="fecha" onchange="asignafechapagoproveedor();" data-parsley-excluded="true" onkeydown="return false" required>'+
                             '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="{{$periodohoy}}">'+
                         '</div>'+
                         '<div class="col-md-3">'+
                             '<label>Fecha del Pago al Proveedor</label>'+
-                            '<input type="datetime-local" class="form-control inputnext" name="fechaapagar" id="fechaapagar" data-parsley-excluded="true" onkeydown="return false" required readonly>'+
+                            '<input type="datetime-local" class="form-control" name="fechaapagar" id="fechaapagar" data-parsley-excluded="true" onkeydown="return false" required readonly>'+
                         '</div>'+
                     '</div>'+
                 '</div>'+
@@ -642,12 +642,12 @@ function obtenerdatos(contrarecibomodificar){
                         '</div>'+
                         '<div class="col-md-3">'+
                             '<label>Fecha Contrarecibo</label>'+
-                            '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" onchange="asignafechapagoproveedor();" data-parsley-excluded="true" onkeydown="return false" required>'+
+                            '<input type="datetime-local" class="form-control" name="fecha" id="fecha" onchange="asignafechapagoproveedor();" data-parsley-excluded="true" onkeydown="return false" required>'+
                             '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy">'+
                         '</div>'+
                         '<div class="col-md-3">'+
                             '<label>Fecha del Pago al Proveedor</label>'+
-                            '<input type="datetime-local" class="form-control inputnext" name="fechaapagar" id="fechaapagar" data-parsley-excluded="true" onkeydown="return false" required readonly>'+
+                            '<input type="datetime-local" class="form-control" name="fechaapagar" id="fechaapagar" data-parsley-excluded="true" onkeydown="return false" required readonly>'+
                         '</div>'+
                     '</div>'+
                 '</div>'+
@@ -840,20 +840,29 @@ function relistarbuscarstringlike(){
 }
 function buscarstringlike(){
     var columnastablafoliosencontrados =  '<tr>'+
-                                          '<th><div style="width:80px !important;">Generar Documento en PDF</div></th>'+
-                                          '<th>ContraRecibo</th>'+
-                                          '<th>Proveedor</th>'+
-                                          '<th>Total</th>'+
-                                          '<th>Status</th>'+
+                                            '<th>Documento</th>'+
+                                            '<th>Proveedor</th>'+
+                                            '<th>Total</th>'+
+                                            '<th>Status</th>'+
                                         '</tr>';
     $("#columnastablafoliosencontrados").html(columnastablafoliosencontrados);
-    tabla=$('#tablafoliosencontrados').DataTable({
+    $("#columnasfootertablafoliosencontrados").html(columnastablafoliosencontrados);
+    //agregar inputs de busqueda por columna
+    $('#tablafoliosencontrados tfoot th').each( function () {
+      var titulocolumnatfoot = $(this).text();
+      $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
+    });
+    var tablafolenc=$('#tablafoliosencontrados').DataTable({
         "paging":   false,
-        "ordering": false,
-        "info":     false,
-        "searching": false,
+        "sScrollX": "100%",
+        "sScrollY": "250px",
         processing: true,
         serverSide: true,
+        processing: true,
+        'language': {
+            'loadingRecords': '&nbsp;',
+            'processing': '<div class="spinner"></div>'
+        },
         ajax: {
             url: contrarecibos_buscar_folio_string_like,
             data: function (d) {
@@ -861,12 +870,29 @@ function buscarstringlike(){
             },
         },
         columns: [
-            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
-            { data: 'ContraRecibo', name: 'ContraRecibo' },
-            { data: 'Proveedor', name: 'Proveedor', orderable: false, searchable: false },
-            { data: 'Total', name: 'Total', orderable: false, searchable: false  },
-            { data: 'Status', name: 'Status', orderable: false, searchable: false  },
+            { data: 'ContraRecibo', name: 'ContraRecibo', orderable: false, searchable: true },
+            { data: 'NombreProveedor', name: 'NombreProveedor', orderable: false, searchable: true },
+            { data: 'Total', name: 'Total', orderable: false, searchable: true  },
+            { data: 'Status', name: 'Status', orderable: false, searchable: true  },
         ],
+        initComplete: function () {
+          // Aplicar busquedas por columna
+          this.api().columns().every( function () {
+            var that = this;
+            $('input',this.footer()).on('keyup', function(){
+              if(that.search() !== this.value){
+                that.search(this.value).draw();
+              }
+            });
+          });
+          $(".dataTables_filter").css('display', 'none');
+        }
+    });
+    //modificacion al dar doble click
+    $('#tablafoliosencontrados tbody').on('dblclick', 'tr', function () {
+        tablafolenc = $("#tablafoliosencontrados").DataTable();
+      var data = tablafolenc.row( this ).data();
+      agregararraypdf(data.ContraRecibo);
     });
 }
 //configurar tabla

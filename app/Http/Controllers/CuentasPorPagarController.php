@@ -488,17 +488,12 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
     public function cuentas_por_pagar_buscar_folio_string_like(Request $request){
         if($request->ajax()){
             $string = $request->string;
-            $data = CuentaXPagar::where('Pago', 'like', '%' . $string . '%')->orderBy('Folio', 'ASC')->take(3)->get();
+            $data = VistaCuentaPorPagar::orderBy('Folio', 'ASC')->get();
             return DataTables::of($data)
-                ->addColumn('operaciones', function($data){
-                    $boton =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Agregar para generar PDF" onclick="agregararraypdf(\''.$data->Pago .'\')"><i class="material-icons">done</i></div> ';
-                    return $boton;
-                })
                 ->addColumn('Abono', function($data){
                     $abono = Helpers::convertirvalorcorrecto($data->Abono);
                     return $abono;
                 })
-                ->rawColumns(['operaciones','Total'])
                 ->make(true);
         } 
     }

@@ -609,7 +609,6 @@ class ProductoController extends ConfiguracionSistemaController{
         $producto = Producto::where('Codigo', $request->codigoproducto)->first();
         $barcode = DNS1D::getBarcodeSVG($request->codigoproducto, 'C128', 1,55,'black', true);
         //$barcode = DNS2D::getBarcodeSVG($request->codigoproducto, 'QRCODE', 2, 2, true);
-
         $valores_producto = Producto::where('Codigo', $request->codigoproducto)->get();
         $marca = Marca::where('Numero', $producto->Marca)->first();
         $linea = Linea::where('Numero', $producto->Linea)->first();

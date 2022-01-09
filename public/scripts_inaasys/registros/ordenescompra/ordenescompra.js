@@ -1578,7 +1578,7 @@ function alta(tipoalta){
                 '</div>'+
                 '<div class="col-xs-12 col-sm-12 col-md-3">'+
                   '<label>Fecha</label>'+
-                  '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required  style="min-width:95%;" data-parsley-excluded="true" onkeydown="return false">'+
+                  '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required  style="min-width:95%;" data-parsley-excluded="true" onkeydown="return false">'+
                   '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                 '</div>'+
               '</div>'+
@@ -2091,7 +2091,7 @@ function obtenerdatos(ordenmodificar){
                   '</div>'+
                   '<div class="col-xs-12 col-sm-12 col-md-3">'+
                     '<label>Fecha</label>'+
-                    '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" required style="min-width:95%;" data-parsley-excluded="true" onkeydown="return false">'+
+                    '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required style="min-width:95%;" data-parsley-excluded="true" onkeydown="return false">'+
                     '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy">'+
                   '</div>'+
                 '</div>'+
@@ -2461,7 +2461,12 @@ function enviardocumentoemail(documento){
     $("#emailpara").val(data.emailpara);
     $("#email2cc").val(data.email2cc);
     $("#email3cc").val(data.email3cc);
-    $("#emailasunto").val("ORDEN DE COMPRA NO. " + documento +" DE "+ nombreempresa);
+    if(agregarreferenciaenasuntocorreo == 'S'){
+      var asunto = "ORDEN DE COMPRA NO. " + documento +" DE "+ nombreempresa + " " + data.ordencompra.Referencia;
+    }else{
+      var asunto = "ORDEN DE COMPRA NO. " + documento +" DE "+ nombreempresa;
+    }
+    $("#emailasunto").val(asunto);
     $(".dropify-clear").trigger("click");
     $("#divadjuntararchivo").show();
     $("#modalenviarpdfemail").modal('show');
@@ -2507,23 +2512,31 @@ function relistarbuscarstringlike(){
   var tabla = $('#tablafoliosencontrados').DataTable();
   tabla.ajax.reload();
 }
-function buscarstringlike(){
+function buscarstringlike(){  
   var columnastablafoliosencontrados =  '<tr>'+
-                                          '<th><div style="width:80px !important;">Generar Documento en PDF</div></th>'+
-                                          '<th>OrdenCompra</th>'+
+                                          '<th>Documento</th>'+
                                           '<th>Proveedor</th>'+
                                           '<th>Total</th>'+
                                           '<th>Status</th>'+
                                         '</tr>';
   $("#columnastablafoliosencontrados").html(columnastablafoliosencontrados);
-  tabla=$('#tablafoliosencontrados').DataTable({
+  $("#columnasfootertablafoliosencontrados").html(columnastablafoliosencontrados);
+  //agregar inputs de busqueda por columna
+  $('#tablafoliosencontrados tfoot th').each( function () {
+    var titulocolumnatfoot = $(this).text();
+    $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
+  });
+  var tablafolenc=$('#tablafoliosencontrados').DataTable({
       "paging":   false,
-      "ordering": false,
-      "info":     false,
-      "searching": false,
-      order: [1, 'asc'],
+      "sScrollX": "100%",
+      "sScrollY": "250px",
       processing: true,
       serverSide: true,
+      processing: true,
+      'language': {
+          'loadingRecords': '&nbsp;',
+          'processing': '<div class="spinner"></div>'
+      },
       ajax: {
           url: ordenes_compra_buscar_folio_string_like,
           data: function (d) {
@@ -2531,12 +2544,29 @@ function buscarstringlike(){
           },
       },
       columns: [
-          { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
-          { data: 'Orden', name: 'Orden' },
-          { data: 'Proveedor', name: 'Proveedor', orderable: false, searchable: false },
-          { data: 'Total', name: 'Total', orderable: false, searchable: false  },
-          { data: 'Status', name: 'Status', orderable: false, searchable: false  },
+          { data: 'Orden', name: 'Orden', orderable: false, searchable: true },
+          { data: 'NombreProveedor', name: 'NombreProveedor', orderable: false, searchable: true },
+          { data: 'Total', name: 'Total', orderable: false, searchable: true  },
+          { data: 'Status', name: 'Status', orderable: false, searchable: true  },
       ],
+      initComplete: function () {
+        // Aplicar busquedas por columna
+        this.api().columns().every( function () {
+          var that = this;
+          $('input',this.footer()).on('keyup', function(){
+            if(that.search() !== this.value){
+              that.search(this.value).draw();
+            }
+          });
+        });
+        $(".dataTables_filter").css('display', 'none');
+      }
+  });
+  //modificacion al dar doble click
+  $('#tablafoliosencontrados tbody').on('dblclick', 'tr', function () {
+    tablafolenc = $("#tablafoliosencontrados").DataTable();
+    var data = tablafolenc.row( this ).data();
+    agregararraypdf(data.Orden);
   });
 }
 //configurar tabla

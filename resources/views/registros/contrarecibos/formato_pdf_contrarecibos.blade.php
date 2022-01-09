@@ -26,6 +26,21 @@
             white-space: -o-pre-wrap;   /* Opera 7 */    
             word-wrap: break-word;      /* IE */
         }
+        .marcafirma {
+            opacity: 0.2;
+            filter: alpha(opacity=40); /* For IE8 and earlier */
+        }
+        #capa1{ 
+            position:absolute;
+            z-index:1;
+            background-color:#FFFFFF;
+            text-align:center;
+            background-color: transparent;
+        }
+        #capa2{
+            /*position:absolute;*/
+            z-index:0;
+        }
     </style>
     @foreach($data as $d)
     <body>
@@ -50,7 +65,7 @@
                     <hr></hr>
                 </div>
                 <div id ="contenedor" style="margin-top:10px;">
-                    <div style="width:53%; height:110px; float:left; text-align: left; border-style: groove;">
+                    <div style="width:53.8%; height:110px; float:left; text-align: left; border-style: groove;">
                         <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
                             <li style="font-size:10px; margin-left: 5px;"> Proveedor: {{$d['proveedor']->Nombre}} ({{$d['contrarecibo']->Proveedor}})</li>
                             <li style="font-size:10px; margin-left: 5px;"> Observaciones: {{$d['contrarecibo']->Obs}}</li>
@@ -101,20 +116,49 @@
                         <b style="font-size:12px;">Nota. No se entregará cheque SIN ContraRecibo Sellado y Firmado</b><br>
                     </div>
                 </div>
-                <div id ="contenedor" style="margin-top:150px;">
-                    <div style="width:45%; float:left; text-align: center;">
-                        <b style="font-size:11px;"><hr></hr></b>
-                        <p style="font-size:11px;">{{$d['proveedor']->Nombre}} ({{$d['contrarecibo']->Proveedor}})</p>
-                        <p style="font-size:11px;">Recibió ContraRecibo</p>
-                    </div>
-                    <div style="width:5%; float:left;">
-                    </div>
-                    <div style="width:45%; float:right; text-align: center;">
-                        <b style="font-size:11px;"><hr></hr></b>
-                        <p style="font-size:11px;">{{$d['contrarecibo']->Usuario}}</p>
-                        <p style="font-size:11px;"></p>
-                    </div>
-                </div>
+                        @if($d['numerofirmas'] > 0)
+                            <div id ="contenedor" style="margin-top:100px;">
+                                @foreach($d['firmas'] as $f)
+                                    <div style="width:50%; float:left; text-align: center;">
+                                        <div id="capa1" style="width:50%;">
+                                            <table style="width: 98%;max-width: 98%;border: 1px solid #ddd;">
+                                                <tr>
+                                                    <td >
+                                                        {{$f->name}}
+                                                    </td>
+                                                    <td>
+                                                        <p style="font-size:13px;color:#122b40;">Firmado electrónicamente por {{$f->name}}</p>
+                                                        <p style="font-size:13px;color:#122b40;">El {{$f->Fecha}}</p>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div id="capa2" style="text-align: center;">
+                                            <img class="marcafirma" src="{!! public_path('logotipo_empresa/') !!}{{$empresa->Logo}}" width="135px" height="95px">
+                                        </div>
+                                        <div>
+                                            <b style="font-size:11px;color:blue;"><hr></hr></b>
+                                            <p style="font-size:11px;">{{$f->ReferenciaPosicion}}</p>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                        <div id ="contenedor" style="margin-top:150px;">
+                            <div style="width:45%; float:left; text-align: center;">
+                                <b style="font-size:11px;"><hr></hr></b>
+                                <p style="font-size:11px;">{{$d['proveedor']->Nombre}} ({{$d['contrarecibo']->Proveedor}})</p>
+                                <p style="font-size:11px;">Recibió ContraRecibo</p>
+                            </div>
+                            <div style="width:5%; float:left;">
+                            </div>
+                            <div style="width:45%; float:right; text-align: center;">
+                                <b style="font-size:11px;"><hr></hr></b>
+                                <p style="font-size:11px;">{{$d['contrarecibo']->Usuario}}</p>
+                                <p style="font-size:11px;"></p>
+                            </div>
+                        </div>
+                        @endif
             </section>
         </div>
     </body>

@@ -22,10 +22,12 @@ use App\CuentaXPagarDetalle;
 use App\OrdenCompraDetalle;
 use App\Proveedor;
 use App\Producto;
+use App\Marca;
 use Mail;
 use App\Configuracion_Tabla;
 use App\Imports\CatalogoSATc_ClaveProdServCPImport;
 use App\Imports\CatalogosSATImport;
+use App\Exports\ProductosActivosMigrarNuevaBaseExport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class PruebaController extends ConfiguracionSistemaController{
@@ -413,6 +415,92 @@ class PruebaController extends ConfiguracionSistemaController{
 
         //return response()->json($rowexcel); 
         
+    }
+
+    //funcion para  obtener datos de producto en base
+    public function obtener_datos_catalogo_productos_por_codigo(Request $request){
+        //CATALOGO  PRODUCTOS 
+        $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('codigos_utilizados.xlsx'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        $arraydatos = array();
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 1){
+                $datosproducto = Producto::where('Codigo', ''.$partida[1].'')->count();
+                if($datosproducto > 0){
+                    $producto = Producto::where('Codigo', ''.$partida[1].'')->first();
+                    $arraydatos[] = array(
+                        "insumo" => $partida[0],
+                        "codigo" => $partida[1], 
+                        "claveproducto" => $producto->ClaveProducto,
+                        "claveunidad" => $producto->ClaveUnidad, 
+                        "descripcion" => $producto->Producto,
+                        "unidad" => $producto->Unidad,
+                        "marca" => $producto->Marca,
+                        "linea" => $producto->Linea,
+                        "impuesto" => $producto->Impuesto,
+                        "ubicacion" => $producto->Ubicacion,
+                        "tipoprod" => $producto->TipoProd,
+                        "costo" => $producto->Costo,
+                        "precio" => $producto->Precio,
+                        "utilidad" => $producto->Utilidad,
+                        "subtotal" => $producto->SubTotal,
+                        "iva" => $producto->Iva,
+                        "total" => $producto->Total,
+                        "status" => $producto->Status,
+                        "costolista" => $producto->CostoDeLista,
+                        "moneda" => $producto->Moneda,
+                        "costoventa" => $producto->CostoDeVenta,
+                        "precio1" => $producto->Precio1
+                    );
+                }
+            }
+            $rowexcel++;
+        }
+        return Excel::download(new ProductosActivosMigrarNuevaBaseExport($arraydatos), "productosamigrar.xlsx");   
+    }
+
+    //migrar los productos que solo se utilizan a base nueva
+    public function migrar_productos_utilizados_base_nueva(Request $request){
+        $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('productosamigrar.xls'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 1){
+                $ExisteProducto = Producto::where('Codigo', ''.$partida[1].'' )->count();
+                if($ExisteProducto == 0){      
+                    $Producto = new Producto;
+                    $Producto->Insumo=$partida[0];
+                    $Producto->Codigo=$partida[1];
+                    $Producto->ClaveProducto=$partida[2];
+                    $Producto->ClaveUnidad=$partida[3];
+                    $Producto->Producto=$partida[4];
+                    $Producto->Unidad=$partida[5];
+                    $Producto->Marca=$partida[6];
+                    $Producto->Linea=$partida[7];
+                    $Producto->Impuesto=$partida[8];;
+                    $Producto->Ubicacion=$partida[9];
+                    $Producto->TipoProd=$partida[10];
+                    $Producto->Costo=$partida[11];
+                    $Producto->Precio=$partida[12];
+                    $Producto->Utilidad=$partida[13];
+                    $Producto->SubTotal=$partida[14];
+                    $Producto->Iva=$partida[15];
+                    $Producto->Total=$partida[16];
+                    $Producto->Status=$partida[17];
+                    $Producto->CostoDeLista=$partida[18];
+                    $Producto->Moneda=$partida[19];
+                    $Producto->CostoDeVenta=$partida[20];
+                    $Producto->Precio1=$partida[21];
+                    $Producto->save();
+                }    
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        return response()->json($rowexcel); 
     }
 
     public function asignar_valores_por_defecto_busquedas_y_ordenamiento(){

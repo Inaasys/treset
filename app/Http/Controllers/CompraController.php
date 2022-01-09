@@ -42,6 +42,7 @@ use App\ContraReciboDetalle;
 use App\OrdenTrabajo;
 use App\OrdenTrabajoDetalle;
 use App\Serie;
+use App\Firma_Rel_Documento;
 use Config;
 use Mail;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
@@ -1902,17 +1903,12 @@ class CompraController extends ConfiguracionSistemaController{
     public function compras_buscar_folio_string_like(Request $request){
         if($request->ajax()){
             $string = $request->string;
-            $data = Compra::where('Compra', 'like', '%' . $string . '%')->orderBy('Folio', 'ASC')->take(3)->get();
+            $data = VistaCompra::orderBy('Folio', 'ASC')->get();
             return DataTables::of($data)
-                ->addColumn('operaciones', function($data){
-                    $boton =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Agregar para generar PDF" onclick="agregararraypdf(\''.$data->Compra .'\')"><i class="material-icons">done</i></div> ';
-                    return $boton;
-                })
                 ->addColumn('Total', function($data){
                     $total = Helpers::convertirvalorcorrecto($data->Total);
                     return $total;
                 })
-                ->rawColumns(['operaciones','Total'])
                 ->make(true);
         } 
     }
@@ -1948,8 +1944,19 @@ class CompraController extends ConfiguracionSistemaController{
                 );
             } 
             $proveedor = Proveedor::where('Numero', $c->Proveedor)->first();
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'Compras')->where('Documento', $c->Compra)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'Compras')
+            ->where('frd.Documento', $c->Compra)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "compra"=>$c,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "descuentocompra"=>Helpers::convertirvalorcorrecto($c->Descuento),
                       "subtotalcompra"=>Helpers::convertirvalorcorrecto($c->SubTotal),
                       "ivacompra"=>Helpers::convertirvalorcorrecto($c->Iva),
@@ -2009,8 +2016,19 @@ class CompraController extends ConfiguracionSistemaController{
                 );
             } 
             $proveedor = Proveedor::where('Numero', $c->Proveedor)->first();
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'Compras')->where('Documento', $c->Compra)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'Compras')
+            ->where('frd.Documento', $c->Compra)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "compra"=>$c,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "descuentocompra"=>Helpers::convertirvalorcorrecto($c->Descuento),
                       "subtotalcompra"=>Helpers::convertirvalorcorrecto($c->SubTotal),
                       "ivacompra"=>Helpers::convertirvalorcorrecto($c->Iva),
@@ -2073,8 +2091,19 @@ class CompraController extends ConfiguracionSistemaController{
                 );
             } 
             $proveedor = Proveedor::where('Numero', $c->Proveedor)->first();
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'Compras')->where('Documento', $c->Compra)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'Compras')
+            ->where('frd.Documento', $c->Compra)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "compra"=>$c,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "descuentocompra"=>Helpers::convertirvalorcorrecto($c->Descuento),
                       "subtotalcompra"=>Helpers::convertirvalorcorrecto($c->SubTotal),
                       "ivacompra"=>Helpers::convertirvalorcorrecto($c->Iva),

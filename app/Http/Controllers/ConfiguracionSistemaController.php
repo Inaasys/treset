@@ -8,13 +8,59 @@ use Helpers;
 use Carbon\Carbon;
 use App\Empresa;
 use App\TipoDeCambio;
+use App\TipoCambioVolvo;
 use DB;
+use App;
 
 class ConfiguracionSistemaController extends Controller
 {
     public function __construct() {
         //DATOS EMPRESA
-        $this->empresa = Empresa::where('Numero', 1)->first();
+        $this->empresa = Empresa::select(   'Numero',
+                                            'Empresa',
+                                            'Nombre',
+                                            'Rfc',
+                                            'Sistema',
+                                            'Logo',
+                                            'background_navbar',
+                                            'background_forms_and_modals',
+                                            'background_tables',
+                                            'Calle',
+                                            'NoExterior',
+                                            'NoInterior',
+                                            'Colonia',
+                                            'Localidad',
+                                            'Referencia',
+                                            'Municipio',
+                                            'Estado',
+                                            'Pais',
+                                            'Telefonos',
+                                            'Email',
+                                            'LugarExpedicion',
+                                            'RegimenFiscal',
+                                            'Moneda',
+                                            'MetodoPago',
+                                            'UsoCfdi',
+                                            'Impuesto',
+                                            'Utilizar_Mayusculas',
+                                            'Unidad',
+                                            'Conversion',
+                                            'Modificar_Registros_Cualquier_Fecha',
+                                            'Periodo_Inicial_Modulos',
+                                            'Numero_Decimales',
+                                            'Numero_Decimales_En_Documentos',
+                                            'Mayusculas_Sistema',
+                                            'IdFacturapi',
+                                            'Tipo_De_Utilidad',
+                                            'CorreoDefault1EnvioDocumentos',
+                                            'CorreoDefault2EnvioDocumentos',
+                                            'UsuariosModificarInsumo',
+                                            'VerificarPartidasRemisionEnOT',
+                                            'AgregarReferenciaOrdenCompraEnAsuntoCorreo',
+                                            'ControlarConsecutivoNumeroRequisicionEnRemisiones',
+                                            'ColocarObservacionesDeRemisionEnFactura',
+                                            'PedirObligatoriamenteObservacionEnFactura')
+                                ->where('Numero', 1)->first();
         //actualizar datos de configuracion global
         config(['app.periodoincialmodulos' => $this->empresa->Periodo_Inicial_Modulos]);
         config(['app.numerodedecimales' => $this->empresa->Numero_Decimales]);
@@ -70,6 +116,7 @@ class ConfiguracionSistemaController extends Controller
         $this->correodefault2enviodocumentos = config('app.correodefault2enviodocumentos');
         //usuarios ue puedes modificar isnumos 
         $this->usuariosamodificarinsumos = config('app.usuariosamodificarinsumos');
+        /*
         //obtener o actualizar el valor del dolar segun sea el caso
         $fechahoy = Carbon::now()->toDateString();
         $dia=date("w", strtotime($fechahoy));
@@ -94,6 +141,7 @@ class ConfiguracionSistemaController extends Controller
                     $tipodecambio = TipoDeCambio::orderBy('Numero', 'DESC')->first();
                     $valor_dolar_dof = $tipodecambio->TipoCambioDOF;
                 }else{
+                    //TipoCambio General
                     $id = Helpers::ultimoidtabla('App\TipoDeCambio');
                     $TipoDeCambio = new TipoDeCambio;
                     $TipoDeCambio->Numero = $id;
@@ -101,6 +149,21 @@ class ConfiguracionSistemaController extends Controller
                     $TipoDeCambio->Fecha = Helpers::fecha_exacta_accion_datetimestring();
                     $TipoDeCambio->TipoCambioDOF = $valor_dolar_dof;
                     $TipoDeCambio->save();
+                    //Tipo Cambio Volvo
+                    //insertar registro
+                    if (App::environment('local') || App::environment('production')) {
+                        DB::unprepared('SET IDENTITY_INSERT tipo_cambio_volvo ON');
+                    }
+                    $id = Helpers::ultimoidtabla('App\TipoCambioVolvo');
+                    $TipoCambioVolvo = new TipoCambioVolvo;
+                    $TipoCambioVolvo->Numero = $id;
+                    $TipoCambioVolvo->Moneda = 'USD';
+                    $TipoCambioVolvo->Fecha = Helpers::fecha_exacta_accion_datetimestring();
+                    $TipoCambioVolvo->Valor = $valor_dolar_dof;
+                    $TipoCambioVolvo->save();
+                    if (App::environment('local') || App::environment('production')) {
+                        DB::unprepared('SET IDENTITY_INSERT tipo_cambio_volvo OFF');
+                    }
                 }
             }else{
                 $tipodecambio = TipoDeCambio::orderBy('Numero', 'DESC')->first();
@@ -109,7 +172,20 @@ class ConfiguracionSistemaController extends Controller
         }else{
             $valor_dolar_dof = $tipodecambio->TipoCambioDOF;
         }
+        */
+        //obtener tipo cambio tabla general
+        $tipodecambio = TipoDeCambio::orderBy('Numero', 'DESC')->first();
+        $valor_dolar_dof = $tipodecambio->TipoCambioDOF;
         $this->valor_dolar_hoy = $valor_dolar_dof;
+        //obtener ultimo valor dolar volvo y fecha de actualizacion
+        $this->ultimo_tipo_cambio_volvo =  TipoCambioVolvo::select("Numero", "Fecha", "Valor")->orderBy("Numero", "DESC")->take(1)->get();
+        if(sizeof($this->ultimo_tipo_cambio_volvo) == 0 || sizeof($this->ultimo_tipo_cambio_volvo) == "" || sizeof($this->ultimo_tipo_cambio_volvo) == null){
+            $this->ultimo_valor_tipo_cambio_volvo = Helpers::convertirvalorcorrecto(0);
+            $this->ultima_fecha_actualización_tipo_cambio_volvo = Helpers::convertirvalorcorrecto(0);
+        }else{
+            $this->ultimo_valor_tipo_cambio_volvo = Helpers::convertirvalorcorrecto($this->ultimo_tipo_cambio_volvo[0]->Valor);  
+            $this->ultima_fecha_actualización_tipo_cambio_volvo = Carbon::parse($this->ultimo_tipo_cambio_volvo[0]->Fecha)->toDateTimeString();
+        }
         //timbres ingreso - facturas totales activos utilizados
         $this->timbresingresofacturastotalesactivosfacturapi = DB::table('Comprobantes')
                         ->where('Comprobante', 'Factura')
@@ -170,6 +246,8 @@ class ConfiguracionSistemaController extends Controller
         View::share ( 'empresa', $this->empresa);
         View::share ( 'meshoy', $this->meshoy);
         View::share ( 'valor_dolar_hoy', $this->valor_dolar_hoy);
+        View::share ( 'ultimo_valor_tipo_cambio_volvo', $this->ultimo_valor_tipo_cambio_volvo);
+        View::share ( 'ultima_fecha_actualización_tipo_cambio_volvo', $this->ultima_fecha_actualización_tipo_cambio_volvo);
         View::share ( 'calleempresa', $this->calleempresa);
         View::share ( 'noexteriorempresa', $this->noexteriorempresa);
         View::share ( 'nointeriorempresa', $this->nointeriorempresa);

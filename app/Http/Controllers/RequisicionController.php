@@ -36,6 +36,7 @@ use App\VistaObtenerExistenciaProducto;
 use App\OrdenTrabajo;
 use App\OrdenTrabajoDetalle;
 use App\Serie;
+use App\Firma_Rel_Documento;
 use Config;
 use Mail;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
@@ -747,17 +748,12 @@ class RequisicionController extends ConfiguracionSistemaController{
     public function requisiciones_buscar_folio_string_like(Request $request){
         if($request->ajax()){
             $string = $request->string;
-            $data = Requisicion::where('Requisicion', 'like', '%' . $string . '%')->orderBy('Folio', 'ASC')->take(3)->get();
+            $data = VistaRequisicion::orderBy('Folio', 'ASC')->get();
             return DataTables::of($data)
-                ->addColumn('operaciones', function($data){
-                    $boton =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Agregar para generar PDF" onclick="agregararraypdf(\''.$data->Requisicion .'\')"><i class="material-icons">done</i></div> ';
-                    return $boton;
-                })
                 ->addColumn('Total', function($data){
                     $total = Helpers::convertirvalorcorrecto($data->Total);
                     return $total;
                 })
-                ->rawColumns(['operaciones','Total'])
                 ->make(true);
         } 
     }
@@ -795,8 +791,19 @@ class RequisicionController extends ConfiguracionSistemaController{
             } 
             $ordentrabajo = OrdenTrabajo::where('Orden', $r->Orden)->first();
             $cliente = Cliente::where('Numero', $ordentrabajo->Cliente)->first();
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'Requisiciones')->where('Documento', $r->Requisicion)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'Requisiciones')
+            ->where('frd.Documento', $r->Requisicion)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "requisicion"=>$r,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "cliente" =>  $cliente,
                       "ordentrabajo" => $ordentrabajo,
                       "totalrequisicion"=>Helpers::convertirvalorcorrecto($r->Total),
@@ -854,8 +861,19 @@ class RequisicionController extends ConfiguracionSistemaController{
             } 
             $ordentrabajo = OrdenTrabajo::where('Orden', $r->Orden)->first();
             $cliente = Cliente::where('Numero', $ordentrabajo->Cliente)->first();
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'Requisiciones')->where('Documento', $r->Requisicion)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'Requisiciones')
+            ->where('frd.Documento', $r->Requisicion)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "requisicion"=>$r,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "cliente" =>  $cliente,
                       "ordentrabajo" => $ordentrabajo,
                       "totalrequisicion"=>Helpers::convertirvalorcorrecto($r->Total),
@@ -916,8 +934,19 @@ class RequisicionController extends ConfiguracionSistemaController{
             } 
             $ordentrabajo = OrdenTrabajo::where('Orden', $r->Orden)->first();
             $cliente = Cliente::where('Numero', $ordentrabajo->Cliente)->first();
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'Requisiciones')->where('Documento', $r->Requisicion)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'Requisiciones')
+            ->where('frd.Documento', $r->Requisicion)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "requisicion"=>$r,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "cliente" =>  $cliente,
                       "ordentrabajo" => $ordentrabajo,
                       "totalrequisicion"=>Helpers::convertirvalorcorrecto($r->Total),

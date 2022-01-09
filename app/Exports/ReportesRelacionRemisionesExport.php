@@ -448,7 +448,7 @@ class ReportesRelacionRemisionesExport implements FromCollection,WithHeadings,Wi
                 ->leftjoin('Agentes as a', 'r.Agente', '=', 'a.Numero')
                 ->leftjoin('Remisiones Detalles as rd', 'r.Remision', '=', 'rd.Remision')
                 ->leftJoin('Productos as p', 'rd.Codigo', 'p.Codigo')
-                ->select('r.Referencia as Listado', 'r.Rq as Requisicion', 'p.Insumo', 'rd.Codigo AS NumeroParte', 'rd.Descripcion', "r.Equipo AS NumeroEquipo", 'rd.Precio as PrecioVenta', 'r.Fecha as FechaDeVentaListado', 'p.Ultimo Costo as PrecioUltimaCompra', 'p.Fecha Ultima Compra as FechaUltimaCompra')
+                ->select('r.Referencia as Listado', 'r.Rq as Requisicion', 'p.Insumo', 'rd.Codigo AS NumeroParte', 'rd.Descripcion', "r.Eq AS NumeroEquipo", 'rd.Precio as PrecioVenta', DB::raw("FORMAT(r.Fecha, 'yyyy-MM-dd') as FechaDeVentaListado"),  'p.Ultimo Costo as PrecioUltimaCompra', DB::raw("FORMAT(p.[Fecha Ultima Compra], 'yyyy-MM-dd') as FechaUltimaCompra"))
                 ->whereDate('r.Fecha', '>=', $fechainicio)->whereDate('r.Fecha', '<=', $fechaterminacion)
                 ->where(function($q) use ($numerocliente) {
                     if($numerocliente != ""){

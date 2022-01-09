@@ -159,6 +159,7 @@ class EmpresaController extends ConfiguracionSistemaController{
             'Nombre' => $request->nombrecomercialempresa,
             'Empresa' => $request->razonsocialempresa,
             'Calle' => $request->calleempresa,
+            'Rfc' => $request->rfcempresa,
             'NoExterior' => $request->noexteriorempresa,
             'NoInterior' => $request->nointeriorempresa,
             'Colonia' => $request->coloniaempresa,
@@ -200,7 +201,11 @@ class EmpresaController extends ConfiguracionSistemaController{
             'CorreoDefault1EnvioDocumentos' => $request->correodefault1enviodocumentos,
             'CorreoDefault2EnvioDocumentos' => $request->correodefault2enviodocumentos,
             'UsuariosModificarInsumo' => $usuariosamodificarinsumos,
-            'VerificarPartidasRemisionEnOT' => $request->verificarpartidasremisionenot
+            'VerificarPartidasRemisionEnOT' => $request->verificarpartidasremisionenot,
+            'AgregarReferenciaOrdenCompraEnAsuntoCorreo' => $request->agregarreferenciaenasuntocorreo,
+            'ControlarConsecutivoNumeroRequisicionEnRemisiones' => $request->controlarconsecutivonumrequisicion,
+            'ColocarObservacionesDeRemisionEnFactura' => $request->colocarobservacionesremisionenfactura,
+            'PedirObligatoriamenteObservacionEnFactura' => $request->pedirobligatoriamenteobservacionenfactura,
         ]);
         return response()->json($request->all());
     }

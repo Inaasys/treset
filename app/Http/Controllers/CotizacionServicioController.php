@@ -34,6 +34,7 @@ use App\Configuracion_Tabla;
 use App\VistaCotizacionServicio;
 use App\VistaObtenerExistenciaProducto;
 use App\Existencia;
+use App\Firma_Rel_Documento;
 use Config;
 use Mail;
 use Schema;
@@ -1242,17 +1243,12 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
     public function cotizaciones_servicios_buscar_folio_string_like(Request $request){
         if($request->ajax()){
             $string = $request->string;
-            $data = CotizacionServicio::where('Cotizacion', 'like', '%' . $string . '%')->orderBy('Folio', 'ASC')->take(3)->get();
+            $data = VistaCotizacionServicio::orderBy('Folio', 'ASC')->get();
             return DataTables::of($data)
-                ->addColumn('operaciones', function($data){
-                    $boton =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Agregar para generar PDF" onclick="agregararraypdf(\''.$data->Cotizacion .'\')"><i class="material-icons">done</i></div> ';
-                    return $boton;
-                })
                 ->addColumn('Total', function($data){
                     $total = Helpers::convertirvalorcorrecto($data->Total);
                     return $total;
                 })
-                ->rawColumns(['operaciones','Total'])
                 ->make(true);
         } 
     }
@@ -1295,8 +1291,19 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
                 );
             } 
             $cliente = Cliente::where('Numero', $cs->Cliente)->first();
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'CotizacionesServicios')->where('Documento', $cs->Cotizacion)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'CotizacionesServicios')
+            ->where('frd.Documento', $cs->Cotizacion)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "cotizacionservicio"=>$cs,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "descuentocotizacionservicio"=>Helpers::convertirvalorcorrecto($cs->Descuento),
                       "subtotalcotizacionservicio"=>Helpers::convertirvalorcorrecto($cs->SubTotal),
                       "ivacotizacionservicio"=>Helpers::convertirvalorcorrecto($cs->Iva),
@@ -1362,8 +1369,19 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
                 );
             } 
             $cliente = Cliente::where('Numero', $cs->Cliente)->first();
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'CotizacionesServicios')->where('Documento', $cs->Cotizacion)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'CotizacionesServicios')
+            ->where('frd.Documento', $cs->Cotizacion)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "cotizacionservicio"=>$cs,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "descuentocotizacionservicio"=>Helpers::convertirvalorcorrecto($cs->Descuento),
                       "subtotalcotizacionservicio"=>Helpers::convertirvalorcorrecto($cs->SubTotal),
                       "ivacotizacionservicio"=>Helpers::convertirvalorcorrecto($cs->Iva),
@@ -1433,8 +1451,19 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
                 );
             } 
             $cliente = Cliente::where('Numero', $cs->Cliente)->first();
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'CotizacionesServicios')->where('Documento', $cs->Cotizacion)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'CotizacionesServicios')
+            ->where('frd.Documento', $cs->Cotizacion)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "cotizacionservicio"=>$cs,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "descuentocotizacionservicio"=>Helpers::convertirvalorcorrecto($cs->Descuento),
                       "subtotalcotizacionservicio"=>Helpers::convertirvalorcorrecto($cs->SubTotal),
                       "ivacotizacionservicio"=>Helpers::convertirvalorcorrecto($cs->Iva),
@@ -1596,8 +1625,19 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
                 );
             } 
             $cliente = Cliente::where('Numero', $cs->Cliente)->first();
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'CotizacionesServicios')->where('Documento', $cs->Cotizacion)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'CotizacionesServicios')
+            ->where('frd.Documento', $cs->Cotizacion)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "cotizacionservicio"=>$cs,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "descuentocotizacionservicio"=>Helpers::convertirvalorcorrecto($cs->Descuento),
                       "subtotalcotizacionservicio"=>Helpers::convertirvalorcorrecto($cs->SubTotal),
                       "ivacotizacionservicio"=>Helpers::convertirvalorcorrecto($cs->Iva),
@@ -1652,8 +1692,19 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
                 );
             } 
             $cliente = Cliente::where('Numero', $cs->Cliente)->first();
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'CotizacionesServicios')->where('Documento', $cs->Cotizacion)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'CotizacionesServicios')
+            ->where('frd.Documento', $cs->Cotizacion)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "cotizacionservicio"=>$cs,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "descuentocotizacionservicio"=>Helpers::convertirvalorcorrecto($cs->Descuento),
                       "subtotalcotizacionservicio"=>Helpers::convertirvalorcorrecto($cs->SubTotal),
                       "ivacotizacionservicio"=>Helpers::convertirvalorcorrecto($cs->Iva),

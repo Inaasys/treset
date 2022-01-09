@@ -587,7 +587,8 @@ function obtenerproductoporcodigo(){
     if(parseInt(data.contarproductos) > 0){
       agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, data.SubTotal, data.Existencias, tipooperacion, data.Insumo, data.ClaveProducto, data.ClaveUnidad, data.CostoDeLista);
     }else{
-      msjnoseencontroningunproducto();
+      agregarfilaproductoinexistente(codigoabuscar, "", "PIEZA", number_format(round(0, numerodecimales), numerodecimales, '.', ''), number_format(round(0, numerodecimales), numerodecimales, '.', ''), number_format(round(0, numerodecimales), numerodecimales, '.', ''), number_format(round(0, numerodecimales), numerodecimales, '.', ''), tipooperacion, "", "", "", number_format(round(0, numerodecimales), numerodecimales, '.', ''));
+
     }
   }) 
 }
@@ -847,6 +848,72 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
     msj_errorproductoyaagregado();
   }  
 }
+//agregar fila productos inexistente en base
+function agregarfilaproductoinexistente(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal, Existencias, tipooperacion, Insumo, ClaveProducto, ClaveUnidad, CostoDeLista){
+  var result = evaluarproductoexistente(Codigo);
+  if(result == false){
+      var multiplicacionexistenciaporindicesurtimiento = new Decimal(0).times(100);
+      var indicesurtimientopartida = new Decimal(multiplicacionexistenciaporindicesurtimiento).dividedBy(1);
+      var multiplicacioncostoimpuesto =  new Decimal(SubTotal).times(Impuesto);      
+      var ivapesos = new Decimal(multiplicacioncostoimpuesto/100);
+      var total = new Decimal(SubTotal).plus(ivapesos);
+      var preciopartida = SubTotal;
+      var comisionporcentaje = new Decimal(SubTotal).times(0);
+      var comisionespesos= new Decimal(comisionporcentaje/100);
+      var utilidad = new Decimal(SubTotal).minus(Costo).minus(comisionespesos);
+      var tipo = "alta";
+      var fila= '<tr class="filasproductos" id="filaproducto'+contadorproductos+'">'+
+                  '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('+contadorproductos+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
+                  '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+
+                  '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
+                  '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'+Unidad+'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'+Unidad+'</td>'+
+                  '<td class="tdmod">'+
+                    '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.'+numerocerosconfiguradosinputnumberstep+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');cambiodecantidadpartida('+contadorfilas+',\''+tipo +'\');">'+
+                    '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'+                           
+                  '</td>'+
+                  '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');cambiodepreciopartida('+contadorfilas+',\''+tipo +'\');"></td>'+
+                  '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
+                  '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('+contadorfilas+');"></td>'+
+                  '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentoporcentajepartida('+contadorfilas+');"></td>'+
+                  '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
+                  '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'+Impuesto+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');"></td>'+
+                  '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm ivapesospartida" name="ivapesospartida[]" value="'+number_format(round(ivapesos, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
+                  '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'+number_format(round(total, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
+                  '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'+Costo+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                  '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="'+Costo+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                  '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm comisionporcentajepartida" name="comisionporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('+contadorfilas+');" required></td>'+
+                  '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm comisionespesospartida" name="comisionespesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'+
+                  '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'+number_format(round(utilidad, numerodecimales), numerodecimales, '.', '')+'" data-parsley-utilidad="0.'+numerocerosconfiguradosinputnumberstep+'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                  '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm existenciaactualpartida" name="existenciaactualpartida[]" value="'+number_format(round(0, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                  '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodxl cantidadsolicitadapartida" name="cantidadsolicitadapartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                  '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm indicesurtimientopartida" name="indicesurtimientopartida[]" value="'+number_format(round(indicesurtimientopartida, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                  '<td class="tdmod"><input type="text" class="form-control divorinputmodsm monedapartida" name="monedapartida[]" value="MXN" readonly data-parsley-length="[1, 3]" autocomplete="off"></td>'+
+                  '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costolistapartida" name="costolistapartida[]" value="'+CostoDeLista+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'+
+                  '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm tipocambiopartida" name="tipocambiopartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                  '<td class="tdmod"><input type="text" class="form-control divorinputmodsm mesespartida" name="mesespartida[]" value="0" readonly></td>'+
+                  '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm tasainterespartida" name="tasainterespartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                  '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm montointerespartida" name="montointerespartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                '</tr>';
+      contadorproductos++;
+      contadorfilas++;
+      $("#tablaproductocotizacion").append(fila);
+      mostrarformulario();      
+      comprobarfilas();
+      calculartotal();
+      $("#codigoabuscar").val("");
+      //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+      $(".inputnextdet").keypress(function (e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+          var index = $(this).index(".inputnextdet");          
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+        }
+      });
+  }else{
+    msj_errorproductoyaagregado();
+  }  
+}
 //eliminar una fila en la tabla de precios clientes
 function eliminarfila(numerofila){
     var confirmacion = confirm("Esta seguro de eliminar el producto?"); 
@@ -923,7 +990,7 @@ function alta(){
                         '</div>'+
                         '<div class="col-xs-12 col-sm-12 col-md-3">'+
                             '<label>Fecha</label>'+
-                            '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required style="min-width:95%;" data-parsley-excluded="true" onkeydown="return false">'+
+                            '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required style="min-width:95%;" data-parsley-excluded="true" onkeydown="return false">'+
                             '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                         '</div>'+
                     '</div>'+
@@ -971,7 +1038,7 @@ function alta(){
                               '</td>'+
                               '<td>'+ 
                                 '<div class="form-line">'+
-                                  '<input type="text" class="form-control inputnext" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                                  '<input type="text" class="form-control inputnext" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" onkeyup="tipoLetra(this)" autocomplete="off">'+
                                 '</div>'+
                               '</td>'+
                             '</tr>'+    
@@ -1314,7 +1381,7 @@ function obtenerdatos(cotizacionmodificar){
                   '</div>'+
                   '<div class="col-xs-12 col-sm-12 col-md-3">'+
                     '<label>Fecha</label>'+
-                    '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha"  required style="min-width:95%;" data-parsley-excluded="true" onkeydown="return false">'+
+                    '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required style="min-width:95%;" data-parsley-excluded="true" onkeydown="return false">'+
                     '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                   '</div>'+
                 '</div>'+
@@ -1362,7 +1429,7 @@ function obtenerdatos(cotizacionmodificar){
                         '</td>'+
                         '<td>'+ 
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control inputnext" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                            '<input type="text" class="form-control inputnext" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" onkeyup="tipoLetra(this)" autocomplete="off">'+
                           '</div>'+
                         '</td>'+
                       '</tr>'+    
@@ -1687,21 +1754,29 @@ function relistarbuscarstringlike(){
 }
 function buscarstringlike(){
   var columnastablafoliosencontrados =  '<tr>'+
-                                          '<th><div style="width:80px !important;">Generar Documento en PDF</div></th>'+
-                                          '<th>Cotización</th>'+
-                                          '<th>Cliente</th>'+
-                                          '<th>Total</th>'+
-                                          '<th>Status</th>'+
+                                            '<th>Documento</th>'+
+                                            '<th>Cliente</th>'+
+                                            '<th>Total</th>'+
+                                            '<th>Status</th>'+
                                         '</tr>';
   $("#columnastablafoliosencontrados").html(columnastablafoliosencontrados);
-  tabla=$('#tablafoliosencontrados').DataTable({
+  $("#columnasfootertablafoliosencontrados").html(columnastablafoliosencontrados);
+  //agregar inputs de busqueda por columna
+  $('#tablafoliosencontrados tfoot th').each( function () {
+    var titulocolumnatfoot = $(this).text();
+    $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
+  });
+  var tablafolenc=$('#tablafoliosencontrados').DataTable({
       "paging":   false,
-      "ordering": false,
-      "info":     false,
-      "searching": false,
-      order: [1, 'asc'],
+      "sScrollX": "100%",
+      "sScrollY": "250px",
       processing: true,
       serverSide: true,
+      processing: true,
+      'language': {
+          'loadingRecords': '&nbsp;',
+          'processing': '<div class="spinner"></div>'
+      },
       ajax: {
           url: cotizaciones_productos_buscar_folio_string_like,
           data: function (d) {
@@ -1709,12 +1784,29 @@ function buscarstringlike(){
           },
       },
       columns: [
-          { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
-          { data: 'Cotizacion', name: 'Cotizacion' },
-          { data: 'Cliente', name: 'Cliente', orderable: false, searchable: false },
-          { data: 'Total', name: 'Total', orderable: false, searchable: false  },
-          { data: 'Status', name: 'Status', orderable: false, searchable: false  },
+          { data: 'Cotizacion', name: 'Cotizacion', orderable: false, searchable: true  },
+          { data: 'NombreCliente', name: 'NombreCliente', orderable: false, searchable: true },
+          { data: 'Total', name: 'Total', orderable: false, searchable: true  },
+          { data: 'Status', name: 'Status', orderable: false, searchable: true  },
       ],
+      initComplete: function () {
+        // Aplicar busquedas por columna
+        this.api().columns().every( function () {
+          var that = this;
+          $('input',this.footer()).on('keyup', function(){
+            if(that.search() !== this.value){
+              that.search(this.value).draw();
+            }
+          });
+        });
+        $(".dataTables_filter").css('display', 'none');
+      }
+  });
+  //modificacion al dar doble click
+  $('#tablafoliosencontrados tbody').on('dblclick', 'tr', function () {
+    tablafolenc = $("#tablafoliosencontrados").DataTable();
+    var data = tablafolenc.row( this ).data();
+    agregararraypdf(data.Cotizacion);
   });
 }
 //configurar tabla

@@ -881,13 +881,13 @@ function alta(){
                       '</div>'+
                       '<div class="col-md-4">'+
                           '<label>No. Exterior <b style="color:#F44336 !important;">*</b></label>'+
-                          '<input type="text" class="form-control inputnext" name="noexterior" id="noexterior" required data-parsley-length="[1, 10]" data-parsley-type="number" onkeyup="tipoLetra(this);">'+
+                          '<input type="text" class="form-control inputnext" name="noexterior" id="noexterior" required data-parsley-length="[1, 10]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                   '</div>'+
                   '<div class="row">'+
                       '<div class="col-md-4">'+
                           '<label>No. Interior</label>'+
-                          '<input type="text" class="form-control inputnext" name="nointerior" id="nointerior" data-parsley-length="[1, 10]" data-parsley-type="number" onkeyup="tipoLetra(this);">'+
+                          '<input type="text" class="form-control inputnext" name="nointerior" id="nointerior" data-parsley-length="[1, 10]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                       '<div class="col-md-4">'+
                           '<label>Colonia<b style="color:#F44336 !important;">*</b></label>'+
@@ -1421,13 +1421,13 @@ function obtenerdatos(numerocliente){
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>No. Exterior <b style="color:#F44336 !important;">*</b></label>'+
-                            '<input type="text" class="form-control inputnext" name="noexterior" id="noexterior" required data-parsley-length="[1, 10]" data-parsley-type="number" onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control inputnext" name="noexterior" id="noexterior" required data-parsley-length="[1, 10]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
                     '</div>'+
                     '<div class="row">'+
                         '<div class="col-md-4">'+
                             '<label>No. Interior</label>'+
-                            '<input type="text" class="form-control inputnext" name="nointerior" id="nointerior" data-parsley-length="[1, 10]" data-parsley-type="number" onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control inputnext" name="nointerior" id="nointerior" data-parsley-length="[1, 10]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Colonia<b style="color:#F44336 !important;">*</b></label>'+

@@ -19,6 +19,7 @@ use App\Compra;
 use App\BitacoraDocumento;
 use App\Configuracion_Tabla;
 use App\VistaContraRecibo;
+use App\Firma_Rel_Documento;
 use Config;
 use Mail;
 use App\Serie;
@@ -444,17 +445,12 @@ class ContraRecibosController extends ConfiguracionSistemaController{
     public function contrarecibos_buscar_folio_string_like(Request $request){
         if($request->ajax()){
             $string = $request->string;
-            $data = ContraRecibo::where('Contrarecibo', 'like', '%' . $string . '%')->orderBy('Folio', 'ASC')->take(3)->get();
+            $data = VistaContraRecibo::orderBy('Folio', 'ASC')->get();
             return DataTables::of($data)
-                ->addColumn('operaciones', function($data){
-                    $boton =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Agregar para generar PDF" onclick="agregararraypdf(\''.$data->ContraRecibo .'\')"><i class="material-icons">done</i></div> ';
-                    return $boton;
-                })
                 ->addColumn('Total', function($data){
                     $total = Helpers::convertirvalorcorrecto($data->Total);
                     return $total;
                 })
-                ->rawColumns(['operaciones','Total'])
                 ->make(true);
         } 
     }
@@ -486,8 +482,19 @@ class ContraRecibosController extends ConfiguracionSistemaController{
                 );
             } 
             $proveedor = Proveedor::where('Numero', $cr->Proveedor)->first();
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'ContraRecibos')->where('Documento', $cr->ContraRecibo)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'ContraRecibos')
+            ->where('frd.Documento', $cr->ContraRecibo)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "contrarecibo"=>$cr,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "totalcontrarecibo"=>Helpers::convertirvalorcorrecto($cr->Total),
                       "contrarecibodetalle"=>$contrarecibodetalle,
                       "proveedor" => $proveedor,
@@ -541,8 +548,19 @@ class ContraRecibosController extends ConfiguracionSistemaController{
                 );
             } 
             $proveedor = Proveedor::where('Numero', $cr->Proveedor)->first();
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'ContraRecibos')->where('Documento', $cr->ContraRecibo)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'ContraRecibos')
+            ->where('frd.Documento', $cr->ContraRecibo)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "contrarecibo"=>$cr,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "totalcontrarecibo"=>Helpers::convertirvalorcorrecto($cr->Total),
                       "contrarecibodetalle"=>$contrarecibodetalle,
                       "proveedor" => $proveedor,
@@ -599,8 +617,19 @@ class ContraRecibosController extends ConfiguracionSistemaController{
                 );
             } 
             $proveedor = Proveedor::where('Numero', $cr->Proveedor)->first();
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'ContraRecibos')->where('Documento', $cr->ContraRecibo)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'ContraRecibos')
+            ->where('frd.Documento', $cr->ContraRecibo)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "contrarecibo"=>$cr,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "totalcontrarecibo"=>Helpers::convertirvalorcorrecto($cr->Total),
                       "contrarecibodetalle"=>$contrarecibodetalle,
                       "proveedor" => $proveedor,

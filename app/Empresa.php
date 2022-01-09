@@ -130,5 +130,9 @@ class Empresa extends Model
         'CorreoDefault1EnvioDocumentos',
         'CorreoDefault2EnvioDocumentos',
         'UsuariosModificarInsumo',
+        'AgregarReferenciaOrdenCompraEnAsuntoCorreo',
+        'ControlarConsecutivoNumeroRequisicionEnRemisiones',
+        'ColocarObservacionesDeRemisionEnFactura',
+        'PedirObligatoriamenteObservacionEnFactura'
     ];
 }

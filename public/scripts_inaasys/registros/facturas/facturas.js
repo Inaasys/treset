@@ -98,20 +98,20 @@ function relistar(){
 }
 //listar todos los registros de la tabla
 function listar(){
-    cambiarurlexportarexcel();
-    //Campos ordenados a mostras
-    var campos = columnas_ordenadas.split(",");
-    var campos_busqueda = campos_busquedas.split(",");
-    //agregar inputs de busqueda por columna
-    $('#tbllistado tfoot th').each( function () {
-      var titulocolumnatfoot = $(this).text();
-      var valor_encontrado_en_array = campos_busqueda.indexOf(titulocolumnatfoot); 
-      if(valor_encontrado_en_array >= 0){
-        $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
-      }
-    });
-    // armar columas para datatable se arma desde funcionesglobales.js
-    var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
+  cambiarurlexportarexcel();
+  //Campos ordenados a mostras
+  var campos = columnas_ordenadas.split(",");
+  var campos_busqueda = campos_busquedas.split(",");
+  //agregar inputs de busqueda por columna
+  $('#tbllistado tfoot th').each( function () {
+    var titulocolumnatfoot = $(this).text();
+    var valor_encontrado_en_array = campos_busqueda.indexOf(titulocolumnatfoot); 
+    if(valor_encontrado_en_array >= 0){
+      $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
+    }
+  });
+  // armar columas para datatable se arma desde funcionesglobales.js
+  var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
   tabla=$('#tbllistado').DataTable({
     "lengthMenu": [ 100, 250, 500, 1000 ],
     "pageLength": 100,
@@ -2642,7 +2642,7 @@ function alta(){
                               '</div>'+  
                               '<div class="col-md-2">'+
                                 '<label>Fecha</label>'+
-                                '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" required  data-parsley-excluded="true" onkeydown="return false">'+
+                                '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required  data-parsley-excluded="true" onkeydown="return false">'+
                                 '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                 '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
                               '</div>'+   
@@ -3016,7 +3016,7 @@ function alta(){
                         '<div class="row">'+
                           '<div class="col-md-6">'+   
                             '<label>Observaciones</label>'+
-                            '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
+                            '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]"></textarea>'+
                           '</div>'+ 
                           '<div class="col-md-3">'+
                             '<table class="table table-striped table-hover">'+
@@ -3075,6 +3075,10 @@ function alta(){
                       '</div>'+
                     '</div>';
   $("#tabsform").html(tabs);
+  //colocar required en observaciones segun la configuracion de la empresa
+  if(pedirobligatoriamenteobservacionenfactura == 'S'){
+    $("#observaciones").attr('required', 'required');
+  }
   //mostrar mensaje de bajar plantilla
   $('[data-toggle="tooltip"]').tooltip({
     container: 'body'
@@ -3591,6 +3595,7 @@ $("#btnGuardar").on('click', function (e) {
                 limpiar();
                 ocultarmodalformulario();
                 limpiarmodales();
+                arrayclientesremisionesseleccionadas = []
                 $('.page-loader-wrapper').css('display', 'none');
             },
             error:function(data){
@@ -3693,7 +3698,7 @@ function obtenerdatos(facturamodificar){
                         '</div>'+  
                         '<div class="col-md-2">'+
                           '<label>Fecha</label>'+
-                          '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" required data-parsley-excluded="true" onkeydown="return false">'+
+                          '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required data-parsley-excluded="true" onkeydown="return false">'+
                           '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                           '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
                         '</div>'+   
@@ -4054,7 +4059,7 @@ function obtenerdatos(facturamodificar){
                   '<div class="row">'+
                     '<div class="col-md-6">'+   
                       '<label>Observaciones</label>'+
-                      '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
+                      '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]"></textarea>'+
                     '</div>'+ 
                     '<div class="col-md-3">'+
                       '<table class="table table-striped table-hover">'+
@@ -4113,6 +4118,10 @@ function obtenerdatos(facturamodificar){
                 '</div>'+
               '</div>';
     $("#tabsform").html(tabs);
+    //colocar required en observaciones segun la configuracion de la empresa
+    if(pedirobligatoriamenteobservacionenfactura == 'S'){
+      $("#observaciones").attr('required', 'required');
+    }
     obtenertiposordenescompra();
     obtenertiposunidades();
     //esconder el div del boton
@@ -4746,20 +4755,29 @@ function relistarbuscarstringlike(){
 }
 function buscarstringlike(){
   var columnastablafoliosencontrados =    '<tr>'+
-                                                '<th><div style="width:80px !important;">Generar Documento en PDF</div></th>'+
-                                                '<th>Factura</th>'+
-                                                '<th>Cliente</th>'+
-                                                '<th>Total</th>'+
-                                                '<th>Status</th>'+
-                                            '</tr>';
+                                            '<th>Documento</th>'+
+                                            '<th>Cliente</th>'+
+                                            '<th>Total</th>'+
+                                            '<th>Status</th>'+
+                                          '</tr>';
   $("#columnastablafoliosencontrados").html(columnastablafoliosencontrados);
-  tabla=$('#tablafoliosencontrados').DataTable({
+  $("#columnasfootertablafoliosencontrados").html(columnastablafoliosencontrados);
+  //agregar inputs de busqueda por columna
+  $('#tablafoliosencontrados tfoot th').each( function () {
+    var titulocolumnatfoot = $(this).text();
+    $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
+  });
+  var tablafolenc=$('#tablafoliosencontrados').DataTable({
       "paging":   false,
-      "ordering": false,
-      "info":     false,
-      "searching": false,
+      "sScrollX": "100%",
+      "sScrollY": "250px",
       processing: true,
       serverSide: true,
+      processing: true,
+      'language': {
+          'loadingRecords': '&nbsp;',
+          'processing': '<div class="spinner"></div>'
+      },
       ajax: {
           url: facturas_buscar_folio_string_like,
           data: function (d) {
@@ -4767,13 +4785,30 @@ function buscarstringlike(){
           },
       },
       columns: [
-          { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
-          { data: 'Factura', name: 'Factura' },
-          { data: 'Cliente', name: 'Cliente', orderable: false, searchable: false },
-          { data: 'Total', name: 'Total', orderable: false, searchable: false  },
-          { data: 'Status', name: 'Status', orderable: false, searchable: false  },
+          { data: 'Factura', name: 'Factura', orderable: false, searchable: true },
+          { data: 'NombreCliente', name: 'NombreCliente', orderable: false, searchable: true },
+          { data: 'Total', name: 'Total', orderable: false, searchable: true  },
+          { data: 'Status', name: 'Status', orderable: false, searchable: true  },
       ],
-  });
+      initComplete: function () {
+        // Aplicar busquedas por columna
+        this.api().columns().every( function () {
+          var that = this;
+          $('input',this.footer()).on('keyup', function(){
+            if(that.search() !== this.value){
+              that.search(this.value).draw();
+            }
+          });
+        });
+        $(".dataTables_filter").css('display', 'none');
+      }
+    });
+    //modificacion al dar doble click
+    $('#tablafoliosencontrados tbody').on('dblclick', 'tr', function () {
+        tablafolenc = $("#tablafoliosencontrados").DataTable();
+        var data = tablafolenc.row( this ).data();
+        agregararraypdf(data.Factura);
+    });
 }
 //configurar tabla
 function configurar_tabla(){

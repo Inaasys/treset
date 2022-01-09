@@ -873,16 +873,11 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
     public function cuentas_por_cobrar_buscar_folio_string_like(Request $request){
         if($request->ajax()){
             $string = $request->string;
-            $data = CuentaXCobrar::where('Pago', 'like', '%' . $string . '%')->orderBy('Folio', 'ASC')->take(3)->get();
+            $data = VistaCuentaPorCobrar::orderBy('Folio', 'ASC')->get();
             return DataTables::of($data)
-                ->addColumn('operaciones', function($data){
-                    $boton =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Agregar para generar PDF" onclick="agregararraypdf(\''.$data->Pago .'\')"><i class="material-icons">done</i></div> ';
-                    return $boton;
-                })
                 ->addColumn('Abono', function($data){
                     return Helpers::convertirvalorcorrecto($data->Abono);
                 })
-                ->rawColumns(['operaciones','Total'])
                 ->make(true);
         } 
     }
@@ -961,9 +956,6 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             );        
             ini_set('max_execution_time', 300); // 5 minutos
             ini_set('memory_limit', '-1');
-
-
-
             if($request->tipoformatocxc == 1){
                 $pdf = PDF::loadView('registros.cuentasporcobrar.formato_poliza_ingreso_pdf_cuentasporcobrar', compact('data'))
                         ->setPaper('Letter')
@@ -982,7 +974,6 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                         ->setOption('margin-right', 2)
                         ->setOption('margin-bottom', 10);
             }
-
             $ArchivoPDF = "PDF".$cxc->Pago.".pdf";
             $pdf->save(storage_path('archivos_pdf_documentos_generados/'.$ArchivoPDF));
         }

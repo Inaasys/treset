@@ -1997,7 +1997,7 @@ function alta(){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Fecha</label>'+
-                                        '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" required  onkeydown="return false">'+
+                                        '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required  onkeydown="return false">'+
                                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                         '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
                                     '</div>'+   
@@ -2032,7 +2032,7 @@ function alta(){
                                     '</div>'+
                                     '<div class="col-md-2">'+
                                         '<label>Fecha y Hora Salida</label>'+
-                                        '<input type="datetime-local" class="form-control inputnext" name="fechasalida" id="fechasalida" required  onkeydown="return false">'+
+                                        '<input type="datetime-local" class="form-control" name="fechasalida" id="fechasalida" required  onkeydown="return false">'+
                                     '</div>'+
                                     '<div class="col-md-4">'+
                                         '<label>Calle</label>'+
@@ -2088,7 +2088,7 @@ function alta(){
                                   '</div>'+
                                   '<div class="col-md-2">'+
                                       '<label>Fecha y Hora Llegada</label>'+
-                                      '<input type="datetime-local" class="form-control inputnext" name="fechallegada" id="fechallegada" required  onkeydown="return false">'+
+                                      '<input type="datetime-local" class="form-control" name="fechallegada" id="fechallegada" required  onkeydown="return false">'+
                                   '</div>'+
                                   '<div class="col-md-4">'+
                                       '<label>Calle</label>'+
@@ -2890,7 +2890,7 @@ function obtenerdatos(notamodificar){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Fecha</label>'+
-                                        '<input type="datetime-local" class="form-control inputnext" name="fecha" id="fecha" required  onkeydown="return false">'+
+                                        '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required  onkeydown="return false">'+
                                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                         '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
                                     '</div>'+   

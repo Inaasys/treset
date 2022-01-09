@@ -38,6 +38,7 @@ use App\Cotizacion;
 use App\CotizacionDetalle;
 use App\OrdenTrabajo;
 use App\OrdenTrabajoDetalle;
+use App\Firma_Rel_Documento;
 use Config;
 use Mail;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
@@ -102,7 +103,6 @@ class RemisionController extends ConfiguracionSistemaController{
                                                 '<li><a href="'.route('remisiones_generar_pdfs_indiv',$data->Remision).'" target="_blank">Ver Documento PDF</a></li>'.
                                                 '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Remision .'\')">Enviar Documento por Correo</a></li>'.
                                                 '<li><a href="'.route('remisiones_generar_pdfs_indiv_requisicion_tyt',$data->Remision).'" target="_blank">Generar Formato Requisición TYT</a></li>'.
-
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;
@@ -1154,17 +1154,12 @@ class RemisionController extends ConfiguracionSistemaController{
     public function remisiones_buscar_folio_string_like(Request $request){
         if($request->ajax()){
             $string = $request->string;
-            $data = Remision::where('Remision', 'like', '%' . $string . '%')->orderBy('Folio', 'ASC')->take(3)->get();
+            $data = VistaRemision::orderBy('Folio', 'ASC')->get();
             return DataTables::of($data)
-                ->addColumn('operaciones', function($data){
-                    $boton =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Agregar para generar PDF" onclick="agregararraypdf(\''.$data->Remision .'\')"><i class="material-icons">done</i></div> ';
-                    return $boton;
-                })
                 ->addColumn('Total', function($data){
                     $total = Helpers::convertirvalorcorrecto($data->Total);
                     return $total;
                 })
-                ->rawColumns(['operaciones','Total'])
                 ->make(true);
         } 
     }
@@ -1202,8 +1197,19 @@ class RemisionController extends ConfiguracionSistemaController{
             } 
             $cliente = Cliente::where('Numero', $r->Cliente)->first();
             $agente = Agente::where('Numero', $r->Agente)->first();
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'Remisiones')->where('Documento', $r->Remision)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'Remisiones')
+            ->where('frd.Documento', $r->Remision)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "remision"=>$r,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "descuentoremision"=>Helpers::convertirvalorcorrecto($r->Descuento),
                       "subtotalremision"=>Helpers::convertirvalorcorrecto($r->SubTotal),
                       "ivaremision"=>Helpers::convertirvalorcorrecto($r->Iva),
@@ -1265,8 +1271,19 @@ class RemisionController extends ConfiguracionSistemaController{
             } 
             $cliente = Cliente::where('Numero', $r->Cliente)->first();
             $agente = Agente::where('Numero', $r->Agente)->first();
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'Remisiones')->where('Documento', $r->Remision)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'Remisiones')
+            ->where('frd.Documento', $r->Remision)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "remision"=>$r,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "descuentoremision"=>Helpers::convertirvalorcorrecto($r->Descuento),
                       "subtotalremision"=>Helpers::convertirvalorcorrecto($r->SubTotal),
                       "ivaremision"=>Helpers::convertirvalorcorrecto($r->Iva),
@@ -1369,8 +1386,19 @@ class RemisionController extends ConfiguracionSistemaController{
             } 
             $cliente = Cliente::where('Numero', $r->Cliente)->first();
             $agente = Agente::where('Numero', $r->Agente)->first();
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'Remisiones')->where('Documento', $r->Remision)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'Remisiones')
+            ->where('frd.Documento', $r->Remision)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "remision"=>$r,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "descuentoremision"=>Helpers::convertirvalorcorrecto($r->Descuento),
                       "subtotalremision"=>Helpers::convertirvalorcorrecto($r->SubTotal),
                       "ivaremision"=>Helpers::convertirvalorcorrecto($r->Iva),

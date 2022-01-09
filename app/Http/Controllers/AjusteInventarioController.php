@@ -24,6 +24,7 @@ use App\Producto;
 use App\Configuracion_Tabla;
 use App\VistaAjusteInventario;
 use App\VistaObtenerExistenciaProducto;
+use App\Firma_Rel_Documento;
 use Config;
 use Mail;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
@@ -838,17 +839,12 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
     public function ajustesinventario_buscar_folio_string_like(Request $request){
         if($request->ajax()){
             $string = $request->string;
-            $data = AjusteInventario::where('Ajuste', 'like', '%' . $string . '%')->orderBy('Folio', 'ASC')->take(3)->get();
+            $data = VistaAjusteInventario::orderBy('Folio', 'ASC')->get();
             return DataTables::of($data)
-                ->addColumn('operaciones', function($data){
-                    $boton =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Agregar para generar PDF" onclick="agregararraypdf(\''.$data->Ajuste .'\')"><i class="material-icons">done</i></div> ';
-                    return $boton;
-                })
                 ->addColumn('Total', function($data){
                     $total = Helpers::convertirvalorcorrecto($data->Total);
                     return $total;
                 })
-                ->rawColumns(['operaciones','Total'])
                 ->make(true);
         } 
     }
@@ -891,8 +887,19 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
                     "totaldetalle" => Helpers::convertirvalorcorrecto($total)
                 );
             } 
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'AjustesInventario')->where('Documento', $a->Ajuste)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'AjustesInventario')
+            ->where('frd.Documento', $a->Ajuste)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "ajuste"=>$a,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "totalajuste"=>Helpers::convertirvalorcorrecto($a->Total),
                       "fechaformato"=> $fechaformato,
                       "datadetalle" => $datadetalle,
@@ -954,8 +961,19 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
                     "totaldetalle" => Helpers::convertirvalorcorrecto($total)
                 );
             } 
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'AjustesInventario')->where('Documento', $a->Ajuste)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'AjustesInventario')
+            ->where('frd.Documento', $a->Ajuste)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "ajuste"=>$a,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "totalajuste"=>Helpers::convertirvalorcorrecto($a->Total),
                       "fechaformato"=> $fechaformato,
                       "datadetalle" => $datadetalle,
@@ -1018,8 +1036,19 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
                     "totaldetalle" => Helpers::convertirvalorcorrecto($total)
                 );
             } 
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'AjustesInventario')->where('Documento', $a->Ajuste)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'AjustesInventario')
+            ->where('frd.Documento', $a->Ajuste)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "ajuste"=>$a,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "totalajuste"=>Helpers::convertirvalorcorrecto($a->Total),
                       "fechaformato"=> $fechaformato,
                       "datadetalle" => $datadetalle,

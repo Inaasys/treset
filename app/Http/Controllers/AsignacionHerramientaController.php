@@ -26,6 +26,7 @@ use App\Producto;
 use App\Existencia;
 use App\Almacen;
 use App\Serie;
+use App\Firma_Rel_Documento;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
 
 class AsignacionHerramientaController extends ConfiguracionSistemaController{
@@ -84,6 +85,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                                             '<ul class="dropdown-menu">'.
                                                 '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->asignacion .'\')">Cambios</a></li>'.
                                                 '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->asignacion .'\')">Bajas</a></li>'.
+                                                //'<li><a href="javascript:void(0);" onclick="autorizarasignacion(\''.$data->asignacion .'\')">Autorizar Asignación</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;
@@ -111,11 +113,11 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
         $almacenes = Almacen::where('status', 'ALTA')->get();
         $selectalmacenes = "<option selected disabled hidden>Selecciona el almacén</option>";
         foreach($almacenes as $a){
-            if($a->Numero == 1){
-                $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.' selected>'.$a->Nombre;
-            }else{
+            //if($a->Numero == 1){
+              //  $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.' selected>'.$a->Nombre;
+            //}else{
                 $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.'>'.$a->Nombre;
-            }
+            //}
         }
         $arraycodigosyaagregados = $porciones = explode(",", $request->arraycodigospartidas);
         foreach($partidasexcel as $partida){
@@ -162,7 +164,6 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" id="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto($totalpesospartida).'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
                             '<td class="tdmod">'.
                             '<select name="estadopartida[]" class="form-control divorinputmodmd" style="width:100% !important;height: 28px !important;" required>'.
-                                '<option selected disabled hidden>Selecciona</option>'.
                                 '<option value="Nuevo">Nuevo</option>'.
                                 '<option value="Usado">Usado</option>'.
                             '</select>'.
@@ -273,13 +274,13 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
             $tipooperacion = $request->tipooperacion;
             $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%');
             $almacenes = Almacen::where('status', 'ALTA')->get();
-            $selectalmacenes = "<option selected disabled hidden>Selecciona el almacén</option>";
+            $selectalmacenes = "";
             foreach($almacenes as $a){
-                if($a->Numero == 1){
-                    $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.' selected>'.$a->Nombre;
-                }else{
+                //if($a->Numero == 1){
+                    //$selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.' selected>'.$a->Nombre;
+                //}else{
                     $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.'>'.$a->Nombre;
-                }
+                //}
             }
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($selectalmacenes, $tipooperacion){
@@ -427,7 +428,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
             $Asignacion_Herramienta_Detalle->save();
             $item++;
             DB::unprepared('SET IDENTITY_INSERT asignacion_herramientas_detalles OFF');
-            //restar existencias a almacen principal
+            //restar existencias a almacen
             $RestarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->almacenpartida [$key])->first();
             $RestarExistenciaNuevaAlmacen = $RestarExistenciaAlmacen->Existencias - $request->cantidadpartida  [$key];
             Existencia::where('Codigo', $codigoproductopartida)
@@ -443,16 +444,11 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
     public function asignacion_herramienta_buscar_id_string_like(Request $request){
         if($request->ajax()){
             $string = $request->string;
-            $data = VistaAsignacionHerramienta::where('asignacion', 'like', '%' . $string . '%')->orderBy('id', 'ASC')->take(3)->get();
+            $data = VistaAsignacionHerramienta::orderBy('id', 'ASC')->get();
             return DataTables::of($data)
-                ->addColumn('operaciones', function($data){
-                    $boton =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Agregar para generar PDF" onclick="agregararraypdf(\''.$data->asignacion .'\')"><i class="material-icons">done</i></div> ';
-                    return $boton;
-                })
                 ->addColumn('Total', function($data){
                     return Helpers::convertirvalorcorrecto($data->total);
                 })
-                ->rawColumns(['operaciones'])
                 ->make(true);
         } 
     }
@@ -484,8 +480,19 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                     "estadodetalle" => $ahd->estado_herramienta
                 );
             } 
+            //obtener firmas
+            $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'asignacion_herramientas')->where('Documento', $ah->asignacion)->where('Status', 'ALTA')->count();
+            $firmas = DB::table('firmas_rel_documentos as frd')
+            ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+            ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+            ->where('frd.TipoDocumento', 'asignacion_herramientas')
+            ->where('frd.Documento', $ah->asignacion)
+            ->where('frd.Status', 'ALTA')
+            ->get();
             $data[]=array(
                       "asignacion"=>$ah,
+                      "numerofirmas"=>$numerofirmas,
+                      "firmas"=>$firmas,
                       "totalasignacion"=>Helpers::convertirvalorcorrecto($ah->total),
                       "fechaformato"=> $fechaformato,
                       "datadetalle" => $datadetalle,
@@ -641,7 +648,6 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" id="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto($ahd->total).'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
                     '<td class="tdmod">'.
                     '<select name="estadopartida[]" class="form-control" style="width:100% !important;height: 28px !important;" required>'.
-                        '<option selected disabled hidden>Selecciona</option>'.
                         $opciones.
                     '</select>'.
                     '</td>'.
@@ -878,7 +884,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
         $contadorfilas = 0;
         $contadorasignacionessinautorizar = 0;
         foreach($Asignacion_Herramienta as $ah){
-            if($ah->autorizado_por != ''){
+            //if($ah->autorizado_por != ''){
                 $Asignacion_Herramienta_Detalle = Asignacion_Herramienta_Detalle::where('asignacion', $ah->asignacion)->get();
                 foreach($Asignacion_Herramienta_Detalle as $ahd){    
                     if($ahd->estado_auditoria == 'FALTANTE'){
@@ -913,9 +919,9 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                     '</tr>';
                     $contadorfilas++;
                 }
-            }else{
-                $contadorasignacionessinautorizar++;
-            }
+            //}else{
+              //  $contadorasignacionessinautorizar++;
+            //}
         }
         //url para generar reporte de auditoria
         $urlgenerarreporteauditoria  = route('asignacion_herramienta_generar_reporte_auditoria', $request->idpersonal);
@@ -949,13 +955,12 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
     }
     //generar reporte de auditoria
     public function asignacion_herramienta_generar_reporte_auditoria($id){
-        $Asignacion_Herramienta = Asignacion_Herramienta::where('recibe_herramienta', $id)->where('status', 'ALTA')->where('autorizado_por', '<>', '')->get();
+        $Asignacion_Herramienta = Asignacion_Herramienta::where('recibe_herramienta', $id)->where('status', 'ALTA')->get();
         $Personal_Recibe_Herramienta = Personal::where('id', $id)->first();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $totalasignacion = 0;
         $data=array();
         $datadetalle=array();
-
         foreach ($Asignacion_Herramienta as $ah){
             $Asignacion_Herramienta_Detalle = Asignacion_Herramienta_Detalle::where('asignacion', $ah->asignacion)->get();
             foreach($Asignacion_Herramienta_Detalle as $ahd){
@@ -974,10 +979,20 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                     $totalasignacion = $totalasignacion + $totaldetalle;
                 }
             } 
-
         }
+        //obtener firmas
+        $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'asignacion_herramientas')->where('Documento', $ah->asignacion)->where('Status', 'ALTA')->count();
+        $firmas = DB::table('firmas_rel_documentos as frd')
+        ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+        ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+        ->where('frd.TipoDocumento', 'asignacion_herramientas')
+        ->where('frd.Documento', $ah->asignacion)
+        ->where('frd.Status', 'ALTA')
+        ->get();
         $data[]=array(
             "asignacion"=>$ah,
+            "numerofirmas"=>$numerofirmas,
+            "firmas"=>$firmas,
             "totalasignacion"=>Helpers::convertirvalorcorrecto($totalasignacion),
             "fechaformato"=> $fechaformato,
             "datadetalle" => $datadetalle,
@@ -997,7 +1012,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
     }
     //generar reporte general
     public function asignacion_herramienta_generar_reporte_general($id){
-        $Asignacion_Herramienta = Asignacion_Herramienta::where('recibe_herramienta', $id)->where('status', 'ALTA')->where('autorizado_por', '<>', '')->get();
+        $Asignacion_Herramienta = Asignacion_Herramienta::where('recibe_herramienta', $id)->where('status', 'ALTA')->get();
         $Personal_Recibe_Herramienta = Personal::where('id', $id)->first();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $totalasignacion = 0;
@@ -1039,8 +1054,19 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                 }
             } 
         }
+        //obtener firmas
+        $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'asignacion_herramientas')->where('Documento', $ah->asignacion)->where('Status', 'ALTA')->count();
+        $firmas = DB::table('firmas_rel_documentos as frd')
+        ->select("u.name", "frd.Fecha", "frd.ReferenciaPosicion", "frd.TipoDocumento", "frd.Documento", "frd.Status")
+        ->leftjoin('users as u', 'frd.IdUsuario', '=', 'u.id')
+        ->where('frd.TipoDocumento', 'asignacion_herramientas')
+        ->where('frd.Documento', $ah->asignacion)
+        ->where('frd.Status', 'ALTA')
+        ->get();
         $data[]=array(
             "asignacion"=>$ah,
+            "numerofirmas"=>$numerofirmas,
+            "firmas"=>$firmas,
             "totalasignacion"=>Helpers::convertirvalorcorrecto($totalasignacion),
             "totalfaltante"=>Helpers::convertirvalorcorrecto($totalfaltante),
             "fechaformato"=> $fechaformato,

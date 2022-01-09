@@ -301,7 +301,7 @@ function msj_mantenimientoajax(){
 }
 //error en peticion ajax
 function msj_errorajax(){
-    toastr.error( "Aviso, estamos experimentando problemas, contacta al administrador del sistema", "Mensaje", {
+    toastr.error( "Aviso, estamos experimentando problemas, revisa si no perdite tu conexion a internet e intenta nuevamente", "Mensaje", {
         "timeOut": "6000",
         "progressBar": true,
         "extendedTImeout": "6000"
@@ -749,6 +749,16 @@ function msj_faltanarchivosocontrasena(msj){
         "progressBar": true,
         "extendedTImeout": "9000"
     });
+}
+//mensajes Datos guardados correctamente, pero algunas firmas no se guardaron porque ya existen en el documento especificado
+function msj_firmasyaexistentes (){
+    toastr.info( "Datos guardados correctamente, pero algunas firmas no se guardaron porque ya existen en el documento especificado", "Mensaje", {
+        "timeOut": "9000",
+        "progressBar": true,
+        "extendedTImeout": "9000"
+    });
+    var tabla = $('.tbllistado').DataTable();
+    tabla.ajax.reload();
 }
 //|||||MENSAJES API FACTURAPI |||||||
 //mensaje factura timbrada correctamente

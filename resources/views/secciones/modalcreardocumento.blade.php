@@ -6,7 +6,7 @@
         		<h5 class="modal-title" id="exampleModalLabel">Generación de Documentos en PDF</h5>
       		</div>
       		<div class="modal-body">
-                  <form id="formgenerarpdf" action='{{$rutacreardocumento}}' method="POST" data-parsley-validate="" target="_blank">
+                  <form id="formgenerarpdf" action='{{$rutacreardocumento}}' method="POST" data-parsley-validate="" target="_blank" onkeydown="return event.key != 'Enter';">
                     @csrf
 		        	<h5 id="textomodalgenerarpdf"> </h5>
                     <div class="row">
@@ -42,6 +42,9 @@
                     <div class="row">
                         <div id="tiposeleccionfolios" hidden>
                             <div class="col-md-12">
+                                <small><b>Doble click para seleccionar</b></small>
+                            </div>
+                            <div class="col-md-12" hidden>
                                 <input type="text" name="buscarfolio" id="buscarfolio" class="form-control" placeholder="Teclea el folio..." autocomplete="off" onkeyup="relistarbuscarstringlike()">
                             </div>    
                             <div class="col-md-12">
@@ -53,6 +56,8 @@
                                             </tr>
                                             </thead>
                                             <tbody></tbody>
+                                            <tfoot id="columnasfootertablafoliosencontrados">
+                                            </tfoot>
                                     </table>
                                 </div>
                             </div>

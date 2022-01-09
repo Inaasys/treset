@@ -2,7 +2,9 @@
 /public/hot
 /public/storage
 /public/videosayuda
+/public/logotipo_empresa
 /storage/*.key
+/storage/archivos_pdf_documentos_generados
 /vendor
 .env
 .env.backup

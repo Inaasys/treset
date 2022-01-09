@@ -316,6 +316,7 @@
         var background_tables = '{{$empresa->background_tables}}';
         var urlgenerarplantilla = '{{$urlgenerarplantilla}}';       
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
+        var pedirobligatoriamenteobservacionenfactura = '{{$empresa->PedirObligatoriamenteObservacionEnFactura}}';
         var facturas_obtener = '{!!URL::to('facturas_obtener')!!}';
         var facturas_descargar_plantilla = '{!!URL::to('facturas_descargar_plantilla')!!}';
         var facturas_cargar_partidas_excel = '{!!URL::to('facturas_cargar_partidas_excel')!!}';

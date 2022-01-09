@@ -259,6 +259,7 @@
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';
+        var agregarreferenciaenasuntocorreo = '{{$empresa->AgregarReferenciaOrdenCompraEnAsuntoCorreo}}';
         var urlgenerarplantilla = '{{$urlgenerarplantilla}}';
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var ordenes_compra_obtener = '{!!URL::to('ordenes_compra_obtener')!!}';
