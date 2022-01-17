@@ -53,6 +53,17 @@ return [
             'root' => storage_path('xml_cargados'),
         ],
 
+        'local2' => [
+            'driver' => 'local',
+            'root' => storage_path('xml_descargados'),
+        ],
+
+        'local3' => [
+            'driver' => 'local',
+            'root' => storage_path('archivos_pdf_documentos_generados'),
+        ],
+        
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

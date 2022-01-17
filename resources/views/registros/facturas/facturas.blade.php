@@ -28,7 +28,7 @@
                                                         </div>
                                                     </td>
                                                     <td >
-                                                        <div class="btn bg-blue btn-xs waves-effect" onclick="mostrarmodalgenerarpdf()">
+                                                        <div class="btn bg-blue btn-xs waves-effect" onclick="mostrarmodalgenerarpdf(0,1)">
                                                             Generar Documento
                                                         </div>
                                                     </td>
@@ -191,6 +191,8 @@
                         <h5 id="textomodalbajatimbre"> </h5>
                         <input type="hidden" class="form-control" id="iddocumentofacturapi" name="iddocumentofacturapi" readonly>
                         <input type="hidden" class="form-control" id="facturabajatimbre" name="facturabajatimbre" readonly>
+                        <label for="">Motivo:</label>
+                        <select name="motivobajatimbre" id="motivobajatimbre" class="form-control select2" style="width:100%;" required></select>
                     </form>	
                 </div>
                 <div class="modal-footer">

@@ -90,6 +90,7 @@
                     <table style="width: 100%;max-width: 100%;border: 1px solid #ddd;">
                         <tbody style="font-size:9px; text-align: justify;">
                             <tr style="background-color:#a6a6b3;font-size:10px;">
+                                <th>Codigo</th>
                                 <th>Cantidad</th>
                                 <th>Descripción</th>
                                 <th>Existencias</th>
@@ -100,6 +101,7 @@
                             </tr>
                             @foreach($d['datadetalle'] as $cpd)
                             <tr style="font-size:10px;">
+                                <td>{{$cpd['codigodetalle']}}</td>
                                 <td>{{ number_format($cpd['cantidaddetalle'], $d['numerodecimalesdocumento']) }}</td>
                                 <td>{{$cpd['descripciondetalle']}}</td>
                                 <td>{{ number_format($cpd['existenciasdetalle'], $d['numerodecimalesdocumento']) }}</td>
@@ -110,22 +112,22 @@
                             </tr>
                             @endforeach
                             <tr>
-                                <td colspan="5" style="font-size:11px"></td>
+                                <td colspan="6" style="font-size:11px"></td>
                                 <td style="font-size:11px;text-align: right;">Descuento $ : </td>
                                 <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"><b>{{ number_format($d['descuentocotizacionproducto'], $d['numerodecimalesdocumento']) }}</b></td>
                             </tr>
                             <tr>
-                                <td colspan="5" style="font-size:11px"></td>
+                                <td colspan="6" style="font-size:11px"></td>
                                 <td style="font-size:11px;text-align: right;">SubTotal $ : </td>
                                 <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"><b>{{ number_format($d['subtotalcotizacionproducto'], $d['numerodecimalesdocumento']) }}</b></td>
                             </tr>
                             <tr>
-                                <td colspan="5" style="font-size:11px"></td>
+                                <td colspan="6" style="font-size:11px"></td>
                                 <td style="font-size:11px;text-align: right;">IVA $ : </td>
                                 <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"><b>{{ number_format($d['ivacotizacionproducto'], $d['numerodecimalesdocumento']) }}</b></td>
                             </tr>
                             <tr>
-                                <td colspan="5" style="font-size:11px"></td>
+                                <td colspan="6" style="font-size:11px"></td>
                                 <td style="font-size:11px;text-align: right;">Total $ : </td>
                                 <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"><b>{{ number_format($d['totalcotizacionproducto'], $d['numerodecimalesdocumento']) }}</b></td>
                             </tr>

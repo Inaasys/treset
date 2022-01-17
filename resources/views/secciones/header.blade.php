@@ -52,7 +52,7 @@
             <li><a href="{{ route('asignacionherramienta') }}" id="menuregistrosasignacionherramienta">Asignación Herramienta</a></li>
             <li><a href="{{ route('prestamoherramienta') }}" id="menuregistrosprestamoherramienta">Prestamo Herramienta</a></li>
             <li><a href="{{ route('ajustesinventario') }}" id="menuregistrosajusteinventario">Ajustes de Inventario <b>--> CTRL+A</b></a></li>
-            <li><a href="{{ route('firmardocumentos') }}" id="menuregistrosajusteinventario">Firmar Documentos </a></li>
+            <li><a href="{{ route('firmardocumentos') }}" id="menuregistrosfirmardocumentos">Firmar Documentos </a></li>
           </ul>
         </li>
         <li class="dropdown">

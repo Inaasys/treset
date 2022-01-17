@@ -13,18 +13,14 @@ class VistaCotizacion extends Model
         'cotizacion',
         'serie',
         'fecha',
-        'num_equipo',
         'subtotal',
         'iva',
         'total',
-        'ot_tecnodiesel',
-        'ot_tyt',
         'status',
         'motivo_baja',
         'equipo',
         'usuario',
         'periodo',
-        'num_remision'
     ];
     protected $casts = [
         'fecha' => 'datetime:Y-m-d',

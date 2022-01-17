@@ -230,6 +230,7 @@ function obtenerremisiones(){
                                                     '<th>Requisición</th>'+
                                                     '<th>Total</th>'+
                                                     '<th>Status</th>'+
+                                                    '<th>Selecciona</th>'+
                                                 '</tr>'+
                                             '</thead>'+
                                             '<tbody></tbody>'+
@@ -240,6 +241,7 @@ function obtenerremisiones(){
                         '</div>'+
                         '<div class="modal-footer">'+
                             '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                            '<button type="button" class="btn btn-success btn-sm" onclick="cargarremisionesseleccionadas();">Cargar remisiones</button>'+
                         '</div>';
     $("#contenidomodaltablas").html(tablaremisiones);
     $('#tbllistadoremision').DataTable({
@@ -258,6 +260,7 @@ function obtenerremisiones(){
           url: cotizaciones_obtener_remisiones,
           data: function (d) {
             d.tipooperacion = $("#tipooperacion").val();
+            d.stringremisionesseleccionadas = $("#stringremisionesseleccionadas").val();
           }
         },
         columns: [
@@ -268,7 +271,8 @@ function obtenerremisiones(){
             { data: 'Unidad', name: 'Unidad', orderable: false, searchable: false },
             { data: 'Rq', name: 'Rq', orderable: false, searchable: false },
             { data: 'Total', name: 'Total', orderable: false, searchable: false },
-            { data: 'Status', name: 'Status', orderable: false, searchable: false }
+            { data: 'Status', name: 'Status', orderable: false, searchable: false },
+            { data: 'Selecciona', name: 'Selecciona', orderable: false, searchable: false }
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
@@ -279,9 +283,112 @@ function obtenerremisiones(){
                 }
             });
         },
-        
     }); 
 } 
+
+
+
+
+
+
+function construirarrayremisionesseleccionadas(){
+  var arrayremisionesseleccionadas = [];
+  var lista = document.getElementsByClassName("remisionesseleccionadas");
+  for (var i = 0; i < lista.length; i++) {
+    if(lista[i].checked){
+      arrayremisionesseleccionadas.push(lista[i].value);
+    }
+  }
+  $("#stringremisionesseleccionadas").val(arrayremisionesseleccionadas.sort());
+}
+var arrayclientesremisionesseleccionadas = [];
+//obtener todos los datos de la orden de compra seleccionada
+function seleccionarremision(Folio,Remision,Cliente){
+  if( $('#idremisionesseleccionadas'+Remision).prop('checked') ) {
+    var cantidadclientesremisionesseleccionadas = arrayclientesremisionesseleccionadas.length;
+    if(cantidadclientesremisionesseleccionadas == 0){
+      arrayclientesremisionesseleccionadas.push(Cliente);
+    }else{
+      var existeclienteenarray = arrayclientesremisionesseleccionadas.indexOf(Cliente);
+      if(existeclienteenarray == -1){
+        alert("Solo se debe seleccionar un mismo cliente para cotizar");
+        $('#idremisionesseleccionadas'+Remision).removeAttr('checked');
+      }else{
+        arrayclientesremisionesseleccionadas.push(Cliente);
+      }
+    }
+  }else{
+    arrayclientesremisionesseleccionadas.pop();
+  }
+  construirarrayremisionesseleccionadas();
+  //calculartotalafacturar("REMISIONES");
+}
+//cargar remisiones
+var contadorproductos=0;
+var contadorfilas = 0;
+var partida = 1;
+function cargarremisionesseleccionadas(){
+  contadorfilas = 0;
+  partida = 1;
+  $("#tablaproductocotizacion tbody").html("");
+  var tipooperacion = $("#tipooperacion").val();
+  var stringremisionesseleccionadas = $("#stringremisionesseleccionadas").val();
+  $.get(cotizaciones_obtener_remision, {stringremisionesseleccionadas:stringremisionesseleccionadas, contadorfilas:contadorfilas, partida:partida, tipooperacion:tipooperacion}, function(data){
+    $("#tablaproductocotizacion tbody").append(data.filasremisiones);
+    //array de remisiones seleccionadas
+    construirarrayremisionesseleccionadas();
+    //comprobar numero de filas en la tabla
+    comprobarfilas();
+    //calcular totales
+    calculartotales();
+    contadorfilas = data.contadorfilas;
+    partida = data.partida;
+    remisionagregadacorrectamente();
+    mostrarformulario();
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnextdet").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        var index = $(this).index(".inputnextdet");          
+        $(".inputnextdet").eq(index + 1).focus().select(); 
+      }
+    });
+  })
+}
+
+//eliminar todas las filas de la remision que se deselecciono
+function eliminarfilasremisiondeseleccionada(Remision){
+  var cuentaFilas = 0;
+  $("tr.filasproductos").each(function () { 
+    // obtener los datos de la fila
+    var remisionpartida = $(".remisionpartida", this).val();
+    if(remisionpartida == Remision){
+      eliminarfila(cuentaFilas).then(fila=>{  
+      })      
+    }
+    cuentaFilas++;
+  });  
+  msjsuccesseliminacionpartidasremision();
+}
+async function msjsuccesseliminacionpartidasremision(){
+  await retraso();
+  remisioneliminadacorrectamente();
+  construirarrayremisionesseleccionadas();
+  renumerarfilas();//importante para todos los calculo en el modulo
+  comprobarfilas();
+  calculartotal();
+}
+
+
+
+
+
+
+
+
+
+/*
 //obtener datos de remision seleccionada
 function seleccionarremision(Folio, Remision){
     var tipooperacion = $("#tipooperacion").val();
@@ -290,19 +397,19 @@ function seleccionarremision(Folio, Remision){
     mostrarformulario();
     $('.page-loader-wrapper').css('display', 'block');
     $.get(cotizaciones_obtener_remision, {Folio:Folio, Remision:Remision, tipooperacion:tipooperacion}, function(data){
-      if(data.cotizacionyaexistente == 1){
-        msjremisionyautilizada();
-      }else{
+      //if(data.cotizacionyaexistente == 1){
+      //  msjremisionyautilizada();
+      //}else{
         $("#tablaproductocotizacion tbody").html(data.filasdetallesremision);
-        $("#ottecnodiesel").val(data.remision.Referencia);
-        $("#ottyt").val(data.remision.Os);
-        $("#equipo").val(data.remision.Eq);
-        $("#requisicion").val(data.remision.Rq);
+        //$("#ottecnodiesel").val(data.remision.Referencia);
+        //$("#ottyt").val(data.remision.Os);
+        //$("#equipo").val(data.remision.Eq);
+        //$("#requisicion").val(data.remision.Rq);
         $("#subtotal").val(data.subtotal);
         $("#iva").val(data.iva);
         $("#total").val(data.total);
         $("#numerofilas").val(data.numerodetallesremision);
-      }
+      //}
       $('.page-loader-wrapper').css('display', 'none');
       //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
       $(".inputnextdet").keypress(function (e) {
@@ -315,6 +422,7 @@ function seleccionarremision(Folio, Remision){
       });
     }) 
 }
+*/
 //calcular total de cada fila
 function calculartotalesfilas(fila){
   // for each por cada fila:
@@ -394,28 +502,19 @@ function alta(){
                   '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                   '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
                   '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
-                '</div>'+ 
-                '<div class="col-md-3">'+
-                  '<label>OT Tecnodiesel</label>'+
-                  '<input type="text" class="form-control inputnext" name="ottecnodiesel" id="ottecnodiesel"  required  onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
-                '</div>'+
-                '<div class="col-md-3">'+
-                  '<label>OT TyT</label>'+
-                  '<input type="text" class="form-control inputnext" name="ottyt" id="ottyt" required data-parsley-length="[0, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                  '<input type="hidden" class="form-control" name="stringremisionesseleccionadas" id="stringremisionesseleccionadas" readonly required>'+
                 '</div>'+ 
                 '<div class="col-md-3">'+
                   '<label>Fecha </label>'+
                   '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required  data-parsley-excluded="true" onkeydown="return false">'+
                   '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="{{$periodohoy}}">'+
                 '</div>'+
-              '</div>'+
-              '<div class="row">'+
                 '<div class="col-md-3">'+
-                  '<label>Remisión</label>'+
+                  '<label>Agregar Remisiones</label>'+
                   '<table class="col-md-12">'+
                     '<tr>'+
                       '<td>'+
-                        '<div class="btn bg-blue waves-effect" onclick="obtenerremisiones()">Seleccionar</div>'+
+                        '<div class="btn bg-blue waves-effect" onclick="obtenerremisiones()">Agregar Remisiones</div>'+
                       '</td>'+
                       '<td>'+
                         '<div class="form-line">'+
@@ -425,15 +524,7 @@ function alta(){
                       '</td>'+
                     '</tr>'+   
                   '</table>'+
-                '</div>'+
-                '<div class="col-md-3">'+
-                  '<label>Equipo</label>'+
-                  '<input type="text" class="form-control inputnext" name="equipo" id="equipo" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                 '</div>'+ 
-                '<div class="col-md-3">'+
-                  '<label>Requisición</label>'+
-                  '<input type="text" class="form-control inputnext" name="requisicion" id="requisicion" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
-                '</div>'+  
               '</div>'+
             '</div>'+
             '<div class="col-md-12">'+ 
@@ -458,6 +549,11 @@ function alta(){
                             '<th class="customercolortheadth">precio $</th>'+
                             '<th class="customercolortheadth">cantidad</th>'+
                             '<th class="'+background_tables+'">importe $</th>'+
+                            '<th class="'+background_tables+'">num remision</th>'+
+                            '<th class="'+background_tables+'">fecha remision</th>'+
+                            '<th class="'+background_tables+'">num equipo</th>'+
+                            '<th class="'+background_tables+'">ot tecnodiesel</th>'+
+                            '<th class="'+background_tables+'">ot tyt</th>'+
                           '</tr>'+
                         '</thead>'+
                         '<tbody>'+           

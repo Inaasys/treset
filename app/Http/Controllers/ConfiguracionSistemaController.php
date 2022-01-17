@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use App\Empresa;
 use App\TipoDeCambio;
 use App\TipoCambioVolvo;
+use App\TipoCambioCummins;
 use DB;
 use App;
 
@@ -186,6 +187,15 @@ class ConfiguracionSistemaController extends Controller
             $this->ultimo_valor_tipo_cambio_volvo = Helpers::convertirvalorcorrecto($this->ultimo_tipo_cambio_volvo[0]->Valor);  
             $this->ultima_fecha_actualización_tipo_cambio_volvo = Carbon::parse($this->ultimo_tipo_cambio_volvo[0]->Fecha)->toDateTimeString();
         }
+        //obtener ultimo valor dolar cummins y fecha de actualizacion
+        $this->ultimo_tipo_cambio_cummins=  TipoCambioCummins::select("Numero", "Fecha", "Valor")->orderBy("Numero", "DESC")->take(1)->get();
+        if(sizeof($this->ultimo_tipo_cambio_cummins) == 0 || sizeof($this->ultimo_tipo_cambio_cummins) == "" || sizeof($this->ultimo_tipo_cambio_cummins) == null){
+            $this->ultimo_valor_tipo_cambio_cummins = Helpers::convertirvalorcorrecto(0);
+            $this->ultima_fecha_actualización_tipo_cambio_cummins = Helpers::convertirvalorcorrecto(0);
+        }else{
+            $this->ultimo_valor_tipo_cambio_cummins = Helpers::convertirvalorcorrecto($this->ultimo_tipo_cambio_cummins[0]->Valor);  
+            $this->ultima_fecha_actualización_tipo_cambio_cummins = Carbon::parse($this->ultimo_tipo_cambio_cummins[0]->Fecha)->toDateTimeString();
+        }
         //timbres ingreso - facturas totales activos utilizados
         $this->timbresingresofacturastotalesactivosfacturapi = DB::table('Comprobantes')
                         ->where('Comprobante', 'Factura')
@@ -248,6 +258,8 @@ class ConfiguracionSistemaController extends Controller
         View::share ( 'valor_dolar_hoy', $this->valor_dolar_hoy);
         View::share ( 'ultimo_valor_tipo_cambio_volvo', $this->ultimo_valor_tipo_cambio_volvo);
         View::share ( 'ultima_fecha_actualización_tipo_cambio_volvo', $this->ultima_fecha_actualización_tipo_cambio_volvo);
+        View::share ( 'ultimo_valor_tipo_cambio_cummins', $this->ultimo_valor_tipo_cambio_cummins);
+        View::share ( 'ultima_fecha_actualización_tipo_cambio_cummins', $this->ultima_fecha_actualización_tipo_cambio_cummins);
         View::share ( 'calleempresa', $this->calleempresa);
         View::share ( 'noexteriorempresa', $this->noexteriorempresa);
         View::share ( 'nointeriorempresa', $this->nointeriorempresa);

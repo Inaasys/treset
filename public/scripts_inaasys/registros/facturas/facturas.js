@@ -24,9 +24,13 @@ function obtenultimonumero(){
   })  
 }
 //obtener tipos ordenes de compra
-function obtenertiposordenescompra(){
+function obtenertiposordenescompra(defaultvalue){
   $.get(facturas_obtener_tipos, function(select_tipos){
     $("#tipo").html(select_tipos);
+    if(defaultvalue != undefined){
+      $("#tipo").val(defaultvalue).change();
+      $("#tipo").select2();
+    }
   })  
 }
 //obtener tipos de unidades
@@ -3084,7 +3088,7 @@ function alta(){
     container: 'body'
   });
   obtenultimonumero();
-  obtenertiposordenescompra();
+  obtenertiposordenescompra('CLIENTE');
   obtenertiposunidades();
   asignarfechaactual();
   var Depto = $("#depto").val();
@@ -4156,8 +4160,6 @@ function obtenerdatos(facturamodificar){
     $("#moneda").val(data.factura.Moneda).change();
     $("#pesosmoneda").val(data.tipocambio);
     $("#pedido").val(data.factura.Pedido);
-    $("#tipo").val(data.factura.Tipo).change();
-    $("#tipounidad").val(data.factura.Unidad).change();
     $("#observaciones").val(data.factura.Obs);
     $("#emisorrfc").val(data.factura.EmisorRfc);
     $("#emisornombre").val(data.factura.EmisorNombre);
@@ -4224,8 +4226,6 @@ function obtenerdatos(facturamodificar){
     $("#tipooperacion").val("modificacion");
     //activar los input select
     $("#moneda").select2();
-    $("#tipo").select2();
-    $("#tipounidad").select2();
     //reiniciar contadores
     contadorproductos=data.contadorproductos;
     contadorfilas = data.contadorfilas;
@@ -4391,13 +4391,21 @@ function obtenerdatos(facturamodificar){
       }
     });
     renumerarfilasuuid();
-    setTimeout(function(){$("#folio").focus();},500);
-    mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
-    $('.page-loader-wrapper').css('display', 'none');
+    seleccionartipocliente(data);
   }).fail( function() {
     msj_errorajax();
     $('.page-loader-wrapper').css('display', 'none');
   })
+}
+async function seleccionartipocliente(data){
+  await retraso();
+  $("#tipo").val(data.factura.Tipo).change();
+  $("#tipo").select2();
+  $("#tipounidad").val(data.factura.Unidad).change();
+  $("#tipounidad").select2();
+  setTimeout(function(){$("#folio").focus();},500);
+  mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
+  $('.page-loader-wrapper').css('display', 'none');
 }
 //guardar modificación
 $("#btnGuardarModificacion").on('click', function (e) {
@@ -4689,6 +4697,7 @@ function cancelartimbre(facturabajatimbre){
             $("#facturabajatimbre").val(facturabajatimbre);
             $("#iddocumentofacturapi").val(data.obtener_factura.id);
             $("#textomodalbajatimbre").html('Esta seguro de dar de baja el timbre de la factura No.'+ facturabajatimbre);
+            $("#motivobajatimbre").html("<option value='01'>01 - Comprobante emitido con errores con relación</option><option value='02'>02 - Comprobante emitido con errores sin relación</option><option value='03'>03 - No se llevó a cabo la operación</option><option value='04'>04 - Operación nominativa relacionada en la factura global</option> ");
             $("#btnbajatimbre").show();
             $('#modalbajatimbre').modal('show');
           }else if(data.obtener_factura.cancellation_status == "accepted"){

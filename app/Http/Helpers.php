@@ -3,6 +3,7 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Empresa;
 use App\Serie;
+use App\Configuracion_Tabla;
 use Jenssegers\Date\Date;
 use Goutte\Client;
 use GuzzleHttp\Client as GuzzleClient;
@@ -364,6 +365,60 @@ class Helpers{
             unlink($pd); //elimino el fichero
         }
         return $pdfs;
+    }
+
+    //eliminar archivos xmls generados
+    public static function eliminararchivosxmlsgenerados(){
+        //primero eliminar todos los archivos de la carpeta
+        $xmls = glob(storage_path('xml_descargados/*')); //obtenemos todos los nombres de los ficheros
+        foreach($xmls as $xml){
+            if(is_file($xml))
+            unlink($xml); //elimino el fichero
+        }
+        return $xmls;
+    }
+
+    //eliminar archivos zip generados
+    public static function eliminararchivoszipgenerados(){
+        $public_dir = public_path();
+        //primero eliminar todos los archivos de la carpeta
+        $zips = glob($public_dir . '/xml_descargados/*'); //obtenemos todos los nombres de los ficheros
+        foreach($zips as $z){
+            if(is_file($z))
+            unlink($z); //elimino el fichero
+        }
+        return $zips;
+        
+    }
+
+    //obtener configuracion de tablas en modulos
+    public static function obtenerconfiguraciontabla($tipodocumento, $idusuariologueado){
+        $contar_configuracion_tabla = Configuracion_Tabla::where('tabla', $tipodocumento)->where('IdUsuario', $idusuariologueado)->count();
+        if($contar_configuracion_tabla > 0){
+            $configuracion_tabla = Configuracion_Tabla::where('tabla', $tipodocumento)->where('IdUsuario', $idusuariologueado)->first();
+        }else{
+            $configuracion_tabla = Configuracion_Tabla::where('tabla', $tipodocumento)->where('IdUsuario', NULL)->first();
+        }
+        //consultas ordenadas
+        $campos_consulta = [];
+        foreach (explode(",", $configuracion_tabla->columnas_ordenadas) as $campo){
+            array_push($campos_consulta, $campo);
+        }
+        //campos vista
+        $camposvista = [];
+        foreach (explode(",", $configuracion_tabla->campos_activados) as $campo){
+            array_push($camposvista, $campo);
+        }
+        foreach (explode(",", $configuracion_tabla->campos_desactivados) as $campo){
+            array_push($camposvista, $campo);
+        }
+        $configuraciones_tabla = array(
+            'configuracion_tabla' => $configuracion_tabla,
+            'camposvista' => $camposvista,
+            'campos_consulta' => $campos_consulta,
+            'contar_configuracion_tabla' => $contar_configuracion_tabla
+        );
+        return $configuraciones_tabla;
     }
     
     //quitar acentos

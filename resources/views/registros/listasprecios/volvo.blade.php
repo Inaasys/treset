@@ -33,9 +33,14 @@
                                                     </div>
                                                 </td>
                                                 <td >
-                                                    <a class="btn bg-blue btn-xs waves-effect" href="{{route('productos_exportar_excel')}}" target="_blank">
+                                                    <a class="btn bg-blue btn-xs waves-effect" href="{{route('lista_precios_volvo_exportar_excel')}}" target="_blank">
                                                         Excel
                                                     </a>
+                                                </td>
+                                                <td>
+                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
+                                                        Configurar Tabla
+                                                    </div>
                                                 </td>
                                             </tr>
                                         </table>
@@ -80,28 +85,29 @@
                     <div class="modal-header {{$empresa->background_forms_and_modals}}">
                         <h4 class="modal-title" id="titulomodal"></h4>
                     </div>
+                    <form id="formplantilla" action="#" enctype="multipart/form-data" hidden>
+                        <div class="col-md-12">
+                            <table class="col-md-12">
+                                <tr>
+                                    <td>
+                                        <div class="col-md-6">
+                                            <label>Selecciona el archivo excel</label>
+                                            <input type="file" class="form-control" name="partidasexcel" id="partidasexcel" onchange="cargarpartidasexcel(this)" onclick="this.value=null;">
+                                            <button type="button" class="btn btn-success btn-sm" id="btnenviarpartidasexcel" style="display:none">Enviar Excel</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>   
+                        </div>
+                    </form>
                     <form id="formparsley" action="#">
                         <div class="modal-body">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label>Código<b style="color:#F44336 !important;">*</b></label>
-                                    <div class="row">
-                                        <div class="col-md-12"> 
-                                            <div class="form-line">
-                                                <input type="text" class="form-control inputnext" name="codigo" id="codigo" required data-parsley-length="[1, 20]" onchange="buscarcodigoencatalogo();" onkeyup="tipoLetra(this);">
-                                            </div>
-                                        </div>  
-                                    </div>
-                                </div>
-                            </div>
                             <div class="col-md-12" id="tabsform">
-                                
+
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
-                            <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
-                            <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
                         </div>
                     </form> 
                 </div>
@@ -111,7 +117,6 @@
             </div>
         </div>
     </div>
-
     <!-- Modal Actualizar Tipo Cambio-->
     <div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalactualizartipocambio" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -134,7 +139,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="">Obtener valor dolar hoy Diario Oficial de la Federación</label>
-                                <div class="btn btn-block btn-success" onclick="obtenervalordolarhoydof();">Obtener valor dolar hoy Diario Oficial de la Federación</div>
+                                <div class="btn btn-block btn-success" onclick="obtenervalordolarhoydof();">Obtener ultimo valor dolar Diario Oficial de la Federación</div>
                             </div>
                         </div>
                     </form>	
@@ -146,7 +151,6 @@
             </div>
         </div>
     </div> 
-
 <!-- modal para configuraciones de tablas-->
 @include('secciones.modalconfiguraciontablas')
 <!-- fin modal para configuraciones de tablas-->
@@ -173,18 +177,13 @@
         var background_tables = '{{$empresa->background_tables}}';       
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var tipodeutilidad = '{{$tipodeutilidad}}';
-        var productos_obtener = '{!!URL::to('productos_obtener')!!}';
-        var productos_buscar_codigo_en_tabla = '{!!URL::to('productos_buscar_codigo_en_tabla')!!}';
-        var productos_guardar = '{!!URL::to('productos_guardar')!!}'; 
-        var productos_obtener_producto = '{!!URL::to('productos_obtener_producto')!!}';  
-        var productos_guardar_modificacion = '{!!URL::to('productos_guardar_modificacion')!!}';
-
+        var urlgenerarplantilla = '{{$urlgenerarplantilla}}';
+        var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var lista_precios_volvo_obtener = '{!!URL::to('lista_precios_volvo_obtener')!!}';
         var lista_precios_volvo_obtener_valor_dolar_hoy_dof = '{!!URL::to('lista_precios_volvo_obtener_valor_dolar_hoy_dof')!!}';
         var lista_precios_volvo_guardar_valor_tipo_cambio = '{!!URL::to('lista_precios_volvo_guardar_valor_tipo_cambio')!!}';
-
+        var lista_precios_volvo_actualizar_lista_precios_vs_excel = '{!!URL::to('lista_precios_volvo_actualizar_lista_precios_vs_excel')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="scripts_inaasys/registros/listasprecios/volvo.js"></script>
-    <!--<script src="scripts_inaasys/catalogos/productos/infodocumentos.js"></script>-->
 @endsection

@@ -11,7 +11,7 @@
 		        	<h5 id="textomodalgenerarpdf"> </h5>
                     <div class="row">
                         <div class="col-md-4">
-                            <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Generar Documento en PDF por:</label>
+                            <label>Generar Documento en PDF por:</label>
                             <div class="col-md-12 form-check">
                                 <input type="radio" name="tipogeneracionpdf" id="tipogeneracionpdf" value="0" onchange="mostrartipogeneracionpdf()" required>
                                 <label for="tipogeneracionpdf">Selección de Folios</label>
@@ -31,6 +31,17 @@
                                 <option value="6">6</option>
                             </select>
                         </div>
+                        <div class="col-md-4">
+                            <label>Ver o Descargar documentos:</label>
+                            <div class="col-md-12 form-check">
+                                <input type="radio" name="descargar_xml" id="descargar_xml" value="0" checked required>
+                                <label for="descargar_xml">Ver documentos pdf's</label>
+                                <input type="radio" name="descargar_xml" id="descargar_xml1" value="1" required>
+                                <label for="descargar_xml1">Descargar documentos pdf's y xml's</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row"> 
                         <div class="col-md-4" id="divseleccionartipoformatocxc" hidden>
                             <label > Tipo de formato que desea generar:</label>
                             <select name="tipoformatocxc" id="tipoformatocxc" class="form-control select2">

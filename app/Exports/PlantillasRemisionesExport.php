@@ -17,7 +17,7 @@ class PlantillasRemisionesExport implements FromCollection,WithHeadings,WithTitl
     private $campos_consulta;
 
     public function __construct(){
-        $this->campos_consulta = array('codigo', 'cantidad');
+        $this->campos_consulta = array('codigo', 'cantidad', 'precio');
     }
 
     public function columnWidths(): array

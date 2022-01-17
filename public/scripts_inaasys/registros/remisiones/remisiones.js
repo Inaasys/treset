@@ -174,12 +174,14 @@ $("#btnenviarpartidasexcel").on('click', function(e){
   }
   var partidasexcel = $('#partidasexcel')[0].files[0];
   var numeroalmacen = $("#numeroalmacen").val();
+  var numerocliente = $("#numerocliente").val();
   var form_data = new FormData();
   form_data.append('partidasexcel', partidasexcel);  
   form_data.append('numeroalmacen', numeroalmacen);
   form_data.append('contadorproductos', contadorproductos);
   form_data.append('contadorfilas', contadorfilas);
   form_data.append('arraycodigospartidas', arraycodigospartidas);
+  form_data.append('numerocliente', numerocliente);
   $.ajax({
     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
     url:remisiones_cargar_partidas_excel,
@@ -210,9 +212,13 @@ $("#btnenviarpartidasexcel").on('click', function(e){
   });                      
 });
 //obtener tipos cliente
-function obtenertiposcliente(){
+function obtenertiposcliente(defaultvalue){
     $.get(remisiones_obtener_tipos_cliente, function(select_tipos_cliente){
-      $("#tipo").html(select_tipos_cliente);
+        $("#tipo").html(select_tipos_cliente);
+        if(defaultvalue != undefined){
+            $("#tipo").val(defaultvalue).change();
+            $("#tipo").select2();
+        }
     })  
 }
 //obtener tipos unidad
@@ -918,9 +924,9 @@ function listarproductos(){
         ajax: {
             url: remisiones_obtener_productos,
             data: function (d) {
-            d.codigoabuscar = $("#codigoabuscar").val();
-            d.numeroalmacen = $("#numeroalmacen").val();
-            d.tipooperacion = $("#tipooperacion").val();
+                d.codigoabuscar = $("#codigoabuscar").val();
+                d.numeroalmacen = $("#numeroalmacen").val();
+                d.tipooperacion = $("#tipooperacion").val();
             }
         },
         columns: [
@@ -948,7 +954,8 @@ function listarproductos(){
     $('#tbllistadoproducto tbody').on('dblclick', 'tr', function () {
         var data = tprod.row( this ).data();
         var tipooperacion = $("#tipooperacion").val();
-        agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, number_format(round(data.Impuesto, numerodecimales), numerodecimales, '.', ''), data.SubTotal, data.Existencias, tipooperacion, data.Insumo, data.ClaveProducto, data.ClaveUnidad, number_format(round(data.CostoDeLista, numerodecimales), numerodecimales, '.', ''));
+        //agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, number_format(round(data.Impuesto, numerodecimales), numerodecimales, '.', ''), data.SubTotal, data.Existencias, tipooperacion, data.Insumo, data.ClaveProducto, data.ClaveUnidad, number_format(round(data.CostoDeLista, numerodecimales), numerodecimales, '.', ''));
+        obtenerdatosagregarfilaproducto(data.Codigo);
     });
 }
 function obtenerproductoporcodigo(){
@@ -957,7 +964,8 @@ function obtenerproductoporcodigo(){
   var tipooperacion = $("#tipooperacion").val();
   $.get(remisiones_obtener_producto_por_codigo,{codigoabuscar:codigoabuscar,numeroalmacen:numeroalmacen}, function(data){
     if(parseInt(data.contarproductos) > 0){
-      agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, data.SubTotal, data.Existencias, tipooperacion, data.Insumo, data.ClaveProducto, data.ClaveUnidad, data.CostoDeLista);
+      //agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, data.SubTotal, data.Existencias, tipooperacion, data.Insumo, data.ClaveProducto, data.ClaveUnidad, data.CostoDeLista);
+      obtenerdatosagregarfilaproducto(data.Codigo);
     }else{
       msjnoseencontroningunproducto();
     }
@@ -1163,13 +1171,24 @@ function comprobarexistenciasenbd(fila, tipo, numeroalmacen, codigo){
     },500);
   })
 }
+//obtener dato para agtegar fila producto
+function obtenerdatosagregarfilaproducto(Codigo){
+    var numeroalmacen = $("#numeroalmacen").val();
+    var numerocliente = $("#numerocliente").val();
+    var tipooperacion = $("#tipooperacion").val();
+    $.get(remisiones_obtener_datos_agregar_fila_producto,{Codigo:Codigo,numeroalmacen:numeroalmacen,numerocliente:numerocliente,contadorproductos:contadorproductos,contadorfilas:contadorfilas,tipooperacion:tipooperacion}, function(data){
+        agregarfilaproducto(data,Codigo);
+    })
+}
 //agregar una fila en la tabla de precios productos
 var contadorproductos=0;
 var contadorfilas = 0;
-function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal, Existencias, tipooperacion, Insumo, ClaveProducto, ClaveUnidad, CostoDeLista){
+//function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal, Existencias, tipooperacion, Insumo, ClaveProducto, ClaveUnidad, CostoDeLista){
+function agregarfilaproducto(data,Codigo){
     $('.page-loader-wrapper').css('display', 'block');
     var result = evaluarproductoexistente(Codigo);
     if(result == false){
+        /*
         var multiplicacioncostoimpuesto =  new Decimal(SubTotal).times(Impuesto);      
         var ivapesos = new Decimal(multiplicacioncostoimpuesto/100);
         var total = new Decimal(SubTotal).plus(ivapesos);
@@ -1217,6 +1236,24 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
         mostrarformulario();      
         comprobarfilas();
         calculartotal();
+        $("#codigoabuscar").val("");
+        //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+        $(".inputnextdet").keypress(function (e) {
+          //recomentable para mayor compatibilidad entre navegadores.
+          var code = (e.keyCode ? e.keyCode : e.which);
+          if(code==13){
+            var index = $(this).index(".inputnextdet");          
+            $(".inputnextdet").eq(index + 1).focus().select(); 
+          }
+        });
+        $('.page-loader-wrapper').css('display', 'none');
+        */
+        contadorfilas = data.contadorfilas;
+        contadorproductos = data.contadorproductos;
+        $("#tablaproductosremisiones tbody").append(data.filasdetallesremision);
+        comprobarfilas();
+        calculartotal();
+        mostrarformulario();      
         $("#codigoabuscar").val("");
         //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
         $(".inputnextdet").keypress(function (e) {
@@ -1620,7 +1657,7 @@ function alta(){
     $("#numeroalmacen").val(1);
     obteneralmacenpornumero();
     obtenultimonumero();
-    obtenertiposcliente();
+    obtenertiposcliente('CLIENTE');
     obtenertiposunidad();
     asignarfechaactual();
     //ocultar buscador de productos
@@ -2235,10 +2272,6 @@ function obtenerdatos(remisionmodificar){
     //activar seelct2
     obtenertiposcliente();
     obtenertiposunidad();
-    $("#unidad").val(data.remision.Unidad).change();
-    $("#unidad").select2();
-    $("#tipo").val(data.remision.Tipo).change();
-    $("#tipo").select2();
     //activar busqueda de codigos
     $("#codigoabuscar").keypress(function(e) {
         //recomentable para mayor compatibilidad entre navegadores.
@@ -2327,13 +2360,21 @@ function obtenerdatos(remisionmodificar){
     });
     //asignar el tipo de operacion que se realizara
     $("#tipooperacion").val("modificacion");
-    setTimeout(function(){$("#folio").focus();},500);
-    mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
-    $('.page-loader-wrapper').css('display', 'none');
+    seleccionartipocliente(data);
   }).fail( function() {
     msj_errorajax();
     $('.page-loader-wrapper').css('display', 'none');
   })
+}
+async function seleccionartipocliente(data){
+    await retraso();
+    $("#unidad").val(data.remision.Unidad).change();
+    $("#unidad").select2();
+    $("#tipo").val(data.remision.Tipo).change();
+    $("#tipo").select2();
+    setTimeout(function(){$("#folio").focus();},500);
+    mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
+    $('.page-loader-wrapper').css('display', 'none');
 }
 //guardar modificación
 $("#btnGuardarModificacion").on('click', function (e) {

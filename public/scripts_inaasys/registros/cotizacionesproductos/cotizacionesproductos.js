@@ -197,9 +197,13 @@ $("#btnenviarpartidasexcel").on('click', function(e){
   });                      
 });
 //obtener tipos ordenes de compra
-function obtenertiposordenescompra(){
+function obtenertiposordenescompra(defaultvalue){
   $.get(cotizaciones_productos_obtener_tipos_ordenes_compra, function(select_tipos_ordenes_compra){
     $("#tipo").html(select_tipos_ordenes_compra);
+    if(defaultvalue != undefined){
+      $("#tipo").val(defaultvalue).change();
+      $("#tipo").select2();
+    }
   })  
 }
 //obtener series documento
@@ -1168,16 +1172,12 @@ function alta(){
                     '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
-
-
-
-
     //mostrar mensaje de bajar plantilla
     $('[data-toggle="tooltip"]').tooltip({
       container: 'body'
     });
     obtenultimonumero();
-    obtenertiposordenescompra();
+    obtenertiposordenescompra('CLIENTE');
     asignarfechaactual();
     //reiniciar los contadores
     contadorproductos=0;

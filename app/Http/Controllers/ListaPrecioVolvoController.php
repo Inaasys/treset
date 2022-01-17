@@ -32,6 +32,9 @@ use App\TipoCambioVolvo;
 use App\TipoDeCambio;
 use App\ListaPrecioVolvo;
 use App\VistaListaPrecioVolvo;
+use App\Exports\PlantillasActualizarListaPreciosVolvoExport;
+use App\Exports\ListaPreciosVolvoExport;
+use App\Imports\ListaPreciosVolvoImport;
 use GuzzleHttp\Client;
 use DNS1D;
 use DNS2D;
@@ -64,11 +67,10 @@ class ListaPrecioVolvoController extends ConfiguracionSistemaController{
     public function lista_precios_volvo(){
         $configuracion_tabla = $this->configuracion_tabla;
         $rutaconfiguraciontabla = route('lista_precios_volvo_guardar_configuracion_tabla');
-        $rutacrearpdfcodigosdebarrascatalogo = route('productos_generar_codigos_barras_catalogo');
-        $rutacrearpdfcodigosdebarrasarray = route('productos_generar_codigos_barras_array');
-        return view('registros.listasprecios.volvo', compact('configuracion_tabla','rutaconfiguraciontabla','rutacrearpdfcodigosdebarrascatalogo','rutacrearpdfcodigosdebarrasarray'));
+        $urlgenerarplantilla = route('lista_precios_volvo_generar_plantilla');
+        $urlgenerarformatoexcel = route('lista_precios_volvo_exportar_excel');
+        return view('registros.listasprecios.volvo', compact('configuracion_tabla','rutaconfiguraciontabla','urlgenerarplantilla','urlgenerarformatoexcel'));
     }
-
 
     //obtener todos los registros
     public function lista_precios_volvo_obtener(Request $request){
@@ -101,8 +103,6 @@ class ListaPrecioVolvoController extends ConfiguracionSistemaController{
                     ->make(true);
         } 
     } 
-
-
 
     //obtenr valor dolar ho de DOF
     public function lista_precios_volvo_obtener_valor_dolar_hoy_dof(){
@@ -148,6 +148,52 @@ class ListaPrecioVolvoController extends ConfiguracionSistemaController{
         $TipoDeCambio->Fecha = Helpers::fecha_exacta_accion_datetimestring();
         $TipoDeCambio->TipoCambioDOF = $request->valortipocambio;
         $TipoDeCambio->save();  
+    }
+
+    //generar plantilla 
+    public function lista_precios_volvo_generar_plantilla(Request $request){
+        return Excel::download(new PlantillasActualizarListaPreciosVolvoExport(), "plantillaactualizarlistapreciosvolvo.xlsx"); 
+    }
+
+    //actualizar costos
+    public function lista_precios_volvo_actualizar_lista_precios_vs_excel(Request $request){
+        ini_set('max_execution_time', 3600); // 60 minutos
+        ini_set('memory_limit', '-1');
+        $arrayexcel =  Excel::toArray(new ListaPreciosVolvoImport, request()->file('partidasexcel'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $eliminarlistaprecios = ListaPrecioVolvo::truncate();
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 1){
+                $buscarcodigoenlista = ListaPrecioVolvo::where('NumeroParte', ''.$partida[0].'')->count();
+                /*if($buscarcodigoenlista > 0){
+                    ListaPrecioVolvo::where('NumeroParte', ''.$partida[0].'')
+                    ->update([
+                        'PrecioPublico' => $partida[2],
+                    ]);
+                    $listaactualizada = ListaPrecioVolvo::where('NumeroParte', ''.$partida[0].'')->first();
+                }else{
+                */
+                    //insertar registro
+                    $ListaPrecioVolvo = new ListaPrecioVolvo;
+                    $ListaPrecioVolvo->NumeroParte = $partida[0];
+                    $ListaPrecioVolvo->Descripcion = $partida[1];
+                    $ListaPrecioVolvo->PrecioPublico = $partida[2];
+                    $ListaPrecioVolvo->save();
+                //}
+            }
+            $rowexcel++;
+        }
+        return response()->json($rowexcel); 
+    }
+
+    //exportar excel
+    public function lista_precios_volvo_exportar_excel(Request $request){
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('ListaPreciosVolvo', Auth::user()->id);
+        return Excel::download(new ListaPreciosVolvoExport($configuraciones_tabla['campos_consulta']), "listapreciosvolvo.xlsx");
+
     }
 
     //configurar tabalas

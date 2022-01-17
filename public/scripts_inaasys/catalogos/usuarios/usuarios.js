@@ -725,6 +725,15 @@ function permisos(id){
                                         '</div>'+
                                     '</div>'+
                                 '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-md-6">'+
+                                        '<label>Firmar Documentos</label>'+
+                                        '<div class="col-md-12 form-check">'+
+                                            '<input type="checkbox" name="menuregistrosfirmardocumentos" id="idmenuregistrosfirmardocumentos" class="filled-in submenu accesoregistros" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                            '<label for="idmenuregistrosfirmardocumentos">Acceso</label>'+
+                                        '</div>'+
+                                    '</div>'+
+                                '</div>'+                                
                             '</div>'+ 
                             '<div>'+
                                 '<div class="row">'+

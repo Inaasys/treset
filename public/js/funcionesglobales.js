@@ -145,9 +145,12 @@ function destruirtablafoliosexportacion(){
     $('#tablafoliosencontrados').DataTable().clear().destroy();
 }
 //mostrar modal de generacion PDF
-function mostrarmodalgenerarpdf(seleccionformato){
+function mostrarmodalgenerarpdf(seleccionformato,descargarxmls){
     if(seleccionformato == 1){
         $("#divseleccionartipoformatocxc").show();
+    }
+    if(descargarxmls == 0){
+        $("#descargar_xml1").attr('disabled', true);
     }
     ocultartipofiltracionfechas();
     ocultartiposeleccionfolios();

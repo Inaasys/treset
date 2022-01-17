@@ -28,7 +28,7 @@
                                                     </div>
                                                 </td>
                                                 <td >
-                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="mostrarmodalgenerarpdf()">
+                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="mostrarmodalgenerarpdf(0,0)">
                                                         Generar Documento
                                                     </div>
                                                 </td>
@@ -227,6 +227,9 @@
         var remisiones_obtener_datos_envio_email = '{!!URL::to('remisiones_obtener_datos_envio_email')!!}';
         var remisiones_enviar_pdfs_email = '{!!URL::to('remisiones_enviar_pdfs_email')!!}';
         var remisiones_buscar_folio_string_like = '{!!URL::to('remisiones_buscar_folio_string_like')!!}';
+
+
+        var remisiones_obtener_datos_agregar_fila_producto = '{!!URL::to('remisiones_obtener_datos_agregar_fila_producto')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="scripts_inaasys/registros/remisiones/remisiones.js"></script>

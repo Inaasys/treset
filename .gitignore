@@ -5,6 +5,7 @@
 /public/logotipo_empresa
 /storage/*.key
 /storage/archivos_pdf_documentos_generados
+/storage/xml_descargados
 /vendor
 .env
 .env.backup

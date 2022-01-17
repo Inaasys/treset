@@ -39,6 +39,7 @@ use App\CotizacionDetalle;
 use App\OrdenTrabajo;
 use App\OrdenTrabajoDetalle;
 use App\Firma_Rel_Documento;
+use App\ProductoPrecio;
 use Config;
 use Mail;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
@@ -47,26 +48,12 @@ class RemisionController extends ConfiguracionSistemaController{
 
     public function __construct(){
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
-        //CONFIGURACIONES DE LA TABLA DEL CATALOGO O MODULO//
-        $this->configuracion_tabla = Configuracion_Tabla::where('tabla', 'Remisiones')->first();
-        $this->campos_consulta = [];
-        foreach (explode(",", $this->configuracion_tabla->columnas_ordenadas) as $campo){
-            array_push($this->campos_consulta, $campo);
-        }
-        //campos vista
-        $this->camposvista = [];
-        foreach (explode(",", $this->configuracion_tabla->campos_activados) as $campo){
-            array_push($this->camposvista, $campo);
-        }
-        foreach (explode(",", $this->configuracion_tabla->campos_desactivados) as $campo){
-            array_push($this->camposvista, $campo);
-        }
-        //FIN CONFIGURACIONES DE LA TABLA//
     }
 
     public function remisiones(){
         $serieusuario = 'A';
-        $configuracion_tabla = $this->configuracion_tabla;
+        $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Remisiones', Auth::user()->id);
+        $configuracion_tabla = $configuraciones_tabla['configuracion_tabla'];
         $rutaconfiguraciontabla = route('remisiones_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('remisiones_exportar_excel');
         $rutacreardocumento = route('remisiones_generar_pdfs');
@@ -77,19 +64,19 @@ class RemisionController extends ConfiguracionSistemaController{
     //obtener registros tabla
     public function remisiones_obtener(Request $request){
         if($request->ajax()){
+            $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Remisiones', Auth::user()->id);
             $periodo = $request->periodo;
-            //$data = VistaRemision::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->orderBy('Serie', 'ASC')->orderBy('Folio', 'DESC')->get();
-            $data = VistaRemision::select($this->campos_consulta)->where('Periodo', $periodo);
+            $data = VistaRemision::select($configuraciones_tabla['campos_consulta'])->where('Periodo', $periodo);
             return DataTables::of($data)
-                    ->order(function ($query){
-                        if($this->configuracion_tabla->primerordenamiento != 'omitir'){
-                            $query->orderBy($this->configuracion_tabla->primerordenamiento, '' . $this->configuracion_tabla->formaprimerordenamiento . '');
+                    ->order(function ($query) use($configuraciones_tabla) {
+                        if($configuraciones_tabla['configuracion_tabla']->primerordenamiento != 'omitir'){
+                            $query->orderBy($configuraciones_tabla['configuracion_tabla']->primerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formaprimerordenamiento . '');
                         }
-                        if($this->configuracion_tabla->segundoordenamiento != 'omitir'){
-                            $query->orderBy($this->configuracion_tabla->segundoordenamiento, '' . $this->configuracion_tabla->formasegundoordenamiento . '');
+                        if($configuraciones_tabla['configuracion_tabla']->segundoordenamiento != 'omitir'){
+                            $query->orderBy($configuraciones_tabla['configuracion_tabla']->segundoordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formasegundoordenamiento . '');
                         }
-                        if($this->configuracion_tabla->tercerordenamiento != 'omitir'){
-                            $query->orderBy($this->configuracion_tabla->tercerordenamiento, '' . $this->configuracion_tabla->formatercerordenamiento . '');
+                        if($configuraciones_tabla['configuracion_tabla']->tercerordenamiento != 'omitir'){
+                            $query->orderBy($configuraciones_tabla['configuracion_tabla']->tercerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formatercerordenamiento . '');
                         }
                     })
                     ->addColumn('operaciones', function($data){
@@ -163,10 +150,20 @@ class RemisionController extends ConfiguracionSistemaController{
                         }else{
                             $cantidad = $cantidadpartida;
                         }
-                        //dd(Helpers::convertirvalorcorrecto($cantidad));
-                        //precio de la partida
-                        //$preciopartida = $producto->SubTotal;
-                        $preciopartida = $partida[2];
+                        if($request->numerocliente > 0){
+                            $contarpreciocliente = ProductoPrecio::where('Codigo', ''.$codigoabuscar.'')->where('Cliente', $request->numerocliente)->count();
+                            if($contarpreciocliente > 0){
+                                $precioproductocliente = ProductoPrecio::where('Codigo', ''.$codigoabuscar.'')->where('Cliente', $request->numerocliente)->first();
+                                $preciopartida = $precioproductocliente->Precio;
+                            }else{
+                                $preciopartida = $partida[2];
+                            }
+                        }else{
+                            //dd(Helpers::convertirvalorcorrecto($cantidad));
+                            //precio de la partida
+                            //$preciopartida = $producto->SubTotal;
+                            $preciopartida = $partida[2];
+                        }
                         //importe de la partida
                         $importepartida = $cantidad*$preciopartida;
                         //subtotal de la partida
@@ -499,11 +496,13 @@ class RemisionController extends ConfiguracionSistemaController{
             $codigoabuscar = $request->codigoabuscar;
             $numeroalmacen = $request->numeroalmacen;
             $tipooperacion = $request->tipooperacion;
-            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->where('TipoProd', 'REFACCION')->where('Almacen', $numeroalmacen);
+            //$data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->where('TipoProd', 'REFACCION')->where('Almacen', $numeroalmacen);
+            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->where('TipoProd', 'REFACCION');
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($tipooperacion, $numeroalmacen){
                         if($data->Almacen == $numeroalmacen){
-                            $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$tipooperacion.'\',\''.$data->Insumo.'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\')">Seleccionar</div>';
+                            //$boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$tipooperacion.'\',\''.$data->Insumo.'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\')">Seleccionar</div>';
+                            $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="obtenerdatosagregarfilaproducto(\''.$data->Codigo .'\')">Seleccionar</div>';
                         }else{
                             $boton = '';
                         }
@@ -526,9 +525,11 @@ class RemisionController extends ConfiguracionSistemaController{
     public function remisiones_obtener_producto_por_codigo(Request $request){
         $codigoabuscar = $request->codigoabuscar;
         $numeroalmacen = $request->numeroalmacen;
-        $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('TipoProd', 'REFACCION')->where('Almacen', $numeroalmacen)->count();
+        //$contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('TipoProd', 'REFACCION')->where('Almacen', $numeroalmacen)->count();
+        $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('TipoProd', 'REFACCION')->count();
         if($contarproductos > 0){
-            $producto = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('TipoProd', 'REFACCION')->where('Almacen', $numeroalmacen)->first();
+            //$producto = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('TipoProd', 'REFACCION')->where('Almacen', $numeroalmacen)->first();
+            $producto = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('TipoProd', 'REFACCION')->first();
             $data = array(
                 'Codigo' => $producto->Codigo,
                 'Producto' => htmlspecialchars($producto->Producto, ENT_QUOTES),
@@ -560,6 +561,96 @@ class RemisionController extends ConfiguracionSistemaController{
             );
         }
         return response()->json($data);
+    }
+
+    //obtener datos agregar filas
+    public function remisiones_obtener_datos_agregar_fila_producto(Request $request){
+        $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $request->Codigo)->where('TipoProd', 'REFACCION')->count();
+        $contadorproductos = $request->contadorproductos;
+        $contadorfilas = $request->contadorfilas;
+        $tipooperacion = $request->tipooperacion;
+        $filasdetallesremision = '';
+        if($contarproductos > 0){
+            $producto = VistaObtenerExistenciaProducto::where('Codigo', $request->Codigo)->where('TipoProd', 'REFACCION')->first();
+            $contarexistencia = Existencia::where('Codigo', $request->Codigo)->where('Almacen', $request->numeroalmacen)->count();
+            if($contarexistencia > 0){
+                $Existencia = Existencia::where('Codigo', $request->Codigo)->where('Almacen', $request->numeroalmacen)->first();
+                $Existencias = Helpers::convertirvalorcorrecto($Existencia->Existencias);
+            }else{
+                $Existencias = Helpers::convertirvalorcorrecto(0);
+            }
+            $cantidad = 1;
+            if($request->numerocliente > 0){
+                $contarpreciocliente = ProductoPrecio::where('Codigo', $request->Codigo)->where('Cliente', $request->numerocliente)->count();
+                if($contarpreciocliente > 0){
+                    $precioproductocliente = ProductoPrecio::where('Codigo', $request->Codigo)->where('Cliente', $request->numerocliente)->first();
+                    $preciopartida = $precioproductocliente->Precio;
+                }else{
+                    $preciopartida = $producto->Costo;
+                }
+            }else{
+                $preciopartida = $producto->Costo;
+            }
+            //importe de la partida
+            $importepartida = $cantidad*$preciopartida;
+            //subtotal de la partida
+            $subtotalpartida =  $importepartida-0;
+            //iva en pesos de la partida
+            $multiplicacionivapesospartida = $subtotalpartida*$producto->Impuesto;
+            $ivapesospartida = $multiplicacionivapesospartida/100;
+            //total en pesos de la partida
+            $totalpesospartida = $subtotalpartida+$ivapesospartida;
+            //costo total
+            $costototalpartida  = $producto->Costo*$cantidad;
+            //comision de la partida
+            $comisionporcentajepartida = $subtotalpartida*0;
+            $comisionespesospartida = $comisionporcentajepartida/100;
+            //utilidad de la partida
+            $utilidadpartida = $subtotalpartida-$costototalpartida-$comisionespesospartida;
+            $tipo = "alta";
+            $filasdetallesremision= $filasdetallesremision.
+            '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
+                '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
+                '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]">'.$producto->Codigo.'</td>'.
+                '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.htmlspecialchars($producto->Producto, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'.
+                '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$producto->Unidad.'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'.$producto->Unidad.'</td>'.
+                '<td class="tdmod">'.
+                    '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($cantidad).'"  data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-existencias="'.$Existencias.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodecantidadpartida('.$contadorfilas.',\''.$tipo.'\');">'.
+                    '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'.                         
+                '</td>'.
+                '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($preciopartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodepreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
+                '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.Helpers::convertirvalorcorrecto($importepartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('.$contadorfilas.');"></td>'.
+                '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentoporcentajepartida('.$contadorfilas.');"></td>'.
+                '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'.Helpers::convertirvalorcorrecto($subtotalpartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($producto->Impuesto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');"></td>'.
+                '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm ivapesospartida" name="ivapesospartida[]" value="'.Helpers::convertirvalorcorrecto($ivapesospartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto($totalpesospartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'.Helpers::convertirvalorcorrecto($producto->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="'.Helpers::convertirvalorcorrecto($costototalpartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm comisionporcentajepartida" name="comisionporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($comisionporcentajepartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('.$contadorfilas.');" required></td>'.
+                '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm comisionespesospartida" name="comisionespesospartida[]" value="'.Helpers::convertirvalorcorrecto($comisionespesospartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'.
+                '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'.Helpers::convertirvalorcorrecto($utilidadpartida).'" data-parsley-utilidad="0.'.$this->numerocerosconfiguradosinputnumberstep.'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                '<td class="tdmod"><input type="text" class="form-control divorinputmodsm monedapartida" name="monedapartida[]" value="MXN" readonly data-parsley-length="[1, 3]" autocomplete="off"></td>'.
+                '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costolistapartida" name="costolistapartida[]" value="'.Helpers::convertirvalorcorrecto($producto->CostoDeLista).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'.
+                '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm tipocambiopartida" name="tipocambiopartida[]" value="'.Helpers::convertirvalorcorrecto(1).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                '<td class="tdmod"><input type="text" class="form-control divorinputmodsm cotizacionpartida" name="cotizacionpartida[]" value="" readonly data-parsley-length="[1, 20]"></td>'.
+                '<td class="tdmod"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'.$producto->Insumo.'" readonly data-parsley-length="[1, 20]"></td>'.
+                '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveprodutopartida" name="claveprodutopartida[]" value="'.$producto->ClaveProducto.'" readonly required></td>'.
+                '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]" value="'.$producto->ClaveUnidad.'" readonly required></td>'.
+                '<td class="tdmod"><input type="text" class="form-control divorinputmodsm mesespartida" name="mesespartida[]" value="0" readonly></td>'.
+                '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm tasainterespartida" name="tasainterespartida[]" value="'.Helpers::convertirvalorcorrecto(0).'"  data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm montointerespartida" name="montointerespartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+            '</tr>';
+            $contadorproductos++;
+            $contadorfilas++;
+        }
+        $data = array(
+            "filasdetallesremision" => $filasdetallesremision,
+            "contadorproductos" => $contadorproductos,
+            "contadorfilas" => $contadorfilas,
+        );
+        return response()->json($data); 
     }
 
     //obtener existencias
@@ -1469,7 +1560,8 @@ class RemisionController extends ConfiguracionSistemaController{
     public function remisiones_exportar_excel(Request $request){
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
-        return Excel::download(new RemisionesExport($this->campos_consulta,$request->periodo), "remisiones-".$request->periodo.".xlsx");   
+        $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Remisiones', Auth::user()->id);
+        return Excel::download(new RemisionesExport($configuraciones_tabla['campos_consulta'],$request->periodo), "remisiones-".$request->periodo.".xlsx");   
     }
 
     //guardar configuracion tabla
@@ -1483,20 +1575,40 @@ class RemisionController extends ConfiguracionSistemaController{
         foreach($request->selectfiltrosbusquedas as $campofiltro){
             $selectmultiple = $selectmultiple.",".$campofiltro;
         }
-        Configuracion_Tabla::where('tabla', 'Remisiones')
-        ->update([
-            'campos_activados' => $request->string_datos_tabla_true,
-            'campos_desactivados' => $string_datos_tabla_false,
-            'columnas_ordenadas' => $request->string_datos_ordenamiento_columnas,
-            'usuario' => Auth::user()->user,
-            'primerordenamiento' => $request->selectorderby1,
-            'formaprimerordenamiento' => $request->deorderby1,
-            'segundoordenamiento' => $request->selectorderby2,
-            'formasegundoordenamiento' => $request->deorderby2,
-            'tercerordenamiento' => $request->selectorderby3,
-            'formatercerordenamiento' => $request->deorderby3,
-            'campos_busquedas' => substr($selectmultiple, 1),
-        ]);
+        $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Remisiones', Auth::user()->id);
+        if($configuraciones_tabla['contar_configuracion_tabla'] > 0){
+            Configuracion_Tabla::where('tabla', 'Remisiones')->where('IdUsuario', Auth::user()->id)
+            ->update([
+                'campos_activados' => $request->string_datos_tabla_true,
+                'campos_desactivados' => $string_datos_tabla_false,
+                'columnas_ordenadas' => $request->string_datos_ordenamiento_columnas,
+                'usuario' => Auth::user()->user,
+                'primerordenamiento' => $request->selectorderby1,
+                'formaprimerordenamiento' => $request->deorderby1,
+                'segundoordenamiento' => $request->selectorderby2,
+                'formasegundoordenamiento' => $request->deorderby2,
+                'tercerordenamiento' => $request->selectorderby3,
+                'formatercerordenamiento' => $request->deorderby3,
+                'campos_busquedas' => substr($selectmultiple, 1),
+            ]);
+        }else{
+            $Configuracion_Tabla=new Configuracion_Tabla;
+            $Configuracion_Tabla->tabla='Remisiones';
+            $Configuracion_Tabla->campos_activados = $request->string_datos_tabla_true;
+            $Configuracion_Tabla->campos_desactivados = $string_datos_tabla_false;
+            $Configuracion_Tabla->columnas_ordenadas = $request->string_datos_ordenamiento_columnas;
+            $Configuracion_Tabla->ordenar = 0;
+            $Configuracion_Tabla->usuario = Auth::user()->user;
+            $Configuracion_Tabla->campos_busquedas = substr($selectmultiple, 1);
+            $Configuracion_Tabla->primerordenamiento = $request->selectorderby1;
+            $Configuracion_Tabla->formaprimerordenamiento = $request->deorderby1;
+            $Configuracion_Tabla->segundoordenamiento =  $request->selectorderby2;
+            $Configuracion_Tabla->formasegundoordenamiento =  $request->deorderby2;
+            $Configuracion_Tabla->tercerordenamiento = $request->selectorderby3;
+            $Configuracion_Tabla->formatercerordenamiento = $request->deorderby3;
+            $Configuracion_Tabla->IdUsuario = Auth::user()->id;
+            $Configuracion_Tabla->save();
+        }
         return redirect()->route('remisiones');
     }
     

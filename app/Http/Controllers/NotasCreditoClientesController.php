@@ -45,26 +45,12 @@ use Mail;
 use Facturapi\Facturapi;
 use Storage;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
+use ZipArchive;
 
 class NotasCreditoClientesController extends ConfiguracionSistemaController{
 
     public function __construct(){
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
-        //CONFIGURACIONES DE LA TABLA DEL CATALOGO O MODULO//
-        $this->configuracion_tabla = Configuracion_Tabla::where('tabla', 'NotasCreditoCliente')->first();
-        $this->campos_consulta = [];
-        foreach (explode(",", $this->configuracion_tabla->columnas_ordenadas) as $campo){
-            array_push($this->campos_consulta, $campo);
-        }
-        //campos vista
-        $this->camposvista = [];
-        foreach (explode(",", $this->configuracion_tabla->campos_activados) as $campo){
-            array_push($this->camposvista, $campo);
-        }
-        foreach (explode(",", $this->configuracion_tabla->campos_desactivados) as $campo){
-            array_push($this->camposvista, $campo);
-        }
-        //FIN CONFIGURACIONES DE LA TABLA//
         //API FACTURAPI 
         $this->facturapi = new Facturapi( config('app.keyfacturapi') ); //
     }
@@ -80,7 +66,8 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $serieusuario = $FolioComprobanteNota->Serie;
             $esquema = $FolioComprobanteNota->Esquema;
         }
-        $configuracion_tabla = $this->configuracion_tabla;
+        $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('NotasCreditoCliente', Auth::user()->id);
+        $configuracion_tabla = $configuraciones_tabla['configuracion_tabla'];
         $rutaconfiguraciontabla = route('notas_credito_clientes_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('notas_credito_clientes_exportar_excel');
         $rutacreardocumento = route('notas_credito_clientes_generar_pdfs');
@@ -97,21 +84,21 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
 
     public function notas_credito_clientes_obtener(Request $request){
         if($request->ajax()){
+            $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('NotasCreditoCliente', Auth::user()->id);
             $fechahoy = Carbon::now()->toDateString();
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            //$data = VistaNotaCreditoCliente::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->orderBy('Serie', 'ASC')->orderBy('Folio', 'DESC')->get();
-            $data = VistaNotaCreditoCliente::select($this->campos_consulta)->where('Periodo', $periodo);
+            $data = VistaNotaCreditoCliente::select($configuraciones_tabla['campos_consulta'])->where('Periodo', $periodo);
             return DataTables::of($data)
-                    ->order(function ($query) {
-                        if($this->configuracion_tabla->primerordenamiento != 'omitir'){
-                            $query->orderBy($this->configuracion_tabla->primerordenamiento, '' . $this->configuracion_tabla->formaprimerordenamiento . '');
+                    ->order(function ($query) use($configuraciones_tabla) {
+                        if($configuraciones_tabla['configuracion_tabla']->primerordenamiento != 'omitir'){
+                            $query->orderBy($configuraciones_tabla['configuracion_tabla']->primerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formaprimerordenamiento . '');
                         }
-                        if($this->configuracion_tabla->segundoordenamiento != 'omitir'){
-                            $query->orderBy($this->configuracion_tabla->segundoordenamiento, '' . $this->configuracion_tabla->formasegundoordenamiento . '');
+                        if($configuraciones_tabla['configuracion_tabla']->segundoordenamiento != 'omitir'){
+                            $query->orderBy($configuraciones_tabla['configuracion_tabla']->segundoordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formasegundoordenamiento . '');
                         }
-                        if($this->configuracion_tabla->tercerordenamiento != 'omitir'){
-                            $query->orderBy($this->configuracion_tabla->tercerordenamiento, '' . $this->configuracion_tabla->formatercerordenamiento . '');
+                        if($configuraciones_tabla['configuracion_tabla']->tercerordenamiento != 'omitir'){
+                            $query->orderBy($configuraciones_tabla['configuracion_tabla']->tercerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formatercerordenamiento . '');
                         }
                     })
                     ->addColumn('operaciones', function($data){
@@ -124,8 +111,8 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                                                 '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Nota .'\')">Bajas</a></li>'.
                                                 '<li><a href="'.route('notas_credito_clientes_generar_pdfs_indiv',$data->Nota).'" target="_blank">Ver Documento PDF</a></li>'.
                                                 '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Nota .'\')">Enviar Documento por Correo</a></li>'.
-                                                //'<li><a href="javascript:void(0);" onclick="timbrarnota(\''.$data->Nota .'\')">Timbrar Nota</a></li>'.
-                                                //'<li><a href="javascript:void(0);" onclick="cancelartimbre(\''.$data->Nota .'\')">Cancelar Timbre</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="timbrarnota(\''.$data->Nota .'\')">Timbrar Nota</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="cancelartimbre(\''.$data->Nota .'\')">Cancelar Timbre</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;
@@ -1550,6 +1537,10 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
     public function notas_credito_clientes_generar_pdfs(Request $request){
         //primero eliminar todos los archivos de la carpeta
         Helpers::eliminararchivospdfsgenerados();
+        //primero eliminar todos los archivos xml generados
+        Helpers::eliminararchivosxmlsgenerados();
+        //primero eliminar todos los archivos zip
+        Helpers::eliminararchivoszipgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
             $notascreditocliente = NotaCliente::whereIn('Nota', $request->arraypdf)->orderBy('Folio', 'ASC')->take(250)->get(); 
@@ -1560,6 +1551,8 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $notascreditocliente = NotaCliente::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(250)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $arrayfiles = array();
+        $arrayfilespdf = array();
         foreach ($notascreditocliente as $ncc){
             $data=array();
             $notascreditoclientedetalle = NotaClienteDetalle::where('Nota', $ncc->Nota)->get();
@@ -1581,6 +1574,17 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                     "claveunidad" => $claveunidad
                 );
             } 
+            //obtener XML
+            if($request->descargar_xml == 1){
+                $factura = NotaCliente::where('Nota', $ncc->Nota)->first();
+                $comprobante = Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->where('IdFacturapi', '<>', NULL)->first();
+                if($comprobante != null){
+                    $descargar_xml = $this->facturapi->Invoices->download_xml($comprobante->IdFacturapi); // stream containing the XML file or
+                    $nombre_xml = "NotaCreditoClienteNo".$ncc->Pago.'##'.$ncc->UUID.'.xml';
+                    Storage::disk('local2')->put($nombre_xml, $descargar_xml);
+                    array_push($arrayfiles, $nombre_xml);
+                }
+            }
             $cliente = Cliente::where('Numero', $ncc->Cliente)->first();
             $formapago = FormaPago::where('Clave', $ncc->FormaPago)->first();
             $metodopago = MetodoPago::where('Clave', $ncc->MetodoPago)->first();
@@ -1630,9 +1634,39 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $ArchivoPDF = "PDF".$notcc->Nota.".pdf";
             $urlarchivo = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
             $pdfMerger->addPDF($urlarchivo, 'all');
+            array_push($arrayfilespdf,$ArchivoPDF);
         }
         $pdfMerger->merge(); //unirlos
-        $pdfMerger->save("NotasCreditoCliente.pdf", "browser");//mostrarlos en el navegador
+        if($request->descargar_xml == 0){
+            $pdfMerger->save("NotasCreditoCliente.pdf", "browser");//mostrarlos en el navegador
+        }else{
+            //carpeta donde se guardara el archivo zip
+            $public_dir=public_path();
+            // Zip File Name
+            $zipFileName = 'NotasCreditoClientes.zip';
+            // Crear Objeto ZipArchive
+            $zip = new ZipArchive;
+            if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
+                // Agregar archivos que se comprimiran
+                foreach($arrayfiles as $af) {
+                    $zip->addFile(Storage::disk('local2')->getAdapter()->applyPathPrefix($af),$af);
+                }  
+                foreach($arrayfilespdf as $afp) {
+                    $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
+                }     
+                //terminar proceso   
+                $zip->close();
+            }
+            // Set Encabezados para descargar
+            $headers = array(
+                'Content-Type' => 'application/octet-stream',
+            );
+            $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
+            // Create Download Response
+            if(file_exists($filetopath)){
+                return response()->download($filetopath,$zipFileName,$headers);
+            }
+        }
     }
 
     //generacion de formato en PDF
@@ -1965,7 +1999,8 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
     public function notas_credito_clientes_exportar_excel(Request $request){
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
-        return Excel::download(new NotasCreditoClientesExport($this->campos_consulta,$request->periodo), "notascreditoclientes-".$request->periodo.".xlsx");   
+        $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('NotasCreditoCliente', Auth::user()->id);
+        return Excel::download(new NotasCreditoClientesExport($configuraciones_tabla['campos_consulta'],$request->periodo), "notascreditoclientes-".$request->periodo.".xlsx");   
     }
     //configuracion tabla
     public function notas_credito_clientes_guardar_configuracion_tabla(Request $request){
@@ -1978,20 +2013,40 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
         foreach($request->selectfiltrosbusquedas as $campofiltro){
             $selectmultiple = $selectmultiple.",".$campofiltro;
         }
-        Configuracion_Tabla::where('tabla', 'NotasCreditoCliente')
-        ->update([
-            'campos_activados' => $request->string_datos_tabla_true,
-            'campos_desactivados' => $string_datos_tabla_false,
-            'columnas_ordenadas' => $request->string_datos_ordenamiento_columnas,
-            'usuario' => Auth::user()->user,
-            'primerordenamiento' => $request->selectorderby1,
-            'formaprimerordenamiento' => $request->deorderby1,
-            'segundoordenamiento' => $request->selectorderby2,
-            'formasegundoordenamiento' => $request->deorderby2,
-            'tercerordenamiento' => $request->selectorderby3,
-            'formatercerordenamiento' => $request->deorderby3,
-            'campos_busquedas' => substr($selectmultiple, 1),
-        ]);
+        $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('NotasCreditoCliente', Auth::user()->id);
+        if($configuraciones_tabla['contar_configuracion_tabla'] > 0){
+            Configuracion_Tabla::where('tabla', 'NotasCreditoCliente')->where('IdUsuario', Auth::user()->id)
+            ->update([
+                'campos_activados' => $request->string_datos_tabla_true,
+                'campos_desactivados' => $string_datos_tabla_false,
+                'columnas_ordenadas' => $request->string_datos_ordenamiento_columnas,
+                'usuario' => Auth::user()->user,
+                'primerordenamiento' => $request->selectorderby1,
+                'formaprimerordenamiento' => $request->deorderby1,
+                'segundoordenamiento' => $request->selectorderby2,
+                'formasegundoordenamiento' => $request->deorderby2,
+                'tercerordenamiento' => $request->selectorderby3,
+                'formatercerordenamiento' => $request->deorderby3,
+                'campos_busquedas' => substr($selectmultiple, 1),
+            ]);
+        }else{
+            $Configuracion_Tabla=new Configuracion_Tabla;
+            $Configuracion_Tabla->tabla='NotasCreditoCliente';
+            $Configuracion_Tabla->campos_activados = $request->string_datos_tabla_true;
+            $Configuracion_Tabla->campos_desactivados = $string_datos_tabla_false;
+            $Configuracion_Tabla->columnas_ordenadas = $request->string_datos_ordenamiento_columnas;
+            $Configuracion_Tabla->ordenar = 0;
+            $Configuracion_Tabla->usuario = Auth::user()->user;
+            $Configuracion_Tabla->campos_busquedas = substr($selectmultiple, 1);
+            $Configuracion_Tabla->primerordenamiento = $request->selectorderby1;
+            $Configuracion_Tabla->formaprimerordenamiento = $request->deorderby1;
+            $Configuracion_Tabla->segundoordenamiento =  $request->selectorderby2;
+            $Configuracion_Tabla->formasegundoordenamiento =  $request->deorderby2;
+            $Configuracion_Tabla->tercerordenamiento = $request->selectorderby3;
+            $Configuracion_Tabla->formatercerordenamiento = $request->deorderby3;
+            $Configuracion_Tabla->IdUsuario = Auth::user()->id;
+            $Configuracion_Tabla->save();
+        }
         return redirect()->route('notas_credito_clientes');
     }
     //verificar si se puede timbrar la factura

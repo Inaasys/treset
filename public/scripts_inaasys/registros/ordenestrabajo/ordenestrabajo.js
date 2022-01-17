@@ -1777,7 +1777,7 @@ function alta(){
                     '</div>'+
                     '<div class="col-md-2">'+
                       '<label>Bahia</label>'+
-                      '<input type="text" class="form-control inputnexttabes" name="bahia" id="bahia"  required  onkeyup="tipoLetra(this);" data-parsley-type="number"	autocomplete="off">'+
+                      '<input type="text" class="form-control inputnexttabes" name="bahia" id="bahia"  onkeyup="tipoLetra(this);" data-parsley-type="number"	autocomplete="off">'+
                     '</div>'+
                     '<div class="col-md-2" >'+
                       '<label>Horas Reales</label>'+
@@ -2434,7 +2434,7 @@ function obtenerdatos(ordenmodificar){
                       '</div>'+
                       '<div class="col-md-2">'+
                         '<label>Bahia</label>'+
-                        '<input type="text" class="form-control inputnexttabes" name="bahia" id="bahia"  required  onkeyup="tipoLetra(this);" autocomplete="off">'+
+                        '<input type="text" class="form-control inputnexttabes" name="bahia" id="bahia"  onkeyup="tipoLetra(this);" autocomplete="off">'+
                       '</div>'+
                       '<div class="col-md-2" >'+
                         '<label>Horas Reales</label>'+

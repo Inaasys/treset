@@ -23,11 +23,13 @@ use App\OrdenCompraDetalle;
 use App\Proveedor;
 use App\Producto;
 use App\Marca;
+use App\Existencia;
 use Mail;
 use App\Configuracion_Tabla;
 use App\Imports\CatalogoSATc_ClaveProdServCPImport;
 use App\Imports\CatalogosSATImport;
 use App\Exports\ProductosActivosMigrarNuevaBaseExport;
+use App\Exports\ProductosActivosMigrarExistenciasNuevaBaseExport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class PruebaController extends ConfiguracionSistemaController{
@@ -420,13 +422,13 @@ class PruebaController extends ConfiguracionSistemaController{
     //funcion para  obtener datos de producto en base
     public function obtener_datos_catalogo_productos_por_codigo(Request $request){
         //CATALOGO  PRODUCTOS 
-        $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('codigos_utilizados.xlsx'));
+        //$arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('codigosconmovimientos.xlsx'));
+        $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('codigossinmovimientos.xlsx'));
         $partidasexcel = $arrayexcel[0];
         $rowexcel = 0;
         $numerofila = 1;
         $arraydatos = array();
         foreach($partidasexcel as $partida){
-            if($rowexcel > 1){
                 $datosproducto = Producto::where('Codigo', ''.$partida[1].'')->count();
                 if($datosproducto > 0){
                     $producto = Producto::where('Codigo', ''.$partida[1].'')->first();
@@ -454,16 +456,47 @@ class PruebaController extends ConfiguracionSistemaController{
                         "costoventa" => $producto->CostoDeVenta,
                         "precio1" => $producto->Precio1
                     );
+                }else{
+                    $nuevocodigo = '0'.$partida[1];
+                    $datosnuevoproducto = Producto::where('Codigo', ''.$nuevocodigo.'')->count();
+                    if($datosnuevoproducto > 0){
+                        $producto = Producto::where('Codigo', ''.$nuevocodigo.'')->first();
+                        $arraydatos[] = array(
+                            "insumo" => $partida[0],
+                            "codigo" => $partida[1], 
+                            "claveproducto" => $producto->ClaveProducto,
+                            "claveunidad" => $producto->ClaveUnidad, 
+                            "descripcion" => $producto->Producto,
+                            "unidad" => $producto->Unidad,
+                            "marca" => $producto->Marca,
+                            "linea" => $producto->Linea,
+                            "impuesto" => $producto->Impuesto,
+                            "ubicacion" => $producto->Ubicacion,
+                            "tipoprod" => $producto->TipoProd,
+                            "costo" => $producto->Costo,
+                            "precio" => $producto->Precio,
+                            "utilidad" => $producto->Utilidad,
+                            "subtotal" => $producto->SubTotal,
+                            "iva" => $producto->Iva,
+                            "total" => $producto->Total,
+                            "status" => $producto->Status,
+                            "costolista" => $producto->CostoDeLista,
+                            "moneda" => $producto->Moneda,
+                            "costoventa" => $producto->CostoDeVenta,
+                            "precio1" => $producto->Precio1
+                        );
+                    }
                 }
-            }
             $rowexcel++;
         }
-        return Excel::download(new ProductosActivosMigrarNuevaBaseExport($arraydatos), "productosamigrar.xlsx");   
+        //return Excel::download(new ProductosActivosMigrarNuevaBaseExport($arraydatos), "productosconmovimientosamigrar.xlsx");   
+        return Excel::download(new ProductosActivosMigrarNuevaBaseExport($arraydatos), "productossinmovimientosamigrar.xlsx");   
     }
 
     //migrar los productos que solo se utilizan a base nueva
     public function migrar_productos_utilizados_base_nueva(Request $request){
-        $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('productosamigrar.xls'));
+        //$arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('productosconmovimientosamigrar.xlsx'));
+        $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('productossinmovimientosamigrar.xlsx'));
         $partidasexcel = $arrayexcel[0];
         $rowexcel = 0;
         $numerofila = 1;
@@ -501,6 +534,75 @@ class PruebaController extends ConfiguracionSistemaController{
             $rowexcel++;
         }
         return response()->json($rowexcel); 
+    }
+
+    //obtener existencias actuales producto y almacen y generar excel para cargar ajuste
+    public function obtener_existencias_por_codigo_y_almacen_generar_excel_ajuste(Request $request){
+        //CATALOGO  PRODUCTOS 
+        //$arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('codigosconmovimientos.xlsx'));
+        $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('codigossinmovimientos.xlsx'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        $arraydatos = array();
+        $numeroalmacen = 1;
+        foreach($partidasexcel as $partida){
+                $existenciasproducto = Existencia::where('Codigo', ''.$partida[1].'')->where('Almacen', $numeroalmacen)->count();
+                if($existenciasproducto > 0){
+                    $existencias = Existencia::where('Codigo', ''.$partida[1].'')->where('Almacen', $numeroalmacen)->first();
+                    $arraydatos[] = array(
+                        "codigo" => $partida[1], 
+                        "entradas" => $existencias->Existencias,
+                        "salidas" => '0.000000', 
+                    );
+                }else{
+                    $nuevocodigo = '0'.$partida[1];
+                    $existenciasproducto = Existencia::where('Codigo', ''.$nuevocodigo.'')->where('Almacen', $numeroalmacen)->count();
+                    if($existenciasproducto > 0){
+                        $existencias = Existencia::where('Codigo', ''.$nuevocodigo.'')->where('Almacen', $numeroalmacen)->first();
+                        $arraydatos[] = array(
+                            "codigo" => $partida[1], 
+                            "entradas" => $existencias->Existencias,
+                            "salidas" => '0.000000',
+                        );
+                    }
+                }
+            $rowexcel++;
+        }
+        return Excel::download(new ProductosActivosMigrarExistenciasNuevaBaseExport($arraydatos), "plantillaajustesmisgrarexistenciasbaseproduccion.xlsx");   
+
+    }
+    
+    public function comparar_existencias_vs_ajuste(Request $request){
+        $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('ajusteconmov.xlsx'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        $arraydatos = array();
+        $numeroalmacen = 1;
+        $existenciasdiferentes = array();
+        foreach($partidasexcel as $partida){
+                $existenciasproducto = Existencia::where('Codigo', ''.$partida[0].'')->where('Almacen', $numeroalmacen)->count();
+                if($existenciasproducto > 0){
+                    $existencias = Existencia::where('Codigo', ''.$partida[0].'')->where('Almacen', $numeroalmacen)->first();
+                    if($partida[1] != $existencias->Existencias){
+                        array_push($existenciasdiferentes, $existencias->Existencias);
+                    }
+                }else{
+                    $nuevocodigo = '0'.$partida[0];
+                    $existenciasproducto = Existencia::where('Codigo', ''.$nuevocodigo.'')->where('Almacen', $numeroalmacen)->count();
+                    if($existenciasproducto > 0){
+                        $existencias = Existencia::where('Codigo', ''.$nuevocodigo.'')->where('Almacen', $numeroalmacen)->first();
+                        if($partida[1] != $existencias->Existencias){
+                            array_push($existenciasdiferentes, $existencias->Existencias);
+                        }
+                    }
+                }
+            $rowexcel++;
+        }
+        dd($existenciasdiferentes);
+        //return Excel::download(new ProductosActivosMigrarExistenciasNuevaBaseExport($arraydatos), "plantillaajustesmisgrarexistenciasbaseproduccion.xlsx");   
+
     }
 
     public function asignar_valores_por_defecto_busquedas_y_ordenamiento(){
@@ -825,6 +927,16 @@ class PruebaController extends ConfiguracionSistemaController{
             'campos_activados'=>'Remision,Serie,Folio,Fecha,Status,Cliente,NombreCliente,Pedido,Os,Eq,SerieRq,Rq,Agente,NombreAgente,Tipo,Almacen,NombreAlmacen,SubTotal,Iva,Total,Equipo,Usuario,MotivoBaja,Periodo',
             'campos_desactivados'=>'Referencia,Plazo,Unidad,Solicita,Destino,TeleMarketing,Importe,Descuento,Costo,Comision,Utilidad,FormaPago,Obs,TipoCambio,Hora,Facturada,Corte,SuPago,EnEfectivo,EnTarjetas,EnVales,EnCheque,Lugar,Personas',
             'columnas_ordenadas'=>'Remision,Serie,Folio,Fecha,Status,Cliente,NombreCliente,Pedido,Os,Eq,SerieRq,Rq,Agente,NombreAgente,Tipo,Almacen,NombreAlmacen,SubTotal,Iva,Total,Equipo,Usuario,MotivoBaja,Periodo',
+        ]);
+    }
+
+    public function modificar_valores_en_bd_para_actualizacion_rama20220109correciones(){
+        //Configuracion columnas tabla cotizaciones_t       
+        Configuracion_Tabla::where('tabla', 'cotizaciones_t')
+        ->update([
+            'campos_activados'=>'id,cotizacion,fecha,subtotal,iva,total,status,periodo',
+            'campos_desactivados'=>'motivo_baja,equipo,usuario,serie',
+            'columnas_ordenadas'=>'id,cotizacion,fecha,subtotal,iva,total,status,periodo',
         ]);
     }
 

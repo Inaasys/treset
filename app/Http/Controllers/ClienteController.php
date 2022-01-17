@@ -31,43 +31,29 @@ class ClienteController extends ConfiguracionSistemaController{
 
     public function __construct(){
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
-        //CONFIGURACIONES DE LA TABLA DEL CATALOGO O MODULO//
-        $this->configuracion_tabla = Configuracion_Tabla::where('tabla', 'Clientes')->first();
-        $this->campos_consulta = [];
-        foreach (explode(",", $this->configuracion_tabla->columnas_ordenadas) as $campo){
-            array_push($this->campos_consulta, $campo);
-        }
-        //campos vista
-        $this->camposvista = [];
-        foreach (explode(",", $this->configuracion_tabla->campos_activados) as $campo){
-            array_push($this->camposvista, $campo);
-        }
-        foreach (explode(",", $this->configuracion_tabla->campos_desactivados) as $campo){
-            array_push($this->camposvista, $campo);
-        }
-        //FIN CONFIGURACIONES DE LA TABLA//
     }
 
     public function clientes(){
-        $configuracion_tabla = $this->configuracion_tabla;
+        $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Clientes', Auth::user()->id);
+        $configuracion_tabla = $configuraciones_tabla['configuracion_tabla'];
         $rutaconfiguraciontabla = route('clientes_guardar_configuracion_tabla');
         return view('catalogos.clientes.clientes', compact('configuracion_tabla','rutaconfiguraciontabla'));
     }
     //obtener todos los registros
     public function clientes_obtener(Request $request){
         if($request->ajax()){
-            //$data = VistaCliente::select($this->campos_consulta)->orderBy('Numero', 'DESC')->get();
-            $data = VistaCliente::select($this->campos_consulta);
+            $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Clientes', Auth::user()->id);
+            $data = VistaCliente::select($configuraciones_tabla['campos_consulta']);
             return DataTables::of($data)
-                    ->order(function ($query) {
-                        if($this->configuracion_tabla->primerordenamiento != 'omitir'){
-                            $query->orderBy($this->configuracion_tabla->primerordenamiento, '' . $this->configuracion_tabla->formaprimerordenamiento . '');
+                    ->order(function ($query) use($configuraciones_tabla) {
+                        if($configuraciones_tabla['configuracion_tabla']->primerordenamiento != 'omitir'){
+                            $query->orderBy($configuraciones_tabla['configuracion_tabla']->primerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formaprimerordenamiento . '');
                         }
-                        if($this->configuracion_tabla->segundoordenamiento != 'omitir'){
-                            $query->orderBy($this->configuracion_tabla->segundoordenamiento, '' . $this->configuracion_tabla->formasegundoordenamiento . '');
+                        if($configuraciones_tabla['configuracion_tabla']->segundoordenamiento != 'omitir'){
+                            $query->orderBy($configuraciones_tabla['configuracion_tabla']->segundoordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formasegundoordenamiento . '');
                         }
-                        if($this->configuracion_tabla->tercerordenamiento != 'omitir'){
-                            $query->orderBy($this->configuracion_tabla->tercerordenamiento, '' . $this->configuracion_tabla->formatercerordenamiento . '');
+                        if($configuraciones_tabla['configuracion_tabla']->tercerordenamiento != 'omitir'){
+                            $query->orderBy($configuraciones_tabla['configuracion_tabla']->tercerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formatercerordenamiento . '');
                         }
                     })
                     ->addColumn('operaciones', function($data){
@@ -603,7 +589,8 @@ class ClienteController extends ConfiguracionSistemaController{
     public function clientes_exportar_excel(){
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
-        return Excel::download(new ClientesExport($this->campos_consulta), "clientes.xlsx");        
+        $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Clientes', Auth::user()->id);
+        return Excel::download(new ClientesExport($configuraciones_tabla['campos_consulta']), "clientes.xlsx");        
     }
     //guardar configuracion tabla
     public function clientes_guardar_configuracion_tabla(Request $request){
@@ -616,20 +603,40 @@ class ClienteController extends ConfiguracionSistemaController{
         foreach($request->selectfiltrosbusquedas as $campofiltro){
             $selectmultiple = $selectmultiple.",".$campofiltro;
         }
-        Configuracion_Tabla::where('tabla', 'Clientes')
-        ->update([
-            'campos_activados' => $request->string_datos_tabla_true,
-            'campos_desactivados' => $string_datos_tabla_false,
-            'columnas_ordenadas' => $request->string_datos_ordenamiento_columnas,
-            'usuario' => Auth::user()->user,
-            'primerordenamiento' => $request->selectorderby1,
-            'formaprimerordenamiento' => $request->deorderby1,
-            'segundoordenamiento' => $request->selectorderby2,
-            'formasegundoordenamiento' => $request->deorderby2,
-            'tercerordenamiento' => $request->selectorderby3,
-            'formatercerordenamiento' => $request->deorderby3,
-            'campos_busquedas' => substr($selectmultiple, 1),
-        ]);
+        $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Clientes', Auth::user()->id);
+        if($configuraciones_tabla['contar_configuracion_tabla'] > 0){
+            Configuracion_Tabla::where('tabla', 'Clientes')->where('IdUsuario', Auth::user()->id)
+            ->update([
+                'campos_activados' => $request->string_datos_tabla_true,
+                'campos_desactivados' => $string_datos_tabla_false,
+                'columnas_ordenadas' => $request->string_datos_ordenamiento_columnas,
+                'usuario' => Auth::user()->user,
+                'primerordenamiento' => $request->selectorderby1,
+                'formaprimerordenamiento' => $request->deorderby1,
+                'segundoordenamiento' => $request->selectorderby2,
+                'formasegundoordenamiento' => $request->deorderby2,
+                'tercerordenamiento' => $request->selectorderby3,
+                'formatercerordenamiento' => $request->deorderby3,
+                'campos_busquedas' => substr($selectmultiple, 1),
+            ]);
+        }else{
+            $Configuracion_Tabla=new Configuracion_Tabla;
+            $Configuracion_Tabla->tabla='Clientes';
+            $Configuracion_Tabla->campos_activados = $request->string_datos_tabla_true;
+            $Configuracion_Tabla->campos_desactivados = $string_datos_tabla_false;
+            $Configuracion_Tabla->columnas_ordenadas = $request->string_datos_ordenamiento_columnas;
+            $Configuracion_Tabla->ordenar = 0;
+            $Configuracion_Tabla->usuario = Auth::user()->user;
+            $Configuracion_Tabla->campos_busquedas = substr($selectmultiple, 1);
+            $Configuracion_Tabla->primerordenamiento = $request->selectorderby1;
+            $Configuracion_Tabla->formaprimerordenamiento = $request->deorderby1;
+            $Configuracion_Tabla->segundoordenamiento =  $request->selectorderby2;
+            $Configuracion_Tabla->formasegundoordenamiento =  $request->deorderby2;
+            $Configuracion_Tabla->tercerordenamiento = $request->selectorderby3;
+            $Configuracion_Tabla->formatercerordenamiento = $request->deorderby3;
+            $Configuracion_Tabla->IdUsuario = Auth::user()->id;
+            $Configuracion_Tabla->save();
+        }
         return redirect()->route('clientes');
     }
 }

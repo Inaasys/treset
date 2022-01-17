@@ -22,5 +22,6 @@ class Configuracion_Tabla extends Model
         'formasegundoordenamiento',
         'tercerordenamiento',
         'formatercerordenamiento',
+        'IdUsuario'
     ];
 }

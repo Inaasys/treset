@@ -45,26 +45,12 @@ class RequisicionController extends ConfiguracionSistemaController{
 
     public function __construct(){
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
-        //CONFIGURACIONES DE LA TABLA DEL CATALOGO O MODULO//
-        $this->configuracion_tabla = Configuracion_Tabla::where('tabla', 'Requisiciones')->first();
-        $this->campos_consulta = [];
-        foreach (explode(",", $this->configuracion_tabla->columnas_ordenadas) as $campo){
-            array_push($this->campos_consulta, $campo);
-        }
-        //campos vista
-        $this->camposvista = [];
-        foreach (explode(",", $this->configuracion_tabla->campos_activados) as $campo){
-            array_push($this->camposvista, $campo);
-        }
-        foreach (explode(",", $this->configuracion_tabla->campos_desactivados) as $campo){
-            array_push($this->camposvista, $campo);
-        }
-        //FIN CONFIGURACIONES DE LA TABLA//
     }
 
     public function requisiciones(){
         $serieusuario = 'A';
-        $configuracion_tabla = $this->configuracion_tabla;
+        $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Requisiciones', Auth::user()->id);
+        $configuracion_tabla = $configuraciones_tabla['configuracion_tabla'];
         $rutaconfiguraciontabla = route('requisiciones_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('requisiciones_exportar_excel');
         $rutacreardocumento = route('requisiciones_generar_pdfs');
@@ -75,18 +61,19 @@ class RequisicionController extends ConfiguracionSistemaController{
 
     public function requisiciones_obtener(Request $request){
         if($request->ajax()){
+            $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Requisiciones', Auth::user()->id);
             $periodo = $request->periodo;
-            $data = VistaRequisicion::select($this->campos_consulta)->where('periodo', $periodo);
+            $data = VistaRequisicion::select($configuraciones_tabla['campos_consulta'])->where('periodo', $periodo);
             return DataTables::of($data)
-                    ->order(function ($query){
-                        if($this->configuracion_tabla->primerordenamiento != 'omitir'){
-                            $query->orderBy($this->configuracion_tabla->primerordenamiento, '' . $this->configuracion_tabla->formaprimerordenamiento . '');
+                    ->order(function ($query) use($configuraciones_tabla) {
+                        if($configuraciones_tabla['configuracion_tabla']->primerordenamiento != 'omitir'){
+                            $query->orderBy($configuraciones_tabla['configuracion_tabla']->primerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formaprimerordenamiento . '');
                         }
-                        if($this->configuracion_tabla->segundoordenamiento != 'omitir'){
-                            $query->orderBy($this->configuracion_tabla->segundoordenamiento, '' . $this->configuracion_tabla->formasegundoordenamiento . '');
+                        if($configuraciones_tabla['configuracion_tabla']->segundoordenamiento != 'omitir'){
+                            $query->orderBy($configuraciones_tabla['configuracion_tabla']->segundoordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formasegundoordenamiento . '');
                         }
-                        if($this->configuracion_tabla->tercerordenamiento != 'omitir'){
-                            $query->orderBy($this->configuracion_tabla->tercerordenamiento, '' . $this->configuracion_tabla->formatercerordenamiento . '');
+                        if($configuraciones_tabla['configuracion_tabla']->tercerordenamiento != 'omitir'){
+                            $query->orderBy($configuraciones_tabla['configuracion_tabla']->tercerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formatercerordenamiento . '');
                         }
                     })
                     ->addColumn('operaciones', function($data){
@@ -1013,7 +1000,8 @@ class RequisicionController extends ConfiguracionSistemaController{
     public function requisiciones_exportar_excel(Request $request){
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
-        return Excel::download(new RequisicionesExport($this->campos_consulta,$request->periodo), "requisciones-".$request->periodo.".xlsx");   
+        $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Requisiciones', Auth::user()->id);
+        return Excel::download(new RequisicionesExport($configuraciones_tabla['campos_consulta'],$request->periodo), "requisciones-".$request->periodo.".xlsx");   
     }
     //guardar configuracion tabla
     public function requisiciones_guardar_configuracion_tabla(Request $request){
@@ -1026,20 +1014,40 @@ class RequisicionController extends ConfiguracionSistemaController{
         foreach($request->selectfiltrosbusquedas as $campofiltro){
             $selectmultiple = $selectmultiple.",".$campofiltro;
         }
-        Configuracion_Tabla::where('tabla', 'Requisiciones')
-        ->update([
-            'campos_activados' => $request->string_datos_tabla_true,
-            'campos_desactivados' => $string_datos_tabla_false,
-            'columnas_ordenadas' => $request->string_datos_ordenamiento_columnas,
-            'usuario' => Auth::user()->user,
-            'primerordenamiento' => $request->selectorderby1,
-            'formaprimerordenamiento' => $request->deorderby1,
-            'segundoordenamiento' => $request->selectorderby2,
-            'formasegundoordenamiento' => $request->deorderby2,
-            'tercerordenamiento' => $request->selectorderby3,
-            'formatercerordenamiento' => $request->deorderby3,
-            'campos_busquedas' => substr($selectmultiple, 1),
-        ]);
+        $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Requisiciones', Auth::user()->id);
+        if($configuraciones_tabla['contar_configuracion_tabla'] > 0){
+            Configuracion_Tabla::where('tabla', 'Requisiciones')->where('IdUsuario', Auth::user()->id)
+            ->update([
+                'campos_activados' => $request->string_datos_tabla_true,
+                'campos_desactivados' => $string_datos_tabla_false,
+                'columnas_ordenadas' => $request->string_datos_ordenamiento_columnas,
+                'usuario' => Auth::user()->user,
+                'primerordenamiento' => $request->selectorderby1,
+                'formaprimerordenamiento' => $request->deorderby1,
+                'segundoordenamiento' => $request->selectorderby2,
+                'formasegundoordenamiento' => $request->deorderby2,
+                'tercerordenamiento' => $request->selectorderby3,
+                'formatercerordenamiento' => $request->deorderby3,
+                'campos_busquedas' => substr($selectmultiple, 1),
+            ]);
+        }else{
+            $Configuracion_Tabla=new Configuracion_Tabla;
+            $Configuracion_Tabla->tabla='Requisiciones';
+            $Configuracion_Tabla->campos_activados = $request->string_datos_tabla_true;
+            $Configuracion_Tabla->campos_desactivados = $string_datos_tabla_false;
+            $Configuracion_Tabla->columnas_ordenadas = $request->string_datos_ordenamiento_columnas;
+            $Configuracion_Tabla->ordenar = 0;
+            $Configuracion_Tabla->usuario = Auth::user()->user;
+            $Configuracion_Tabla->campos_busquedas = substr($selectmultiple, 1);
+            $Configuracion_Tabla->primerordenamiento = $request->selectorderby1;
+            $Configuracion_Tabla->formaprimerordenamiento = $request->deorderby1;
+            $Configuracion_Tabla->segundoordenamiento =  $request->selectorderby2;
+            $Configuracion_Tabla->formasegundoordenamiento =  $request->deorderby2;
+            $Configuracion_Tabla->tercerordenamiento = $request->selectorderby3;
+            $Configuracion_Tabla->formatercerordenamiento = $request->deorderby3;
+            $Configuracion_Tabla->IdUsuario = Auth::user()->id;
+            $Configuracion_Tabla->save();
+        }
         return redirect()->route('requisiciones');
     }
 }

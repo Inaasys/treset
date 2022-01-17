@@ -56,33 +56,18 @@ use Mail;
 use Facturapi\Facturapi;
 use Storage;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
+use ZipArchive;
 
 class FacturaController extends ConfiguracionSistemaController{
 
     public function __construct(){
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
-        //CONFIGURACIONES DE LA TABLA DEL CATALOGO O MODULO//
-        $this->configuracion_tabla = Configuracion_Tabla::where('tabla', 'Facturas')->first();
-        $this->campos_consulta = [];
-        foreach (explode(",", $this->configuracion_tabla->columnas_ordenadas) as $campo){
-            array_push($this->campos_consulta, $campo);
-        }
-        //campos vista
-        $this->camposvista = [];
-        foreach (explode(",", $this->configuracion_tabla->campos_activados) as $campo){
-            array_push($this->camposvista, $campo);
-        }
-        foreach (explode(",", $this->configuracion_tabla->campos_desactivados) as $campo){
-            array_push($this->camposvista, $campo);
-        }
-        //FIN CONFIGURACIONES DE LA TABLA//
         //API FACTURAPI 
         $this->facturapi = new Facturapi( config('app.keyfacturapi') ); //
 
     }
     
     public function facturas(){
-        //dd($this->regimenfiscal);
         $contarserieusuario = FolioComprobanteFactura::where('Predeterminar', '+')->count();
         if($contarserieusuario == 0){
             $FolioComprobanteFactura = FolioComprobanteFactura::orderBy('Numero','DESC')->take(1)->get();
@@ -95,7 +80,8 @@ class FacturaController extends ConfiguracionSistemaController{
             $esquema = $FolioComprobanteFactura->Esquema;
             $depto = $FolioComprobanteFactura->Depto;
         }
-        $configuracion_tabla = $this->configuracion_tabla;
+        $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Facturas', Auth::user()->id);
+        $configuracion_tabla = $configuraciones_tabla['configuracion_tabla'];
         $rutaconfiguraciontabla = route('facturas_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('facturas_exportar_excel');
         $rutacreardocumento = route('facturas_generar_pdfs');
@@ -113,21 +99,21 @@ class FacturaController extends ConfiguracionSistemaController{
 
     public function facturas_obtener(Request $request){
         if($request->ajax()){
+            $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Facturas', Auth::user()->id);
             $fechahoy = Carbon::now()->toDateString();
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            //$data = VistaFactura::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->OrderBy('Serie', 'ASC')->OrderBy('Folio', 'DESC')->get();
-            $data = VistaFactura::select($this->campos_consulta)->where('Periodo', $periodo);//la consulta es dos veces mas rapido
+            $data = VistaFactura::select($configuraciones_tabla['campos_consulta'])->where('Periodo', $periodo);//la consulta es dos veces mas rapido
             return DataTables::of($data)
-                    ->order(function ($query) {
-                        if($this->configuracion_tabla->primerordenamiento != 'omitir'){
-                            $query->orderBy($this->configuracion_tabla->primerordenamiento, '' . $this->configuracion_tabla->formaprimerordenamiento . '');
+                    ->order(function ($query) use($configuraciones_tabla) {
+                        if($configuraciones_tabla['configuracion_tabla']->primerordenamiento != 'omitir'){
+                            $query->orderBy($configuraciones_tabla['configuracion_tabla']->primerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formaprimerordenamiento . '');
                         }
-                        if($this->configuracion_tabla->segundoordenamiento != 'omitir'){
-                            $query->orderBy($this->configuracion_tabla->segundoordenamiento, '' . $this->configuracion_tabla->formasegundoordenamiento . '');
+                        if($configuraciones_tabla['configuracion_tabla']->segundoordenamiento != 'omitir'){
+                            $query->orderBy($configuraciones_tabla['configuracion_tabla']->segundoordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formasegundoordenamiento . '');
                         }
-                        if($this->configuracion_tabla->tercerordenamiento != 'omitir'){
-                            $query->orderBy($this->configuracion_tabla->tercerordenamiento, '' . $this->configuracion_tabla->formatercerordenamiento . '');
+                        if($configuraciones_tabla['configuracion_tabla']->tercerordenamiento != 'omitir'){
+                            $query->orderBy($configuraciones_tabla['configuracion_tabla']->tercerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formatercerordenamiento . '');
                         }
                     })
                     ->addColumn('operaciones', function($data){
@@ -143,8 +129,8 @@ class FacturaController extends ConfiguracionSistemaController{
                                                 '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Factura .'\',1)">Enviar Documento Interno por Correo</a></li>'.
                                                 '<li><a href="'.route('facturas_generar_pdfs_cliente_indiv',$data->Factura).'" target="_blank">Ver Documento Cliente PDF</a></li>'.
                                                 '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Factura .'\',0)">Enviar Documento Cliente por Correo</a></li>'.
-                                                //'<li><a href="javascript:void(0);" onclick="timbrarfactura(\''.$data->Factura .'\')">Timbrar Factura</a></li>'.
-                                                //'<li><a href="javascript:void(0);" onclick="cancelartimbre(\''.$data->Factura .'\')">Cancelar Timbre</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="timbrarfactura(\''.$data->Factura .'\')">Timbrar Factura</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="cancelartimbre(\''.$data->Factura .'\')">Cancelar Timbre</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;
@@ -2165,6 +2151,10 @@ class FacturaController extends ConfiguracionSistemaController{
     public function facturas_generar_pdfs(Request $request){
         //primero eliminar todos los archivos de la carpeta
         Helpers::eliminararchivospdfsgenerados();
+        //primero eliminar todos los archivos xml generados
+        Helpers::eliminararchivosxmlsgenerados();
+        //primero eliminar todos los archivos zip
+        Helpers::eliminararchivoszipgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
             $facturas = Factura::whereIn('Factura', $request->arraypdf)->orderBy('Folio', 'ASC')->take(250)->get(); 
@@ -2174,6 +2164,8 @@ class FacturaController extends ConfiguracionSistemaController{
             $facturas = Factura::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(250)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $arrayfiles = array();
+        $arrayfilespdf = array();
         foreach ($facturas as $f){
             $data=array();
             $facturadetalles = FacturaDetalle::where('Factura', $f->Factura)->get();
@@ -2243,6 +2235,17 @@ class FacturaController extends ConfiguracionSistemaController{
                                 );
                             }
                             break;
+                    }
+                    //obtener XML
+                    if($request->descargar_xml == 1){
+                        $factura = Factura::where('Factura', $f->Factura)->first();
+                        $comprobante = Comprobante::where('Comprobante', 'Factura')->where('Folio', '' . $f->Folio . '')->where('Serie', '' . $f->Serie . '')->where('IdFacturapi', '<>', NULL)->first();
+                        if($comprobante != null){
+                            $descargar_xml = $this->facturapi->Invoices->download_xml($comprobante->IdFacturapi); // stream containing the XML file or
+                            $nombre_xml = "FacturaNo".$f->Factura.'##'.$f->UUID.'.xml';
+                            Storage::disk('local2')->put($nombre_xml, $descargar_xml);
+                            array_push($arrayfiles, $nombre_xml);
+                        }
                     }
                     $datageneral[]=array(
                         "datosgenerales"=>$datosgenerales,
@@ -2343,11 +2346,40 @@ class FacturaController extends ConfiguracionSistemaController{
             $ArchivoPDF = "PDF".$fac->Factura.".pdf";
             $urlarchivo = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
             $pdfMerger->addPDF($urlarchivo, 'all');
+            array_push($arrayfilespdf,$ArchivoPDF);
         }
         $pdfMerger->merge(); //unirlos
-        $pdfMerger->save("Facturas.pdf", "browser");//mostrarlos en el navegador
+        if($request->descargar_xml == 0){
+            $pdfMerger->save("Facturas.pdf", "browser");//mostrarlos en el navegador
+        }else{
+            //carpeta donde se guardara el archivo zip
+            $public_dir=public_path();
+            // Zip File Name
+            $zipFileName = 'Facturas.zip';
+            // Crear Objeto ZipArchive
+            $zip = new ZipArchive;
+            if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
+                // Agregar archivos que se comprimiran
+                foreach($arrayfiles as $af) {
+                    $zip->addFile(Storage::disk('local2')->getAdapter()->applyPathPrefix($af),$af);
+                }  
+                foreach($arrayfilespdf as $afp) {
+                    $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
+                }     
+                //terminar proceso   
+                $zip->close();
+            }
+            // Set Encabezados para descargar
+            $headers = array(
+                'Content-Type' => 'application/octet-stream',
+            );
+            $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
+            // Create Download Response
+            if(file_exists($filetopath)){
+                return response()->download($filetopath,$zipFileName,$headers);
+            }
+        }
     }
-
     //generacion de formato en PDF INTERNO
     public function facturas_generar_pdfs_indiv($documento){
         $facturas = Factura::where('Factura', $documento)->get(); 
@@ -3380,7 +3412,8 @@ class FacturaController extends ConfiguracionSistemaController{
     public function facturas_exportar_excel(Request $request){
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
-        return Excel::download(new FacturasExport($this->campos_consulta,$request->periodo), "facturas-".$request->periodo.".xlsx");   
+        $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Facturas', Auth::user()->id);
+        return Excel::download(new FacturasExport($configuraciones_tabla['campos_consulta'],$request->periodo), "facturas-".$request->periodo.".xlsx");   
     }
     //configuracion tabla
     public function facturas_guardar_configuracion_tabla(Request $request){
@@ -3393,20 +3426,40 @@ class FacturaController extends ConfiguracionSistemaController{
         foreach($request->selectfiltrosbusquedas as $campofiltro){
             $selectmultiple = $selectmultiple.",".$campofiltro;
         }
-        Configuracion_Tabla::where('tabla', 'Facturas')
-        ->update([
-            'campos_activados' => $request->string_datos_tabla_true,
-            'campos_desactivados' => $string_datos_tabla_false,
-            'columnas_ordenadas' => $request->string_datos_ordenamiento_columnas,
-            'usuario' => Auth::user()->user,
-            'primerordenamiento' => $request->selectorderby1,
-            'formaprimerordenamiento' => $request->deorderby1,
-            'segundoordenamiento' => $request->selectorderby2,
-            'formasegundoordenamiento' => $request->deorderby2,
-            'tercerordenamiento' => $request->selectorderby3,
-            'formatercerordenamiento' => $request->deorderby3,
-            'campos_busquedas' => substr($selectmultiple, 1),
-        ]);
+        $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Facturas', Auth::user()->id);
+        if($configuraciones_tabla['contar_configuracion_tabla'] > 0){
+            Configuracion_Tabla::where('tabla', 'Facturas')->where('IdUsuario', Auth::user()->id)
+            ->update([
+                'campos_activados' => $request->string_datos_tabla_true,
+                'campos_desactivados' => $string_datos_tabla_false,
+                'columnas_ordenadas' => $request->string_datos_ordenamiento_columnas,
+                'usuario' => Auth::user()->user,
+                'primerordenamiento' => $request->selectorderby1,
+                'formaprimerordenamiento' => $request->deorderby1,
+                'segundoordenamiento' => $request->selectorderby2,
+                'formasegundoordenamiento' => $request->deorderby2,
+                'tercerordenamiento' => $request->selectorderby3,
+                'formatercerordenamiento' => $request->deorderby3,
+                'campos_busquedas' => substr($selectmultiple, 1),
+            ]);
+        }else{
+            $Configuracion_Tabla=new Configuracion_Tabla;
+            $Configuracion_Tabla->tabla='Facturas';
+            $Configuracion_Tabla->campos_activados = $request->string_datos_tabla_true;
+            $Configuracion_Tabla->campos_desactivados = $string_datos_tabla_false;
+            $Configuracion_Tabla->columnas_ordenadas = $request->string_datos_ordenamiento_columnas;
+            $Configuracion_Tabla->ordenar = 0;
+            $Configuracion_Tabla->usuario = Auth::user()->user;
+            $Configuracion_Tabla->campos_busquedas = substr($selectmultiple, 1);
+            $Configuracion_Tabla->primerordenamiento = $request->selectorderby1;
+            $Configuracion_Tabla->formaprimerordenamiento = $request->deorderby1;
+            $Configuracion_Tabla->segundoordenamiento =  $request->selectorderby2;
+            $Configuracion_Tabla->formasegundoordenamiento =  $request->deorderby2;
+            $Configuracion_Tabla->tercerordenamiento = $request->selectorderby3;
+            $Configuracion_Tabla->formatercerordenamiento = $request->deorderby3;
+            $Configuracion_Tabla->IdUsuario = Auth::user()->id;
+            $Configuracion_Tabla->save();
+        }
         return redirect()->route('facturas');
     }
     //verificar si se puede timbrar la factura
@@ -3558,13 +3611,25 @@ class FacturaController extends ConfiguracionSistemaController{
     //cancelar timbre
     public function facturas_baja_timbre(Request $request){
         //colocar fecha de cancelacion en tabla comprobante
+        
         $factura = Factura::where('Factura', $request->facturabajatimbre)->first();
         Comprobante::where('Comprobante', 'Factura')->where('Folio', '' . $factura->Folio . '')->where('Serie', '' . $factura->Serie . '')
         ->update([
             'FechaCancelacion' => Helpers::fecha_exacta_accion_datetimestring()
         ]);
+        
         //cancelar timbre facturapi
-        $timbrecancelado = $this->facturapi->Invoices->cancel($request->iddocumentofacturapi);
+        //$timbrecancelado = $this->facturapi->Invoices->cancel($request->iddocumentofacturapi);
+
+        $timbrecancelado = $this->facturapi->Invoices->cancel(
+            $request->iddocumentofacturapi,
+            [
+              "motive" => $request->motivobajatimbre
+            ]
+        );
+        dd($timbrecancelado);
+
+        
         return response()->json($timbrecancelado);
     }
 }
