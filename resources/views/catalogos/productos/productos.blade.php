@@ -365,6 +365,16 @@
             </div>
         </div>
     </div>
+    <!--Modal imagenes productos-->
+    <div class="modal fade" id="modalimagenes" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img src="#" id="imagenactualmodal" style="object-fit: contain;" width="100%" height="560px">
+                </div>
+            </div>
+        </div>
+    </div>
 <!-- modal para configuraciones de tablas-->
 @include('secciones.modalconfiguraciontablas')
 <!-- fin modal para configuraciones de tablas-->
@@ -391,6 +401,7 @@
         var background_tables = '{{$empresa->background_tables}}';       
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var tipodeutilidad = '{{$tipodeutilidad}}';
+        var urlimagenesproductos = '{{asset("imagenes_productos/")}}/';
         var productos_obtener = '{!!URL::to('productos_obtener')!!}';
         var productos_buscar_codigo_en_tabla = '{!!URL::to('productos_buscar_codigo_en_tabla')!!}';
         var productos_obtener_claves_productos = '{!!URL::to('productos_obtener_claves_productos')!!}';

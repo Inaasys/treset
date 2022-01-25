@@ -113,6 +113,10 @@ function listar(){
             else if( data.Status ==  `PRODUCIDO`){ $(row).addClass('bg-green');}
         },
         columns: campos_tabla,
+        "drawCallback": function( data ) {
+            $("#sumatotalfiltrado").html(data.json.sumatotal);
+            $("#sumacostofiltrado").html(data.json.sumacosto);
+        },
         initComplete: function () {
           // Aplicar busquedas por columna
           this.api().columns().every( function () {
@@ -526,7 +530,7 @@ function listarproductos(){
 function seleccionarproducto(Codigo){
     var numeroalmacen = $("#numeroalmacen").val();
     var tipooperacion = $("#tipooperacion").val();
-    $.get(produccion_obtener_producto_por_codigo,{codigoabuscar:Codigo,numeroalmacen:numeroalmacen,tipooperacion:tipooperacion}, function(data){
+    $.get(produccion_obtener_producto_por_codigo,{codigoabuscar:Codigo,numeroalmacen:numeroalmacen,tipooperacion:tipooperacion,contadorproductos:contadorproductos,contadorfilas:contadorfilas,partida:partida}, function(data){
         if(parseInt(data.contarproductos) > 0){
             $("#tablaproductosremisiones tbody").html(data.filasdetallesproduccion);
             mostrarformulario();      
@@ -535,11 +539,12 @@ function seleccionarproducto(Codigo){
             //colocar valores a contadores
             contadorproductos = data.contadorproductos;
             contadorfilas = data.contadorfilas;
+            partida = data.partida;
             if(data.productoterminado.Producto != null){
                 $("#textopt").html(data.productoterminado.Producto.substring(0, 70));
             }
             $("#codigoabuscar").val(data.productoterminado.Codigo);
-            $("#costo").val(data.productoterminado.Costo);
+            $("#costo").val(data.costopt);
             $('.page-loader-wrapper').css('display', 'none');
         }else{
           msjnoseencontroningunproducto();
@@ -560,7 +565,7 @@ function obtenerproductoporcodigo(){
   var codigoabuscar = $("#codigoabuscar").val();
   var numeroalmacen = $("#numeroalmacen").val();
   var tipooperacion = $("#tipooperacion").val();
-  $.get(produccion_obtener_producto_por_codigo,{codigoabuscar:codigoabuscar,numeroalmacen:numeroalmacen,tipooperacion:tipooperacion}, function(data){
+  $.get(produccion_obtener_producto_por_codigo,{codigoabuscar:codigoabuscar,numeroalmacen:numeroalmacen,tipooperacion:tipooperacion,contadorproductos:contadorproductos,contadorfilas:contadorfilas,partida:partida}, function(data){
     if(parseInt(data.contarproductos) > 0){
         $("#tablaproductosremisiones tbody").html(data.filasdetallesproduccion);
         mostrarformulario();      
@@ -569,10 +574,11 @@ function obtenerproductoporcodigo(){
         //colocar valores a contadores
         contadorproductos = data.contadorproductos;
         contadorfilas = data.contadorfilas;
+        partida = data.partida;
         if(data.productoterminado.Producto != null){
             $("#textopt").html(data.productoterminado.Producto.substring(0, 70));
         }           
-        $("#costo").val(data.productoterminado.Costo);
+        $("#costo").val(data.costopt);
         $('.page-loader-wrapper').css('display', 'none');
         //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
         $(".inputnextdet").keypress(function (e) {
@@ -677,7 +683,7 @@ function obtenerproductoinsumoptporcodigo(){
     var tipooperacion = $("#tipooperacion").val();
     var result = evaluarproductoexistente(codigoabuscarinsumo);
     if(result == false){
-        $.get(produccion_obtener_producto_insumo_pt_por_codigo,{codigoabuscarinsumo:codigoabuscarinsumo,numeroalmacen:numeroalmacen,contadorproductos:contadorproductos,contadorfilas:contadorfilas}, function(data){
+        $.get(produccion_obtener_producto_insumo_pt_por_codigo,{codigoabuscarinsumo:codigoabuscarinsumo,numeroalmacen:numeroalmacen,contadorproductos:contadorproductos,contadorfilas:contadorfilas,partida:partida}, function(data){
             if(parseInt(data.contarproductos) > 0){
                 $("#tablaproductosremisiones").append(data.filainsumo);
                 mostrarformulario();      
@@ -685,6 +691,7 @@ function obtenerproductoinsumoptporcodigo(){
                 calculartotalesfilas();
                 contadorproductos = data.contadorproductos;
                 contadorfilas = data.contadorfilas;
+                partida = data.partida;
                 $("#codigoabuscarinsumo").val("");
                 $('.page-loader-wrapper').css('display', 'none');
             }else{
@@ -767,6 +774,7 @@ function calculartotal(){
 //agregar una fila en la tabla de precios productos
 var contadorproductos=0;
 var contadorfilas = 0;
+var partida = 1;
 function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal, Existencias, tipooperacion, Insumo, ClaveProducto, ClaveUnidad, CostoDeLista){
     $('.page-loader-wrapper').css('display', 'block');
     var result = evaluarproductoexistente(Codigo);
@@ -787,9 +795,11 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
             '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm consumopartida" name="consumopartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
             '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm costounitariopartida" name="costounitariopartida[]" value="'+Costo+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas();"></td>'+
             '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
+            '<td class="tdmod" hidden><input type="text" class="form-control divorinputmodsm partidapartida" name="partidapartida[]" value="'+partida+'" required></td>'+
         '</tr>';
         contadorproductos++;
         contadorfilas++;
+        partida++;
         $("#tablaproductosremisiones").append(fila);
         mostrarformulario();         
         comprobarfilas();
@@ -806,8 +816,9 @@ function eliminarfila(numerofila){
     var confirmacion = confirm("Esta seguro de eliminar la fila?"); 
     if (confirmacion == true) { 
         $("#filaproducto"+numerofila).remove();
-        contadorfilas--;
-        contadorproductos--;
+        //contadorfilas--;
+        //contadorproductos--;
+        //partida--;
         comprobarfilas();
         calculartotal();  
     }
@@ -880,8 +891,8 @@ function alta(){
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
-                            '<div class="col-md-4">'+
-                                '<label>Escribe el código del PT a buscar y presiona la tecla ENTER<span class="label label-danger" id="textopt"></span></label>'+
+                            '<div class="col-md-3">'+
+                                '<label>Escribe el código del PT y presiona la tecla ENTER<span class="label label-danger" id="textopt"></span></label>'+
                                 '<table class="col-md-12">'+
                                     '<tr>'+
                                         '<td>'+
@@ -895,16 +906,16 @@ function alta(){
                                     '</tr>'+    
                                 '</table>'+
                             '</div>'+
-                            '<div class="col-md-4">'+
+                            '<div class="col-md-3">'+
                                 '<label>Cantidad a fabricar PT</label>'+
                                 '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="cantidad" id="cantidad" value="0.'+numerocerosconfigurados+'" data-parsley-min="0.'+numerocerosconfiguradosinputnumberstep+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas();" required>'+
                             '</div>'+
-                            '<div class="col-md-4">'+
+                            '<div class="col-md-3">'+
                                 '<label>Costo PT</label>'+
                                 '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="costo" id="costo" value="0.'+numerocerosconfigurados+'" readonly required>'+
                             '</div>'+
-                            '<div class="col-md-4" hidden>'+
-                                '<label>Escribe el código del Insumo a buscar y presiona la tecla ENTER</label>'+
+                            '<div class="col-md-3">'+
+                                '<label>Escribe el código y presiona la tecla ENTER</label>'+
                                 '<table class="col-md-12">'+
                                     '<tr>'+
                                         '<td>'+
@@ -931,7 +942,7 @@ function alta(){
                 '<div class="tab-content">'+
                     '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
                         '<div class="row">'+
-                            '<div class="col-md-12 table-responsive cabecerafija" style="height: 200px;overflow-y: scroll;padding: 0px 0px;">'+
+                            '<div class="col-md-12 table-responsive cabecerafija" style="height: 250px;overflow-y: scroll;padding: 0px 0px;">'+
                                 '<table id="tablaproductosremisiones" class="table table-bordered tablaproductosremisiones">'+
                                     '<thead class="'+background_tables+'">'+
                                         '<tr>'+
@@ -979,6 +990,7 @@ function alta(){
     //reiniciar los contadores
     contadorproductos=0;
     contadorfilas = 0;
+    partida = 0;
     //activar busqueda de codigos
     $("#codigoabuscar").keypress(function(e) {
         //recomentable para mayor compatibilidad entre navegadores.
@@ -1392,7 +1404,6 @@ function obtenerdatos(produccionmodificar){
     }
     $("#numeroalmacen").val(data.almacen.Numero);
     $("#numeroalmacenanterior").val(data.almacen.Numero);
-
     $("#codigoabuscar").val(data.produccion.Codigo);
     $("#cantidad").val(data.cantidad);
     $("#costo").val(data.costo);
@@ -1404,6 +1415,7 @@ function obtenerdatos(produccionmodificar){
     //colocar valores a contadores
     contadorproductos = data.contadorproductos;
     contadorfilas = data.contadorfilas;
+    partida = data.partida;
     //ocultar botones de seleccion
     $("#botonobtenerclientes").show();
     $("#botonobteneralmacenes").hide();
@@ -1525,12 +1537,24 @@ function enviardocumentoemail(documento){
       $("#emaildocumento").val(documento);
       $("#emailde").val(data.emailde);
       $("#emailpara").val(data.emailpara);
-      $("#email2cc").val(data.email2cc);
-      $("#email3cc").val(data.email3cc);
+      $("#email2cc").val(data.correodefault1enviodocumentos);
+      $("#email3cc").val(data.correodefault2enviodocumentos);
+      if(data.email2cc != ""){
+        $("#correosconcopia").append('<option value="'+data.email2cc+'" selected>'+data.email2cc+'</option>');
+      }
+      if(data.email3cc != ""){
+        $("#correosconcopia").append('<option value="'+data.email3cc+'" selected>'+data.email3cc+'</option>');
+      }
       $("#emailasunto").val("PRODUCCIÓN NO. " + documento +" DE "+ nombreempresa);
       $(".dropify-clear").trigger("click");
       $("#divadjuntararchivo").hide();
       $("#modalenviarpdfemail").modal('show');
+      $("#correosconcopia").select2({
+          dropdownParent: $('#modalenviarpdfemail'),
+          tags: true,
+          width: '78.00em',
+          tokenSeparators: [',', ' ']
+      })
     })   
 }
 //enviar documento pdf por email
@@ -1552,6 +1576,7 @@ $("#btnenviarpdfemail").on('click', function (e) {
         success:function(data){
           msj_documentoenviadoporemailcorrectamente();
           $("#modalenviarpdfemail").modal('hide');
+          $("#correosconcopia").html("");
           $('.page-loader-wrapper').css('display', 'none');
         },
         error:function(data){

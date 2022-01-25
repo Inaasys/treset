@@ -358,10 +358,10 @@ class ClienteController extends ConfiguracionSistemaController{
     //guardar en catalogo
     public function clientes_guardar(Request $request){
 	    $rfc=$request->rfc;
-	    $ExisteCliente = Cliente::where('Rfc', $rfc )->first();
+	    /*$ExisteCliente = Cliente::where('Rfc', $rfc )->first();
 	    if($ExisteCliente == true){
 	        $Cliente = 1;
-	    }else{
+	    }else{*/
             //obtener el ultimo id de la tabla
             $id = Helpers::ultimoidtabla('App\Cliente');
 		    $Cliente = new Cliente;
@@ -397,7 +397,7 @@ class ClienteController extends ConfiguracionSistemaController{
             $Cliente->Status='ALTA';
             Log::channel('cliente')->info('Se registro un nuevo cliente: '.$Cliente.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
 		    $Cliente->save();
-      	}
+      	//}
     	return response()->json($Cliente); 
     }
     //dar de baja o alta en catalogo
@@ -497,10 +497,10 @@ class ClienteController extends ConfiguracionSistemaController{
     public function clientes_guardar_modificacion(Request $request){
         $rfc=$request->rfc;
         $numerocliente = $request->numero;
-	    $ExisteCliente = Cliente::where('Numero','<>', $numerocliente)->where('Rfc', $rfc )->first();
+	    /*$ExisteCliente = Cliente::where('Numero','<>', $numerocliente)->where('Rfc', $rfc )->first();
 	    if($ExisteCliente == true){
             $Cliente = 1;
-	    }else{
+	    }else{*/
             $Cliente = Cliente::where('Numero', $numerocliente )->first();
             Cliente::where('Numero', $numerocliente)
             ->update([
@@ -582,7 +582,7 @@ class ClienteController extends ConfiguracionSistemaController{
                     $contador++;
                 }   
             } 
-      	}
+      	//}
     	return response()->json($Cliente); 
     }
     //exportar a excel

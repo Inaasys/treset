@@ -286,6 +286,28 @@ function generar_formato_excel(){
         form.parsley().validate();
     }
 }
+
+//realizar en reporte en pdf
+function generar_formato_pdf(){
+    var form = $("#formreporte");
+    if (form.parsley().isValid()){
+        var fechacorte = $("#fechacorte").val();
+        var numerocliente = $("#numerocliente").val();
+        var claveserie = $("#claveserie").val();
+        var departamento = $("#departamento").val();
+        if( $('#idsaldomayor').prop('checked') ) {
+            var saldomayor = 1;
+        }else{
+            saldomayor = 0;
+        }
+        var reporte = $("#reporte").val();
+        $("#btnGenerarFormatoReportePdf").attr("href", urlgenerarformatopdf+'?fechacorte='+fechacorte+'&numerocliente='+numerocliente+'&claveserie='+claveserie+'&departamento='+departamento+'&saldomayor='+saldomayor+'&reporte='+reporte);
+        $("#btnGenerarFormatoReportePdf").click();
+    }else{
+        form.parsley().validate();
+    }
+}
+
 //listar tabla reporte
 function listar(){
     var reporte = $("#reporte").val();

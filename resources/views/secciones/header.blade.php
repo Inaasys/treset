@@ -4,7 +4,7 @@
     <div class="navbar-header">
       <a href="javascript:void(0);" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false"></a>
       <a href="javascript:void(0);" class="bars"></a>
-      <a class="navbar-brand" href="#"><img id="navbarlogotipoempresa" src="logotipo_empresa/{{$empresa->Logo}}" width="125" height="50"></a>
+      <a class="navbar-brand" href="#"><img id="navbarlogotipoempresa" src="logotipo_empresa/{{$empresa->Logo}}" style="object-fit: contain;" width="125" height="50"></a>
     </div>
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="navbar-collapse">
@@ -21,6 +21,7 @@
                 <li><a href="{{ route('cotizaciones') }}" id="menuregistroscotizaciones">Cotizaciones</a></li>
                 <li><a  href="{{ route('lista_precios_volvo') }}" id="menuregistroslistapreciosvolvo">Lista Precio Volvo</a></li>
                 <li><a  href="{{ route('lista_precios_cummins') }}" id="menuregistroslistaprecioscummins">Lista Precio Cummins</a></li>
+                <li><a  href="{{ route('lista_precios_fleetguard') }}" id="menuregistroslistaprecioscummins">Lista Precio Fleetguard</a></li>
               </ul>
             </li>  
             <li class="dropdown-submenu">
@@ -367,9 +368,9 @@
                       <i class="material-icons">attach_money</i>
                     </div>
                     <div class="menu-info">
-                      <h4 style="font-size:11px;">Valor Dolar Cummins : $ 20.589000</h4>
+                      <h4 style="font-size:11px;">Valor Dolar Cummins : $ {{$ultimo_valor_tipo_cambio_cummins}}</h4>
                       <p style="font-size:9px;">
-                        <i class="material-icons">update</i>Ultima Actualización {{$timbresegresonotastotalesactivosfacturapi}}
+                        <i class="material-icons">update</i>Ultima Actualización {{$ultima_fecha_actualización_tipo_cambio_cummins}}
                       </p>
                     </div>
                   </a>

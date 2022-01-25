@@ -126,6 +126,16 @@ function listar(){
             else if( data.Status ==  `POR FACTURAR`){ $(row).addClass('bg-red');}
         },
         columns: campos_tabla,
+        "drawCallback": function( data ) {
+            $("#sumaimportefiltrado").html(data.json.sumaimporte);
+            $("#sumadescuentofiltrado").html(data.json.sumadescuento);
+            $("#sumasubtotalfiltrado").html(data.json.sumasubtotal);
+            $("#sumaivafiltrado").html(data.json.sumaiva);
+            $("#sumatotalfiltrado").html(data.json.sumatotal);
+            $("#sumacostofiltrado").html(data.json.sumacosto);
+            $("#sumacomisionfiltrado").html(data.json.sumacomision);
+            $("#sumautilidadfiltrado").html(data.json.sumautilidad); 
+        },
         initComplete: function () {
           // Aplicar busquedas por columna
           this.api().columns().every( function () {
@@ -1199,6 +1209,7 @@ function agregarfilaproducto(data,Codigo){
         var tipo = "alta";
         var fila=   '<tr class="filasproductos" id="filaproducto'+contadorproductos+'">'+
                           '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('+contadorproductos+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
+                          '<td class="tdmod"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'+Insumo+'" readonly data-parsley-length="[1, 20]"></td>'+
                           '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+
                           '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
                           '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'+Unidad+'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'+Unidad+'</td>'+
@@ -1223,7 +1234,6 @@ function agregarfilaproducto(data,Codigo){
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costolistapartida" name="costolistapartida[]" value="'+CostoDeLista+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm tipocambiopartida" name="tipocambiopartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                           '<td class="tdmod"><input type="text" class="form-control divorinputmodsm cotizacionpartida" name="cotizacionpartida[]" value="" readonly data-parsley-length="[1, 20]"></td>'+
-                          '<td class="tdmod"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'+Insumo+'" readonly data-parsley-length="[1, 20]"></td>'+
                           '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveprodutopartida" name="claveprodutopartida[]" value="'+ClaveProducto+'" readonly required></td>'+
                           '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]" value="'+ClaveUnidad+'" readonly required></td>'+
                           '<td class="tdmod"><input type="text" class="form-control divorinputmodsm mesespartida" name="mesespartida[]" value="0" readonly></td>'+
@@ -1525,8 +1535,9 @@ function alta(){
                                     '<thead class="'+background_tables+'">'+
                                         '<tr>'+
                                           '<th class="'+background_tables+'">#</th>'+
+                                          '<th class="'+background_tables+'">Insumo</th>'+
                                           '<th class="'+background_tables+'">Código</th>'+
-                                          '<th class="'+background_tables+'"><div style="width:200px !important;">Descripción</div></th>'+
+                                          '<th class="'+background_tables+'"><div style="width:400px !important;">Descripción</div></th>'+
                                           '<th class="'+background_tables+'">Unidad</th>'+
                                           '<th class="customercolortheadth">Cantidad</th>'+
                                           '<th class="customercolortheadth">Precio $</th>'+
@@ -1546,7 +1557,6 @@ function alta(){
                                           '<th class="'+background_tables+'">Costo de Lista</th>'+
                                           '<th class="'+background_tables+'">Tipo de Cambio</th>'+
                                           '<th class="'+background_tables+'">Cotización</th>'+
-                                          '<th class="'+background_tables+'">Insumo</th>'+
                                           '<th class="'+background_tables+'">ClaveProducto</th>'+
                                           '<th class="'+background_tables+'">ClaveUnidad</th>'+
                                           '<th class="'+background_tables+'">Meses</th>'+
@@ -2098,8 +2108,9 @@ function obtenerdatos(remisionmodificar){
                                     '<thead class="'+background_tables+'">'+
                                         '<tr>'+
                                           '<th class="'+background_tables+'">#</th>'+
+                                          '<th class="'+background_tables+'">Insumo</th>'+
                                           '<th class="'+background_tables+'">Código</th>'+
-                                          '<th class="'+background_tables+'"><div style="width:200px !important;">Descripción</div></th>'+
+                                          '<th class="'+background_tables+'"><div style="width:400px !important;">Descripción</div></th>'+
                                           '<th class="'+background_tables+'">Unidad</th>'+
                                           '<th class="customercolortheadth">Cantidad</th>'+
                                           '<th class="customercolortheadth">Precio $</th>'+
@@ -2119,7 +2130,6 @@ function obtenerdatos(remisionmodificar){
                                           '<th class="'+background_tables+'">Costo de Lista</th>'+
                                           '<th class="'+background_tables+'">Tipo de Cambio</th>'+
                                           '<th class="'+background_tables+'">Cotización</th>'+
-                                          '<th class="'+background_tables+'">Insumo</th>'+
                                           '<th class="'+background_tables+'">ClaveProducto</th>'+
                                           '<th class="'+background_tables+'">ClaveUnidad</th>'+
                                           '<th class="'+background_tables+'">Meses</th>'+
@@ -2428,16 +2438,28 @@ $("#btnGuardarModificacion").on('click', function (e) {
 //obtener datos para el envio del documento por email
 function enviardocumentoemail(documento){
     $.get(remisiones_obtener_datos_envio_email,{documento:documento}, function(data){
-      $("#textomodalenviarpdfemail").html("Enviar email Remisión No." + documento);
-      $("#emaildocumento").val(documento);
-      $("#emailde").val(data.emailde);
-      $("#emailpara").val(data.emailpara);
-      $("#email2cc").val(data.email2cc);
-      $("#email3cc").val(data.email3cc);
-      $("#emailasunto").val("REMISIÓN NO. " + documento +" DE "+ nombreempresa);
-      $(".dropify-clear").trigger("click");
-      $("#divadjuntararchivo").hide();
-      $("#modalenviarpdfemail").modal('show');
+        $("#textomodalenviarpdfemail").html("Enviar email Remisión No." + documento);
+        $("#emaildocumento").val(documento);
+        $("#emailde").val(data.emailde);
+        $("#emailpara").val(data.emailpara);
+        $("#email2cc").val(data.correodefault1enviodocumentos);
+        $("#email3cc").val(data.correodefault2enviodocumentos);
+        if(data.email2cc != ""){
+            $("#correosconcopia").append('<option value="'+data.email2cc+'" selected>'+data.email2cc+'</option>');
+        }
+        if(data.email3cc != ""){
+            $("#correosconcopia").append('<option value="'+data.email3cc+'" selected>'+data.email3cc+'</option>');
+        }
+        $("#emailasunto").val("REMISIÓN NO. " + documento +" DE "+ nombreempresa);
+        $(".dropify-clear").trigger("click");
+        $("#divadjuntararchivo").hide();
+        $("#modalenviarpdfemail").modal('show');
+        $("#correosconcopia").select2({
+            dropdownParent: $('#modalenviarpdfemail'),
+            tags: true,
+            width: '78.00em',
+            tokenSeparators: [',', ' ']
+        })
     })   
 }
 //enviar documento pdf por email
@@ -2459,6 +2481,7 @@ $("#btnenviarpdfemail").on('click', function (e) {
         success:function(data){
           msj_documentoenviadoporemailcorrectamente();
           $("#modalenviarpdfemail").modal('hide');
+          $("#correosconcopia").html("");
           $('.page-loader-wrapper').css('display', 'none');
         },
         error:function(data){

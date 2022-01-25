@@ -20,19 +20,26 @@
                         <div class="col-md-12">
                             <div class="col-md-12 form-check">
                                 <label>Para:</label>
-                                <input type="text" class="form-control" name="emailpara" id="emailpara" data-parsley-type="email" required>
+                                <input type="text" class="form-control" name="emailpara" id="emailpara" data-parsley-type="email" autocomplete="off" required>
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="col-md-12 form-check">
-                                <label>CC:</label>
-                                <input type="text" class="form-control" name="email2cc" id="email2cc" data-parsley-type="email">
+                                <label>Con Copia a: (escribe o pega el correo y presiona la tecla enter)</label> <br>
+                                <select  name="correosconcopia[]" id="correosconcopia" multiple="multiple">
+                                </select>
                             </div>
                         </div>
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="col-md-12 form-check">
-                                <label>CC:</label>
-                                <input type="text" class="form-control" name="email3cc" id="email3cc" data-parsley-type="email">
+                                <label>Primer correo configurado con copia siempre:</label>
+                                <input type="text" class="form-control" name="email2cc" id="email2cc" value="{{$correodefault1enviodocumentos}}" autocomplete="off"  data-parsley-type="email" >
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="col-md-12 form-check">
+                                <label>Segundo correo configurado con copia siempre:</label>
+                                <input type="text" class="form-control" name="email3cc" id="email3cc" value="{{$correodefault2enviodocumentos}}" autocomplete="off"  data-parsley-type="email" >
                             </div>
                         </div>
                         <div class="col-md-12">

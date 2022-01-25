@@ -126,6 +126,9 @@ function listar(){
         else if( data.status ==  `ENTREGADO`){$(row).addClass('bg-green');}
     },
     columns: campos_tabla,
+    "drawCallback": function( data ) {
+        $("#sumatotalfiltrado").html(data.json.sumatotal);
+    },
     initComplete: function () {
       // Aplicar busquedas por columna
       this.api().columns().every( function () {

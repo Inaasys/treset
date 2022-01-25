@@ -29,6 +29,11 @@
                                             <a class="btn bg-blue btn-xs waves-effect" id="btnGenerarFormatoReporteExcel" onclick="generar_formato_excel()">Generar Reporte en Excel</a>
                                         </div>  
                                     </td>
+                                    <td>
+                                        <div class="">
+                                            <a class="btn bg-blue btn-xs waves-effect" id="btnGenerarFormatoReportePdf" onclick="generar_formato_pdf()" target="__blank">Generar Reporte en PDF</a>
+                                        </div>  
+                                    </td>
                         		</tr>
                         	</table>
                         </div>
@@ -139,6 +144,7 @@
         var numerocerosconfigurados = '{{$numerocerosconfigurados}}';
         var numerocerosconfiguradosinputnumberstep = '{{$numerocerosconfiguradosinputnumberstep}}';
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
+        var urlgenerarformatopdf = '{{$urlgenerarformatopdf}}';
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';

@@ -60,7 +60,8 @@ class ConfiguracionSistemaController extends Controller
                                             'AgregarReferenciaOrdenCompraEnAsuntoCorreo',
                                             'ControlarConsecutivoNumeroRequisicionEnRemisiones',
                                             'ColocarObservacionesDeRemisionEnFactura',
-                                            'PedirObligatoriamenteObservacionEnFactura')
+                                            'PedirObligatoriamenteObservacionEnFactura',
+                                            'ColocarEnCeroCantidadEnPartidasDeRemisiones')
                                 ->where('Numero', 1)->first();
         //actualizar datos de configuracion global
         config(['app.periodoincialmodulos' => $this->empresa->Periodo_Inicial_Modulos]);

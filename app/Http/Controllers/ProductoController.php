@@ -810,6 +810,30 @@ class ProductoController extends ConfiguracionSistemaController{
         $utilidadpesos = $subtotalpesos - $request->costo;
         $ivapesos = $subtotalpesos * ($request->impuesto/100);
         $totalpesos = $subtotalpesos + $ivapesos;
+        
+        //imagen
+        if($request->hasFile('imagen')){
+            $destinationPath="imagenes_productos";
+            $file = $request->imagen;
+            $extension = $file->getClientOriginalName();
+            $fileName = time().$extension;
+            $file->move($destinationPath,$fileName);
+            $img = $fileName;
+            //eliminar imagen anterior
+            $ImagenProducto = Producto::where('Codigo', $codigo )->first();
+            if($ImagenProducto->Imagen == NULL){
+                $url = public_path().'/imagenes_productos/'.'NULL';
+            }else{
+                $url = public_path().'/imagenes_productos/'.$ImagenProducto->Imagen;
+            }
+            if (file_exists($url)) {
+                unlink($url);
+            }
+        }else{
+            $ImagenProducto = Producto::where('Codigo', $codigo )->first();
+            $img = $ImagenProducto->Imagen;
+        }
+
         $Producto = Producto::where('Codigo', $codigo )->first();
         Producto::where('Codigo', $codigo)
         ->update([
@@ -849,7 +873,8 @@ class ProductoController extends ConfiguracionSistemaController{
             'Zona' => $request->fechaszonadeimpresion,
             'ProductoPeligroso' => $request->fechasproductopeligroso,
             'Supercedido' => $request->fechassupercedido,
-            'Descripcion' => $request->fechasdescripcion
+            'Descripcion' => $request->fechasdescripcion,
+            'Imagen' => $img
         ]);
         //solo si el usuario esta autorizado en modificar el dato insumo
         if (in_array(strtoupper(Auth::user()->user), explode(",",$this->usuariosamodificarinsumos))) {

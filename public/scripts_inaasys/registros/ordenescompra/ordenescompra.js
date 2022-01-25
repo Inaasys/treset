@@ -114,6 +114,13 @@ function listar(){
         else if( data.Status ==  `BACKORDER`){ $(row).addClass('bg-yellow');}
     },
     columns: campos_tabla,
+    "drawCallback": function( data ) {
+        $("#sumaimportefiltrado").html(data.json.sumaimporte);
+        $("#sumadescuentofiltrado").html(data.json.sumadescuento);
+        $("#sumasubtotalfiltrado").html(data.json.sumasubtotal);
+        $("#sumaivafiltrado").html(data.json.sumaiva);
+        $("#sumatotalfiltrado").html(data.json.sumatotal);
+    },
     initComplete: function () {
       // Aplicar busquedas por columna
       this.api().columns().every( function () {
@@ -1469,7 +1476,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, tipooper
     var fila=   '<tr class="filasproductos" id="filaproducto'+contadorproductos+'">'+
                         '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('+contadorproductos+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
                         '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+
-                        '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
+                        '<td class="tdmod"><textarea rows="1" type="text" class="form-control inputnextdet nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"  style="font-size:10px;">'+Producto+'</textarea></td>'+
                         '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'+Unidad+'" readonly data-parsley-length="[1, 5]">'+Unidad+'</td>'+
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm porsurtirpartida" name="porsurtirpartida[]" id="porsurtirpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.'+numerocerosconfiguradosinputnumberstep+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('+contadorfilas+');cambiodecantidadopreciopartida('+contadorfilas+',\''+tipo +'\');"></td>'+
@@ -1667,7 +1674,7 @@ function alta(tipoalta){
                           '<tr>'+
                             '<th class="'+background_tables+'">#</th>'+
                             '<th class="customercolortheadth">Código</th>'+
-                            '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
+                            '<th class="customercolortheadth"><div style="width:400px !important;">Descripción</div></th>'+
                             '<th class="customercolortheadth">Unidad</th>'+
                             '<th class="'+background_tables+'">Por Surtir</th>'+
                             '<th class="customercolortheadth">Cantidad</th>'+
@@ -2180,7 +2187,7 @@ function obtenerdatos(ordenmodificar){
                             '<tr>'+
                               '<th class="'+background_tables+'">#</th>'+
                               '<th class="customercolortheadth" ondblclick="construirtabladinamicaporcolumna(\'codigoproductopartida\',\'Codigo\');">Código</th>'+
-                              '<th class="customercolortheadth" ondblclick="construirtabladinamicaporcolumna(\'nombreproductopartida\',\'Descripción\');"><div style="width:200px !important;">Descripción</div></th>'+
+                              '<th class="customercolortheadth" ondblclick="construirtabladinamicaporcolumna(\'nombreproductopartida\',\'Descripción\');"><div style="width:400px !important;">Descripción</div></th>'+
                               '<th class="customercolortheadth" ondblclick="construirtabladinamicaporcolumna(\'unidadproductopartida\',\'Unidad\');">Unidad</th>'+
                               '<th class="'+background_tables+'" ondblclick="construirtabladinamicaporcolumna(\'porsurtirpartida\',\'Por Surtir\');">Por Surtir</th>'+
                               '<th class="customercolortheadth" ondblclick="construirtabladinamicaporcolumna(\'cantidadpartida\',\'Cantidad\');">Cantidad</th>'+
@@ -2459,8 +2466,14 @@ function enviardocumentoemail(documento){
     $("#emaildocumento").val(documento);
     $("#emailde").val(data.emailde);
     $("#emailpara").val(data.emailpara);
-    $("#email2cc").val(data.email2cc);
-    $("#email3cc").val(data.email3cc);
+    $("#email2cc").val(data.correodefault1enviodocumentos);
+    $("#email3cc").val(data.correodefault2enviodocumentos);
+    if(data.email2cc != ""){
+      $("#correosconcopia").append('<option value="'+data.email2cc+'" selected>'+data.email2cc+'</option>');
+    }
+    if(data.email3cc != ""){
+      $("#correosconcopia").append('<option value="'+data.email3cc+'" selected>'+data.email3cc+'</option>');
+    }
     if(agregarreferenciaenasuntocorreo == 'S'){
       var asunto = "ORDEN DE COMPRA NO. " + documento +" DE "+ nombreempresa + " " + data.ordencompra.Referencia;
     }else{
@@ -2470,6 +2483,12 @@ function enviardocumentoemail(documento){
     $(".dropify-clear").trigger("click");
     $("#divadjuntararchivo").show();
     $("#modalenviarpdfemail").modal('show');
+    $("#correosconcopia").select2({
+        dropdownParent: $('#modalenviarpdfemail'),
+        tags: true,
+        width: '78.00em',
+        tokenSeparators: [',', ' ']
+    })
   })   
 }
 //enviar documento pdf por email
@@ -2491,6 +2510,7 @@ $("#btnenviarpdfemail").on('click', function (e) {
       success:function(data){
         msj_documentoenviadoporemailcorrectamente();
         $("#modalenviarpdfemail").modal('hide');
+        $("#correosconcopia").html("");
         $('.page-loader-wrapper').css('display', 'none');
       },
       error:function(data){

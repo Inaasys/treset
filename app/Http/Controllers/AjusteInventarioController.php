@@ -64,6 +64,9 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
                             $query->orderBy($configuraciones_tabla['configuracion_tabla']->tercerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formatercerordenamiento . '');
                         }
                     })
+                    ->withQuery('sumatotal', function($data) {
+                        return $data->sum('Total');
+                    })
                     ->addColumn('operaciones', function($data){
                         $operaciones = '<div class="dropdown">'.
                                             '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
@@ -986,9 +989,11 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
         $data = array(
             'ajusteinventario' => $ajusteinventario,
             'emailde' => Config::get('mail.from.address'),
-            'emailpara' => '',
-            'email2cc' => '',
-            'email3cc' => ''
+            'emailpara' => "",
+            'email2cc' => "",
+            'email3cc' => "",
+            'correodefault1enviodocumentos' => $this->correodefault1enviodocumentos,
+            'correodefault2enviodocumentos' => $this->correodefault2enviodocumentos
         );
         return response()->json($data);
     }
@@ -1065,11 +1070,12 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
             if($request->email3cc != ""){
                 array_push($arraycc, $request->email3cc);
             }
-            if($this->correodefault1enviodocumentos != ""){
-                array_push($arraycc, $this->correodefault1enviodocumentos);
-            }
-            if($this->correodefault2enviodocumentos != ""){
-                array_push($arraycc, $this->correodefault2enviodocumentos);
+            if($request->correosconcopia != null){
+                foreach($request->correosconcopia as $cc){
+                    if (filter_var($cc, FILTER_VALIDATE_EMAIL)) {
+                        array_push($arraycc, $cc);
+                    }
+                }
             }
             $correos = [$request->emailpara];
             $asunto = $request->emailasunto;

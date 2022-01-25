@@ -65,24 +65,27 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                             $query->orderBy($configuraciones_tabla['configuracion_tabla']->tercerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formatercerordenamiento . '');
                         }
                     })
-                ->addColumn('operaciones', function($data){
-                    $operaciones =  '<div class="dropdown">'.
-                                        '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
-                                            'OPERACIONES <span class="caret"></span>'.
-                                        '</button>'.
-                                        '<ul class="dropdown-menu">'.
-                                            '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Pago .'\')">Cambios</a></li>'.
-                                            '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Pago .'\')">Bajas</a></li>'.
-                                            '<li><a href="'.route('cuentas_por_pagar_generar_pdfs_indiv',$data->Pago).'" target="_blank">Ver Documento PDF</a></li>'.
-                                            '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Pago .'\')">Enviar Documento por Correo</a></li>'.
-                                        '</ul>'.
-                                    '</div>';
-                    return $operaciones;
-                })
-                ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
-                ->addColumn('Abono', function($data){ return $data->Abono; })
-                ->rawColumns(['operaciones'])
-                ->make(true);
+                    ->withQuery('sumaabono', function($data) {
+                        return $data->sum('Abono');
+                    })
+                    ->addColumn('operaciones', function($data){
+                        $operaciones =  '<div class="dropdown">'.
+                                            '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                                                'OPERACIONES <span class="caret"></span>'.
+                                            '</button>'.
+                                            '<ul class="dropdown-menu">'.
+                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Pago .'\')">Cambios</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Pago .'\')">Bajas</a></li>'.
+                                                '<li><a href="'.route('cuentas_por_pagar_generar_pdfs_indiv',$data->Pago).'" target="_blank">Ver Documento PDF</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Pago .'\')">Enviar Documento por Correo</a></li>'.
+                                            '</ul>'.
+                                        '</div>';
+                        return $operaciones;
+                    })
+                    ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
+                    ->addColumn('Abono', function($data){ return $data->Abono; })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
         } 
     }
     //obtener series documento
@@ -618,13 +621,23 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
     public function cuentas_por_pagar_obtener_datos_envio_email(Request $request){
         $cuentaxpagar = CuentaXPagar::where('Pago', $request->documento)->first();
         $proveedor = Proveedor::where('Numero',$cuentaxpagar->Proveedor)->first();
+        $email2cc = '';
+        $email3cc = '';
+        if($proveedor->Email2 != '' || $proveedor->Email2 != null){
+            $email2cc = $proveedor->Email2;
+        }
+        if($proveedor->Email3 != '' || $proveedor->Email3 != null){
+            $email3cc = $proveedor->Email3;
+        }
         $data = array(
             'cuentaxpagar' => $cuentaxpagar,
             'proveedor' => $proveedor,
             'emailde' => Config::get('mail.from.address'),
             'emailpara' => $proveedor->Email1,
-            'email2cc' => $proveedor->Email2,
-            'email3cc' => $proveedor->Email3
+            'email2cc' => $email2cc,
+            'email3cc' => $email3cc,
+            'correodefault1enviodocumentos' => $this->correodefault1enviodocumentos,
+            'correodefault2enviodocumentos' => $this->correodefault2enviodocumentos
         );
         return response()->json($data);
     }
@@ -694,11 +707,12 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
             if($request->email3cc != ""){
                 array_push($arraycc, $request->email3cc);
             }
-            if($this->correodefault1enviodocumentos != ""){
-                array_push($arraycc, $this->correodefault1enviodocumentos);
-            }
-            if($this->correodefault2enviodocumentos != ""){
-                array_push($arraycc, $this->correodefault2enviodocumentos);
+            if($request->correosconcopia != null){
+                foreach($request->correosconcopia as $cc){
+                    if (filter_var($cc, FILTER_VALIDATE_EMAIL)) {
+                        array_push($arraycc, $cc);
+                    }
+                }
             }
             $correos = [$request->emailpara];
             $asunto = $request->emailasunto;

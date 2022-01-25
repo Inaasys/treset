@@ -97,6 +97,9 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                         $query->orderBy($configuraciones_tabla['configuracion_tabla']->tercerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formatercerordenamiento . '');
                     }
                 })
+                ->withQuery('sumaabono', function($data) {
+                    return $data->sum('Abono');
+                })
                 ->addColumn('operaciones', function($data){
                     $operaciones = '<div class="dropdown">'.
                                         '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
@@ -1113,13 +1116,23 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
     public function cuentas_por_cobrar_obtener_datos_envio_email(Request $request){
         $cuentaporcobrar = CuentaXCobrar::where('Pago', $request->documento)->first();
         $cliente = Cliente::where('Numero',$cuentaporcobrar->Cliente)->first();
+        $email2cc = '';
+        $email3cc = '';
+        if($cliente->Email2 != '' || $cliente->Email2 != null){
+            $email2cc = $cliente->Email2;
+        }
+        if($cliente->Email3 != '' || $cliente->Email3 != null){
+            $email3cc = $cliente->Email3;
+        }
         $data = array(
             'cuentaporcobrar' => $cuentaporcobrar,
             'cliente' => $cliente,
             'emailde' => Config::get('mail.from.address'),
             'emailpara' => $cliente->Email1,
-            'email2cc' => $cliente->Email2,
-            'email3cc' => $cliente->Email3
+            'email2cc' => $email2cc,
+            'email3cc' => $email3cc,
+            'correodefault1enviodocumentos' => $this->correodefault1enviodocumentos,
+            'correodefault2enviodocumentos' => $this->correodefault2enviodocumentos
         );
         return response()->json($data);
     }
@@ -1232,11 +1245,12 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             if($request->email3cc != ""){
                 array_push($arraycc, $request->email3cc);
             }
-            if($this->correodefault1enviodocumentos != ""){
-                array_push($arraycc, $this->correodefault1enviodocumentos);
-            }
-            if($this->correodefault2enviodocumentos != ""){
-                array_push($arraycc, $this->correodefault2enviodocumentos);
+            if($request->correosconcopia != null){
+                foreach($request->correosconcopia as $cc){
+                    if (filter_var($cc, FILTER_VALIDATE_EMAIL)) {
+                        array_push($arraycc, $cc);
+                    }
+                }
             }
             $correos = [$request->emailpara];
             $asunto = $request->emailasunto;
@@ -1256,9 +1270,9 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                 //eliminar xml de storage/xml_cargados
                 unlink($url_xml);
             }else{
-                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $correos, $asunto, $pdf, $emaildocumento) {
+                Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {
                     $message->to($receptor, $nombre, $asunto, $pdf, $emaildocumento)
-                            ->cc($correos)
+                            ->cc($arraycc)
                             ->subject($asunto)
                             ->attachData($pdf->output(), "CuentaPorCobrarNo".$emaildocumento.".pdf");
                 });

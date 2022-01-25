@@ -206,6 +206,7 @@ class EmpresaController extends ConfiguracionSistemaController{
             'ControlarConsecutivoNumeroRequisicionEnRemisiones' => $request->controlarconsecutivonumrequisicion,
             'ColocarObservacionesDeRemisionEnFactura' => $request->colocarobservacionesremisionenfactura,
             'PedirObligatoriamenteObservacionEnFactura' => $request->pedirobligatoriamenteobservacionenfactura,
+            'ColocarEnCeroCantidadEnPartidasDeRemisiones' => $request->colocarencerocantidadenpartidasderemisiones,
         ]);
         return response()->json($request->all());
     }

@@ -478,6 +478,18 @@
                                                                     </div>
                                                                 </td>
                                                             </tr>
+                                                            <tr>
+                                                                <td class="col-md-2">Remisiones</td>
+                                                                <td class="col-md-5">Colocar en cero la cantidad al agregar partidas en remisiones</td>
+                                                                <td class="col-md-4">
+                                                                    <div class="col-md-12 form-check">
+                                                                        <input type="radio" name="colocarencerocantidadenpartidasderemisiones" id="colocarencerocantidadenpartidasderemisiones" value="S">
+                                                                        <label for="colocarencerocantidadenpartidasderemisiones">SI</label>
+                                                                        <input type="radio" name="colocarencerocantidadenpartidasderemisiones" id="colocarencerocantidadenpartidasderemisiones1" value="N">
+                                                                        <label for="colocarencerocantidadenpartidasderemisiones1">NO</label>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -909,6 +921,7 @@
         var controlarconsecutivonumrequisicion = '{{$empresa->ControlarConsecutivoNumeroRequisicionEnRemisiones}}';
         var colocarobservacionesremisionenfactura = '{{$empresa->ColocarObservacionesDeRemisionEnFactura}}';
         var pedirobligatoriamenteobservacionenfactura = '{{$empresa->PedirObligatoriamenteObservacionEnFactura}}';
+        var colocarencerocantidadenpartidasderemisiones = '{{$empresa->ColocarEnCeroCantidadEnPartidasDeRemisiones}}';
         var empresa_obtener_usuarios_a_modificar_insumos = '{!!URL::to('empresa_obtener_usuarios_a_modificar_insumos')!!}';
         var empresa_obtener_paises = '{!!URL::to('empresa_obtener_paises')!!}';
         var empresa_obtener_estados = '{!!URL::to('empresa_obtener_estados')!!}';

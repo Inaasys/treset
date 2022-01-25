@@ -113,6 +113,9 @@ function listar(){
             else{ $(row).addClass(''); }
         },
         columns: campos_tabla,
+        "drawCallback": function( data ) {
+            $("#sumaabonofiltrado").html(data.json.sumaabono);
+        },
         initComplete: function () {
           // Aplicar busquedas por columna
           this.api().columns().every( function () {
@@ -1026,12 +1029,24 @@ function enviardocumentoemail(documento){
       $("#emaildocumento").val(documento);
       $("#emailde").val(data.emailde);
       $("#emailpara").val(data.emailpara);
-      $("#email2cc").val(data.email2cc);
-      $("#email3cc").val(data.email3cc);
+      $("#email2cc").val(data.correodefault1enviodocumentos);
+      $("#email3cc").val(data.correodefault2enviodocumentos);
+      if(data.email2cc != ""){
+        $("#correosconcopia").append('<option value="'+data.email2cc+'" selected>'+data.email2cc+'</option>');
+      }
+      if(data.email3cc != ""){
+        $("#correosconcopia").append('<option value="'+data.email3cc+'" selected>'+data.email3cc+'</option>');
+      }
       $("#emailasunto").val("CUENTA POR PAGAR NO. " + documento +" DE "+ nombreempresa);
       $(".dropify-clear").trigger("click");
       $("#divadjuntararchivo").hide();
       $("#modalenviarpdfemail").modal('show');
+      $("#correosconcopia").select2({
+          dropdownParent: $('#modalenviarpdfemail'),
+          tags: true,
+          width: '78.00em',
+          tokenSeparators: [',', ' ']
+      })
     })   
 }
 //enviar documento pdf por email
@@ -1053,6 +1068,7 @@ $("#btnenviarpdfemail").on('click', function (e) {
         success:function(data){
           msj_documentoenviadoporemailcorrectamente();
           $("#modalenviarpdfemail").modal('hide');
+          $("#correosconcopia").html("");
           $('.page-loader-wrapper').css('display', 'none');
         },
         error:function(data){

@@ -72,6 +72,30 @@ class TraspasoController extends ConfiguracionSistemaController{
                             $query->orderBy($configuraciones_tabla['configuracion_tabla']->tercerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formatercerordenamiento . '');
                         }
                     })
+                    ->withQuery('sumaimporte', function($data) {
+                        return $data->sum('Importe');
+                    })
+                    ->withQuery('sumadescuento', function($data) {
+                        return $data->sum('Descuento');
+                    })
+                    ->withQuery('sumasubtotal', function($data) {
+                        return $data->sum('SubTotal');
+                    })
+                    ->withQuery('sumaiva', function($data) {
+                        return $data->sum('Iva');
+                    })
+                    ->withQuery('sumatotal', function($data) {
+                        return $data->sum('Total');
+                    })
+                    ->withQuery('sumacosto', function($data) {
+                        return $data->sum('Costo');
+                    })
+                    ->withQuery('sumacomision', function($data) {
+                        return $data->sum('Comision');
+                    })
+                    ->withQuery('sumautilidad', function($data) {
+                        return $data->sum('Utilidad');
+                    })
                     ->addColumn('operaciones', function($data){
                         $operaciones = '<div class="dropdown">'.
                                     '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
@@ -1565,9 +1589,11 @@ class TraspasoController extends ConfiguracionSistemaController{
         $data = array(
             'traspaso' => $traspaso,
             'emailde' => Config::get('mail.from.address'),
-            'emailpara' => '',
-            'email2cc' => '',
-            'email3cc' => ''
+            'emailpara' => "",
+            'email2cc' => "",
+            'email3cc' => "",
+            'correodefault1enviodocumentos' => $this->correodefault1enviodocumentos,
+            'correodefault2enviodocumentos' => $this->correodefault2enviodocumentos
         );
         return response()->json($data);
     }
@@ -1649,11 +1675,12 @@ class TraspasoController extends ConfiguracionSistemaController{
             if($request->email3cc != ""){
                 array_push($arraycc, $request->email3cc);
             }
-            if($this->correodefault1enviodocumentos != ""){
-                array_push($arraycc, $this->correodefault1enviodocumentos);
-            }
-            if($this->correodefault2enviodocumentos != ""){
-                array_push($arraycc, $this->correodefault2enviodocumentos);
+            if($request->correosconcopia != null){
+                foreach($request->correosconcopia as $cc){
+                    if (filter_var($cc, FILTER_VALIDATE_EMAIL)) {
+                        array_push($arraycc, $cc);
+                    }
+                }
             }
             $correos = [$request->emailpara];
             $asunto = $request->emailasunto;

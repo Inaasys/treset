@@ -7,7 +7,7 @@ function init(){
     listar();
 }
 function retraso(){
-  return new Promise(resolve => setTimeout(resolve, 5000));
+  return new Promise(resolve => setTimeout(resolve, 2000));
 }
 //cerrar modales
 function limpiarmodales(){
@@ -1129,7 +1129,7 @@ function obtenerdatos(codigoproducto){
                         '<a href="#consumostab" data-toggle="tab">Consumos</a>'+
                     '</li>'+
                     '<li role="presentation" >'+
-                        '<a href="#fechastab" data-toggle="tab">Fechas</a>'+
+                        '<a href="#fechastab" data-toggle="tab">Otros datos</a>'+
                     '</li>'+
                 '</ul>'+
                 '<div class="tab-content">'+
@@ -1408,14 +1408,30 @@ function obtenerdatos(codigoproducto){
                                 '<div class="row">'+
                                     '<div class="col-md-12">'+
                                         '<label>Descripción </label>'+
-                                        '<textarea class="form-control inputnexttabfe" name="fechasdescripcion" id="fechasdescripcion" rows="4" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
+                                        '<textarea class="form-control inputnexttabfe" name="fechasdescripcion" id="fechasdescripcion" rows="1" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
                                     '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-md-6">'+
+                                        '<label>Cambiar Imagen</label>'+
+                                        '<input type="file" name="imagen" id="imagen"  class="dropify" data-max-file-size="1M" data-allowed-file-extensions="jpg jpeg png gif" data-min-width="200" data-min-height="200"/>'+
+                                    '</div>'+
+                                    '<div class="col-md-6">'+
+                                        '<label>Imagen Actual</label>'+
+                                        '<div data-toggle="modal" data-target="#modalimagenes"><img src="#" id="imagenactual" style="object-fit: contain;" width="100%" height="200px"></div>'+
+                                    '</div>'+
+
                                 '</div>'+
                             '</div>'+
                         '</div>'+
                     '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
+    $('.dropify').dropify();
+    if(data.producto.Imagen != null){
+        $('#imagenactual').attr("src", urlimagenesproductos+data.producto.Imagen);
+        $('#imagenactualmodal').attr("src", urlimagenesproductos+data.producto.Imagen);
+    }
     //obtener tipos
     obtenertipos();
     //datos principales
@@ -1517,7 +1533,6 @@ function obtenerdatos(codigoproducto){
     $('#linea').on('change', function(e) {
         regresarlinea();
     });
-    
     //activar busqueda para moneda
     $('#moneda').on('keypress', function(e) {
         //recomentable para mayor compatibilidad entre navegadores.
@@ -1561,8 +1576,7 @@ async function seleccionartipo(data){
     setTimeout(function(){$("#codigo").focus();},500);
     mostrarmodalformulario('MODIFICACION');
     $('.page-loader-wrapper').css('display', 'none');
-  }
-
+}
 //guardar el registro
 $("#btnGuardarModificacion").on('click', function (e) {
     e.preventDefault();

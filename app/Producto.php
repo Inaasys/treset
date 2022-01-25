@@ -84,7 +84,8 @@ class Producto extends Model
         'Lpa2CodigoCompra',
         'Status',
         'Surtir',
-        'NoSubir'
+        'NoSubir',
+        'Imagen'
     ];
   
 }

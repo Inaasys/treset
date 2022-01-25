@@ -68,6 +68,12 @@ class ProduccionController extends ConfiguracionSistemaController{
                             $query->orderBy($configuraciones_tabla['configuracion_tabla']->tercerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formatercerordenamiento . '');
                         }
                     })
+                    ->withQuery('sumacosto', function($data) {
+                        return $data->sum('Costo');
+                    })
+                    ->withQuery('sumatotal', function($data) {
+                        return $data->sum('Total');
+                    })
                     ->addColumn('operaciones', function($data){
                         $operaciones =  '<div class="dropdown">'.
                                             '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
@@ -189,7 +195,7 @@ class ProduccionController extends ConfiguracionSistemaController{
             $codigoabuscar = $request->codigoabuscar;
             $numeroalmacen = $request->numeroalmacen;
             $tipooperacion = $request->tipooperacion;
-            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->where('Pt', 'S');
+            $data = VistaObtenerExistenciaProducto::where('Pt', 'S');
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($tipooperacion, $numeroalmacen){
                         if($data->Almacen == $numeroalmacen){
@@ -219,6 +225,7 @@ class ProduccionController extends ConfiguracionSistemaController{
         $filasdetallesproduccion = '';
         $contadorproductos = 0;
         $contadorfilas = 0;
+        $partida = 1;
         $tipo = $request->tipooperacion;
         $productoterminado = "";
         $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('Almacen', $numeroalmacen)->where('Pt', 'S')->count();
@@ -250,20 +257,23 @@ class ProduccionController extends ConfiguracionSistemaController{
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm consumopartida" name="consumopartida[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm costounitariopartida" name="costounitariopartida[]" value="'.Helpers::convertirvalorcorrecto($producto->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas();"></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod" hidden><input type="text" class="form-control divorinputmodsm partidapartida" name="partidapartida[]" value="'.$if->Item.'" required></td>'.
+                    '<td class="tdmod" hidden><input type="text" class="form-control divorinputmodsm partidapartida" name="partidapartida[]" value="'.$partida.'" required></td>'.
                 '</tr>';
                 $contadorproductos++;
                 $contadorfilas++;
+                $partida++;
             }
         }else{
             $filasdetallesproduccion = '';
         }  
         $data = array(
             'productoterminado' => $productoterminado,
+            'costopt' => Helpers::convertirvalorcorrecto($productoterminado->Costo),
             'filasdetallesproduccion' => $filasdetallesproduccion,
             'contadorproductos' => $contadorproductos,
             'contadorfilas' => $contadorfilas,
-            'contarproductos' => $contarproductos
+            'contarproductos' => $contarproductos,
+            'partida' => $partida
         );
         return response()->json($data);
     }
@@ -284,7 +294,7 @@ class ProduccionController extends ConfiguracionSistemaController{
             $codigoabuscarinsumo = $request->codigoabuscarinsumo;
             $numeroalmacen = $request->numeroalmacen;
             $tipooperacion = $request->tipooperacion;
-            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscarinsumo . '%');
+            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscarinsumo . '%')->where('Pt', '<>', 'S');
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($tipooperacion, $numeroalmacen){
                         if($data->Almacen == $numeroalmacen){
@@ -312,12 +322,14 @@ class ProduccionController extends ConfiguracionSistemaController{
         $codigoabuscarinsumo = $request->codigoabuscarinsumo;
         $numeroalmacen = $request->numeroalmacen;
         $filainsumo = '';
+        $insumo = '';
         $contadorproductos = $request->contadorproductos;
         $contadorfilas = $request->contadorfilas;
+        $partida = $request->partida;
         $tipo = "alta";
-        $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscarinsumo)->where('Almacen', $numeroalmacen)->count();
+        $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscarinsumo)->where('Pt', '<>', 'S')->where('Almacen', $numeroalmacen)->count();
         if($contarproductos > 0){
-            $insumo = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscarinsumo)->where('Almacen', $numeroalmacen)->first();
+            $insumo = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscarinsumo)->where('Pt', '<>', 'S')->where('Almacen', $numeroalmacen)->first();
             $Existencia = Existencia::where('Codigo', $insumo->Codigo)->where('Almacen', $numeroalmacen)->first();
             $parsleymax = $Existencia->Existencias;
             $filainsumo= $filainsumo.
@@ -335,9 +347,11 @@ class ProduccionController extends ConfiguracionSistemaController{
                 '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm consumopartida" name="consumopartida[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                 '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm costounitariopartida" name="costounitariopartida[]" value="'.Helpers::convertirvalorcorrecto($insumo->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas();"></td>'.
                 '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                '<td class="tdmod" hidden><input type="text" class="form-control divorinputmodsm partidapartida" name="partidapartida[]" value="'.$partida.'" required></td>'.
             '</tr>';
             $contadorproductos++;
             $contadorfilas++;
+            $partida++;
         }else{
             $filainsumo = '';
         } 
@@ -346,7 +360,8 @@ class ProduccionController extends ConfiguracionSistemaController{
             'filainsumo' => $filainsumo,
             'contadorproductos' => $contadorproductos,
             'contadorfilas' => $contadorfilas,
-            'contarproductos' => $contarproductos
+            'contarproductos' => $contarproductos,
+            'partida' => $partida
         );
         return response()->json($data);
     }
@@ -563,6 +578,7 @@ class ProduccionController extends ConfiguracionSistemaController{
             $filasdetallesproduccion = '';
             $contadorproductos = 0;
             $contadorfilas = 0;
+            $partida = 1;
             $tipo="modificacion";
             foreach($detallesproduccion as $dp){
                 $producto = Producto::where('Codigo', $dp->Codigo)->first();
@@ -593,6 +609,7 @@ class ProduccionController extends ConfiguracionSistemaController{
                 '</tr>';
                 $contadorproductos++;
                 $contadorfilas++;
+                $partida++;
             }
         }else{
             $filasdetallesproduccion = '';
@@ -625,6 +642,7 @@ class ProduccionController extends ConfiguracionSistemaController{
             "numerodetallesproduccion" => $numerodetallesproduccion,
             "contadorproductos" => $contadorproductos,
             "contadorfilas" => $contadorfilas,
+            "partida" => $partida,
             "fecha" => Helpers::formatoinputdatetime($produccion->Fecha),
             "fechasdisponiblesenmodificacion" => Helpers::obtenerfechasdisponiblesenmodificacion($produccion->Fecha),
             "cantidad" => Helpers::convertirvalorcorrecto($produccion->Cantidad),
@@ -913,7 +931,9 @@ class ProduccionController extends ConfiguracionSistemaController{
             'emailde' => Config::get('mail.from.address'),
             'emailpara' => "",
             'email2cc' => "",
-            'email3cc' => ""
+            'email3cc' => "",
+            'correodefault1enviodocumentos' => $this->correodefault1enviodocumentos,
+            'correodefault2enviodocumentos' => $this->correodefault2enviodocumentos
         );
         return response()->json($data);
     }
@@ -997,11 +1017,12 @@ class ProduccionController extends ConfiguracionSistemaController{
             if($request->email3cc != ""){
                 array_push($arraycc, $request->email3cc);
             }
-            if($this->correodefault1enviodocumentos != ""){
-                array_push($arraycc, $this->correodefault1enviodocumentos);
-            }
-            if($this->correodefault2enviodocumentos != ""){
-                array_push($arraycc, $this->correodefault2enviodocumentos);
+            if($request->correosconcopia != null){
+                foreach($request->correosconcopia as $cc){
+                    if (filter_var($cc, FILTER_VALIDATE_EMAIL)) {
+                        array_push($arraycc, $cc);
+                    }
+                }
             }
             $correos = [$request->emailpara];
             $asunto = $request->emailasunto;

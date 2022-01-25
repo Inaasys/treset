@@ -39,7 +39,7 @@ function setvaluesselects(){
     $("input[name=controlarconsecutivonumrequisicion][value='"+controlarconsecutivonumrequisicion+"']").prop("checked",true);  
     $("input[name=colocarobservacionesremisionenfactura][value='"+colocarobservacionesremisionenfactura+"']").prop("checked",true);  
     $("input[name=pedirobligatoriamenteobservacionenfactura][value='"+pedirobligatoriamenteobservacionenfactura+"']").prop("checked",true);  
-
+    $("input[name=colocarencerocantidadenpartidasderemisiones][value='"+colocarencerocantidadenpartidasderemisiones+"']").prop("checked",true);     
 }
 //obtener ususarios
 function obtenerusuarios(){

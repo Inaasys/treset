@@ -85,6 +85,21 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                             $query->orderBy($configuraciones_tabla['configuracion_tabla']->tercerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formatercerordenamiento . '');
                         }
                     })
+                    ->withQuery('sumaimporte', function($data) {
+                        return $data->sum('Importe');
+                    })
+                    ->withQuery('sumadescuento', function($data) {
+                        return $data->sum('Descuento');
+                    })
+                    ->withQuery('sumasubtotal', function($data) {
+                        return $data->sum('SubTotal');
+                    })
+                    ->withQuery('sumaiva', function($data) {
+                        return $data->sum('Iva');
+                    })
+                    ->withQuery('sumatotal', function($data) {
+                        return $data->sum('Total');
+                    })
                     ->addColumn('operaciones', function($data){
                         $operaciones = '<div class="dropdown">'.
                                             '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
@@ -1543,13 +1558,23 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
     public function notas_credito_proveedores_obtener_datos_envio_email(Request $request){
         $notaproveedor = NotaProveedor::where('Nota', $request->documento)->first();
         $proveedor = Proveedor::where('Numero',$notaproveedor->Proveedor)->first();
+        $email2cc = '';
+        $email3cc = '';
+        if($proveedor->Email2 != '' || $proveedor->Email2 != null){
+            $email2cc = $proveedor->Email2;
+        }
+        if($proveedor->Email3 != '' || $proveedor->Email3 != null){
+            $email3cc = $proveedor->Email3;
+        }
         $data = array(
             'notaproveedor' => $notaproveedor,
             'proveedor' => $proveedor,
             'emailde' => Config::get('mail.from.address'),
             'emailpara' => $proveedor->Email1,
-            'email2cc' => $proveedor->Email2,
-            'email3cc' => $proveedor->Email3
+            'email2cc' => $email2cc,
+            'email3cc' => $email3cc,
+            'correodefault1enviodocumentos' => $this->correodefault1enviodocumentos,
+            'correodefault2enviodocumentos' => $this->correodefault2enviodocumentos
         );
         return response()->json($data);
     }
@@ -1630,11 +1655,12 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             if($request->email3cc != ""){
                 array_push($arraycc, $request->email3cc);
             }
-            if($this->correodefault1enviodocumentos != ""){
-                array_push($arraycc, $this->correodefault1enviodocumentos);
-            }
-            if($this->correodefault2enviodocumentos != ""){
-                array_push($arraycc, $this->correodefault2enviodocumentos);
+            if($request->correosconcopia != null){
+                foreach($request->correosconcopia as $cc){
+                    if (filter_var($cc, FILTER_VALIDATE_EMAIL)) {
+                        array_push($arraycc, $cc);
+                    }
+                }
             }
             $correos = [$request->emailpara];
             $asunto = $request->emailasunto;

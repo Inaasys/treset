@@ -25,6 +25,7 @@ use App\TipoOrdenCompra;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ReportesAntiguedadSaldosExport;
 use DB;
+use PDF;
 
 class ReporteAntiguedadSaldosController extends ConfiguracionSistemaController{
 
@@ -35,7 +36,8 @@ class ReporteAntiguedadSaldosController extends ConfiguracionSistemaController{
     //vista
     public function reporte_antiguedad_saldos(Request $request){
         $urlgenerarformatoexcel = route('reporte_antiguedad_saldos_generar_formato_excel');
-        return view('reportes.facturas.reporteantiguedadsaldos', compact('urlgenerarformatoexcel'));
+        $urlgenerarformatopdf = route('reporte_antiguedad_saldos_generar_formato_pdf');
+        return view('reportes.facturas.reporteantiguedadsaldos', compact('urlgenerarformatoexcel','urlgenerarformatopdf'));
     }
     //obtener clientes
     public function reporte_antiguedad_saldos_obtener_clientes(Request $request){
@@ -205,6 +207,122 @@ class ReporteAntiguedadSaldosController extends ConfiguracionSistemaController{
     //generar reporte en excel
     public function reporte_antiguedad_saldos_generar_formato_excel(Request $request){
         return Excel::download(new ReportesAntiguedadSaldosExport($request->fechacorte, $request->numerocliente, $request->claveserie, $request->departamento, $request->saldomayor, $request->reporte, $this->numerodecimales, $this->empresa), "formatoantiguedadsaldos-".$request->reporte.".xlsx"); 
+    }
+    //generar reporte en pdf
+    public function reporte_antiguedad_saldos_generar_formato_pdf(Request $request){
+        $fechacorte = date($request->fechacorte);
+        $numerocliente=$request->numerocliente;
+        $claveserie=$request->claveserie;
+        $departamento=$request->departamento;
+        $saldomayor=$request->saldomayor;
+        $reporte = $request->reporte;
+        switch($reporte){
+            case "GENERAL":
+                if($fechacorte == date('Y-m-d')){
+                    $consultarep = DB::table('Facturas as f')
+                    ->leftjoin('Clientes as c', 'f.Cliente', '=', 'c.Numero')
+                    ->select("f.Cliente AS Cliente", "c.Nombre AS NombreCliente", DB::raw("SUM(f.Total) AS Facturado"), 
+                                DB::raw("isnull((select sum(abono) from [cxc detalles] where cliente = f.cliente group by cliente ),0) as AbonosCXC"),
+                                DB::raw("isnull((select sum(total) from [notas cliente detalles] where cliente = f.cliente group by cliente ),0) as DescuentosNotasCredito"),
+                                DB::raw("isnull((select sum(abono) from [cxc detalles] where cliente = f.cliente group by cliente ),0) + isnull((select sum(total) from [notas cliente detalles] where cliente = f.cliente group by cliente ),0) as TotalPagos"),
+                                DB::raw("sum(f.total) - (isnull((select sum(abono) from [cxc detalles] where cliente = f.cliente group by cliente ),0) + isnull((select sum(total) from [notas cliente detalles] where cliente = f.cliente group by cliente ),0)) as SaldoFacturado "))            
+                    ->where('f.Status', '<>', 'BAJA')
+                    ->where(function($q) use ($numerocliente) {
+                        if($numerocliente != ""){
+                            $q->where('f.Cliente', $numerocliente);
+                        }
+                    })
+                    ->where(function($q) use ($saldomayor) {
+                        if($saldomayor > 0){
+                            $q->where('c.Saldo', '>', 0.1);
+                        }
+                    })
+                    ->orderby('f.Cliente')
+                    ->groupby('f.Cliente', 'c.Nombre')
+                    ->get();
+                }else{
+                    $consultarep = DB::table('Facturas as f')
+                    ->leftjoin('Clientes as c', 'f.Cliente', '=', 'c.Numero')
+                    ->select("f.Cliente AS Cliente", "c.Nombre AS NombreCliente", DB::raw("SUM(f.Total) AS Facturado"), 
+                                DB::raw("isnull((select sum(abono) from [cxc detalles] where cliente = f.cliente and fecha <= '".$fechacorte."' group by cliente ),0) as AbonosCXC"),
+                                DB::raw("isnull((select sum(total) from [notas cliente detalles] where cliente = f.cliente and fecha <= '".$fechacorte."' group by cliente ),0) as DescuentosNotasCredito"),
+                                DB::raw("isnull((select sum(abono) from [cxc detalles] where cliente = f.cliente and fecha <= '".$fechacorte."' group by cliente ),0) + isnull((select sum(total) from [notas cliente detalles] where cliente = f.cliente and fecha <= '".$fechacorte."' group by cliente ),0) as TotalPagos"),
+                                DB::raw("sum(f.total) - (isnull((select sum(abono) from [cxc detalles] where cliente = f.cliente and fecha <= '".$fechacorte."' group by cliente ),0) + isnull((select sum(total) from [notas cliente detalles] where cliente = f.cliente and fecha <= '".$fechacorte."' group by cliente ),0)) as SaldoFacturado "))
+                    ->where('f.Fecha', '<=', $fechacorte)
+                    ->where('f.Status', '<>', 'BAJA')
+                    ->where(function($q) use ($numerocliente) {
+                        if($numerocliente != ""){
+                            $q->where('f.Cliente', $numerocliente);
+                        }
+                    })
+                    ->where(function($q) use ($saldomayor) {
+                        if($saldomayor > 0){
+                            $q->where('c.Saldo', '>', 0.1);
+                        }
+                    })
+                    ->where(function($q) use ($departamento) {
+                        if($departamento != 'TODOS'){
+                            $q->where('f.depto', $departamento);  
+                        }
+                    })
+                    ->orderby('f.Cliente')
+                    ->groupby('f.Cliente', 'c.Nombre')
+                    ->get();
+                }
+                break;
+            case "DETALLES":
+                $consultarep = DB::table('Facturas as f')
+                ->leftjoin('Clientes as c', 'f.Cliente', '=', 'c.Numero')
+                ->select("f.Factura", DB::raw("FORMAT(f.Fecha, 'yyyy-MM-dd') as Fecha"), "f.Plazo", "f.Cliente AS Cliente", "c.Nombre AS NombreCliente", DB::raw("SUM(f.Total) AS TotalFactura"), 
+                            DB::raw("isnull((select sum(abono) from [cxc detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0) as AbonosCXC"),
+                            DB::raw("isnull((select sum(total) from [notas cliente detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0) as DescuentosNotasCredito"),
+                            DB::raw("isnull((select sum(abono) from [cxc detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0) + isnull((select sum(total) from [notas cliente detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0) as TotalPagos"),
+                            DB::raw("sum(f.total) - (isnull((select sum(abono) from [cxc detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0) + isnull((select sum(total) from [notas cliente detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0)) as SaldoFacturado "))
+                ->where('f.Fecha', '<=', $fechacorte)
+                ->where('f.Status', '<>', 'BAJA')
+                ->where(function($q) use ($numerocliente) {
+                    if($numerocliente != ""){
+                        $q->where('f.Cliente', $numerocliente);
+                    }
+                })
+                ->where(function($q) use ($saldomayor) {
+                    if($saldomayor > 0){
+                        $q->where('f.Saldo', '>', 0.1);
+                    }
+                })
+                ->where(function($q) use ($departamento) {
+                    if($departamento != 'TODOS'){
+                        $q->where('f.depto', $departamento);  
+                    }
+                })
+                ->orderby('f.Cliente')
+                ->groupby('f.Factura', 'f.Fecha', 'f.Plazo', 'f.Cliente', 'c.Nombre')
+                ->get();
+                break;
+        }
+        $data = array(
+            'fechacorte' => $fechacorte,
+            'numerocliente' => $numerocliente,
+            'claveserie' => $claveserie,
+            'departamento' => $departamento,
+            'saldomayor' => $saldomayor,
+            'reporte' => $reporte,
+            'numerodecimales' => $this->numerodecimales, 
+            'empresa' => $this->empresa,
+            'consultarep' => $consultarep
+        );
+
+
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('reportes.facturas.formato_pdf_reporteantiguedadsaldos', compact('data'))
+        ->setPaper('Letter')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        return $pdf->stream();
     }
 
 

@@ -75,37 +75,61 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                             $query->orderBy($configuraciones_tabla['configuracion_tabla']->tercerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formatercerordenamiento . '');
                         }
                     })
-                ->addColumn('operaciones', function($data){
-                    $operaciones =  '<div class="dropdown">'.
-                                        '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
-                                            'OPERACIONES <span class="caret"></span>'.
-                                        '</button>'.
-                                        '<ul class="dropdown-menu">'.
-                                            '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Orden .'\')">Cambios</a></li>'.
-                                            '<li><a href="javascript:void(0);" onclick="terminar(\''.$data->Orden .'\')">Terminar OT</a></li>'.
-                                            '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Orden .'\')">Bajas</a></li>'.
-                                            '<li><a href="'.route('ordenes_trabajo_generar_pdfs_indiv',$data->Orden).'" target="_blank">Generar Documento</a></li>'.
-                                            '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Orden .'\')">Enviar Documento por Correo</a></li>'.
-                                        '</ul>'.
-                                    '</div>';
-                    return $operaciones;
-                })
-                ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
-                ->addColumn('Total', function($data){ return $data->Total; })
-                ->addColumn('Kilometros', function($data){ return $data->Kilometros; })
-                ->addColumn('Impuesto', function($data){ return $data->Impuesto; })
-                ->addColumn('Importe', function($data){ return $data->Importe; })
-                ->addColumn('Descuento', function($data){ return $data->Descuento; })
-                ->addColumn('SubTotal', function($data){ return $data->SubTotal; })
-                ->addColumn('Iva', function($data){ return $data->Iva; })
-                ->addColumn('Facturado', function($data){ return $data->Facturado; })
-                ->addColumn('Costo', function($data){ return $data->Costo; })
-                ->addColumn('Comision', function($data){ return $data->Comision; })
-                ->addColumn('Utilidad', function($data){ return $data->Utilidad; })
-                ->addColumn('HorasReales', function($data){ return $data->HorasReales; })
-                ->addColumn('KmProximoServicio', function($data){ return $data->KmProximoServicio; })
-                ->rawColumns(['operaciones'])
-                ->make(true);
+                    ->withQuery('sumaimporte', function($data) {
+                        return $data->sum('Importe');
+                    })
+                    ->withQuery('sumadescuento', function($data) {
+                        return $data->sum('Descuento');
+                    })
+                    ->withQuery('sumasubtotal', function($data) {
+                        return $data->sum('SubTotal');
+                    })
+                    ->withQuery('sumaiva', function($data) {
+                        return $data->sum('Iva');
+                    })
+                    ->withQuery('sumatotal', function($data) {
+                        return $data->sum('Total');
+                    })
+                    ->withQuery('sumacosto', function($data) {
+                        return $data->sum('Costo');
+                    })
+                    ->withQuery('sumacomision', function($data) {
+                        return $data->sum('Comision');
+                    })
+                    ->withQuery('sumautilidad', function($data) {
+                        return $data->sum('Utilidad');
+                    })
+                    ->addColumn('operaciones', function($data){
+                        $operaciones =  '<div class="dropdown">'.
+                                            '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                                                'OPERACIONES <span class="caret"></span>'.
+                                            '</button>'.
+                                            '<ul class="dropdown-menu">'.
+                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Orden .'\')">Cambios</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="terminar(\''.$data->Orden .'\')">Terminar OT</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Orden .'\')">Bajas</a></li>'.
+                                                '<li><a href="'.route('ordenes_trabajo_generar_pdfs_indiv',$data->Orden).'" target="_blank">Generar Documento</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Orden .'\')">Enviar Documento por Correo</a></li>'.
+                                            '</ul>'.
+                                        '</div>';
+                        return $operaciones;
+                    })
+                    ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
+                    ->addColumn('Total', function($data){ return $data->Total; })
+                    ->addColumn('Kilometros', function($data){ return $data->Kilometros; })
+                    ->addColumn('Impuesto', function($data){ return $data->Impuesto; })
+                    ->addColumn('Importe', function($data){ return $data->Importe; })
+                    ->addColumn('Descuento', function($data){ return $data->Descuento; })
+                    ->addColumn('SubTotal', function($data){ return $data->SubTotal; })
+                    ->addColumn('Iva', function($data){ return $data->Iva; })
+                    ->addColumn('Facturado', function($data){ return $data->Facturado; })
+                    ->addColumn('Costo', function($data){ return $data->Costo; })
+                    ->addColumn('Comision', function($data){ return $data->Comision; })
+                    ->addColumn('Utilidad', function($data){ return $data->Utilidad; })
+                    ->addColumn('HorasReales', function($data){ return $data->HorasReales; })
+                    ->addColumn('KmProximoServicio', function($data){ return $data->KmProximoServicio; })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
         } 
     }
     //descargar plantilla
@@ -1315,12 +1339,23 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
     public function ordenes_trabajo_obtener_datos_envio_email(Request $request){
         $ordentrabajo= OrdenTrabajo::where('Orden', $request->documento)->first();
         $cliente = Cliente::where('Numero', $ordentrabajo->Cliente)->first();
+        $email2cc = '';
+        $email3cc = '';
+        if($cliente->Email2 != '' || $cliente->Email2 != null){
+            $email2cc = $cliente->Email2;
+        }
+        if($cliente->Email3 != '' || $cliente->Email3 != null){
+            $email3cc = $cliente->Email3;
+        }
         $data = array(
             'ordentrabajo' => $ordentrabajo,
+            'cliente' => $cliente,
             'emailde' => Config::get('mail.from.address'),
             'emailpara' => $cliente->Email1,
-            'email2cc' => $cliente->Email2,
-            'email3cc' => $cliente->Email3
+            'email2cc' => $email2cc,
+            'email3cc' => $email3cc,
+            'correodefault1enviodocumentos' => $this->correodefault1enviodocumentos,
+            'correodefault2enviodocumentos' => $this->correodefault2enviodocumentos
         );
         return response()->json($data);
     }
@@ -1383,11 +1418,12 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             if($request->email3cc != ""){
                 array_push($arraycc, $request->email3cc);
             }
-            if($this->correodefault1enviodocumentos != ""){
-                array_push($arraycc, $this->correodefault1enviodocumentos);
-            }
-            if($this->correodefault2enviodocumentos != ""){
-                array_push($arraycc, $this->correodefault2enviodocumentos);
+            if($request->correosconcopia != null){
+                foreach($request->correosconcopia as $cc){
+                    if (filter_var($cc, FILTER_VALIDATE_EMAIL)) {
+                        array_push($arraycc, $cc);
+                    }
+                }
             }
             $correos = [$request->emailpara];
             $asunto = $request->emailasunto;

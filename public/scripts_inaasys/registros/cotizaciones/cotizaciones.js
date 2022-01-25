@@ -112,6 +112,11 @@ function listar(){
         if( data.status ==  `BAJA`){ $(row).addClass('bg-orange');}
     },
     columns: campos_tabla,
+    "drawCallback": function( data ) {
+        $("#sumasubtotalfiltrado").html(data.json.sumasubtotal);
+        $("#sumaivafiltrado").html(data.json.sumaiva);
+        $("#sumatotalfiltrado").html(data.json.sumatotal);
+    },
     initComplete: function () {
       // Aplicar busquedas por columna
       this.api().columns().every( function () {
@@ -516,12 +521,6 @@ function alta(){
                       '<td>'+
                         '<div class="btn bg-blue waves-effect" onclick="obtenerremisiones()">Agregar Remisiones</div>'+
                       '</td>'+
-                      '<td>'+
-                        '<div class="form-line">'+
-                          '<input type="hidden" class="form-control" name="numeroremision" id="numeroremision" required readonly onkeyup="tipoLetra(this)" autocomplete="off">'+
-                          '<input type="text" class="form-control inputnext" name="remision" id="remision" required readonly>'+
-                        '</div>'+
-                      '</td>'+
                     '</tr>'+   
                   '</table>'+
                 '</div>'+ 
@@ -541,19 +540,22 @@ function alta(){
                         '<thead class="'+background_tables+'">'+
                           '<tr>'+
                             '<th class="'+background_tables+'">#</th>'+
+                            '<th class="'+background_tables+'">operaciones</th>'+
+                            '<th class="'+background_tables+'">num remision</th>'+
+                            '<th class="'+background_tables+'">insumo</th>'+
                             '<th class="customercolortheadth">numero_parte</th>'+
                             '<th class="customercolortheadth"><div style="width:200px !important;">descripcion</div></th>'+
-                            '<th class="customercolortheadth">unidad</th>'+
-                            '<th class="'+background_tables+'">insumo</th>'+
-                            '<th class="customercolortheadth">status_refaccion</th>'+
-                            '<th class="customercolortheadth">precio $</th>'+
                             '<th class="customercolortheadth">cantidad</th>'+
-                            '<th class="'+background_tables+'">importe $</th>'+
-                            '<th class="'+background_tables+'">num remision</th>'+
-                            '<th class="'+background_tables+'">fecha remision</th>'+
+                            '<th class="customercolortheadth">unidad</th>'+
                             '<th class="'+background_tables+'">num equipo</th>'+
-                            '<th class="'+background_tables+'">ot tecnodiesel</th>'+
                             '<th class="'+background_tables+'">ot tyt</th>'+
+                            '<th class="'+background_tables+'">ot tecnodiesel</th>'+
+                            '<th class="customercolortheadth">precio $</th>'+
+                            '<th class="'+background_tables+'">importe $</th>'+
+                            '<th class="'+background_tables+'">fecha remision</th>'+
+                            '<th class="'+background_tables+'">tipo cambio</th>'+
+                            '<th class="'+background_tables+'">usd</th>'+
+                            '<th class="customercolortheadth">status_refaccion</th>'+
                           '</tr>'+
                         '</thead>'+
                         '<tbody>'+           

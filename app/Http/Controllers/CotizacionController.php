@@ -62,6 +62,15 @@ class CotizacionController extends ConfiguracionSistemaController{
                             $query->orderBy($configuraciones_tabla['configuracion_tabla']->tercerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formatercerordenamiento . '');
                         }
                     })
+                    ->withQuery('sumasubtotal', function($data) {
+                        return $data->sum('subtotal');
+                    })
+                    ->withQuery('sumaiva', function($data) {
+                        return $data->sum('iva');
+                    })
+                    ->withQuery('sumatotal', function($data) {
+                        return $data->sum('total');
+                    })
                     ->addColumn('operaciones', function($data){
                         $operaciones = '<div class="dropdown">'.
                                             '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
@@ -152,11 +161,22 @@ class CotizacionController extends ConfiguracionSistemaController{
                         $producto = Producto::where('Codigo', $dr->Codigo)->first();
                         $filasremisiones= $filasremisiones.
                         '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
+                            '<td>'.$partida.'</td>'.
                             '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorfilas.');">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dr->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm numeroremisionpartida" name="numeroremisionpartida[]" value="'.$remision->Remision.'" readonly required></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'.$producto->Insumo.'" readonly required></td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dr->Codigo.'" readonly data-parsley-length="[1, 50]">'.$dr->Codigo.'</td>'.
                             '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($dr->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Cantidad).'" data-parsley-min="0.1"  data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" readonly></td>'.  
                             '<td class="tdmod"><input type="hidden" class="form-control unidadpartida" name="unidadpartida[]" value="'.$dr->Unidad.'" readonly data-parsley-length="[1, 50]">'.$dr->Unidad.'</td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'.$producto->Insumo.'" readonly required></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm numeroequipopartida" name="numeroequipopartida[]" value="'.$remision->Eq.'" readonly required></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm ottytpartida" name="ottytpartida[]" value="'.$remision->Os.'" readonly required></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm ottecnodieselpartida" name="ottecnodieselpartida[]" value="'.$remision->Referencia.'" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Precio).'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" ></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Importe).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                            '<td class="tdmod"><input type="datetime-local" class="form-control divorinputmodxl fecharemisionpartida" name="fecharemisionpartida[]" value="'.Helpers::formatoinputdatetime($remision->Fecha).'" readonly required></td>'.
+                            '<td></td>'.
+                            '<td></td>'.
                             '<td class="tdmod">'.
                                 '<select name="estadopartida[]" class="form-control inputnextdet divorinputmodmd" style="width:100% !important;height: 28px !important;" required>'.
                                     '<option value="Nuevo">Nuevo</option>'.
@@ -164,14 +184,6 @@ class CotizacionController extends ConfiguracionSistemaController{
                                     '<option value="Reparado">Reparado</option>'.
                                 '</select>'.
                             '</td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Precio).'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" ></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Cantidad).'" data-parsley-min="0.1"  data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" readonly></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Importe).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm numeroremisionpartida" name="numeroremisionpartida[]" value="'.$remision->Remision.'" readonly required></td>'.
-                            '<td class="tdmod"><input type="datetime-local" class="form-control divorinputmodxl fecharemisionpartida" name="fecharemisionpartida[]" value="'.Helpers::formatoinputdatetime($remision->Fecha).'" readonly required></td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm numeroequipopartida" name="numeroequipopartida[]" value="'.$remision->Eq.'" readonly required></td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm ottecnodieselpartida" name="ottecnodieselpartida[]" value="'.$remision->Referencia.'" readonly></td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm ottytpartida" name="ottytpartida[]" value="'.$remision->Os.'" readonly required></td>'.
                         '</tr>';
                         $partida++;
                         $contadorfilas++;

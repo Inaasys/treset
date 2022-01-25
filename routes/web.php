@@ -650,6 +650,15 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/lista_precios_cummins_actualizar_lista_precios_vs_excel', 'ListaPrecioCumminsController@lista_precios_cummins_actualizar_lista_precios_vs_excel')->name('lista_precios_cummins_actualizar_lista_precios_vs_excel')->middleware('revisaraccesomenu:menuregistroslistaprecioscummins');
     Route::get('/lista_precios_cummins_exportar_excel', 'ListaPrecioCumminsController@lista_precios_cummins_exportar_excel')->name('lista_precios_cummins_exportar_excel')->middleware('revisaraccesomenu:menuregistroslistaprecioscummins');
     Route::post('/lista_precios_cummins_guardar_configuracion_tabla', 'ListaPrecioCumminsController@lista_precios_cummins_guardar_configuracion_tabla')->name('lista_precios_cummins_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistroslistaprecioscummins');
+    //Lista Precios Fleetguard
+    Route::get('/lista_precios_fleetguard', 'ListaPrecioFleetguardController@lista_precios_fleetguard')->name('lista_precios_fleetguard')->middleware('revisaraccesomenu:menuregistroslistaprecioscummins');
+    Route::get('/lista_precios_fleetguard_obtener', 'ListaPrecioFleetguardController@lista_precios_fleetguard_obtener')->name('lista_precios_fleetguard_obtener')->middleware('revisaraccesomenu:menuregistroslistaprecioscummins');
+    
+    Route::get('/lista_precios_fleetguard_generar_plantilla', 'ListaPrecioFleetguardController@lista_precios_fleetguard_generar_plantilla')->name('lista_precios_fleetguard_generar_plantilla')->middleware('revisaraccesomenu:menuregistroslistaprecioscummins');
+    Route::post('/lista_precios_fleetguard_actualizar_lista_precios_vs_excel', 'ListaPrecioFleetguardController@lista_precios_fleetguard_actualizar_lista_precios_vs_excel')->name('lista_precios_fleetguard_actualizar_lista_precios_vs_excel')->middleware('revisaraccesomenu:menuregistroslistaprecioscummins');
+    Route::get('/lista_precios_fleetguard_exportar_excel', 'ListaPrecioFleetguardController@lista_precios_fleetguard_exportar_excel')->name('lista_precios_fleetguard_exportar_excel')->middleware('revisaraccesomenu:menuregistroslistaprecioscummins');
+    Route::post('/lista_precios_fleetguard_guardar_configuracion_tabla', 'ListaPrecioFleetguardController@lista_precios_fleetguard_guardar_configuracion_tabla')->name('lista_precios_fleetguard_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistroslistaprecioscummins');
+    
     //Cotizaciones Productos
     Route::get('/cotizaciones_productos', 'CotizacionProductoController@cotizaciones_productos')->name('cotizaciones_productos')->middleware('revisaraccesomenu:menuregistroscotizacionesproductos');
     Route::get('/cotizaciones_productos_obtener', 'CotizacionProductoController@cotizaciones_productos_obtener')->name('cotizaciones_productos_obtener')->middleware('revisaraccesomenu:menuregistroscotizacionesproductos');
@@ -1016,6 +1025,9 @@ Route::group(['middleware' => ['auth']], function () {
     //reporte antiguedad saldos
     Route::get('/reporte_antiguedad_saldos', 'ReporteAntiguedadSaldosController@reporte_antiguedad_saldos')->name('reporte_antiguedad_saldos')->middleware('revisaraccesomenu:menureportefacturasantiguedadsaldos');
     Route::get('/reporte_antiguedad_saldos_generar_formato_excel', 'ReporteAntiguedadSaldosController@reporte_antiguedad_saldos_generar_formato_excel')->name('reporte_antiguedad_saldos_generar_formato_excel')->middleware('revisaraccesomenu:menureportefacturasantiguedadsaldos');
+    
+    Route::get('/reporte_antiguedad_saldos_generar_formato_pdf', 'ReporteAntiguedadSaldosController@reporte_antiguedad_saldos_generar_formato_pdf')->name('reporte_antiguedad_saldos_generar_formato_pdf')->middleware('revisaraccesomenu:menureportefacturasantiguedadsaldos');
+    
     Route::get('/reporte_antiguedad_saldos_obtener_clientes', 'ReporteAntiguedadSaldosController@reporte_antiguedad_saldos_obtener_clientes')->name('reporte_antiguedad_saldos_obtener_clientes')->middleware('revisaraccesomenu:menureportefacturasantiguedadsaldos');
     Route::get('/reporte_antiguedad_saldos_obtener_series', 'ReporteAntiguedadSaldosController@reporte_antiguedad_saldos_obtener_series')->name('reporte_antiguedad_saldos_obtener_series')->middleware('revisaraccesomenu:menureportefacturasantiguedadsaldos');
     Route::get('/reporte_antiguedad_saldos_obtener_cliente_por_numero', 'ReporteAntiguedadSaldosController@reporte_antiguedad_saldos_obtener_cliente_por_numero')->name('reporte_antiguedad_saldos_obtener_cliente_por_numero')->middleware('revisaraccesomenu:menureportefacturasantiguedadsaldos');

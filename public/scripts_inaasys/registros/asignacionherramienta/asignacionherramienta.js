@@ -114,6 +114,9 @@ function listar(){
         if( data.status ==  `BAJA`){ $(row).addClass('bg-orange');}
     },
     columns: campos_tabla,
+    "drawCallback": function( data ) {
+        $("#sumatotalfiltrado").html(data.json.sumatotal);
+    },
     initComplete: function () {
       // Aplicar busquedas por columna
       this.api().columns().every( function () {
