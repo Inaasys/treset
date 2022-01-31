@@ -35,6 +35,8 @@ use Config;
 use Mail;
 use Schema;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
+use Storage; 
+use ZipArchive;
 
 class CotizacionProductoController extends ConfiguracionSistemaController{
 
@@ -166,7 +168,7 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
                         $filasdetallescotizacion= $filasdetallescotizacion.
                         '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                             '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
-                            '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]">'.$producto->Codigo.'</td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$producto->Codigo.'</b></td>'.
                             '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.htmlspecialchars($producto->Producto, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$producto->Unidad.'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'.$producto->Unidad.'</td>'.
                             '<td class="tdmod">'.
@@ -207,7 +209,7 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
                         $filasdetallescotizacion= $filasdetallescotizacion.
                         '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                             '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
-                            '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$codigoabuscar.'" readonly data-parsley-length="[1, 20]">'.$codigoabuscar.'</td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$codigoabuscar.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$codigoabuscar.'</b></td>'.
                             '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="PIEZA" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">PIEZA</td>'.
                             '<td class="tdmod">'.
@@ -628,7 +630,7 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
                 $filasdetallescotizacion= $filasdetallescotizacion.
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dc->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dc->Codigo.'" readonly data-parsley-length="[1, 20]">'.$dc->Codigo.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dc->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$dc->Codigo.'</b></td>'.
                     '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.htmlspecialchars($dc->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$dc->Unidad.'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'.$dc->Unidad.'</td>'.
                     '<td class="tdmod">'.
@@ -863,6 +865,8 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
     public function cotizaciones_productos_generar_pdfs(Request $request){
         //primero eliminar todos los archivos de la carpeta
         Helpers::eliminararchivospdfsgenerados();
+        //primero eliminar todos los archivos zip
+        Helpers::eliminararchivoszipgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
             $cotizacionesproductos = CotizacionProducto::whereIn('Cotizacion', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
@@ -872,6 +876,7 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
             $cotizacionesproductos = CotizacionProducto::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $arrayfilespdf = array();
         foreach ($cotizacionesproductos as $cp){
             $data=array();
             $cotizacionesproductosdetalle = CotizacionProductoDetalle::where('Cotizacion', $cp->Cotizacion)->get();
@@ -938,9 +943,36 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
             $ArchivoPDF = "PDF".$cotp->Cotizacion.".pdf";
             $urlarchivo = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
             $pdfMerger->addPDF($urlarchivo, 'all');
+            array_push($arrayfilespdf,$ArchivoPDF);
         }
         $pdfMerger->merge(); //unirlos
-        $pdfMerger->save("CotizacionesProducto.pdf", "browser");//mostrarlos en el navegador
+        if($request->descargar_xml == 0){
+            $pdfMerger->save("CotizacionesProducto.pdf", "browser");//mostrarlos en el navegador
+        }else{
+            //carpeta donde se guardara el archivo zip
+            $public_dir=public_path();
+            // Zip File Name
+            $zipFileName = 'DocumentosPDF.zip';
+            // Crear Objeto ZipArchive
+            $zip = new ZipArchive;
+            if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
+                // Agregar archivos que se comprimiran
+                foreach($arrayfilespdf as $afp) {
+                    $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
+                }     
+                //terminar proceso   
+                $zip->close();
+            }
+            // Set Encabezados para descargar
+            $headers = array(
+                'Content-Type' => 'application/octet-stream',
+            );
+            $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
+            // Create Download Response
+            if(file_exists($filetopath)){
+                return response()->download($filetopath,$zipFileName,$headers);
+            }
+        }
     }
 
     //generacion de formato en PDF
@@ -1139,7 +1171,7 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
             $asunto = $request->emailasunto;
             $emaildocumento = $request->emaildocumento;
             $name = "Receptor envio de correos";
-            $body = $request->emailasunto;
+            $body = $request->emailmensaje;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             if($request->archivoadjunto != null && $request->archivoadjunto2 != null) {
@@ -1375,7 +1407,7 @@ class CotizacionProductoController extends ConfiguracionSistemaController{
             $asunto = $request->emailasunto;
             $emaildocumento = $request->emaildocumento;
             $name = "Receptor envio de correos";
-            $body = $request->emailasunto;
+            $body = $request->emailmensaje;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             if($request->archivoadjunto != null && $request->archivoadjunto2 != null) {

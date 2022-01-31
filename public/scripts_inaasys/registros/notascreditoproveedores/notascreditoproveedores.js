@@ -1030,7 +1030,7 @@ function agregarfiladppp(){
     var tipooperacion = $("#tipooperacion").val();
     var fila= '<tr class="filasproductos" id="filaproducto'+contadorfilas+'">'+
                 '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfila" onclick="eliminarfila('+contadorfilas+')" >X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
-                '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="DPPP" readonly data-parsley-length="[1, 20]">DPPP</td>'+         
+                '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="DPPP" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">DPPP</b></td>'+         
                 '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="DESCUENTO POR PRONTO PAGO" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" ></td>'+
                 '<td class="tdmod"><input type="text" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="ACTIV" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
                 '<td class="tdmod">'+
@@ -1117,7 +1117,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
         var tipo = "alta";
         var fila= '<tr class="filasproductos" id="filaproducto'+contadorfilas+'">'+
                     '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfila" onclick="eliminarfila('+contadorfilas+')" >X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
-                    '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+         
+                    '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'+Codigo+'</b></td>'+         
                     '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" ></td>'+
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="'+Unidad+'" data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
                     '<td class="tdmod">'+
@@ -1365,7 +1365,7 @@ function alta(){
                                                 '<th class="'+background_tables+'">#</th>'+
                                                 '<th class="customercolortheadth" hidden>Compra</th>'+
                                                 '<th class="'+background_tables+'" hidden><div style="width:250px !important;">UUID</div></th>'+
-                                                '<th class="customercolortheadth">Código</th>'+
+                                                '<th class="customercolortheadth"><div style="width:100px !important;">Código</div></th>'+
                                                 '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
                                                 '<th class="customercolortheadth">Uda</th>'+
                                                 '<th class="customercolortheadth">Cantidad</th>'+
@@ -2162,7 +2162,7 @@ function obtenerdatos(notamodificar){
                               '<th class="'+background_tables+'">#</th>'+
                               '<th class="customercolortheadth" hidden>Compra</th>'+
                               '<th class="'+background_tables+'" hidden><div style="width:250px !important;">UUID</div></th>'+
-                              '<th class="customercolortheadth">Código</th>'+
+                              '<th class="customercolortheadth"><div style="width:100px !important;">Código</div></th>'+
                               '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
                               '<th class="customercolortheadth">Uda</th>'+
                               '<th class="customercolortheadth">Cantidad</th>'+
@@ -2567,6 +2567,7 @@ function enviardocumentoemail(documento){
       $("#correosconcopia").append('<option value="'+data.email3cc+'" selected>'+data.email3cc+'</option>');
     }
     $("#emailasunto").val("NOTA DE CRÉDITO PROVEEDOR NO. " + documento +" DE "+ nombreempresa);
+    $("#emailmensaje").val("NOTA DE CRÉDITO PROVEEDOR NO. " + documento +" DE "+ nombreempresa);
     $(".dropify-clear").trigger("click");
     $("#divadjuntararchivo").hide();
     $("#modalenviarpdfemail").modal('show');

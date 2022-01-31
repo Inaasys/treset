@@ -207,6 +207,8 @@ class EmpresaController extends ConfiguracionSistemaController{
             'ColocarObservacionesDeRemisionEnFactura' => $request->colocarobservacionesremisionenfactura,
             'PedirObligatoriamenteObservacionEnFactura' => $request->pedirobligatoriamenteobservacionenfactura,
             'ColocarEnCeroCantidadEnPartidasDeRemisiones' => $request->colocarencerocantidadenpartidasderemisiones,
+            'MostrarTotalesDeColumnasEnDocumentos' => $request->mostrartotalesdecolumnasendocumentos,
+            'MostrarInsumoPorPartidaEnCapturaDeRemisiones' => $request->mostrarinsumoporpartidaenremisiones,
         ]);
         return response()->json($request->all());
     }
@@ -284,7 +286,7 @@ class EmpresaController extends ConfiguracionSistemaController{
                 "country" => config('app.paisempresa')
               )
             )
-          );
+        );
 
         return response()->json($registro_empresa_facturapi);
     }

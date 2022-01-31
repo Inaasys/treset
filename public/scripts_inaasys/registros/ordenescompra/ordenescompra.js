@@ -1475,7 +1475,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, tipooper
     var tipo = "alta";
     var fila=   '<tr class="filasproductos" id="filaproducto'+contadorproductos+'">'+
                         '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('+contadorproductos+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
-                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+
+                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'+Codigo+'</b></td>'+
                         '<td class="tdmod"><textarea rows="1" type="text" class="form-control inputnextdet nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"  style="font-size:10px;">'+Producto+'</textarea></td>'+
                         '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'+Unidad+'" readonly data-parsley-length="[1, 5]">'+Unidad+'</td>'+
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm porsurtirpartida" name="porsurtirpartida[]" id="porsurtirpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
@@ -1673,7 +1673,7 @@ function alta(tipoalta){
                         '<thead class="'+background_tables+'">'+
                           '<tr>'+
                             '<th class="'+background_tables+'">#</th>'+
-                            '<th class="customercolortheadth">Código</th>'+
+                            '<th class="customercolortheadth"><div style="width:100px !important;">Código</div></th>'+
                             '<th class="customercolortheadth"><div style="width:400px !important;">Descripción</div></th>'+
                             '<th class="customercolortheadth">Unidad</th>'+
                             '<th class="'+background_tables+'">Por Surtir</th>'+
@@ -1948,19 +1948,39 @@ $("#btnautorizar").on('click', function(e){
 //quitar autorzacion a orden compra
 function quitarautorizacionordencompra(orden){
   $.get(ordenes_compra_verificar_quitar_autorizacion,{orden:orden}, function(data){
-    if(data.Status == 'POR SURTIR'){
+    if(data.OrdenCompra.Status == 'POR SURTIR'){
       $("#ordenquitarautorizacion").val(orden);
       $("#ordenautorizar").val("");
       $("#textomodalautorizar").html("Estas seguro de quitar autorizacion a la orden de compra? No."+ orden);
       $("#btnautorizar").hide();
       $("#btnquitarautorizacion").show();
+      $("#divmsjsurtimiento").hide();
       $('#autorizarorden').modal('show');
+    }else if(data.OrdenCompra.Status == 'BACKORDER'){ 
+      if(data.numerocompra > 0){
+        $("#ordenquitarautorizacion").val("");
+        $("#ordenautorizar").val("");
+        $("#textomodalautorizar").html("No se puede quitar autorización a la Orden de Compra porque esta dada de BAJA o ya fue utilizada en una Compra");
+        $("#btnautorizar").hide();
+        $("#btnquitarautorizacion").hide();
+        $("#divmsjsurtimiento").hide();
+        $('#autorizarorden').modal('show');
+      }else{
+        $("#ordenquitarautorizacion").val(orden);
+        $("#ordenautorizar").val("");
+        $("#textomodalautorizar").html("Estas seguro de quitar autorizacion a la orden de compra? No."+ orden);
+        $("#btnautorizar").hide();
+        $("#btnquitarautorizacion").show();
+        $("#divmsjsurtimiento").hide();
+        $('#autorizarorden').modal('show');
+      }
     }else{
       $("#ordenquitarautorizacion").val("");
       $("#ordenautorizar").val("");
       $("#textomodalautorizar").html("No se puede quitar autorización a la Orden de Compra porque esta dada de BAJA o ya fue utilizada en una Compra");
       $("#btnautorizar").hide();
       $("#btnquitarautorizacion").hide();
+      $("#divmsjsurtimiento").hide();
       $('#autorizarorden').modal('show');
     } 
   });
@@ -2186,7 +2206,7 @@ function obtenerdatos(ordenmodificar){
                           '<thead class="'+background_tables+'">'+
                             '<tr>'+
                               '<th class="'+background_tables+'">#</th>'+
-                              '<th class="customercolortheadth" ondblclick="construirtabladinamicaporcolumna(\'codigoproductopartida\',\'Codigo\');">Código</th>'+
+                              '<th class="customercolortheadth" ondblclick="construirtabladinamicaporcolumna(\'codigoproductopartida\',\'Codigo\');"><div style="width:100px !important;">Código</div></th>'+
                               '<th class="customercolortheadth" ondblclick="construirtabladinamicaporcolumna(\'nombreproductopartida\',\'Descripción\');"><div style="width:400px !important;">Descripción</div></th>'+
                               '<th class="customercolortheadth" ondblclick="construirtabladinamicaporcolumna(\'unidadproductopartida\',\'Unidad\');">Unidad</th>'+
                               '<th class="'+background_tables+'" ondblclick="construirtabladinamicaporcolumna(\'porsurtirpartida\',\'Por Surtir\');">Por Surtir</th>'+
@@ -2480,6 +2500,7 @@ function enviardocumentoemail(documento){
       var asunto = "ORDEN DE COMPRA NO. " + documento +" DE "+ nombreempresa;
     }
     $("#emailasunto").val(asunto);
+    $("#emailmensaje").val(asunto);
     $(".dropify-clear").trigger("click");
     $("#divadjuntararchivo").show();
     $("#modalenviarpdfemail").modal('show');

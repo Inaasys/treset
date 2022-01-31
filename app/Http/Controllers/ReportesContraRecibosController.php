@@ -17,6 +17,7 @@ use App\Proveedor;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ReportesRelacionContraReciboExport;
 use DB;
+use PDF;
 
 class ReportesContraRecibosController extends ConfiguracionSistemaController{
 
@@ -27,7 +28,8 @@ class ReportesContraRecibosController extends ConfiguracionSistemaController{
     //vista
     public function reporte_relacion_contrarecibos(Request $request){
         $urlgenerarformatoexcel = route('reporte_relacion_contrarecibos_generar_formato_excel');
-        return view('reportes.contrarecibos.reporterelacioncontrarecibos', compact('urlgenerarformatoexcel'));
+        $urlgenerarformatopdf = route('reporte_relacion_contrarecibos_generar_formato_pdf');
+        return view('reportes.contrarecibos.reporterelacioncontrarecibos', compact('urlgenerarformatoexcel','urlgenerarformatopdf'));
     }
     //obtener proveedores
     public function reporte_relacion_contrarecibos_obtener_proveedores(Request $request){
@@ -112,5 +114,63 @@ class ReportesContraRecibosController extends ConfiguracionSistemaController{
     //generar excel reporte relacion ordenes compra
     public function reporte_relacion_contrarecibos_generar_formato_excel(Request $request){
         return Excel::download(new ReportesRelacionContraReciboExport($request->fechainicialreporte, $request->fechafinalreporte, $request->numeroproveedor, $request->reporte, $this->numerodecimales, $this->empresa), "formatorelacioncontrarecibos-".$request->reporte.".xlsx"); 
+    }
+    //generar reporte en pdf
+    public function reporte_relacion_contrarecibos_generar_formato_pdf(Request $request){
+        $fechainicio = date($request->fechainicialreporte);
+        $fechaterminacion = date($request->fechafinalreporte);
+        $reporte = $request->reporte;
+        $numeroproveedor=$request->numeroproveedor;
+        if($reporte == "GENERAL"){
+            $consultarep = DB::table('ContraRecibos as cr')
+            ->leftjoin('Proveedores as p', 'cr.Proveedor', '=', 'p.Numero')
+            ->leftjoin('ContraRecibos Detalles as crd', 'cr.ContraRecibo', '=', 'crd.ContraRecibo')
+            ->leftjoin('Compras as c', 'crd.Compra', '=', 'c.Compra')
+            ->select('cr.ContraRecibo', 'cr.Proveedor', 'p.Nombre', 'cr.Fecha', DB::raw("SUM(c.SubTotal) as SubTotal"), DB::raw("SUM(c.Iva) as Iva"), DB::raw("SUM(c.Total) as Total"), 'cr.Status')
+            //->whereBetween('cr.Fecha', [$fechainicio, $fechaterminacion])
+            ->whereDate('cr.Fecha', '>=', $fechainicio)->whereDate('cr.Fecha', '<=', $fechaterminacion)
+            ->where(function($q) use ($numeroproveedor) {
+                if($numeroproveedor != ""){
+                    $q->where('cr.Proveedor', $numeroproveedor);
+                }
+            })
+            ->groupby('cr.ContraRecibo', 'cr.Fecha', 'cr.Proveedor', 'p.Nombre', 'cr.Status')
+            ->orderby('p.Nombre')
+            ->get();
+        }else{
+            $consultarep = DB::table('ContraRecibos as cr')
+            ->leftjoin('Proveedores as p', 'cr.Proveedor', '=', 'p.Numero')
+            ->leftjoin('ContraRecibos Detalles as crd', 'cr.ContraRecibo', '=', 'crd.ContraRecibo')
+            ->leftjoin('Compras as c', 'crd.Compra', '=', 'c.Compra')
+            ->select('cr.ContraRecibo', 'cr.Proveedor', 'p.Nombre', 'crd.Compra', 'c.Movimiento', 'cr.Fecha', 'c.Remision', 'c.Factura', 'crd.FechaAPagar', 'c.SubTotal', 'c.Iva', 'c.Total', 'cr.Status')
+            //->whereBetween('cr.Fecha', [$fechainicio, $fechaterminacion])
+            ->whereDate('cr.Fecha', '>=', $fechainicio)->whereDate('cr.Fecha', '<=', $fechaterminacion)
+            ->where(function($q) use ($numeroproveedor) {
+                if($numeroproveedor != ""){
+                    $q->where('cr.Proveedor', $numeroproveedor);
+                }
+            })
+            ->orderby('p.Nombre')
+            ->get();
+        }
+        $data = array(
+            'fechainicio' => $fechainicio,
+            'fechaterminacion' => $fechaterminacion,
+            'reporte' => $reporte,
+            'numeroproveedor' => $numeroproveedor,
+            'numerodecimales' => $this->numerodecimales, 
+            'empresa' => $this->empresa,
+            'consultarep' => $consultarep
+        );
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('reportes.contrarecibos.formato_pdf_reporterelacioncontrarecibos', compact('data'))
+        ->setPaper('Letter')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        return $pdf->stream();
     }
 }

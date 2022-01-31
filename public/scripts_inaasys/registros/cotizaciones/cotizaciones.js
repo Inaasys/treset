@@ -543,7 +543,7 @@ function alta(){
                             '<th class="'+background_tables+'">operaciones</th>'+
                             '<th class="'+background_tables+'">num remision</th>'+
                             '<th class="'+background_tables+'">insumo</th>'+
-                            '<th class="customercolortheadth">numero_parte</th>'+
+                            '<th class="customercolortheadth"><div style="width:100px !important;">numero_parte</div></th>'+
                             '<th class="customercolortheadth"><div style="width:200px !important;">descripcion</div></th>'+
                             '<th class="customercolortheadth">cantidad</th>'+
                             '<th class="customercolortheadth">unidad</th>'+
@@ -784,7 +784,7 @@ function obtenerdatos(cotizacionmodificar){
                           '<thead class="'+background_tables+'">'+
                             '<tr>'+
                               '<th class="'+background_tables+'">#</th>'+
-                              '<th class="customercolortheadth">numero_parte</th>'+
+                              '<th class="customercolortheadth"><div style="width:100px !important;">numero_parte</div></th>'+
                               '<th class="customercolortheadth"><div style="width:200px !important;">descripcion</div></th>'+
                               '<th class="customercolortheadth">unidad</th>'+
                               '<th class="'+background_tables+'">insumo</th>'+

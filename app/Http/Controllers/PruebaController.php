@@ -24,6 +24,7 @@ use App\Proveedor;
 use App\Producto;
 use App\Marca;
 use App\Existencia;
+use App\Almacen;
 use Mail;
 use App\Configuracion_Tabla;
 use App\Imports\CatalogoSATc_ClaveProdServCPImport;
@@ -39,7 +40,102 @@ class PruebaController extends ConfiguracionSistemaController{
     }
 
     public function pruebaswebscraping(){
-        $fecha = "2020-09-24";
+
+        /*
+        $almacenes = Almacen::where('Status', 'ALTA')->get();
+        $selectalmacenes = "<option selected disabled hidden>Selecciona el almacén</option>";
+        foreach($almacenes as $a){
+            if($a->Numero == $request->almacen){
+                $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.' Selected>'.$a->Nombre.'</option>';
+            }else{
+                $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.'>'.$a->Nombre.'</option>';
+            }
+        }*/
+        
+        $numerodecimalesconfigurados = config('app.numerodedecimales');
+        $data = array();
+        $productos = Producto::all();
+        foreach($productos as $p){
+            $kardex = DB::select('exec ObtenerKardex ?,?', array($p->Codigo,1));
+            //dd($kardex);
+            $nummovimiento = 1;
+            $entradas = 0;
+            $salidas = 0;
+            $existencias = 0;
+            foreach(array_reverse($kardex) as $k){
+                $entradas = $entradas + $k->Entradas;
+                $salidas = $salidas + $k->Salidas;
+                $existencias = $existencias + $k->Entradas - $k->Salidas;
+                //$colorfila = '';
+                //if($k->Status == 'BAJA'){
+                  //  $colorfila = 'bg-red';
+                //}
+                $nummovimiento++;
+            }
+            
+            $data[]=array(
+                //"colorfila"=>$colorfila,
+                //"nummovimiento"=>$nummovimiento,
+                "codigo"=>$p->Codigo,
+                //"documento"=>$k->Documento,
+                //"movimiento"=>$k->Movimiento,
+                //"fecha"=>Helpers::fecha_espanol($k->Fecha),
+                "almacen" => Helpers::convertirvalorcorrecto(1),
+                "entradas"=> Helpers::convertirvalorcorrecto($entradas),
+                "salidas" => Helpers::convertirvalorcorrecto($salidas),
+                "existencias"=> round($existencias, $numerodecimalesconfigurados),
+                //"costo"=>Helpers::convertirvalorcorrecto($k->Costo),
+                //"status"=>$k->Status
+            );
+            //dd($data);
+            //$filasmovimientos = "";
+            //$primerfila = 0;
+            //foreach(array_reverse($data) as $d){
+                //if($primerfila == 0){
+                  //  $colorfilaex = 'bg-amber font-bold col-pink';
+                //}else{
+                  //  $colorfilaex = '';
+                //}
+                /*$filasmovimientos= $filasmovimientos.
+                '<tr class="'.$d['colorfila'].'">'.
+                    '<td><b>'.$d['nummovimiento'].'</b></td>'.
+                    '<td>'.$d['documento'].'</td>'.
+                    '<td>'.$d['movimiento'].'</td>'.
+                    '<td>'.$d['fecha'].'</td>'.
+                    '<td>'.$d['almacen'].'</td>'.
+                    '<td>'.$d['entradas'].'</td>'.
+                    '<td>'.$d['salidas'].'</td>'.
+                    '<td class="'.$colorfilaex.'">'.$d['existencias'].'</td>'.
+                    '<td>'.$d['costo'].'</td>'.
+                    '<td>'.$d['status'].'</td>'.
+                '</tr>';
+                $primerfila++;
+                */
+            //}
+            /*$data = array(
+                'filasmovimientos' => $filasmovimientos,
+                'entradas' => Helpers::convertirvalorcorrecto($entradas),
+                'salidas' => Helpers::convertirvalorcorrecto($salidas),
+                'existencias' => Helpers::convertirvalorcorrecto($existencias),
+                //'selectalmacenes' => $selectalmacenes,
+            );*/
+        }
+        $filasmovimientos = '';
+        foreach($data as $d){
+            $filasmovimientos= $filasmovimientos.
+            '<tr>'.
+                    '<td><b>'.$d['codigo'].'</b></td>'.
+                    '<td>'.$d['almacen'].'</td>'.
+                    '<td>'.$d['entradas'].'</td>'.
+                    '<td>'.$d['salidas'].'</td>'.
+                    '<td>'.$d['existencias'].'</td>'.
+            '</tr>';
+        }
+        echo '<table border="2"><tr><td>Codigo</td><td>Almacen</td><td>Entradas</td><td>Salidas</td><td>Existencias</td></tr>'.$filasmovimientos.'</table>';
+        //return response()->json($data);
+
+
+        /*$fecha = "2020-09-24";
 
         $client = new Client();
 
@@ -54,12 +150,12 @@ class PruebaController extends ConfiguracionSistemaController{
 
         });*/
 
-        $arraydolar = $crawler->filter('.Celda .txt')->last()->text();
+        //$arraydolar = $crawler->filter('.Celda .txt')->last()->text();
         /*foreach ($arraydolar as $domElement) {
             //var_dump($domElement->nodeName);
             print $domElement->nodeName."<br>";
         }*/
-        dd($arraydolar);
+        //dd($arraydolar);*/
 
     }
 

@@ -813,6 +813,11 @@ function seleccionarformapago(Clave, Nombre){
     $("#formapago").val(Nombre);
     if(Nombre != null){
       $("#textonombreformapago").html(Nombre.substring(0, 40));
+    }    
+    if(Clave == '99'){
+      seleccionarmetodopago('PPD','Pago en parcialidades o diferido');
+    }else{
+      seleccionarmetodopago('PUE','Pago en una sola exhibición');
     }
     mostrarformulario();
   }
@@ -1954,6 +1959,11 @@ function obtenerformapagoporclave(){
         if(data.nombre != null){
           $("#textonombreformapago").html(data.nombre.substring(0, 40));
         }
+        if(data.clave == '99'){
+          seleccionarmetodopago('PPD','Pago en parcialidades o diferido');
+        }else{
+          seleccionarmetodopago('PUE','Pago en una sola exhibición');
+        }
         mostrarformulario();
       }) 
     }
@@ -2495,7 +2505,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
         var tipo = "alta";
         var fila= '<tr class="filasproductos" id="filaproducto'+contadorfilas+'">'+
                     '<td class="tdmod"><div class="numeropartida">'+partida+'</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
-                    '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+
+                    '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'+Codigo+'</b></td>'+
                     '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'+Producto+'" data-parsley-length="[1, 255]" autocomplete="off"></td>'+
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="'+Unidad+'" data-parsley-length="[1, 5]" autocomplete="off"></td>'+
                     '<td class="tdmod">'+
@@ -2966,7 +2976,7 @@ function alta(){
                                   '<thead class="'+background_tables+'">'+
                                     '<tr>'+
                                       '<th class="'+background_tables+'">#</th>'+
-                                      '<th class="customercolortheadth">Código</th>'+
+                                      '<th class="customercolortheadth"><div style="width:100px !important;">Código</div></th>'+
                                       '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
                                       '<th class="customercolortheadth">Uda</th>'+
                                       '<th class="customercolortheadth">Cantidad</th>'+
@@ -4019,7 +4029,7 @@ function obtenerdatos(facturamodificar){
                             '<thead class="'+background_tables+'">'+
                               '<tr>'+
                                 '<th class="'+background_tables+'">#</th>'+
-                                '<th class="customercolortheadth">Código</th>'+
+                                '<th class="customercolortheadth"><div style="width:100px !important;">Código</div></th>'+
                                 '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
                                 '<th class="customercolortheadth">Uda</th>'+
                                 '<th class="customercolortheadth">Cantidad</th>'+
@@ -4591,6 +4601,7 @@ function enviardocumentoemail(documento, tipo){
       $("#correosconcopia").append('<option value="'+data.email3cc+'" selected>'+data.email3cc+'</option>');
     }
     $("#emailasunto").val("FACTURA NO. " + documento +" DE "+ nombreempresa);
+    $("#emailmensaje").val("FACTURA NO. " + documento +" DE "+ nombreempresa);
     if(data.factura.UUID != ""){
       $("#incluir_xml").removeAttr('onclick');
     }else{

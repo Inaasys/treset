@@ -1003,7 +1003,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
             var tipo = "alta";
             var fila= '<tr class="filasproductos" id="filaproducto'+contadorproductos+'">'+
                         '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('+contadorproductos+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
-                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+
+                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'+Codigo+'</b></td>'+
                         '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
                         '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'+Unidad+'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'+Unidad+'</td>'+
                         '<td class="tdmod">'+
@@ -1331,7 +1331,7 @@ function agregarfilaservicio(Codigo, Servicio, Unidad, Familia, Costo, Venta, Ca
         var tipo = "alta";
         var fila='<tr class="filasservicios" id="filaservicio'+contadorservicios+'">'+
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilaservicio('+contadorservicios+')">X</div><input type="hidden" class="form-control agregadoenservicio" name="agregadoenservicio[]" value="'+tipooperacion+'" readonly></td>'+
-                    '<td class="tdmod"><input type="hidden" class="form-control codigoserviciopartida" name="codigoserviciopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+
+                    '<td class="tdmod"><input type="hidden" class="form-control codigoserviciopartida" name="codigoserviciopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'+Codigo+'</b></td>'+
                     '<td class="tdmod"><input type="text" class="form-control inputnextdetser divorinputmodxl descripcionserviciopartida" name="descripcionserviciopartida[]" value="'+Servicio+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
                     '<td class="tdmod"><input type="hidden" class="form-control unidadserviciopartida" name="unidadserviciopartida[]" value="'+Unidad+'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'+Unidad+'</td>'+
                     '<td class="tdmod">'+
@@ -1542,7 +1542,7 @@ function alta(){
                                         '<thead class="'+background_tables+'">'+
                                             '<tr>'+
                                                 '<th class="'+background_tables+'">#</th>'+
-                                                '<th class="customercolortheadth">Código</th>'+
+                                                '<th class="customercolortheadth"><div style="width:100px !important;">Código</div></th>'+
                                                 '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
                                                 '<th class="customercolortheadth">Unidad</th>'+
                                                 '<th class="customercolortheadth">Cantidad</th>'+
@@ -1590,7 +1590,7 @@ function alta(){
                                         '<thead class="'+background_tables+'">'+
                                             '<tr>'+
                                                 '<th class="'+background_tables+'">#</th>'+
-                                                '<th class="customercolortheadth">Código</th>'+
+                                                '<th class="customercolortheadth"><div style="width:100px !important;">Código</div></th>'+
                                                 '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
                                                 '<th class="customercolortheadth">Unidad</th>'+
                                                 '<th class="customercolortheadth">Cantidad</th>'+
@@ -2114,7 +2114,7 @@ function obtenerdatos(cotizacionmodificar){
                           '<thead class="'+background_tables+'">'+
                             '<tr>'+
                               '<th class="'+background_tables+'">#</th>'+
-                              '<th class="customercolortheadth">Código</th>'+
+                              '<th class="customercolortheadth"><div style="width:100px !important;">Código</div></th>'+
                               '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
                               '<th class="customercolortheadth">Unidad</th>'+
                               '<th class="customercolortheadth">Cantidad</th>'+
@@ -2152,7 +2152,7 @@ function obtenerdatos(cotizacionmodificar){
                           '<thead class="'+background_tables+'">'+
                             '<tr>'+
                               '<th class="'+background_tables+'">#</th>'+
-                              '<th class="customercolortheadth">Código</th>'+
+                              '<th class="customercolortheadth"><div style="width:100px !important;">Código</div></th>'+
                               '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
                               '<th class="customercolortheadth">Unidad</th>'+
                               '<th class="customercolortheadth">Cantidad</th>'+
@@ -2562,6 +2562,7 @@ function enviardocumentoemail(documento, tipo){
       $("#correosconcopia").append('<option value="'+data.email3cc+'" selected>'+data.email3cc+'</option>');
     }
     $("#emailasunto").val("COTIZACIÓN SERVICIO NO. " + documento +" DE "+ nombreempresa);
+    $("#emailmensaje").val("COTIZACIÓN SERVICIO NO. " + documento +" DE "+ nombreempresa);
     $(".dropify-clear").trigger("click");
     $("#divadjuntararchivo").show();
     $("#modalenviarpdfemail").modal('show');

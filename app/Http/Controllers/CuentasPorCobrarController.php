@@ -1256,7 +1256,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $asunto = $request->emailasunto;
             $emaildocumento = $request->emaildocumento;
             $name = "Receptor envio de correos";
-            $body = $request->emailasunto;
+            $body = $request->emailmensaje;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             if (file_exists($url_xml) != false) {

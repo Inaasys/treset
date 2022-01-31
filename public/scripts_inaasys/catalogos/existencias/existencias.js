@@ -34,6 +34,16 @@ function listar(){
         serverSide: true,
         ajax: existencias_obtener,
         columns: campos_tabla,
+        "drawCallback": function( data ) {
+            $("#sumacostofiltrado").html(data.json.sumacosto);
+            $("#sumasubtotalfiltrado").html(data.json.sumasubtotal);
+            $("#sumaivafiltrado").html(data.json.sumaiva);
+            $("#sumatotalfiltrado").html(data.json.sumatotal);
+            $("#sumatotalcostoinventariofiltrado").html(data.json.sumatotalcostoinventario);
+            $("#sumacostolistafiltrado").html(data.json.sumacostolista);
+            $("#sumacostoventafiltrado").html(data.json.sumacostoventa);
+            $("#sumaexistenciasfiltrado").html(data.json.sumaexistencias);
+        },
         initComplete: function () {
           // Aplicar busquedas por columna
           this.api().columns().every( function () {

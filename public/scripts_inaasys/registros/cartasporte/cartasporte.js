@@ -3624,6 +3624,7 @@ function enviardocumentoemail(documento){
     $("#email2cc").val(data.email2cc);
     $("#email3cc").val(data.email3cc);
     $("#emailasunto").val("NOTA DE CRÉDITO CLIENTE NO. " + documento +" DE "+ nombreempresa);
+    $("#emailmensaje").val("NOTA DE CRÉDITO CLIENTE NO. " + documento +" DE "+ nombreempresa);
     if(data.notacliente.UUID != ""){
       $("#incluir_xml").removeAttr('onclick');
     }else{

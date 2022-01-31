@@ -66,6 +66,21 @@ class ProductoController extends ConfiguracionSistemaController{
                             $query->orderBy($configuraciones_tabla['configuracion_tabla']->tercerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formatercerordenamiento . '');
                         }
                     })
+                    ->withQuery('sumacosto', function($data) {
+                        return $data->sum('Costo');
+                    })
+                    ->withQuery('sumaultimocosto', function($data) {
+                        return $data->sum('UltimoCosto');
+                    })
+                    ->withQuery('sumaultimaventa', function($data) {
+                        return $data->sum('UltimaVenta');
+                    })
+                    ->withQuery('sumaprecio', function($data) {
+                        return $data->sum('Precio');
+                    })
+                    ->withQuery('sumaexistencias', function($data) {
+                        return $data->sum('Existencias');
+                    })
                     ->addColumn('operaciones', function($data){
                         $operaciones = '<div class="dropdown">'.
                                             '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
@@ -707,6 +722,7 @@ class ProductoController extends ConfiguracionSistemaController{
         $tamanoetiquetas = $request->tamanoetiquetascatalogocodigosbarras;
         $tipoprod = $request->tipoprodcodigosbarras;
         $status = $request->statuscodigosbarras;
+        $ubicacion = $request->codigobarrasubicacion;
         $codigos = Producto::select('Codigo','Producto','Ubicacion')
         ->where(function($q) use ($tipoprod) {
             if($tipoprod != "TODOS"){
@@ -716,6 +732,11 @@ class ProductoController extends ConfiguracionSistemaController{
         ->where(function($q) use ($status) {
             if($status != "TODOS"){
                 $q->where('Status', $status);
+            }
+        })
+        ->where(function($q) use ($ubicacion) {
+            if($ubicacion != ""){
+                $q->where('Ubicacion', $ubicacion);
             }
         })
         ->get();
@@ -984,9 +1005,9 @@ class ProductoController extends ConfiguracionSistemaController{
         $selectalmacenes = "<option selected disabled hidden>Selecciona el almacén</option>";
         foreach($almacenes as $a){
             if($a->Numero == $request->almacen){
-                $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.' Selected>'.$a->Nombre;
+                $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.' Selected>'.$a->Nombre.'</option>';
             }else{
-                $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.'>'.$a->Nombre;
+                $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.'>'.$a->Nombre.'</option>';
             }
         }
         $kardex = DB::select('exec ObtenerKardex ?,?', array($request->codigo,$request->almacen));

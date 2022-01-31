@@ -46,6 +46,7 @@ use App\Firma_Rel_Documento;
 use Config;
 use Mail;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
+use ZipArchive;
 
 class CompraController extends ConfiguracionSistemaController{
 
@@ -240,18 +241,30 @@ class CompraController extends ConfiguracionSistemaController{
                 $receptor = "";
             }
             //obtener datos generales del xml nodo Impuestos
-            $impuesto = $namespaces->Impuestos->attributes();
-            $TotalImpuestosTrasladados = $impuesto['TotalImpuestosTrasladados'];
-            //obtener datos generales del xml nodo hijo traslado del nodo padre Impuestos
-            $array_traslados_impuestos = array();
-            foreach($namespaces->Impuestos->Traslados->Traslado as $traslado){
-                $atributos_traslado = $traslado->attributes();
-                $array_traslados_impuestos[] = array(
-                    "Impuesto" => $atributos_traslado['Impuesto'],
-                    "TipoFactor" => $atributos_traslado['TipoFactor'],
-                    "TasaOCuota" => $atributos_traslado['TasaOCuota'],
-                    "Importe" => $atributos_traslado['Importe']
-                );
+            if(isset($namespaces->Impuestos)){
+                $impuesto = $namespaces->Impuestos->attributes();
+                $TotalImpuestosTrasladados = $impuesto['TotalImpuestosTrasladados'];
+                //obtener datos generales del xml nodo hijo traslado del nodo padre Impuestos
+                $array_traslados_impuestos = array();
+                foreach($namespaces->Impuestos->Traslados->Traslado as $traslado){
+                    $atributos_traslado = $traslado->attributes();
+                    $array_traslados_impuestos[] = array(
+                        "Impuesto" => $atributos_traslado['Impuesto'],
+                        "TipoFactor" => $atributos_traslado['TipoFactor'],
+                        "TasaOCuota" => $atributos_traslado['TasaOCuota'],
+                        "Importe" => $atributos_traslado['Importe']
+                    );
+                }
+            }else{
+                $TotalImpuestosTrasladados = '0.00';
+                //obtener datos generales del xml nodo hijo traslado del nodo padre Impuestos
+                $array_traslados_impuestos = array();
+                    $array_traslados_impuestos[] = array(
+                        "Impuesto" => "",
+                        "TipoFactor" =>"",
+                        "TasaOCuota" => "0.160000",
+                        "Importe" => "0.00"
+                    );
             }
             //obtener todas las partidas ó conceptos del xml
             $array_conceptos = array();
@@ -308,7 +321,7 @@ class CompraController extends ConfiguracionSistemaController{
                 $filasdetallesxml= $filasdetallesxml.
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" >X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" readonly></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$atributos_concepto['NoIdentificacion'].'" readonly>'.$atributos_concepto['NoIdentificacion'].'</td>'.                    
+                    '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$atributos_concepto['NoIdentificacion'].'" readonly><b style="font-size:12px;">'.$atributos_concepto['NoIdentificacion'].'</b></td>'.                    
                     '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet nombreproductopartida" name="nombreproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($atributos_concepto['Descripcion'], ENT_QUOTES).'</textarea></td>'.                    
                     '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$atributos_concepto['Unidad'].'" readonly>'.$atributos_concepto['Unidad'].'</td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm porsurtirpartida"  name="porsurtirpartida[]" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
@@ -659,7 +672,7 @@ class CompraController extends ConfiguracionSistemaController{
                     $filasdetallesordencompra= $filasdetallesordencompra.
                     '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                         '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$doc->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
-                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$doc->Codigo.'" readonly data-parsley-length="[1, 20]">'.$doc->Codigo.'</td>'.
+                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$doc->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$doc->Codigo.'</b></td>'.
                         '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet nombreproductopartida" name="nombreproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($doc->Descripcion, ENT_QUOTES).'</textarea></td>'.                    
                         '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$doc->Unidad.'" readonly data-parsley-length="[1, 5]">'.$doc->Unidad.'</td>'.
                         '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm porsurtirpartida"  name="porsurtirpartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Surtir).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
@@ -1071,7 +1084,7 @@ class CompraController extends ConfiguracionSistemaController{
                     $filasdetallescompra= $filasdetallescompra.
                     '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                         '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dc->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
-                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dc->Codigo.'" readonly data-parsley-length="[1, 20]">'.$dc->Codigo.'</td>'.
+                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dc->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$dc->Codigo.'</b></td>'.
                         '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet nombreproductopartida" name="nombreproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($dc->Descripcion, ENT_QUOTES).'</textarea></td>'.                    
                         '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$dc->Unidad.'" readonly data-parsley-length="[1, 5]">'.$dc->Unidad.'</td>'.
                         '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm porsurtirpartida"  name="porsurtirpartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
@@ -1927,6 +1940,8 @@ class CompraController extends ConfiguracionSistemaController{
     public function compras_generar_pdfs(Request $request){
         //primero eliminar todos los archivos de la carpeta
         Helpers::eliminararchivospdfsgenerados();
+        //primero eliminar todos los archivos zip
+        Helpers::eliminararchivoszipgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
             $compras = Compra::whereIn('Compra', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
@@ -1936,6 +1951,7 @@ class CompraController extends ConfiguracionSistemaController{
             $compras = Compra::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $arrayfilespdf = array();
         foreach ($compras as $c){
             $data=array();
             $compradetalle = CompraDetalle::where('Compra', $c->Compra)->get();
@@ -1999,9 +2015,36 @@ class CompraController extends ConfiguracionSistemaController{
             $ArchivoPDF = "PDF".$com->Compra.".pdf";
             $urlarchivo = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
             $pdfMerger->addPDF($urlarchivo, 'all');
+            array_push($arrayfilespdf,$ArchivoPDF);
         }
         $pdfMerger->merge(); //unirlos
-        $pdfMerger->save("Compras.pdf", "browser");//mostrarlos en el navegador   
+        if($request->descargar_xml == 0){
+            $pdfMerger->save("Compras.pdf", "browser");//mostrarlos en el navegador   
+        }else{
+            //carpeta donde se guardara el archivo zip
+            $public_dir=public_path();
+            // Zip File Name
+            $zipFileName = 'DocumentosPDF.zip';
+            // Crear Objeto ZipArchive
+            $zip = new ZipArchive;
+            if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
+                // Agregar archivos que se comprimiran
+                foreach($arrayfilespdf as $afp) {
+                    $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
+                }     
+                //terminar proceso   
+                $zip->close();
+            }
+            // Set Encabezados para descargar
+            $headers = array(
+                'Content-Type' => 'application/octet-stream',
+            );
+            $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
+            // Create Download Response
+            if(file_exists($filetopath)){
+                return response()->download($filetopath,$zipFileName,$headers);
+            }
+        }
     }
 
     //generacion de formato en PDF
@@ -2192,7 +2235,7 @@ class CompraController extends ConfiguracionSistemaController{
             $asunto = $request->emailasunto;
             $emaildocumento = $request->emaildocumento;
             $name = "Receptor envio de correos";
-            $body = $request->emailasunto;
+            $body = $request->emailmensaje;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             if($request->archivoadjunto != null && $request->archivoadjunto2 != null) {

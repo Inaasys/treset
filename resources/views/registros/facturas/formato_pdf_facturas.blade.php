@@ -54,9 +54,9 @@
                         <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
                             <li style="font-size:10px; margin-left: 5px;"> Nombre: {{$d['cliente']->Nombre}} ({{$d['cliente']->Numero}})</li>
                             <li style="font-size:10px; margin-left: 5px;"> Dirección: {{$d['cliente']->Calle}} {{$d['cliente']->noExterior}} {{$d['cliente']->noInterior}}</b></li>
-                            <li style="font-size:10px; margin-left: 5px;"> Colonia: {{$d['cliente']->Colonia}}</li>
-                            <li style="font-size:10px; margin-left: 5px;"> Estado: {{$d['cliente']->Localidad}}</li>
-                            <li style="font-size:10px; margin-left: 5px;"> Ciudad: {{$d['cliente']->Municipio}} C.P. {{$d['cliente']->CodigoPostal}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> Colonia: {{$d['cliente']->Colonia}} {{$d['cliente']->Localidad}} C.P. {{$d['cliente']->CodigoPostal}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> Estado: {{$d['est']}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> Ciudad: {{$d['est']}} </li>
                             <li style="font-size:10px; margin-left: 5px;"> Agente: {{$d['agente']->Nombre}}</li>
                             <li style="font-size:10px; margin-left: 5px;"> EmisorRfc: {{$d['factura']->EmisorRfc}}</li>
                             <li style="font-size:10px; margin-left: 5px;"> ReceptorRfc: {{$d['factura']->ReceptorRfc}}</li>
@@ -70,7 +70,6 @@
                             <li style="font-size:10px; margin-left: 5px;">Plazo: {{$d['factura']->Plazo}} Días</li>
                             <li style="font-size:10px; margin-left: 5px;">Emitida: {{$d['factura']->Hora}}</li>
                             <li style="font-size:10px; margin-left: 5px;">Vence: {{$d['fechavence']}}</li>
-                            <li style="font-size:10px; margin-left: 5px;">Pedido: {{$d['factura']->Pedido}}</li>
                             <li style="font-size:10px; margin-left: 5px;">UsoCfdi: @if($d['usocfdi'] != null) {{$d['usocfdi']->Clave}} {{$d['usocfdi']->Nombre}} @endif</li>
                             <li style="font-size:10px; margin-left: 5px;">Forma de Pago: @if($d['formapago'] != null) {{$d['formapago']->Clave}} {{$d['formapago']->Nombre}} @endif</li>
                             <li style="font-size:10px; margin-left: 5px;">Método de Pago: @if($d['metodopago'] != null) {{$d['metodopago']->Clave}} {{$d['metodopago']->Nombre}} @endif</li>
@@ -99,7 +98,7 @@
                                                         <td><b>Pedido:</b> <br>{{$dataremisionoorden['datosgenerales']->Pedido}}</td>
                                                         <td><b>Orden Servicio:</b> <br>{{$dataremisionoorden['datosgenerales']->Os}}</td>
                                                         <td><b>Equipo:</b> <br>{{$dataremisionoorden['datosgenerales']->Eq}}</td>
-                                                        <td><b>Requisición:</b> <br>{{$dataremisionoorden['datosgenerales']->Rq}}</td>
+                                                        <td><b>Requisición:</b> <br>{{$dataremisionoorden['datosgenerales']->SerieRq}} {{$dataremisionoorden['datosgenerales']->Rq}}</td>
                                                     </tr>
                                                 </table>
                                             </td>
@@ -121,7 +120,7 @@
                                         </tr>
                                     @endforeach
                                     <tr>
-                                        <td colspan="5" style="font-size:10px"></td>
+                                        <td colspan="5" style="font-size:10px"><b>@if($empresa->ColocarObservacionesDeRemisionEnFactura == 'S') {{ $dataremisionoorden['obsdocumento'] }} @endif</b></td>
                                         <td style="font-size:11px;text-align: right;"><b>{{ number_format($dataremisionoorden['sumatotaldetalles'], $d['numerodecimalesdocumento']) }}</b></td>
                                     </tr>
                                 @endforeach

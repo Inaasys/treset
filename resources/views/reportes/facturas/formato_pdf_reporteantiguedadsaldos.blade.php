@@ -77,9 +77,14 @@
                                 $totalnc = 0; 
                                 $totalpagos = 0; 
                                 $totalsaldos = 0; 
+                                $numfila = 1;
                             ?>
                             @foreach($data['consultarep'] as $cr)
+                                @if($numfila % 2 == 0)
+                                <tr style="font-size:9px;background-color:#dddddd;">
+                                @else
                                 <tr style="font-size:9px;">
+                                @endif
                                     <td>{{$cr->NombreCliente}}</td>
                                     <td style="text-align: right;">{{ number_format($cr->Facturado, $data['numerodecimales']) }}</td>
                                     <td style="text-align: right;">{{ number_format($cr->AbonosCXC, $data['numerodecimales']) }}</td>
@@ -93,6 +98,7 @@
                                     $totalnc = $totalnc + $cr->DescuentosNotasCredito; 
                                     $totalpagos = $totalpagos + $cr->TotalPagos; 
                                     $totalsaldos = $totalsaldos + $cr->SaldoFacturado; 
+                                    $numfila++;
                                 ?>
                             @endforeach
                             <tr>
@@ -144,9 +150,14 @@
                                 $totalnc = 0; 
                                 $totalpagos = 0; 
                                 $totalsaldos = 0; 
+                                $numfila = 1;
                             ?>
                             @foreach($data['consultarep'] as $cr)
+                                @if($numfila % 2 == 0)
+                                <tr style="font-size:9px;background-color:#dddddd;">
+                                @else
                                 <tr style="font-size:9px;">
+                                @endif
                                     <td>{{$cr->Factura}}</td>
                                     <td>{{$cr->Fecha}}</td>
                                     <td>{{$cr->Plazo}}</td>
@@ -163,6 +174,7 @@
                                     $totalnc = $totalnc + $cr->DescuentosNotasCredito; 
                                     $totalpagos = $totalpagos + $cr->TotalPagos; 
                                     $totalsaldos = $totalsaldos + $cr->SaldoFacturado; 
+                                    $numfila++;
                                 ?>
                             @endforeach
                             <tr>

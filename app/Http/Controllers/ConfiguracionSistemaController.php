@@ -61,7 +61,9 @@ class ConfiguracionSistemaController extends Controller
                                             'ControlarConsecutivoNumeroRequisicionEnRemisiones',
                                             'ColocarObservacionesDeRemisionEnFactura',
                                             'PedirObligatoriamenteObservacionEnFactura',
-                                            'ColocarEnCeroCantidadEnPartidasDeRemisiones')
+                                            'ColocarEnCeroCantidadEnPartidasDeRemisiones',
+                                            'MostrarTotalesDeColumnasEnDocumentos',
+                                            'MostrarInsumoPorPartidaEnCapturaDeRemisiones')
                                 ->where('Numero', 1)->first();
         //actualizar datos de configuracion global
         config(['app.periodoincialmodulos' => $this->empresa->Periodo_Inicial_Modulos]);
@@ -245,6 +247,8 @@ class ConfiguracionSistemaController extends Controller
                         ->where('IdFacturapi', '<>', NULL)
                         ->where('FechaCancelacion', '<>', NULL)
                         ->count();
+        //mostrar resultado de totales por columnas en tabla principal de todos los modulos
+        $this->mostrartotalesdecolumnasendocumentos = $this->empresa->MostrarTotalesDeColumnasEnDocumentos;
         ////////////FIN OBTENER CONFIGURACIONES DEL SISTEMA////////////////
         ///////////COMPARTIR CONFIGURACIONES EN TODAS LAS VISTAS ///////////
         View::share ( 'mayusculas_sistema', $this->mayusculas_sistema );
@@ -287,6 +291,7 @@ class ConfiguracionSistemaController extends Controller
         View::share ( 'timbrespagocxccanceladastotalesactivosfacturapi', $this->timbrespagocxccanceladastotalesactivosfacturapi);
         View::share ( 'timbrestotalesactivosfacturapi', $this->timbrestotalesactivosfacturapi);
         View::share ( 'timbrestotalescanceladosfacturapi', $this->timbrestotalescanceladosfacturapi);
+        View::share ( 'mostrartotalesdecolumnasendocumentos', $this->mostrartotalesdecolumnasendocumentos);
         //View::share ( 'array', ['name'=>'Franky','address'=>'Mars'] );
     } 
 }

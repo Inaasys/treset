@@ -391,6 +391,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/ordenes_trabajo_alta_o_baja', 'OrdenTrabajoController@ordenes_trabajo_alta_o_baja')->name('ordenes_trabajo_alta_o_baja')->middleware('revisarpermisos:registros.ordenes.trabajo.bajas');
     Route::get('/ordenes_trabajo_verificar_status_orden', 'OrdenTrabajoController@ordenes_trabajo_verificar_status_orden')->name('ordenes_trabajo_verificar_status_orden')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
     Route::post('/ordenes_trabajo_terminar_orden', 'OrdenTrabajoController@ordenes_trabajo_terminar_orden')->name('ordenes_trabajo_terminar_orden')->middleware('revisarpermisos:registros.ordenes.trabajo.terminar');
+    Route::get('/ordenes_trabajo_verificar_abrir_nuevamente_orden', 'OrdenTrabajoController@ordenes_trabajo_verificar_abrir_nuevamente_orden')->name('ordenes_trabajo_verificar_abrir_nuevamente_orden')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+    Route::post('/ordenes_trabajo_abrir_nuevamente_orden', 'OrdenTrabajoController@ordenes_trabajo_abrir_nuevamente_orden')->name('ordenes_trabajo_abrir_nuevamente_orden')->middleware('revisarpermisos:registros.ordenes.trabajo.terminar');
     Route::get('/ordenes_trabajo_buscar_folio_string_like', 'OrdenTrabajoController@ordenes_trabajo_buscar_folio_string_like')->name('ordenes_trabajo_buscar_folio_string_like')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
     Route::post('/ordenes_trabajo_generar_pdfs', 'OrdenTrabajoController@ordenes_trabajo_generar_pdfs')->name('ordenes_trabajo_generar_pdfs')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
     Route::get('/ordenes_trabajo_obtener_datos_envio_email', 'OrdenTrabajoController@ordenes_trabajo_obtener_datos_envio_email')->name('ordenes_trabajo_obtener_datos_envio_email')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
@@ -982,10 +984,23 @@ Route::group(['middleware' => ['auth']], function () {
     //relacion contrarecibos
     Route::get('/reporte_relacion_contrarecibos', 'ReportesContraRecibosController@reporte_relacion_contrarecibos')->name('reporte_relacion_contrarecibos')->middleware('revisaraccesomenu:menureporterelacioncontrarecibos');
     Route::get('/reporte_relacion_contrarecibos_generar_formato_excel', 'ReportesContraRecibosController@reporte_relacion_contrarecibos_generar_formato_excel')->name('reporte_relacion_contrarecibos_generar_formato_excel')->middleware('revisaraccesomenu:menureporterelacioncontrarecibos');
+    Route::get('/reporte_relacion_contrarecibos_generar_formato_pdf', 'ReportesContraRecibosController@reporte_relacion_contrarecibos_generar_formato_pdf')->name('reporte_relacion_contrarecibos_generar_formato_pdf')->middleware('revisaraccesomenu:menureporterelacioncontrarecibos');
     Route::get('/reporte_relacion_contrarecibos_obtener_proveedores', 'ReportesContraRecibosController@reporte_relacion_contrarecibos_obtener_proveedores')->name('reporte_relacion_contrarecibos_obtener_proveedores')->middleware('revisaraccesomenu:menureporterelacioncontrarecibos');
     Route::get('/reporte_relacion_contrarecibos_obtener_proveedor_por_numero', 'ReportesContraRecibosController@reporte_relacion_contrarecibos_obtener_proveedor_por_numero')->name('reporte_relacion_contrarecibos_obtener_proveedor_por_numero')->middleware('revisaraccesomenu:menureporterelacioncontrarecibos');
     Route::post('/reporte_relacion_contrarecibos_generar_reporte', 'ReportesContraRecibosController@reporte_relacion_contrarecibos_generar_reporte')->name('reporte_relacion_contrarecibos_generar_reporte')->middleware('revisaraccesomenu:menureporterelacioncontrarecibos');
     /*#################################FIN CONTRARECIBOS##########################################*/
+    /*#################################CUENTAS POR PAGAR##########################################*/
+    //relacion contrarecibos
+    Route::get('/reporte_relacion_cuentasporpagar', 'ReportesCuentasPorPagarController@reporte_relacion_cuentasporpagar')->name('reporte_relacion_cuentasporpagar')->middleware('revisaraccesomenu:menureporterelacioncxp');
+    Route::get('/reporte_relacion_cuentasporpagar_generar_formato_excel', 'ReportesCuentasPorPagarController@reporte_relacion_cuentasporpagar_generar_formato_excel')->name('reporte_relacion_cuentasporpagar_generar_formato_excel')->middleware('revisaraccesomenu:menureporterelacioncxp');
+    Route::get('/reporte_relacion_cuentasporpagar_generar_formato_pdf', 'ReportesCuentasPorPagarController@reporte_relacion_cuentasporpagar_generar_formato_pdf')->name('reporte_relacion_cuentasporpagar_generar_formato_pdf')->middleware('revisaraccesomenu:menureporterelacioncxp');
+    Route::get('/reporte_relacion_cuentasporpagar_obtener_proveedores', 'ReportesCuentasPorPagarController@reporte_relacion_cuentasporpagar_obtener_proveedores')->name('reporte_relacion_cuentasporpagar_obtener_proveedores')->middleware('revisaraccesomenu:menureporterelacioncxp');
+    Route::get('/reporte_relacion_cuentasporpagar_obtener_proveedor_por_numero', 'ReportesCuentasPorPagarController@reporte_relacion_cuentasporpagar_obtener_proveedor_por_numero')->name('reporte_relacion_cuentasporpagar_obtener_proveedor_por_numero')->middleware('revisaraccesomenu:menureporterelacioncxp');
+    Route::get('/reporte_relacion_cuentasporpagar_obtener_bancos', 'ReportesCuentasPorPagarController@reporte_relacion_cuentasporpagar_obtener_bancos')->name('reporte_relacion_cuentasporpagar_obtener_bancos')->middleware('revisaraccesomenu:menureporterelacioncxp');
+    Route::get('/reporte_relacion_cuentasporpagar_obtener_banco_por_numero', 'ReportesCuentasPorPagarController@reporte_relacion_cuentasporpagar_obtener_banco_por_numero')->name('reporte_relacion_cuentasporpagar_obtener_banco_por_numero')->middleware('revisaraccesomenu:menureporterelacioncxp');
+    Route::post('/reporte_relacion_cuentasporpagar_generar_reporte', 'ReportesCuentasPorPagarController@reporte_relacion_cuentasporpagar_generar_reporte')->name('reporte_relacion_cuentasporpagar_generar_reporte')->middleware('revisaraccesomenu:menureporterelacioncxp');
+    /*#################################FIN CUENTAS POR PAGAR##########################################*/
+    
     /*#################################COTIZACIONES##########################################*/
     //relacion cotizciones
     Route::get('/reporte_relacion_cotizaciones', 'ReportesCotizacionesController@reporte_relacion_cotizaciones')->name('reporte_relacion_cotizaciones')->middleware('revisaraccesomenu:menureporterelacioncotizaciones');
@@ -1025,9 +1040,7 @@ Route::group(['middleware' => ['auth']], function () {
     //reporte antiguedad saldos
     Route::get('/reporte_antiguedad_saldos', 'ReporteAntiguedadSaldosController@reporte_antiguedad_saldos')->name('reporte_antiguedad_saldos')->middleware('revisaraccesomenu:menureportefacturasantiguedadsaldos');
     Route::get('/reporte_antiguedad_saldos_generar_formato_excel', 'ReporteAntiguedadSaldosController@reporte_antiguedad_saldos_generar_formato_excel')->name('reporte_antiguedad_saldos_generar_formato_excel')->middleware('revisaraccesomenu:menureportefacturasantiguedadsaldos');
-    
     Route::get('/reporte_antiguedad_saldos_generar_formato_pdf', 'ReporteAntiguedadSaldosController@reporte_antiguedad_saldos_generar_formato_pdf')->name('reporte_antiguedad_saldos_generar_formato_pdf')->middleware('revisaraccesomenu:menureportefacturasantiguedadsaldos');
-    
     Route::get('/reporte_antiguedad_saldos_obtener_clientes', 'ReporteAntiguedadSaldosController@reporte_antiguedad_saldos_obtener_clientes')->name('reporte_antiguedad_saldos_obtener_clientes')->middleware('revisaraccesomenu:menureportefacturasantiguedadsaldos');
     Route::get('/reporte_antiguedad_saldos_obtener_series', 'ReporteAntiguedadSaldosController@reporte_antiguedad_saldos_obtener_series')->name('reporte_antiguedad_saldos_obtener_series')->middleware('revisaraccesomenu:menureportefacturasantiguedadsaldos');
     Route::get('/reporte_antiguedad_saldos_obtener_cliente_por_numero', 'ReporteAntiguedadSaldosController@reporte_antiguedad_saldos_obtener_cliente_por_numero')->name('reporte_antiguedad_saldos_obtener_cliente_por_numero')->middleware('revisaraccesomenu:menureportefacturasantiguedadsaldos');

@@ -245,7 +245,7 @@ class FacturaController extends ConfiguracionSistemaController{
                         $filasdetallesfactura= $filasdetallesfactura.
                         '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                             '<td class="tdmod"><div class="numeropartida">'.$numeropartida.'</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
-                            '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]">'.$producto->Codigo.'</td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$producto->Codigo.'</b></td>'.
                             '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($producto->Producto, ENT_QUOTES).'"  data-parsley-length="[1, 255]" autocomplete="off"></td>'.
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="'.$producto->Unidad.'" data-parsley-length="[1, 5]" autocomplete="off"></td>'.
                             '<td class="tdmod">'.
@@ -854,7 +854,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 $filasremisiones= $filasremisiones.
                 '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                     '<td class="tdmod"><div class="numeropartida">'.$partida.'</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$detalle->Codigo.'" readonly data-parsley-length="[1, 20]">'.$detalle->Codigo.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$detalle->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$detalle->Codigo.'</b></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control inputnextdet descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($detalle->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]">'.htmlspecialchars($detalle->Descripcion, ENT_QUOTES).'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="'.$detalle->Unidad.'" required data-parsley-length="[1, 5]">'.$detalle->Unidad.'</td>'.
                     '<td class="tdmod">'.
@@ -975,7 +975,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 $filasremisiones= $filasremisiones.
                 '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                     '<td class="tdmod"><div class="numeropartida">'.$partida.'</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$detalle->Codigo.'" readonly data-parsley-length="[1, 20]">'.$detalle->Codigo.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$detalle->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$detalle->Codigo.'</b></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control inputnextdet descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($detalle->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]">'.htmlspecialchars($detalle->Descripcion, ENT_QUOTES).'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="'.$detalle->Unidad.'" required data-parsley-length="[1, 5]">'.$detalle->Unidad.'</td>'.
                     '<td class="tdmod">'.
@@ -1061,7 +1061,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 $filasremisiones= $filasremisiones.
                 '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                     '<td class="tdmod"><div class="numeropartida">'.$partida.'</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$detalle->Codigo.'" readonly data-parsley-length="[1, 20]">'.$detalle->Codigo.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$detalle->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$detalle->Codigo.'</b></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($detalle->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]">'.htmlspecialchars($detalle->Descripcion, ENT_QUOTES).'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="'.$detalle->Unidad.'" required data-parsley-length="[1, 5]">'.$detalle->Unidad.'</td>'.
                     '<td class="tdmod">'.
@@ -1206,7 +1206,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 $filasordenes= $filasordenes.
                 '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                     '<td class="tdmod"><div class="numeropartida">'.$partida.'</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$detalle->Codigo.'" readonly data-parsley-length="[1, 20]">'.$detalle->Codigo.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$detalle->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$detalle->Codigo.'</b></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control inputnextdet descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($detalle->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]">'.htmlspecialchars($detalle->Descripcion, ENT_QUOTES).'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="'.$detalle->Unidad.'" required data-parsley-length="[1, 5]">'.$detalle->Unidad.'</td>'.
                     '<td class="tdmod">'.
@@ -1296,7 +1296,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 $filasordenes= $filasordenes.
                 '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                     '<td class="tdmod"><div class="numeropartida">'.$partida.'</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$detalle->Codigo.'" readonly data-parsley-length="[1, 20]">'.$detalle->Codigo.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$detalle->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$detalle->Codigo.'</b></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($detalle->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]">'.htmlspecialchars($detalle->Descripcion, ENT_QUOTES).'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="'.$detalle->Unidad.'" required data-parsley-length="[1, 5]">'.$detalle->Unidad.'</td>'.
                     '<td class="tdmod">'.
@@ -1769,7 +1769,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 $filasdetallesfactura= $filasdetallesfactura.
                 '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                     '<td class="tdmod"><div class="numeropartida">'.$partida.'</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$df->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$df->Codigo.'" readonly data-parsley-length="[1, 20]">'.$df->Codigo.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$df->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$df->Codigo.'</b></td>'.
                     '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($df->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="'.$df->Unidad.'" required data-parsley-length="[1, 5]">'.$df->Unidad.'</td>'.
                     '<td class="tdmod">'.
@@ -2225,6 +2225,10 @@ class FacturaController extends ConfiguracionSistemaController{
                     switch ($tipodetalles) {
                         case 'remisiones':
                             $datosgenerales = Remision::where('Remision', $sorf)->first();
+                            $observacionesdocumento = '';
+                            if($datosgenerales != null){
+                                $observacionesdocumento = $datosgenerales->Obs;
+                            }
                             $detallesfacturaremision = FacturaDetalle::where('Factura', $f->Factura)->where('Remision', $sorf)->get();
                             $sumatotaldetalles = 0;
                             foreach($detallesfacturaremision as $dfr){
@@ -2248,6 +2252,10 @@ class FacturaController extends ConfiguracionSistemaController{
                             break;
                         case 'ordenes':
                             $datosgenerales = OrdenTrabajo::where('Orden', $sorf)->first();
+                            $observacionesdocumento = '';
+                            if($datosgenerales != null){
+                                $observaciones = $datosgenerales->ObsOrden;
+                            }
                             $detallesfacturaremision = FacturaDetalle::where('Factura', $f->Factura)->where('Orden', $sorf)->get();
                             $sumatotaldetalles = 0;
                             foreach($detallesfacturaremision as $dfr){
@@ -2283,7 +2291,8 @@ class FacturaController extends ConfiguracionSistemaController{
                     $datageneral[]=array(
                         "datosgenerales"=>$datosgenerales,
                         "datadetalle" => $datadetalle,
-                        "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles)
+                        "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles),
+                        "obsdocumento" => $observacionesdocumento
                     );
                 }
             //si la factura es libre
@@ -2310,10 +2319,18 @@ class FacturaController extends ConfiguracionSistemaController{
                 }  
                 $datageneral[]=array(
                     "datadetalle" => $datadetalle,
-                    "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles)
+                    "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles),
+                    "obsdocumento" => ""
                 );
             }
             $cliente = Cliente::where('Numero', $f->Cliente)->first();
+            $estadoclienteexiste = Estado::where('Clave', $cliente->Estado)->count();
+            if($estadoclienteexiste > 0){
+                $estadocliente = Estado::where('Clave', $cliente->Estado)->first();
+                $est = $estadocliente->Nombre;
+            }else{
+                $est = $cliente->Estado;
+            }
             $agente = Agente::where('Numero', $f->Agente)->first();
             $formapago = FormaPago::where('Clave', $f->FormaPago)->first();
             $metodopago = MetodoPago::where('Clave', $f->MetodoPago)->first();
@@ -2340,6 +2357,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 "factura"=>$f,
                 "datageneral" => $datageneral,
                 "cliente" => $cliente,
+                "est" => $est,
                 "agente" => $agente,
                 "formapago" => $formapago,
                 "metodopago" => $metodopago,
@@ -2357,7 +2375,6 @@ class FacturaController extends ConfiguracionSistemaController{
                 "totalletras"=>$totalletras,
                 "numerodecimalesdocumento"=> $request->numerodecimalesdocumento
             );
-            //dd($data);
             ini_set('max_execution_time', 300); // 5 minutos
             ini_set('memory_limit', '-1');
             $pdf = PDF::loadView('registros.facturas.formato_pdf_facturas', compact('data'))
@@ -2443,6 +2460,10 @@ class FacturaController extends ConfiguracionSistemaController{
                     switch ($tipodetalles) {
                         case 'remisiones':
                             $datosgenerales = Remision::where('Remision', $sorf)->first();
+                            $observacionesdocumento = '';
+                            if($datosgenerales != null){
+                                $observacionesdocumento = $datosgenerales->Obs;
+                            }
                             $detallesfacturaremision = FacturaDetalle::where('Factura', $f->Factura)->where('Remision', $sorf)->get();
                             $sumatotaldetalles = 0;
                             foreach($detallesfacturaremision as $dfr){
@@ -2466,6 +2487,10 @@ class FacturaController extends ConfiguracionSistemaController{
                             break;
                         case 'ordenes':
                             $datosgenerales = OrdenTrabajo::where('Orden', $sorf)->first();
+                            $observacionesdocumento = '';
+                            if($datosgenerales != null){
+                                $observaciones = $datosgenerales->ObsOrden;
+                            }
                             $detallesfacturaremision = FacturaDetalle::where('Factura', $f->Factura)->where('Orden', $sorf)->get();
                             $sumatotaldetalles = 0;
                             foreach($detallesfacturaremision as $dfr){
@@ -2490,7 +2515,8 @@ class FacturaController extends ConfiguracionSistemaController{
                     $datageneral[]=array(
                         "datosgenerales"=>$datosgenerales,
                         "datadetalle" => $datadetalle,
-                        "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles)
+                        "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles),
+                        "obsdocumento" => $observacionesdocumento
                     );
                 }
             //si la factura es libre
@@ -2517,10 +2543,18 @@ class FacturaController extends ConfiguracionSistemaController{
                 }  
                 $datageneral[]=array(
                     "datadetalle" => $datadetalle,
-                    "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles)
+                    "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles),
+                    "obsdocumento" => "",
                 );
             }
             $cliente = Cliente::where('Numero', $f->Cliente)->first();
+            $estadoclienteexiste = Estado::where('Clave', $cliente->Estado)->count();
+            if($estadoclienteexiste > 0){
+                $estadocliente = Estado::where('Clave', $cliente->Estado)->first();
+                $est = $estadocliente->Nombre;
+            }else{
+                $est = $cliente->Estado;
+            }
             $agente = Agente::where('Numero', $f->Agente)->first();
             $formapago = FormaPago::where('Clave', $f->FormaPago)->first();
             $metodopago = MetodoPago::where('Clave', $f->MetodoPago)->first();
@@ -2547,6 +2581,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 "factura"=>$f,
                 "datageneral" => $datageneral,
                 "cliente" => $cliente,
+                "est" => $est,
                 "agente" => $agente,
                 "formapago" => $formapago,
                 "metodopago" => $metodopago,
@@ -2634,6 +2669,10 @@ class FacturaController extends ConfiguracionSistemaController{
                     switch ($tipodetalles) {
                         case 'remisiones':
                             $datosgenerales = Remision::where('Remision', $sorf)->first();
+                            $observacionesdocumento = '';
+                            if($datosgenerales != null){
+                                $observacionesdocumento = $datosgenerales->Obs;
+                            }
                             $detallesfacturaremision = FacturaDetalle::where('Factura', $f->Factura)->where('Remision', $sorf)->get();
                             $sumatotaldetalles = 0;
                             foreach($detallesfacturaremision as $dfr){
@@ -2657,6 +2696,10 @@ class FacturaController extends ConfiguracionSistemaController{
                             break;
                         case 'ordenes':
                             $datosgenerales = OrdenTrabajo::where('Orden', $sorf)->first();
+                            $observacionesdocumento = '';
+                            if($datosgenerales != null){
+                                $observaciones = $datosgenerales->ObsOrden;
+                            }
                             $detallesfacturaremision = FacturaDetalle::where('Factura', $f->Factura)->where('Orden', $sorf)->get();
                             $sumatotaldetalles = 0;
                             foreach($detallesfacturaremision as $dfr){
@@ -2681,7 +2724,8 @@ class FacturaController extends ConfiguracionSistemaController{
                     $datageneral[]=array(
                         "datosgenerales"=>$datosgenerales,
                         "datadetalle" => $datadetalle,
-                        "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles)
+                        "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles),
+                        "obsdocumento" => $observacionesdocumento
                     );
                 }
             //si la factura es libre
@@ -2708,10 +2752,18 @@ class FacturaController extends ConfiguracionSistemaController{
                 }  
                 $datageneral[]=array(
                     "datadetalle" => $datadetalle,
-                    "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles)
+                    "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles),
+                    "obsdocumento" => ""
                 );
             }
             $cliente = Cliente::where('Numero', $f->Cliente)->first();
+            $estadoclienteexiste = Estado::where('Clave', $cliente->Estado)->count();
+            if($estadoclienteexiste > 0){
+                $estadocliente = Estado::where('Clave', $cliente->Estado)->first();
+                $est = $estadocliente->Nombre;
+            }else{
+                $est = $cliente->Estado;
+            }
             $agente = Agente::where('Numero', $f->Agente)->first();
             $formapago = FormaPago::where('Clave', $f->FormaPago)->first();
             $metodopago = MetodoPago::where('Clave', $f->MetodoPago)->first();
@@ -2738,6 +2790,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 "factura"=>$f,
                 "datageneral" => $datageneral,
                 "cliente" => $cliente,
+                "est",
                 "agente" => $agente,
                 "formapago" => $formapago,
                 "metodopago" => $metodopago,
@@ -2825,7 +2878,7 @@ class FacturaController extends ConfiguracionSistemaController{
             $asunto = $request->emailasunto;
             $emaildocumento = $request->emaildocumento;
             $name = "Receptor envio de correos";
-            $body = $request->emailasunto;
+            $body = $request->emailmensaje;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             if (file_exists($url_xml) != false) {
@@ -2976,6 +3029,10 @@ class FacturaController extends ConfiguracionSistemaController{
                     switch ($tipodetalles) {
                         case 'remisiones':
                             $datosgenerales = Remision::where('Remision', $sorf)->first();
+                            $observacionesdocumento = '';
+                            if($datosgenerales != null){
+                                $observacionesdocumento = $datosgenerales->Obs;
+                            }
                             $detallesfacturaremision = FacturaDetalle::where('Factura', $f->Factura)->where('Remision', $sorf)->get();
                             $sumatotaldetalles = 0;
                             foreach($detallesfacturaremision as $dfr){
@@ -2999,6 +3056,10 @@ class FacturaController extends ConfiguracionSistemaController{
                             break;
                         case 'ordenes':
                             $datosgenerales = OrdenTrabajo::where('Orden', $sorf)->first();
+                            $observacionesdocumento = '';
+                            if($datosgenerales != null){
+                                $observaciones = $datosgenerales->ObsOrden;
+                            }
                             $detallesfacturaremision = FacturaDetalle::where('Factura', $f->Factura)->where('Orden', $sorf)->get();
                             $sumatotaldetalles = 0;
                             foreach($detallesfacturaremision as $dfr){
@@ -3023,7 +3084,8 @@ class FacturaController extends ConfiguracionSistemaController{
                     $datageneral[]=array(
                         "datosgenerales"=>$datosgenerales,
                         "datadetalle" => $datadetalle,
-                        "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles)
+                        "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles),
+                        "obsdocumento" => $observacionesdocumento
                     );
                 }
             //si la factura es libre
@@ -3050,10 +3112,18 @@ class FacturaController extends ConfiguracionSistemaController{
                 }  
                 $datageneral[]=array(
                     "datadetalle" => $datadetalle,
-                    "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles)
+                    "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles),
+                    "obsdocumento" => ""
                 );
             }
             $cliente = Cliente::where('Numero', $f->Cliente)->first();
+            $estadoclienteexiste = Estado::where('Clave', $cliente->Estado)->count();
+            if($estadoclienteexiste > 0){
+                $estadocliente = Estado::where('Clave', $cliente->Estado)->first();
+                $est = $estadocliente->Nombre;
+            }else{
+                $est = $cliente->Estado;
+            }
             $agente = Agente::where('Numero', $f->Agente)->first();
             $formapago = FormaPago::where('Clave', $f->FormaPago)->first();
             $metodopago = MetodoPago::where('Clave', $f->MetodoPago)->first();
@@ -3080,6 +3150,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 "factura"=>$f,
                 "datageneral" => $datageneral,
                 "cliente" => $cliente,
+                "est" => $est,
                 "agente" => $agente,
                 "formapago" => $formapago,
                 "metodopago" => $metodopago,
@@ -3141,6 +3212,10 @@ class FacturaController extends ConfiguracionSistemaController{
                     switch ($tipodetalles) {
                         case 'remisiones':
                             $datosgenerales = Remision::where('Remision', $sorf)->first();
+                            $observacionesdocumento = '';
+                            if($datosgenerales != null){
+                                $observacionesdocumento = $datosgenerales->Obs;
+                            }
                             $detallesfacturaremision = FacturaDetalle::where('Factura', $f->Factura)->where('Remision', $sorf)->get();
                             $sumatotaldetalles = 0;
                             foreach($detallesfacturaremision as $dfr){
@@ -3164,6 +3239,10 @@ class FacturaController extends ConfiguracionSistemaController{
                             break;
                         case 'ordenes':
                             $datosgenerales = OrdenTrabajo::where('Orden', $sorf)->first();
+                            $observacionesdocumento = '';
+                            if($datosgenerales != null){
+                                $observaciones = $datosgenerales->ObsOrden;
+                            }
                             $detallesfacturaremision = FacturaDetalle::where('Factura', $f->Factura)->where('Orden', $sorf)->get();
                             $sumatotaldetalles = 0;
                             foreach($detallesfacturaremision as $dfr){
@@ -3188,7 +3267,8 @@ class FacturaController extends ConfiguracionSistemaController{
                     $datageneral[]=array(
                         "datosgenerales"=>$datosgenerales,
                         "datadetalle" => $datadetalle,
-                        "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles)
+                        "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles),
+                        "obsdocumento" => $observacionesdocumento
                     );
                 }
             //si la factura es libre
@@ -3215,10 +3295,18 @@ class FacturaController extends ConfiguracionSistemaController{
                 }  
                 $datageneral[]=array(
                     "datadetalle" => $datadetalle,
-                    "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles)
+                    "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles),
+                    "obsdocumento" => ""
                 );
             }
             $cliente = Cliente::where('Numero', $f->Cliente)->first();
+            $estadoclienteexiste = Estado::where('Clave', $cliente->Estado)->count();
+            if($estadoclienteexiste > 0){
+                $estadocliente = Estado::where('Clave', $cliente->Estado)->first();
+                $est = $estadocliente->Nombre;
+            }else{
+                $est = $cliente->Estado;
+            }
             $agente = Agente::where('Numero', $f->Agente)->first();
             $formapago = FormaPago::where('Clave', $f->FormaPago)->first();
             $metodopago = MetodoPago::where('Clave', $f->MetodoPago)->first();
@@ -3245,6 +3333,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 "factura"=>$f,
                 "datageneral" => $datageneral,
                 "cliente" => $cliente,
+                "est",
                 "agente" => $agente,
                 "formapago" => $formapago,
                 "metodopago" => $metodopago,
@@ -3332,7 +3421,7 @@ class FacturaController extends ConfiguracionSistemaController{
             $asunto = $request->emailasunto;
             $emaildocumento = $request->emaildocumento;
             $name = "Receptor envio de correos";
-            $body = $request->emailasunto;
+            $body = $request->emailmensaje;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             if (file_exists($url_xml) != false) {

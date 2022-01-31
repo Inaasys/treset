@@ -59,9 +59,11 @@
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap" >
                                     <thead class="{{$empresa->background_tables}}">
-                                        <tr>
-                                            <th class="bg-light-green">Total: <b id="sumatotalfiltrado"></b></th>
-                                        </tr>  
+                                        @if($mostrartotalesdecolumnasendocumentos == 'S')
+                                            <tr>
+                                                <th class="bg-light-green">Total: <b id="sumatotalfiltrado"></b></th>
+                                            </tr>  
+                                        @endif
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 

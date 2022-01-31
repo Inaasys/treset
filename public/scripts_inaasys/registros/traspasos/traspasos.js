@@ -1292,7 +1292,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
       var tipo = "alta";
       var fila=   '<tr class="filasproductos" id="filaproducto'+contadorproductos+'">'+
                           '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('+contadorproductos+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
-                          '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+
+                          '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'+Codigo+'</b></td>'+
                           '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
                           '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'+Unidad+'" readonly data-parsley-length="[1, 5]">'+Unidad+'</td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.'+numerocerosconfiguradosinputnumberstep+'" data-parsley-existencias="'+Existencias+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');cambiodecantidadopreciopartida('+contadorfilas+',\''+tipo +'\');"></td>'+
@@ -1513,7 +1513,7 @@ function alta(){
                           '<thead class="'+background_tables+'">'+
                             '<tr>'+
                               '<th class="'+background_tables+'">#</th>'+
-                              '<th class="'+background_tables+'">Código</th>'+
+                              '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
                               '<th class="'+background_tables+'"><div style="width:200px !important;">Descripción</div></th>'+
                               '<th class="'+background_tables+'">Unidad</th>'+
                               '<th class="customercolortheadth">Cantidad</th>'+
@@ -1926,7 +1926,7 @@ function obtenerdatos(traspasomodificar){
                           '<thead class="'+background_tables+'">'+
                             '<tr>'+
                               '<th class="'+background_tables+'">#</th>'+
-                              '<th class="'+background_tables+'">Código</th>'+
+                              '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
                               '<th class="'+background_tables+'"><div style="width:200px !important;">Descripción</div></th>'+
                               '<th class="'+background_tables+'">Unidad</th>'+
                               '<th class="customercolortheadth">Cantidad</th>'+
@@ -2165,6 +2165,7 @@ function enviardocumentoemail(documento){
       $("#correosconcopia").append('<option value="'+data.email3cc+'" selected>'+data.email3cc+'</option>');
     }
     $("#emailasunto").val("TRASPASO NO. " + documento +" DE "+ nombreempresa);
+    $("#emailmensaje").val("TRASPASO NO. " + documento +" DE "+ nombreempresa);
     $(".dropify-clear").trigger("click");
     $("#divadjuntararchivo").hide();
     $("#modalenviarpdfemail").modal('show');

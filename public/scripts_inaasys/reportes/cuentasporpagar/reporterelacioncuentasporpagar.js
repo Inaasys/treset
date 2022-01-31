@@ -77,6 +77,19 @@ $(document).ready(function() {
     $('#numeroproveedor').on('change', function(e) {
         regresarnumeroproveedor();
     });
+    //activar busqueda
+    $('#numerobanco').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obtenerbancopornumero();
+            e.preventDefault();
+        }
+    });
+    //regresar numero
+    $('#numerobanco').on('change', function(e) {
+        regresarnumerobanco();
+    });
 });
 //obtener registros de proveedores
 function obtenerproveedores(){
@@ -125,7 +138,7 @@ function obtenerproveedores(){
         },
         serverSide: true,
         ajax: {
-            url: reporte_relacion_contrarecibos_obtener_proveedores,
+            url: reporte_relacion_cuentasporpagar_obtener_proveedores,
         },
         columns: [
             { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
@@ -167,7 +180,7 @@ function obtenerproveedorpornumero(){
     var numeroproveedor = $("#numeroproveedor").val();
     if(numeroproveedoranterior != numeroproveedor){
         if($("#numeroproveedor").parsley().isValid()){
-            $.get(reporte_relacion_contrarecibos_obtener_proveedor_por_numero, {numeroproveedor:numeroproveedor}, function(data){
+            $.get(reporte_relacion_cuentasporpagar_obtener_proveedor_por_numero, {numeroproveedor:numeroproveedor}, function(data){
                 $("#numeroproveedor").val(data.numero);
                 $("#numeroproveedoranterior").val(data.numero);
                 $("#proveedor").val(data.nombre);
@@ -184,6 +197,107 @@ function regresarnumeroproveedor(){
     var numeroproveedoranterior = $("#numeroproveedoranterior").val();
     $("#numeroproveedor").val(numeroproveedoranterior);
 }
+
+
+//obtener registros de bancos
+function obtenerbancos(){
+    $("#ModalFormulario").modal('show');
+    $("#contenidomodaltablas").show();
+    $("#formulario").hide();
+    var tablabancos = '<div class="modal-header '+background_forms_and_modals+'">'+
+                                '<h4 class="modal-title">Bancos</h4>'+
+                            '</div>'+
+                            '<div class="modal-body">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-12">'+
+                                        '<div class="table-responsive">'+
+                                            '<table id="tbllistadobanco" class="tbllistadobanco table table-bordered table-striped table-hover" style="width:100% !important">'+
+                                                '<thead class="'+background_tables+'">'+
+                                                    '<tr>'+
+                                                        '<th>Operaciones</th>'+
+                                                        '<th>Numero</th>'+
+                                                        '<th>Nombre</th>'+
+                                                    '</tr>'+
+                                                '</thead>'+
+                                                '<tbody></tbody>'+
+                                            '</table>'+
+                                        '</div>'+
+                                    '</div>'+   
+                                '</div>'+
+                            '</div>'+
+                            '<div class="modal-footer">'+
+                                '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                            '</div>';
+    $("#contenidomodaltablas").html(tablabancos);
+    $('#tbllistadobanco').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,
+        processing: true,
+        'language': {
+            'loadingRecords': '&nbsp;',
+            'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+            url: reporte_relacion_cuentasporpagar_obtener_bancos,
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Numero', name: 'Numero' },
+            { data: 'Nombre', name: 'Nombre' }
+        ],
+        "initComplete": function() {
+            var $buscar = $('div.dataTables_filter input');
+            $buscar.unbind();
+            $buscar.bind('keyup change', function(e) {
+                if(e.keyCode == 13 || this.value == "") {
+                  $('#tbllistadobanco').DataTable().search( this.value ).draw();
+                }
+            });
+        },  
+    }); 
+} 
+function seleccionarbanco(Numero, Nombre){
+    var numerobancoanterior = $("#numerobancoanterior").val();
+    var numerobanco = Numero;
+    if(numerobancoanterior != numerobanco){
+        $("#numerobanco").val(Numero);
+        $("#numerobancoanterior").val(Numero);
+        $("#banco").val(Nombre);
+        if(Nombre != null){
+            $("#textonombrebanco").attr('style', 'font-size:8px').html(Nombre.substring(0, 45));
+        }
+        generar_reporte();
+        $("#ModalFormulario").modal('hide');
+    }
+}
+//obtener por numero
+function obtenerbancopornumero(){
+    var numerobancoanterior = $("#numerobancoanterior").val();
+    var numerobanco = $("#numerobanco").val();
+    if(numerobancoanterior != numerobanco){
+        if($("#numerobanco").parsley().isValid()){
+            $.get(reporte_relacion_cuentasporpagar_obtener_banco_por_numero, {numerobanco:numerobanco}, function(data){
+                $("#numerobanco").val(data.numero);
+                $("#numerobancoanterior").val(data.numero);
+                $("#banco").val(data.nombre);
+                if(data.nombre != null){
+                    $("#textonombrebanco").attr('style', 'font-size:8px').html(data.nombre.substring(0, 45));
+                }
+                generar_reporte();
+            }) 
+        }
+    }
+}
+//regresar numero
+function regresarnumerobanco(){
+    var numerobancoanterior = $("#numerobancoanterior").val();
+    $("#numerobanco").val(numerobancoanterior);
+}
+
 //actualizar reporte
 function generar_reporte(){
     var form = $("#formreporte");
@@ -210,10 +324,11 @@ function generar_formato_excel(){
     var form = $("#formreporte");
     if (form.parsley().isValid()){
         var numeroproveedor = $("#numeroproveedor").val();
+        var numerobanco = $("#numerobanco").val();
         var fechainicialreporte = $("#fechainicialreporte").val();
         var fechafinalreporte = $("#fechafinalreporte").val();
         var reporte = $("#reporte").val();
-        $("#btnGenerarFormatoReporteExcel").attr("href", urlgenerarformatoexcel+'?fechainicialreporte='+fechainicialreporte+'&fechafinalreporte='+fechafinalreporte+'&numeroproveedor='+numeroproveedor+'&reporte='+reporte);
+        $("#btnGenerarFormatoReporteExcel").attr("href", urlgenerarformatoexcel+'?fechainicialreporte='+fechainicialreporte+'&fechafinalreporte='+fechafinalreporte+'&numeroproveedor='+numeroproveedor+'&numerobanco='+numerobanco+'&reporte='+reporte);
         $("#btnGenerarFormatoReporteExcel").click();
     }else{
         form.parsley().validate();
@@ -236,10 +351,16 @@ function generar_formato_pdf(){
 //listar tabla reporte
 function listar(){
     var reporte = $("#reporte").val();
-    if(reporte == 'GENERAL'){
-        var columnas = new Array("ContraRecibo", "Proveedor", "Nombre", "Fecha", "SubTotal", "Iva", "Total", "Status");
-    }else{
-        var columnas = new Array("ContraRecibo", "Proveedor", "Nombre", "Compra", "Movimiento", "Fecha", "Remision", "Factura", "FechaAPagar", "SubTotal", "Iva", "Total", "Status");
+    switch(reporte){
+        case "AGRUPARxPROVEEDOR":
+            var columnas = new Array("Pago", "Fecha", "Proveedor", "Banco", "Compra", "Remision", "Factura", "Transferencia", "Cheque", "Beneficiario", "Total", "Abono", "Saldo", "Anotacion", "MotivoBaja", "Status");
+            break;
+        case "AGRUPARxBANCO":
+            var columnas = new Array("Pago", "Fecha", "Proveedor", "Banco", "Compra", "Remision", "Factura", "Transferencia", "Cheque", "Beneficiario", "Total", "Abono", "Saldo", "Anotacion", "MotivoBaja", "Status");
+            break;
+        case "RELACIONPAGOS":
+            var columnas = new Array("Pago", "Fecha", "Proveedor", "Banco", "Abono", "Anotacion", "MotivoBaja", "Status");
+            break;
     }
     var campos_tabla  = [];
     var cabecerastablareporte = "";
@@ -272,10 +393,11 @@ function listar(){
         serverSide: true,
         ajax: {
             headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-            url: reporte_relacion_contrarecibos_generar_reporte,
+            url: reporte_relacion_cuentasporpagar_generar_reporte,
             method: 'POST',
             data: function (d) {
                 d.numeroproveedor = $("#numeroproveedor").val();
+                d.numerobanco = $("#numerobanco").val();
                 d.fechainicialreporte = $("#fechainicialreporte").val();
                 d.fechafinalreporte = $("#fechafinalreporte").val();
                 d.reporte = $("#reporte").val();

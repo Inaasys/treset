@@ -255,7 +255,7 @@
             <li class="dropdown-submenu">
               <a class="test"  href="#">Cuentas x Pagar <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a  href="#" id="menureporterelacioncxp">Relación de Pagos a Proveedores</a></li>
+                <li><a  href="reporte_relacion_cuentasporpagar" id="menureporterelacioncxp">Relación de Pagos a Proveedores</a></li>
               </ul>
             </li>                  
             <li class="dropdown-submenu">

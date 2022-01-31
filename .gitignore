@@ -3,6 +3,7 @@
 /public/storage
 /public/videosayuda
 /public/logotipo_empresa
+/public/imagenes_productos
 /storage/*.key
 /storage/archivos_pdf_documentos_generados
 /storage/xml_descargados

@@ -490,6 +490,30 @@
                                                                     </div>
                                                                 </td>
                                                             </tr>
+                                                            <tr>
+                                                                <td class="col-md-2">Sistema</td>
+                                                                <td class="col-md-5">Mostrar totales por columna en todas las tablas principales del sistema (Registros y Catalogos)</td>
+                                                                <td class="col-md-4">
+                                                                    <div class="col-md-12 form-check">
+                                                                        <input type="radio" name="mostrartotalesdecolumnasendocumentos" id="mostrartotalesdecolumnasendocumentos" value="S">
+                                                                        <label for="mostrartotalesdecolumnasendocumentos">SI</label>
+                                                                        <input type="radio" name="mostrartotalesdecolumnasendocumentos" id="mostrartotalesdecolumnasendocumentos1" value="N">
+                                                                        <label for="mostrartotalesdecolumnasendocumentos1">NO</label>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="col-md-2">Remisiones</td>
+                                                                <td class="col-md-5">Mostrar insumo por partida al capturar remisiones</td>
+                                                                <td class="col-md-4">
+                                                                    <div class="col-md-12 form-check">
+                                                                        <input type="radio" name="mostrarinsumoporpartidaenremisiones" id="mostrarinsumoporpartidaenremisiones" value="S">
+                                                                        <label for="mostrarinsumoporpartidaenremisiones">SI</label>
+                                                                        <input type="radio" name="mostrarinsumoporpartidaenremisiones" id="mostrarinsumoporpartidaenremisiones1" value="N">
+                                                                        <label for="mostrarinsumoporpartidaenremisiones1">NO</label>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -922,6 +946,8 @@
         var colocarobservacionesremisionenfactura = '{{$empresa->ColocarObservacionesDeRemisionEnFactura}}';
         var pedirobligatoriamenteobservacionenfactura = '{{$empresa->PedirObligatoriamenteObservacionEnFactura}}';
         var colocarencerocantidadenpartidasderemisiones = '{{$empresa->ColocarEnCeroCantidadEnPartidasDeRemisiones}}';
+        var mostrartotalesdecolumnasendocumentos = '{{$empresa->MostrarTotalesDeColumnasEnDocumentos}}';
+        var mostrarinsumoporpartidaenremisiones = '{{$empresa->MostrarInsumoPorPartidaEnCapturaDeRemisiones}}';
         var empresa_obtener_usuarios_a_modificar_insumos = '{!!URL::to('empresa_obtener_usuarios_a_modificar_insumos')!!}';
         var empresa_obtener_paises = '{!!URL::to('empresa_obtener_paises')!!}';
         var empresa_obtener_estados = '{!!URL::to('empresa_obtener_estados')!!}';

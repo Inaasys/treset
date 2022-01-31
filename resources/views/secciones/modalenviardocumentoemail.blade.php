@@ -45,7 +45,13 @@
                         <div class="col-md-12">
                             <div class="col-md-12 form-check">
                                 <label>Asunto:</label>
-                                <textarea class="form-control" name="emailasunto" id="emailasunto"  required rows="4" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>
+                                <textarea class="form-control" name="emailasunto" id="emailasunto"  required rows="2" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-12 form-check">
+                                <label>Mensaje:</label>
+                                <textarea class="form-control" name="emailmensaje" id="emailmensaje"  required rows="2" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>
                             </div>
                         </div>
                         <div class="col-md-12" id="divadjuntararchivo">

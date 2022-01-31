@@ -1170,7 +1170,7 @@ function agregarfilaservicio(Codigo, Servicio, Unidad, Costo, Venta, Cantidad, C
                           '<div class="btn bg-red btn-xs" data-toggle="tooltip" title="Eliminar Fila" onclick="eliminarfila('+contadorservicios+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly> '+
                           '<div class="btn bg-blue btn-xs" data-toggle="tooltip" title="Asignar Técnicos" onclick="asignaciontecnicos('+contadorservicios+')">Asignar técnicos</div>'+
                         '</div></td>'+
-                        '<td class="tdmod"><input type="hidden" class="form-control tipofila" name="tipofila[]" value="agregado" readonly><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+
+                        '<td class="tdmod"><input type="hidden" class="form-control tipofila" name="tipofila[]" value="agregado" readonly><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'+Codigo+'</b></td>'+
                         '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'+Servicio+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
                         '<td class="tdmod"><input type="hidden" class="form-control unidadpartidad" name="unidadpartidad[]" value="'+Unidad+'" readonly data-parsley-length="[1, 5]">'+Unidad+'</td>'+
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'+Cantidad+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordentrabajo('+contadorfilas+');cambiodecantidadopreciopartida('+contadorfilas+',\''+tipo +'\');"></td>'+
@@ -1358,7 +1358,7 @@ function asignaciontecnicos(fila){
                                                           '<td colspan="2">'+
                                                           '<td style="padding:0px !important;" class="text-right font-bold">Asignar tiempos iguales a cada técnico:</td>'+
                                                           '<td class="tdmod text-center">'+
-                                                            '<input type="checkbox" name="asignaciontecnicosdividirtiemposiguales" id="idasignaciontecnicosdividirtiemposiguales" class="asignaciontecnicosdividirtiemposiguales filled-in" value="0" onchange="dividirtiemposiguales()">'+
+                                                            '<input type="checkbox" name="asignaciontecnicosdividirtiemposiguales" id="idasignaciontecnicosdividirtiemposiguales" class="asignaciontecnicosdividirtiemposiguales filled-in" value="0" onchange="dividirtiemposiguales()" checked>'+
                                                             '<label for="idasignaciontecnicosdividirtiemposiguales" ></label>'+
                                                           '</td>'+                                                 
                                                       '</tr>'+
@@ -1418,6 +1418,7 @@ function agregarfilatecnico(Numero, Nombre){
     contadortecnicos++;
     $("#tablatecnicosasignaciontiempos tbody").append(fila); 
     asignaciontecnicosmostrarformulario();
+    dividirtiemposiguales();
   }else{
     msj_errortecnicoyaagregado();
   }
@@ -1432,13 +1433,6 @@ function dividirtiemposiguales(){
       $('.horastecnicopartida', this).val(number_format(round(horastrabajadasportecnico, numerodecimales), numerodecimales, '.', '')).attr('readonly', 'readonly');
       totalhorastrabajadastecnicos = new Decimal(totalhorastrabajadastecnicos).plus(horastrabajadasportecnico);
     });
-
-
-
-    
-
-
-
   }else{
     $("tr.filastecnicos").each(function () {
       $('.horastecnicopartida', this).val(number_format(round(horastrabajadasportecnico, numerodecimales), numerodecimales, '.', '')).removeAttr('readonly');
@@ -1737,7 +1731,7 @@ function alta(){
                     '</div>'+
                     '<div class="col-md-1">'+
                       '<label>Año</label>'+
-                      '<input type="text" class="form-control inputnexttabda" name="ano" id="ano"  data-parsley-max="'+parseInt(periodohoy)+'" data-parsley-type="digits" data-parsley-length="[4,4]" required  onkeyup="tipoLetra(this);" autocomplete="off">'+
+                      '<input type="text" class="form-control inputnexttabda" name="ano" id="ano"  data-parsley-max="'+parseInt(periodohoy)+'" data-parsley-type="digits" data-parsley-length="[4,4]"  onkeyup="tipoLetra(this);" autocomplete="off">'+
                     '</div>'+
                   '</div>'+
                   '<div class="row">'+
@@ -1821,7 +1815,7 @@ function alta(){
                         '<thead class="'+background_tables+'">'+
                           '<tr>'+
                             '<th class="'+background_tables+'">#</th>'+
-                            '<th class="'+background_tables+'">Código</th>'+
+                            '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
                             '<th class="'+background_tables+'"><div style="width:200px !important;">Descripción</div></th>'+
                             '<th class="'+background_tables+'">Unidad</th>'+
                             '<th class="customercolortheadth">Cantidad</th>'+
@@ -2394,7 +2388,7 @@ function obtenerdatos(ordenmodificar){
                       '</div>'+
                       '<div class="col-md-1">'+
                         '<label>Año</label>'+
-                        '<input type="text" class="form-control inputnexttabda" name="ano" id="ano"  data-parsley-max="'+parseInt(periodohoy)+'" data-parsley-type="digits" data-parsley-length="[4,4]" required  onkeyup="tipoLetra(this);" autocomplete="off">'+
+                        '<input type="text" class="form-control inputnexttabda" name="ano" id="ano"  data-parsley-max="'+parseInt(periodohoy)+'" data-parsley-type="digits" data-parsley-length="[4,4]"  onkeyup="tipoLetra(this);" autocomplete="off">'+
                       '</div>'+
                     '</div>'+
                     '<div class="row">'+
@@ -2478,7 +2472,7 @@ function obtenerdatos(ordenmodificar){
                           '<thead class="'+background_tables+'">'+
                             '<tr>'+
                               '<th class="'+background_tables+'">#</th>'+
-                              '<th class="'+background_tables+'">Código</th>'+
+                              '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
                               '<th class="'+background_tables+'"><div style="width:200px !important;">Descripción</div></th>'+
                               '<th class="'+background_tables+'">Unidad</th>'+
                               '<th class="customercolortheadth">Cantidad</th>'+
@@ -2845,6 +2839,57 @@ $("#btnterminar").on('click', function(e){
     form.parsley().validate();
   }
 });
+//verificar si la orden de compra se esta utilzando en alguna orden de compra
+function abrirnuevamente(ordenabrir){
+  $.get(ordenes_trabajo_verificar_abrir_nuevamente_orden,{ordenabrir:ordenabrir}, function(data){
+    if(data.Status == 'CERRADA'){
+      $("#ordenabrir").val(data.Orden);
+      $("#btnabrirnuevamente").show();
+      $("#tituloabrirnuevamenteorden").html("Esta seguro de abrir nuevamente la Orden de Trabajo No."+data.Orden);
+      $('#modalabrirorden').modal('show');
+    }else{
+      $("#ordenabrir").val(data.Orden);
+      $("#btnabrirnuevamente").hide();
+      $("#tituloabrirnuevamenteorden").html("La Orden No."+data.Orden+" no se puede abrir nuevamente porque se encuentra ABIERTA, dada de BAJA o FACTURADA");
+      $('#modalabrirorden').modal('show');
+    }
+  }) 
+}
+$("#btnabrirnuevamente").on('click', function(e){
+  e.preventDefault();
+  var formData = new FormData($("#formabrirnuevamente")[0]);
+  var form = $("#formabrirnuevamente");
+  if (form.parsley().isValid()){
+    $('.page-loader-wrapper').css('display', 'block');
+    $.ajax({
+      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+      url:ordenes_trabajo_abrir_nuevamente_orden,
+      type: "post",
+      dataType: "html",
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false,
+      success:function(data){
+        $('#modalabrirorden').modal('hide');
+        msj_ordenterminada();
+        $("#formabrirnuevamente")[0].reset();
+        $('.page-loader-wrapper').css('display', 'none');
+      },
+      error:function(data){
+        if(data.status == 403){
+          msj_errorenpermisos();
+        }else{
+          msj_errorajax();
+        }
+        $('#modalabrirorden').modal('hide');
+        $('.page-loader-wrapper').css('display', 'none');
+      }
+    })
+  }else{
+    form.parsley().validate();
+  }
+});
 //obtener datos para el envio del documento por email
 function enviardocumentoemail(documento){
   $.get(ordenes_trabajo_obtener_datos_envio_email,{documento:documento}, function(data){
@@ -2861,6 +2906,7 @@ function enviardocumentoemail(documento){
       $("#correosconcopia").append('<option value="'+data.email3cc+'" selected>'+data.email3cc+'</option>');
     }
     $("#emailasunto").val("ORDEN DE TRABAJO NO. " + documento +" DE "+ nombreempresa);
+    $("#emailmensaje").val("ORDEN DE TRABAJO NO. " + documento +" DE "+ nombreempresa);
     $(".dropify-clear").trigger("click");
     $("#divadjuntararchivo").hide();
     $("#modalenviarpdfemail").modal('show');

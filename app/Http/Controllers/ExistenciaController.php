@@ -51,6 +51,30 @@ class ExistenciaController extends ConfiguracionSistemaController{
                             $query->orderBy($configuraciones_tabla['configuracion_tabla']->tercerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formatercerordenamiento . '');
                         }
                     })
+                    ->withQuery('sumacosto', function($data) {
+                        return $data->sum('Costo');
+                    })
+                    ->withQuery('sumasubtotal', function($data) {
+                        return $data->sum('SubTotal');
+                    })
+                    ->withQuery('sumaiva', function($data) {
+                        return $data->sum('Iva');
+                    })
+                    ->withQuery('sumatotal', function($data) {
+                        return $data->sum('Total');
+                    })
+                    ->withQuery('sumatotalcostoinventario', function($data) {
+                        return $data->sum('totalCostoInventario');
+                    })
+                    ->withQuery('sumacostolista', function($data) {
+                        return $data->sum('CostoDeLista');
+                    })
+                    ->withQuery('sumacostoventa', function($data) {
+                        return $data->sum('CostoDeVenta');
+                    })
+                    ->withQuery('sumaexistencias', function($data) {
+                        return $data->sum('Existencias');
+                    })
                     ->addColumn('operaciones', function($data){
                         $operaciones = '';
                         return $operaciones;

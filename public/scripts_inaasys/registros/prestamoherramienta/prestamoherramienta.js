@@ -504,7 +504,7 @@ function seleccionarherramientaasignada(iddetalleasignacionherramienta){
       if(parseFloat(data.cantidad) > 0){
         var fila=   '<tr class="filasproductos" id="filaproducto'+contadorproductos+'">'+
                             '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('+contadorproductos+')">X</div></td>'+
-                            '<td class="tdmod"><input type="hidden" class="form-control iddetalleasignacionherramienta" name="iddetalleasignacionherramienta[]" value="'+iddetalleasignacionherramienta+'" readonly><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'+data.herramienta+'" readonly>'+data.herramienta+'</td>'+
+                            '<td class="tdmod"><input type="hidden" class="form-control iddetalleasignacionherramienta" name="iddetalleasignacionherramienta[]" value="'+iddetalleasignacionherramienta+'" readonly><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'+data.herramienta+'" readonly><b style="font-size:12px;">'+data.herramienta+'</b></td>'+
                             '<td class="tdmod"><div class="divorinputmodl"><input type="hidden" class="form-control descripcionpartida" name="descripcionpartida[]" value="'+data.descripcion+'" readonly>'+data.descripcion+'</div></td>'+
                             '<td class="tdmod"><input type="hidden" class="form-control unidadpartida" name="unidadpartida[]" value="'+data.unidad+'" readonly>'+data.unidad+'</td>'+
                             '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-max="'+data.cantidad+'" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('+contadorfilas+');" required></td>'+
@@ -635,7 +635,7 @@ function alta(){
                         '<thead class="'+background_tables+'">'+
                           '<tr>'+
                             '<th class="'+background_tables+'">#</th>'+
-                            '<th class="'+background_tables+'">Herramienta</th>'+
+                            '<th class="'+background_tables+'"><div style="width:100px !important;">Herramienta</div></th>'+
                             '<th class="'+background_tables+'"><div style="width:200px !important;">Descripción</div></th>'+
                             '<th class="customercolortheadth">Unidad</th>'+
                             '<th class="customercolortheadth">Cantidad</th>'+

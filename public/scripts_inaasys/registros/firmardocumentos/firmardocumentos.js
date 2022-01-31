@@ -309,7 +309,7 @@ function alta(tipoalta){
                             '<th class="customercolortheadth">TipoDocumento</th>'+
                             '<th class="customercolortheadth">Documento</th>'+
                             '<th class="customercolortheadth">Usuario</th>'+
-                            '<th class="'+background_tables+'">Colocar firma en</th>'+
+                            '<th class="'+background_tables+'"><div style="width:300px;">Colocar firma en</div></th>'+
                           '</tr>'+
                         '</thead>'+
                         '<tbody>'+           

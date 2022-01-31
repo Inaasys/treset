@@ -32,6 +32,8 @@ use Config;
 use Mail;
 use App\Serie;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
+use Storage; 
+use ZipArchive;
 
 class OrdenTrabajoController extends ConfiguracionSistemaController
 {
@@ -107,6 +109,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                                             '<ul class="dropdown-menu">'.
                                                 '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Orden .'\')">Cambios</a></li>'.
                                                 '<li><a href="javascript:void(0);" onclick="terminar(\''.$data->Orden .'\')">Terminar OT</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="abrirnuevamente(\''.$data->Orden .'\')">Abrir Nuevamente OT</a></li>'.
                                                 '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Orden .'\')">Bajas</a></li>'.
                                                 '<li><a href="'.route('ordenes_trabajo_generar_pdfs_indiv',$data->Orden).'" target="_blank">Generar Documento</a></li>'.
                                                 '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Orden .'\')">Enviar Documento por Correo</a></li>'.
@@ -193,7 +196,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                                 '<div class="btn bg-blue btn-xs" data-toggle="tooltip" title="Asignar Técnicos" onclick="asignaciontecnicos('.$contadorservicios.')">Asignar técnicos</div>'.
                                 '</div>'.
                             '</td>'.
-                            '<td class="tdmod"><input type="hidden" class="form-control tipofila" name="tipofila[]" value="agregado" readonly><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$servicio->Codigo.'" readonly data-parsley-length="[1, 20]">'.$servicio->Codigo.'</td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control tipofila" name="tipofila[]" value="agregado" readonly><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$servicio->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$servicio->Codigo.'</b></td>'.
                             '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($servicio->Servicio, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control unidadpartidad" name="unidadpartidad[]" value="'.$servicio->Unidad.'" readonly data-parsley-length="[1, 5]">'.$servicio->Unidad.'</td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordentrabajo('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
@@ -503,7 +506,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                             '<div class="btn bg-blue btn-xs" data-toggle="tooltip" title="Asignar Técnicos" onclick="asignaciontecnicos('.$contadorservicios.')">Asignar técnicos</div>'.
                         '</div>'.
                     '</td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control tipofila" name="tipofila[]" value="agregado" readonly><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dc->Codigo.'" readonly data-parsley-length="[1, 20]">'.$dc->Codigo.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control tipofila" name="tipofila[]" value="agregado" readonly><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dc->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$dc->Codigo.'</b></td>'.
                     '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($dc->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadpartidad" name="unidadpartidad[]" value="'.$dc->Unidad.'" readonly data-parsley-length="[1, 5]">'.$dc->Unidad.'</td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordentrabajo('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
@@ -847,7 +850,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     $botonasignartecnicos.
                     '<input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly>'.
                     '</div></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control tipofila" name="tipofila[]" value="consultado" readonly><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dot->Codigo.'" readonly data-parsley-length="[1, 20]">'.$dot->Codigo.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control tipofila" name="tipofila[]" value="consultado" readonly><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dot->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$dot->Codigo.'</b></td>'.
                     '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($dot->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadpartidad" name="unidadpartidad[]" value="'.$dot->Unidad.'" readonly data-parsley-length="[1, 5]">'.$dot->Unidad.'</td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dot->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordentrabajo('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');" '.$readonly.'></td>'.
@@ -1204,6 +1207,32 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         return response()->json($OrdenTrabajo);  
     }
 
+    //verificar status del registro
+    public function ordenes_trabajo_verificar_abrir_nuevamente_orden(Request $request){
+        $ordentrabajo = OrdenTrabajo::where('Orden', $request->ordenabrir)->first();
+        return response()->json($ordentrabajo); 
+    }
+
+    //abrir nuevamente orden de trabajo
+    public function ordenes_trabajo_abrir_nuevamente_orden(Request $request){
+        $OrdenTrabajo = OrdenTrabajo::where('Orden', $request->ordenabrir)->first();
+        OrdenTrabajo::where('Orden', $request->ordenabrir)
+            ->update([
+                'Status' => 'ABIERTA'
+            ]);
+        //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
+        $BitacoraDocumento = new BitacoraDocumento;
+        $BitacoraDocumento->Documento = "ORDENES DE TRABAJO";
+        $BitacoraDocumento->Movimiento = $request->ordenabrir;
+        $BitacoraDocumento->Aplicacion = "ABRIRNUEVAMENTE";
+        $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
+        $BitacoraDocumento->Status = $OrdenTrabajo->Status;
+        $BitacoraDocumento->Usuario = Auth::user()->user;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
+        $BitacoraDocumento->save();
+        return response()->json($OrdenTrabajo);  
+    }
+
     //buscar folio on key up
     public function ordenes_trabajo_buscar_folio_string_like(Request $request){
         if($request->ajax()){
@@ -1221,6 +1250,8 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
     public function ordenes_trabajo_generar_pdfs(Request $request){
         //primero eliminar todos los archivos de la carpeta
         Helpers::eliminararchivospdfsgenerados();
+        //primero eliminar todos los archivos zip
+        Helpers::eliminararchivoszipgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
             $ordenestrabajo = OrdenTrabajo::whereIn('Orden', $request->arraypdf)->orderBy('Folio', 'ASC')->take(500)->get(); 
@@ -1231,6 +1262,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             $ordenestrabajo = OrdenTrabajo::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(500)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $arrayfilespdf = array();
         foreach ($ordenestrabajo as $ot){
             $data=array();
             $ordentrabajodetalle = OrdenTrabajoDetalle::where('Orden', $ot->Orden)->get();
@@ -1282,9 +1314,36 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             $ArchivoPDF = "PDF".$ots->Orden.".pdf";
             $urlarchivo = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
             $pdfMerger->addPDF($urlarchivo, 'all');
+            array_push($arrayfilespdf,$ArchivoPDF);
         }
         $pdfMerger->merge(); //unirlos
-        $pdfMerger->save("OrdenesTrabajo.pdf", "browser");//mostrarlos en el navegador
+        if($request->descargar_xml == 0){
+            $pdfMerger->save("OrdenesTrabajo.pdf", "browser");//mostrarlos en el navegador
+        }else{
+            //carpeta donde se guardara el archivo zip
+            $public_dir=public_path();
+            // Zip File Name
+            $zipFileName = 'DocumentosPDF.zip';
+            // Crear Objeto ZipArchive
+            $zip = new ZipArchive;
+            if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
+                // Agregar archivos que se comprimiran
+                foreach($arrayfilespdf as $afp) {
+                    $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
+                }     
+                //terminar proceso   
+                $zip->close();
+            }
+            // Set Encabezados para descargar
+            $headers = array(
+                'Content-Type' => 'application/octet-stream',
+            );
+            $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
+            // Create Download Response
+            if(file_exists($filetopath)){
+                return response()->download($filetopath,$zipFileName,$headers);
+            }
+        }
     }
 
     //generacion de formato en PDF
@@ -1429,7 +1488,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             $asunto = $request->emailasunto;
             $emaildocumento = $request->emaildocumento;
             $name = "Receptor envio de correos";
-            $body = $request->emailasunto;
+            $body = $request->emailmensaje;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {

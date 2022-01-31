@@ -75,6 +75,13 @@ function listar(){
         serverSide: true,
         ajax: productos_obtener,
         columns: campos_tabla,
+        "drawCallback": function( data ) {
+            $("#sumacostofiltrado").html(data.json.sumacosto);
+            $("#sumaultimocostofiltrado").html(data.json.sumaultimocosto);
+            $("#sumaultimaventafiltrado").html(data.json.sumaultimaventa);
+            $("#sumapreciofiltrado").html(data.json.sumaprecio);
+            $("#sumaexistenciasfiltrado").html(data.json.sumaexistencias);
+        },
         initComplete: function () {
           // Aplicar busquedas por columna
           this.api().columns().every( function () {
@@ -1218,7 +1225,7 @@ function obtenerdatos(codigoproducto){
                             '<div class="col-md-2">'+
                                 '<label>Tamaño Etiquetas</label>'+
                                 '<select id="tamanoetiquetas" name="tamanoetiquetas" class="form-control">'+
-                                    '<option value="chica">chica</option>'+
+                                    '<!--<option value="chica">chica</option>-->'+
                                     '<option value="grande">grande</option>'+
                                 '</select>'+
                             '</div>'+

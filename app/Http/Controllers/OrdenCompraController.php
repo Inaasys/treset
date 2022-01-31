@@ -37,6 +37,7 @@ use Mail;
 use Schema;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
 use Storage; 
+use ZipArchive;
 
 class OrdenCompraController extends ConfiguracionSistemaController{
 
@@ -186,7 +187,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                         $filasdetallesordencompra= $filasdetallesordencompra.
                         '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                             '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
-                            '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]">'.$producto->Codigo.'</td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$producto->Codigo.'</b></td>'.
                             '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet nombreproductopartida" name="nombreproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($producto->Producto, ENT_QUOTES).'</textarea></td>'.                    
                             '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'.$producto->Unidad.'" readonly data-parsley-length="[1, 5]">'.$producto->Unidad.'</td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm porsurtirpartida" name="porsurtirpartida[]" id="porsurtirpartida[]" value="'.Helpers::convertirvalorcorrecto($cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
@@ -565,7 +566,22 @@ class OrdenCompraController extends ConfiguracionSistemaController{
     //verificar si se puede quitar auotizacion a orden compra
     public function ordenes_compra_verificar_quitar_autorizacion(Request $request){
         $OrdenCompra = OrdenCompra::where('Orden', $request->orden)->first();
-        return response()->json($OrdenCompra);
+        $resultado = CompraDetalle::where('Orden', $request->orden)->count();
+        $numerocompra = 0;
+        if($resultado > 0){
+            $detallescompras = CompraDetalle::where('Orden', $request->orden)->get();
+            foreach($detallescompras as $dc){
+                $compra = Compra::where('Compra', $dc->Compra)->first();
+                if($compra->Status != 'BAJA'){
+                    $numerocompra++;
+                }
+            }
+        }
+        $data = array(
+            'OrdenCompra' => $OrdenCompra,
+            'numerocompra' => $numerocompra,
+        );
+        return response()->json($data);
     }
     //quitar autorizacion a orden de compra
     public function ordenes_compra_quitar_autorizacion(Request $request){
@@ -673,7 +689,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                 $filasdetallesordencompra= $filasdetallesordencompra.
                 '<tr class="filasproductos filaproducto'.$contadorproductos.'" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$doc->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
-                    '<td class="tdmod" ondblclick="construirtabladinamicaporfila('.$contadorfilas.',\'tr.filasproductos\',\''.$encabezadostablaacopiar.'\',\''.$clasecolumnaobtenervalor.'\')"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$doc->Codigo.'" readonly data-parsley-length="[1, 20]">'.$doc->Codigo.'</td>'.
+                    '<td class="tdmod" ondblclick="construirtabladinamicaporfila('.$contadorfilas.',\'tr.filasproductos\',\''.$encabezadostablaacopiar.'\',\''.$clasecolumnaobtenervalor.'\')"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$doc->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$doc->Codigo.'</b></td>'.
                     '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet nombreproductopartida" name="nombreproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($doc->Descripcion, ENT_QUOTES).'</textarea></td>'.                    
                     '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$doc->Unidad.'" readonly data-parsley-length="[1, 5]">'.$doc->Unidad.'</td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm porsurtirpartida"  name="porsurtirpartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Surtir).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
@@ -892,6 +908,8 @@ class OrdenCompraController extends ConfiguracionSistemaController{
     public function ordenes_compra_generar_pdfs(Request $request){
         //primero eliminar todos los archivos de la carpeta
         Helpers::eliminararchivospdfsgenerados();
+        //primero eliminar todos los archivos zip
+        Helpers::eliminararchivoszipgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
             $ordenescompra = OrdenCompra::whereIn('Orden', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
@@ -901,6 +919,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             $ordenescompra = OrdenCompra::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $arrayfilespdf = array();
         foreach ($ordenescompra as $oc){
             $data=array();
             $ordencompradetalle = OrdenCompraDetalle::where('Orden', $oc->Orden)->get();
@@ -964,9 +983,36 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             $ArchivoPDF = "PDF".$orc->Orden.".pdf";
             $urlarchivo = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
             $pdfMerger->addPDF($urlarchivo, 'all');
+            array_push($arrayfilespdf,$ArchivoPDF);
         }
         $pdfMerger->merge(); //unirlos
-        $pdfMerger->save("OrdenesCompra.pdf", "browser");//mostrarlos en el navegador
+        if($request->descargar_xml == 0){
+            $pdfMerger->save("OrdenesCompra.pdf", "browser");//mostrarlos en el navegador
+        }else{
+            //carpeta donde se guardara el archivo zip
+            $public_dir=public_path();
+            // Zip File Name
+            $zipFileName = 'DocumentosPDF.zip';
+            // Crear Objeto ZipArchive
+            $zip = new ZipArchive;
+            if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
+                // Agregar archivos que se comprimiran
+                foreach($arrayfilespdf as $afp) {
+                    $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
+                }     
+                //terminar proceso   
+                $zip->close();
+            }
+            // Set Encabezados para descargar
+            $headers = array(
+                'Content-Type' => 'application/octet-stream',
+            );
+            $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
+            // Create Download Response
+            if(file_exists($filetopath)){
+                return response()->download($filetopath,$zipFileName,$headers);
+            }
+        }
     }
 
     //generacion de formato en PDF
@@ -1158,7 +1204,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             $asunto = $request->emailasunto;
             $emaildocumento = $request->emaildocumento;
             $name = "Receptor envio de correos";
-            $body = $request->emailasunto;
+            $body = $request->emailmensaje;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             if($request->archivoadjunto != null && $request->archivoadjunto2 != null) {

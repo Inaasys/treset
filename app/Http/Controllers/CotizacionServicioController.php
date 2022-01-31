@@ -39,6 +39,8 @@ use Config;
 use Mail;
 use Schema;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
+use Storage; 
+use ZipArchive;
 
 class CotizacionServicioController extends ConfiguracionSistemaController{
 
@@ -165,7 +167,7 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
                         $filasdetallescotizacion= $filasdetallescotizacion.
                         '<tr class="filasservicios" id="filaservicio'.$contadorservicios.'">'.
                             '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilaservicio('.$contadorservicios.')">X</div><input type="hidden" class="form-control agregadoenservicio" name="agregadoenservicio[]" value="'.$tipooperacion.'" readonly></td>'.
-                            '<td class="tdmod"><input type="hidden" class="form-control codigoserviciopartida" name="codigoserviciopartida[]" value="'.$servicio->Codigo.'" readonly data-parsley-length="[1, 20]">'.$servicio->Codigo.'</td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control codigoserviciopartida" name="codigoserviciopartida[]" value="'.$servicio->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$servicio->Codigo.'</b></td>'.
                             '<td class="tdmod"><input type="text" class="form-control inputnextdetser divorinputmodxl descripcionserviciopartida" name="descripcionserviciopartida[]" value="'.htmlspecialchars($servicio->Servicio, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control unidadserviciopartida" name="unidadserviciopartida[]" value="'.$servicio->Unidad.'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'.$servicio->Unidad.'</td>'.
                             '<td class="tdmod">'.
@@ -262,7 +264,7 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
                         $filasdetallescotizacion= $filasdetallescotizacion.
                         '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                             '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
-                            '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]">'.$producto->Codigo.'</td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$producto->Codigo.'</b></td>'.
                             '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.htmlspecialchars($producto->Producto, ENT_QUOTES).'"  required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$producto->Unidad.'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'.$producto->Unidad.'</td>'.
                             '<td class="tdmod">'.
@@ -826,7 +828,7 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
                 $filasdetallescotizacion= $filasdetallescotizacion.
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dc->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dc->Codigo.'" readonly data-parsley-length="[1, 20]">'.$dc->Codigo.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dc->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$dc->Codigo.'</b></td>'.
                     '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.htmlspecialchars($dc->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$dc->Unidad.'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'.$dc->Unidad.'</td>'.
                     '<td class="tdmod">'.
@@ -887,7 +889,7 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
                 $filasdetallesservicioscotizacion= $filasdetallesservicioscotizacion.
                 '<tr class="filasservicios" id="filaservicio'.$contadorservicios.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilaservicio('.$contadorservicios.')">X</div><input type="hidden" class="form-control itempartidaservicio" name="itempartidaservicio[]" value="'.$dsc->Item.'" readonly><input type="hidden" class="form-control agregadoenservicio" name="agregadoenservicio[]" value="NA" readonly></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control codigoserviciopartida" name="codigoserviciopartida[]" value="'.$dsc->Codigo.'" readonly data-parsley-length="[1, 20]">'.$dsc->Codigo.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control codigoserviciopartida" name="codigoserviciopartida[]" value="'.$dsc->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$dsc->Codigo.'</b></td>'.
                     '<td class="tdmod"><input type="text" class="form-control inputnextdetser divorinputmodxl descripcionserviciopartida" name="descripcionserviciopartida[]" value="'.htmlspecialchars($dsc->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadserviciopartida" name="unidadserviciopartida[]" value="'.$dsc->Unidad.'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'.$dsc->Unidad.'</td>'.
                     '<td class="tdmod">'.
@@ -1251,6 +1253,8 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
     public function cotizaciones_servicios_generar_pdfs(Request $request){
         //primero eliminar todos los archivos de la carpeta
         Helpers::eliminararchivospdfsgenerados();
+        //primero eliminar todos los archivos zip
+        Helpers::eliminararchivoszipgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
             $cotizacionesservicios = CotizacionServicio::whereIn('Cotizacion', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
@@ -1260,6 +1264,7 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
             $cotizacionesservicios = CotizacionServicio::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $arrayfilespdf = array();
         foreach ($cotizacionesservicios as $cs){
             $data=array();
             $cotizacionesserviciosdetalle = CotizacionServicioDetalle::where('Cotizacion', $cs->Cotizacion)->get();
@@ -1329,9 +1334,36 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
             $ArchivoPDF = "PDF".$cots->Cotizacion.".pdf";
             $urlarchivo = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
             $pdfMerger->addPDF($urlarchivo, 'all');
+            array_push($arrayfilespdf,$ArchivoPDF);
         }
         $pdfMerger->merge(); //unirlos
-        $pdfMerger->save("CotizacionesServicio.pdf", "browser");//mostrarlos en el navegador
+        if($request->descargar_xml == 0){
+            $pdfMerger->save("CotizacionesServicio.pdf", "browser");//mostrarlos en el navegador
+        }else{
+            //carpeta donde se guardara el archivo zip
+            $public_dir=public_path();
+            // Zip File Name
+            $zipFileName = 'DocumentosPDF.zip';
+            // Crear Objeto ZipArchive
+            $zip = new ZipArchive;
+            if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
+                // Agregar archivos que se comprimiran
+                foreach($arrayfilespdf as $afp) {
+                    $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
+                }     
+                //terminar proceso   
+                $zip->close();
+            }
+            // Set Encabezados para descargar
+            $headers = array(
+                'Content-Type' => 'application/octet-stream',
+            );
+            $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
+            // Create Download Response
+            if(file_exists($filetopath)){
+                return response()->download($filetopath,$zipFileName,$headers);
+            }
+        }
     }
 
     //generacion de formato en PDF
@@ -1536,7 +1568,7 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
             $asunto = $request->emailasunto;
             $emaildocumento = $request->emaildocumento;
             $name = "Receptor envio de correos";
-            $body = $request->emailasunto;
+            $body = $request->emailmensaje;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             if($request->archivoadjunto != null && $request->archivoadjunto2 != null) {
@@ -1778,7 +1810,7 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
             $asunto = $request->emailasunto;
             $emaildocumento = $request->emaildocumento;
             $name = "Receptor envio de correos";
-            $body = $request->emailasunto;
+            $body = $request->emailmensaje;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             if($request->archivoadjunto != null && $request->archivoadjunto2 != null) {

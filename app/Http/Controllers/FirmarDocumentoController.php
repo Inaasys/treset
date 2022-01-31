@@ -112,7 +112,7 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
                 case "OrdenesDeCompra":
                     $data = DB::table('Ordenes de Compra as oc')
                     ->select("oc.Serie", "oc.Folio", "oc.Orden as Documento", "oc.Fecha")
-                    ->leftjoin('firmas_rel_documentos as frd', 'oc.Orden', '=', 'frd.Documento')
+                    //->leftjoin('firmas_rel_documentos as frd', 'oc.Orden', '=', 'frd.Documento')
                     ->whereDate('oc.Fecha', '>=', $primerdiamesanterior->toDateString())->whereDate('oc.Fecha', '<=', $ultimodiamesactual->toDateString())
                     ->where('oc.AutorizadoPor', '<>', '')
                     ->orderBy('oc.Folio', 'DESC')
@@ -121,7 +121,7 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
                 case "Compras":
                     $data = DB::table('Compras as c')
                     ->select("c.Serie", "c.Folio", "c.Compra as Documento", "c.Fecha")
-                    ->leftjoin('firmas_rel_documentos as frd', 'c.Compra', '=', 'frd.Documento')
+                    //->leftjoin('firmas_rel_documentos as frd', 'c.Compra', '=', 'frd.Documento')
                     ->whereDate('c.Fecha', '>=', $primerdiamesanterior->toDateString())->whereDate('c.Fecha', '<=', $ultimodiamesactual->toDateString())
                     ->where('c.Status', '<>', 'BAJA')
                     ->orderBy('c.Folio', 'DESC')
@@ -130,7 +130,7 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
                 case "ContraRecibos":
                     $data = DB::table('ContraRecibos as c')
                     ->select("c.Serie", "c.Folio", "c.ContraRecibo as Documento", "c.Fecha")
-                    ->leftjoin('firmas_rel_documentos as frd', 'c.ContraRecibo', '=', 'frd.Documento')
+                    //->leftjoin('firmas_rel_documentos as frd', 'c.ContraRecibo', '=', 'frd.Documento')
                     ->whereDate('c.Fecha', '>=', $primerdiamesanterior->toDateString())->whereDate('c.Fecha', '<=', $ultimodiamesactual->toDateString())
                     ->where('c.Status', '<>', 'BAJA')
                     ->orderBy('c.Folio', 'DESC')
@@ -139,7 +139,7 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
                 case "Remisiones":
                     $data = DB::table('Remisiones as r')
                     ->select("r.Serie", "r.Folio", "r.Remision as Documento", "r.Fecha")
-                    ->leftjoin('firmas_rel_documentos as frd', 'r.Remision', '=', 'frd.Documento')
+                    //->leftjoin('firmas_rel_documentos as frd', 'r.Remision', '=', 'frd.Documento')
                     ->whereDate('r.Fecha', '>=', $primerdiamesanterior->toDateString())->whereDate('r.Fecha', '<=', $ultimodiamesactual->toDateString())
                     ->where('r.Status', '<>', 'BAJA')
                     ->orderBy('r.Folio', 'DESC')
@@ -150,7 +150,7 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
                 case "Traspasos":
                     $data = DB::table('Traspasos as t')
                     ->select("t.Serie", "t.Folio", "t.Traspaso as Documento", "t.Fecha")
-                    ->leftjoin('firmas_rel_documentos as frd', 't.Traspaso', '=', 'frd.Documento')
+                    //->leftjoin('firmas_rel_documentos as frd', 't.Traspaso', '=', 'frd.Documento')
                     ->whereDate('t.Fecha', '>=', $primerdiamesanterior->toDateString())->whereDate('t.Fecha', '<=', $ultimodiamesactual->toDateString())
                     ->where('t.Status', '<>', 'BAJA')
                     ->orderBy('t.Folio', 'DESC')
@@ -163,7 +163,7 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
                 case "NotasCreditoProveedor":
                     $data = DB::table('Notas Proveedor as np')
                     ->select("np.Serie", "np.Folio", "np.Nota as Documento", "np.Fecha")
-                    ->leftjoin('firmas_rel_documentos as frd', 'np.Nota', '=', 'frd.Documento')
+                    //->leftjoin('firmas_rel_documentos as frd', 'np.Nota', '=', 'frd.Documento')
                     ->whereDate('np.Fecha', '>=', $primerdiamesanterior->toDateString())->whereDate('np.Fecha', '<=', $ultimodiamesactual->toDateString())
                     ->where('np.Status', '<>', 'BAJA')
                     ->orderBy('np.Folio', 'DESC')
@@ -172,7 +172,7 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
                 case "asignacion_herramientas":
                     $data = DB::table('asignacion_herramientas as ah')
                     ->select("ah.serie as Serie", "ah.id as Folio", "ah.asignacion as Documento", "ah.fecha as Fecha")
-                    ->leftjoin('firmas_rel_documentos as frd', 'ah.asignacion', '=', 'frd.Documento')
+                    //->leftjoin('firmas_rel_documentos as frd', 'ah.asignacion', '=', 'frd.Documento')
                     ->whereDate('ah.fecha', '>=', $primerdiamesanterior->toDateString())->whereDate('ah.fecha', '<=', $ultimodiamesactual->toDateString())
                     ->where('ah.status', '<>', 'BAJA')
                     ->orderBy('ah.id', 'DESC')
@@ -183,7 +183,7 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
                 case "AjustesInventario":
                     $data = DB::table('Ajustes de Inventario as aji')
                     ->select("aji.Serie", "aji.Folio", "aji.Ajuste as Documento", "aji.Fecha")
-                    ->leftjoin('firmas_rel_documentos as frd', 'aji.Ajuste', '=', 'frd.Documento')
+                    //->leftjoin('firmas_rel_documentos as frd', 'aji.Ajuste', '=', 'frd.Documento')
                     ->whereDate('aji.Fecha', '>=', $primerdiamesanterior->toDateString())->whereDate('aji.Fecha', '<=', $ultimodiamesactual->toDateString())
                     ->where('aji.Status', '<>', 'BAJA')
                     ->orderBy('aji.Folio', 'DESC')
@@ -192,7 +192,7 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
                 case "CotizacionesProductos":
                     $data = DB::table('Cotizaciones as c')
                     ->select("c.Serie", "c.Folio", "c.Cotizacion as Documento", "c.Fecha")
-                    ->leftjoin('firmas_rel_documentos as frd', 'c.Cotizacion', '=', 'frd.Documento')
+                    //->leftjoin('firmas_rel_documentos as frd', 'c.Cotizacion', '=', 'frd.Documento')
                     ->whereDate('c.Fecha', '>=', $primerdiamesanterior->toDateString())->whereDate('c.Fecha', '<=', $ultimodiamesactual->toDateString())
                     ->where('c.Status', '<>', 'BAJA')
                     ->orderBy('c.Folio', 'DESC')
@@ -201,7 +201,7 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
                 case "CotizacionesServicios":
                     $data = DB::table('Cotizaciones Servicio as c')
                     ->select("c.Serie", "c.Folio", "c.Cotizacion as Documento", "c.Fecha")
-                    ->leftjoin('firmas_rel_documentos as frd', 'c.Cotizacion', '=', 'frd.Documento')
+                    //->leftjoin('firmas_rel_documentos as frd', 'c.Cotizacion', '=', 'frd.Documento')
                     ->whereDate('c.Fecha', '>=', $primerdiamesanterior->toDateString())->whereDate('c.Fecha', '<=', $ultimodiamesactual->toDateString())
                     ->where('c.Status', '<>', 'BAJA')
                     ->orderBy('c.Folio', 'DESC')
@@ -210,7 +210,7 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
                 case "Produccion":
                     $data = DB::table('Produccion as p')
                     ->select("p.Serie", "p.Folio", "p.Produccion as Documento", "p.Fecha")
-                    ->leftjoin('firmas_rel_documentos as frd', 'p.Produccion', '=', 'frd.Documento')
+                    //->leftjoin('firmas_rel_documentos as frd', 'p.Produccion', '=', 'frd.Documento')
                     ->whereDate('p.Fecha', '>=', $primerdiamesanterior->toDateString())->whereDate('p.Fecha', '<=', $ultimodiamesactual->toDateString())
                     ->where('p.Status', '<>', 'BAJA')
                     ->orderBy('p.Folio', 'DESC')
@@ -219,7 +219,7 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
                 case "Requisiciones":
                     $data = DB::table('Requisiciones as r')
                     ->select("r.Serie", "r.Folio", "r.Requisicion as Documento", "r.Fecha")
-                    ->leftjoin('firmas_rel_documentos as frd', 'r.Requisicion', '=', 'frd.Documento')
+                    //->leftjoin('firmas_rel_documentos as frd', 'r.Requisicion', '=', 'frd.Documento')
                     ->whereDate('r.Fecha', '>=', $primerdiamesanterior->toDateString())->whereDate('r.Fecha', '<=', $ultimodiamesactual->toDateString())
                     ->where('r.Status', '<>', 'BAJA')
                     ->orderBy('r.Folio', 'DESC')
@@ -346,7 +346,7 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
                 '<td class="tdmod"><input type="hidden" class="form-control tipodocumentopartida" name="tipodocumentopartida[]" value="'.$request->tipo.'" readonly required data-parsley-length="[1, 255]">'.$request->tipo.'</td>'.
                 '<td class="tdmod"><input type="hidden" class="form-control documentopartida" name="documentopartida[]" value="'.$datos->Documento.'" readonly required data-parsley-length="[1, 255]">'.$datos->Documento.'</td>'.
                 '<td class="tdmod"><input type="hidden" class="form-control idusuariopartida" name="idusuariopartida[]" value="'.Auth::user()->id.'" readonly required data-parsley-length="[1, 255]"><input type="text" class="form-control divorinputmodxl usuariopartida" name="usuariopartida[]" value="'.Auth::user()->user.'" required readonly data-parsley-length="[1, 255]"></td>'.
-                '<td class="tdmod"><select class="form-control titulofirmapartida select2" name="titulofirmapartida[]"  style="width:100%;">'.$select_titulos_firmas.'</select></td>'.    
+                '<td class="tdmod"><select class="form-control titulofirmapartida select2" multiple="multiple" name="titulofirmapartida[]"  style="width:100%;" required>'.$select_titulos_firmas.'</select></td>'.    
             '</tr>';
             $contadorfilas++;
             $partida++; 
@@ -361,30 +361,32 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
 
     //firmas altas en irdenes compras
     public function firmardocumentosoc_guardar(Request $request){
-        //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
+        //INGRESAR DATOS A TABLA
         $item = 1;
         $existenfirmas = 0; 
         foreach ($request->tipodocumentopartida as $key => $tipodocumentopartida){  
-            $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
-                                                            ->where('Documento',$request->documentopartida [$key])
-                                                            ->where('ReferenciaPosicion',$request->titulofirmapartida [$key])
-                                                            ->where('IdUsuario',Auth::user()->id)
-                                                            ->where('Status', 'ALTA')
-                                                            ->count();
-            if($existefirmaendocumento == 0){
-                $Firma_Rel_Documento=new Firma_Rel_Documento;
-                $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
-                $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
-                $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
-                $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
-                $Firma_Rel_Documento->ReferenciaPosicion = $request->titulofirmapartida [$key];
-                $Firma_Rel_Documento->Status = "ALTA";
-                $Firma_Rel_Documento->Usuario = Auth::user()->user;
-                $Firma_Rel_Documento->Periodo =  $this->periodohoy;
-                $Firma_Rel_Documento->save();
-                $item++;
-            }else{
-                $existenfirmas++;
+            foreach($request->titulofirmapartida as $titulofirma){
+                $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
+                                                                ->where('Documento',$request->documentopartida [$key])
+                                                                ->where('ReferenciaPosicion',$titulofirma)
+                                                                ->where('IdUsuario',Auth::user()->id)
+                                                                ->where('Status', 'ALTA')
+                                                                ->count();
+                if($existefirmaendocumento == 0){
+                    $Firma_Rel_Documento=new Firma_Rel_Documento;
+                    $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
+                    $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
+                    $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
+                    $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
+                    $Firma_Rel_Documento->ReferenciaPosicion = $titulofirma;
+                    $Firma_Rel_Documento->Status = "ALTA";
+                    $Firma_Rel_Documento->Usuario = Auth::user()->user;
+                    $Firma_Rel_Documento->Periodo =  $this->periodohoy;
+                    $Firma_Rel_Documento->save();
+                    $item++;
+                }else{
+                    $existenfirmas++;
+                }
             }
         }
     	return response()->json($existenfirmas); 

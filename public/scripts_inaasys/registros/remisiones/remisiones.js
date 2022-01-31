@@ -215,6 +215,12 @@ $("#btnenviarpartidasexcel").on('click', function(e){
           $(".inputnextdet").eq(index + 1).focus().select(); 
         }
       });
+      //mostrar o no insumos en partidas segun la configuracion de la empresa
+      if(mostrarinsumoporpartidaenremisiones == 'S'){
+          $(".tdinsumospartidas").show();
+      }else{
+          $(".tdinsumospartidas").hide();       
+      }
     },
     error: function (data) {
       console.log(data);
@@ -866,6 +872,12 @@ function seleccionarcotizacion(Folio, Cotizacion){
         contadorproductos = data.contadorproductos;
         contadorfilas = data.contadorfilas;
         seleccionartipocotizacion(data);
+        //mostrar o no insumos en partidas segun la configuracion de la empresa
+        if(mostrarinsumoporpartidaenremisiones == 'S'){
+            $(".tdinsumospartidas").show();
+        }else{
+            $(".tdinsumospartidas").hide();     
+        }
     })  
 }
 async function seleccionartipocotizacion(data){
@@ -1209,8 +1221,8 @@ function agregarfilaproducto(data,Codigo){
         var tipo = "alta";
         var fila=   '<tr class="filasproductos" id="filaproducto'+contadorproductos+'">'+
                           '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('+contadorproductos+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
-                          '<td class="tdmod"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'+Insumo+'" readonly data-parsley-length="[1, 20]"></td>'+
-                          '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+
+                          '<td class="tdmod tdinsumospartidas"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'+Insumo+'" readonly data-parsley-length="[1, 20]"></td>'+
+                          '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'+Codigo+'</b></td>'+
                           '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
                           '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'+Unidad+'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'+Unidad+'</td>'+
                             '<td class="tdmod">'+
@@ -1274,6 +1286,12 @@ function agregarfilaproducto(data,Codigo){
             $(".inputnextdet").eq(index + 1).focus().select(); 
           }
         });
+        //mostrar o no insumos en partidas segun la configuracion de la empresa
+        if(mostrarinsumoporpartidaenremisiones == 'S'){
+            $(".tdinsumospartidas").show();
+        }else{
+            $(".tdinsumospartidas").hide();       
+        }
         $('.page-loader-wrapper').css('display', 'none');
     }else{
         msj_errorproductoyaagregado();
@@ -1535,8 +1553,8 @@ function alta(){
                                     '<thead class="'+background_tables+'">'+
                                         '<tr>'+
                                           '<th class="'+background_tables+'">#</th>'+
-                                          '<th class="'+background_tables+'">Insumo</th>'+
-                                          '<th class="'+background_tables+'">Código</th>'+
+                                          '<th class="'+background_tables+'" id="thinsumospartidas">Insumo</th>'+
+                                          '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
                                           '<th class="'+background_tables+'"><div style="width:400px !important;">Descripción</div></th>'+
                                           '<th class="'+background_tables+'">Unidad</th>'+
                                           '<th class="customercolortheadth">Cantidad</th>'+
@@ -1648,6 +1666,12 @@ function alta(){
                 '</div>'+
             '</div>';
     $("#tabsform").html(tabs);
+    //mostrar o no insumos en partidas segun la configuracion de la empresa
+    if(mostrarinsumoporpartidaenremisiones == 'S'){
+        $("#thinsumospartidas").show();
+    }else{
+        $("#thinsumospartidas").hide();       
+    }
     //colocar readonly o no a input de requisicion segun la configuracion de la empresa
     if(controlarconsecutivonumrequisicion == 'S'){
         $("#requisicion").attr('readonly', 'readonly');
@@ -2108,8 +2132,8 @@ function obtenerdatos(remisionmodificar){
                                     '<thead class="'+background_tables+'">'+
                                         '<tr>'+
                                           '<th class="'+background_tables+'">#</th>'+
-                                          '<th class="'+background_tables+'">Insumo</th>'+
-                                          '<th class="'+background_tables+'">Código</th>'+
+                                          '<th class="'+background_tables+'" id="thinsumospartidas">Insumo</th>'+
+                                          '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
                                           '<th class="'+background_tables+'"><div style="width:400px !important;">Descripción</div></th>'+
                                           '<th class="'+background_tables+'">Unidad</th>'+
                                           '<th class="customercolortheadth">Cantidad</th>'+
@@ -2368,6 +2392,14 @@ function obtenerdatos(remisionmodificar){
         $(".inputnextdet").eq(index + 1).focus().select(); 
       }
     });
+    //mostrar o no insumos en partidas segun la configuracion de la empresa
+    if(mostrarinsumoporpartidaenremisiones == 'S'){
+        $("#thinsumospartidas").show();
+        $(".tdinsumospartidas").show();
+    }else{
+        $("#thinsumospartidas").hide();  
+        $(".tdinsumospartidas").hide();     
+    }
     //asignar el tipo de operacion que se realizara
     $("#tipooperacion").val("modificacion");
     seleccionartipocliente(data);
@@ -2451,6 +2483,7 @@ function enviardocumentoemail(documento){
             $("#correosconcopia").append('<option value="'+data.email3cc+'" selected>'+data.email3cc+'</option>');
         }
         $("#emailasunto").val("REMISIÓN NO. " + documento +" DE "+ nombreempresa);
+        $("#emailmensaje").val("REMISIÓN NO. " + documento +" DE "+ nombreempresa);
         $(".dropify-clear").trigger("click");
         $("#divadjuntararchivo").hide();
         $("#modalenviarpdfemail").modal('show');

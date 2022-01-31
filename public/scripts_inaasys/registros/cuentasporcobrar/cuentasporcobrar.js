@@ -2146,6 +2146,7 @@ function enviardocumentoemail(documento,tipoformato){
           $("#correosconcopia").append('<option value="'+data.email3cc+'" selected>'+data.email3cc+'</option>');
         }
         $("#emailasunto").val("CUENTA POR COBRAR NO. " + documento +" DE "+ nombreempresa);
+        $("#emailmensaje").val("CUENTA POR COBRAR NO. " + documento +" DE "+ nombreempresa);
         if(data.cuentaporcobrar.UUID != ""){
             $("#incluir_xml").removeAttr('onclick');
         }else{

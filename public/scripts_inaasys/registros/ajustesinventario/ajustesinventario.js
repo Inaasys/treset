@@ -818,7 +818,7 @@ function alta(){
                         '<thead class="'+background_tables+'">'+
                           '<tr>'+
                             '<th class="'+background_tables+'">#</th>'+
-                            '<th class="'+background_tables+'">Código</th>'+
+                            '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
                             '<th class="'+background_tables+'"><div style="width:200px !important;">Producto</div></th>'+
                             '<th class="'+background_tables+'">Unidad</th>'+
                             '<th class="'+background_tables+'">Existencia Actual</th>'+
@@ -1106,7 +1106,7 @@ function obtenerdatos(ajustemodificar){
                           '<thead class="'+background_tables+'">'+
                             '<tr>'+
                               '<th class="'+background_tables+'">#</th>'+
-                              '<th class="'+background_tables+'">Código</th>'+
+                              '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
                               '<th class="'+background_tables+'"><div style="width:200px !important;">Producto</div></th>'+
                               '<th class="'+background_tables+'">Unidad</th>'+
                               '<th class="'+background_tables+'">Existencia Actual</th>'+
@@ -1265,6 +1265,7 @@ function enviardocumentoemail(documento){
       $("#correosconcopia").append('<option value="'+data.email3cc+'" selected>'+data.email3cc+'</option>');
     }
     $("#emailasunto").val("AJUSTE DE INVENTARIO NO. " + documento +" DE "+ nombreempresa);
+    $("#emailmensaje").val("AJUSTE DE INVENTARIO NO. " + documento +" DE "+ nombreempresa);
     $(".dropify-clear").trigger("click");
     $("#divadjuntararchivo").hide();
     $("#modalenviarpdfemail").modal('show');

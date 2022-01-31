@@ -1,6 +1,6 @@
 @extends('plantilla_maestra')
 @section('titulo')
-  Reporte Relación ContraRecibos
+  Reporte Relación Cuentas Por Pagar
 @endsection
 @section('additionals_css')
     @include('secciones.libreriascss')
@@ -17,7 +17,7 @@
                         	<table>
                         		<tr>
                         			<td >
-                        				<h5>&nbsp;&nbsp;&nbsp;Reporte Relación ContraRecibos&nbsp;&nbsp;&nbsp;</h5>
+                        				<h5>&nbsp;&nbsp;&nbsp;Reporte Relación Cuentas Por Pagar&nbsp;&nbsp;&nbsp;</h5>
                         			</td>
                                     <td >
                                         <div class="btn bg-blue btn-xs waves-effect" onclick="generar_reporte()">
@@ -58,18 +58,36 @@
                                         </table>
                                     </div>
                                     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+                                        <label>Banco <span class="label label-danger" id="textonombrebanco"></span></label>
+                                        <table class="col-md-12">
+                                            <tr>
+                                                <td>
+                                                    <div class="btn bg-blue waves-effect" onclick="obtenerbancos()">Seleccionar</div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-line">
+                                                        <input type="text" class="form-control" name="numerobanco" id="numerobanco" data-parsley-type="integer" autocomplete="off">
+                                                        <input type="hidden" class="form-control" name="numerobancoanterior" id="numerobancoanterior" data-parsley-type="integer">
+                                                        <input type="hidden" class="form-control" name="banco" id="banco" readonly onkeyup="tipoLetra(this)">
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
                                         <label>Fecha Inicial</label>
                                         <input type="date" class="form-control" name="fechainicialreporte" id="fechainicialreporte" onchange="generar_reporte()" required>
                                     </div>  
-                                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+                                    <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
                                         <label>Fecha Final</label>
                                         <input type="date" class="form-control" name="fechafinalreporte" id="fechafinalreporte" onchange="generar_reporte()" required>
                                     </div> 
-                                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+                                    <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
                                         <label>Reporte</label>
                                         <select class="form-control select2" name="reporte" id="reporte" onchange="generar_reporte()"  required>
-                                            <option value="GENERAL">GENERAL</option>
-                                            <option value="DETALLES">DETALLES</option>
+                                            <option value="AGRUPARxPROVEEDOR">AGRUPARxPROVEEDOR</option>
+                                            <!--<option value="AGRUPARxBANCO">AGRUPARxBANCO</option>-->
+                                            <option value="RELACIONPAGOS">RELACION DE PAGOS</option>
                                         </select>
                                     </div>
                                 </div>
@@ -119,10 +137,12 @@
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';
-        var reporte_relacion_contrarecibos_obtener_proveedores = '{!!URL::to('reporte_relacion_contrarecibos_obtener_proveedores')!!}';
-        var reporte_relacion_contrarecibos_obtener_proveedor_por_numero = '{!!URL::to('reporte_relacion_contrarecibos_obtener_proveedor_por_numero')!!}';
-        var reporte_relacion_contrarecibos_generar_reporte = '{!!URL::to('reporte_relacion_contrarecibos_generar_reporte')!!}';
+        var reporte_relacion_cuentasporpagar_obtener_proveedores = '{!!URL::to('reporte_relacion_cuentasporpagar_obtener_proveedores')!!}';
+        var reporte_relacion_cuentasporpagar_obtener_proveedor_por_numero = '{!!URL::to('reporte_relacion_cuentasporpagar_obtener_proveedor_por_numero')!!}';
+        var reporte_relacion_cuentasporpagar_obtener_bancos = '{!!URL::to('reporte_relacion_cuentasporpagar_obtener_bancos')!!}';
+        var reporte_relacion_cuentasporpagar_obtener_banco_por_numero = '{!!URL::to('reporte_relacion_cuentasporpagar_obtener_banco_por_numero')!!}';
+        var reporte_relacion_cuentasporpagar_generar_reporte = '{!!URL::to('reporte_relacion_cuentasporpagar_generar_reporte')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
-    <script src="scripts_inaasys/reportes/contrarecibos/reporterelacioncontrarecibos.js"></script>
+    <script src="scripts_inaasys/reportes/cuentasporpagar/reporterelacioncuentasporpagar.js"></script>
 @endsection

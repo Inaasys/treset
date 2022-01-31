@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -34,6 +33,8 @@ use App\Firma_Rel_Documento;
 use Config;
 use Mail;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
+use Storage; 
+use ZipArchive;
 
 class ProduccionController extends ConfiguracionSistemaController{
 
@@ -198,11 +199,11 @@ class ProduccionController extends ConfiguracionSistemaController{
             $data = VistaObtenerExistenciaProducto::where('Pt', 'S');
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($tipooperacion, $numeroalmacen){
-                        if($data->Almacen == $numeroalmacen){
+                        //if($data->Almacen == $numeroalmacen){
                             $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarproducto(\''.$data->Codigo .'\')">Seleccionar</div>';
-                        }else{
-                            $boton = '';
-                        }
+                        //}else{
+                          //  $boton = '';
+                        //}
                         return $boton;
                     })
                     ->addColumn('Existencias', function($data){
@@ -228,44 +229,55 @@ class ProduccionController extends ConfiguracionSistemaController{
         $partida = 1;
         $tipo = $request->tipooperacion;
         $productoterminado = "";
-        $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('Almacen', $numeroalmacen)->where('Pt', 'S')->count();
-        if($contarproductos > 0){
-            $productoterminado = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('Almacen', $numeroalmacen)->where('Pt', 'S')->first();
-            $insumosfabricacion =  ProductoConsumo::where('Codigo', $codigoabuscar)->get();
-            foreach($insumosfabricacion as $if){
-                $producto = Producto::where('Codigo', $if->Equivale)->first();
-                $contarexistencia = Existencia::where('Codigo', $if->Equivale)->where('Almacen', $numeroalmacen)->count();
-                if($contarexistencia > 0){
-                    $Existencia = Existencia::where('Codigo', $if->Equivale)->where('Almacen', $numeroalmacen)->first();
-                    $Existencias = Helpers::convertirvalorcorrecto($Existencia->Existencias);
-                }else{
-                    $Existencias = Helpers::convertirvalorcorrecto(0);
-                }
-                $parsleymax = $Existencias;
-                $filasdetallesproduccion= $filasdetallesproduccion.
-                '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
-                    '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipo.'" readonly></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$if->Equivale.'" readonly data-parsley-length="[1, 20]">'.$if->Equivale.'</td>'.
-                    '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.htmlspecialchars($producto->Producto, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
-                    '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodsm unidadproductopartida" name="unidadproductopartida[]" value="'.$producto->Unidad.'" data-parsley-length="[1, 5]"></td>'.
-                    '<td class="tdmod">'.
-                        '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="'.Helpers::convertirvalorcorrecto($if->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
-                        '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($if->Cantidad).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas();">'.
-                        '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'.                           
-                    '</td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm mermapartida" name="mermapartida[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas();"></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm consumopartida" name="consumopartida[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm costounitariopartida" name="costounitariopartida[]" value="'.Helpers::convertirvalorcorrecto($producto->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas();"></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod" hidden><input type="text" class="form-control divorinputmodsm partidapartida" name="partidapartida[]" value="'.$partida.'" required></td>'.
-                '</tr>';
-                $contadorproductos++;
-                $contadorfilas++;
-                $partida++;
+        $contarcatproducto = Producto::where('Codigo', $codigoabuscar)->where('Pt', 'S')->count();
+        if($contarcatproducto > 0){
+            $ContarExistencia = Existencia::where('Codigo', $codigoabuscar)->where('Almacen', $numeroalmacen)->count();
+            if($ContarExistencia == 0){ 
+                $ExistenciaAlmacen = new Existencia;
+                $ExistenciaAlmacen->Codigo = $codigoabuscar;
+                $ExistenciaAlmacen->Almacen = $numeroalmacen;
+                $ExistenciaAlmacen->Existencias = Helpers::convertirvalorcorrecto(0);
+                $ExistenciaAlmacen->save();
             }
-        }else{
-            $filasdetallesproduccion = '';
-        }  
+            $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('Almacen', $numeroalmacen)->where('Pt', 'S')->count();
+            if($contarproductos > 0){
+                $productoterminado = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('Almacen', $numeroalmacen)->where('Pt', 'S')->first();
+                $insumosfabricacion =  ProductoConsumo::where('Codigo', $codigoabuscar)->get();
+                foreach($insumosfabricacion as $if){
+                    $producto = Producto::where('Codigo', $if->Equivale)->first();
+                    $contarexistencia = Existencia::where('Codigo', $if->Equivale)->where('Almacen', $numeroalmacen)->count();
+                    if($contarexistencia > 0){
+                        $Existencia = Existencia::where('Codigo', $if->Equivale)->where('Almacen', $numeroalmacen)->first();
+                        $Existencias = Helpers::convertirvalorcorrecto($Existencia->Existencias);
+                    }else{
+                        $Existencias = Helpers::convertirvalorcorrecto(0);
+                    }
+                    $parsleymax = $Existencias;
+                    $filasdetallesproduccion= $filasdetallesproduccion.
+                    '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
+                        '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipo.'" readonly></td>'.
+                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$if->Equivale.'" readonly data-parsley-length="[1, 20]">'.$if->Equivale.'</td>'.
+                        '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.htmlspecialchars($producto->Producto, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                        '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodsm unidadproductopartida" name="unidadproductopartida[]" value="'.$producto->Unidad.'" data-parsley-length="[1, 5]"></td>'.
+                        '<td class="tdmod">'.
+                            '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="'.Helpers::convertirvalorcorrecto($if->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
+                            '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($if->Cantidad).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas();">'.
+                            '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'.                           
+                        '</td>'.
+                        '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm mermapartida" name="mermapartida[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas();"></td>'.
+                        '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm consumopartida" name="consumopartida[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                        '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm costounitariopartida" name="costounitariopartida[]" value="'.Helpers::convertirvalorcorrecto($producto->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas();"></td>'.
+                        '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                        '<td class="tdmod" hidden><input type="text" class="form-control divorinputmodsm partidapartida" name="partidapartida[]" value="'.$partida.'" required></td>'.
+                    '</tr>';
+                    $contadorproductos++;
+                    $contadorfilas++;
+                    $partida++;
+                }
+            }else{
+                $filasdetallesproduccion = '';
+            }  
+        }
         $data = array(
             'productoterminado' => $productoterminado,
             'costopt' => Helpers::convertirvalorcorrecto($productoterminado->Costo),
@@ -335,7 +347,7 @@ class ProduccionController extends ConfiguracionSistemaController{
             $filainsumo= $filainsumo.
             '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                 '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipo.'" readonly></td>'.
-                '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$insumo->Codigo.'" readonly data-parsley-length="[1, 20]">'.$insumo->Codigo.'</td>'.
+                '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$insumo->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$insumo->Codigo.'</b></td>'.
                 '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.htmlspecialchars($insumo->Producto, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                 '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodsm unidadproductopartida" name="unidadproductopartida[]" value="'.$insumo->Unidad.'" data-parsley-length="[1, 5]"></td>'.
                 '<td class="tdmod">'.
@@ -470,13 +482,23 @@ class ProduccionController extends ConfiguracionSistemaController{
                         ]);
         }
         //sumar existencias de PT en Almacen
-        $ExistenciaAlmacen = Existencia::where('Codigo', $Produccion->Codigo)->where('Almacen', $Produccion->Almacen)->first();
-        $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias+$Produccion->Cantidad;
-        Existencia::where('Codigo', $Produccion->Codigo)
+        $ContarExistencia = Existencia::where('Codigo', $Produccion->Codigo)->where('Almacen', $Produccion->Almacen)->count();
+        if($ContarExistencia > 0){
+            $ExistenciaAlmacen = Existencia::where('Codigo', $Produccion->Codigo)->where('Almacen',$Produccion->Almacen)->first();
+            $ExistenciaNuevaAlmacen = Helpers::convertirvalorcorrecto($ExistenciaAlmacen->Existencias+$Produccion->Cantidad);
+            Existencia::where('Codigo', $Produccion->Codigo)
                     ->where('Almacen', $Produccion->Almacen)
                     ->update([
                         'Existencias' => Helpers::convertirvalorcorrecto($ExistenciaNuevaAlmacen)
                     ]);
+        }else{
+            $ExistenciaNuevaAlmacen = Helpers::convertirvalorcorrecto($produccion->Cantidad);
+            $ExistenciaAlmacen = new Existencia;
+            $ExistenciaAlmacen->Codigo = $Produccion->Codigo;
+            $ExistenciaAlmacen->Almacen = $Produccion->Almacen;
+            $ExistenciaAlmacen->Existencias = $ExistenciaNuevaAlmacen;
+            $ExistenciaAlmacen->save();
+        }
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
         $BitacoraDocumento->Documento = "PRODUCCION";
@@ -593,7 +615,7 @@ class ProduccionController extends ConfiguracionSistemaController{
                 $filasdetallesproduccion= $filasdetallesproduccion.
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dp->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dp->Codigo.'" readonly data-parsley-length="[1, 20]">'.$dp->Codigo.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dp->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$dp->Codigo.'</b></td>'.
                     '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'.htmlspecialchars($dp->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm unidadproductopartida" name="unidadproductopartida[]" value="'.$dp->Unidad.'" data-parsley-length="[1, 5]"></td>'.
                     '<td class="tdmod">'.
@@ -769,6 +791,8 @@ class ProduccionController extends ConfiguracionSistemaController{
     public function produccion_generar_pdfs(Request $request){
         //primero eliminar todos los archivos de la carpeta
         Helpers::eliminararchivospdfsgenerados();
+        //primero eliminar todos los archivos zip
+        Helpers::eliminararchivoszipgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
             $producciones = Produccion::whereIn('Produccion', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
@@ -778,6 +802,7 @@ class ProduccionController extends ConfiguracionSistemaController{
             $producciones = Produccion::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $arrayfilespdf = array();
         foreach ($producciones as $p){
             $data=array();
             $producciondetalle = ProduccionDetalle::where('Produccion', $p->Produccion)->get();
@@ -850,9 +875,36 @@ class ProduccionController extends ConfiguracionSistemaController{
             $ArchivoPDF = "PDF".$pro->Produccion.".pdf";
             $urlarchivo = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
             $pdfMerger->addPDF($urlarchivo, 'all');
+            array_push($arrayfilespdf,$ArchivoPDF);
         }
         $pdfMerger->merge(); //unirlos
-        $pdfMerger->save("Producciones.pdf", "browser");//mostrarlos en el navegador
+        if($request->descargar_xml == 0){
+            $pdfMerger->save("Producciones.pdf", "browser");//mostrarlos en el navegador
+        }else{
+            //carpeta donde se guardara el archivo zip
+            $public_dir=public_path();
+            // Zip File Name
+            $zipFileName = 'DocumentosPDF.zip';
+            // Crear Objeto ZipArchive
+            $zip = new ZipArchive;
+            if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
+                // Agregar archivos que se comprimiran
+                foreach($arrayfilespdf as $afp) {
+                    $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
+                }     
+                //terminar proceso   
+                $zip->close();
+            }
+            // Set Encabezados para descargar
+            $headers = array(
+                'Content-Type' => 'application/octet-stream',
+            );
+            $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
+            // Create Download Response
+            if(file_exists($filetopath)){
+                return response()->download($filetopath,$zipFileName,$headers);
+            }
+        }
     }
     //generar pef por folio
     public function produccion_generar_pdfs_indiv($documento){
@@ -1028,7 +1080,7 @@ class ProduccionController extends ConfiguracionSistemaController{
             $asunto = $request->emailasunto;
             $emaildocumento = $request->emaildocumento;
             $name = "Receptor envio de correos";
-            $body = $request->emailasunto;
+            $body = $request->emailmensaje;
             $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
             $horaaccionespanol = Helpers::fecha_espanol($horaaccion);
             Mail::send('correos.enviodocumentosemail.enviodocumentosemail', compact('nombre', 'name', 'body', 'receptor', 'horaaccion', 'horaaccionespanol', 'datosdocumento'), function($message) use ($nombre, $receptor, $arraycc, $correos, $asunto, $pdf, $emaildocumento) {

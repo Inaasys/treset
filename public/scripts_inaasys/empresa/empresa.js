@@ -39,7 +39,9 @@ function setvaluesselects(){
     $("input[name=controlarconsecutivonumrequisicion][value='"+controlarconsecutivonumrequisicion+"']").prop("checked",true);  
     $("input[name=colocarobservacionesremisionenfactura][value='"+colocarobservacionesremisionenfactura+"']").prop("checked",true);  
     $("input[name=pedirobligatoriamenteobservacionenfactura][value='"+pedirobligatoriamenteobservacionenfactura+"']").prop("checked",true);  
-    $("input[name=colocarencerocantidadenpartidasderemisiones][value='"+colocarencerocantidadenpartidasderemisiones+"']").prop("checked",true);     
+    $("input[name=colocarencerocantidadenpartidasderemisiones][value='"+colocarencerocantidadenpartidasderemisiones+"']").prop("checked",true);    
+    $("input[name=mostrartotalesdecolumnasendocumentos][value='"+mostrartotalesdecolumnasendocumentos+"']").prop("checked",true);   
+    $("input[name=mostrarinsumoporpartidaenremisiones][value='"+mostrarinsumoporpartidaenremisiones+"']").prop("checked",true);    
 }
 //obtener ususarios
 function obtenerusuarios(){

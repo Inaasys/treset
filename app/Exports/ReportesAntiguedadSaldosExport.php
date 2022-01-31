@@ -124,6 +124,11 @@ class ReportesAntiguedadSaldosExport implements FromCollection,WithHeadings,With
                             $q->where('f.Cliente', $numerocliente);
                         }
                     })
+                    ->where(function($q) use ($claveserie) {
+                        if($claveserie != ""){
+                            $q->where('f.Serie', $claveserie);
+                        }
+                    })
                     ->where(function($q) use ($saldomayor) {
                         if($saldomayor > 0){
                             $q->where('c.Saldo', '>', 0.1);
@@ -147,6 +152,11 @@ class ReportesAntiguedadSaldosExport implements FromCollection,WithHeadings,With
                             $q->where('f.Cliente', $numerocliente);
                         }
                     })
+                    ->where(function($q) use ($claveserie) {
+                        if($claveserie != ""){
+                            $q->where('f.Serie', $claveserie);
+                        }
+                    })
                     ->where(function($q) use ($saldomayor) {
                         if($saldomayor > 0){
                             $q->where('c.Saldo', '>', 0.1);
@@ -165,16 +175,22 @@ class ReportesAntiguedadSaldosExport implements FromCollection,WithHeadings,With
             case "DETALLES":
                 $data = DB::table('Facturas as f')
                 ->leftjoin('Clientes as c', 'f.Cliente', '=', 'c.Numero')
-                ->select("f.Factura", DB::raw("FORMAT(f.Fecha, 'yyyy-MM-dd') as Fecha"), "f.Plazo", "f.Cliente AS Cliente", "c.Nombre AS NombreCliente", DB::raw("SUM(f.Total) AS TotalFactura"), 
+                ->select("f.Factura", "f.Fecha", "f.Plazo", "f.Cliente AS Cliente", "c.Nombre AS NombreCliente", DB::raw("SUM(f.Total) AS TotalFactura"), 
                             DB::raw("isnull((select sum(abono) from [cxc detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0) as AbonosCXC"),
-                            DB::raw("isnull((select sum(total) from [notas cliente detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0) as DescuentosNotasCredito"),
-                            DB::raw("isnull((select sum(abono) from [cxc detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0) + isnull((select sum(total) from [notas cliente detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0) as TotalPagos"),
-                            DB::raw("sum(f.total) - (isnull((select sum(abono) from [cxc detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0) + isnull((select sum(total) from [notas cliente detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0)) as SaldoFacturado "))
+                            //DB::raw("isnull((select sum(total) from [notas cliente detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0) as DescuentosNotasCredito"),
+                            DB::raw("isnull((SELECT sum(ncdoc.Descuento) AS DescuentosNotasCredito FROM dbo.[Notas Cliente Documentos] AS ncdoc LEFT OUTER JOIN dbo.[Notas Cliente Detalles] AS ncd ON ncd.Nota = ncdoc.Nota where ncdoc.Factura = f.Factura and ncd.Fecha <= '".$fechacorte."' group by ncdoc.Factura ),0) as DescuentosNotasCredito"),
+                            DB::raw("isnull((select sum(abono) from [cxc detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0) + isnull((SELECT sum(ncdoc.Descuento) AS DescuentosNotasCredito FROM dbo.[Notas Cliente Documentos] AS ncdoc LEFT OUTER JOIN dbo.[Notas Cliente Detalles] AS ncd ON ncd.Nota = ncdoc.Nota where ncdoc.Factura = f.Factura and ncd.Fecha <= '".$fechacorte."' group by ncdoc.Factura ),0) as TotalPagos"),
+                            DB::raw("sum(f.total) - (isnull((select sum(abono) from [cxc detalles] where factura = f.factura and fecha <= '".$fechacorte."' ),0) + isnull((SELECT sum(ncdoc.Descuento) AS DescuentosNotasCredito FROM dbo.[Notas Cliente Documentos] AS ncdoc LEFT OUTER JOIN dbo.[Notas Cliente Detalles] AS ncd ON ncd.Nota = ncdoc.Nota where ncdoc.Factura = f.Factura and ncd.Fecha <= '".$fechacorte."' group by ncdoc.Factura ),0)) as SaldoFacturado "))
                 ->where('f.Fecha', '<=', $fechacorte)
                 ->where('f.Status', '<>', 'BAJA')
                 ->where(function($q) use ($numerocliente) {
                     if($numerocliente != ""){
                         $q->where('f.Cliente', $numerocliente);
+                    }
+                })
+                ->where(function($q) use ($claveserie) {
+                    if($claveserie != ""){
+                        $q->where('f.Serie', $claveserie);
                     }
                 })
                 ->where(function($q) use ($saldomayor) {

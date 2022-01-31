@@ -648,7 +648,7 @@ function agregarfilaherramienta(Codigo, Producto, Unidad, Costo, Existencias, se
     var tipo = "alta";
     var fila=   '<tr class="filasproductos" id="filaproducto'+contadorproductos+'">'+
                         '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('+contadorproductos+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
-                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+
+                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'+Codigo+'</b></td>'+
                         '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
                         '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'+Unidad+'" readonly data-parsley-length="[1, 5]">'+Unidad+'</td>'+
                         '<td class="tdmod">'+
@@ -842,7 +842,7 @@ function alta(){
                         '<thead class="'+background_tables+'">'+
                           '<tr>'+
                             '<th class="'+background_tables+'">#</th>'+
-                            '<th class="'+background_tables+'">Herramienta</th>'+
+                            '<th class="'+background_tables+'"><div style="width:100px !important;">Herramienta</div></th>'+
                             '<th class="'+background_tables+'"><div style="width:200px !important;">Descripción</div></th>'+
                             '<th class="customercolortheadth">Unidad</th>'+
                             '<th class="customercolortheadth">Almacén</th>'+
@@ -1192,7 +1192,7 @@ function obtenerdatos(asignacionmodificar){
                           '<thead class="'+background_tables+'">'+
                             '<tr>'+
                               '<th class="'+background_tables+'">#</th>'+
-                              '<th class="'+background_tables+'">Herramienta</th>'+
+                              '<th class="'+background_tables+'"><div style="width:100px !important;">Herramienta</div></th>'+
                               '<th class="'+background_tables+'"><div style="width:200px !important;">Descripción</div></th>'+
                               '<th class="customercolortheadth">Unidad</th>'+
                               '<th class="customercolortheadth">Almacén</th>'+

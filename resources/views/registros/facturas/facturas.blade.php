@@ -64,19 +64,21 @@
                                 <div class="table-responsive">
                                     <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap">
                                         <thead class="{{$empresa->background_tables}}">
-                                            <tr>
-                                                <th class="bg-light-green">Importe: <b id="sumaimportefiltrado"></b></th>
-                                                <th class="bg-light-green">Descuento: <b id="sumadescuentofiltrado"></b></th>
-                                                <th class="bg-light-green">SubTotal: <b id="sumasubtotalfiltrado"></b></th>
-                                                <th class="bg-light-green">Iva: <b id="sumaivafiltrado"></b></th>
-                                                <th class="bg-light-green">Total: <b id="sumatotalfiltrado"></b></th>
-                                                <th class="bg-light-green">Abonos: <b id="sumaabonosfiltrado"></b></th>
-                                                <th class="bg-light-green">Descuentos: <b id="sumadescuentosfiltrado"></b></th>
-                                                <th class="bg-light-green">Saldo: <b id="sumasaldofiltrado"></b></th>
-                                                <th class="bg-light-green">Costo: <b id="sumacostofiltrado"></b></th>
-                                                <th class="bg-light-green">Comisión: <b id="sumacomisionfiltrado"></b></th>
-                                                <th class="bg-light-green">Utilidad: <b id="sumautilidadfiltrado"></b></th>
-                                            </tr>  
+                                            @if($mostrartotalesdecolumnasendocumentos == 'S')
+                                                <tr>
+                                                    <th class="bg-light-green">Importe: <b id="sumaimportefiltrado"></b></th>
+                                                    <th class="bg-light-green">Descuento: <b id="sumadescuentofiltrado"></b></th>
+                                                    <th class="bg-light-green">SubTotal: <b id="sumasubtotalfiltrado"></b></th>
+                                                    <th class="bg-light-green">Iva: <b id="sumaivafiltrado"></b></th>
+                                                    <th class="bg-light-green">Total: <b id="sumatotalfiltrado"></b></th>
+                                                    <th class="bg-light-green">Abonos: <b id="sumaabonosfiltrado"></b></th>
+                                                    <th class="bg-light-green">Descuentos: <b id="sumadescuentosfiltrado"></b></th>
+                                                    <th class="bg-light-green">Saldo: <b id="sumasaldofiltrado"></b></th>
+                                                    <th class="bg-light-green">Costo: <b id="sumacostofiltrado"></b></th>
+                                                    <th class="bg-light-green">Comisión: <b id="sumacomisionfiltrado"></b></th>
+                                                    <th class="bg-light-green">Utilidad: <b id="sumautilidadfiltrado"></b></th>
+                                                </tr>  
+                                            @endif
                                             <tr>
                                                 <th><div style="width:100px !important;">Operaciones</div></th>
                                                 @foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 

@@ -28,6 +28,8 @@ use App\Almacen;
 use App\Serie;
 use App\Firma_Rel_Documento;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
+use Storage; 
+use ZipArchive;
 
 class AsignacionHerramientaController extends ConfiguracionSistemaController{
 
@@ -139,7 +141,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                         $filasdetallesasignacion= $filasdetallesasignacion.
                         '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                             '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
-                            '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]">'.$producto->Codigo.'</td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$producto->Codigo.'</b></td>'.
                             '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'.htmlspecialchars($producto->Producto, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'.$producto->Unidad.'" readonly data-parsley-length="[1, 5]">'.$producto->Unidad.'</td>'.
                             '<td class="tdmod">'.
@@ -445,6 +447,8 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
     public function asignacion_herramienta_generar_pdfs(Request $request){
         //primero eliminar todos los archivos de la carpeta
         Helpers::eliminararchivospdfsgenerados();
+        //primero eliminar todos los archivos zip
+        Helpers::eliminararchivoszipgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
             $asignacionesherramientas = VistaAsignacionHerramienta::whereIn('asignacion', $request->arraypdf)->orderBy('id', 'ASC')->take(500)->get(); 
@@ -454,6 +458,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
             $asignacionesherramientas = VistaAsignacionHerramienta::whereBetween('fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('id', 'ASC')->take(500)->get();
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $arrayfilespdf = array();
         foreach ($asignacionesherramientas as $ah){
             $data=array();
             $asignacionherramientadetalle = Asignacion_Herramienta_Detalle::where('asignacion', $ah->asignacion)->get();
@@ -509,9 +514,36 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
             $ArchivoPDF = "PDF".$asigh->asignacion.".pdf";
             $urlarchivo = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
             $pdfMerger->addPDF($urlarchivo, 'all');
+            array_push($arrayfilespdf,$ArchivoPDF);
         }
         $pdfMerger->merge(); //unirlos
-        $pdfMerger->save("AsignacionesHerramienta.pdf", "browser");//mostrarlos en el navegador
+        if($request->descargar_xml == 0){
+            $pdfMerger->save("AsignacionesHerramienta.pdf", "browser");//mostrarlos en el navegador
+        }else{
+            //carpeta donde se guardara el archivo zip
+            $public_dir=public_path();
+            // Zip File Name
+            $zipFileName = 'DocumentosPDF.zip';
+            // Crear Objeto ZipArchive
+            $zip = new ZipArchive;
+            if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
+                // Agregar archivos que se comprimiran
+                foreach($arrayfilespdf as $afp) {
+                    $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
+                }     
+                //terminar proceso   
+                $zip->close();
+            }
+            // Set Encabezados para descargar
+            $headers = array(
+                'Content-Type' => 'application/octet-stream',
+            );
+            $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
+            // Create Download Response
+            if(file_exists($filetopath)){
+                return response()->download($filetopath,$zipFileName,$headers);
+            }
+        }
     }
     //guardar configuracion tabla
     public function asignacion_herramienta_guardar_configuracion_tabla(Request $request){
@@ -644,7 +676,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                 $filasdetallesasignacion= $filasdetallesasignacion.
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$ahd->item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'.$ahd->herramienta.'" readonly data-parsley-length="[1, 20]">'.$ahd->herramienta.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'.$ahd->herramienta.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$ahd->herramienta.'</b></td>'.
                     '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'.htmlspecialchars($ahd->descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'.$ahd->unidad.'" readonly data-parsley-length="[1, 5]">'.$ahd->unidad.'</td>'.
                     '<td class="tdmod">'.
@@ -913,7 +945,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                     $filasdetallesasignacion= $filasdetallesasignacion.
                     '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                         '<td class="tdmod"><input type="hidden" class="form-control asignacionpartida" name="asignacionpartida[]" id="asignacsionpartida[]" value="'.$ahd->id.'" readonly>'.$ahd->asignacion.'</td>'.
-                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'.$ahd->herramienta.'" readonly>'.$ahd->herramienta.'</td>'.
+                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'.$ahd->herramienta.'" readonly><b style="font-size:12px;">'.$ahd->herramienta.'</b></td>'.
                         '<td class="tdmod"><div class="divorinputmodl"><input type="hidden" class="form-control inputnextdet nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'.htmlspecialchars($ahd->descripcion, ENT_QUOTES).'" readonly>'.htmlspecialchars($ahd->descripcion, ENT_QUOTES).'</div></td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'.$ahd->unidad.'" readonly>'.$ahd->unidad.'</td>'.
                         '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($ahd->cantidad).'" onchange="formatocorrectoinputcantidades(this)" readonly></td>'.

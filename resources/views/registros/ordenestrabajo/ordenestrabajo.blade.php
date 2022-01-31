@@ -28,7 +28,7 @@
                                                     </div>
                                                 </td>
                                                 <td >
-                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="mostrarmodalgenerarpdf(0,0)">
+                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="mostrarmodalgenerarpdf(0,1)">
                                                         Generar Documento
                                                     </div>
                                                 </td>
@@ -64,16 +64,18 @@
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap">
                                     <thead class="{{$empresa->background_tables}}">
-                                        <tr>
-                                            <th class="bg-light-green">Importe: <b id="sumaimportefiltrado"></b></th>
-                                            <th class="bg-light-green">Descuento: <b id="sumadescuentofiltrado"></b></th>
-                                            <th class="bg-light-green">SubTotal: <b id="sumasubtotalfiltrado"></b></th>
-                                            <th class="bg-light-green">Iva: <b id="sumaivafiltrado"></b></th>
-                                            <th class="bg-light-green">Total: <b id="sumatotalfiltrado"></b></th>
-                                            <th class="bg-light-green">Costo: <b id="sumacostofiltrado"></b></th>
-                                            <th class="bg-light-green">Comisión: <b id="sumacomisionfiltrado"></b></th>
-                                            <th class="bg-light-green">Utilidad: <b id="sumautilidadfiltrado"></b></th>
-                                        </tr>  
+                                        @if($mostrartotalesdecolumnasendocumentos == 'S')
+                                            <tr>
+                                                <th class="bg-light-green">Importe: <b id="sumaimportefiltrado"></b></th>
+                                                <th class="bg-light-green">Descuento: <b id="sumadescuentofiltrado"></b></th>
+                                                <th class="bg-light-green">SubTotal: <b id="sumasubtotalfiltrado"></b></th>
+                                                <th class="bg-light-green">Iva: <b id="sumaivafiltrado"></b></th>
+                                                <th class="bg-light-green">Total: <b id="sumatotalfiltrado"></b></th>
+                                                <th class="bg-light-green">Costo: <b id="sumacostofiltrado"></b></th>
+                                                <th class="bg-light-green">Comisión: <b id="sumacomisionfiltrado"></b></th>
+                                                <th class="bg-light-green">Utilidad: <b id="sumautilidadfiltrado"></b></th>
+                                            </tr>  
+                                        @endif
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
@@ -212,6 +214,33 @@
     	</div>
   	</div>
 </div> 
+<!-- Modal ABRIR de nuevo Orden de Trabajo-->
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalabrirorden" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  	<div class="modal-dialog" role="document">
+    	<div class="modal-content">
+      		<div class="modal-header {{$empresa->background_forms_and_modals}}">
+        		<h5 class="modal-title" id="exampleModalLabel">Ordenes de Trabajo Abrir Nuevamente</h5>
+      		</div>
+      		<div class="modal-body">
+		      	<form id="formabrirnuevamente" action="#">
+                      <div class="row">
+                          <div class="col-md-12">
+                              <h4 id="tituloabrirnuevamenteorden"></h4>
+                          </div>
+                          <div class="col-md-2" hidden>
+                              <label >Orden</label>
+                            <input type="text" class="form-control" id="ordenabrir" name="ordenabrir" readonly>
+                          </div>
+                      </div>                    
+		        </form>	
+      		</div>
+	      	<div class="modal-footer">
+	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
+	        	<button type="button" class="btn btn-success btn-sm" id="btnabrirnuevamente">Abrir Nuevamente Orden Trabajo</button>
+	      	</div>
+    	</div>
+  	</div>
+</div> 
 <!-- modal para crear documento en PDF-->
 @include('secciones.modalcreardocumento')
 <!-- fin modal para crear documento en PDF-->
@@ -277,6 +306,8 @@
         var ordenes_trabajo_alta_o_baja = '{!!URL::to('ordenes_trabajo_alta_o_baja')!!}'; 
         var ordenes_trabajo_verificar_status_orden = '{!!URL::to('ordenes_trabajo_verificar_status_orden')!!}'; 
         var ordenes_trabajo_terminar_orden = '{!!URL::to('ordenes_trabajo_terminar_orden')!!}'; 
+        var ordenes_trabajo_verificar_abrir_nuevamente_orden = '{!!URL::to('ordenes_trabajo_verificar_abrir_nuevamente_orden')!!}'; 
+        var ordenes_trabajo_abrir_nuevamente_orden = '{!!URL::to('ordenes_trabajo_abrir_nuevamente_orden')!!}'; 
         var ordenes_trabajo_obtener_orden_trabajo = '{!!URL::to('ordenes_trabajo_obtener_orden_trabajo')!!}'; 
         var ordenes_trabajo_guardar_modificacion = '{!!URL::to('ordenes_trabajo_guardar_modificacion')!!}';
         var ordenes_trabajo_obtener_datos_envio_email = '{!!URL::to('ordenes_trabajo_obtener_datos_envio_email')!!}';

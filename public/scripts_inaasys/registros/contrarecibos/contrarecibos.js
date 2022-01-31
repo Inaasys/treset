@@ -802,6 +802,7 @@ function enviardocumentoemail(documento){
         $("#correosconcopia").append('<option value="'+data.email3cc+'" selected>'+data.email3cc+'</option>');
       }
       $("#emailasunto").val("CONTRARECIBO NO. " + documento +" DE "+ nombreempresa);
+      $("#emailmensaje").val("CONTRARECIBO NO. " + documento +" DE "+ nombreempresa);
       $(".dropify-clear").trigger("click");
       $("#divadjuntararchivo").hide();
       $("#modalenviarpdfemail").modal('show');

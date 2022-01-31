@@ -286,7 +286,6 @@ function generar_formato_excel(){
         form.parsley().validate();
     }
 }
-
 //realizar en reporte en pdf
 function generar_formato_pdf(){
     var form = $("#formreporte");
@@ -307,7 +306,6 @@ function generar_formato_pdf(){
         form.parsley().validate();
     }
 }
-
 //listar tabla reporte
 function listar(){
     var reporte = $("#reporte").val();

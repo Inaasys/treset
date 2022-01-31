@@ -52,6 +52,15 @@
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap" style="width:100% !important;">
                                     <thead class="{{$empresa->background_tables}}">
+                                        @if($mostrartotalesdecolumnasendocumentos == 'S')
+                                            <tr>
+                                                <th class="bg-light-green">Costo: <b id="sumacostofiltrado"></b></th>
+                                                <th class="bg-light-green">Ultimo Costo: <b id="sumaultimocostofiltrado"></b></th>
+                                                <th class="bg-light-green">Ultima Venta: <b id="sumaultimaventafiltrado"></b></th>
+                                                <th class="bg-light-green">Precio: <b id="sumapreciofiltrado"></b></th>
+                                                <th class="bg-light-green">Existencias: <b id="sumaexistenciasfiltrado"></b></th>
+                                            </tr>  
+                                        @endif
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
                                             @foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
@@ -280,7 +289,7 @@
                                                 <div class="col-md-6">
                                                     <label for="">Tamaño Etiquetas</label>
                                                     <select name="tamanoetiquetasarraycodigosbarras" id="tamanoetiquetasarraycodigosbarras" class="form-control select2" style="width:100%">
-                                                        <option value="chica">chica</option>
+                                                        <!--<option value="chica">chica</option>-->
                                                         <option value="grande">grande</option>
                                                     </select>
                                                 </div>
@@ -297,7 +306,7 @@
                                         <form action='{{$rutacrearpdfcodigosdebarrascatalogo}}' method="POST" data-parsley-validate="" target="_blank">
                                             @csrf
                                             <div class="row">
-                                                <div class="col-md-6">
+                                                <div class="col-md-3">
                                                     <label >Tipo</label>
                                                     <select class="form-control select2" id="tipoprodcodigosbarras" name="tipoprodcodigosbarras" style="width:100%" required>
                                                         <option value="TODOS" selected>TODOS</option>    
@@ -315,9 +324,13 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-md-3">
+                                                    <label for="">Ubicación</label>
+                                                    <input type="text" name="codigobarrasubicacion" id="codigobarrasubicacion" class="form-control" placeholder="Escribe la ubicación del producto" autocomplete="off" onkeyup="tipoLetra(this);">
+                                                </div>
+                                                <div class="col-md-3">
                                                     <label for="">Tamaño Etiquetas</label>
                                                     <select name="tamanoetiquetascatalogocodigosbarras" id="tamanoetiquetascatalogocodigosbarras" class="form-control select2" style="width:100%">
-                                                        <option value="chica">chica</option>
+                                                        <!--<option value="chica">chica</option>-->
                                                         <option value="grande">grande</option>
                                                     </select>
                                                 </div>
