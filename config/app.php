@@ -164,6 +164,7 @@ return [
     'correodefault2enviodocumentos' => '',
     //usuariis que puedes modificar insumos
     'usuariosamodificarinsumos' => '',
+    'modificarcostosdeproductos' => '',
 
     /*
     |--------------------------------------------------------------------------

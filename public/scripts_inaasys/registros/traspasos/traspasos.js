@@ -1593,6 +1593,8 @@ function alta(){
                 '</div>'+ 
               '</div>';
   $("#tabsform").html(tabs);
+  //colocar autocomplette off  todo el formulario
+  $(".form-control").attr('autocomplete','off');
   //mostrar mensaje de bajar plantilla
   $('[data-toggle="tooltip"]').tooltip({
     container: 'body'
@@ -1996,6 +1998,8 @@ function obtenerdatos(traspasomodificar){
                 '</div>'+ 
               '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     $("#periodohoy").val(data.traspaso.Periodo);
     $("#folio").val(data.traspaso.Folio);
     $("#serie").val(data.traspaso.Serie);
@@ -2232,7 +2236,8 @@ function buscarstringlike(){
     $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
   });
   var tablafolenc=$('#tablafoliosencontrados').DataTable({
-      "paging":   false,
+      "pageLength": 100,
+      'sDom': 't',
       "sScrollX": "100%",
       "sScrollY": "250px",
       processing: true,

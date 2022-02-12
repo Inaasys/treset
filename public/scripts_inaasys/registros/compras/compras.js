@@ -1779,6 +1779,8 @@ function alta(tipoalta){
                     '</div>'+
                 '</div>';
   $("#tabsform").html(tabs);
+  //colocar autocomplette off  todo el formulario
+  $(".form-control").attr('autocomplete','off');
   obtenultimonumero();
   obtenertiposordenescompra(tipoalta);
   asignarfechaactual();
@@ -2220,6 +2222,8 @@ function obtenerdatos(compramodificar){
                     '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     //esconder el div del boton listar ordenes
     $("#divbtnlistarordenes").hide();
     $("#periodohoy").val(data.compra.Periodo);
@@ -2716,7 +2720,8 @@ function buscarstringlike(){
     $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
   });
   var tablafolenc=$('#tablafoliosencontrados').DataTable({
-      "paging":   false,
+      "pageLength": 100,
+      'sDom': 't',
       "sScrollX": "100%",
       "sScrollY": "250px",
       processing: true,

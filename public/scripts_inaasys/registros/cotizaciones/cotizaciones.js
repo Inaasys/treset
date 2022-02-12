@@ -587,6 +587,8 @@ function alta(){
               '</div>'+ 
             '</div>';
   $("#tabsform").html(tabs);
+  //colocar autocomplette off  todo el formulario
+  $(".form-control").attr('autocomplete','off');
   obtenultimonumero();
   asignarfechaactual();
   $("#ModalAlta").modal('show');
@@ -823,6 +825,8 @@ function obtenerdatos(cotizacionmodificar){
                 '</div>'+ 
               '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     $("#periodohoy").val(data.cotizacion.periodo);
     $("#folio").val(data.cotizacion.folio);
     $("#serie").val(data.cotizacion.serie);

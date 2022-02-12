@@ -41,33 +41,13 @@ function validartiporeporte(){
     if(tiporeporte == 'Porsucursal'){
         generar_reporte();
         $("#divportecnico").hide();
-        $("#tecnico").removeAttr('required');
-        $("#numerotecnico").removeAttr('required');
     }else if(tiporeporte == 'Portecnico'){
         $("#string_tecnicos_seleccionados").val("");
         $("#tecnico").val("");
         $("#numerotecnico").val("");
         $("#divportecnico").show();
-        $("#tecnico").attr('required', 'required');
-        $("#numerotecnico").attr('required', 'required');
+        generar_reporte();
     }
-}
-//validar fechas incio y final de reporte
-function validafechas(){
-    var fechainicialreporte = $('#fechainicialreporte').val();
-    var fechafinalreporte = $('#fechafinalreporte').val();
-    var fechahoy = new Date();
-    var dia = ("0" + fechahoy.getDate()).slice(-2);
-    var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
-    var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia);
-    if(fechafinalreporte > hoy){
-        var msj = 'fechafinalmayorahoy';
-    }else if(fechainicialreporte > fechafinalreporte){
-        var msj ='fechainicialmayorafechafinal';
-    }else{
-        var msj ='ok';
-    }
-    return msj;
 }
 //detectar cuando en el input de objetivo mensual cambie y se presione enter para actualizar la busqueda
 function activarrelistarreporteenterfechainicial(){
@@ -91,21 +71,24 @@ function activarrelistarreporteenterfechafinal(){
         }
     });
 }
+/*
 //actualizar reporte
 function generar_reporte(){
     var form = $("#formreporte");
     if (form.parsley().isValid()){
-        var result = validafechas();
-        if(result == 'fechafinalmayorahoy'){
-            msjfechafinalmayorahoy();
-            $('#fechafinalreporte').val("");
-        }else if(result == 'fechainicialmayorafechafinal'){
-            msjfechainicialmayorafechafinal();
-            $('#fechainicialreporte').val("");
-        }else if(result == 'ok'){
             var tabla = $('.tbllistado').DataTable();
             tabla.ajax.reload();
-        }
+    }else{
+        form.parsley().validate();
+    }
+}
+*/
+//actualizar reporte
+function generar_reporte(){
+    var form = $("#formreporte");
+    if (form.parsley().isValid()){
+        $('#tbllistado').DataTable().clear().destroy();
+        listar();
     }else{
         form.parsley().validate();
     }
@@ -119,15 +102,25 @@ function generar_formato_excel(){
         var tiporeporte = $("#tiporeporte").val();
         var tipoorden = $("#tipoorden").val();
         var statusorden = $("#statusorden").val();
-        var string_tecnicos_seleccionados = $("#string_tecnicos_seleccionados").val();
-        $("#btnGenerarFormatoExcelHorasTecnico").attr("href", urlgenerarformatoexcel+'?fechainicialreporte='+fechainicialreporte+'&fechafinalreporte='+fechafinalreporte+'&tiporeporte='+tiporeporte+'&tipoorden='+tipoorden+'&statusorden='+statusorden+'&string_tecnicos_seleccionados='+string_tecnicos_seleccionados);
+        var string_tecnicos_seleccionados = $("#string_tecnicos_seleccionados").val(); 
+        if( $('#idtodoslostecnicos').prop('checked') ) {
+            var todoslostecnicos = 1;
+        }else{
+            todoslostecnicos = 0;
+        }
+        $("#btnGenerarFormatoExcelHorasTecnico").attr("href", urlgenerarformatoexcel+'?fechainicialreporte='+fechainicialreporte+'&fechafinalreporte='+fechafinalreporte+'&tiporeporte='+tiporeporte+'&tipoorden='+tipoorden+'&statusorden='+statusorden+'&string_tecnicos_seleccionados='+string_tecnicos_seleccionados+'&todoslostecnicos='+todoslostecnicos);
         $("#btnGenerarFormatoExcelHorasTecnico").click();
     }else{
         form.parsley().validate();
     }
 }
 //listar tabla reporte
-function listar(){
+function listar(){    
+    if( $('#idtodoslostecnicos').prop('checked') ) {
+        var todoslostecnicos = 1;
+    }else{
+        todoslostecnicos = 0;
+    }
     tabla=$('#tbllistado').DataTable({
         "sScrollX": "110%",
         "sScrollY": "350px",
@@ -152,6 +145,7 @@ function listar(){
                 d.tipoorden = $("#tipoorden").val();
                 d.statusorden = $("#statusorden").val();
                 d.string_tecnicos_seleccionados = $("#string_tecnicos_seleccionados").val();
+                d.todoslostecnicos = todoslostecnicos;
             }
         },
         columns: [
@@ -231,7 +225,7 @@ function listartecnicos(){
                 }
             });
         },
-        "iDisplayLength": 50,
+        "iDisplayLength": 250,
     });
 }
 //construir array de tecnicos seleccionados

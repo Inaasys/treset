@@ -838,6 +838,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         CuentaXCobrar::where('Pago', $cuentaxcobrar)
         ->update([
             'Fecha' => Carbon::parse($request->fecha)->toDateTimeString(),
+            'Hora' => Carbon::parse($request->fecha)->toDateTimeString(),
             'FechaPago' => Carbon::parse($request->fechaaplicacionpagos)->toDateTimeString(),
             'Banco' => $request->numerobanco,
             'Anotacion' => $request->anotacion,
@@ -894,7 +895,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         foreach ($cuentasporcobrar as $cxc){
             $data=array();
             $formatter = new NumeroALetras;
-            $abonoletras =  $formatter->toInvoice($cxc->Abono, $this->numerodecimales, 'M.N.');
+            $formatter->conector = 'PESOS';
+            $abonoletras =  $formatter->toInvoice($cxc->Abono, 2, 'M.N.');
             $cuentaporcobrardetalle = CuentaXCobrarDetalle::where('Pago', $cxc->Pago)->get();
             $datadetalle=array();
             $importepagado = 0;
@@ -940,6 +942,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $comprobantetimbrado = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->count();
             $comprobante = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->first();
             $formatter = new NumeroALetras;
+            $formatter->conector = 'PESOS';
             $totalletras = $formatter->toInvoice($cxc->Abono, 2, 'M.N.');
             $banco = Banco::where('Numero', $cxc->Banco)->first();
             $data[]=array(
@@ -1032,7 +1035,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         $data=array();
         foreach ($cuentasporcobrar as $cxc){
             $formatter = new NumeroALetras;
-            $abonoletras =  $formatter->toInvoice($cxc->Abono, $this->numerodecimales, 'M.N.');
+            $formatter->conector = 'PESOS';
+            $abonoletras =  $formatter->toInvoice($cxc->Abono, 2, 'M.N.');
             $cuentaporcobrardetalle = CuentaXCobrarDetalle::where('Pago', $cxc->Pago)->get();
             $datadetalle=array();
             $importepagado = 0;
@@ -1067,6 +1071,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $comprobantetimbrado = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->count();
             $comprobante = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->first();
             $formatter = new NumeroALetras;
+            $formatter->conector = 'PESOS';
             $totalletras = $formatter->toInvoice($cxc->Abono, 2, 'M.N.');
             $banco = Banco::where('Numero', $cxc->Banco)->first();
             $data[]=array(
@@ -1144,7 +1149,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         $data=array();
         foreach ($cuentasporcobrar as $cxc){
             $formatter = new NumeroALetras;
-            $abonoletras =  $formatter->toInvoice($cxc->Abono, $this->numerodecimales, 'M.N.');
+            $formatter->conector = 'PESOS';
+            $abonoletras =  $formatter->toInvoice($cxc->Abono, 2, 'M.N.');
             $cuentaporcobrardetalle = CuentaXCobrarDetalle::where('Pago', $cxc->Pago)->get();
             $datadetalle=array();
             $importepagado = 0;
@@ -1179,6 +1185,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $comprobantetimbrado = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->count();
             $comprobante = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->first();
             $formatter = new NumeroALetras;
+            $formatter->conector = 'PESOS';
             $totalletras = $formatter->toInvoice($cxc->Abono, 2, 'M.N.');
             $banco = Banco::where('Numero', $cxc->Banco)->first();
             $data[]=array(

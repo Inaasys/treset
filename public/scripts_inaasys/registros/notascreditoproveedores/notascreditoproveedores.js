@@ -1484,6 +1484,8 @@ function alta(){
                     '</div>'+
                 '</div>';
   $("#tabsform").html(tabs);
+  //colocar autocomplette off  todo el formulario
+  $(".form-control").attr('autocomplete','off');
   $("#serie").val(serieusuario);
   $("#serietexto").html("Serie: "+serieusuario);
   obtenultimonumero();
@@ -2281,6 +2283,8 @@ function obtenerdatos(notamodificar){
               '</div>'+
             '</div>';
     $("#tabsform").html(tabs);  
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     //esconder el div del boton listar ordenes
     $("#btnobtenerproveedores").hide();
     $("#btnlistarcompras").hide();
@@ -2635,7 +2639,8 @@ function buscarstringlike(){
       $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
   });
   var tablafolenc=$('#tablafoliosencontrados').DataTable({
-        "paging":   false,
+        "pageLength": 100,
+        'sDom': 't',
         "sScrollX": "100%",
         "sScrollY": "250px",
         processing: true,

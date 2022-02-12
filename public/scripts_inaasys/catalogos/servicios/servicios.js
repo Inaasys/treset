@@ -492,6 +492,8 @@ function alta(){
                     '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     setTimeout(function(){$("#codigo").focus();},500);  
     $("#codigo").removeAttr('readonly');
     //activar busqueda
@@ -711,6 +713,8 @@ function obtenerdatos(codigoservicio){
                     '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     //boton formulario 
     $("#codigo").val(codigoservicio);
     $("#servicio").val(data.servicio.Servicio);

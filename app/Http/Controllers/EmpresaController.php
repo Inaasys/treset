@@ -64,6 +64,20 @@ class EmpresaController extends ConfiguracionSistemaController{
         }
         return response()->json($select_usuarios);
     }
+    //obtener usuarios a modificar costos de productos
+    public function empresa_obtener_usuarios_a_modificar_costos_productos(Request $request){
+        $usuarios = User::all();
+        $select_usuarios = "<option disabled hidden>Selecciona...</option>";
+        foreach($usuarios as $usuario){
+            if (in_array(strtoupper($usuario->user), explode(",",$this->modificarcostosdeproductos))) {
+                $select_usuarios = $select_usuarios."<option value='".$usuario->user."' selected>".$usuario->user."</option>"; 
+            }else{
+                $select_usuarios = $select_usuarios."<option value='".$usuario->user."'>".$usuario->user."</option>";
+            }
+        }
+        return response()->json($select_usuarios);
+
+    }
     //obtener paises
     public function empresa_obtener_paises(Request $request){
         if($request->ajax()){
@@ -191,6 +205,11 @@ class EmpresaController extends ConfiguracionSistemaController{
         }else{
             $usuariosamodificarinsumos = "";
         }
+        if ($request->has("modificarcostosdeproductos")){
+            $modificarcostosdeproductos = implode(",", $request->modificarcostosdeproductos);
+        }else{
+            $modificarcostosdeproductos = "";
+        }
         $Empresa = Empresa::where('Numero', 1)->first();
         Empresa::where('Numero', 1)
         ->update([
@@ -209,6 +228,9 @@ class EmpresaController extends ConfiguracionSistemaController{
             'ColocarEnCeroCantidadEnPartidasDeRemisiones' => $request->colocarencerocantidadenpartidasderemisiones,
             'MostrarTotalesDeColumnasEnDocumentos' => $request->mostrartotalesdecolumnasendocumentos,
             'MostrarInsumoPorPartidaEnCapturaDeRemisiones' => $request->mostrarinsumoporpartidaenremisiones,
+            'ModificarConsecutivoFolioEnRemisiones' => $request->modificarconsecutivofolioenremisiones,
+            'ModificarCostosDeProductos' => $modificarcostosdeproductos,
+            'ValidarUtilidadNegativa' => $request->validarutilidadnegativa,
         ]);
         return response()->json($request->all());
     }

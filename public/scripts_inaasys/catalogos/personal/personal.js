@@ -196,6 +196,8 @@ function obtenerdatos(numeropersonal){
                   '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     //boton formulario 
     $("#id").val(numeropersonal);
     $("#nombre").val(data.personal.nombre);

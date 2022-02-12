@@ -63,7 +63,10 @@ class ConfiguracionSistemaController extends Controller
                                             'PedirObligatoriamenteObservacionEnFactura',
                                             'ColocarEnCeroCantidadEnPartidasDeRemisiones',
                                             'MostrarTotalesDeColumnasEnDocumentos',
-                                            'MostrarInsumoPorPartidaEnCapturaDeRemisiones')
+                                            'MostrarInsumoPorPartidaEnCapturaDeRemisiones',
+                                            'ModificarConsecutivoFolioEnRemisiones',
+                                            'ModificarCostosDeProductos',
+                                            'ValidarUtilidadNegativa')
                                 ->where('Numero', 1)->first();
         //actualizar datos de configuracion global
         config(['app.periodoincialmodulos' => $this->empresa->Periodo_Inicial_Modulos]);
@@ -88,6 +91,7 @@ class ConfiguracionSistemaController extends Controller
         config(['app.correodefault1enviodocumentos' => $this->empresa->CorreoDefault1EnvioDocumentos]);
         config(['app.correodefault2enviodocumentos' => $this->empresa->CorreoDefault2EnvioDocumentos]);
         config(['app.usuariosamodificarinsumos' => $this->empresa->UsuariosModificarInsumo]);
+        config(['app.modificarcostosdeproductos' => $this->empresa->ModificarCostosDeProductos]);
         ////////////OBTENER CONFIGURACIONES DEL SISTEMA////////////////
         $this->numerocerosconfigurados = Helpers::numerocerosconfiguracion(); //obtienes los ceros que se deben colocar con base a los decimales configurados en el sistemas ejemplo decimales para el sistema = 3 numero de ceros = 000
         $this->numerocerosconfiguradosinputnumberstep = Helpers::numerocerosconfiguracioninputnumberstep(); //obtienes los ceros que se deben colocar en los input type number con base a los decimales configurados en el sistemas ejemplo decimales para el sistema = 3 numero de ceros = 001
@@ -120,6 +124,8 @@ class ConfiguracionSistemaController extends Controller
         $this->correodefault2enviodocumentos = config('app.correodefault2enviodocumentos');
         //usuarios ue puedes modificar isnumos 
         $this->usuariosamodificarinsumos = config('app.usuariosamodificarinsumos');
+        //usuarios que pueden modificar costos en productos
+        $this->modificarcostosdeproductos = config('app.modificarcostosdeproductos');
         /*
         //obtener o actualizar el valor del dolar segun sea el caso
         $fechahoy = Carbon::now()->toDateString();
@@ -249,6 +255,10 @@ class ConfiguracionSistemaController extends Controller
                         ->count();
         //mostrar resultado de totales por columnas en tabla principal de todos los modulos
         $this->mostrartotalesdecolumnasendocumentos = $this->empresa->MostrarTotalesDeColumnasEnDocumentos;
+        //modificar folio consecutivo en remisiones
+        $this->modificarconsecutivofolioenremisiones = $this->empresa->ModificarConsecutivoFolioEnRemisiones;
+        //validar utilidad negativa en remisiones y facturas
+        $this->validarutilidadnegativa = $this->empresa->ValidarUtilidadNegativa;
         ////////////FIN OBTENER CONFIGURACIONES DEL SISTEMA////////////////
         ///////////COMPARTIR CONFIGURACIONES EN TODAS LAS VISTAS ///////////
         View::share ( 'mayusculas_sistema', $this->mayusculas_sistema );
@@ -292,6 +302,9 @@ class ConfiguracionSistemaController extends Controller
         View::share ( 'timbrestotalesactivosfacturapi', $this->timbrestotalesactivosfacturapi);
         View::share ( 'timbrestotalescanceladosfacturapi', $this->timbrestotalescanceladosfacturapi);
         View::share ( 'mostrartotalesdecolumnasendocumentos', $this->mostrartotalesdecolumnasendocumentos);
+        View::share ( 'modificarcostosdeproductos', $this->modificarcostosdeproductos);
+        View::share ( 'modificarconsecutivofolioenremisiones', $this->modificarconsecutivofolioenremisiones);
+        View::share ( 'validarutilidadnegativa', $this->validarutilidadnegativa);
         //View::share ( 'array', ['name'=>'Franky','address'=>'Mars'] );
     } 
 }

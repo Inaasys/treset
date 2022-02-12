@@ -667,6 +667,8 @@ function alta(){
               '</div>'+ 
             '</div>';
   $("#tabsform").html(tabs);
+  //colocar autocomplette off  todo el formulario
+  $(".form-control").attr('autocomplete','off');
   obtenultimonumero();
   asignarfechaactual();
   obtenerpersonal();
@@ -953,6 +955,8 @@ function obtenerdatos(prestamomodificar){
                 '</div>'+ 
               '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     $("#periodohoy").val(data.Prestamo_Herramienta.periodo);
     $("#folio").val(data.Prestamo_Herramienta.folio);
     $("#serie").val(data.Prestamo_Herramienta.serie);

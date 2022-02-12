@@ -982,6 +982,8 @@ function alta(){
                 '</div>'+
             '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     obtenultimonumero();
     asignarfechaactual();
     //activar seelct2
@@ -1392,6 +1394,8 @@ function obtenerdatos(produccionmodificar){
                     '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     $("#periodohoy").val(data.produccion.Periodo);
     $("#folio").val(data.produccion.Folio);
     $("#serie").val(data.produccion.Serie);
@@ -1619,7 +1623,8 @@ function buscarstringlike(){
       $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
     });
     var tablafolenc=$('#tablafoliosencontrados').DataTable({
-        "paging":   false,
+        "pageLength": 100,
+        'sDom': 't',
         "sScrollX": "100%",
         "sScrollY": "250px",
         processing: true,

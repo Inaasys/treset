@@ -188,6 +188,9 @@ class ServicioController extends ConfiguracionSistemaController{
     //obtener datos del catalogo
     public function servicios_obtener_servicio(Request $request){
         $servicio = Servicio::where('Codigo', $request->codigoservicio)->first();
+        if($servicio == null){
+            $servicio = Servicio::where('Codigo','LIKE', '%'.$request->codigoservicio.'%')->first();
+        }
         $familia = Familia::select('Numero', 'Nombre')->where('Numero', $servicio->Familia)->first();
         $claveproducto = ClaveProdServ::select('Clave', 'Nombre')->where('Clave', $servicio->ClaveProducto)->first();
         $claveunidad = ClaveUnidad::select('Clave', 'Nombre')->where('Clave', $servicio->ClaveUnidad)->first();

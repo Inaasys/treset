@@ -100,7 +100,7 @@ class Helpers{
         //$fecha = Carbon::now()->format('Y-m-d')."T".Carbon::now()->format('H:i');
         //$date = Carbon::parse('2021-12-02');
         $date = Carbon::now();
-        if($date->day <= 3){
+        if($date->day <= 5){
             $fecha = Carbon::now()->format('Y-m-d')."T".Carbon::now()->format('H:i');
             $ultimodiamesactual = Carbon::now()->endOfMonth()->toDateString();
             $fechamax = Carbon::parse($ultimodiamesactual)->format('Y-m-d')."T23:59";

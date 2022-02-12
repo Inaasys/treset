@@ -1875,19 +1875,19 @@ function alta(){
                       '<div class="row">'+ 
                         '<div class="col-md-3">'+
                           '<label>Falla</label>'+
-                          '<textarea class="form-control inputnextdet" name="falla" id="falla"  required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"  rows="4"></textarea>'+
+                          '<textarea class="form-control inputnextdet" name="falla" id="falla"  required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"  rows="4" value=""></textarea>'+
                         '</div>'+
                         '<div class="col-md-3">'+
                           '<label>Observaciones</label>'+
-                          '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones"  required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rows="4"></textarea>'+
+                          '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones"  required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rows="4" value=""></textarea>'+
                         '</div>'+
                         '<div class="col-md-3">'+
                           '<label>Causa</label>'+
-                          '<textarea class="form-control inputnextdet" name="causa" id="causa" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rows="4"></textarea>'+
+                          '<textarea class="form-control inputnextdet" name="causa" id="causa" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rows="4" value=""></textarea>'+
                         '</div>'+
                         '<div class="col-md-3">'+
                           '<label>Corrección</label>'+
-                          '<textarea class="form-control inputnextdet" name="correccion" id="correccion"  data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rows="4"></textarea>'+
+                          '<textarea class="form-control inputnextdet" name="correccion" id="correccion"  data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rows="4" value=""></textarea>'+
                         '</div>'+
                       '</div>'+  
                     '</div>'+ 
@@ -1920,6 +1920,8 @@ function alta(){
               '</div>'+ 
             '</div>';
   $("#tabsform").html(tabs);
+  //colocar autocomplette off  todo el formulario
+  $(".form-control").attr('autocomplete','off');
   //mostrar mensaje de bajar plantilla
   $('[data-toggle="tooltip"]').tooltip({
     container: 'body'
@@ -2039,9 +2041,18 @@ function alta(){
     var code = (e.keyCode ? e.keyCode : e.which);
     if(code==13){
       var index = $(this).index(".inputnextdet");          
-      $(".inputnextdet").eq(index + 1).focus().select(); 
+      $(".inputnextdet").eq(index + 1).focus().select();
+      
+
+
+
     }
   });
+
+
+
+
+
   //se debe motrar el input para buscar los productos
   $("#divbuscarcodigoservicio").show();
   $("#ModalAlta").modal('show');
@@ -2577,6 +2588,8 @@ function obtenerdatos(ordenmodificar){
                 '</div>'+ 
               '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     $("#periodohoy").val(data.ordentrabajo.Periodo);
     $("#folio").val(data.ordentrabajo.Folio);
     $("#serie").val(data.ordentrabajo.Serie);
@@ -2890,6 +2903,63 @@ $("#btnabrirnuevamente").on('click', function(e){
     form.parsley().validate();
   }
 });
+//modificar datos generales orden
+function modificardatosgeneralesorden(Orden){
+  $.get(ordenes_trabajo_obtener_datos_generales_orden,{Orden:Orden}, function(data){
+    $("#modalmodificardatosgeneralesorden").modal('show');
+    $("#ordenmodificardatosgenerales").val(Orden);
+    $("#kilometrosdatosgenerales").val(data.Kilometros);
+    $("#placasdatosgenerales").val(data.Placas);
+    $("#economicodatosgenerales").val(data.Economico);
+    $("#ordenclientedatosgenerales").val(data.Pedido);
+    setTimeout(function(){$("#ordenmodificardatosgenerales").focus();},500);
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnextdatosgenerales").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        var index = $(this).index(".inputnextdatosgenerales");          
+        $(".inputnextdatosgenerales").eq(index + 1).focus().select(); 
+      }
+    });
+  });
+}
+//guardar cambios datos generales
+$("#btnguardardatosgenerales").on('click', function(e){
+  e.preventDefault();
+  var formData = new FormData($("#formamodificardatosgenerales")[0]);
+  var form = $("#formamodificardatosgenerales");
+  if (form.parsley().isValid()){
+    $('.page-loader-wrapper').css('display', 'block');
+    $.ajax({
+      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+      url:ordenes_trabajo_guardar_modificacion_datos_generales,
+      type: "post",
+      dataType: "html",
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false,
+      success:function(data){
+        $('#modalmodificardatosgeneralesorden').modal('hide');
+        msj_datosguardadoscorrectamente();
+        $("#formamodificardatosgenerales")[0].reset();
+        $('.page-loader-wrapper').css('display', 'none');
+      },
+      error:function(data){
+        if(data.status == 403){
+          msj_errorenpermisos();
+        }else{
+          msj_errorajax();
+        }
+        $('#modalmodificardatosgeneralesorden').modal('hide');
+        $('.page-loader-wrapper').css('display', 'none');
+      }
+    })
+  }else{
+    form.parsley().validate();
+  }
+});
 //obtener datos para el envio del documento por email
 function enviardocumentoemail(documento){
   $.get(ordenes_trabajo_obtener_datos_envio_email,{documento:documento}, function(data){
@@ -2974,7 +3044,8 @@ function buscarstringlike(){
     $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
   });
   var tablafolenc=$('#tablafoliosencontrados').DataTable({
-      "paging":   false,
+      "pageLength": 100,
+      'sDom': 't',
       "sScrollX": "100%",
       "sScrollY": "250px",
       processing: true,

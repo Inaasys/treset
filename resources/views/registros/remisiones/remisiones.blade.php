@@ -167,6 +167,41 @@
     	</div>
   	</div>
 </div> 
+<!-- Modal modificar datos generales-->
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalmodificardatosgeneralesdocumento" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  	<div class="modal-dialog" role="document">
+    	<div class="modal-content">
+      		<div class="modal-header {{$empresa->background_forms_and_modals}}">
+        		<h5 class="modal-title" id="exampleModalLabel">Remisiones Modificar Datos Generales</h5>
+      		</div>
+      		<div class="modal-body">
+		      	<form id="formamodificardatosgenerales" action="#">
+                      <div class="row">
+                          <div class="col-md-12">
+                              <h4 id="titulomodificardatosgenerales"></h4>
+                          </div>
+                          <div class="col-md-2">
+                                <label >Remision</label>
+                                <input type="text" class="form-control inputnextdatosgenerales" id="remisiondatosgenerales" name="remisiondatosgenerales" readonly>
+                          </div>
+                          <div class="col-md-2">
+                                <label>Orden Servicio</label>
+                                <input type="text" class="form-control inputnextdatosgenerales" id="ordenserviciodatosgenerales" name="ordenserviciodatosgenerales" onkeyup="tipoLetra(this)">
+                          </div>
+                          <div class="col-md-2">
+                                <label>Equipo</label>
+                                <input type="text" class="form-control inputnextdatosgenerales" id="equipodatosgenerales" name="equipodatosgenerales" onkeyup="tipoLetra(this)">
+                          </div>
+                      </div>                    
+		        </form>	
+      		</div>
+	      	<div class="modal-footer">
+	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
+	        	<button type="button" class="btn btn-success btn-sm" id="btnguardardatosgenerales">Confirmar Cambios</button>
+	      	</div>
+    	</div>
+  	</div>
+</div> 
 <!-- modal para crear documento en PDF-->
 @include('secciones.modalcreardocumento')
 <!-- fin modal para crear documento en PDF-->
@@ -207,6 +242,10 @@
         var verificarinsumosremisionenot = '{{$empresa->VerificarPartidasRemisionEnOT}}';
         var controlarconsecutivonumrequisicion = '{{$empresa->ControlarConsecutivoNumeroRequisicionEnRemisiones}}';
         var mostrarinsumoporpartidaenremisiones = '{{$empresa->MostrarInsumoPorPartidaEnCapturaDeRemisiones}}';
+        var usuariosamodificarinsumos = '{{$usuariosamodificarinsumos}}';
+        var usuariologueado = '{{Auth::user()->user}}';
+        var modificarconsecutivofolioenremisiones = '{{$modificarconsecutivofolioenremisiones}}';
+        var validarutilidadnegativa = '{{$validarutilidadnegativa}}';
         var remisiones_obtener = '{!!URL::to('remisiones_obtener')!!}';
         var remisiones_descargar_plantilla = '{!!URL::to('remisiones_descargar_plantilla')!!}';
         var remisiones_cargar_partidas_excel = '{!!URL::to('remisiones_cargar_partidas_excel')!!}';
@@ -237,6 +276,8 @@
         var remisiones_alta_o_baja = '{!!URL::to('remisiones_alta_o_baja')!!}'; 
         var remisiones_obtener_remision = '{!!URL::to('remisiones_obtener_remision')!!}'; 
         var remisiones_guardar_modificacion = '{!!URL::to('remisiones_guardar_modificacion')!!}';
+        var remisiones_obtener_datos_generales = '{!!URL::to('remisiones_obtener_datos_generales')!!}';
+        var remisiones_guardar_modificacion_datos_generales = '{!!URL::to('remisiones_guardar_modificacion_datos_generales')!!}';
         var remisiones_obtener_datos_envio_email = '{!!URL::to('remisiones_obtener_datos_envio_email')!!}';
         var remisiones_enviar_pdfs_email = '{!!URL::to('remisiones_enviar_pdfs_email')!!}';
         var remisiones_buscar_folio_string_like = '{!!URL::to('remisiones_buscar_folio_string_like')!!}';

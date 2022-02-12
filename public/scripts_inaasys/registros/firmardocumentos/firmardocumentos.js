@@ -207,18 +207,31 @@ function obtenerfoliosdocumento(){
 var arraydocumentosseleccionados = [];
 //obtener todos los datos de la orden de compra seleccionada
 function seleccionardocumento(Documento){
-    construirarraydocumentosseleccionados();
+    construirarraydocumentosseleccionados(Documento);
 }
-function construirarraydocumentosseleccionados(){
-    $("#stringdocumentosseleccionados").val("");
-    var arraydocumentosseleccionados = [];
-    var lista = document.getElementsByClassName("documentosseleccionados");
-    for (var i = 0; i < lista.length; i++) {
-      if(lista[i].checked){
-        arraydocumentosseleccionados.push(lista[i].value);
+var arraydocumentosseleccionados = new Array();
+function construirarraydocumentosseleccionados(Documento){
+    if( $("#iddocumentosseleccionados"+Documento).prop('checked') ) {
+      var stringdocumentosseleccionados = $("#stringdocumentosseleccionados").val();
+      if(stringdocumentosseleccionados != ""){
+        arraydocumentosseleccionados = stringdocumentosseleccionados.split(",");
       }
+      var coincidencias = 0;
+      if(arraydocumentosseleccionados.length > 0){
+          for(var i = 0; i < arraydocumentosseleccionados.length; i++){
+              if(Documento == arraydocumentosseleccionados[i]){
+                  coincidencias++;
+              }
+          }
+      }
+      if(coincidencias == 0){
+          arraydocumentosseleccionados.push(Documento);
+          $("#stringdocumentosseleccionados").val(arraydocumentosseleccionados.sort());
+      }
+    }else{
+      EliminarElementoArrayPorValor(arraydocumentosseleccionados,Documento);
+      $("#stringdocumentosseleccionados").val(arraydocumentosseleccionados.sort());
     }
-    $("#stringdocumentosseleccionados").val(arraydocumentosseleccionados.sort());
 }
 var contadorproductos=0;
 var contadorfilas = 0;
@@ -413,6 +426,8 @@ $("#btnGuardar").on('click', function (e) {
                 limpiar();
                 ocultarmodalformulario();
                 limpiarmodales();
+                arraydocumentosseleccionados = new Array();
+                $("#stringdocumentosseleccionados").val("");
                 $('.page-loader-wrapper').css('display', 'none');
             },
             error:function(data){

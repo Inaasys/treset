@@ -57,11 +57,11 @@
                         <div class="col-md-12" id="divadjuntararchivo">
                             <div class="col-md-6 form-check">
                                 <label>Adjuntar Archivo 1</label>
-                                <input type="file" name="archivoadjunto" id="archivoadjunto"  class="dropify" data-max-file-size="2M" data-allowed-file-extensions="pdf xlsx xls csv xml docx"  data-height="100"/>
+                                <input type="file" name="archivoadjunto" id="archivoadjunto"  class="dropify" data-max-file-size="2M" data-allowed-file-extensions="pdf xlsx xls csv xml docx zip"  data-height="100"/>
                             </div>
                             <div class="col-md-6 form-check">
                                 <label>Adjuntar Archivo 2</label>
-                                <input type="file" name="archivoadjunto2" id="archivoadjunto2"  class="dropify" data-max-file-size="2M" data-allowed-file-extensions="pdf xlsx xls csv xml docx"  data-height="100"/>
+                                <input type="file" name="archivoadjunto2" id="archivoadjunto2"  class="dropify" data-max-file-size="2M" data-allowed-file-extensions="pdf xlsx xls csv xml docx zip"  data-height="100"/>
                             </div>
                         </div>
                         <div class="col-md-12" id="divincluirxml" hidden>

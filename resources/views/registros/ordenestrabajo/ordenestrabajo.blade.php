@@ -241,6 +241,49 @@
     	</div>
   	</div>
 </div> 
+<!-- Modal modificar datos generales Orden de Trabajo-->
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalmodificardatosgeneralesorden" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  	<div class="modal-dialog" role="document">
+    	<div class="modal-content">
+      		<div class="modal-header {{$empresa->background_forms_and_modals}}">
+        		<h5 class="modal-title" id="exampleModalLabel">Ordenes de Trabajo Modificar Datos Generales</h5>
+      		</div>
+      		<div class="modal-body">
+		      	<form id="formamodificardatosgenerales" action="#">
+                      <div class="row">
+                          <div class="col-md-12">
+                              <h4 id="titulomodificardatosgenerales"></h4>
+                          </div>
+                          <div class="col-md-2">
+                                <label >Orden</label>
+                                <input type="text" class="form-control inputnextdatosgenerales" id="ordenmodificardatosgenerales" name="ordenmodificardatosgenerales" readonly>
+                          </div>
+                          <div class="col-md-2">
+                                <label>Kilometros</label>
+                                <input type="text" class="form-control inputnextdatosgenerales" id="kilometrosdatosgenerales" name="kilometrosdatosgenerales" onkeyup="tipoLetra(this)">
+                          </div>
+                          <div class="col-md-2">
+                                <label>Placas</label>
+                                <input type="text" class="form-control inputnextdatosgenerales" id="placasdatosgenerales" name="placasdatosgenerales" onkeyup="tipoLetra(this)" >
+                          </div>
+                          <div class="col-md-2">
+                                <label>Economico</label>
+                                <input type="text" class="form-control inputnextdatosgenerales" id="economicodatosgenerales" name="economicodatosgenerales" onkeyup="tipoLetra(this)">
+                          </div>
+                          <div class="col-md-2">
+                                <label>Orden Cliente</label>
+                                <input type="text" class="form-control inputnextdatosgenerales" id="ordenclientedatosgenerales" name="ordenclientedatosgenerales" onkeyup="tipoLetra(this)">
+                          </div>
+                      </div>                    
+		        </form>	
+      		</div>
+	      	<div class="modal-footer">
+	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
+	        	<button type="button" class="btn btn-success btn-sm" id="btnguardardatosgenerales">Confirmar Cambios</button>
+	      	</div>
+    	</div>
+  	</div>
+</div> 
 <!-- modal para crear documento en PDF-->
 @include('secciones.modalcreardocumento')
 <!-- fin modal para crear documento en PDF-->
@@ -310,6 +353,8 @@
         var ordenes_trabajo_abrir_nuevamente_orden = '{!!URL::to('ordenes_trabajo_abrir_nuevamente_orden')!!}'; 
         var ordenes_trabajo_obtener_orden_trabajo = '{!!URL::to('ordenes_trabajo_obtener_orden_trabajo')!!}'; 
         var ordenes_trabajo_guardar_modificacion = '{!!URL::to('ordenes_trabajo_guardar_modificacion')!!}';
+        var ordenes_trabajo_obtener_datos_generales_orden = '{!!URL::to('ordenes_trabajo_obtener_datos_generales_orden')!!}';
+        var ordenes_trabajo_guardar_modificacion_datos_generales = '{!!URL::to('ordenes_trabajo_guardar_modificacion_datos_generales')!!}';
         var ordenes_trabajo_obtener_datos_envio_email = '{!!URL::to('ordenes_trabajo_obtener_datos_envio_email')!!}';
         var ordenes_trabajo_enviar_pdfs_email = '{!!URL::to('ordenes_trabajo_enviar_pdfs_email')!!}';
         var ordenes_trabajo_buscar_folio_string_like = '{!!URL::to('ordenes_trabajo_buscar_folio_string_like')!!}'; 

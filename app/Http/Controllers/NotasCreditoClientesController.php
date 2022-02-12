@@ -1319,6 +1319,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             ->update([
                 'Cliente' => $request->numerocliente,
                 'Fecha' => Carbon::parse($request->fecha)->toDateTimeString(),
+                'Hora' => Carbon::parse($request->fecha)->toDateTimeString(),
                 'Almacen' => $request->numeroalmacen, 
                 'Importe' => $request->importe,
                 'Descuento' => $request->descuento,
@@ -1605,6 +1606,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $metodopago = MetodoPago::where('Clave', $ncc->MetodoPago)->first();
             $usocfdi = UsoCFDI::where('Clave', $ncc->UsoCfdi)->first();
             $formatter = new NumeroALetras;
+            $formatter->conector = 'PESOS';
             $totalletras = $formatter->toInvoice($ncc->Total, 2, 'M.N.');
             $notaclientedocumento = NotaClienteDocumento::where('Nota', $ncc->Nota)->first();
             $comprobantetimbrado = Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->count();
@@ -1714,6 +1716,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $metodopago = MetodoPago::where('Clave', $ncc->MetodoPago)->first();
             $usocfdi = UsoCFDI::where('Clave', $ncc->UsoCfdi)->first();
             $formatter = new NumeroALetras;
+            $formatter->conector = 'PESOS';
             $totalletras = $formatter->toInvoice($ncc->Total, 2, 'M.N.');
             $notaclientedocumento = NotaClienteDocumento::where('Nota', $ncc->Nota)->first();
             $comprobantetimbrado = Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->count();
@@ -1807,6 +1810,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $metodopago = MetodoPago::where('Clave', $ncc->MetodoPago)->first();
             $usocfdi = UsoCFDI::where('Clave', $ncc->UsoCfdi)->first();
             $formatter = new NumeroALetras;
+            $formatter->conector = 'PESOS';
             $totalletras = $formatter->toInvoice($ncc->Total, 2, 'M.N.');
             $notaclientedocumento = NotaClienteDocumento::where('Nota', $ncc->Nota)->first();
             $comprobantetimbrado = Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->count();

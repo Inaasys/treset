@@ -33,7 +33,7 @@ class FacturasExport implements FromCollection,WithHeadings,WithTitle
         return $this->campos_consulta;
     }
     public function collection(){
-        $facturas = \App\VistaFactura::select($this->campos_consulta)->where('Periodo', $this->periodo)->orderBy('Folio','DESC')->get();
+        $facturas = \App\VistaFactura::select($this->campos_consulta)->where('Periodo', $this->periodo)->orderBy('Serie', 'DESC')->orderBy('Folio','ASC')->get();
         return $facturas;
         
     }

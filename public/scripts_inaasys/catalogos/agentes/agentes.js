@@ -282,6 +282,8 @@ function alta(){
                 '</div>'+
               '</div>';
   $("#tabsform").html(tabs);
+  //colocar autocomplette off  todo el formulario
+  $(".form-control").attr('autocomplete','off');
   obtenultimonumero();
   obteneralmacenpornumero();
   setTimeout(function(){$("#nombre").focus();},500);
@@ -470,6 +472,8 @@ function obtenerdatos(numeroagente){
                     '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     //boton formulario 
     $(".select2").select2();
     $("#numero").val(numeroagente);

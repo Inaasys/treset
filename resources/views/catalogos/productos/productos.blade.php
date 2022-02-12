@@ -306,7 +306,7 @@
                                         <form action='{{$rutacrearpdfcodigosdebarrascatalogo}}' method="POST" data-parsley-validate="" target="_blank">
                                             @csrf
                                             <div class="row">
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <label >Tipo</label>
                                                     <select class="form-control select2" id="tipoprodcodigosbarras" name="tipoprodcodigosbarras" style="width:100%" required>
                                                         <option value="TODOS" selected>TODOS</option>    
@@ -315,7 +315,7 @@
                                                         <option value="TOT">TOT</option>
                                                     </select>
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <label >Status</label>
                                                     <select class="form-control select2" id="statuscodigosbarras" name="statuscodigosbarras" style="width:100%" required>
                                                         <option value="TODOS" selected>TODOS</option> 
@@ -324,15 +324,27 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <label for="">Ubicación</label>
-                                                    <input type="text" name="codigobarrasubicacion" id="codigobarrasubicacion" class="form-control" placeholder="Escribe la ubicación del producto" autocomplete="off" onkeyup="tipoLetra(this);">
+                                                    <label for="">Ubicación</label><br>
+                                                    <select  name="codigobarrasubicacion[]" id="codigobarrasubicacion" multiple="multiple" onkeyup="tipoLetra(this);">
+                                                    </select>
+                                                    <!--<input type="text" name="codigobarrasubicacion" id="codigobarrasubicacion" class="form-control" placeholder="Escribe la ubicación del producto" autocomplete="off" onkeyup="tipoLetra(this);">-->
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <label for="">Tamaño Etiquetas</label>
                                                     <select name="tamanoetiquetascatalogocodigosbarras" id="tamanoetiquetascatalogocodigosbarras" class="form-control select2" style="width:100%">
                                                         <!--<option value="chica">chica</option>-->
                                                         <option value="grande">grande</option>
                                                     </select>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label>Generar codigos de barras a existencias actuales</label>
+                                                    <div class="col-md-12 form-check">
+                                                        <div class="col-md-3">
+                                                            <input name="generarcodigosdebarrasporexistencias" type="hidden" value="0"/>
+                                                            <input type="checkbox" name="generarcodigosdebarrasporexistencias" id="idgenerarcodigosdebarrasporexistencias" class="filled-in submenu accesoreportes" value="1" />
+                                                            <label for="idgenerarcodigosdebarrasporexistencias"></label>
+                                                        </div>                           
+                                                    </div>
                                                 </div>
                                             </div><br>
                                             <div class="row">
@@ -415,6 +427,9 @@
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var tipodeutilidad = '{{$tipodeutilidad}}';
         var urlimagenesproductos = '{{asset("imagenes_productos/")}}/';
+        var usuariosamodificarinsumos = '{{$usuariosamodificarinsumos}}';
+        var modificarcostosdeproductos = '{{$modificarcostosdeproductos}}';
+        var usuariologueado = '{{Auth::user()->user}}';
         var productos_obtener = '{!!URL::to('productos_obtener')!!}';
         var productos_buscar_codigo_en_tabla = '{!!URL::to('productos_buscar_codigo_en_tabla')!!}';
         var productos_obtener_claves_productos = '{!!URL::to('productos_obtener_claves_productos')!!}';

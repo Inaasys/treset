@@ -194,6 +194,7 @@ class CompraController extends ConfiguracionSistemaController{
         $xml->move($mover_a_carpeta,$nombre_original);
         if (file_exists('xml_cargados/'.$nombre_original)) {
             //cargar xml
+            libxml_use_internal_errors(true); 
             $xml = simplexml_load_file('xml_cargados/'.$nombre_original);                   
             //obtener datos generales del xml nodo Comprobante
             $comprobante = $xml->attributes();

@@ -245,6 +245,8 @@ function alta(){
                 '</div>'+
               '</div>';
   $("#tabsform").html(tabs);
+  //colocar autocomplette off  todo el formulario
+  $(".form-control").attr('autocomplete','off');
   //inicializar los select con la libreria select2
   obtenultimonumero();
   setTimeout(function(){$("#nombre").focus();},500);
@@ -401,6 +403,8 @@ function obtenerdatos(numeroproveedor){
                     '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     //boton formulario 
     $("#numero").val(numeroproveedor);
     $("#nombre").val(data.proveedor.Nombre);

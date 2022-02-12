@@ -113,6 +113,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                                                 '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Orden .'\')">Bajas</a></li>'.
                                                 '<li><a href="'.route('ordenes_trabajo_generar_pdfs_indiv',$data->Orden).'" target="_blank">Generar Documento</a></li>'.
                                                 '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Orden .'\')">Enviar Documento por Correo</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="modificardatosgeneralesorden(\''.$data->Orden .'\')">Modificar Datos Generales</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;
@@ -1117,6 +1118,25 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             }
         }
     	return response()->json($OrdenTrabajo);         
+    }
+
+    //obtener datos generales orden
+    public function ordenes_trabajo_obtener_datos_generales_orden(Request $request){
+        $ordentrabajo = OrdenTrabajo::where('Orden', $request->Orden)->first();
+        return response()->json($ordentrabajo);
+    }
+
+    //guardar cambios datos generales
+    public function ordenes_trabajo_guardar_modificacion_datos_generales(Request $request){
+        $OrdenTrabajo = OrdenTrabajo::where('Orden', $request->ordenmodificardatosgenerales)->first();
+        OrdenTrabajo::where('Orden', $request->ordenmodificardatosgenerales)
+        ->update([
+            'Kilometros'=>$request->kilometrosdatosgenerales,
+            'Placas'=>$request->placasdatosgenerales,
+            'Economico'=>$request->economicodatosgenerales,
+            'Pedido'=>$request->ordenclientedatosgenerales,
+        ]);
+        return response()->json($OrdenTrabajo);
     }
 
     //verificar el registro que se dara de baja

@@ -722,8 +722,9 @@ class ProductoController extends ConfiguracionSistemaController{
         $tamanoetiquetas = $request->tamanoetiquetascatalogocodigosbarras;
         $tipoprod = $request->tipoprodcodigosbarras;
         $status = $request->statuscodigosbarras;
-        $ubicacion = $request->codigobarrasubicacion;
-        $codigos = Producto::select('Codigo','Producto','Ubicacion')
+        $ubicaciones = $request->codigobarrasubicacion;
+        $codigos = array();
+        $productos = Producto::select('Codigo','Producto','Ubicacion')
         ->where(function($q) use ($tipoprod) {
             if($tipoprod != "TODOS"){
                 $q->where('TipoProd', $tipoprod);
@@ -734,12 +735,41 @@ class ProductoController extends ConfiguracionSistemaController{
                 $q->where('Status', $status);
             }
         })
-        ->where(function($q) use ($ubicacion) {
-            if($ubicacion != ""){
-                $q->where('Ubicacion', $ubicacion);
+        ->where(function($q) use ($ubicaciones) {
+            if($ubicaciones != null){
+                $q->whereIn('Ubicacion', $ubicaciones);
             }
         })
         ->get();
+        if($request->generarcodigosdebarrasporexistencias == 1){
+            foreach($productos as $p){
+                $contarexistencias = Existencia::where('Codigo', $p->Codigo)->where('Almacen', 1)->count();
+                if($contarexistencias > 0){
+                    $existencias = Existencia::where('Codigo', $p->Codigo)->where('Almacen', 1)->first();
+                    $existencia = $existencias->Existencias;
+                }else{
+                    $existencia = 0;
+                }
+                $datos = array(
+                    'codigo' => $p->Codigo,
+                    'producto' => $p->Producto,
+                    'ubicacion' => $p->Ubicacion,
+                    'existencia' => $existencia
+                );
+                array_push($codigos, $datos);
+            }
+        }else{
+            foreach($productos as $p){
+                $datos = array(
+                    'codigo' => $p->Codigo,
+                    'producto' => $p->Producto,
+                    'ubicacion' => $p->Ubicacion,
+                    'existencia' => 1
+                );
+                array_push($codigos, $datos);
+            }
+        }
+        //dd($codigos);
         $tipo = 1;
         if($tamanoetiquetas == 'chica'){
             $pdf = PDF::loadView('catalogos.productos.formato_pdf_codigos_de_barras', compact('codigos','tipo','tamanoetiquetas'))
@@ -754,7 +784,7 @@ class ProductoController extends ConfiguracionSistemaController{
             ->setOption('margin-left', 0)
             ->setOption('margin-right', 0)
             ->setOption('margin-bottom', 1)
-            ->setOption('margin-top', 18);
+            ->setOption('margin-top', 12);
         }
         return $pdf->stream();
     }
@@ -788,7 +818,7 @@ class ProductoController extends ConfiguracionSistemaController{
             ->setOption('margin-left', 0)
             ->setOption('margin-right', 0)
             ->setOption('margin-bottom', 1)
-            ->setOption('margin-top', 18);
+            ->setOption('margin-top', 12);
         }
         return $pdf->stream();
     }
@@ -817,7 +847,7 @@ class ProductoController extends ConfiguracionSistemaController{
             ->setOption('margin-left', 0)
             ->setOption('margin-right', 0)
             ->setOption('margin-bottom', 1)
-            ->setOption('margin-top', 18);
+            ->setOption('margin-top', 12);
         }
         return $pdf->stream();
     }

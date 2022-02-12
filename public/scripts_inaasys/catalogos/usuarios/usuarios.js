@@ -164,6 +164,8 @@ function alta(){
                     '</div>'+ 
                 '</div>';
   $("#tabsform").html(tabs);
+  //colocar autocomplette off  todo el formulario
+  $(".form-control").attr('autocomplete','off');
   obtenultimonumero();
   obtenerroles();
   $("#ModalAlta").modal('show');
@@ -297,6 +299,8 @@ function obtenerdatos(id){
                     '</div>'+ 
                 '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     $("#numero").val(id);
     $("#name").val(data.usuario.name);
     $("#user").val(data.usuario.user);
@@ -1096,7 +1100,15 @@ function permisos(id){
                                             '<div class="col-md-3">'+
                                                 '<input type="checkbox" name="menureportesfacturasventasdiarias" id="idmenureportesfacturasventasdiarias" class="filled-in submenu accesoreportes" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
                                                 '<label for="idmenureportesfacturasventasdiarias">Ventas Diarias</label>'+    
-                                            '</div>'+                                 
+                                            '</div>'+  
+                                            '<div class="col-md-3">'+
+                                                '<input type="checkbox" name="menureporterelaciontimbresutilizados" id="idmenureporterelaciontimbresutilizados" class="filled-in submenu accesoreportes" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                                '<label for="idmenureporterelaciontimbresutilizados">Relación Timbres Utilizados</label>'+    
+                                            '</div>'+ 
+                                            '<div class="col-md-3">'+
+                                                '<input type="checkbox" name="menureportefacturasvencidas" id="idmenureportefacturasvencidas" class="filled-in submenu accesoreportes" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                                '<label for="idmenureportefacturasvencidas">Facturas Vencidas</label>'+    
+                                            '</div>'+                                
                                         '</div>'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
@@ -1611,6 +1623,8 @@ function altaserie(usuario){
                     '</div>'+ 
                 '</div>';
     $("#tabsformserie").html(tabs);  
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     obtenerdocumentos();
     $("#documento").select2();
 }
@@ -1700,6 +1714,8 @@ function obtenerdatosserie(documento, serie, usuario, nombre){
                         '</div>'+ 
                     '</div>';
         $("#tabsformserie").html(tabs);  
+        //colocar autocomplette off  todo el formulario
+        $(".form-control").attr('autocomplete','off');
         $("#serie").val(serie);
         $("#nombre").val(nombre);
         $("#usuario").val(usuario);

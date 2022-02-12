@@ -255,6 +255,8 @@ function alta(){
                     '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     $('.dropify').dropify();
     obtenultimonumero();
 }
@@ -509,6 +511,8 @@ function obtenerdatos(numerofolio){
                     '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     $("#numero").val(data.FolioComprobanteNota.Numero);
     $("#serie").val(data.FolioComprobanteNota.Serie);
     $("#titulo").val(data.FolioComprobanteNota.Titulo);

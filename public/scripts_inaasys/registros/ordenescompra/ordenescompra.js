@@ -812,6 +812,8 @@ function obtenerproductoporcodigo(){
                           '</div>'+
                       '</div>';
           $("#tabsformproducto").html(tabs);
+          //colocar autocomplette off  todo el formulario
+          $(".form-control").attr('autocomplete','off');
           $("#codigo").val(codigoabuscar);
           obtenertipos(tipo);
           $("#ModalFormularioProducto").modal('show');
@@ -1737,6 +1739,8 @@ function alta(tipoalta){
               '</div>'+
             '</div>';
   $("#tabsform").html(tabs);
+  //colocar autocomplette off  todo el formulario
+  $(".form-control").attr('autocomplete','off');
   //mostrar mensaje de bajar plantilla
   $('[data-toggle="tooltip"]').tooltip({
     container: 'body'
@@ -2568,7 +2572,8 @@ function buscarstringlike(){
     $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
   });
   var tablafolenc=$('#tablafoliosencontrados').DataTable({
-      "paging":   false,
+      "pageLength": 100,
+      'sDom': 't',
       "sScrollX": "100%",
       "sScrollY": "250px",
       processing: true,
@@ -2603,12 +2608,47 @@ function buscarstringlike(){
         $(".dataTables_filter").css('display', 'none');
       }
   });
-  //modificacion al dar doble click
+  //seleccionar al dar doble click
   $('#tablafoliosencontrados tbody').on('dblclick', 'tr', function () {
     tablafolenc = $("#tablafoliosencontrados").DataTable();
     var data = tablafolenc.row( this ).data();
     agregararraypdf(data.Orden);
   });
+}
+
+
+
+//generar documento en iframe
+function generardocumentoeniframe(Orden){
+  var arraypdf = new Array();
+  var folios = [Orden];
+  arraypdf.push(folios);
+  var form_data = new FormData();
+  form_data.append('arraypdf', arraypdf); 
+  form_data.append('tipogeneracionpdf', 0);
+  form_data.append('numerodecimalesdocumento', 2);
+  form_data.append('imprimirdirectamente', 1);
+  $.ajax({
+    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+    url:ordenes_compra_generar_pdfs,
+    data: form_data,
+    type: 'POST',
+    contentType: false,
+    processData: false,
+    success: function (data) {
+      $('#pdfiframe').attr("src", urlpdfsimpresionesrapidas+data);
+      setTimeout(function(){imprimirdirecto();},500);    
+    },
+    error: function (data) {
+      console.log(data);
+    }
+  });
+}
+//imprimir documento pdf directamente
+function imprimirdirecto(){
+  var pdfFrame = window.frames["pdfiframe"];
+  pdfFrame.focus();
+  pdfFrame.print();
 }
 //configurar tabla
 function configurar_tabla(){

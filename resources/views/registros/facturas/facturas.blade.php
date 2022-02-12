@@ -206,8 +206,12 @@
                         <h5 id="textomodalbajatimbre"> </h5>
                         <input type="hidden" class="form-control" id="iddocumentofacturapi" name="iddocumentofacturapi" readonly>
                         <input type="hidden" class="form-control" id="facturabajatimbre" name="facturabajatimbre" readonly>
-                        <label for="">Motivo:</label>
-                        <select name="motivobajatimbre" id="motivobajatimbre" class="form-control select2" style="width:100%;" required></select>
+                        <div class="row">
+                            <div class="col-md-12" id="divmotivobajatimbre">
+                                <label for="">Motivo:</label>
+                                <select name="motivobajatimbre" id="motivobajatimbre" class="form-control select2" style="width:100%;" required></select>
+                            </div>
+                        </div>
                     </form>	
                 </div>
                 <div class="modal-footer">
@@ -290,6 +294,37 @@
             </div>
         </div>
     </div> 
+    <!-- Modal modificar datos generales-->
+    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalmodificardatosgeneralesdocumento" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header {{$empresa->background_forms_and_modals}}">
+                    <h5 class="modal-title" id="exampleModalLabel">Facturas Modificar Datos Generales</h5>
+                </div>
+                <div class="modal-body">
+                    <form id="formamodificardatosgenerales" action="#">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h4 id="titulomodificardatosgenerales"></h4>
+                            </div>
+                            <div class="col-md-2">
+                                    <label >Factura</label>
+                                    <input type="text" class="form-control inputnextdatosgenerales" id="facturadatosgenerales" name="facturadatosgenerales" readonly>
+                            </div>
+                            <div class="col-md-2">
+                                    <label>Pedido</label>
+                                    <input type="text" class="form-control inputnextdatosgenerales" id="pedidodatosgenerales" name="pedidodatosgenerales" onkeyup="tipoLetra(this)">
+                            </div>
+                        </div>                    
+                    </form>	
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
+                    <button type="button" class="btn btn-success btn-sm" id="btnguardardatosgenerales">Confirmar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div> 
     <!-- modal para crear documento en PDF-->
     @include('secciones.modalcreardocumento')
     <!-- fin modal para crear documento en PDF-->
@@ -334,6 +369,7 @@
         var urlgenerarplantilla = '{{$urlgenerarplantilla}}';       
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var pedirobligatoriamenteobservacionenfactura = '{{$empresa->PedirObligatoriamenteObservacionEnFactura}}';
+        var validarutilidadnegativa = '{{$validarutilidadnegativa}}';
         var facturas_obtener = '{!!URL::to('facturas_obtener')!!}';
         var facturas_descargar_plantilla = '{!!URL::to('facturas_descargar_plantilla')!!}';
         var facturas_cargar_partidas_excel = '{!!URL::to('facturas_cargar_partidas_excel')!!}';
@@ -382,6 +418,8 @@
         var facturas_guardar = '{!!URL::to('facturas_guardar')!!}';
         var facturas_obtener_factura = '{!!URL::to('facturas_obtener_factura')!!}';
         var facturas_guardar_modificacion = '{!!URL::to('facturas_guardar_modificacion')!!}';
+        var facturas_obtener_datos_generales = '{!!URL::to('facturas_obtener_datos_generales')!!}';
+        var facturas_guardar_modificacion_datos_generales = '{!!URL::to('facturas_guardar_modificacion_datos_generales')!!}';
         var facturas_obtener_kardex = '{!!URL::to('facturas_obtener_kardex')!!}';
         var facturas_verificar_si_continua_baja = '{!!URL::to('facturas_verificar_si_continua_baja')!!}';
         var facturas_alta_o_baja = '{!!URL::to('facturas_alta_o_baja')!!}'; 

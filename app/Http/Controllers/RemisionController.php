@@ -116,6 +116,8 @@ class RemisionController extends ConfiguracionSistemaController{
                                                 '<li><a href="'.route('remisiones_generar_pdfs_indiv',$data->Remision).'" target="_blank">Ver Documento PDF</a></li>'.
                                                 '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Remision .'\')">Enviar Documento por Correo</a></li>'.
                                                 '<li><a href="'.route('remisiones_generar_pdfs_indiv_requisicion_tyt',$data->Remision).'" target="_blank">Generar Formato Requisición TYT</a></li>'.
+                                                '<li><a href="javascript:void(0);" onclick="modificardatosgeneralesdocumento(\''.$data->Remision .'\')">Modificar Datos Generales</a></li>'.
+                                                
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;
@@ -214,7 +216,7 @@ class RemisionController extends ConfiguracionSistemaController{
                         $filasdetallesremision= $filasdetallesremision.
                         '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                             '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
-                            '<td class="tdmod tdinsumospartidas"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'.$producto->Insumo.'" readonly data-parsley-length="[1, 20]"></td>'.
+                            '<td class="tdmod tdinsumospartidas"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'.$producto->Insumo.'"  data-parsley-length="[1, 20]"></td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$producto->Codigo.'</b></td>'.
                             '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet descripcionproductopartida" name="descripcionproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($producto->Producto, ENT_QUOTES).'</textarea></td>'.                    
                             '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$producto->Unidad.'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'.$producto->Unidad.'</td>'.
@@ -465,7 +467,7 @@ class RemisionController extends ConfiguracionSistemaController{
                     $filasdetallescotizacion= $filasdetallescotizacion.
                     '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                         '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipo.'" readonly></td>'.
-                        '<td class="tdmod tdinsumospartidas"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'.$producto->Insumo.'" readonly data-parsley-length="[1, 20]"></td>'.
+                        '<td class="tdmod tdinsumospartidas"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'.$producto->Insumo.'" data-parsley-length="[1, 20]"></td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dc->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$dc->Codigo.'</b></td>'.
                         '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet descripcionproductopartida" name="descripcionproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($dc->Descripcion, ENT_QUOTES).'</textarea></td>'.                                        
                         '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$dc->Unidad.'" readonly data-parsley-length="[1, 5]">'.$dc->Unidad.'</td>'.
@@ -653,7 +655,7 @@ class RemisionController extends ConfiguracionSistemaController{
             $filasdetallesremision= $filasdetallesremision.
             '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                 '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
-                '<td class="tdmod tdinsumospartidas"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'.$producto->Insumo.'" readonly data-parsley-length="[1, 20]"></td>'.
+                '<td class="tdmod tdinsumospartidas"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'.$producto->Insumo.'" data-parsley-length="[1, 20]"></td>'.
                 '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$producto->Codigo.'</b></td>'.
                 '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet descripcionproductopartida" name="descripcionproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($producto->Producto, ENT_QUOTES).'</textarea></td>'.
                 '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$producto->Unidad.'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'.$producto->Unidad.'</td>'.
@@ -765,9 +767,12 @@ class RemisionController extends ConfiguracionSistemaController{
     //guardar
     public function remisiones_guardar(Request $request){
         ini_set('max_input_vars','20000' );
-        //obtener el ultimo folio de la tabla
-        //$folio = Helpers::ultimofolioserietablamodulos('App\Remision',$request->serie);
-        $folio = $request->folio;
+        if($this->modificarconsecutivofolioenremisiones == 'S'){
+            $folio = $request->folio;
+        }else{
+            //obtener el ultimo folio de la tabla
+            $folio = Helpers::ultimofolioserietablamodulos('App\Remision',$request->serie);
+        }
         //INGRESAR DATOS A TABLA ORDEN COMPRA
         $remision = $folio.'-'.$request->serie;
         $ExisteRemision = Remision::where('Remision', $remision)->first();
@@ -1019,7 +1024,7 @@ class RemisionController extends ConfiguracionSistemaController{
                 $filasdetallesremision= $filasdetallesremision.
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dr->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
-                    '<td class="tdmod tdinsumospartidas"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'.$dr->Insumo.'" readonly data-parsley-length="[1, 20]"></td>'.
+                    '<td class="tdmod tdinsumospartidas"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'.$dr->Insumo.'" data-parsley-length="[1, 20]"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dr->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$dr->Codigo.'</b></td>'.
                     '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet descripcionproductopartida" name="descripcionproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($dr->Descripcion, ENT_QUOTES).'</textarea></td>'.                    
                     '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$dr->Unidad.'" readonly data-parsley-length="[1, 5]">'.$dr->Unidad.'</td>'.
@@ -1294,6 +1299,23 @@ class RemisionController extends ConfiguracionSistemaController{
                 }
             }
         }
+        return response()->json($Remision);
+    }
+
+    //obtener datos generales
+    public function remisiones_obtener_datos_generales(Request $request){
+        $documento = Remision::where('Remision', $request->Remision)->first();
+        return response()->json($documento);
+    }
+
+    //guardar cambios datos generales
+    public function remisiones_guardar_modificacion_datos_generales(Request $request){
+        $Remision = Remision::where('Remision', $request->remisiondatosgenerales)->first();
+        Remision::where('Remision', $request->remisiondatosgenerales)
+        ->update([
+            'Os'=>$request->ordenserviciodatosgenerales,
+            'Eq'=>$request->equipodatosgenerales,
+        ]);
         return response()->json($Remision);
     }
 

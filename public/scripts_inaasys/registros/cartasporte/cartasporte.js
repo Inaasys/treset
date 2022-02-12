@@ -2337,6 +2337,8 @@ function alta(){
                     '</div>'+
                 '</div>';
   $("#tabsform").html(tabs);
+  //colocar autocomplette off  todo el formulario
+  $(".form-control").attr('autocomplete','off');
   obtenultimonumero();
   asignarfechaactual();
   //asignar el tipo de operacion que se realizara
@@ -3225,6 +3227,8 @@ function obtenerdatos(notamodificar){
                     '</div>'+
                   '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     //esconder el div del boton listar ordenes
     $("#btnobtenerclientes").hide();
     $("#btnlistarfacturas").hide();

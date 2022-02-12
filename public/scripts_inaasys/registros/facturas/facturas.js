@@ -1231,8 +1231,10 @@ function listarremisiones(){
                       '</div>';
     $("#contenidomodaltablas").html(tablaremisiones);
     $('#tbllistadoremision').DataTable({
-        "searching": false,
-        "paging":   false,
+        "lengthMenu": [ 200 ,500, 1000 ],
+        "pageLength": 200,
+        //"searching": false,
+        //"paging":   false,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,  
@@ -1277,6 +1279,8 @@ function mostrarmodalnumeropedido(){
   $("#modalremisionesporpedido").modal('show');
   $("#modalremisionesporpedido").css('overflow', 'auto');
   $("#ModalFormulario").modal('hide');
+  $("#numeropedidoremisiones").val("");
+  setTimeout(function(){$("#numeropedidoremisiones").focus();},500);
 }
 //seleccionar las remisiones por numero de pedido especificado
 function seleccionarremisionesporpedido(){
@@ -1329,8 +1333,8 @@ function seleccionarremisionesporpedido(){
                           '</div>';
                           $("#contenidomodaltablas").html(tablaremisiones);
                           $('#tbllistadoremision').DataTable({
-                            "searching": false,
-                            "paging":   false,
+                            //"searching": false,
+                            //"paging":   false,
                             "sScrollX": "110%",
                             "sScrollY": "370px",
                             "bScrollCollapse": true,  
@@ -1366,26 +1370,19 @@ function seleccionarremisionesporpedido(){
                                 }
                               });
                               construirarrayremisionesseleccionadas();
+                              arrayremisionesseleccionadas = [];
+                              var lista = document.getElementsByClassName("remisionesseleccionadas");
+                              for (var i = 0; i < lista.length; i++) {
+                                if(lista[i].checked){
+                                  arrayremisionesseleccionadas.push(lista[i].value);
+                                }
+                              }
+                              $("#stringremisionesseleccionadas").val(arrayremisionesseleccionadas.sort());
                               calculartotalafacturar("REMISIONES");
                             },
                             "iDisplayLength": 1000,
                             "order": [[ 0, "desc" ]]
                           });
-    /*
-    //obtener remisiones
-    $.get(facturas_obtener_remisiones_pedido, {numeropedidoremisiones:numeropedidoremisiones,numerocliente:numerocliente,contadorfilas:contadorfilas,partida:partida,tipooperacion:tipooperacion} , function(data){
-      $("#tabladetallesfactura tbody").append(data.filasremisiones);
-      //array de remisiones seleccionadas
-      construirarrayremisionesseleccionadas();
-      //comprobar numero de filas en la tabla
-      comprobarfilas();
-      //calcular totales compras nota proveedor
-      calculartotal();
-      contadorfilas = data.contadorfilas;
-      partida = data.partida;
-      remisionagregadacorrectamente();
-    });
-    */
     $("#modalremisionesporpedido").modal('hide');
     $("#ModalFormulario").modal('show');
     $("#ModalFormulario").css('overflow', 'auto');
@@ -1395,37 +1392,31 @@ function seleccionarremisionesporpedido(){
   //validar formulario
   form.parsley().validate();
 }
-//eliminar fila
-function seleccionarremisionasync(Remision){
-  return new Promise((ejecuta)=>{
-    setTimeout(function(){ 
-      var tipooperacion = $("#tipooperacion").val();
-      $.get(facturas_obtener_remision, {Remision:Remision, contadorfilas:contadorfilas, partida:partida, tipooperacion:tipooperacion}, function(data){
-        $("#tabladetallesfactura tbody").append(data.filasremisiones);
-        //array de remisiones seleccionadas
-        construirarrayremisionesseleccionadas();
-        //comprobar numero de filas en la tabla
-        comprobarfilas();
-        //calcular totales compras nota proveedor
-        calculartotal();
-        contadorfilas = data.contadorfilas;
-        partida = data.partida;
-        remisionagregadacorrectamente();
-        //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-        $(".inputnextdet").keypress(function (e) {
-          //recomentable para mayor compatibilidad entre navegadores.
-          var code = (e.keyCode ? e.keyCode : e.which);
-          if(code==13){
-            var index = $(this).index(".inputnextdet");          
-            $(".inputnextdet").eq(index + 1).focus().select(); 
-          }
-        });
-      });
-      return ejecuta(fila);
-    },1500);
-  })
-}
-function construirarrayremisionesseleccionadas(){
+//construir array de remisiones seleccionadas
+var arrayremisionesseleccionadas = new Array();
+function construirarrayremisionesseleccionadas(Remision){
+  if( $("#idremisionesseleccionadas"+Remision).prop('checked') ) {
+    var stringremisionesseleccionadas = $("#stringremisionesseleccionadas").val();
+    if(stringremisionesseleccionadas != ""){
+      arrayremisionesseleccionadas = stringremisionesseleccionadas.split(",");
+    }
+    var coincidencias = 0;
+    if(arrayremisionesseleccionadas.length > 0){
+        for(var i = 0; i < arrayremisionesseleccionadas.length; i++){
+            if(Remision == arrayremisionesseleccionadas[i]){
+                coincidencias++;
+            }
+        }
+    }
+    if(coincidencias == 0){
+      arrayremisionesseleccionadas.push(Remision);
+        $("#stringremisionesseleccionadas").val(arrayremisionesseleccionadas.sort());
+    }
+  }else{
+    EliminarElementoArrayPorValor(arrayremisionesseleccionadas,Remision);
+    $("#stringremisionesseleccionadas").val(arrayremisionesseleccionadas.sort());
+  }
+  /*
   var arrayremisionesseleccionadas = [];
   var lista = document.getElementsByClassName("remisionesseleccionadas");
   for (var i = 0; i < lista.length; i++) {
@@ -1434,6 +1425,7 @@ function construirarrayremisionesseleccionadas(){
     }
   }
   $("#stringremisionesseleccionadas").val(arrayremisionesseleccionadas.sort());
+  */
 }
 var arrayclientesremisionesseleccionadas = [];
 //obtener todos los datos de la orden de compra seleccionada
@@ -1454,28 +1446,8 @@ function seleccionarremision(Folio,Remision,Cliente){
   }else{
     arrayclientesremisionesseleccionadas.pop();
   }
-  construirarrayremisionesseleccionadas();
+  construirarrayremisionesseleccionadas(Remision);
   calculartotalafacturar("REMISIONES");
-  /*if( $('#idremisionesseleccionadas'+Remision).prop('checked') ) {
-      var tipooperacion = $("#tipooperacion").val();
-      $.get(facturas_obtener_remision, {Remision:Remision, contadorfilas:contadorfilas, partida:partida, tipooperacion:tipooperacion}, function(data){
-        $("#tabladetallesfactura tbody").append(data.filasremisiones);
-        //array de remisiones seleccionadas
-        construirarrayremisionesseleccionadas();
-        //comprobar numero de filas en la tabla
-        comprobarfilas();
-        //calcular totales compras nota proveedor
-        calculartotal();
-        contadorfilas = data.contadorfilas;
-        partida = data.partida;
-        remisionagregadacorrectamente();
-      })
-    }else{
-      var confirmacion = confirm("Esta seguro de eliminar las partidas de la remisión?"); 
-      if (confirmacion == true) { 
-        eliminarfilasremisiondeseleccionada(Remision);
-      }
-    }*/
 }
 //cargar remisiones
 function cargarremisionesseleccionadas(){
@@ -1508,29 +1480,15 @@ function cargarremisionesseleccionadas(){
         $(".inputnextdet").eq(index + 1).focus().select(); 
       }
     });
-  })
-}
-//eliminar todas las filas de la remision que se deselecciono
-function eliminarfilasremisiondeseleccionada(Remision){
-  var cuentaFilas = 0;
-  $("tr.filasproductos").each(function () { 
-    // obtener los datos de la fila
-    var remisionpartida = $(".remisionpartida", this).val();
-    if(remisionpartida == Remision){
-      eliminarfila(cuentaFilas).then(fila=>{  
-      })      
+    //colocar o no dataparsleyutilidad segun la configuracion de la empresa
+    if(validarutilidadnegativa == 'S'){
+        $(".utilidadpartida").removeAttr('data-parsley-utilidad');
+        $("#utilidad").removeAttr('data-parsley-decimalesconfigurados');
+    }else{
+        $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
+        $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
     }
-    cuentaFilas++;
-  });  
-  msjsuccesseliminacionpartidasremision();
-}
-async function msjsuccesseliminacionpartidasremision(){
-  await retraso();
-  remisioneliminadacorrectamente();
-  construirarrayremisionesseleccionadas();
-  renumerarfilas();//importante para todos los calculo en el modulo
-  comprobarfilas();
-  calculartotal();
+  })
 }
 //listar todas las facturas
 function listarordenes(){
@@ -1575,8 +1533,8 @@ function listarordenes(){
                       '</div>';
     $("#contenidomodaltablas").html(tablaordenes);
     $('#tbllistadoorden').DataTable({
-        "searching": false,
-        "paging":   false,
+        //"searching": false,
+        //"paging":   false,
         "sScrollX": "110%",
         "sScrollY": "370px",
         "bScrollCollapse": true,  
@@ -1616,7 +1574,31 @@ function listarordenes(){
         "order": [[ 0, "desc" ]]
     });
 } 
-function construirarrayordenesseleccionadas(){
+//construir array ordenes seleccionadas
+var arrayordenesseleccionadas = new Array();
+function construirarrayordenesseleccionadas(Orden){
+  if( $("#idordenesseleccionadas"+Orden).prop('checked') ) {
+    var stringordenesseleccionadas = $("#stringordenesseleccionadas").val();
+    if(stringordenesseleccionadas != ""){
+      arrayordenesseleccionadas = stringordenesseleccionadas.split(",");
+    }
+    var coincidencias = 0;
+    if(arrayordenesseleccionadas.length > 0){
+        for(var i = 0; i < arrayordenesseleccionadas.length; i++){
+            if(Orden == arrayordenesseleccionadas[i]){
+                coincidencias++;
+            }
+        }
+    }
+    if(coincidencias == 0){
+      arrayordenesseleccionadas.push(Orden);
+      $("#stringordenesseleccionadas").val(arrayordenesseleccionadas.sort());
+    }
+  }else{
+    EliminarElementoArrayPorValor(arrayordenesseleccionadas,Orden);
+    $("#stringordenesseleccionadas").val(arrayordenesseleccionadas.sort());
+  }
+  /*
   var arrayordenesseleccionadas = [];
   var lista = document.getElementsByClassName("ordenesseleccionadas");
   for (var i = 0; i < lista.length; i++) {
@@ -1625,6 +1607,7 @@ function construirarrayordenesseleccionadas(){
     }
   }
   $("#stringordenesseleccionadas").val(arrayordenesseleccionadas.sort());
+  */
 }
 var arrayclientesordenesseleccionadas = [];
 //obtener todos los datos de la orden de compra seleccionada
@@ -1645,30 +1628,8 @@ function seleccionarorden(Orden,Cliente){
   }else{
     arrayclientesordenesseleccionadas.pop();
   }
-  construirarrayordenesseleccionadas();
+  construirarrayordenesseleccionadas(Orden);
   calculartotalafacturar("SERVICIOS");
-    /*
-    if( $('#idordenesseleccionadas'+Orden).prop('checked') ) {
-      var tipooperacion = $("#tipooperacion").val();
-      $.get(facturas_obtener_orden, {Orden:Orden, contadorfilas:contadorfilas, partida:partida, tipooperacion:tipooperacion}, function(data){
-        $("#tabladetallesfactura tbody").append(data.filasordenes);
-        //array de ordenes seleccionadas
-        construirarrayordenesseleccionadas();
-        //comprobar numero de filas en la tabla
-        comprobarfilas();
-        //calcular totales compras nota proveedor
-        calculartotal();
-        contadorfilas = data.contadorfilas;
-        partida = data.partida;
-        ordenagregadacorrectamente();
-      })
-    }else{
-      var confirmacion = confirm("Esta seguro de eliminar las partidas de la orden?"); 
-      if (confirmacion == true) { 
-        eliminarfilasordendeseleccionada(Orden);
-      }
-    }
-    */
 }
 //cargar servicios
 function cargarserviciosseleccionadas(){
@@ -1679,6 +1640,8 @@ function cargarserviciosseleccionadas(){
   var stringordenesseleccionadas = $("#stringordenesseleccionadas").val();
   $.get(facturas_obtener_orden, {stringordenesseleccionadas:stringordenesseleccionadas, contadorfilas:contadorfilas, partida:partida, tipooperacion:tipooperacion}, function(data){
     $("#tabladetallesfactura tbody").append(data.filasordenes);
+    //colocar pedido
+    $("#pedido").val(data.pedido);
     //array de ordenes seleccionadas
     construirarrayordenesseleccionadas();
     //comprobar numero de filas en la tabla
@@ -1701,29 +1664,15 @@ function cargarserviciosseleccionadas(){
         $(".inputnextdet").eq(index + 1).focus().select(); 
       }
     });
-  })
-}
-//eliminar todas las filas de la orden que se deselecciono
-function eliminarfilasordendeseleccionada(Orden){
-  var cuentaFilas = 0;
-  $("tr.filasproductos").each(function () { 
-    // obtener los datos de la fila
-    var ordenpartida = $(".ordenpartida", this).val();
-    if(ordenpartida == Orden){
-      eliminarfila(cuentaFilas).then(fila=>{  
-      })      
+    //colocar o no dataparsleyutilidad segun la configuracion de la empresa
+    if(validarutilidadnegativa == 'S'){
+        $(".utilidadpartida").removeAttr('data-parsley-utilidad');
+        $("#utilidad").removeAttr('data-parsley-decimalesconfigurados');
+    }else{
+        $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
+        $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
     }
-    cuentaFilas++;
-  });  
-  msjsuccesseliminacionpartidasorden();
-}
-async function msjsuccesseliminacionpartidasorden(){
-  await retraso();
-  ordeneliminadacorrectamente();
-  construirarrayordenesseleccionadas();
-  renumerarfilas();//importante para todos los calculo en el modulo
-  comprobarfilas();
-  calculartotal();
+  })
 }
 //detectar cuando en el input de buscar por codigo de producto el usuario presione la tecla enter, si es asi se realizara la busqueda con el codigo escrito
 $(document).ready(function(){
@@ -2135,10 +2084,6 @@ function obtenerproductoporcodigo(){
     }
   }) 
 }
-
-
-
-
 //listar productos para tab consumos
 function listarproductosgastos(){
   ocultarformulario();
@@ -2509,13 +2454,13 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
                     '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'+Producto+'" data-parsley-length="[1, 255]" autocomplete="off"></td>'+
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="'+Unidad+'" data-parsley-length="[1, 5]" autocomplete="off"></td>'+
                     '<td class="tdmod">'+
-                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');">'+
+                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.'+numerocerosconfiguradosinputnumberstep+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');">'+
                         '<input type="hidden" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="1.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly>'+
                         '<input type="hidden" class="form-control cantidadincorrecta" name="cantidadincorrecta[]" >'+
                         '<input type="hidden" class="form-control realizarbusquedaexistencias" name="realizarbusquedaexistencias[]" value="1" >'+
                         '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'+
                     '</td>'+
-                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'+preciopartida+'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');"></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'+preciopartida+'" data-parsley-min="0.'+numerocerosconfiguradosinputnumberstep+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');"></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('+contadorfilas+');"></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentoporcentajepartida('+contadorfilas+');"></td>'+
@@ -2528,7 +2473,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="'+Costo+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm comisionporcentajepartida" name="comisionporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('+contadorfilas+');" required></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm comisionpesospartida" name="comisionpesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'+
-                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'+number_format(round(utilidad, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'+number_format(round(utilidad, numerodecimales), numerodecimales, '.', '')+'" readonly></td>'+
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm remisionpartida" name="remisionpartida[]"  value="" readonly></td>'+
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm cartaportepartida" name="cartaportepartida[]"  value="" readonly></td>'+
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm ordenpartida" name="ordenpartida[]"  value="" readonly></td>'+
@@ -2574,6 +2519,14 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
         mostrarformulario();      
         comprobarfilas();
         calculartotal();
+        //colocar o no dataparsleyutilidad segun la configuracion de la empresa
+        if(validarutilidadnegativa == 'S'){
+            $(".utilidadpartida").removeAttr('data-parsley-utilidad');
+            $("#utilidad").removeAttr('data-parsley-decimalesconfigurados');
+        }else{
+            $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
+            $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
+        }
         $("#codigoabuscar").val("");
         $("#codigogastoabuscar").val("");
         //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
@@ -3102,6 +3055,8 @@ function alta(){
                       '</div>'+
                     '</div>';
   $("#tabsform").html(tabs);
+  //colocar autocomplette off  todo el formulario
+  $(".form-control").attr('autocomplete','off');
   //colocar required en observaciones segun la configuracion de la empresa
   if(pedirobligatoriamenteobservacionenfactura == 'S'){
     $("#observaciones").attr('required', 'required');
@@ -3622,7 +3577,12 @@ $("#btnGuardar").on('click', function (e) {
                 limpiar();
                 ocultarmodalformulario();
                 limpiarmodales();
-                arrayclientesremisionesseleccionadas = []
+                arrayclientesremisionesseleccionadas = [];
+
+                arrayremisionesseleccionadas = new Array();
+                $("#stringremisionesseleccionadas").val("");
+
+
                 $('.page-loader-wrapper').css('display', 'none');
             },
             error:function(data){
@@ -4145,6 +4105,8 @@ function obtenerdatos(facturamodificar){
                 '</div>'+
               '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     //colocar required en observaciones segun la configuracion de la empresa
     if(pedirobligatoriamenteobservacionenfactura == 'S'){
       $("#observaciones").attr('required', 'required');
@@ -4413,6 +4375,14 @@ function obtenerdatos(facturamodificar){
         $(".inputnextdet").eq(index + 1).focus().select(); 
       }
     });
+    //colocar o no dataparsleyutilidad segun la configuracion de la empresa
+    if(validarutilidadnegativa == 'S'){
+        $(".utilidadpartida").removeAttr('data-parsley-utilidad');
+        $("#utilidad").removeAttr('data-parsley-decimalesconfigurados');
+    }else{
+        $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
+        $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
+    }
     renumerarfilasuuid();
     seleccionartipocliente(data);
   }).fail( function() {
@@ -4478,6 +4448,60 @@ $("#btnGuardarModificacion").on('click', function (e) {
   }
   //validar formulario
   form.parsley().validate();
+});
+//modificar datos generales
+function modificardatosgeneralesdocumento(Factura){
+  $.get(facturas_obtener_datos_generales,{Factura:Factura}, function(data){
+    $("#modalmodificardatosgeneralesdocumento").modal('show');
+    $("#facturadatosgenerales").val(Factura);
+    $("#pedidodatosgenerales").val(data.Pedido);
+    setTimeout(function(){$("#facturadatosgenerales").focus();},500);
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnextdatosgenerales").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        var index = $(this).index(".inputnextdatosgenerales");          
+        $(".inputnextdatosgenerales").eq(index + 1).focus().select(); 
+      }
+    });
+  });
+}
+//guardar cambios datos generales
+$("#btnguardardatosgenerales").on('click', function(e){
+  e.preventDefault();
+  var formData = new FormData($("#formamodificardatosgenerales")[0]);
+  var form = $("#formamodificardatosgenerales");
+  if (form.parsley().isValid()){
+    $('.page-loader-wrapper').css('display', 'block');
+    $.ajax({
+      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+      url:facturas_guardar_modificacion_datos_generales,
+      type: "post",
+      dataType: "html",
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false,
+      success:function(data){
+        $('#modalmodificardatosgeneralesdocumento').modal('hide');
+        msj_datosguardadoscorrectamente();
+        $("#formamodificardatosgenerales")[0].reset();
+        $('.page-loader-wrapper').css('display', 'none');
+      },
+      error:function(data){
+        if(data.status == 403){
+          msj_errorenpermisos();
+        }else{
+          msj_errorajax();
+        }
+        $('#modalmodificardatosgeneralesdocumento').modal('hide');
+        $('.page-loader-wrapper').css('display', 'none');
+      }
+    })
+  }else{
+    form.parsley().validate();
+  }
 });
 //detectar cuando en el input de buscar por codigo de producto el usuario presione la tecla enter, si es asi se realizara la busqueda con el codigo escrito
 $(document).ready(function(){
@@ -4727,27 +4751,39 @@ $("#btntimbrarfactura").on('click', function(e){
 // fin timbrar factura
 //cancelar timbre
 function cancelartimbre(facturabajatimbre){
-  $.get(facturas_verificar_si_continua_baja_timbre,{facturabajatimbre:facturabajatimbre}, function(data){
+  $.get(facturas_verificar_si_continua_baja_timbre,{facturabajatimbre:facturabajatimbre}, function(data){   
     if(data.comprobante != ''){
       if(data.comprobante.IdFacturapi != null){
-          if(data.obtener_factura.cancellation_status == "none" || data.obtener_factura.cancellation_status == "pending"){
-            $("#facturabajatimbre").val(facturabajatimbre);
-            $("#iddocumentofacturapi").val(data.obtener_factura.id);
-            $("#textomodalbajatimbre").html('Esta seguro de dar de baja el timbre de la factura No.'+ facturabajatimbre);
-            $("#motivobajatimbre").html("<option value='01'>01 - Comprobante emitido con errores con relación</option><option value='02'>02 - Comprobante emitido con errores sin relación</option><option value='03'>03 - No se llevó a cabo la operación</option><option value='04'>04 - Operación nominativa relacionada en la factura global</option> ");
-            $("#btnbajatimbre").show();
-            $('#modalbajatimbre').modal('show');
-          }else if(data.obtener_factura.cancellation_status == "accepted"){
+        if(data.obtener_factura.status == "canceled"){
+          $("#facturabajatimbre").val(0);
+          $("#iddocumentofacturapi").val(0);
+          $("#textomodalbajatimbre").html('Aviso, el timbre de la factura No.' + facturabajatimbre +' ya esta cancelado');
+          $("#divmotivobajatimbre").hide();
+          $("#btnbajatimbre").hide();
+          $('#modalbajatimbre').modal('show');
+        }else if(data.obtener_factura.status == "valid"){
+          if(data.obtener_factura.cancellation_status == "pending"){
             $("#facturabajatimbre").val(0);
             $("#iddocumentofacturapi").val(0);
-            $("#textomodalbajatimbre").html('Aviso, el timbre de la factura No.' + facturabajatimbre +' ya esta cancelado');
+            $("#textomodalbajatimbre").html('Aviso, el timbre de la factura No.' + facturabajatimbre +' ya se solicito su baja pero esta en espera de confirmación por parte del cliente');
+            $("#divmotivobajatimbre").hide();
             $("#btnbajatimbre").hide();
             $('#modalbajatimbre').modal('show');
           }
+        }else{
+          $("#facturabajatimbre").val(facturabajatimbre);
+          $("#iddocumentofacturapi").val(data.obtener_factura.id);
+          $("#textomodalbajatimbre").html('Esta seguro de dar de baja el timbre de la factura No.'+ facturabajatimbre);
+          $("#divmotivobajatimbre").show();
+          $("#motivobajatimbre").html("<option value='01'>01 - Comprobante emitido con errores con relación</option><option value='02'>02 - Comprobante emitido con errores sin relación</option><option value='03'>03 - No se llevó a cabo la operación</option><option value='04'>04 - Operación nominativa relacionada en la factura global</option> ");
+          $("#btnbajatimbre").show();
+          $('#modalbajatimbre').modal('show');
+        }
       }else{
         $("#facturabajatimbre").val(0);
         $("#iddocumentofacturapi").val(0);
         $("#textomodalbajatimbre").html('Aviso, la factura No.'+ facturabajatimbre +' no esta timbrada en el nuevo sistema');
+        $("#divmotivobajatimbre").hide();
         $("#btnbajatimbre").hide();
         $('#modalbajatimbre').modal('show');
       }
@@ -4755,6 +4791,7 @@ function cancelartimbre(facturabajatimbre){
       $("#facturabajatimbre").val(0);
       $("#iddocumentofacturapi").val(0);
       $("#textomodalbajatimbre").html('Aviso, la factura No.'+ facturabajatimbre +' no esta timbrada');
+      $("#divmotivobajatimbre").hide();
       $("#btnbajatimbre").hide();
       $('#modalbajatimbre').modal('show');
     }
@@ -4814,7 +4851,8 @@ function buscarstringlike(){
     $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
   });
   var tablafolenc=$('#tablafoliosencontrados').DataTable({
-      "paging":   false,
+      "pageLength": 100,
+      'sDom': 't',
       "sScrollX": "100%",
       "sScrollY": "250px",
       processing: true,

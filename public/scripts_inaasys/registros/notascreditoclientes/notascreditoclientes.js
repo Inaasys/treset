@@ -2358,6 +2358,8 @@ function alta(){
                     '</div>'+
                 '</div>';
   $("#tabsform").html(tabs);
+  //colocar autocomplette off  todo el formulario
+  $(".form-control").attr('autocomplete','off');
   obtenultimonumero();
   asignarfechaactual();
   //asignar el tipo de operacion que se realizara
@@ -3246,6 +3248,8 @@ function obtenerdatos(notamodificar){
                     '</div>'+
                   '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     //esconder el div del boton listar ordenes
     $("#btnobtenerclientes").hide();
     $("#btnlistarfacturas").hide();
@@ -3774,19 +3778,27 @@ function cancelartimbre(facturabajatimbre){
   $.get(notas_credito_clientes_verificar_si_continua_baja_timbre,{facturabajatimbre:facturabajatimbre}, function(data){
     if(data.comprobante != ''){
       if(data.comprobante.IdFacturapi != null){
-          if(data.obtener_factura.cancellation_status == "none" || data.obtener_factura.cancellation_status == "pending"){
-            $("#facturabajatimbre").val(facturabajatimbre);
-            $("#iddocumentofacturapi").val(data.obtener_factura.id);
-            $("#textomodalbajatimbre").html('Esta seguro de dar de baja el timbre de la factura No.'+ facturabajatimbre);
-            $("#btnbajatimbre").show();
-            $('#modalbajatimbre').modal('show');
-          }else if(data.obtener_factura.cancellation_status == "accepted"){
+        if(data.obtener_factura.status == "canceled"){
+          $("#facturabajatimbre").val(0);
+          $("#iddocumentofacturapi").val(0);
+          $("#textomodalbajatimbre").html('Aviso, el timbre de la factura No.' + facturabajatimbre +' ya esta cancelado');
+          $("#btnbajatimbre").hide();
+          $('#modalbajatimbre').modal('show');
+        }else if(data.obtener_factura.status == "valid"){
+          if(data.obtener_factura.cancellation_status == "pending"){
             $("#facturabajatimbre").val(0);
             $("#iddocumentofacturapi").val(0);
-            $("#textomodalbajatimbre").html('Aviso, el timbre de la factura No.' + facturabajatimbre +' ya esta cancelado');
+            $("#textomodalbajatimbre").html('Aviso, el timbre de la factura No.' + facturabajatimbre +' ya se solicito su baja pero esta en espera de confirmación por parte del cliente');
             $("#btnbajatimbre").hide();
             $('#modalbajatimbre').modal('show');
           }
+        }else{
+          $("#facturabajatimbre").val(facturabajatimbre);
+          $("#iddocumentofacturapi").val(data.obtener_factura.id);
+          $("#textomodalbajatimbre").html('Esta seguro de dar de baja el timbre de la factura No.'+ facturabajatimbre);
+          $("#btnbajatimbre").show();
+          $('#modalbajatimbre').modal('show');
+        }
       }else{
         $("#facturabajatimbre").val(0);
         $("#iddocumentofacturapi").val(0);
@@ -3859,7 +3871,8 @@ function buscarstringlike(){
       $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
   });
   var tablafolenc=$('#tablafoliosencontrados').DataTable({
-        "paging":   false,
+        "pageLength": 100,
+        'sDom': 't',
         "sScrollX": "100%",
         "sScrollY": "250px",
         processing: true,

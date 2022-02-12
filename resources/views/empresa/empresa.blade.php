@@ -514,6 +514,38 @@
                                                                     </div>
                                                                 </td>
                                                             </tr>
+                                                            <tr>
+                                                                <td class="col-md-2">Remisiones</td>
+                                                                <td class="col-md-5">Permitir modificar folio consecutivo en remisiones</td>
+                                                                <td class="col-md-4">
+                                                                    <div class="col-md-12 form-check">
+                                                                        <input type="radio" name="modificarconsecutivofolioenremisiones" id="modificarconsecutivofolioenremisiones" value="S">
+                                                                        <label for="modificarconsecutivofolioenremisiones">SI</label>
+                                                                        <input type="radio" name="modificarconsecutivofolioenremisiones" id="modificarconsecutivofolioenremisiones1" value="N">
+                                                                        <label for="modificarconsecutivofolioenremisiones1">NO</label>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="col-md-2">Productos</td>
+                                                                <td class="col-md-5">Permitir modificar el costo en productos</td>
+                                                                <td class="col-md-4">
+                                                                    <select  name="modificarcostosdeproductos[]" id="modificarcostosdeproductos" class="form-control select2" multiple="multiple" style="width:100% !important;" >
+                                                                    </select>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="col-md-2">Remisiones</td>
+                                                                <td class="col-md-5">Permitir remisionar productos con utilidad negativa</td>
+                                                                <td class="col-md-4">
+                                                                    <div class="col-md-12 form-check">
+                                                                        <input type="radio" name="validarutilidadnegativa" id="validarutilidadnegativa" value="S">
+                                                                        <label for="validarutilidadnegativa">SI</label>
+                                                                        <input type="radio" name="validarutilidadnegativa" id="validarutilidadnegativa1" value="N">
+                                                                        <label for="validarutilidadnegativa1">NO</label>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -948,7 +980,10 @@
         var colocarencerocantidadenpartidasderemisiones = '{{$empresa->ColocarEnCeroCantidadEnPartidasDeRemisiones}}';
         var mostrartotalesdecolumnasendocumentos = '{{$empresa->MostrarTotalesDeColumnasEnDocumentos}}';
         var mostrarinsumoporpartidaenremisiones = '{{$empresa->MostrarInsumoPorPartidaEnCapturaDeRemisiones}}';
+        var modificarconsecutivofolioenremisiones = '{{$empresa->ModificarConsecutivoFolioEnRemisiones}}';
+        var validarutilidadnegativa = '{{$empresa->ValidarUtilidadNegativa}}';
         var empresa_obtener_usuarios_a_modificar_insumos = '{!!URL::to('empresa_obtener_usuarios_a_modificar_insumos')!!}';
+        var empresa_obtener_usuarios_a_modificar_costos_productos = '{!!URL::to('empresa_obtener_usuarios_a_modificar_costos_productos')!!}';
         var empresa_obtener_paises = '{!!URL::to('empresa_obtener_paises')!!}';
         var empresa_obtener_estados = '{!!URL::to('empresa_obtener_estados')!!}';
         var empresa_obtener_municipios = '{!!URL::to('empresa_obtener_municipios')!!}';

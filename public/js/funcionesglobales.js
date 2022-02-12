@@ -192,6 +192,13 @@ function agregararraypdf(foliomodulo){
         $("#arraypdf").append('<option value="'+foliomodulo+'" selected>'+foliomodulo+'</option>');
     }
 }
+//eliminar Elemento de una arreglo por valor
+function EliminarElementoArrayPorValor(Arreglo,ValorElemento){
+    var i = Arreglo.indexOf( ValorElemento );
+    if ( i !== -1 ) {
+      Arreglo.splice( i, 1 );
+    }
+}
 //validar que el rango de las fecha de inicio y fin para la creacion de documentos sea maximos 2 meses y validar que la fecha final sea mayor a la fecha inicial en la creacion de documentos
 function validarrangofechascreaciondocumentos(){
     var fechainiciopdf = $("#fechainiciopdf").val();

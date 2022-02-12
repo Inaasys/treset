@@ -276,6 +276,8 @@ function alta(){
                     '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);    
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     setTimeout(function(){$("#cliente").focus();},500);  
     //activar busqueda
     $('#cliente').on('keypress', function(e) {
@@ -450,6 +452,8 @@ function obtenerdatos(numerovin){
                     '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     //boton formulario 
     if(data.cliente != null){
         $("#cliente").val(data.cliente.Numero);

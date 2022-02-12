@@ -124,6 +124,8 @@ function alta(){
                 '</div>'+
               '</div>';
   $("#tabsform").html(tabs);
+  //colocar autocomplette off  todo el formulario
+  $(".form-control").attr('autocomplete','off');
   obtenultimonumero();
   setTimeout(function(){$("#nombre").focus();},500);  
 }
@@ -223,6 +225,8 @@ function obtenerdatos(numerolinea){
                   '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     //boton formulario 
     $("#numero").val(numerolinea);
     $("#nombre").val(data.linea.Nombre);

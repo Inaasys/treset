@@ -200,27 +200,42 @@ $("#btnenviarpartidasexcel").on('click', function(e){
     contentType: false,
     processData: false,
     success: function (data) {
-      contadorfilas = data.contadorfilas;
-      contadorproductos = data.contadorproductos;
-      $("#tablaproductosremisiones tbody").append(data.filasdetallesremision);
-      comprobarfilas();
-      calculartotal();
-      $("#codigoabuscar").val("");
-      //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-      $(".inputnextdet").keypress(function (e) {
-        //recomentable para mayor compatibilidad entre navegadores.
-        var code = (e.keyCode ? e.keyCode : e.which);
-        if(code==13){
-          var index = $(this).index(".inputnextdet");          
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+        contadorfilas = data.contadorfilas;
+        contadorproductos = data.contadorproductos;
+        $("#tablaproductosremisiones tbody").append(data.filasdetallesremision);
+        comprobarfilas();
+        calculartotal();
+        $("#codigoabuscar").val("");
+        //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+        $(".inputnextdet").keypress(function (e) {
+            //recomentable para mayor compatibilidad entre navegadores.
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if(code==13){
+            var index = $(this).index(".inputnextdet");          
+            $(".inputnextdet").eq(index + 1).focus().select(); 
+            }
+        });
+        //mostrar o no insumos en partidas segun la configuracion de la empresa
+        if(mostrarinsumoporpartidaenremisiones == 'S'){
+            $(".tdinsumospartidas").show();
+        }else{
+            $(".tdinsumospartidas").hide();       
         }
-      });
-      //mostrar o no insumos en partidas segun la configuracion de la empresa
-      if(mostrarinsumoporpartidaenremisiones == 'S'){
-          $(".tdinsumospartidas").show();
-      }else{
-          $(".tdinsumospartidas").hide();       
-      }
+        //colocar readonly si no puede modificar insumos
+        var arrayusuariosamodificarinsumosproductos = usuariosamodificarinsumos.split(",");
+        if(arrayusuariosamodificarinsumosproductos.indexOf(usuariologueado) == '-1'){
+            $(".insumopartida").attr('readonly', 'readonly');
+        }else{
+            $(".insumopartida").removeAttr('readonly');
+        }
+        //colocar o no dataparsleyutilidad segun la configuracion de la empresa
+        if(validarutilidadnegativa == 'S'){
+            $(".utilidadpartida").removeAttr('data-parsley-utilidad');
+            $("#utilidad").removeAttr('data-parsley-decimalesconfigurados');
+        }else{
+            $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
+            $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
+        }
     },
     error: function (data) {
       console.log(data);
@@ -878,6 +893,21 @@ function seleccionarcotizacion(Folio, Cotizacion){
         }else{
             $(".tdinsumospartidas").hide();     
         }
+        //colocar readonly si no puede modificar insumos
+        var arrayusuariosamodificarinsumosproductos = usuariosamodificarinsumos.split(",");
+        if(arrayusuariosamodificarinsumosproductos.indexOf(usuariologueado) == '-1'){
+            $(".insumopartida").attr('readonly', 'readonly');
+        }else{
+            $(".insumopartida").removeAttr('readonly');
+        }
+        //colocar o no dataparsleyutilidad segun la configuracion de la empresa
+        if(validarutilidadnegativa == 'S'){
+            $(".utilidadpartida").removeAttr('data-parsley-utilidad');
+            $("#utilidad").removeAttr('data-parsley-decimalesconfigurados');
+        }else{
+            $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
+            $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
+        }
     })  
 }
 async function seleccionartipocotizacion(data){
@@ -1221,7 +1251,7 @@ function agregarfilaproducto(data,Codigo){
         var tipo = "alta";
         var fila=   '<tr class="filasproductos" id="filaproducto'+contadorproductos+'">'+
                           '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('+contadorproductos+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
-                          '<td class="tdmod tdinsumospartidas"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'+Insumo+'" readonly data-parsley-length="[1, 20]"></td>'+
+                          '<td class="tdmod tdinsumospartidas"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'+Insumo+'" data-parsley-length="[1, 20]"></td>'+
                           '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'+Codigo+'</b></td>'+
                           '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
                           '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'+Unidad+'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'+Unidad+'</td>'+
@@ -1291,6 +1321,21 @@ function agregarfilaproducto(data,Codigo){
             $(".tdinsumospartidas").show();
         }else{
             $(".tdinsumospartidas").hide();       
+        }
+        //colocar readonly si no puede modificar insumos
+        var arrayusuariosamodificarinsumosproductos = usuariosamodificarinsumos.split(",");
+        if(arrayusuariosamodificarinsumosproductos.indexOf(usuariologueado) == '-1'){
+            $(".insumopartida").attr('readonly', 'readonly');
+        }else{
+            $(".insumopartida").removeAttr('readonly');
+        }
+        //colocar o no dataparsleyutilidad segun la configuracion de la empresa
+        if(validarutilidadnegativa == 'S'){
+            $(".utilidadpartida").removeAttr('data-parsley-utilidad');
+            $("#utilidad").removeAttr('data-parsley-decimalesconfigurados');
+        }else{
+            $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
+            $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
         }
         $('.page-loader-wrapper').css('display', 'none');
     }else{
@@ -1666,6 +1711,14 @@ function alta(){
                 '</div>'+
             '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
+    //permitir modificar consecutvio folio en remisiones
+    if(modificarconsecutivofolioenremisiones == 'S'){
+        $("#folio").removeAttr('readonly');
+    }else{
+        $("#folio").attr('readonly', 'readonly');
+    }
     //mostrar o no insumos en partidas segun la configuracion de la empresa
     if(mostrarinsumoporpartidaenremisiones == 'S'){
         $("#thinsumospartidas").show();
@@ -2235,6 +2288,8 @@ function obtenerdatos(remisionmodificar){
                 '</div>'+
             '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     //colocar readonly o no a input de requisicion segun la configuracion de la empresa
     if(controlarconsecutivonumrequisicion == 'S'){
         $("#requisicion").attr('readonly', 'readonly');
@@ -2400,6 +2455,21 @@ function obtenerdatos(remisionmodificar){
         $("#thinsumospartidas").hide();  
         $(".tdinsumospartidas").hide();     
     }
+    //colocar readonly si no puede modificar insumos
+    var arrayusuariosamodificarinsumosproductos = usuariosamodificarinsumos.split(",");
+    if(arrayusuariosamodificarinsumosproductos.indexOf(usuariologueado) == '-1'){
+        $(".insumopartida").attr('readonly', 'readonly');
+    }else{
+        $(".insumopartida").removeAttr('readonly');
+    }
+    //colocar o no dataparsleyutilidad segun la configuracion de la empresa
+    if(validarutilidadnegativa == 'S'){
+        $(".utilidadpartida").removeAttr('data-parsley-utilidad');
+        $("#utilidad").removeAttr('data-parsley-decimalesconfigurados');
+    }else{
+        $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
+        $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
+    }
     //asignar el tipo de operacion que se realizara
     $("#tipooperacion").val("modificacion");
     seleccionartipocliente(data);
@@ -2531,6 +2601,61 @@ $("#btnenviarpdfemail").on('click', function (e) {
       form.parsley().validate();
     }
 });
+//modificar datos generales
+function modificardatosgeneralesdocumento(Remision){
+  $.get(remisiones_obtener_datos_generales,{Remision:Remision}, function(data){
+    $("#modalmodificardatosgeneralesdocumento").modal('show');
+    $("#remisiondatosgenerales").val(Remision);
+    $("#ordenserviciodatosgenerales").val(data.Os);
+    $("#equipodatosgenerales").val(data.Eq);
+    setTimeout(function(){$("#remisiondatosgenerales").focus();},500);
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnextdatosgenerales").keypress(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        var index = $(this).index(".inputnextdatosgenerales");          
+        $(".inputnextdatosgenerales").eq(index + 1).focus().select(); 
+      }
+    });
+  });
+}
+//guardar cambios datos generales
+$("#btnguardardatosgenerales").on('click', function(e){
+  e.preventDefault();
+  var formData = new FormData($("#formamodificardatosgenerales")[0]);
+  var form = $("#formamodificardatosgenerales");
+  if (form.parsley().isValid()){
+    $('.page-loader-wrapper').css('display', 'block');
+    $.ajax({
+      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+      url:remisiones_guardar_modificacion_datos_generales,
+      type: "post",
+      dataType: "html",
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false,
+      success:function(data){
+        $('#modalmodificardatosgeneralesdocumento').modal('hide');
+        msj_datosguardadoscorrectamente();
+        $("#formamodificardatosgenerales")[0].reset();
+        $('.page-loader-wrapper').css('display', 'none');
+      },
+      error:function(data){
+        if(data.status == 403){
+          msj_errorenpermisos();
+        }else{
+          msj_errorajax();
+        }
+        $('#modalmodificardatosgeneralesdocumento').modal('hide');
+        $('.page-loader-wrapper').css('display', 'none');
+      }
+    })
+  }else{
+    form.parsley().validate();
+  }
+});
 //hacer busqueda de folio para exportacion en pdf
 function relistarbuscarstringlike(){
   var tabla = $('#tablafoliosencontrados').DataTable();
@@ -2551,7 +2676,8 @@ function buscarstringlike(){
     $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
   });
   var tablafolenc=$('#tablafoliosencontrados').DataTable({
-      "paging":   false,
+      "pageLength": 100,
+      'sDom': 't',
       "sScrollX": "100%",
       "sScrollY": "250px",
       processing: true,

@@ -28,6 +28,7 @@ function setvaluesselects(){
     $("#selectcolortables option[value='"+colortables+"']").attr("selected", true);
     //tab configurar
     obtenerusuarios();
+    obtenerusuariosmodificarcostosproductos();
     $("#numerodecimalessistema").val(numerodecimales).trigger("change");
     $("#numerodecilamesdocumentospdfsistema").val(numerodecimalesendocumentos).trigger("change");
     $("input[name=utilizarmayusculasistema][value='"+mayusculas_sistema+"']").prop("checked",true);  
@@ -41,12 +42,21 @@ function setvaluesselects(){
     $("input[name=pedirobligatoriamenteobservacionenfactura][value='"+pedirobligatoriamenteobservacionenfactura+"']").prop("checked",true);  
     $("input[name=colocarencerocantidadenpartidasderemisiones][value='"+colocarencerocantidadenpartidasderemisiones+"']").prop("checked",true);    
     $("input[name=mostrartotalesdecolumnasendocumentos][value='"+mostrartotalesdecolumnasendocumentos+"']").prop("checked",true);   
-    $("input[name=mostrarinsumoporpartidaenremisiones][value='"+mostrarinsumoporpartidaenremisiones+"']").prop("checked",true);    
+    $("input[name=mostrarinsumoporpartidaenremisiones][value='"+mostrarinsumoporpartidaenremisiones+"']").prop("checked",true);   
+    $("input[name=modificarconsecutivofolioenremisiones][value='"+modificarconsecutivofolioenremisiones+"']").prop("checked",true);  
+    $("input[name=validarutilidadnegativa][value='"+validarutilidadnegativa+"']").prop("checked",true);  
+    $("input[name=mostrarinsumoporpartidaenremisiones][value='"+mostrarinsumoporpartidaenremisiones+"']").prop("checked",true);   
 }
-//obtener ususarios
+//obtener ususarios que pueden modificar insumos en remisiones
 function obtenerusuarios(){
   $.get(empresa_obtener_usuarios_a_modificar_insumos, function(select_usuarios){
     $("#usuariosmodificacioninsumo").html(select_usuarios);
+  }) 
+}
+//obtener ususarios que pueden modifciar costos en productos
+function obtenerusuariosmodificarcostosproductos(){
+  $.get(empresa_obtener_usuarios_a_modificar_costos_productos, function(select_usuarios_modificar_costos){
+    $("#modificarcostosdeproductos").html(select_usuarios_modificar_costos);
   }) 
 }
 //ocultar modal formulario

@@ -933,7 +933,7 @@ function alta(){
                             '</div>'+
                             '<div class="col-md-2">'+
                                 '<label>Ubicación</label>'+
-                                '<input type="text" class="form-control inputnext" name="ubicacion" id="ubicacion" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this)">'+
+                                '<input type="text" class="form-control inputnext" name="ubicacion" id="ubicacion" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this)" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-2">'+
                                 '<label>Tipo Producto</label>'+
@@ -970,6 +970,8 @@ function alta(){
                     '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     obtenertipos();
     $("#codigo").removeAttr('readonly');
     setTimeout(function(){$("#codigo").focus();},500);
@@ -1186,7 +1188,7 @@ function obtenerdatos(codigoproducto){
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Ubicación</label>'+
-                                '<input type="text" class="form-control inputnext" name="ubicacion" id="ubicacion" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this)">'+
+                                '<input type="text" class="form-control inputnext" name="ubicacion" id="ubicacion" data-parsley-length="[1, 60]" onkeyup="tipoLetra(this)" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-2">'+
                                 '<label>Tipo Producto</label>'+
@@ -1434,6 +1436,25 @@ function obtenerdatos(codigoproducto){
                     '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
+    //colocar readonly si no puede modificar insumos
+    var arrayusuariosamodificarinsumosproductos = usuariosamodificarinsumos.split(",");
+    if(arrayusuariosamodificarinsumosproductos.indexOf(usuariologueado) == '-1'){
+        $("#fechasinsumo").attr('readonly', 'readonly');
+    }else{
+        $("#fechasinsumo").removeAttr('readonly');
+    }
+    //colocar readonly si no puede modificar costos
+    var arrayusuariosamodificarcostosproductos = modificarcostosdeproductos.split(",");
+    if(arrayusuariosamodificarcostosproductos.indexOf(usuariologueado) == '-1'){
+        $("#costo").attr('readonly', 'readonly');
+        $("#costodelista").attr('readonly', 'readonly');
+
+    }else{
+        $("#costo").removeAttr('readonly');
+        $("#costodelista").removeAttr('readonly');
+    }
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     $('.dropify').dropify();
     if(data.producto.Imagen != null){
         $('#imagenactual').attr("src", urlimagenesproductos+data.producto.Imagen);
@@ -1671,6 +1692,12 @@ function generarcodigosbarras(){
     $("#arraycodigosparacodigosdebarras").val("");
     $("#tipoprodcodigosbarras").val("TODOS").change();
     $("#statuscodigosbarras").val("TODOS").change();
+    $("#codigobarrasubicacion").select2({
+        dropdownParent: $('#ModalCodigosBarras'),
+        tags: true,
+        width: '25.00em',
+        tokenSeparators: [',', ' ']
+    })
     //activar busqueda para metodo pago
     $('#valorgenerarcodigobarras').on('keypress', function(e) {
         //recomentable para mayor compatibilidad entre navegadores.

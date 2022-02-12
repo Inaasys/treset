@@ -133,6 +133,8 @@ function alta(){
                 '</div>'+
               '</div>';
   $("#tabsform").html(tabs);
+  //colocar autocomplette off  todo el formulario
+  $(".form-control").attr('autocomplete','off');
   obtenultimonumero();
   setTimeout(function(){$("#nombre").focus();},500);   
   //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
@@ -247,6 +249,8 @@ function obtenerdatos(numerobanco){
                   '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
+    //colocar autocomplette off  todo el formulario
+    $(".form-control").attr('autocomplete','off');
     //boton formulario 
     $("#numero").val(numerobanco);
     $("#nombre").val(data.banco.Nombre);

@@ -41,17 +41,62 @@ class PruebaController extends ConfiguracionSistemaController{
 
     public function pruebaswebscraping(){
 
-        /*
-        $almacenes = Almacen::where('Status', 'ALTA')->get();
-        $selectalmacenes = "<option selected disabled hidden>Selecciona el almacén</option>";
-        foreach($almacenes as $a){
-            if($a->Numero == $request->almacen){
-                $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.' Selected>'.$a->Nombre.'</option>';
-            }else{
-                $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.'>'.$a->Nombre.'</option>';
-            }
-        }*/
         
+        /*
+        /*OBTENER INSUMOS CaTALOGOS PRODUCTOS*/
+        /*$insumosproductos = Producto::select('Insumo', 'Codigo')->where('Insumo', '<>', '')->get();
+        //dd($insumosproductos);
+        $modificados=1;
+        foreach($insumosproductos as $ip){
+            $porciones = str_split($ip->Insumo);
+            if($porciones[0] == "0"){
+                //dd("no se agrega");
+            }else{
+                Producto::where('Codigo', $ip->Codigo)
+                ->update([
+                    'Insumo'=>"0".$ip->Insumo,
+                ]);
+                $modificados++;
+            }
+
+            /*
+            if($ip->Insumo == null){
+                dd($ip);
+            }
+            */
+        //}
+        
+
+        /*
+
+        /*OBTENER INSUMOS Remisiones  detalles*/
+        $insumosproductos = RemisionDetalle::select('Insumo', 'Codigo', 'Remision', 'Item')->where('Insumo', '<>', '')->get();
+        //dd($insumosproductos);
+        $modificados=1;
+        foreach($insumosproductos as $ip){
+            $porciones = str_split($ip->Insumo);
+            if($porciones[0] == "0"){
+                //dd("no se agrega");
+            }else{
+                RemisionDetalle::where('Remision', $ip->Remision)->where('Codigo', $ip->Codigo)->where('Item', $ip->Item)
+                ->update([
+                    'Insumo'=>"0".$ip->Insumo,
+                ]);
+                $modificados++;
+            }
+
+            /*
+            if($ip->Insumo == null){
+                dd($ip);
+            }
+            */
+        }
+
+        /*
+
+
+        /*OBTENER EXISTENCIAS CORRECTA POR PRODUCTOS SUMANDO Y RESTANDO SU KARDEX*/        
+        /*
         $numerodecimalesconfigurados = config('app.numerodedecimales');
         $data = array();
         $productos = Producto::all();
@@ -66,59 +111,15 @@ class PruebaController extends ConfiguracionSistemaController{
                 $entradas = $entradas + $k->Entradas;
                 $salidas = $salidas + $k->Salidas;
                 $existencias = $existencias + $k->Entradas - $k->Salidas;
-                //$colorfila = '';
-                //if($k->Status == 'BAJA'){
-                  //  $colorfila = 'bg-red';
-                //}
                 $nummovimiento++;
             }
-            
             $data[]=array(
-                //"colorfila"=>$colorfila,
-                //"nummovimiento"=>$nummovimiento,
                 "codigo"=>$p->Codigo,
-                //"documento"=>$k->Documento,
-                //"movimiento"=>$k->Movimiento,
-                //"fecha"=>Helpers::fecha_espanol($k->Fecha),
                 "almacen" => Helpers::convertirvalorcorrecto(1),
                 "entradas"=> Helpers::convertirvalorcorrecto($entradas),
                 "salidas" => Helpers::convertirvalorcorrecto($salidas),
                 "existencias"=> round($existencias, $numerodecimalesconfigurados),
-                //"costo"=>Helpers::convertirvalorcorrecto($k->Costo),
-                //"status"=>$k->Status
             );
-            //dd($data);
-            //$filasmovimientos = "";
-            //$primerfila = 0;
-            //foreach(array_reverse($data) as $d){
-                //if($primerfila == 0){
-                  //  $colorfilaex = 'bg-amber font-bold col-pink';
-                //}else{
-                  //  $colorfilaex = '';
-                //}
-                /*$filasmovimientos= $filasmovimientos.
-                '<tr class="'.$d['colorfila'].'">'.
-                    '<td><b>'.$d['nummovimiento'].'</b></td>'.
-                    '<td>'.$d['documento'].'</td>'.
-                    '<td>'.$d['movimiento'].'</td>'.
-                    '<td>'.$d['fecha'].'</td>'.
-                    '<td>'.$d['almacen'].'</td>'.
-                    '<td>'.$d['entradas'].'</td>'.
-                    '<td>'.$d['salidas'].'</td>'.
-                    '<td class="'.$colorfilaex.'">'.$d['existencias'].'</td>'.
-                    '<td>'.$d['costo'].'</td>'.
-                    '<td>'.$d['status'].'</td>'.
-                '</tr>';
-                $primerfila++;
-                */
-            //}
-            /*$data = array(
-                'filasmovimientos' => $filasmovimientos,
-                'entradas' => Helpers::convertirvalorcorrecto($entradas),
-                'salidas' => Helpers::convertirvalorcorrecto($salidas),
-                'existencias' => Helpers::convertirvalorcorrecto($existencias),
-                //'selectalmacenes' => $selectalmacenes,
-            );*/
         }
         $filasmovimientos = '';
         foreach($data as $d){
@@ -132,7 +133,9 @@ class PruebaController extends ConfiguracionSistemaController{
             '</tr>';
         }
         echo '<table border="2"><tr><td>Codigo</td><td>Almacen</td><td>Entradas</td><td>Salidas</td><td>Existencias</td></tr>'.$filasmovimientos.'</table>';
+        */
         //return response()->json($data);
+        /*FIN OBTENER EXISTENCIAS CORRECTA POR PRODUCTOS SUMANDO Y RESTANDO SU KARDEX*/        
 
 
         /*$fecha = "2020-09-24";

@@ -71,6 +71,11 @@
                             </div>
                         </div>
                         <div class="body">
+                            <div class="row" hidden>
+                                <div class="col-md-12">
+                                    <iframe  id="pdfiframe" name="pdfiframe" src="octest.pdf"></iframe>
+                                </div>
+                            </div>
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap">
                                     <thead class="{{$empresa->background_tables}}">
@@ -271,6 +276,7 @@
         var agregarreferenciaenasuntocorreo = '{{$empresa->AgregarReferenciaOrdenCompraEnAsuntoCorreo}}';
         var urlgenerarplantilla = '{{$urlgenerarplantilla}}';
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
+        var urlpdfsimpresionesrapidas = '{{asset("xml_descargados/")}}/';
         var ordenes_compra_obtener = '{!!URL::to('ordenes_compra_obtener')!!}';
         var ordenes_compra_descargar_plantilla = '{!!URL::to('ordenes_compra_descargar_plantilla')!!}';
         var ordenes_compra_cargar_partidas_excel = '{!!URL::to('ordenes_compra_cargar_partidas_excel')!!}';
@@ -298,6 +304,7 @@
         var ordenes_compra_guardar_modificacion = '{!!URL::to('ordenes_compra_guardar_modificacion')!!}';
         var ordenes_compra_obtener_datos_envio_email = '{!!URL::to('ordenes_compra_obtener_datos_envio_email')!!}';
         var ordenes_compra_enviar_pdfs_email = '{!!URL::to('ordenes_compra_enviar_pdfs_email')!!}';
+        var ordenes_compra_generar_pdfs = '{!!URL::to('ordenes_compra_generar_pdfs')!!}';
         var ordenes_compra_buscar_folio_string_like = '{!!URL::to('ordenes_compra_buscar_folio_string_like')!!}';
         //alta PROD
         var ordenes_compra_obtener_claves_productos = '{!!URL::to('ordenes_compra_obtener_claves_productos')!!}';
