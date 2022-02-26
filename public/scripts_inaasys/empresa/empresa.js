@@ -46,6 +46,9 @@ function setvaluesselects(){
     $("input[name=modificarconsecutivofolioenremisiones][value='"+modificarconsecutivofolioenremisiones+"']").prop("checked",true);  
     $("input[name=validarutilidadnegativa][value='"+validarutilidadnegativa+"']").prop("checked",true);  
     $("input[name=mostrarinsumoporpartidaenremisiones][value='"+mostrarinsumoporpartidaenremisiones+"']").prop("checked",true);   
+    $("input[name=pedirobligatoriamentereferenciarnremisiones][value='"+pedirobligatoriamentereferenciarnremisiones+"']").prop("checked",true);  
+    $("input[name=pedirobligatoriamenteordenservicioenremisiones][value='"+pedirobligatoriamenteordenservicioenremisiones+"']").prop("checked",true);  
+    $("input[name=pedirobligatoriamenteequipoenremisiones][value='"+pedirobligatoriamenteequipoenremisiones+"']").prop("checked",true);  
 }
 //obtener ususarios que pueden modificar insumos en remisiones
 function obtenerusuarios(){

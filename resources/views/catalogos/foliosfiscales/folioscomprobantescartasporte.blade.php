@@ -44,7 +44,6 @@
                     						<th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Esquema</th>
                                             <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">FolioInicial</th>
                                             <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Titulo</th>
-                                            <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Depto</th>
                                             <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">ValidoDesde</th>
                                             <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">ValidoHasta</th>
                                             <th class="customercolortheadth" data-toggle="tooltip" data-placement="top" title data-original-title="Búsqueda activada">Empresa</th>
@@ -61,7 +60,6 @@
                                             <th>Esquema</th>
                                             <th>FolioInicial</th>
                                             <th>Titulo</th>
-                                            <th>Depto</th>
                                             <th>ValidoDesde</th>
                                             <th>ValidoHasta</th>
                                             <th>Empresa</th>
@@ -168,14 +166,14 @@
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';
-        var folios_comprobantes_facturas_obtener = '{!!URL::to('folios_comprobantes_facturas_obtener')!!}';
-        var folios_comprobantes_facturas_predeterminar = '{!!URL::to('folios_comprobantes_facturas_predeterminar')!!}';
-        var folios_comprobantes_facturas_obtener_ultimo_numero = '{!!URL::to('folios_comprobantes_facturas_obtener_ultimo_numero')!!}';
-        var folios_comprobantes_facturas_enviar_archivos_timbrado = '{!!URL::to('folios_comprobantes_facturas_enviar_archivos_timbrado')!!}';
-        var folios_comprobantes_facturas_guardar = '{!!URL::to('folios_comprobantes_facturas_guardar')!!}';
-        var folios_comprobantes_facturas_alta_o_baja = '{!!URL::to('folios_comprobantes_facturas_alta_o_baja')!!}'; 
-        var folios_comprobantes_facturas_obtener_folio = '{!!URL::to('folios_comprobantes_facturas_obtener_folio')!!}'; 
-        var folios_comprobantes_facturas_guardar_modificacion = '{!!URL::to('folios_comprobantes_facturas_guardar_modificacion')!!}';
+        var folios_comprobantes_cartasporte_obtener = '{!!URL::to('folios_comprobantes_cartasporte_obtener')!!}';
+        var folios_comprobantes_cartasporte_predeterminar = '{!!URL::to('folios_comprobantes_cartasporte_predeterminar')!!}';
+        var folios_comprobantes_cartasporte_obtener_ultimo_numero = '{!!URL::to('folios_comprobantes_cartasporte_obtener_ultimo_numero')!!}';
+        var folios_comprobantes_cartasporte_enviar_archivos_timbrado = '{!!URL::to('folios_comprobantes_cartasporte_enviar_archivos_timbrado')!!}';
+        var folios_comprobantes_cartasporte_guardar = '{!!URL::to('folios_comprobantes_cartasporte_guardar')!!}';
+        var folios_comprobantes_cartasporte_alta_o_baja = '{!!URL::to('folios_comprobantes_cartasporte_alta_o_baja')!!}'; 
+        var folios_comprobantes_cartasporte_obtener_folio = '{!!URL::to('folios_comprobantes_cartasporte_obtener_folio')!!}'; 
+        var folios_comprobantes_cartasporte_guardar_modificacion = '{!!URL::to('folios_comprobantes_cartasporte_guardar_modificacion')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="scripts_inaasys/catalogos/foliosfiscales/folioscomprobantescartasporte.js"></script>

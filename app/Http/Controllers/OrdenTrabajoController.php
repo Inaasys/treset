@@ -34,6 +34,7 @@ use App\Serie;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
 use Storage; 
 use ZipArchive;
+use File;
 
 class OrdenTrabajoController extends ConfiguracionSistemaController
 {
@@ -107,13 +108,14 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                                                 'OPERACIONES <span class="caret"></span>'.
                                             '</button>'.
                                             '<ul class="dropdown-menu">'.
-                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Orden .'\')">Cambios</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="terminar(\''.$data->Orden .'\')">Terminar OT</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="abrirnuevamente(\''.$data->Orden .'\')">Abrir Nuevamente OT</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Orden .'\')">Bajas</a></li>'.
-                                                '<li><a href="'.route('ordenes_trabajo_generar_pdfs_indiv',$data->Orden).'" target="_blank">Generar Documento</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Orden .'\')">Enviar Documento por Correo</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="modificardatosgeneralesorden(\''.$data->Orden .'\')">Modificar Datos Generales</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Orden .'\')">Cambios</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="terminar(\''.$data->Orden .'\')">Terminar OT</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="abrirnuevamente(\''.$data->Orden .'\')">Abrir Nuevamente OT</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->Orden .'\')">Bajas</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="'.route('ordenes_trabajo_generar_pdfs_indiv',$data->Orden).'" target="_blank">Generar Documento</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Orden .'\')">Enviar Documento por Correo</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="modificardatosgeneralesorden(\''.$data->Orden .'\')">Modificar Datos Generales</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="generardocumentoeniframe(\''.$data->Orden .'\')">Imprimir Documento PDF</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;
@@ -223,7 +225,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodxl anotacionespartida" name="anotacionespartida[]" data-parsley-length="[1, 255]" autocomplete="off"></td>'.
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodxs statuspartida" name="statuspartida[]" readonly></td>'.
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodxs itempartida" name="itempartida[]" value="'.$item.'" readonly></td>'.
-                            '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida1" name="numerotecnicopartida1[]" value="0" readonly><input type="text" class="form-control divorinputmodl tecnicopartida1" name="tecnicopartida1[]" value="0" readonly></td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida1" name="numerotecnicopartida1[]" value="0" readonly><input type="text" class="form-control divorinputmodl tecnicopartida1" name="tecnicopartida1[]" value="0" readonly data-parsley-tecnico="[5, 1000]"></td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida2" name="numerotecnicopartida2[]" value="0" readonly><input type="text" class="form-control divorinputmodl tecnicopartida2" name="tecnicopartida2[]" value="0" readonly></td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida3" name="numerotecnicopartida3[]" value="0" readonly><input type="text" class="form-control divorinputmodl tecnicopartida3" name="tecnicopartida3[]" value="0" readonly></td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida4" name="numerotecnicopartida4[]" value="0" readonly><input type="text" class="form-control divorinputmodl tecnicopartida4" name="tecnicopartida4[]" value="0" readonly></td>'.
@@ -533,7 +535,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxl anotacionespartida" name="anotacionespartida[]" data-parsley-length="[1, 255]"></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxs statuspartida" name="statuspartida[]" readonly></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxs itempartida" name="itempartida[]" value="'.$dc->Item.'" readonly></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida1" name="numerotecnicopartida1[]" value="0" readonly><input type="text" class="form-control divorinputmodl tecnicopartida1" name="tecnicopartida1[]" value="0" readonly></td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida1" name="numerotecnicopartida1[]" value="0" readonly><input type="text" class="form-control divorinputmodl tecnicopartida1" name="tecnicopartida1[]" value="0" data-parsley-tecnico="[5, 1000]" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida2" name="numerotecnicopartida2[]" value="0" readonly><input type="text" class="form-control divorinputmodl tecnicopartida2" name="tecnicopartida2[]" value="0" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida3" name="numerotecnicopartida3[]" value="0" readonly><input type="text" class="form-control divorinputmodl tecnicopartida3" name="tecnicopartida3[]" value="0" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida4" name="numerotecnicopartida4[]" value="0" readonly><input type="text" class="form-control divorinputmodl tecnicopartida4" name="tecnicopartida4[]" value="0" readonly></td>'.
@@ -877,7 +879,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxl anotacionespartida" name="anotacionespartida[]" value="'.$dot->Anotaciones.'" '.$readonly.'  data-parsley-length="[1, 255]"></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxs statuspartida" name="statuspartida[]" value="'.$dot->Status.'" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodxs itempartidabd" name="itempartidabd[]" value="'.$dot->Item.'" readonly><input type="text" class="form-control divorinputmodxs itempartida" name="itempartida[]" value="'.$dot->Item.'" readonly></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida1" name="numerotecnicopartida1[]" value="'.$dot->Tecnico1.'" readonly><input type="text" class="form-control divorinputmodl tecnicopartida1" name="tecnicopartida1[]" value="'.$tecnico1.'" readonly></td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida1" name="numerotecnicopartida1[]" value="'.$dot->Tecnico1.'" readonly><input type="text" class="form-control divorinputmodl tecnicopartida1" name="tecnicopartida1[]" value="'.$tecnico1.'" data-parsley-tecnico="[5, 1000]" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida2" name="numerotecnicopartida2[]" value="'.$dot->Tecnico2.'" readonly><input type="text" class="form-control divorinputmodl tecnicopartida2" name="tecnicopartida2[]" value="'.$tecnico2.'" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida3" name="numerotecnicopartida3[]" value="'.$dot->Tecnico3.'" readonly><input type="text" class="form-control divorinputmodl tecnicopartida3" name="tecnicopartida3[]" value="'.$tecnico3.'" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida4" name="numerotecnicopartida4[]" value="'.$dot->Tecnico4.'" readonly><input type="text" class="form-control divorinputmodl tecnicopartida4" name="tecnicopartida4[]" value="'.$tecnico4.'" readonly></td>'.
@@ -1007,25 +1009,25 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             $DetallesOrdenTrabajoAntesDeModificacion = OrdenTrabajoDetalle::where('Orden', $orden)->get();
             $array_detalles_antes_de_modificar = [];
             foreach($DetallesOrdenTrabajoAntesDeModificacion as $dotadm){
-                array_push($array_detalles_antes_de_modificar, $dotadm->Orden.'#'.$dotadm->Codigo.'#'.$dotadm->Item);
+                array_push($array_detalles_antes_de_modificar, $dotadm->Orden.'#'.$dotadm->Codigo.'#'.$dotadm->Partida);
             }
             $array_detalles_despues_de_modificar = [];
             foreach ($request->codigopartida as $key => $codigopartida){   
                 if($request->tipofila [$key] == 'consultado'){
-                    array_push($array_detalles_despues_de_modificar, $orden.'#'.$codigopartida.'#'.$request->itempartidabd [$key]);
+                    array_push($array_detalles_despues_de_modificar, $orden.'#'.$codigopartida.'#'.$request->partidapartida [$key]);
                 }  
             }
             $diferencias = array_diff($array_detalles_antes_de_modificar, $array_detalles_despues_de_modificar);
             foreach($diferencias as $d){
                 $explode_d = explode("#",$d);
                 $diff = $explode_d[0];
-                $EliminaDetalle = OrdenTrabajoDetalle::where('Orden', $explode_d[0])->where('Codigo', $explode_d[1])->where('Item', $explode_d[2])->forceDelete();
+                $EliminaDetalle = OrdenTrabajoDetalle::where('Orden', $explode_d[0])->where('Codigo', $explode_d[1])->where('Partida', $explode_d[2])->forceDelete();
             }
             //modificar partidas que no se eliminaron
             foreach ($request->codigopartida as $key => $codigopartida){   
                 if($request->tipofila [$key] == 'consultado'){
                     OrdenTrabajoDetalle::where('Orden', $orden)
-                    ->where('Item', $request->itempartidabd [$key])
+                    ->where('Partida', $request->partidapartida [$key])
                     ->update([
                         'Orden' => $orden,
                         'Cliente' => $request->numeroclientefacturaa,
@@ -1272,14 +1274,18 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         Helpers::eliminararchivospdfsgenerados();
         //primero eliminar todos los archivos zip
         Helpers::eliminararchivoszipgenerados();
-        $tipogeneracionpdf = $request->tipogeneracionpdf;
-        if($tipogeneracionpdf == 0){
-            $ordenestrabajo = OrdenTrabajo::whereIn('Orden', $request->arraypdf)->orderBy('Folio', 'ASC')->take(500)->get(); 
+        if($request->imprimirdirectamente == 1){
+            $ordenestrabajo = OrdenTrabajo::where('Orden', $request->arraypdf)->get(); 
         }else{
-            //$contrarecibos = ContraRecibo::where('Fecha', $request->anopdf)->get(); 
-            $fechainiciopdf = date($request->fechainiciopdf);
-            $fechaterminacionpdf = date($request->fechaterminacionpdf);
-            $ordenestrabajo = OrdenTrabajo::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(500)->get();
+            $tipogeneracionpdf = $request->tipogeneracionpdf;
+            if($tipogeneracionpdf == 0){
+                $ordenestrabajo = OrdenTrabajo::whereIn('Orden', $request->arraypdf)->orderBy('Folio', 'ASC')->take(500)->get(); 
+            }else{
+                //$contrarecibos = ContraRecibo::where('Fecha', $request->anopdf)->get(); 
+                $fechainiciopdf = date($request->fechainiciopdf);
+                $fechaterminacionpdf = date($request->fechaterminacionpdf);
+                $ordenestrabajo = OrdenTrabajo::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(500)->get();
+            }
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $arrayfilespdf = array();
@@ -1337,31 +1343,38 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             array_push($arrayfilespdf,$ArchivoPDF);
         }
         $pdfMerger->merge(); //unirlos
-        if($request->descargar_xml == 0){
-            $pdfMerger->save("OrdenesTrabajo.pdf", "browser");//mostrarlos en el navegador
+        if($request->imprimirdirectamente == 1){
+            $archivoacopiar = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
+            $carpetacopias = public_path('xml_descargados/'.$ArchivoPDF);
+            File::copy($archivoacopiar, $carpetacopias);
+            return response()->json($ArchivoPDF);
         }else{
-            //carpeta donde se guardara el archivo zip
-            $public_dir=public_path();
-            // Zip File Name
-            $zipFileName = 'DocumentosPDF.zip';
-            // Crear Objeto ZipArchive
-            $zip = new ZipArchive;
-            if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
-                // Agregar archivos que se comprimiran
-                foreach($arrayfilespdf as $afp) {
-                    $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
-                }     
-                //terminar proceso   
-                $zip->close();
-            }
-            // Set Encabezados para descargar
-            $headers = array(
-                'Content-Type' => 'application/octet-stream',
-            );
-            $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
-            // Create Download Response
-            if(file_exists($filetopath)){
-                return response()->download($filetopath,$zipFileName,$headers);
+            if($request->descargar_xml == 0){
+                $pdfMerger->save("OrdenesTrabajo.pdf", "browser");//mostrarlos en el navegador
+            }else{
+                //carpeta donde se guardara el archivo zip
+                $public_dir=public_path();
+                // Zip File Name
+                $zipFileName = 'DocumentosPDF.zip';
+                // Crear Objeto ZipArchive
+                $zip = new ZipArchive;
+                if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
+                    // Agregar archivos que se comprimiran
+                    foreach($arrayfilespdf as $afp) {
+                        $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
+                    }     
+                    //terminar proceso   
+                    $zip->close();
+                }
+                // Set Encabezados para descargar
+                $headers = array(
+                    'Content-Type' => 'application/octet-stream',
+                );
+                $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
+                // Create Download Response
+                if(file_exists($filetopath)){
+                    return response()->download($filetopath,$zipFileName,$headers);
+                }
             }
         }
     }

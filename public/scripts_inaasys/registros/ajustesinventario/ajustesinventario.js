@@ -131,6 +131,7 @@ function listar(){
       $buscar.bind('keyup change', function(e) {
           if(e.keyCode == 13 || this.value == "") {
             $('#tbllistado').DataTable().search( this.value ).draw();
+            $(".inputbusquedageneral").val(""); 
           }
       });
     }
@@ -636,7 +637,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, tipooper
     $.get(ajustesinventario_obtener_existencias_partida, {almacen:numeroalmacen,codigopartida:Codigo,folio:folio,serie:serie}, function(Existencias){
       var tipo = "alta";
       var fila=   '<tr class="filasproductos" id="filaproducto'+contadorproductos+'">'+
-                          '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('+contadorproductos+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
+                          '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfilas" onclick="eliminarfila('+contadorproductos+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
                           '<td class="tdmod"><input type="text" class="form-control divorinputmodmd codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]"></td>'+
                           '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'+Producto+'" readonly data-parsley-length="[1, 255]"></td>'+
                           '<td class="tdmod"><input type="text" class="form-control divorinputmodsm unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'+Unidad+'" readonly data-parsley-length="[1, 5]"></td>'+
@@ -697,6 +698,23 @@ function comprobarfilas(){
 //renumerar las filas de la orden de compra
 function renumerarfilas(){
   var lista;
+
+
+  //renumerar filas tr
+  lista = document.getElementsByClassName("filasproductos");
+  for (var i = 0; i < lista.length; i++) {
+    lista[i].setAttribute("id", "filaproducto"+i);
+  }
+
+  //renumerar btn eliminar filas
+  lista = document.getElementsByClassName("btneliminarfilas");
+  for (var i = 0; i < lista.length; i++) {
+    lista[i].setAttribute("onclick", "eliminarfila("+i+")");
+    //lista[i].setAttribute("onclick", "calcularsubtotalentradas("+i+');calcularexistencianueva('+i+');colocardataparsleyminentradas('+i+')');
+
+  }
+
+
   //renumerar la cantidad de la partida
   lista = document.getElementsByClassName("entradaspartida");
   for (var i = 0; i < lista.length; i++) {
@@ -1055,12 +1073,12 @@ function obtenerdatos(ajustemodificar){
                     '<label>Almacén <span class="label label-danger" id="textonombrealmacen"></span></label>'+
                     '<table class="col-md-12">'+
                       '<tr>'+
-                        '<td>'+
+                        '<td hidden>'+
                           '<div class="btn bg-blue waves-effect" onclick="obteneralmacenes()">Seleccionar</div>'+
                         '</td>'+
                         '<td>'+
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control inputnext" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer" autocomplete="off">'+
+                            '<input type="text" class="form-control inputnext" name="numeroalmacen" id="numeroalmacen" required readonly data-parsley-type="integer" autocomplete="off">'+
                             '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required data-parsley-type="integer">'+
                             '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
                             '<input type="hidden" class="form-control" name="almacendb" id="almacendb" required readonly>'+
@@ -1077,7 +1095,7 @@ function obtenerdatos(ajustemodificar){
                   '</div>'+
                 '</div>'+
                 '<div class="row">'+
-                  '<div class="col-md-4" id="divbuscarcodigoproducto" hidden>'+
+                  '<div class="col-md-4" id="divbuscarcodigoproducto">'+
                     '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
                     '<table class="col-md-12">'+
                       '<tr>'+
@@ -1159,6 +1177,8 @@ function obtenerdatos(ajustemodificar){
     $("#observaciones").val(data.ajuste.Obs);
     $("#total").val(data.total);
     //detalles
+    contadorfilas = data.contadorfilas;
+    contadorproductos = data.contadorproductos;
     $("#tablaproductosajuste tbody").html(data.filasdetallesajuste);
     $("#numerofilas").val(data.numerodetallesajuste);
     //asignar el tipo de operacion que se realizara
@@ -1170,14 +1190,6 @@ function obtenerdatos(ajustemodificar){
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
         obtenerproductoporcodigo();
-      }
-    });
-    //activar busqueda
-    $('#numeroalmacen').on('keypress', function(e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-      obteneralmacenpornumero();
       }
     });
     //regresar numero

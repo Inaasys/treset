@@ -37,8 +37,8 @@ class TecnicoController extends ConfiguracionSistemaController{
                                                 'OPERACIONES <span class="caret"></span>'.
                                             '</button>'.
                                             '<ul class="dropdown-menu">'.
-                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos('.$data->Numero.')">Cambios</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="desactivar('.$data->Numero.')">Bajas</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos('.$data->Numero.')">Cambios</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar('.$data->Numero.')">Bajas</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;

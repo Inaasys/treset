@@ -61,6 +61,11 @@
                                 </div>
                             </div>
                             <div class="body">
+                                <div class="row" hidden>
+                                    <div class="col-md-12">
+                                        <iframe  id="pdfiframe" name="pdfiframe" src="#"></iframe>
+                                    </div>
+                                </div>
                                 <div class="table-responsive">
                                     <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap">
                                         <thead class="{{$empresa->background_tables}}">
@@ -368,6 +373,9 @@
         var background_tables = '{{$empresa->background_tables}}';
         var urlgenerarplantilla = '{{$urlgenerarplantilla}}';       
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
+        var urlpdfsimpresionesrapidas = '{{asset("xml_descargados/")}}/';
+        var urliconossistema = '{{asset("images/")}}/';
+
         var pedirobligatoriamenteobservacionenfactura = '{{$empresa->PedirObligatoriamenteObservacionEnFactura}}';
         var validarutilidadnegativa = '{{$validarutilidadnegativa}}';
         var facturas_obtener = '{!!URL::to('facturas_obtener')!!}';
@@ -426,6 +434,7 @@
         var facturas_obtener_datos_envio_email = '{!!URL::to('facturas_obtener_datos_envio_email')!!}';
         var facturas_enviar_pdfs_email = '{!!URL::to('facturas_enviar_pdfs_email')!!}';
         var facturas_enviar_pdfs_clientes_email = '{!!URL::to('facturas_enviar_pdfs_clientes_email')!!}';
+        var facturas_generar_pdfs = '{!!URL::to('facturas_generar_pdfs')!!}';
         var facturas_buscar_folio_string_like = '{!!URL::to('facturas_buscar_folio_string_like')!!}'; 
         var facturas_verificar_si_continua_timbrado = '{!!URL::to('facturas_verificar_si_continua_timbrado')!!}'; 
         var facturas_timbrar_factura = '{!!URL::to('facturas_timbrar_factura')!!}'; 

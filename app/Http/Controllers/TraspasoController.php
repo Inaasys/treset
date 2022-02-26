@@ -104,10 +104,10 @@ class TraspasoController extends ConfiguracionSistemaController{
                                         'OPERACIONES <span class="caret"></span>'.
                                     '</button>'.
                                     '<ul class="dropdown-menu">'.
-                                        '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Traspaso .'\')">Cambios</a></li>'.
-                                        '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Traspaso .'\')">Bajas</a></li>'.
-                                        '<li><a href="'.route('traspasos_generar_pdfs_indiv',$data->Traspaso).'" target="_blank">Ver Documento PDF</a></li>'.
-                                        '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Traspaso .'\')">Enviar Documento por Correo</a></li>'.
+                                        '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Traspaso .'\')">Cambios</a></li>'.
+                                        '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->Traspaso .'\')">Bajas</a></li>'.
+                                        '<li><a class="paddingmenuopciones" href="'.route('traspasos_generar_pdfs_indiv',$data->Traspaso).'" target="_blank">Ver Documento PDF</a></li>'.
+                                        '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Traspaso .'\')">Enviar Documento por Correo</a></li>'.
                                     '</ul>'.
                                 '</div>';
                         return $operaciones;

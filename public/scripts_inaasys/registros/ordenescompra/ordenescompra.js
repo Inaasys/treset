@@ -137,7 +137,12 @@ function listar(){
       $buscar.bind('keyup change', function(e) {
           if(e.keyCode == 13 || this.value == "") {
             $('#tbllistado').DataTable().search( this.value ).draw();
+            $(".inputbusquedageneral").val(""); 
           }
+      });
+      //tooltip mensajes
+      $('[data-toggle="tooltip"]').tooltip({
+        container: 'body'
       });
     }
   });
@@ -146,6 +151,8 @@ function listar(){
     var data = tabla.row( this ).data();
     obtenerdatos(data.Orden);
   });
+
+
 }
 //realizar en reporte en excel
 function descargar_plantilla(){
@@ -2615,9 +2622,6 @@ function buscarstringlike(){
     agregararraypdf(data.Orden);
   });
 }
-
-
-
 //generar documento en iframe
 function generardocumentoeniframe(Orden){
   var arraypdf = new Array();

@@ -87,9 +87,9 @@ class ProductoController extends ConfiguracionSistemaController{
                                                 'OPERACIONES <span class="caret"></span>'.
                                             '</button>'.
                                             '<ul class="dropdown-menu">'.
-                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Codigo .'\')">Cambios</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Codigo .'\')">Bajas</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="obtenerkardex(\''.$data->Codigo .'\','.$data->Almacen.')">Ver Movimientos</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Codigo .'\')">Cambios</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->Codigo .'\')">Bajas</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerkardex(\''.$data->Codigo .'\','.$data->Almacen.')">Ver Movimientos</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;
@@ -610,7 +610,7 @@ class ProductoController extends ConfiguracionSistemaController{
         $producto = Producto::where('Codigo', $request->codigoproducto)->first();
         $barcode = DNS1D::getBarcodeSVG($request->codigoproducto, 'C128', 1,55,'black', true);
         //$barcode = DNS2D::getBarcodeSVG($request->codigoproducto, 'QRCODE', 2, 2, true);
-        $valores_producto = Producto::where('Codigo', $request->codigoproducto)->get();
+        $valores_producto = Producto::where('Codigo', $request->codigoproducto)->first();
         $marca = Marca::where('Numero', $producto->Marca)->first();
         $linea = Linea::where('Numero', $producto->Linea)->first();
         $precio = Helpers::convertirvalorcorrecto($producto->Precio);
@@ -677,7 +677,7 @@ class ProductoController extends ConfiguracionSistemaController{
         $data = array(
             "producto" => $producto,
             "barcode" => $barcode,
-            "pt" => $valores_producto[0]->Pt,
+            "pt" => $valores_producto->Pt,
             "valores_producto" => $valores_producto,
             "marca" => $marca,
             "linea" => $linea,
@@ -1033,14 +1033,19 @@ class ProductoController extends ConfiguracionSistemaController{
     public function productos_obtener_kardex(Request $request){
         $almacenes = Almacen::where('Status', 'ALTA')->get();
         $selectalmacenes = "<option selected disabled hidden>Selecciona el almacén</option>";
+        if($request->almacen == null){
+            $almacen_kardex = 1;
+        }else{
+            $almacen_kardex = $request->almacen;
+        }
         foreach($almacenes as $a){
-            if($a->Numero == $request->almacen){
+            if($a->Numero == $almacen_kardex){
                 $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.' Selected>'.$a->Nombre.'</option>';
             }else{
                 $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.'>'.$a->Nombre.'</option>';
             }
         }
-        $kardex = DB::select('exec ObtenerKardex ?,?', array($request->codigo,$request->almacen));
+        $kardex = DB::select('exec ObtenerKardex ?,?', array($request->codigo,$almacen_kardex));
         $nummovimiento = 1;
         $entradas = 0;
         $salidas = 0;

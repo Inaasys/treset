@@ -63,6 +63,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/clientes_obtener_metodopago_por_clave', 'ClienteController@clientes_obtener_metodopago_por_clave')->name('clientes_obtener_metodopago_por_clave')->middleware('revisaraccesomenu:menucatalogoclientes');
     Route::get('/clientes_obtener_uso_cfdi', 'ClienteController@clientes_obtener_uso_cfdi')->name('clientes_obtener_uso_cfdi')->middleware('revisaraccesomenu:menucatalogoclientes');
     Route::get('/clientes_obtener_usocfdi_por_clave', 'ClienteController@clientes_obtener_usocfdi_por_clave')->name('clientes_obtener_usocfdi_por_clave')->middleware('revisaraccesomenu:menucatalogoclientes');
+    Route::get('/clientes_obtener_regimenes_fiscales', 'ClienteController@clientes_obtener_regimenes_fiscales')->name('clientes_obtener_regimenes_fiscales')->middleware('revisaraccesomenu:menucatalogoclientes');
+    Route::get('/clientes_obtener_regimenfiscal_por_clave', 'ClienteController@clientes_obtener_regimenfiscal_por_clave')->name('clientes_obtener_regimenfiscal_por_clave')->middleware('revisaraccesomenu:menucatalogoclientes');
     Route::get('/clientes_obtener_productos', 'ClienteController@clientes_obtener_productos')->name('clientes_obtener_productos')->middleware('revisaraccesomenu:menucatalogoclientes');
     Route::get('/clientes_obtener_datos_producto_agregar_fila', 'ClienteController@clientes_obtener_datos_producto_agregar_fila')->name('clientes_obtener_datos_producto_agregar_fila')->middleware('revisaraccesomenu:menucatalogoclientes');
     Route::post('/clientes_guardar', 'ClienteController@clientes_guardar')->name('clientes_guardar')->middleware('revisarpermisos:catalogos.clientes.altas');
@@ -227,6 +229,14 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/folios_comprobantes_pagos_guardar_modificacion', 'FolioComprobantePagoController@folios_comprobantes_pagos_guardar_modificacion')->name('folios_comprobantes_pagos_guardar_modificacion')->middleware('revisarpermisos:catalogos.folios.fiscales.folios.pagos.cambios');
     //Folio Comprobante Cartas Porte
     Route::get('/folios_comprobantes_cartasporte', 'FolioComprobanteCartaPorteController@folios_comprobantes_cartasporte')->name('folios_comprobantes_cartasporte')->middleware('revisaraccesomenu:menucatalogofoliosfiscalesfolioscartasporte');
+    Route::get('/folios_comprobantes_cartasporte_obtener', 'FolioComprobanteCartaPorteController@folios_comprobantes_cartasporte_obtener')->name('folios_comprobantes_cartasporte_obtener')->middleware('revisaraccesomenu:menucatalogofoliosfiscalesfolioscartasporte');
+    Route::get('/folios_comprobantes_cartasporte_obtener_ultimo_numero', 'FolioComprobanteCartaPorteController@folios_comprobantes_cartasporte_obtener_ultimo_numero')->name('folios_comprobantes_cartasporte_obtener_ultimo_numero')->middleware('revisaraccesomenu:menucatalogofoliosfiscalesfolioscartasporte');
+    Route::post('/folios_comprobantes_cartasporte_predeterminar', 'FolioComprobanteCartaPorteController@folios_comprobantes_cartasporte_predeterminar')->name('folios_comprobantes_cartasporte_predeterminar')->middleware('revisaraccesomenu:menucatalogofoliosfiscalesfolioscartasporte');
+    Route::post('/folios_comprobantes_cartasporte_guardar', 'FolioComprobanteCartaPorteController@folios_comprobantes_cartasporte_guardar')->name('folios_comprobantes_cartasporte_guardar')->middleware('revisarpermisos:catalogos.folios.fiscales.folios.cartasporte.altas');
+    Route::post('/folios_comprobantes_cartasporte_enviar_archivos_timbrado', 'FolioComprobanteCartaPorteController@folios_comprobantes_cartasporte_enviar_archivos_timbrado')->name('folios_comprobantes_cartasporte_enviar_archivos_timbrado')->middleware('revisarpermisos:catalogos.folios.fiscales.folios.cartasporte.altas');
+    Route::post('/folios_comprobantes_cartasporte_alta_o_baja', 'FolioComprobanteCartaPorteController@folios_comprobantes_cartasporte_alta_o_baja')->name('folios_comprobantes_cartasporte_alta_o_baja')->middleware('revisarpermisos:catalogos.folios.fiscales.folios.cartasporte.bajas');
+    Route::get('/folios_comprobantes_cartasporte_obtener_folio', 'FolioComprobanteCartaPorteController@folios_comprobantes_cartasporte_obtener_folio')->name('folios_comprobantes_cartasporte_obtener_folio')->middleware('revisaraccesomenu:menucatalogofoliosfiscalesfolioscartasporte');
+    Route::post('/folios_comprobantes_cartasporte_guardar_modificacion', 'FolioComprobanteCartaPorteController@folios_comprobantes_cartasporte_guardar_modificacion')->name('folios_comprobantes_cartasporte_guardar_modificacion')->middleware('revisarpermisos:catalogos.folios.fiscales.folios.cartasporte.cambios');    
     //Personal
     Route::get('/personal', 'PersonalController@personal')->name('personal')->middleware('revisaraccesomenu:menucatalogopersonal');
     Route::get('/personal_obtener', 'PersonalController@personal_obtener')->name('personal_obtener')->middleware('revisaraccesomenu:menucatalogopersonal');
@@ -258,6 +268,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/existencias_obtener', 'ExistenciaController@existencias_obtener')->name('existencias_obtener')->middleware('revisaraccesomenu:menucatalogoexistencias');
     Route::get('/existencias_exportar_excel', 'ExistenciaController@existencias_exportar_excel')->name('existencias_exportar_excel')->middleware('revisaraccesomenu:menucatalogoexistencias');
     Route::post('/existencias_guardar_configuracion_tabla', 'ExistenciaController@existencias_guardar_configuracion_tabla')->name('existencias_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menucatalogoexistencias');
+    //Existencias Sucursales
+    Route::get('/existencias_suc1', 'ExistenciaSuc1Controller@existencias_suc1')->name('existencias_suc1')->middleware('revisaraccesomenu:menucatalogoexistencias');
+    Route::get('/existencias_suc1_obtener', 'ExistenciaSuc1Controller@existencias_suc1_obtener')->name('existencias_suc1_obtener')->middleware('revisaraccesomenu:menucatalogoexistencias');
+    Route::post('/existencias_suc1_guardar_configuracion_tabla', 'ExistenciaSuc1Controller@existencias_suc1_guardar_configuracion_tabla')->name('existencias_suc1_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menucatalogoexistencias');
+    Route::get('/existencias_suc1_exportar_excel', 'ExistenciaSuc1Controller@existencias_suc1_exportar_excel')->name('existencias_suc1_exportar_excel')->middleware('revisaraccesomenu:menucatalogoexistencias');
     /* -----------------------------------||||||||||||||||||||FIN CATALOGOS||||||||||||||||||||||-------------------------------------*/
 
     /* -----------------------------------||||||||||||||||||||REGISTROS||||||||||||||||||||||-------------------------------------*/
@@ -992,7 +1007,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/reporte_relacion_contrarecibos_generar_reporte', 'ReportesContraRecibosController@reporte_relacion_contrarecibos_generar_reporte')->name('reporte_relacion_contrarecibos_generar_reporte')->middleware('revisaraccesomenu:menureporterelacioncontrarecibos');
     /*#################################FIN CONTRARECIBOS##########################################*/
     /*#################################CUENTAS POR PAGAR##########################################*/
-    //relacion contrarecibos
     Route::get('/reporte_relacion_cuentasporpagar', 'ReportesCuentasPorPagarController@reporte_relacion_cuentasporpagar')->name('reporte_relacion_cuentasporpagar')->middleware('revisaraccesomenu:menureporterelacioncxp');
     Route::get('/reporte_relacion_cuentasporpagar_generar_formato_excel', 'ReportesCuentasPorPagarController@reporte_relacion_cuentasporpagar_generar_formato_excel')->name('reporte_relacion_cuentasporpagar_generar_formato_excel')->middleware('revisaraccesomenu:menureporterelacioncxp');
     Route::get('/reporte_relacion_cuentasporpagar_generar_formato_pdf', 'ReportesCuentasPorPagarController@reporte_relacion_cuentasporpagar_generar_formato_pdf')->name('reporte_relacion_cuentasporpagar_generar_formato_pdf')->middleware('revisaraccesomenu:menureporterelacioncxp');
@@ -1002,6 +1016,22 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/reporte_relacion_cuentasporpagar_obtener_banco_por_numero', 'ReportesCuentasPorPagarController@reporte_relacion_cuentasporpagar_obtener_banco_por_numero')->name('reporte_relacion_cuentasporpagar_obtener_banco_por_numero')->middleware('revisaraccesomenu:menureporterelacioncxp');
     Route::post('/reporte_relacion_cuentasporpagar_generar_reporte', 'ReportesCuentasPorPagarController@reporte_relacion_cuentasporpagar_generar_reporte')->name('reporte_relacion_cuentasporpagar_generar_reporte')->middleware('revisaraccesomenu:menureporterelacioncxp');
     /*#################################FIN CUENTAS POR PAGAR##########################################*/
+    /*#################################CUENTAS POR COBRAR##########################################*/
+    Route::get('/reporte_relacion_cuentasporcobrar', 'ReportesCuentasPorCobrarController@reporte_relacion_cuentasporcobrar')->name('reporte_relacion_cuentasporcobrar')->middleware('revisaraccesomenu:menureporterelacioncxc');
+    Route::get('/reporte_relacion_cuentasporcobrar_obtener_clientes', 'ReportesCuentasPorCobrarController@reporte_relacion_cuentasporcobrar_obtener_clientes')->name('reporte_relacion_cuentasporcobrar_obtener_clientes')->middleware('revisaraccesomenu:menureporterelacioncxc');
+    Route::get('/reporte_relacion_cuentasporcobrar_obtener_agentes', 'ReportesCuentasPorCobrarController@reporte_relacion_cuentasporcobrar_obtener_agentes')->name('reporte_relacion_cuentasporcobrar_obtener_agentes')->middleware('revisaraccesomenu:menureporterelacioncxc');
+    Route::get('/reporte_relacion_cuentasporcobrar_obtener_formaspago', 'ReportesCuentasPorCobrarController@reporte_relacion_cuentasporcobrar_obtener_formaspago')->name('reporte_relacion_cuentasporcobrar_obtener_formaspago')->middleware('revisaraccesomenu:menureporterelacioncxc');
+    Route::get('/reporte_relacion_cuentasporcobrar_obtener_cliente_por_numero', 'ReportesCuentasPorCobrarController@reporte_relacion_cuentasporcobrar_obtener_cliente_por_numero')->name('reporte_relacion_cuentasporcobrar_obtener_cliente_por_numero')->middleware('revisaraccesomenu:menureporterelacioncxc');
+    Route::get('/reporte_relacion_cuentasporcobrar_obtener_agente_por_numero', 'ReportesCuentasPorCobrarController@reporte_relacion_cuentasporcobrar_obtener_agente_por_numero')->name('reporte_relacion_cuentasporcobrar_obtener_agente_por_numero')->middleware('revisaraccesomenu:menureporterelacioncxc');
+    Route::get('/reporte_relacion_cuentasporcobrar_obtener_formapago_por_clave', 'ReportesCuentasPorCobrarController@reporte_relacion_cuentasporcobrar_obtener_formapago_por_clave')->name('reporte_relacion_cuentasporcobrar_obtener_formapago_por_clave')->middleware('revisaraccesomenu:menureporterelacioncxc');
+    Route::get('/reporte_relacion_cuentasporcobrar_obtener_bancos', 'ReportesCuentasPorCobrarController@reporte_relacion_cuentasporcobrar_obtener_bancos')->name('reporte_relacion_cuentasporcobrar_obtener_bancos')->middleware('revisaraccesomenu:menureporterelacioncxc');
+    Route::get('/reporte_relacion_cuentasporcobrar_obtener_banco_por_numero', 'ReportesCuentasPorCobrarController@reporte_relacion_cuentasporcobrar_obtener_banco_por_numero')->name('reporte_relacion_cuentasporcobrar_obtener_banco_por_numero')->middleware('revisaraccesomenu:menureporterelacioncxc');
+    Route::post('/reporte_relacion_cuentasporcobrar_generar_reporte', 'ReportesCuentasPorCobrarController@reporte_relacion_cuentasporcobrar_generar_reporte')->name('reporte_relacion_cuentasporcobrar_generar_reporte')->middleware('revisaraccesomenu:menureporterelacioncxc');
+    Route::get('/reporte_relacion_cuentasporcobrar_generar_formato_excel', 'ReportesCuentasPorCobrarController@reporte_relacion_cuentasporcobrar_generar_formato_excel')->name('reporte_relacion_cuentasporcobrar_generar_formato_excel')->middleware('revisaraccesomenu:menureporterelacioncxc');
+    Route::get('/reporte_relacion_cuentasporcobrar_generar_formato_pdf', 'ReportesCuentasPorCobrarController@reporte_relacion_cuentasporcobrar_generar_formato_pdf')->name('reporte_relacion_cuentasporcobrar_generar_formato_pdf')->middleware('revisaraccesomenu:menureporterelacioncxc');
+    /*#################################FIN CUENTAS POR COBRAR##########################################*/    
+    
+    
     /*#################################COTIZACIONES##########################################*/
     //relacion cotizciones
     Route::get('/reporte_relacion_cotizaciones', 'ReportesCotizacionesController@reporte_relacion_cotizaciones')->name('reporte_relacion_cotizaciones')->middleware('revisaraccesomenu:menureporterelacioncotizaciones');
@@ -1073,6 +1103,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/generar_reporte_horas_tecnico', 'ReportesOrdenesTrabajoController@generar_reporte_horas_tecnico')->name('generar_reporte_horas_tecnico')->middleware('revisaraccesomenu:menureportesordenestrabajohorastecnico');
     Route::get('/reporte_horas_tecnico_obtener_tecnicos', 'ReportesOrdenesTrabajoController@reporte_horas_tecnico_obtener_tecnicos')->name('reporte_horas_tecnico_obtener_tecnicos')->middleware('revisaraccesomenu:menureportesordenestrabajohorastecnico');
     Route::get('/reporte_horas_tecnico_generar_formato_excel', 'ReportesOrdenesTrabajoController@reporte_horas_tecnico_generar_formato_excel')->name('reporte_horas_tecnico_generar_formato_excel')->middleware('revisaraccesomenu:menureportesordenestrabajohorastecnico');
+    Route::get('/reporte_horas_tecnico_generar_formato_pdf', 'ReportesOrdenesTrabajoController@reporte_horas_tecnico_generar_formato_pdf')->name('reporte_horas_tecnico_generar_formato_pdf')->middleware('revisaraccesomenu:menureportesordenestrabajohorastecnico');
     /* -----------------------------------||||||||||||||||||||FIN REPORTES||||||||||||||||||||||-------------------------------------*/
     /* -----------------------------------||||||||||||||||||||EMPRESA||||||||||||||||||||||-------------------------------------*/
     Route::get('/empresa', 'EmpresaController@empresa')->name('empresa');
@@ -1101,6 +1132,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/modificar_valores_en_bd_para_actualizacion_rama20211101correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20211101correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20211101correciones');
     Route::get('/modificar_valores_en_bd_para_actualizacion_rama20211227correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20211227correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20211227correciones');
     Route::get('/modificar_valores_en_bd_para_actualizacion_rama20220109correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20220109correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20220109correciones');
+    Route::get('/modificar_valores_en_bd_para_actualizacion_rama20220214correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20220214correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20220214correciones');
+    
     /* -----------------------------------||||||||||||||||||||FIN CONFIGURACIONES Y PRUEBAS||||||||||||||||||||||-------------------------------------*/
     /*---------------------------------------|||||||||||||||||||MANEJO DE ERRORES LOGS|||||||||||||||||||||------------------------------------------*/
     Route::get('errors_inaasys', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index')->name('errors_inaasys');

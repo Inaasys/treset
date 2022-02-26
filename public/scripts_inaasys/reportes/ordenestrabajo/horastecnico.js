@@ -3,10 +3,10 @@ var tabla;
 var form;
 //funcion que se ejecuta al inicio
 function init(){
-  asignarfechaactual(); 
-  listar();
-  activarrelistarreporteenterfechainicial();
-  activarrelistarreporteenterfechafinal();
+    asignarfechaactual(); 
+    listar();
+    activarrelistarreporteenterfechainicial();
+    activarrelistarreporteenterfechafinal();
 }
 //mostrar modal formulario
 function mostrarmodalformulario(){
@@ -103,33 +103,66 @@ function generar_formato_excel(){
         var tipoorden = $("#tipoorden").val();
         var statusorden = $("#statusorden").val();
         var string_tecnicos_seleccionados = $("#string_tecnicos_seleccionados").val(); 
-        if( $('#idtodoslostecnicos').prop('checked') ) {
-            var todoslostecnicos = 1;
-        }else{
-            todoslostecnicos = 0;
-        }
-        $("#btnGenerarFormatoExcelHorasTecnico").attr("href", urlgenerarformatoexcel+'?fechainicialreporte='+fechainicialreporte+'&fechafinalreporte='+fechafinalreporte+'&tiporeporte='+tiporeporte+'&tipoorden='+tipoorden+'&statusorden='+statusorden+'&string_tecnicos_seleccionados='+string_tecnicos_seleccionados+'&todoslostecnicos='+todoslostecnicos);
+        $("#btnGenerarFormatoExcelHorasTecnico").attr("href", urlgenerarformatoexcel+'?fechainicialreporte='+fechainicialreporte+'&fechafinalreporte='+fechafinalreporte+'&tiporeporte='+tiporeporte+'&tipoorden='+tipoorden+'&statusorden='+statusorden+'&string_tecnicos_seleccionados='+string_tecnicos_seleccionados);
         $("#btnGenerarFormatoExcelHorasTecnico").click();
     }else{
         form.parsley().validate();
     }
 }
+//realizar en reporte en pdf
+function generar_formato_pdf(){
+    var form = $("#formreporte");
+    if (form.parsley().isValid()){
+        var fechainicialreporte = $("#fechainicialreporte").val();
+        var fechafinalreporte = $("#fechafinalreporte").val();
+        var tiporeporte = $("#tiporeporte").val();
+        var tipoorden = $("#tipoorden").val();
+        var statusorden = $("#statusorden").val();
+        var string_tecnicos_seleccionados = $("#string_tecnicos_seleccionados").val(); 
+        $("#btnGenerarFormatoReportePdf").attr("href", urlgenerarformatopdf+'?fechainicialreporte='+fechainicialreporte+'&fechafinalreporte='+fechafinalreporte+'&tiporeporte='+tiporeporte+'&tipoorden='+tipoorden+'&statusorden='+statusorden+'&string_tecnicos_seleccionados='+string_tecnicos_seleccionados);
+        $("#btnGenerarFormatoReportePdf").click();
+    }else{
+        form.parsley().validate();
+    }
+}
+//colocar el mismo valor a string tecnos seleccionados
+function colocarvalorstring(){
+    $("#string_tecnicos_seleccionados").val($("#tecnico").val());
+}
 //listar tabla reporte
 function listar(){    
-    if( $('#idtodoslostecnicos').prop('checked') ) {
-        var todoslostecnicos = 1;
-    }else{
-        todoslostecnicos = 0;
+    var reporte = $("#statusorden").val();
+    switch(reporte){
+        case "FACTURADAS":
+            var columnas = new Array("Tecnico", "Nombre", "Orden", "Tipo", "Factura", "Fecha", "Codigo", "Descripcion", "Horas", "Precio", "Total");
+            break;
+        case "DETALLES":
+            var columnas = new Array("Factura", "Fecha", "Plazo", "Cliente", "NombreCliente", "TotalFactura", "AbonosCXC", "DescuentosNotasCredito", "TotalPagos", "SaldoFacturado");
+            break;
     }
+    var campos_tabla  = [];
+    var cabecerastablareporte = "";
+    for (var i = 0; i < columnas.length; i++) {
+        campos_tabla.push({ 
+            'data'    : columnas[i],
+            'name'  : columnas[i],
+            'orderable': false,
+            'searchable': false
+        });
+        cabecerastablareporte = cabecerastablareporte +'<th>'+columnas[i]+'</th>';
+    }
+    $("#cabecerastablareporte").html(cabecerastablareporte);
     tabla=$('#tbllistado').DataTable({
+        "lengthMenu": [ 500, 1000 ],
         "sScrollX": "110%",
-        "sScrollY": "350px",
+        "sScrollY": "300px",
         "bScrollCollapse": true,  
-        "paging":   false,
+        "lengthChange": false,
+        "paging":   true,
         "ordering": false,
-        "info":     false,
+        "info":     true,
         "searching": false,
-        "iDisplayLength": 50,//paginacion cada 50 registros
+        "iDisplayLength": 500,//paginacion cada 50 registros
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -145,15 +178,9 @@ function listar(){
                 d.tipoorden = $("#tipoorden").val();
                 d.statusorden = $("#statusorden").val();
                 d.string_tecnicos_seleccionados = $("#string_tecnicos_seleccionados").val();
-                d.todoslostecnicos = todoslostecnicos;
             }
         },
-        columns: [
-            { data: 'tecnico', name: 'tecnico', orderable: false, searchable: false },
-            { data: 'nombre', name: 'nombre' },
-            { data: 'horas', name: 'horas' },
-            { data: 'total', name: 'total' }
-        ],
+        columns: campos_tabla,
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
             $buscar.unbind();

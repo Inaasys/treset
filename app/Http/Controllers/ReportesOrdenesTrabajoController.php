@@ -17,6 +17,9 @@ use App\TipoOrdenTrabajo;
 use App\Tecnico;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ReportesOrdenesTrabajoHorasTecnico;
+use DB;
+use Illuminate\Support\Collection;
+use PDF;
 
 class ReportesOrdenesTrabajoController extends ConfiguracionSistemaController{
     public function __construct(){
@@ -35,7 +38,8 @@ class ReportesOrdenesTrabajoController extends ConfiguracionSistemaController{
         $rutaconfiguraciontabla = route('proveedores_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('reporte_horas_tecnico_generar_formato_excel');
         $tipos_ordenes_trabajo = TipoOrdenTrabajo::where('Status', 'ALTA')->get();
-        return view('reportes.ordenestrabajo.horastecnico', compact('configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','tipos_ordenes_trabajo'));
+        $urlgenerarformatopdf = route('reporte_horas_tecnico_generar_formato_pdf');
+        return view('reportes.ordenestrabajo.horastecnico', compact('configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel', 'urlgenerarformatopdf', 'tipos_ordenes_trabajo'));
         
     }
 
@@ -67,128 +71,434 @@ class ReportesOrdenesTrabajoController extends ConfiguracionSistemaController{
     public function generar_reporte_horas_tecnico(Request $request){
         $fechainicio = date($request->fechainicialreporte);
         $fechaterminacion = date($request->fechafinalreporte);
-        $reporte = $request->tiporeporte;
+        //$reporte = $request->tiporeporte;
+        $reporte = $request->statusorden;
         $tipoorden = $request->tipoorden;
         $statusorden = $request->statusorden;
+        $string_tecnicos_seleccionados = $request->string_tecnicos_seleccionados; 
+        if($string_tecnicos_seleccionados > 0){
+            $todoslostecnicos = 0;
+        }else{
+            $todoslostecnicos = 1;
+        }
         switch($reporte){
-            case "Porsucursal":
-                $ordenes = OrdenTrabajo::
-                    whereDate('Fecha', '>=', $fechainicio)->whereDate('Fecha', '<=', $fechaterminacion)
-                    ->where(function($q) use ($tipoorden) {
-                        if($tipoorden != 'TODOS'){
-                            $q->where('Tipo', $tipoorden);
-                        }
-                    })
-                    ->where(function($q) use ($statusorden) {
-                        if($statusorden != 'TODOS'){
-                            if($statusorden == 'FACTURADAS'){
-                                $q->where('Status', 'like', '%-%');
-                            }else{
-                                $q->where('Status', $statusorden);
-                            }
-                        }
-                    })
-                    ->get();
-                $data=array();
-                $totalhorasdetalles = 0;
-                $totalpesoshorasdetalle = 0;
-                foreach ($ordenes as $o){
-                    $detalles = OrdenTrabajoDetalle::where('Orden', $o->Orden)->get();
-                    foreach($detalles as $d){
-                        $totalhorasdetalles = $totalhorasdetalles + $d->Horas1 + $d->Horas2 + $d->Horas3 + $d->Horas4;
-                        $totalpesoshorasdetalle = $totalpesoshorasdetalle + $d->SubTotal;
-                    }
-                }
-                $empresa = $this->empresa;
-                $data[]=array(
-                    "tecnico" => "N/A",
-                    "nombre" => $empresa->Nombre,
-                    "horas" => Helpers::convertirvalorcorrecto($totalhorasdetalles),
-                    "total" => Helpers::convertirvalorcorrecto($totalpesoshorasdetalle)
-                );
-                return DataTables::of($data)
-                ->rawColumns(['operaciones'])
-                ->make(true);
-                break;
-            case "Portecnico":
-                $ordenes = OrdenTrabajo::
-                whereDate('Fecha', '>=', $fechainicio)->whereDate('Fecha', '<=', $fechaterminacion)
+            case "FACTURADAS":
+                $data = DB::table('Facturas as f')
+                ->join('Facturas Detalles as fd', 'f.Factura', '=', 'fd.Factura')
+                ->join('Ordenes de Trabajo as ot', 'fd.Orden', '=', 'ot.Orden')
+                ->join('Ordenes de Trabajo Detalles as otd', 'ot.Orden', '=', 'otd.Orden')
+                ->select("f.Factura", "f.Fecha", "fd.Orden", "f.Unidad", "ot.Marca", "ot.Tipo", "ot.HorasReales", "f.Status", "fd.Codigo", "fd.Descripcion", "fd.Precio", "f.TipoCambio", "fd.Departamento", "fd.Cargo", "otd.Status", "otd.Tecnico1", "otd.Tecnico2", "otd.Tecnico3", "otd.Tecnico4", "otd.Horas1", "otd.Horas2", "otd.Horas3", "otd.Horas4", "otd.Partida", "fd.Partida", "ot.Usuario")
+                ->whereColumn("otd.Status", "f.Factura")
+                ->whereColumn("fd.Partida", "otd.Partida")
+                ->where("ot.Tipo", "<>", "REFACTURA")
+                ->where("fd.Cargo", "SERVICIO")
+                ->where("f.Status", "<>", "BAJA")
+                ->whereDate('f.Fecha', '>=', $fechainicio)->whereDate('f.Fecha', '<=', $fechaterminacion)
+                ->where(function($q){
+                    $q->where('otd.Tecnico1', '>', 0)
+                      ->orWhere('otd.Tecnico2', '>',0)
+                      ->orWhere('otd.Tecnico3', '>',0)
+                      ->orWhere('otd.Tecnico4', '>',0);
+                })
                 ->where(function($q) use ($tipoorden) {
                     if($tipoorden != 'TODOS'){
-                        $q->where('Tipo', $tipoorden);
+                        $q->where('ot.Tipo', $tipoorden);  
                     }
                 })
-                ->where(function($q) use ($statusorden) {
-                    if($statusorden != 'TODOS'){
-                        if($statusorden == 'FACTURADAS'){
-                            $q->where('Status', 'like', '%-%');
-                        }else{
-                            $q->where('Status', $statusorden);
-                        }
-                    }
-                })
+                ->orderby('f.Fecha')
                 ->get();
-                $data=array();
-                $totalhorasdetalles = 0;
-                $totalpesoshorasdetalle = 0;
-
-                if($request->todoslostecnicos == 1){
-                    $tecnicos = Tecnico::where('Status', 'ALTA')->get();
-                    $string_tecnicos = '';
-                    foreach($tecnicos as $tec){
-                        $string_tecnicos = $string_tecnicos.",".$tec->Numero;
+                $cont = 0;
+                $arreglo = new Collection;
+                if($todoslostecnicos == 1){       
+                    foreach($data as $d){
+                        if($d->Tecnico1 > 0){
+                            $tecnico = Tecnico::where('Numero', $d->Tecnico1)->first();
+                            $arreglo->push([
+                                "Tecnico"=>$d->Tecnico1,
+                                "Nombre"=>$tecnico->Nombre,
+                                "Orden"=>$d->Orden,
+                                "Tipo"=>$d->Tipo,
+                                "Factura"=>$d->Factura,
+                                "Fecha"=>$d->Fecha,
+                                "Codigo"=>$d->Codigo,
+                                "Descripcion"=>$d->Descripcion,
+                                "Horas"=>Helpers::convertirvalorcorrecto($d->Horas1),
+                                "Precio"=>Helpers::convertirvalorcorrecto($d->Precio),
+                                "Total"=>Helpers::convertirvalorcorrecto($d->Horas1*$d->Precio),
+                            ]);
+                        }
+                        if($d->Tecnico2 > 0){
+                            $tecnico = Tecnico::where('Numero', $d->Tecnico2)->first();
+                            $arreglo->push([
+                                "Tecnico"=>$d->Tecnico2,
+                                "Nombre"=>$tecnico->Nombre,
+                                "Orden"=>$d->Orden,
+                                "Tipo"=>$d->Tipo,
+                                "Factura"=>$d->Factura,
+                                "Fecha"=>$d->Fecha,
+                                "Codigo"=>$d->Codigo,
+                                "Descripcion"=>$d->Descripcion,
+                                "Horas"=>Helpers::convertirvalorcorrecto($d->Horas2),
+                                "Precio"=>Helpers::convertirvalorcorrecto($d->Precio),
+                                "Total"=>Helpers::convertirvalorcorrecto($d->Horas2*$d->Precio),
+                            ]);
+                        }
+                        if($d->Tecnico3 > 0){
+                            $tecnico = Tecnico::where('Numero', $d->Tecnico3)->first();
+                            $arreglo->push([
+                                "Tecnico"=>$d->Tecnico3,
+                                "Nombre"=>$tecnico->Nombre,
+                                "Orden"=>$d->Orden,
+                                "Tipo"=>$d->Tipo,
+                                "Factura"=>$d->Factura,
+                                "Fecha"=>$d->Fecha,
+                                "Codigo"=>$d->Codigo,
+                                "Descripcion"=>$d->Descripcion,
+                                "Horas"=>Helpers::convertirvalorcorrecto($d->Horas3),
+                                "Precio"=>Helpers::convertirvalorcorrecto($d->Precio),
+                                "Total"=>Helpers::convertirvalorcorrecto($d->Horas3*$d->Precio),
+                            ]);
+                        }
+                        if($d->Tecnico4 > 0){
+                            $tecnico = Tecnico::where('Numero', $d->Tecnico4)->first();
+                            $arreglo->push([
+                                "Tecnico"=>$d->Tecnico4,
+                                "Nombre"=>$tecnico->Nombre,
+                                "Orden"=>$d->Orden,
+                                "Tipo"=>$d->Tipo,
+                                "Factura"=>$d->Factura,
+                                "Fecha"=>$d->Fecha,
+                                "Codigo"=>$d->Codigo,
+                                "Descripcion"=>$d->Descripcion,
+                                "Horas"=>Helpers::convertirvalorcorrecto($d->Horas4),
+                                "Precio"=>Helpers::convertirvalorcorrecto($d->Precio),
+                                "Total"=>Helpers::convertirvalorcorrecto($d->Horas4*$d->Precio),
+                            ]);
+                        }
                     }
-                    $string_tecnicos_seleccionados = substr($string_tecnicos, 1);
                 }else{
-                    $string_tecnicos_seleccionados = $request->string_tecnicos_seleccionados;
-                }
-                foreach(explode(",", $string_tecnicos_seleccionados) as $tecnico){
-                    $totalhorasdetalles = 0;
-                    $totalpesoshorasdetalle = 0;
-                    $tecnico = Tecnico::where('Numero', $tecnico)->first();
-                    foreach ($ordenes as $o){
-                        $detalles = OrdenTrabajoDetalle::where('Orden', $o->Orden)->get();
-                        foreach($detalles as $d){
-                            if($d->Tecnico1 == $tecnico->Numero){
-                                $totalhorasdetalles = $totalhorasdetalles + $d->Horas1;
-                                $subtotaltecnico = $d->Precio * $d->Horas1;
-                                $totalpesoshorasdetalle = $totalpesoshorasdetalle + $subtotaltecnico;
+                    $arraytecnicosseleccionados = explode(",", $string_tecnicos_seleccionados);
+                    foreach($data as $d){
+                        if($d->Tecnico1 > 0){
+                            if (in_array($d->Tecnico1, $arraytecnicosseleccionados)) {
+                                $tecnico = Tecnico::where('Numero', $d->Tecnico1)->first();
+                                $arreglo->push([
+                                    "Tecnico"=>$d->Tecnico1,
+                                    "Nombre"=>$tecnico->Nombre,
+                                    "Orden"=>$d->Orden,
+                                    "Tipo"=>$d->Tipo,
+                                    "Factura"=>$d->Factura,
+                                    "Fecha"=>$d->Fecha,
+                                    "Codigo"=>$d->Codigo,
+                                    "Descripcion"=>$d->Descripcion,
+                                    "Horas"=>Helpers::convertirvalorcorrecto($d->Horas1),
+                                    "Precio"=>Helpers::convertirvalorcorrecto($d->Precio),
+                                    "Total"=>Helpers::convertirvalorcorrecto($d->Horas1*$d->Precio),
+                                ]);
                             }
-                            if($d->Tecnico2 == $tecnico->Numero){
-                                $totalhorasdetalles = $totalhorasdetalles + $d->Horas2;
-                                $subtotaltecnico = $d->Precio * $d->Horas2;
-                                $totalpesoshorasdetalle = $totalpesoshorasdetalle + $subtotaltecnico;
+                        }
+                        if($d->Tecnico2 > 0){
+                            if (in_array($d->Tecnico2, $arraytecnicosseleccionados)) {
+                                $tecnico = Tecnico::where('Numero', $d->Tecnico2)->first();
+                                $arreglo->push([
+                                    "Tecnico"=>$d->Tecnico2,
+                                    "Nombre"=>$tecnico->Nombre,
+                                    "Orden"=>$d->Orden,
+                                    "Tipo"=>$d->Tipo,
+                                    "Factura"=>$d->Factura,
+                                    "Fecha"=>$d->Fecha,
+                                    "Codigo"=>$d->Codigo,
+                                    "Descripcion"=>$d->Descripcion,
+                                    "Horas"=>Helpers::convertirvalorcorrecto($d->Horas2),
+                                    "Precio"=>Helpers::convertirvalorcorrecto($d->Precio),
+                                    "Total"=>Helpers::convertirvalorcorrecto($d->Horas2*$d->Precio),
+                                ]);
                             }
-                            if($d->Tecnico3 == $tecnico->Numero){
-                                $totalhorasdetalles = $totalhorasdetalles + $d->Horas3;
-                                $subtotaltecnico = $d->Precio * $d->Horas3;
-                                $totalpesoshorasdetalle = $totalpesoshorasdetalle + $subtotaltecnico;
+                        }
+                        if($d->Tecnico3 > 0){
+                            if (in_array($d->Tecnico3, $arraytecnicosseleccionados)) {
+                                $tecnico = Tecnico::where('Numero', $d->Tecnico3)->first();
+                                $arreglo->push([
+                                    "Tecnico"=>$d->Tecnico3,
+                                    "Nombre"=>$tecnico->Nombre,
+                                    "Orden"=>$d->Orden,
+                                    "Tipo"=>$d->Tipo,
+                                    "Factura"=>$d->Factura,
+                                    "Fecha"=>$d->Fecha,
+                                    "Codigo"=>$d->Codigo,
+                                    "Descripcion"=>$d->Descripcion,
+                                    "Horas"=>Helpers::convertirvalorcorrecto($d->Horas3),
+                                    "Precio"=>Helpers::convertirvalorcorrecto($d->Precio),
+                                    "Total"=>Helpers::convertirvalorcorrecto($d->Horas3*$d->Precio),
+                                ]);
                             }
-                            if($d->Tecnico4 == $tecnico->Numero){
-                                $totalhorasdetalles = $totalhorasdetalles + $d->Horas4;
-                                $subtotaltecnico = $d->Precio * $d->Horas4;
-                                $totalpesoshorasdetalle = $totalpesoshorasdetalle + $subtotaltecnico;
+                        }
+                        if($d->Tecnico4 > 0){
+                            if (in_array($d->Tecnico4, $arraytecnicosseleccionados)) {
+                                $tecnico = Tecnico::where('Numero', $d->Tecnico4)->first();
+                                $arreglo->push([
+                                    "Tecnico"=>$d->Tecnico4,
+                                    "Nombre"=>$tecnico->Nombre,
+                                    "Orden"=>$d->Orden,
+                                    "Tipo"=>$d->Tipo,
+                                    "Factura"=>$d->Factura,
+                                    "Fecha"=>$d->Fecha,
+                                    "Codigo"=>$d->Codigo,
+                                    "Descripcion"=>$d->Descripcion,
+                                    "Horas"=>Helpers::convertirvalorcorrecto($d->Horas4),
+                                    "Precio"=>Helpers::convertirvalorcorrecto($d->Precio),
+                                    "Total"=>Helpers::convertirvalorcorrecto($d->Horas4*$d->Precio),
+                                ]);
                             }
                         }
                     }
-                    $empresa = $this->empresa;
-                    $data[]=array(
-                        "tecnico" => $tecnico->Numero,
-                        "nombre" => $tecnico->Nombre,
-                        "horas" => Helpers::convertirvalorcorrecto($totalhorasdetalles),
-                        "total" => Helpers::convertirvalorcorrecto($totalpesoshorasdetalle)
-                    );
-    
                 }
-                return DataTables::of($data)
-                ->rawColumns(['operaciones'])
-                ->make(true); 
+                return Datatables::of($arreglo)->make(true);                          
+                break;
+            case "Porsucursal":
+                break;
+            case "Portecnico":
                 break;
         }
     }
 
     //generar formato en excel
     public function reporte_horas_tecnico_generar_formato_excel(Request $request){
-        return Excel::download(new ReportesOrdenesTrabajoHorasTecnico($request->fechainicialreporte, $request->fechafinalreporte, $request->tiporeporte, $request->tipoorden, $request->statusorden, $request->string_tecnicos_seleccionados, $request->todoslostecnicos, $this->numerodecimales, $this->empresa), "formatohorastecnico.xlsx"); 
+        return Excel::download(new ReportesOrdenesTrabajoHorasTecnico($request->fechainicialreporte, $request->fechafinalreporte, $request->tiporeporte, $request->tipoorden, $request->statusorden, $request->string_tecnicos_seleccionados, $this->numerodecimales, $this->empresa), "formatohorastecnico.xlsx"); 
+    }
+
+    //generar formato pdf
+    public function reporte_horas_tecnico_generar_formato_pdf(Request $request){
+        $fechainicio = date($request->fechainicialreporte);
+        $fechaterminacion = date($request->fechafinalreporte);
+        //$reporte = $request->tiporeporte;
+        $reporte = $request->statusorden;
+        $tipoorden = $request->tipoorden;
+        $statusorden = $request->statusorden;
+        $string_tecnicos_seleccionados = $request->string_tecnicos_seleccionados; 
+        if($string_tecnicos_seleccionados > 0){
+            $todoslostecnicos = 0;
+        }else{
+            $todoslostecnicos = 1;
+        }
+        switch($reporte){
+            case "FACTURADAS":
+                $data = DB::table('Facturas as f')
+                ->join('Facturas Detalles as fd', 'f.Factura', '=', 'fd.Factura')
+                ->join('Ordenes de Trabajo as ot', 'fd.Orden', '=', 'ot.Orden')
+                ->join('Ordenes de Trabajo Detalles as otd', 'ot.Orden', '=', 'otd.Orden')
+                ->select("f.Factura", "f.Fecha", "fd.Orden", "f.Unidad", "ot.Marca", "ot.Tipo", "ot.HorasReales", "f.Status", "fd.Codigo", "fd.Descripcion", "fd.Precio", "f.TipoCambio", "fd.Departamento", "fd.Cargo", "otd.Status", "otd.Tecnico1", "otd.Tecnico2", "otd.Tecnico3", "otd.Tecnico4", "otd.Horas1", "otd.Horas2", "otd.Horas3", "otd.Horas4", "otd.Partida", "fd.Partida", "ot.Usuario")
+                ->whereColumn("otd.Status", "f.Factura")
+                ->whereColumn("fd.Partida", "otd.Partida")
+                ->where("ot.Tipo", "<>", "REFACTURA")
+                ->where("fd.Cargo", "SERVICIO")
+                ->where("f.Status", "<>", "BAJA")
+                ->whereDate('f.Fecha', '>=', $fechainicio)->whereDate('f.Fecha', '<=', $fechaterminacion)
+                ->where(function($q){
+                    $q->where('otd.Tecnico1', '>', 0)
+                      ->orWhere('otd.Tecnico2', '>',0)
+                      ->orWhere('otd.Tecnico3', '>',0)
+                      ->orWhere('otd.Tecnico4', '>',0);
+                })
+                ->where(function($q) use ($tipoorden) {
+                    if($tipoorden != 'TODOS'){
+                        $q->where('ot.Tipo', $tipoorden);  
+                    }
+                })
+                ->orderby('f.Fecha')
+                ->get();
+                $cont = 0;
+                $consultarep = new Collection;
+                if($todoslostecnicos == 1){       
+                    foreach($data as $d){
+                        if($d->Tecnico1 > 0){
+                            $tecnico = Tecnico::where('Numero', $d->Tecnico1)->first();
+                            $consultarep->push([
+                                "Tecnico"=>$d->Tecnico1,
+                                "Nombre"=>$tecnico->Nombre,
+                                "Orden"=>$d->Orden,
+                                "Tipo"=>$d->Tipo,
+                                "Factura"=>$d->Factura,
+                                "Fecha"=>$d->Fecha,
+                                "Codigo"=>$d->Codigo,
+                                "Descripcion"=>$d->Descripcion,
+                                "Horas"=>Helpers::convertirvalorcorrecto($d->Horas1),
+                                "Precio"=>Helpers::convertirvalorcorrecto($d->Precio),
+                                "Total"=>Helpers::convertirvalorcorrecto($d->Horas1*$d->Precio),
+                            ]);
+                        }
+                        if($d->Tecnico2 > 0){
+                            $tecnico = Tecnico::where('Numero', $d->Tecnico2)->first();
+                            $consultarep->push([
+                                "Tecnico"=>$d->Tecnico2,
+                                "Nombre"=>$tecnico->Nombre,
+                                "Orden"=>$d->Orden,
+                                "Tipo"=>$d->Tipo,
+                                "Factura"=>$d->Factura,
+                                "Fecha"=>$d->Fecha,
+                                "Codigo"=>$d->Codigo,
+                                "Descripcion"=>$d->Descripcion,
+                                "Horas"=>Helpers::convertirvalorcorrecto($d->Horas2),
+                                "Precio"=>Helpers::convertirvalorcorrecto($d->Precio),
+                                "Total"=>Helpers::convertirvalorcorrecto($d->Horas2*$d->Precio),
+                            ]);
+                        }
+                        if($d->Tecnico3 > 0){
+                            $tecnico = Tecnico::where('Numero', $d->Tecnico3)->first();
+                            $consultarep->push([
+                                "Tecnico"=>$d->Tecnico3,
+                                "Nombre"=>$tecnico->Nombre,
+                                "Orden"=>$d->Orden,
+                                "Tipo"=>$d->Tipo,
+                                "Factura"=>$d->Factura,
+                                "Fecha"=>$d->Fecha,
+                                "Codigo"=>$d->Codigo,
+                                "Descripcion"=>$d->Descripcion,
+                                "Horas"=>Helpers::convertirvalorcorrecto($d->Horas3),
+                                "Precio"=>Helpers::convertirvalorcorrecto($d->Precio),
+                                "Total"=>Helpers::convertirvalorcorrecto($d->Horas3*$d->Precio),
+                            ]);
+                        }
+                        if($d->Tecnico4 > 0){
+                            $tecnico = Tecnico::where('Numero', $d->Tecnico4)->first();
+                            $consultarep->push([
+                                "Tecnico"=>$d->Tecnico4,
+                                "Nombre"=>$tecnico->Nombre,
+                                "Orden"=>$d->Orden,
+                                "Tipo"=>$d->Tipo,
+                                "Factura"=>$d->Factura,
+                                "Fecha"=>$d->Fecha,
+                                "Codigo"=>$d->Codigo,
+                                "Descripcion"=>$d->Descripcion,
+                                "Horas"=>Helpers::convertirvalorcorrecto($d->Horas4),
+                                "Precio"=>Helpers::convertirvalorcorrecto($d->Precio),
+                                "Total"=>Helpers::convertirvalorcorrecto($d->Horas4*$d->Precio),
+                            ]);
+                        }
+                    }
+                }else{
+                    $arraytecnicosseleccionados = explode(",", $string_tecnicos_seleccionados);
+                    foreach($data as $d){
+                        if($d->Tecnico1 > 0){
+                            if (in_array($d->Tecnico1, $arraytecnicosseleccionados)) {
+                                $tecnico = Tecnico::where('Numero', $d->Tecnico1)->first();
+                                $consultarep->push([
+                                    "Tecnico"=>$d->Tecnico1,
+                                    "Nombre"=>$tecnico->Nombre,
+                                    "Orden"=>$d->Orden,
+                                    "Tipo"=>$d->Tipo,
+                                    "Factura"=>$d->Factura,
+                                    "Fecha"=>$d->Fecha,
+                                    "Codigo"=>$d->Codigo,
+                                    "Descripcion"=>$d->Descripcion,
+                                    "Horas"=>Helpers::convertirvalorcorrecto($d->Horas1),
+                                    "Precio"=>Helpers::convertirvalorcorrecto($d->Precio),
+                                    "Total"=>Helpers::convertirvalorcorrecto($d->Horas1*$d->Precio),
+                                ]);
+                            }
+                        }
+                        if($d->Tecnico2 > 0){
+                            if (in_array($d->Tecnico2, $arraytecnicosseleccionados)) {
+                                $tecnico = Tecnico::where('Numero', $d->Tecnico2)->first();
+                                $consultarep->push([
+                                    "Tecnico"=>$d->Tecnico2,
+                                    "Nombre"=>$tecnico->Nombre,
+                                    "Orden"=>$d->Orden,
+                                    "Tipo"=>$d->Tipo,
+                                    "Factura"=>$d->Factura,
+                                    "Fecha"=>$d->Fecha,
+                                    "Codigo"=>$d->Codigo,
+                                    "Descripcion"=>$d->Descripcion,
+                                    "Horas"=>Helpers::convertirvalorcorrecto($d->Horas2),
+                                    "Precio"=>Helpers::convertirvalorcorrecto($d->Precio),
+                                    "Total"=>Helpers::convertirvalorcorrecto($d->Horas2*$d->Precio),
+                                ]);
+                            }
+                        }
+                        if($d->Tecnico3 > 0){
+                            if (in_array($d->Tecnico3, $arraytecnicosseleccionados)) {
+                                $tecnico = Tecnico::where('Numero', $d->Tecnico3)->first();
+                                $consultarep->push([
+                                    "Tecnico"=>$d->Tecnico3,
+                                    "Nombre"=>$tecnico->Nombre,
+                                    "Orden"=>$d->Orden,
+                                    "Tipo"=>$d->Tipo,
+                                    "Factura"=>$d->Factura,
+                                    "Fecha"=>$d->Fecha,
+                                    "Codigo"=>$d->Codigo,
+                                    "Descripcion"=>$d->Descripcion,
+                                    "Horas"=>Helpers::convertirvalorcorrecto($d->Horas3),
+                                    "Precio"=>Helpers::convertirvalorcorrecto($d->Precio),
+                                    "Total"=>Helpers::convertirvalorcorrecto($d->Horas3*$d->Precio),
+                                ]);
+                            }
+                        }
+                        if($d->Tecnico4 > 0){
+                            if (in_array($d->Tecnico4, $arraytecnicosseleccionados)) {
+                                $tecnico = Tecnico::where('Numero', $d->Tecnico4)->first();
+                                $consultarep->push([
+                                    "Tecnico"=>$d->Tecnico4,
+                                    "Nombre"=>$tecnico->Nombre,
+                                    "Orden"=>$d->Orden,
+                                    "Tipo"=>$d->Tipo,
+                                    "Factura"=>$d->Factura,
+                                    "Fecha"=>$d->Fecha,
+                                    "Codigo"=>$d->Codigo,
+                                    "Descripcion"=>$d->Descripcion,
+                                    "Horas"=>Helpers::convertirvalorcorrecto($d->Horas4),
+                                    "Precio"=>Helpers::convertirvalorcorrecto($d->Precio),
+                                    "Total"=>Helpers::convertirvalorcorrecto($d->Horas4*$d->Precio),
+                                ]);
+                            }
+                        }
+                    }
+                }                        
+                break;
+            case "Porsucursal":
+                break;
+            case "Portecnico":
+                break;
+        }
+        if($todoslostecnicos == 1){ 
+            $data = array(
+                'fechainicio' => $fechainicio,
+                'fechaterminacion' => $fechaterminacion,
+                'reporte' => $reporte,
+                'tipoorden' => $tipoorden,
+                'statusorden' => $statusorden,
+                'string_tecnicos_seleccionados' => $string_tecnicos_seleccionados,
+                'todoslostecnicos' => $todoslostecnicos,
+                'numerodecimales' => $this->numerodecimales, 
+                'empresa' => $this->empresa,
+                'consultarep' => $consultarep
+            );
+        }else{
+            $data = array(
+                'fechainicio' => $fechainicio,
+                'fechaterminacion' => $fechaterminacion,
+                'reporte' => $reporte,
+                'tipoorden' => $tipoorden,
+                'statusorden' => $statusorden,
+                'string_tecnicos_seleccionados' => $string_tecnicos_seleccionados,
+                'todoslostecnicos' => $todoslostecnicos,
+                'numerodecimales' => $this->numerodecimales, 
+                'empresa' => $this->empresa,
+                'consultarep' => $consultarep,
+                'arraytecnicosseleccionados' => $arraytecnicosseleccionados
+
+            );
+
+        }
+        //dd($data);
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('reportes.ordenestrabajo.formato_pdf_reportehorastecnico', compact('data'))
+        ->setPaper('Letter')
+        ->setOption('footer-center', 'Página [page] de [toPage]')
+        ->setOption('footer-font-size', 7)
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        return $pdf->stream();
     }
 }

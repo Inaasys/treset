@@ -61,6 +61,11 @@
                             </div>
                         </div>
                         <div class="body">
+                            <div class="row" hidden>
+                                <div class="col-md-12">
+                                    <iframe  id="pdfiframe" name="pdfiframe" src="#"></iframe>
+                                </div>
+                            </div>
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap">
                                     <thead class="{{$empresa->background_tables}}">
@@ -199,6 +204,7 @@
         var background_tables = '{{$empresa->background_tables}}';
         var urlgenerarplantilla = '{{$urlgenerarplantilla}}';       
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
+        var urlpdfsimpresionesrapidas = '{{asset("xml_descargados/")}}/';
         var cotizaciones_productos_obtener = '{!!URL::to('cotizaciones_productos_obtener')!!}';
         var cotizaciones_productos_descargar_plantilla = '{!!URL::to('cotizaciones_productos_descargar_plantilla')!!}';
         var cotizaciones_productos_cargar_partidas_excel = '{!!URL::to('cotizaciones_productos_cargar_partidas_excel')!!}';
@@ -222,7 +228,8 @@
         var cotizaciones_productos_guardar_modificacion = '{!!URL::to('cotizaciones_productos_guardar_modificacion')!!}';
         var cotizaciones_productos_obtener_datos_envio_email = '{!!URL::to('cotizaciones_productos_obtener_datos_envio_email')!!}';
         var cotizaciones_productos_enviar_pdfs_email = '{!!URL::to('cotizaciones_productos_enviar_pdfs_email')!!}';
-        var cotizaciones_productos_enviar_pdfs_cliente_email = '{!!URL::to('cotizaciones_productos_enviar_pdfs_cliente_email')!!}';
+        var cotizaciones_productos_enviar_pdfs_cliente_email = '{!!URL::to('cotizaciones_productos_enviar_pdfs_cliente_email')!!}';     
+        var cotizaciones_productos_generar_pdfs = '{!!URL::to('cotizaciones_productos_generar_pdfs')!!}';
         var cotizaciones_productos_buscar_folio_string_like = '{!!URL::to('cotizaciones_productos_buscar_folio_string_like')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')

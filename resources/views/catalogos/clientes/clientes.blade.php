@@ -174,6 +174,8 @@
         var clientes_obtener_metodopago_por_clave = '{!!URL::to('clientes_obtener_metodopago_por_clave')!!}';
         var clientes_obtener_uso_cfdi = '{!!URL::to('clientes_obtener_uso_cfdi')!!}';
         var clientes_obtener_usocfdi_por_clave = '{!!URL::to('clientes_obtener_usocfdi_por_clave')!!}';
+        var clientes_obtener_regimenes_fiscales = '{!!URL::to('clientes_obtener_regimenes_fiscales')!!}';
+        var clientes_obtener_regimenfiscal_por_clave = '{!!URL::to('clientes_obtener_regimenfiscal_por_clave')!!}';
         var clientes_obtener_productos = '{!!URL::to('clientes_obtener_productos')!!}';
         var clientes_obtener_datos_producto_agregar_fila = '{!!URL::to('clientes_obtener_datos_producto_agregar_fila')!!}';
         var clientes_alta_o_baja = '{!!URL::to('clientes_alta_o_baja')!!}'; 

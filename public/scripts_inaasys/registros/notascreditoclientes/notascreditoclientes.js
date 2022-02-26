@@ -152,6 +152,7 @@ function listar(){
       $buscar.bind('keyup change', function(e) {
           if(e.keyCode == 13 || this.value == "") {
             $('#tbllistado').DataTable().search( this.value ).draw();
+            $(".inputbusquedageneral").val(""); 
           }
       });
     }
@@ -1007,6 +1008,7 @@ function listarfacturas (){
                                   '<tr>'+
                                     '<th>Operaciones</th>'+
                                     '<th>Factura</th>'+
+                                    '<th>UUID</th>'+
                                     '<th>Depto</th>'+
                                     '<th>Fecha</th>'+
                                     '<th>Plazo</th>'+
@@ -1049,6 +1051,7 @@ function listarfacturas (){
         columns: [
             { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
             { data: 'Factura', name: 'Factura' },
+            { data: 'UUID', name: 'UUID' },
             { data: 'Depto', name: 'Depto' },
             { data: 'Fecha', name: 'Fecha' },
             { data: 'Plazo', name: 'Plazo', orderable: false, searchable: false },
@@ -3913,6 +3916,38 @@ function buscarstringlike(){
       var data = tablafolenc.row( this ).data();
       agregararraypdf(data.Nota);
   });
+}
+//generar documento en iframe
+function generardocumentoeniframe(Nota){
+  var arraypdf = new Array();
+  var folios = [Nota];
+  arraypdf.push(folios);
+  var form_data = new FormData();
+  form_data.append('arraypdf', arraypdf); 
+  form_data.append('tipogeneracionpdf', 0);
+  form_data.append('numerodecimalesdocumento', 2);
+  form_data.append('imprimirdirectamente', 1);
+  $.ajax({
+    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+    url:notas_credito_clientes_generar_pdfs,
+    data: form_data,
+    type: 'POST',
+    contentType: false,
+    processData: false,
+    success: function (data) {
+      $('#pdfiframe').attr("src", urlpdfsimpresionesrapidas+data);
+      setTimeout(function(){imprimirdirecto();},500);    
+    },
+    error: function (data) {
+      console.log(data);
+    }
+  });
+}
+//imprimir documento pdf directamente
+function imprimirdirecto(){
+  var pdfFrame = window.frames["pdfiframe"];
+  pdfFrame.focus();
+  pdfFrame.print();
 }
 //configurar tabla
 function configurar_tabla(){

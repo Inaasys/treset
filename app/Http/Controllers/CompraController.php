@@ -47,6 +47,7 @@ use Config;
 use Mail;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
 use ZipArchive;
+use File;
 
 class CompraController extends ConfiguracionSistemaController{
 
@@ -113,12 +114,13 @@ class CompraController extends ConfiguracionSistemaController{
                                         'OPERACIONES <span class="caret"></span>'.
                                     '</button>'.
                                     '<ul class="dropdown-menu">'.
-                                        '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Compra.'\')">Cambios</a></li>'.
-                                        '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Compra.'\')">Bajas</a></li>'.
-                                        '<li><a href="javascript:void(0);" onclick="movimientoscompra(\''.$data->Compra.'\')">Movimientos</a></li>'.
-                                        '<li><a href="'.route('compras_generar_pdfs_indiv',$data->Compra).'" target="_blank">Ver Documento PDF</a></li>'.
-                                        '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Compra .'\')">Enviar Documento por Correo</a></li>'.
-                                        '<li><a href="'.route('compras_generar_excel_indiv',$data->Compra).'" target="_blank">Generar Excel</a></li>'.
+                                        '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Compra.'\')">Cambios</a></li>'.
+                                        '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->Compra.'\')">Bajas</a></li>'.
+                                        '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="movimientoscompra(\''.$data->Compra.'\')">Movimientos</a></li>'.
+                                        '<li><a class="paddingmenuopciones" href="'.route('compras_generar_pdfs_indiv',$data->Compra).'" target="_blank">Ver Documento PDF</a></li>'.
+                                        '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Compra .'\')">Enviar Documento por Correo</a></li>'.
+                                        '<li><a class="paddingmenuopciones" href="'.route('compras_generar_excel_indiv',$data->Compra).'" target="_blank">Generar Excel</a></li>'.
+                                        '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="generardocumentoeniframe(\''.$data->Compra .'\')">Imprimir Documento PDF</a></li>'.
                                     '</ul>'.
                                 '</div>';
                         return $operaciones;
@@ -1943,13 +1945,17 @@ class CompraController extends ConfiguracionSistemaController{
         Helpers::eliminararchivospdfsgenerados();
         //primero eliminar todos los archivos zip
         Helpers::eliminararchivoszipgenerados();
-        $tipogeneracionpdf = $request->tipogeneracionpdf;
-        if($tipogeneracionpdf == 0){
-            $compras = Compra::whereIn('Compra', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
+        if($request->imprimirdirectamente == 1){
+            $compras = Compra::where('Compra', $request->arraypdf)->get(); 
         }else{
-            $fechainiciopdf = date($request->fechainiciopdf);
-            $fechaterminacionpdf = date($request->fechaterminacionpdf);
-            $compras = Compra::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
+            $tipogeneracionpdf = $request->tipogeneracionpdf;
+            if($tipogeneracionpdf == 0){
+                $compras = Compra::whereIn('Compra', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
+            }else{
+                $fechainiciopdf = date($request->fechainiciopdf);
+                $fechaterminacionpdf = date($request->fechaterminacionpdf);
+                $compras = Compra::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
+            }
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $arrayfilespdf = array();
@@ -2019,31 +2025,38 @@ class CompraController extends ConfiguracionSistemaController{
             array_push($arrayfilespdf,$ArchivoPDF);
         }
         $pdfMerger->merge(); //unirlos
-        if($request->descargar_xml == 0){
-            $pdfMerger->save("Compras.pdf", "browser");//mostrarlos en el navegador   
+        if($request->imprimirdirectamente == 1){
+            $archivoacopiar = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
+            $carpetacopias = public_path('xml_descargados/'.$ArchivoPDF);
+            File::copy($archivoacopiar, $carpetacopias);
+            return response()->json($ArchivoPDF);
         }else{
-            //carpeta donde se guardara el archivo zip
-            $public_dir=public_path();
-            // Zip File Name
-            $zipFileName = 'DocumentosPDF.zip';
-            // Crear Objeto ZipArchive
-            $zip = new ZipArchive;
-            if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
-                // Agregar archivos que se comprimiran
-                foreach($arrayfilespdf as $afp) {
-                    $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
-                }     
-                //terminar proceso   
-                $zip->close();
-            }
-            // Set Encabezados para descargar
-            $headers = array(
-                'Content-Type' => 'application/octet-stream',
-            );
-            $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
-            // Create Download Response
-            if(file_exists($filetopath)){
-                return response()->download($filetopath,$zipFileName,$headers);
+            if($request->descargar_xml == 0){
+                $pdfMerger->save("Compras.pdf", "browser");//mostrarlos en el navegador   
+            }else{
+                //carpeta donde se guardara el archivo zip
+                $public_dir=public_path();
+                // Zip File Name
+                $zipFileName = 'DocumentosPDF.zip';
+                // Crear Objeto ZipArchive
+                $zip = new ZipArchive;
+                if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
+                    // Agregar archivos que se comprimiran
+                    foreach($arrayfilespdf as $afp) {
+                        $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
+                    }     
+                    //terminar proceso   
+                    $zip->close();
+                }
+                // Set Encabezados para descargar
+                $headers = array(
+                    'Content-Type' => 'application/octet-stream',
+                );
+                $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
+                // Create Download Response
+                if(file_exists($filetopath)){
+                    return response()->download($filetopath,$zipFileName,$headers);
+                }
             }
         }
     }

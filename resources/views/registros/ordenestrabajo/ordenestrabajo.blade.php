@@ -61,6 +61,11 @@
                             </div>
                         </div>
                         <div class="body">
+                            <div class="row" hidden>
+                                <div class="col-md-12">
+                                    <iframe  id="pdfiframe" name="pdfiframe" src="#"></iframe>
+                                </div>
+                            </div>
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap">
                                     <thead class="{{$empresa->background_tables}}">
@@ -322,6 +327,7 @@
         var background_tables = '{{$empresa->background_tables}}';
         var urlgenerarplantilla = '{{$urlgenerarplantilla}}';       
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
+        var urlpdfsimpresionesrapidas = '{{asset("xml_descargados/")}}/';
         var ordenes_trabajo_obtener = '{!!URL::to('ordenes_trabajo_obtener')!!}';
         var ordenes_trabajo_descargar_plantilla = '{!!URL::to('ordenes_trabajo_descargar_plantilla')!!}';
         var ordenes_trabajo_cargar_partidas_excel = '{!!URL::to('ordenes_trabajo_cargar_partidas_excel')!!}';
@@ -358,6 +364,7 @@
         var ordenes_trabajo_obtener_datos_envio_email = '{!!URL::to('ordenes_trabajo_obtener_datos_envio_email')!!}';
         var ordenes_trabajo_enviar_pdfs_email = '{!!URL::to('ordenes_trabajo_enviar_pdfs_email')!!}';
         var ordenes_trabajo_buscar_folio_string_like = '{!!URL::to('ordenes_trabajo_buscar_folio_string_like')!!}'; 
+        var ordenes_trabajo_generar_pdfs = '{!!URL::to('ordenes_trabajo_generar_pdfs')!!}'; 
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="scripts_inaasys/registros/ordenestrabajo/ordenestrabajo.js"></script>

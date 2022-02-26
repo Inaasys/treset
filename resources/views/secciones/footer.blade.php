@@ -15,6 +15,9 @@
         var ordenes_trabajo = '{!!URL::to('ordenes_trabajo')!!}';
         var clientes = '{!!URL::to('clientes')!!}';
         var proveedores = '{!!URL::to('proveedores')!!}';
+        
+        /*TIPO USUARIO LOGUEADO EN EL SISTEMA*/
+        var rol_de_usuario_logueado_en_sistema = '{{Auth::user()->role_id}}';
     </script>
     <!-- Jquery Core Js -->
     <script src="plugins/jquery/jquery.min.js"></script>

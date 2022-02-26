@@ -77,9 +77,9 @@ class CotizacionController extends ConfiguracionSistemaController{
                                                 'OPERACIONES <span class="caret"></span>'.
                                             '</button>'.
                                             '<ul class="dropdown-menu">'.
-                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->cotizacion .'\')">Cambios</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->cotizacion .'\')">Bajas</a></li>'.
-                                                '<li><a href="'.route('cotizaciones_crear_formato_excel',$data->cotizacion).'" target="_blank">Crear Formato Excel</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->cotizacion .'\')">Cambios</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->cotizacion .'\')">Bajas</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="'.route('cotizaciones_crear_formato_excel',$data->cotizacion).'" target="_blank">Crear Formato Excel</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;

@@ -61,6 +61,11 @@
                             </div>
                         </div>
                         <div class="body">
+                            <div class="row" hidden>
+                                <div class="col-md-12">
+                                    <iframe  id="pdfiframe" name="pdfiframe" src="#"></iframe>
+                                </div>
+                            </div>
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap" >
                                     <thead class="{{$empresa->background_tables}}">
@@ -233,6 +238,7 @@
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';       
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
+        var urlpdfsimpresionesrapidas = '{{asset("xml_descargados/")}}/';
         var notas_credito_clientes_obtener = '{!!URL::to('notas_credito_clientes_obtener')!!}';
         var notas_credito_clientes_obtener_ultimo_folio = '{!!URL::to('notas_credito_clientes_obtener_ultimo_folio')!!}';
         var ordenes_compra_obtener_fecha_actual_datetimelocal = '{!!URL::to('ordenes_compra_obtener_fecha_actual_datetimelocal')!!}';
@@ -270,7 +276,8 @@
         var notas_credito_clientes_obtener_nota_cliente = '{!!URL::to('notas_credito_clientes_obtener_nota_cliente')!!}';
         var notas_credito_clientes_guardar_modificacion = '{!!URL::to('notas_credito_clientes_guardar_modificacion')!!}';
         var notas_credito_clientes_obtener_datos_envio_email = '{!!URL::to('notas_credito_clientes_obtener_datos_envio_email')!!}';
-        var notas_credito_clientes_enviar_pdfs_email = '{!!URL::to('notas_credito_clientes_enviar_pdfs_email')!!}';
+        var notas_credito_clientes_enviar_pdfs_email = '{!!URL::to('notas_credito_clientes_enviar_pdfs_email')!!}';   
+        var notas_credito_clientes_generar_pdfs = '{!!URL::to('notas_credito_clientes_generar_pdfs')!!}';
         var notas_credito_clientes_buscar_folio_string_like = '{!!URL::to('notas_credito_clientes_buscar_folio_string_like')!!}'; 
         var notas_credito_clientes_verificar_si_continua_timbrado=  '{!!URL::to('notas_credito_clientes_verificar_si_continua_timbrado')!!}';
         var notas_credito_clientes_timbrar_nota=  '{!!URL::to('notas_credito_clientes_timbrar_nota')!!}';

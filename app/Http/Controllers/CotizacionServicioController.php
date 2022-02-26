@@ -41,6 +41,7 @@ use Schema;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
 use Storage; 
 use ZipArchive;
+use File;
 
 class CotizacionServicioController extends ConfiguracionSistemaController{
 
@@ -93,12 +94,13 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
                                                 'OPERACIONES <span class="caret"></span>'.
                                             '</button>'.
                                             '<ul class="dropdown-menu">'.
-                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Cotizacion .'\')">Cambios</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Cotizacion .'\')">Bajas</a></li>'.
-                                                '<li><a href="'.route('cotizaciones_servicios_generar_pdfs_indiv',$data->Cotizacion).'" target="_blank">Ver Documento PDF - Formato Interno</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Cotizacion .'\',1)">Enviar Documento por Correo - Formato Interno</a></li>'.
-                                                '<li><a href="'.route('cotizaciones_servicios_generar_pdfs_cliente_indiv',$data->Cotizacion).'" target="_blank">Ver Documento PDF - Formato Cliente</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Cotizacion .'\',0)">Enviar Documento por Correo - Formato Cliente</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Cotizacion .'\')">Cambios</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->Cotizacion .'\')">Bajas</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="'.route('cotizaciones_servicios_generar_pdfs_indiv',$data->Cotizacion).'" target="_blank">Ver Documento PDF - Formato Interno</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Cotizacion .'\',1)">Enviar Documento por Correo - Formato Interno</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="'.route('cotizaciones_servicios_generar_pdfs_cliente_indiv',$data->Cotizacion).'" target="_blank">Ver Documento PDF - Formato Cliente</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Cotizacion .'\',0)">Enviar Documento por Correo - Formato Cliente</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="generardocumentoeniframe(\''.$data->Cotizacion .'\')">Imprimir Documento PDF</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;
@@ -1255,13 +1257,17 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
         Helpers::eliminararchivospdfsgenerados();
         //primero eliminar todos los archivos zip
         Helpers::eliminararchivoszipgenerados();
-        $tipogeneracionpdf = $request->tipogeneracionpdf;
-        if($tipogeneracionpdf == 0){
-            $cotizacionesservicios = CotizacionServicio::whereIn('Cotizacion', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
+        if($request->imprimirdirectamente == 1){
+            $cotizacionesservicios = CotizacionServicio::where('Cotizacion', $request->arraypdf)->get(); 
         }else{
-            $fechainiciopdf = date($request->fechainiciopdf);
-            $fechaterminacionpdf = date($request->fechaterminacionpdf);
-            $cotizacionesservicios = CotizacionServicio::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
+            $tipogeneracionpdf = $request->tipogeneracionpdf;
+            if($tipogeneracionpdf == 0){
+                $cotizacionesservicios = CotizacionServicio::whereIn('Cotizacion', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
+            }else{
+                $fechainiciopdf = date($request->fechainiciopdf);
+                $fechaterminacionpdf = date($request->fechaterminacionpdf);
+                $cotizacionesservicios = CotizacionServicio::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
+            }
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $arrayfilespdf = array();
@@ -1337,31 +1343,38 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
             array_push($arrayfilespdf,$ArchivoPDF);
         }
         $pdfMerger->merge(); //unirlos
-        if($request->descargar_xml == 0){
-            $pdfMerger->save("CotizacionesServicio.pdf", "browser");//mostrarlos en el navegador
+        if($request->imprimirdirectamente == 1){
+            $archivoacopiar = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
+            $carpetacopias = public_path('xml_descargados/'.$ArchivoPDF);
+            File::copy($archivoacopiar, $carpetacopias);
+            return response()->json($ArchivoPDF);
         }else{
-            //carpeta donde se guardara el archivo zip
-            $public_dir=public_path();
-            // Zip File Name
-            $zipFileName = 'DocumentosPDF.zip';
-            // Crear Objeto ZipArchive
-            $zip = new ZipArchive;
-            if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
-                // Agregar archivos que se comprimiran
-                foreach($arrayfilespdf as $afp) {
-                    $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
-                }     
-                //terminar proceso   
-                $zip->close();
-            }
-            // Set Encabezados para descargar
-            $headers = array(
-                'Content-Type' => 'application/octet-stream',
-            );
-            $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
-            // Create Download Response
-            if(file_exists($filetopath)){
-                return response()->download($filetopath,$zipFileName,$headers);
+            if($request->descargar_xml == 0){
+                $pdfMerger->save("CotizacionesServicio.pdf", "browser");//mostrarlos en el navegador
+            }else{
+                //carpeta donde se guardara el archivo zip
+                $public_dir=public_path();
+                // Zip File Name
+                $zipFileName = 'DocumentosPDF.zip';
+                // Crear Objeto ZipArchive
+                $zip = new ZipArchive;
+                if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
+                    // Agregar archivos que se comprimiran
+                    foreach($arrayfilespdf as $afp) {
+                        $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
+                    }     
+                    //terminar proceso   
+                    $zip->close();
+                }
+                // Set Encabezados para descargar
+                $headers = array(
+                    'Content-Type' => 'application/octet-stream',
+                );
+                $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
+                // Create Download Response
+                if(file_exists($filetopath)){
+                    return response()->download($filetopath,$zipFileName,$headers);
+                }
             }
         }
     }

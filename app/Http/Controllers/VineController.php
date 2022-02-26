@@ -40,8 +40,8 @@ class VineController extends ConfiguracionSistemaController{
                                                 'OPERACIONES <span class="caret"></span>'.
                                             '</button>'.
                                             '<ul class="dropdown-menu">'.
-                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Vin .'\')">Cambios</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Vin .'\')">Bajas</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Vin .'\')">Cambios</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->Vin .'\')">Bajas</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;

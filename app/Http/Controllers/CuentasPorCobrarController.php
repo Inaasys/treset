@@ -42,6 +42,7 @@ use Facturapi\Facturapi;
 use Storage;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
 use ZipArchive;
+use File;
 
 class CuentasPorCobrarController extends ConfiguracionSistemaController{
 
@@ -106,14 +107,15 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                                             'OPERACIONES <span class="caret"></span>'.
                                         '</button>'.
                                         '<ul class="dropdown-menu">'.
-                                            '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Pago .'\')">Cambios</a></li>'.
-                                            '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Pago .'\')">Bajas</a></li>'.
-                                            '<li><a href="'.route('cuentas_por_cobrar_generar_pdfs_indiv',['documento'=>$data->Pago,'tipodocumento'=>0]).'" target="_blank">Ver Documento Normal PDF</a></li>'.
-                                            '<li><a href="'.route('cuentas_por_cobrar_generar_pdfs_indiv',['documento'=>$data->Pago,'tipodocumento'=>1]).'" target="_blank">Ver Documento Poliza de Ingreso PDF</a></li>'.
-                                            '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Pago .'\')">Enviar Documento Normal por Correo</a></li>'.
-                                            '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Pago.'\',1)">Enviar Documento Poliza de Ingreso por Correo</a></li>'.
-                                            '<li><a href="javascript:void(0);" onclick="timbrarpago(\''.$data->Pago .'\')">Timbrar Pago</a></li>'.
-                                            '<li><a href="javascript:void(0);" onclick="cancelartimbre(\''.$data->Pago .'\')">Cancelar Timbre</a></li>'.
+                                            '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Pago .'\')">Cambios</a></li>'.
+                                            '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->Pago .'\')">Bajas</a></li>'.
+                                            '<li><a class="paddingmenuopciones" href="'.route('cuentas_por_cobrar_generar_pdfs_indiv',['documento'=>$data->Pago,'tipodocumento'=>0]).'" target="_blank">Ver Documento Normal PDF</a></li>'.
+                                            '<li><a class="paddingmenuopciones" href="'.route('cuentas_por_cobrar_generar_pdfs_indiv',['documento'=>$data->Pago,'tipodocumento'=>1]).'" target="_blank">Ver Documento Poliza de Ingreso PDF</a></li>'.
+                                            '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Pago .'\')">Enviar Documento Normal por Correo</a></li>'.
+                                            '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Pago.'\',1)">Enviar Documento Poliza de Ingreso por Correo</a></li>'.
+                                            '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="timbrarpago(\''.$data->Pago .'\')">Timbrar Pago</a></li>'.
+                                            '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="cancelartimbre(\''.$data->Pago .'\')">Cancelar Timbre</a></li>'.
+                                            '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="generardocumentoeniframe(\''.$data->Pago .'\')">Imprimir Documento PDF</a></li>'.
                                         '</ul>'.
                                     '</div>';
                     return $operaciones;
@@ -121,6 +123,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                 ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
                 ->addColumn('Abono', function($data){ return $data->Abono; })
                 ->addColumn('TipoCambio', function($data){ return $data->TipoCambio; })
+                ->addColumn('Facturas', function($data){ return substr($data->Facturas, 0, 70); })
                 ->rawColumns(['operaciones'])
                 ->make(true);
         } 
@@ -881,13 +884,17 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         Helpers::eliminararchivosxmlsgenerados();
         //primero eliminar todos los archivos zip
         Helpers::eliminararchivoszipgenerados();
-        $tipogeneracionpdf = $request->tipogeneracionpdf;
-        if($tipogeneracionpdf == 0){
-            $cuentasporcobrar = CuentaXCobrar::whereIn('Pago', $request->arraypdf)->orderBy('Folio', 'ASC')->take(150)->get(); 
+        if($request->imprimirdirectamente == 1){
+            $cuentasporcobrar = CuentaXCobrar::where('Pago', $request->arraypdf)->get(); 
         }else{
-            $fechainiciopdf = date($request->fechainiciopdf);
-            $fechaterminacionpdf = date($request->fechaterminacionpdf);
-            $cuentasporcobrar = CuentaXCobrar::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(150)->get();
+            $tipogeneracionpdf = $request->tipogeneracionpdf;
+            if($tipogeneracionpdf == 0){
+                $cuentasporcobrar = CuentaXCobrar::whereIn('Pago', $request->arraypdf)->orderBy('Folio', 'ASC')->take(150)->get(); 
+            }else{
+                $fechainiciopdf = date($request->fechainiciopdf);
+                $fechaterminacionpdf = date($request->fechaterminacionpdf);
+                $cuentasporcobrar = CuentaXCobrar::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(150)->get();
+            }
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $arrayfiles = array();
@@ -996,34 +1003,41 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             array_push($arrayfilespdf,$ArchivoPDF);
         }
         $pdfMerger->merge(); //unirlos
-        if($request->descargar_xml == 0){
-            $pdfMerger->save("CuentasPorCobrar.pdf", "browser");//mostrarlos en el navegador
+        if($request->imprimirdirectamente == 1){
+            $archivoacopiar = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
+            $carpetacopias = public_path('xml_descargados/'.$ArchivoPDF);
+            File::copy($archivoacopiar, $carpetacopias);
+            return response()->json($ArchivoPDF);
         }else{
-            //carpeta donde se guardara el archivo zip
-            $public_dir=public_path();
-            // Zip File Name
-            $zipFileName = 'CuentasPorCobrar.zip';
-            // Crear Objeto ZipArchive
-            $zip = new ZipArchive;
-            if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
-                // Agregar archivos que se comprimiran
-                foreach($arrayfiles as $af) {
-                    $zip->addFile(Storage::disk('local2')->getAdapter()->applyPathPrefix($af),$af);
-                }  
-                foreach($arrayfilespdf as $afp) {
-                    $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
-                }     
-                //terminar proceso   
-                $zip->close();
-            }
-            // Set Encabezados para descargar
-            $headers = array(
-                'Content-Type' => 'application/octet-stream',
-            );
-            $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
-            // Create Download Response
-            if(file_exists($filetopath)){
-                return response()->download($filetopath,$zipFileName,$headers);
+            if($request->descargar_xml == 0){
+                $pdfMerger->save("CuentasPorCobrar.pdf", "browser");//mostrarlos en el navegador
+            }else{
+                //carpeta donde se guardara el archivo zip
+                $public_dir=public_path();
+                // Zip File Name
+                $zipFileName = 'CuentasPorCobrar.zip';
+                // Crear Objeto ZipArchive
+                $zip = new ZipArchive;
+                if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
+                    // Agregar archivos que se comprimiran
+                    foreach($arrayfiles as $af) {
+                        $zip->addFile(Storage::disk('local2')->getAdapter()->applyPathPrefix($af),$af);
+                    }  
+                    foreach($arrayfilespdf as $afp) {
+                        $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
+                    }     
+                    //terminar proceso   
+                    $zip->close();
+                }
+                // Set Encabezados para descargar
+                $headers = array(
+                    'Content-Type' => 'application/octet-stream',
+                );
+                $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
+                // Create Download Response
+                if(file_exists($filetopath)){
+                    return response()->download($filetopath,$zipFileName,$headers);
+                }
             }
         }
     }

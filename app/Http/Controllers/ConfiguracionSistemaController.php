@@ -66,7 +66,10 @@ class ConfiguracionSistemaController extends Controller
                                             'MostrarInsumoPorPartidaEnCapturaDeRemisiones',
                                             'ModificarConsecutivoFolioEnRemisiones',
                                             'ModificarCostosDeProductos',
-                                            'ValidarUtilidadNegativa')
+                                            'ValidarUtilidadNegativa',
+                                            'PedirObligatoriamenteReferenciaEnRemisiones',
+                                            'PedirObligatoriamenteOrdenServicioEnRemisiones',
+                                            'PedirObligatoriamenteEquipoEnRemisiones')
                                 ->where('Numero', 1)->first();
         //actualizar datos de configuracion global
         config(['app.periodoincialmodulos' => $this->empresa->Periodo_Inicial_Modulos]);
@@ -126,6 +129,13 @@ class ConfiguracionSistemaController extends Controller
         $this->usuariosamodificarinsumos = config('app.usuariosamodificarinsumos');
         //usuarios que pueden modificar costos en productos
         $this->modificarcostosdeproductos = config('app.modificarcostosdeproductos');
+        //conexiones a otras bases
+        $this->suc2 = config('app.suc2');
+        $this->connsuc2 = config('app.connsuc2');    
+        $this->suc3 = config('app.suc3');
+        $this->connsuc3 = config('app.connsuc3');  
+        $this->suc4 = config('app.suc4');
+        $this->connsuc4 = config('app.connsuc4');    
         /*
         //obtener o actualizar el valor del dolar segun sea el caso
         $fechahoy = Carbon::now()->toDateString();
@@ -305,6 +315,12 @@ class ConfiguracionSistemaController extends Controller
         View::share ( 'modificarcostosdeproductos', $this->modificarcostosdeproductos);
         View::share ( 'modificarconsecutivofolioenremisiones', $this->modificarconsecutivofolioenremisiones);
         View::share ( 'validarutilidadnegativa', $this->validarutilidadnegativa);
+        View::share ( 'suc2', $this->suc2);
+        View::share ( 'connsuc2', $this->connsuc2); 
+        View::share ( 'suc3', $this->suc3);
+        View::share ( 'connsuc3', $this->connsuc3); 
+        View::share ( 'suc4', $this->suc4);
+        View::share ( 'connsuc4', $this->connsuc4); 
         //View::share ( 'array', ['name'=>'Franky','address'=>'Mars'] );
     } 
 }

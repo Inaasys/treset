@@ -120,12 +120,12 @@ class CartaPorteController extends ConfiguracionSistemaController{
                                                 'OPERACIONES <span class="caret"></span>'.
                                             '</button>'.
                                             '<ul class="dropdown-menu">'.
-                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Nota .'\')">Cambios</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Nota .'\')">Bajas</a></li>'.
-                                                '<li><a href="'.route('notas_credito_clientes_generar_pdfs_indiv',$data->Nota).'" target="_blank">Ver Documento PDF</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Nota .'\')">Enviar Documento por Correo</a></li>'.
-                                                //'<li><a href="javascript:void(0);" onclick="timbrarnota(\''.$data->Nota .'\')">Timbrar Nota</a></li>'.
-                                                //'<li><a href="javascript:void(0);" onclick="cancelartimbre(\''.$data->Nota .'\')">Cancelar Timbre</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Nota .'\')">Cambios</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->Nota .'\')">Bajas</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="'.route('notas_credito_clientes_generar_pdfs_indiv',$data->Nota).'" target="_blank">Ver Documento PDF</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Nota .'\')">Enviar Documento por Correo</a></li>'.
+                                                //'<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="timbrarnota(\''.$data->Nota .'\')">Timbrar Nota</a></li>'.
+                                                //'<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="cancelartimbre(\''.$data->Nota .'\')">Cancelar Timbre</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;

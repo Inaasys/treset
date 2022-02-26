@@ -98,6 +98,7 @@ function listar(){
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {
                 $('#tbllistado').DataTable().search( this.value ).draw();
+                $(".inputbusquedageneral").val(""); 
               }
           });
         }
@@ -1465,23 +1466,23 @@ function obtenerdatos(codigoproducto){
     //datos principales
     $("#codigo").val(codigoproducto);
     $("#codigo").attr('readonly', 'readonly');
-    $("#claveproducto").val(data.producto.ClaveProducto);
+    $("#claveproducto").val(data.valores_producto.ClaveProducto);
     obtenerclaveproductoporclave();
-    $("#claveunidad").val(data.producto.ClaveUnidad);
+    $("#claveunidad").val(data.valores_producto.ClaveUnidad);
     obtenerclaveunidadporclave();
-    $("#producto").val(data.producto.Producto);
-    $("#unidad").val(data.producto.Unidad);
+    $("#producto").val(data.valores_producto.Producto);
+    $("#unidad").val(data.valores_producto.Unidad);
     //datos tab producto
-    $("#marca").val(data.producto.Marca);
+    $("#marca").val(data.valores_producto.Marca);
     obtenermarcapornumero();
-    $("#linea").val(data.producto.Linea);
+    $("#linea").val(data.valores_producto.Linea);
     obtenerlineapornumero();
     $("#impuesto").val(data.impuesto);
     $("#costo").val(data.costo);
     $("#precio").val(data.precio);
-    $("#ubicacion").val(data.producto.Ubicacion);
+    $("#ubicacion").val(data.valores_producto.Ubicacion);
     $("#costodelista").val(data.costodelista);
-    $("#moneda").val(data.producto.Moneda);
+    $("#moneda").val(data.valores_producto.Moneda);
     obtenermonedaporclave();
     //datos tab precios clientes
     $("#tablapreciosclientes").append(data.filaspreciosclientes);
@@ -1504,11 +1505,11 @@ function obtenerdatos(codigoproducto){
     $("#fechasminimos").val(data.minimos);
     $("#fechasmaximos").val(data.maximos);
     $("#fechascostomaximo").val(data.costomaximo);
-    $("#fechaszonadeimpresion").val(data.producto.Zona);
-    $("#fechasproductopeligroso").val(data.producto.ProductoPeligroso);
-    $("#fechassupercedido").val(data.producto.Supercedido);
-    $("#fechasinsumo").val(data.producto.Insumo);
-    $("#fechasdescripcion").val(data.producto.Descripcion);
+    $("#fechaszonadeimpresion").val(data.valores_producto.Zona);
+    $("#fechasproductopeligroso").val(data.valores_producto.ProductoPeligroso);
+    $("#fechassupercedido").val(data.valores_producto.Supercedido);
+    $("#fechasinsumo").val(data.valores_producto.Insumo);
+    $("#fechasdescripcion").val(data.valores_producto.Descripcion);
     listarutilidades();
     listarexistenciasalmacenes();
     activarbusquedaproducto();//importante activa la busqueda de productos por su codigo
@@ -1599,7 +1600,7 @@ function obtenerdatos(codigoproducto){
 }
 async function seleccionartipo(data){
     await retraso();
-    $("#tipo").val(data.producto.TipoProd).change();
+    $("#tipo").val(data.valores_producto.TipoProd).change();
     $("#tipo").select2();
     setTimeout(function(){$("#codigo").focus();},500);
     mostrarmodalformulario('MODIFICACION');

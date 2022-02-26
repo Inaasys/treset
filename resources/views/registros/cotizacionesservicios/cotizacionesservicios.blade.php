@@ -61,6 +61,11 @@
                             </div>
                         </div>
                         <div class="body">
+                            <div class="row" hidden>
+                                <div class="col-md-12">
+                                    <iframe  id="pdfiframe" name="pdfiframe" src="#"></iframe>
+                                </div>
+                            </div>
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap">
                                     <thead class="{{$empresa->background_tables}}">
@@ -202,6 +207,7 @@
         var urlgenerarplantillaser = '{{$urlgenerarplantillaser}}';
         var urlgenerarplantillaref = '{{$urlgenerarplantillaref}}';       
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
+        var urlpdfsimpresionesrapidas = '{{asset("xml_descargados/")}}/';
         var cotizaciones_servicios_obtener = '{!!URL::to('cotizaciones_servicios_obtener')!!}';
         var cotizaciones_servicios_descargar_plantillaser = '{!!URL::to('cotizaciones_servicios_descargar_plantillaser')!!}';
         var cotizaciones_servicios_cargar_partidas_excelser = '{!!URL::to('cotizaciones_servicios_cargar_partidas_excelser')!!}';
@@ -231,6 +237,7 @@
         var cotizaciones_servicios_obtener_datos_envio_email = '{!!URL::to('cotizaciones_servicios_obtener_datos_envio_email')!!}';
         var cotizaciones_servicios_enviar_pdfs_email = '{!!URL::to('cotizaciones_servicios_enviar_pdfs_email')!!}';
         var cotizaciones_servicios_enviar_pdfs_cliente_email = '{!!URL::to('cotizaciones_servicios_enviar_pdfs_cliente_email')!!}';
+        var cotizaciones_servicios_generar_pdfs = '{!!URL::to('cotizaciones_servicios_generar_pdfs')!!}';
         var cotizaciones_servicios_buscar_folio_string_like = '{!!URL::to('cotizaciones_servicios_buscar_folio_string_like')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')

@@ -152,6 +152,7 @@ function listar(){
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {
                 $('#tbllistado').DataTable().search( this.value ).draw();
+                $(".inputbusquedageneral").val(""); 
               }
           });
         }
@@ -236,6 +237,8 @@ $("#btnenviarpartidasexcel").on('click', function(e){
             $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
             $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
         }
+        //dar cambio en cantidad para colocar data parsley existencias de forma correcta
+        $(".cantidadpartida").change();
     },
     error: function (data) {
       console.log(data);
@@ -408,7 +411,7 @@ function seleccionarcliente(Numero, Nombre, Credito, Saldo, NumeroAgente, Agente
         if(Nombre != null){
             $("#textonombrecliente").html(Nombre.substring(0, 40));
         }
-        $("#credito").val(Credito);
+        $("#credito").val(number_format(round(Credito, numerodecimales), numerodecimales, '.', ''));
         $("#saldo").val(Saldo);
         //datos agente
         $("#numeroagente").val(NumeroAgente);
@@ -610,7 +613,7 @@ function obtenerclientepornumero(){
                 if(data.nombre != null){
                     $("#textonombrecliente").html(data.nombre.substring(0, 40));
                 }
-                $("#credito").val(data.credito);
+                $("#credito").val(number_format(round(data.credito, numerodecimales), numerodecimales, '.', ''));
                 $("#saldo").val(data.saldo);
                 //datos agente
                 $("#numeroagente").val(data.numeroagente);
@@ -908,6 +911,8 @@ function seleccionarcotizacion(Folio, Cotizacion){
             $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
             $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
         }
+        //dar cambio en cantidad para colocar data parsley existencias de forma correcta
+        $(".cantidadpartida").change();
     })  
 }
 async function seleccionartipocotizacion(data){
@@ -1107,17 +1112,32 @@ function cambiodecantidadpartida(fila,tipo){
         var codigo = $(".codigoproductopartida", this).val();
         var cantidadpartida = $(".cantidadpartida", this).val();
         comprobarexistenciasenbd(fila, tipo, numeroalmacen, codigo).then(existencias=>{
+            if(cantidadpartida > 0){
                 if(tipo == "alta"){
-                var dataparsleymax = existencias;
+                    var dataparsleymax = existencias;
                 }else if(tipo == "modificacion"){
-                var dataparsleymax = new Decimal(existencias).plus($("#filaproducto"+fila+" .cantidadpartidadb").val());
+                    var dataparsleymax = new Decimal(existencias).plus($("#filaproducto"+fila+" .cantidadpartidadb").val());
                 }
                 $("#filaproducto"+fila+" .cantidadpartida").attr('data-parsley-existencias',dataparsleymax);
                 $('.cantidadpartida', this).parsley().validate();
+            }else{
+                $("#filaproducto"+fila+" .cantidadpartida").removeAttr('data-parsley-existencias');
+                $('.cantidadpartida', this).parsley().validate();
+            }
         })
     }  
     cuentaFilas++;
   });  
+}
+//funcion asincrona para buscar existencias de la partida
+function comprobarexistenciasenbd(fila, tipo, numeroalmacen, codigo){
+  return new Promise((ejecuta)=>{
+    setTimeout(function(){ 
+      $.get(remisiones_obtener_existencias_almacen,{'numeroalmacen':numeroalmacen,'codigo':codigo},existencias=>{
+        return ejecuta(existencias);
+      })
+    },500);
+  })
 }
 //dejar en 0 los descuentos cuando el precio de la partida se cambie
 function cambiodepreciopartida(fila,tipo){
@@ -1213,16 +1233,6 @@ function calculartotal(){
         }
     })  
 }
-//funcion asincrona para buscar existencias de la partida
-function comprobarexistenciasenbd(fila, tipo, numeroalmacen, codigo){
-  return new Promise((ejecuta)=>{
-    setTimeout(function(){ 
-      $.get(remisiones_obtener_existencias_almacen,{'numeroalmacen':numeroalmacen,'codigo':codigo},existencias=>{
-        return ejecuta(existencias);
-      })
-    },500);
-  })
-}
 //obtener dato para agtegar fila producto
 function obtenerdatosagregarfilaproducto(Codigo){
     var numeroalmacen = $("#numeroalmacen").val();
@@ -1256,7 +1266,7 @@ function agregarfilaproducto(data,Codigo){
                           '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
                           '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'+Unidad+'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'+Unidad+'</td>'+
                             '<td class="tdmod">'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.'+numerocerosconfiguradosinputnumberstep+'" data-parsley-existencias="'+Existencias+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');cambiodecantidadpartida('+contadorfilas+',\''+tipo +'\');">'+
+                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-existencias="'+Existencias+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');cambiodecantidadpartida('+contadorfilas+',\''+tipo +'\');">'+
                                 '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'+                           
                             '</td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');cambiodepreciopartida('+contadorfilas+',\''+tipo +'\');"></td>'+
@@ -1337,6 +1347,8 @@ function agregarfilaproducto(data,Codigo){
             $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
             $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
         }
+        //dar cambio en cantidad para colocar data parsley existencias de forma correcta
+        $(".cantidadpartida").change();
         $('.page-loader-wrapper').css('display', 'none');
     }else{
         msj_errorproductoyaagregado();
@@ -1418,7 +1430,7 @@ function alta(){
                         '<div class="row">'+
                             '<div class="col-md-3">'+
                                 '<label>Remisión <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
-                                '<input type="text" class="form-control inputnext" name="folio" id="folio" required onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="folio" id="folio" required onkeyup="tipoLetra(this);"  ondblclick="obtenultimonumero()">'+
                                 '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                                 '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
                                 '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
@@ -1713,6 +1725,24 @@ function alta(){
     $("#tabsform").html(tabs);
     //colocar autocomplette off  todo el formulario
     $(".form-control").attr('autocomplete','off');
+    //colocar required en referencia segun la configuracion de la empresa
+    if(pedirobligatoriamentereferenciarnremisiones == 'S'){
+        $("#referencia").attr('required', 'required');
+    }else{
+        $("#referencia").removeAttr('required');
+    }
+    //colocar required en orden servicio segun la configuracion de la empresa
+    if(pedirobligatoriamenteordenservicioenremisiones == 'S'){
+        $("#ordenservicio").attr('required', 'required');
+    }else{
+        $("#ordenservicio").removeAttr('required');
+    }
+    //colocar required en equipo segun la configuracion de la empresa
+    if(pedirobligatoriamenteequipoenremisiones == 'S'){
+        $("#equipo").attr('required', 'required');
+    }else{
+        $("#equipo").removeAttr('required');
+    }
     //permitir modificar consecutvio folio en remisiones
     if(modificarconsecutivofolioenremisiones == 'S'){
         $("#folio").removeAttr('readonly');
@@ -2005,7 +2035,7 @@ function obtenerdatos(remisionmodificar){
                         '<div class="row">'+
                             '<div class="col-md-3">'+
                                 '<label>Remisión <b style="color:#F44336 !important;" id="serietexto"> Serie:</b></label>'+
-                                '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);" ondblclick="obtenultimonumero()">'+
                                 '<input type="hidden" class="form-control" name="serie" id="serie" required readonly data-parsley-length="[1, 10]">'+
                                 '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
                                 '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
@@ -2290,6 +2320,24 @@ function obtenerdatos(remisionmodificar){
     $("#tabsform").html(tabs);
     //colocar autocomplette off  todo el formulario
     $(".form-control").attr('autocomplete','off');
+    //colocar required en referencia segun la configuracion de la empresa
+    if(pedirobligatoriamentereferenciarnremisiones == 'S'){
+      $("#referencia").attr('required', 'required');
+    }else{
+        $("#referencia").removeAttr('required');
+    }
+    //colocar required en orden servicio segun la configuracion de la empresa
+    if(pedirobligatoriamenteordenservicioenremisiones == 'S'){
+      $("#ordenservicio").attr('required', 'required');
+    }else{
+        $("#ordenservicio").removeAttr('required');
+    }
+    //colocar required en equipo segun la configuracion de la empresa
+    if(pedirobligatoriamenteequipoenremisiones == 'S'){
+      $("#equipo").attr('required', 'required');
+    }else{
+        $("#equipo").removeAttr('required');
+    }
     //colocar readonly o no a input de requisicion segun la configuracion de la empresa
     if(controlarconsecutivonumrequisicion == 'S'){
         $("#requisicion").attr('readonly', 'readonly');
@@ -2344,7 +2392,7 @@ function obtenerdatos(remisionmodificar){
     $("#costo").val(data.costo);
     $("#utilidad").val(data.utilidad);
     $("#comision").val(data.comision);
-    $("#credito").val(data.credito);
+    $("#credito").val(number_format(round(data.credito, numerodecimales), numerodecimales, '.', '')); 
     $("#saldo").val(data.saldo);
     //detalles
     $("#tablaproductosremisiones tbody").html(data.filasdetallesremision);
@@ -2470,6 +2518,8 @@ function obtenerdatos(remisionmodificar){
         $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
         $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
     }
+    //dar cambio en cantidad para colocar data parsley existencias de forma correcta
+    $(".cantidadpartida").change();
     //asignar el tipo de operacion que se realizara
     $("#tipooperacion").val("modificacion");
     seleccionartipocliente(data);
@@ -2718,6 +2768,38 @@ function buscarstringlike(){
         var data = tablafolenc.row( this ).data();
         agregararraypdf(data.Remision);
     });
+}
+//generar documento en iframe
+function generardocumentoeniframe(Remision){
+  var arraypdf = new Array();
+  var folios = [Remision];
+  arraypdf.push(folios);
+  var form_data = new FormData();
+  form_data.append('arraypdf', arraypdf); 
+  form_data.append('tipogeneracionpdf', 0);
+  form_data.append('numerodecimalesdocumento', 2);
+  form_data.append('imprimirdirectamente', 1);
+  $.ajax({
+    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+    url:remisiones_generar_pdfs,
+    data: form_data,
+    type: 'POST',
+    contentType: false,
+    processData: false,
+    success: function (data) {
+      $('#pdfiframe').attr("src", urlpdfsimpresionesrapidas+data);
+      setTimeout(function(){imprimirdirecto();},500);    
+    },
+    error: function (data) {
+      console.log(data);
+    }
+  });
+}
+//imprimir documento pdf directamente
+function imprimirdirecto(){
+  var pdfFrame = window.frames["pdfiframe"];
+  pdfFrame.focus();
+  pdfFrame.print();
 }
 //configurar tabla
 function configurar_tabla(){

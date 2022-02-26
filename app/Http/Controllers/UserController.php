@@ -46,10 +46,10 @@ class UserController extends ConfiguracionSistemaController
                                                 'OPERACIONES <span class="caret"></span>'.
                                             '</button>'.
                                             '<ul class="dropdown-menu">'.
-                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos('.$data->id.')">Cambios</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="desactivar('.$data->id.')">Bajas</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="permisos('.$data->id.')">Ver Permisos</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="seriesusuariodocumentos('.$data->id.',\''.$data->user.'\')">Ver Series Documentos</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos('.$data->id.')">Cambios</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar('.$data->id.')">Bajas</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="permisos('.$data->id.')">Ver Permisos</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="seriesusuariodocumentos('.$data->id.',\''.$data->user.'\')">Ver Series Documentos</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;

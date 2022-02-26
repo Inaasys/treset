@@ -71,6 +71,11 @@
                             </div>
                         </div>
                         <div class="body">
+                            <div class="row" hidden>
+                                <div class="col-md-12">
+                                    <iframe  id="pdfiframe" name="pdfiframe" src="#"></iframe>
+                                </div>
+                            </div>
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap" >
                                     <thead class="{{$empresa->background_tables}}">
@@ -256,6 +261,7 @@
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';       
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
+        var urlpdfsimpresionesrapidas = '{{asset("xml_descargados/")}}/';
         var compras_obtener = '{!!URL::to('compras_obtener')!!}';
         var compras_obtener_series_documento = '{!!URL::to('compras_obtener_series_documento')!!}';
         var compras_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('compras_obtener_ultimo_folio_serie_seleccionada')!!}';
@@ -284,7 +290,8 @@
         var compras_verificar_uso_en_modulos =  '{!!URL::to('compras_verificar_uso_en_modulos')!!}';
         var compras_alta_o_baja = '{!!URL::to('compras_alta_o_baja')!!}'; 
         var compras_obtener_datos_envio_email = '{!!URL::to('compras_obtener_datos_envio_email')!!}';
-        var compras_enviar_pdfs_email = '{!!URL::to('compras_enviar_pdfs_email')!!}';
+        var compras_enviar_pdfs_email = '{!!URL::to('compras_enviar_pdfs_email')!!}';        
+        var compras_generar_pdfs = '{!!URL::to('compras_generar_pdfs')!!}';
         var compras_buscar_folio_string_like = '{!!URL::to('compras_buscar_folio_string_like')!!}'; 
     </script>
     @include('secciones.libreriasregistrosycatalogos')

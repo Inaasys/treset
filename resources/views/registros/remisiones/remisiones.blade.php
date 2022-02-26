@@ -61,6 +61,11 @@
                             </div>
                         </div>
                         <div class="body">
+                            <div class="row" hidden>
+                                <div class="col-md-12">
+                                    <iframe  id="pdfiframe" name="pdfiframe" src="#"></iframe>
+                                </div>
+                            </div>
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap">
                                     <thead class="{{$empresa->background_tables}}">
@@ -246,6 +251,10 @@
         var usuariologueado = '{{Auth::user()->user}}';
         var modificarconsecutivofolioenremisiones = '{{$modificarconsecutivofolioenremisiones}}';
         var validarutilidadnegativa = '{{$validarutilidadnegativa}}';
+        var pedirobligatoriamentereferenciarnremisiones = '{{$empresa->PedirObligatoriamenteReferenciaEnRemisiones}}';
+        var pedirobligatoriamenteordenservicioenremisiones = '{{$empresa->PedirObligatoriamenteOrdenServicioEnRemisiones}}';
+        var pedirobligatoriamenteequipoenremisiones = '{{$empresa->PedirObligatoriamenteEquipoEnRemisiones}}';
+        var urlpdfsimpresionesrapidas = '{{asset("xml_descargados/")}}/';
         var remisiones_obtener = '{!!URL::to('remisiones_obtener')!!}';
         var remisiones_descargar_plantilla = '{!!URL::to('remisiones_descargar_plantilla')!!}';
         var remisiones_cargar_partidas_excel = '{!!URL::to('remisiones_cargar_partidas_excel')!!}';
@@ -280,9 +289,8 @@
         var remisiones_guardar_modificacion_datos_generales = '{!!URL::to('remisiones_guardar_modificacion_datos_generales')!!}';
         var remisiones_obtener_datos_envio_email = '{!!URL::to('remisiones_obtener_datos_envio_email')!!}';
         var remisiones_enviar_pdfs_email = '{!!URL::to('remisiones_enviar_pdfs_email')!!}';
+        var remisiones_generar_pdfs = '{!!URL::to('remisiones_generar_pdfs')!!}';
         var remisiones_buscar_folio_string_like = '{!!URL::to('remisiones_buscar_folio_string_like')!!}';
-
-
         var remisiones_obtener_datos_agregar_fila_producto = '{!!URL::to('remisiones_obtener_datos_agregar_fila_producto')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')

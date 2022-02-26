@@ -57,6 +57,7 @@ use Facturapi\Facturapi;
 use Storage;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
 use ZipArchive;
+use File;
 
 class FacturaController extends ConfiguracionSistemaController{
 
@@ -150,21 +151,66 @@ class FacturaController extends ConfiguracionSistemaController{
                         return $data->sum('Utilidad');
                     })
                     ->addColumn('operaciones', function($data){
+                        /*$operaciones =  '<a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Factura .'\')" >'.
+                                            '<img src="'.asset("images/").'/editar.png" data-toggle="tooltip" data-placement="top" data-original-title="CAMBIOS">'.
+                                            '</img>'.
+                                        '</a>'.
+                                        '<a href="javascript:void(0);" onclick="desactivar(\''.$data->Factura .'\')" >'.
+                                            '<img src="'.asset("images/").'/eliminar.png" data-toggle="tooltip" data-placement="top" data-original-title="BAJAS">'.
+                                            '</img>'.
+                                        '</a>'.
+                                        '<a href="javascript:void(0);" onclick="obtenerkardex(\''.$data->Factura .'\')" >'.
+                                            '<img src="'.asset("images/").'/movimientos.png" data-toggle="tooltip" data-placement="top" data-original-title="VER MOVIMIENTOS">'.
+                                            '</img>'.
+                                        '</a>'.
+                                        '<a href="'.route('facturas_generar_pdfs_indiv',$data->Factura).'" target="_blank">'.
+                                            '<img src="'.asset("images/").'/pdf.png" data-toggle="tooltip" data-placement="top" data-original-title="VER DOCUMENTO INTERNO PDF">'.
+                                            '</img>'.
+                                        '</a>'.
+                                        '<a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Factura .'\',1)" >'.
+                                            '<img src="'.asset("images/").'/correo.png" data-toggle="tooltip" data-placement="top" data-original-title="ENVIAR DOCUMENTO INTERNO POR CORREO">'.
+                                            '</img>'.
+                                        '</a>'.
+                                        '<a href="'.route('facturas_generar_pdfs_cliente_indiv',$data->Factura).'" target="_blank">'.
+                                            '<img src="'.asset("images/").'/pdf.png" data-toggle="tooltip" data-placement="top" data-original-title="VER DOCUMENTO CLIENTE PDF">'.
+                                            '</img>'.
+                                        '</a>'.
+                                        '<a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Factura .'\',0)">'.
+                                            '<img src="'.asset("images/").'/correo.png" data-toggle="tooltip" data-placement="top" data-original-title="ENVIAR DOCUMENTO CLIENTE POR CORREO">'.
+                                            '</img>'.
+                                        '</a>'.
+                                        '<a href="javascript:void(0);" onclick="timbrarfactura(\''.$data->Factura .'\')">'.
+                                            '<img src="'.asset("images/").'/factura.png" data-toggle="tooltip" data-placement="top" data-original-title="TIMBRAR FACTURA">'.
+                                            '</img>'.
+                                        '</a>'.
+                                        '<a href="javascript:void(0);" onclick="cancelartimbre(\''.$data->Factura .'\')">'.
+                                            '<img src="'.asset("images/").'/cancelarfactura.png" data-toggle="tooltip" data-placement="top" data-original-title="CANCELAR TIMBRE">'.
+                                            '</img>'.
+                                        '</a>'.
+                                        '<a href="javascript:void(0);" onclick="modificardatosgeneralesdocumento(\''.$data->Factura .'\')">'.
+                                            '<img src="'.asset("images/").'/datosgenerales.png" data-toggle="tooltip" data-placement="top" data-original-title="MODIFICAR DATOS GENERALES">'.
+                                            '</img>'.
+                                        '</a>'.
+                                        '<a href="javascript:void(0);" onclick="generardocumentoeniframe(\''.$data->Factura .'\')">'.
+                                            '<img src="'.asset("images/").'/impresora.png" data-toggle="tooltip" data-placement="top" data-original-title="IMPRIMIR DOCUMENTO PDF">'.
+                                            '</img>'.
+                                        '</a>';*/
                         $operaciones = '<div class="dropdown">'.
                                             '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
                                                 'OPERACIONES <span class="caret"></span>'.
                                             '</button>'.
                                             '<ul class="dropdown-menu">'.
-                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Factura .'\')">Cambios</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Factura .'\')">Bajas</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="obtenerkardex(\''.$data->Factura .'\')">Ver Movimientos</a></li>'.
-                                                '<li><a href="'.route('facturas_generar_pdfs_indiv',$data->Factura).'" target="_blank">Ver Documento Interno PDF</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Factura .'\',1)">Enviar Documento Interno por Correo</a></li>'.
-                                                '<li><a href="'.route('facturas_generar_pdfs_cliente_indiv',$data->Factura).'" target="_blank">Ver Documento Cliente PDF</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Factura .'\',0)">Enviar Documento Cliente por Correo</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="timbrarfactura(\''.$data->Factura .'\')">Timbrar Factura</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="cancelartimbre(\''.$data->Factura .'\')">Cancelar Timbre</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="modificardatosgeneralesdocumento(\''.$data->Factura .'\')">Modificar Datos Generales</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Factura .'\')">Cambios</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->Factura .'\')">Bajas</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerkardex(\''.$data->Factura .'\')">Ver Movimientos</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="'.route('facturas_generar_pdfs_indiv',$data->Factura).'" target="_blank">Ver Documento Interno PDF</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Factura .'\',1)">Enviar Documento Interno por Correo</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="'.route('facturas_generar_pdfs_cliente_indiv',$data->Factura).'" target="_blank">Ver Documento Cliente PDF</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Factura .'\',0)">Enviar Documento Cliente por Correo</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="timbrarfactura(\''.$data->Factura .'\')">Timbrar Factura</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="cancelartimbre(\''.$data->Factura .'\')">Cancelar Timbre</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="modificardatosgeneralesdocumento(\''.$data->Factura .'\')">Modificar Datos Generales</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="generardocumentoeniframe(\''.$data->Factura .'\')">Imprimir Documento PDF</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;
@@ -291,7 +337,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                         '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                     '</div>'.
                                     '<div class="col-xs-10 col-sm-10 col-md-10">'.    
-                                        '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$producto->ClaveProducto.'" readonly data-parsley-length="[1, 20]">'.
+                                        '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$producto->ClaveProducto.'" readonly required data-parsley-length="[1, 20]">'.
                                     '</div>'.
                                 '</div>'.
                             '</td>'.
@@ -302,7 +348,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                     '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                     '</div>'.
                                     '<div class="col-xs-10 col-sm-10 col-md-10">'.    
-                                    '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$producto->ClaveUnidad.'" readonly data-parsley-length="[1, 5]">'.
+                                    '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$producto->ClaveUnidad.'" readonly required data-parsley-length="[1, 5]">'.
                                     '</div>'.
                                 '</div>'.
                             '</td>'.
@@ -900,7 +946,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                 '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
                             '<div class="col-xs-10 col-sm-10 col-md-10">'.
-                                '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly data-parsley-length="[1, 20]">'.
+                                '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly required data-parsley-length="[1, 20]">'.
                             '</div>'.
                         '</div>'.
                     '</td>'.
@@ -911,7 +957,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                 '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
                             '<div class="col-xs-10 col-sm-10 col-md-10">'.   
-                                '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
+                                '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly required data-parsley-length="[1, 5]">'.
                             '</div>'.
                         '</div>'.
                     '</td>'.
@@ -1021,7 +1067,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                 '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
                             '<div class="col-xs-10 col-sm-10 col-md-10">'.
-                                '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly data-parsley-length="[1, 20]">'.
+                                '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly required data-parsley-length="[1, 20]">'.
                             '</div>'.
                         '</div>'.
                     '</td>'.
@@ -1032,7 +1078,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                 '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
                             '<div class="col-xs-10 col-sm-10 col-md-10">'.   
-                                '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
+                                '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly required data-parsley-length="[1, 5]">'.
                             '</div>'.
                         '</div>'.
                     '</td>'.
@@ -1107,7 +1153,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                 '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
                             '<div class="col-xs-10 col-sm-10 col-md-10">'.
-                                '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly data-parsley-length="[1, 20]">'.
+                                '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly required data-parsley-length="[1, 20]">'.
                             '</div>'.
                         '</div>'.
                     '</td>'.
@@ -1118,7 +1164,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                 '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
                             '<div class="col-xs-10 col-sm-10 col-md-10">'.   
-                                '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
+                                '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly required data-parsley-length="[1, 5]">'.
                             '</div>'.
                         '</div>'.
                     '</td>'.
@@ -1255,7 +1301,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                 '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
                             '<div class="col-xs-10 col-sm-10 col-md-10">'.
-                                '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly data-parsley-length="[1, 20]">'.
+                                '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly required data-parsley-length="[1, 20]">'.
                             '</div>'.
                         '</div>'.
                     '</td>'.
@@ -1266,7 +1312,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                 '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
                             '<div class="col-xs-10 col-sm-10 col-md-10">'.   
-                                '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
+                                '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly required data-parsley-length="[1, 5]">'.
                             '</div>'.
                         '</div>'.
                     '</td>'.
@@ -1345,7 +1391,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                 '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
                             '<div class="col-xs-10 col-sm-10 col-md-10">'.
-                                '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly data-parsley-length="[1, 20]">'.
+                                '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly required data-parsley-length="[1, 20]">'.
                             '</div>'.
                         '</div>'.
                     '</td>'.
@@ -1356,7 +1402,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                 '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
                             '<div class="col-xs-10 col-sm-10 col-md-10">'.   
-                                '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
+                                '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly required data-parsley-length="[1, 5]">'.
                             '</div>'.
                         '</div>'.
                     '</td>'.
@@ -1709,6 +1755,11 @@ class FacturaController extends ConfiguracionSistemaController{
                             ->update([
                                 'Status' => $factura
                             ]);
+                    OrdenTrabajoDetalle::where('Orden', $request->ordenpartida [$key])
+                            ->where('Partida', $request->partida [$key])
+                            ->update([
+                                'Status' => $factura
+                            ]);
                     break;
                 case "PRODUCTOS":
                     //si el producto fue cargador por remision en la tpartida tendra el valor si no es un producto por gasto
@@ -1819,7 +1870,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                 '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
                             '<div class="col-xs-10 col-sm-10 col-md-10">'.
-                                '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly data-parsley-length="[1, 20]">'.
+                                '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly required data-parsley-length="[1, 20]">'.
                             '</div>'.
                         '</div>'.
                     '</td>'.
@@ -1830,7 +1881,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                 '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
                             '<div class="col-xs-10 col-sm-10 col-md-10">'.   
-                                '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
+                                '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly required data-parsley-length="[1, 5]">'.
                             '</div>'.
                         '</div>'.
                     '</td>'.
@@ -2138,6 +2189,11 @@ class FacturaController extends ConfiguracionSistemaController{
                                 ->update([
                                     'Status' => 'ABIERTA'
                                 ]);
+                    OrdenTrabajoDetalle::where('Orden', $detalle->Orden)
+                            ->where('Partida', $detalle->Partida)
+                            ->update([
+                                'Status' => ''
+                            ]);
                     break;
                 case "PRODUCTOS":
                     Remision::where('Remision', $detalle->Remision)
@@ -2210,13 +2266,17 @@ class FacturaController extends ConfiguracionSistemaController{
         Helpers::eliminararchivosxmlsgenerados();
         //primero eliminar todos los archivos zip
         Helpers::eliminararchivoszipgenerados();
-        $tipogeneracionpdf = $request->tipogeneracionpdf;
-        if($tipogeneracionpdf == 0){
-            $facturas = Factura::whereIn('Factura', $request->arraypdf)->orderBy('Folio', 'ASC')->take(250)->get(); 
+        if($request->imprimirdirectamente == 1){
+            $facturas = Factura::where('Factura', $request->arraypdf)->get(); 
         }else{
-            $fechainiciopdf = date($request->fechainiciopdf);
-            $fechaterminacionpdf = date($request->fechaterminacionpdf);
-            $facturas = Factura::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(250)->get();
+            $tipogeneracionpdf = $request->tipogeneracionpdf;
+            if($tipogeneracionpdf == 0){
+                $facturas = Factura::whereIn('Factura', $request->arraypdf)->orderBy('Folio', 'ASC')->take(250)->get(); 
+            }else{
+                $fechainiciopdf = date($request->fechainiciopdf);
+                $fechaterminacionpdf = date($request->fechaterminacionpdf);
+                $facturas = Factura::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(250)->get();
+            }
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $arrayfiles = array();
@@ -2423,34 +2483,41 @@ class FacturaController extends ConfiguracionSistemaController{
             array_push($arrayfilespdf,$ArchivoPDF);
         }
         $pdfMerger->merge(); //unirlos
-        if($request->descargar_xml == 0){
-            $pdfMerger->save("Facturas.pdf", "browser");//mostrarlos en el navegador
+        if($request->imprimirdirectamente == 1){
+            $archivoacopiar = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
+            $carpetacopias = public_path('xml_descargados/'.$ArchivoPDF);
+            File::copy($archivoacopiar, $carpetacopias);
+            return response()->json($ArchivoPDF);
         }else{
-            //carpeta donde se guardara el archivo zip
-            $public_dir=public_path();
-            // Zip File Name
-            $zipFileName = 'Facturas.zip';
-            // Crear Objeto ZipArchive
-            $zip = new ZipArchive;
-            if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
-                // Agregar archivos que se comprimiran
-                foreach($arrayfiles as $af) {
-                    $zip->addFile(Storage::disk('local2')->getAdapter()->applyPathPrefix($af),$af);
-                }  
-                foreach($arrayfilespdf as $afp) {
-                    $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
-                }     
-                //terminar proceso   
-                $zip->close();
-            }
-            // Set Encabezados para descargar
-            $headers = array(
-                'Content-Type' => 'application/octet-stream',
-            );
-            $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
-            // Create Download Response
-            if(file_exists($filetopath)){
-                return response()->download($filetopath,$zipFileName,$headers);
+            if($request->descargar_xml == 0){
+                $pdfMerger->save("Facturas.pdf", "browser");//mostrarlos en el navegador
+            }else{
+                //carpeta donde se guardara el archivo zip
+                $public_dir=public_path();
+                // Zip File Name
+                $zipFileName = 'Facturas.zip';
+                // Crear Objeto ZipArchive
+                $zip = new ZipArchive;
+                if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
+                    // Agregar archivos que se comprimiran
+                    foreach($arrayfiles as $af) {
+                        $zip->addFile(Storage::disk('local2')->getAdapter()->applyPathPrefix($af),$af);
+                    }  
+                    foreach($arrayfilespdf as $afp) {
+                        $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
+                    }     
+                    //terminar proceso   
+                    $zip->close();
+                }
+                // Set Encabezados para descargar
+                $headers = array(
+                    'Content-Type' => 'application/octet-stream',
+                );
+                $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
+                // Create Download Response
+                if(file_exists($filetopath)){
+                    return response()->download($filetopath,$zipFileName,$headers);
+                }
             }
         }
     }
@@ -3642,39 +3709,101 @@ class FacturaController extends ConfiguracionSistemaController{
     public function facturas_timbrar_factura(Request $request){
         $factura = Factura::where('Factura', $request->facturatimbrado)->first();
         $detallesfactura = FacturaDetalle::where('Factura', $request->facturatimbrado)->orderBy('Item','ASC')->get();
+        $detallesdocumentosfactura = FacturaDocumento::where('Factura', $request->facturatimbrado)->get();
         $cliente = Cliente::where('Numero', $factura->Cliente)->first();
         $arraytest = array();
         foreach($detallesfactura as $df){
-            array_push($arraytest,  array(
-                                        "quantity" => Helpers::convertirvalorcorrecto($df->Cantidad),
-                                        "discount" => Helpers::convertirvalorcorrecto($df->Descuento),
-                                        "product" => 
-                                            array(
-                                                "description" => $df->Descripcion,
-                                                "product_key" => $df->ClaveProducto,
-                                                "price" => Helpers::convertirvalorcorrecto($df->Precio),
-                                                "tax_included" => false,
-                                                "sku" => $df->Codigo
-                                            )
-                                    )
-            );
+            if($df->Impuesto == 0.000000){
+                array_push($arraytest,  array(
+                                            "quantity" => Helpers::convertirvalorcorrecto($df->Cantidad),
+                                            "discount" => Helpers::convertirvalorcorrecto($df->Descuento),
+                                            "product" => 
+                                                array(
+                                                    "description" => $df->Descripcion,
+                                                    "product_key" => $df->ClaveProducto,
+                                                    "unit_key" => $df->ClaveUnidad,
+                                                    "price" => Helpers::convertirvalorcorrecto($df->Precio),
+                                                    "tax_included" => false,
+                                                    "taxability" => "01",
+                                                    "taxes" => [],
+                                                    "sku" => $df->Codigo
+                                                )
+                                        )
+                );
+            }else{
+                array_push($arraytest,  array(
+                                            "quantity" => Helpers::convertirvalorcorrecto($df->Cantidad),
+                                            "discount" => Helpers::convertirvalorcorrecto($df->Descuento),
+                                            "product" => 
+                                                array(
+                                                    "description" => $df->Descripcion,
+                                                    "product_key" => $df->ClaveProducto,
+                                                    "unit_key" => $df->ClaveUnidad,
+                                                    "price" => Helpers::convertirvalorcorrecto($df->Precio),
+                                                    "tax_included" => false,
+                                                    "sku" => $df->Codigo
+                                                )
+                                        )
+                );
+            }
         }
-        //FACTURA
-        // Crea una nueva factura
-        $invoice = array(
-            "customer" => array(
-                "legal_name" => $cliente->Nombre,
-                "tax_id" => $cliente->Rfc
-            ),
-            "items" => $arraytest,
-            "payment_form" => $factura->FormaPago,
-            "payment_method" => $factura->MetodoPago,
-            "folio_number" => $factura->Folio,
-            "series" => $factura->Serie,
-            "currency" => $factura->Moneda,
-            "exchange" => Helpers::convertirvalorcorrecto($factura->TipoCambio),
-            "conditions" => $factura->CondicionesDePago
-        );
+
+        if($factura->TipoRelacion != ""){
+            $arraydoc = array();
+            foreach($detallesdocumentosfactura as $ddf){
+                array_push($arraydoc, $ddf->UUID);
+            } 
+            
+            //FACTURA
+            // Crea una nueva factura
+            $invoice = array(
+                "customer" => array(
+                    "legal_name" => $cliente->Nombre,
+                    "tax_id" => $cliente->Rfc,
+                    /*"tax_system" => $cliente->RegimenFiscal,
+                    "address" => 
+                        array(
+                            "zip" => $cliente->CodigoPostal,
+                        )
+                    */
+                ),
+                "items" => $arraytest,
+                "payment_form" => $factura->FormaPago,
+                "payment_method" => $factura->MetodoPago,
+                "relation" => $factura->TipoRelacion,
+                "related" => $arraydoc,
+                "folio_number" => $factura->Folio,
+                "series" => $factura->Serie,
+                "currency" => $factura->Moneda,
+                "exchange" => Helpers::convertirvalorcorrecto($factura->TipoCambio),
+                "conditions" => $factura->CondicionesDePago
+            );
+        }else{
+
+            //FACTURA
+            // Crea una nueva factura
+            $invoice = array(
+                "customer" => array(
+                    "legal_name" => $cliente->Nombre,
+                    "tax_id" => $cliente->Rfc,
+                    /*"tax_system" => $cliente->RegimenFiscal,
+                    "address" => 
+                        array(
+                            "zip" => $cliente->CodigoPostal,
+                        )
+                    */
+                ),
+                "items" => $arraytest,
+                "payment_form" => $factura->FormaPago,
+                "payment_method" => $factura->MetodoPago,
+                "folio_number" => $factura->Folio,
+                "series" => $factura->Serie,
+                "currency" => $factura->Moneda,
+                "exchange" => Helpers::convertirvalorcorrecto($factura->TipoCambio),
+                "conditions" => $factura->CondicionesDePago
+            );
+
+        }
         $new_invoice = $this->facturapi->Invoices->create( $invoice );
         $result = json_encode($new_invoice);
         $result2 = json_decode($result, true);
@@ -3776,26 +3905,39 @@ class FacturaController extends ConfiguracionSistemaController{
     }
     //cancelar timbre
     public function facturas_baja_timbre(Request $request){
-        //colocar fecha de cancelacion en tabla comprobante
-        
-        $factura = Factura::where('Factura', $request->facturabajatimbre)->first();
-        Comprobante::where('Comprobante', 'Factura')->where('Folio', '' . $factura->Folio . '')->where('Serie', '' . $factura->Serie . '')
-        ->update([
-            'FechaCancelacion' => Helpers::fecha_exacta_accion_datetimestring()
-        ]);
-        
         //cancelar timbre facturapi
         //$timbrecancelado = $this->facturapi->Invoices->cancel($request->iddocumentofacturapi);
-
         $timbrecancelado = $this->facturapi->Invoices->cancel(
             $request->iddocumentofacturapi,
             [
               "motive" => $request->motivobajatimbre
             ]
         );
-        //dd($timbrecancelado);
-
-        
-        return response()->json($timbrecancelado);
+        //$new_invoice = $this->facturapi->Invoices->create( $invoice );
+        $result = json_encode($timbrecancelado);
+        $result2 = json_decode($result, true);
+        if(array_key_exists('ok', $result2) == true){
+            $mensaje = $timbrecancelado->message;
+            $tipomensaje = "error";
+            $data = array(
+                        'mensaje' => "Error, ".$mensaje,
+                        'tipomensaje' => $tipomensaje 
+                    );
+            return response()->json($data);
+        }else{
+            //colocar fecha de cancelacion en tabla comprobante
+            $factura = Factura::where('Factura', $request->facturabajatimbre)->first();
+            Comprobante::where('Comprobante', 'Factura')->where('Folio', '' . $factura->Folio . '')->where('Serie', '' . $factura->Serie . '')
+            ->update([
+                'FechaCancelacion' => Helpers::fecha_exacta_accion_datetimestring()
+            ]);
+            $mensaje = "Correcto, se cancelo el timbre correctamente";
+            $tipomensaje = "success";
+            $data = array(
+                        'mensaje' => $mensaje,
+                        'tipomensaje' => $tipomensaje 
+                    );
+            return response()->json($data);
+        }
     }
 }

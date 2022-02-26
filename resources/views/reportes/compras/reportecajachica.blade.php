@@ -66,6 +66,7 @@
                                             <th>MOVIMIENTO COMPRA</th>
                                             <th>PROVEEDOR</th>
                                             <th>UUID</th>
+                                            <th>FACTURA</th>
                                             <th>CONCEPTO DE PAGO</th>
                                             <th>OBSERVACIONES</th>
                                             <th>SUBTOTAL</th>

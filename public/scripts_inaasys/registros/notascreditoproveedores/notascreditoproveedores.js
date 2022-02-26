@@ -11,10 +11,18 @@ function retraso(){
   return new Promise(resolve => setTimeout(resolve, 1500));
 }
 function asignarfechaactual(){
-    $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechas){
-      $("#fecha").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
-      $("#fechaemitida").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
-    }) 
+    var validarfechacapturamesactual = 0;
+    if(validarfechacapturamesactual == 0){
+      $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechas){
+        $("#fecha").val(fechas.fecha);
+        $("#fechaemitida").val(fechas.fecha);
+      });
+    }else{
+      $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechas){
+        $("#fecha").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
+        $("#fechaemitida").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
+      }) 
+    }
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
@@ -138,6 +146,7 @@ function listar(){
       $buscar.bind('keyup change', function(e) {
           if(e.keyCode == 13 || this.value == "") {
             $('#tbllistado').DataTable().search( this.value ).draw();
+            $(".inputbusquedageneral").val(""); 
           }
       });
     }
@@ -1134,9 +1143,9 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm importedescuentopesospartida" name="importedescuentopesospartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm iepsporcentajepartida" name="iepsporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" readonly></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm trasladoiepspesospartida" name="trasladoiepspesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
-                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'+Impuesto+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" readonly></td>'+
-                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm trasladoivapesospartida" name="trasladoivapesospartida[]" value="'+ivapesos+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'+number_format(round(preciopartida, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'+number_format(round(Impuesto, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" readonly></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm trasladoivapesospartida" name="trasladoivapesospartida[]" value="'+number_format(round(ivapesos, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencionivaporcentajepartida" name="retencionivaporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" readonly></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencionivapesospartida" name="retencionivapesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencionisrporcentajepartida" name="retencionisrporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" readonly></td>'+
@@ -1252,7 +1261,7 @@ function alta(){
                                     '</div>'+   
                                     '<div class="col-md-3">'+
                                         '<label>Fecha</label>'+
-                                        '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required onchange="validarmescompra();" data-parsley-excluded="true" onkeydown="return false">'+
+                                        '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required data-parsley-excluded="true" onkeydown="return false">'+
                                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                         '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
                                     '</div>'+   
@@ -1608,7 +1617,7 @@ $("#btnenviarxml").on('click', function(e){
             $("#totalxml").val(number_format(round(totalxml, numerodecimales), numerodecimales, '.', ''));
             $("#fechaemitida").val(data.array_comprobante.Fecha[0]);
             //validar si la fecha de la compra es igual a la fecha de la factura del proveedor
-            validarmescompra();
+            //validarmescompra();
             //machar totales factura proveedor y orden de compra
             var totalxml = $("#totalxml").val();
             var total = $("#total").val();
@@ -2051,7 +2060,7 @@ function obtenerdatos(notamodificar){
                       '</div>'+   
                       '<div class="col-md-3">'+
                         '<label>Fecha</label>'+
-                        '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required onchange="validarmescompra();" data-parsley-excluded="true" onkeydown="return false">'+
+                        '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required data-parsley-excluded="true" onkeydown="return false">'+
                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                         '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
                       '</div>'+   
@@ -2681,6 +2690,38 @@ function buscarstringlike(){
       var data = tablafolenc.row( this ).data();
       agregararraypdf(data.Nota);
   });
+}
+//generar documento en iframe
+function generardocumentoeniframe(Nota){
+  var arraypdf = new Array();
+  var folios = [Nota];
+  arraypdf.push(folios);
+  var form_data = new FormData();
+  form_data.append('arraypdf', arraypdf); 
+  form_data.append('tipogeneracionpdf', 0);
+  form_data.append('numerodecimalesdocumento', 2);
+  form_data.append('imprimirdirectamente', 1);
+  $.ajax({
+    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+    url:notas_credito_proveedores_generar_pdfs,
+    data: form_data,
+    type: 'POST',
+    contentType: false,
+    processData: false,
+    success: function (data) {
+      $('#pdfiframe').attr("src", urlpdfsimpresionesrapidas+data);
+      setTimeout(function(){imprimirdirecto();},500);    
+    },
+    error: function (data) {
+      console.log(data);
+    }
+  });
+}
+//imprimir documento pdf directamente
+function imprimirdirecto(){
+  var pdfFrame = window.frames["pdfiframe"];
+  pdfFrame.focus();
+  pdfFrame.print();
 }
 //configurar tabla
 function configurar_tabla(){

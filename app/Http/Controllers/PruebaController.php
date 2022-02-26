@@ -25,6 +25,10 @@ use App\Producto;
 use App\Marca;
 use App\Existencia;
 use App\Almacen;
+use App\OrdenTrabajo;
+use App\OrdenTrabajoDetalle;
+use App\Factura;
+use App\FacturaDetalle;
 use Mail;
 use App\Configuracion_Tabla;
 use App\Imports\CatalogoSATc_ClaveProdServCPImport;
@@ -40,6 +44,20 @@ class PruebaController extends ConfiguracionSistemaController{
     }
 
     public function pruebaswebscraping(){
+
+
+        /*modificar en ordenes de trabajo detalles el status colocar el numero de factura */
+        $ordenes = OrdenTrabajo::orderby('Fecha', 'DESC')->get();
+        foreach($ordenes as $o){
+            $buscarordenenfactura = FacturaDetalle::where('Orden', $o->Orden)->count();
+            if($buscarordenenfactura > 0){
+                $factura = FacturaDetalle::where('Orden', $o->Orden)->first();
+                OrdenTrabajoDetalle::where('Orden', $o->Orden)
+                ->update([
+                    'Status'=>$factura->Factura,
+                ]);
+            }
+        }
 
         
         /*
@@ -70,7 +88,7 @@ class PruebaController extends ConfiguracionSistemaController{
         /*
 
         /*OBTENER INSUMOS Remisiones  detalles*/
-        $insumosproductos = RemisionDetalle::select('Insumo', 'Codigo', 'Remision', 'Item')->where('Insumo', '<>', '')->get();
+        /*$insumosproductos = RemisionDetalle::select('Insumo', 'Codigo', 'Remision', 'Item')->where('Insumo', '<>', '')->get();
         //dd($insumosproductos);
         $modificados=1;
         foreach($insumosproductos as $ip){
@@ -90,7 +108,7 @@ class PruebaController extends ConfiguracionSistemaController{
                 dd($ip);
             }
             */
-        }
+        //}
 
         /*
 
@@ -1036,6 +1054,23 @@ class PruebaController extends ConfiguracionSistemaController{
             'campos_activados'=>'id,cotizacion,fecha,subtotal,iva,total,status,periodo',
             'campos_desactivados'=>'motivo_baja,equipo,usuario,serie',
             'columnas_ordenadas'=>'id,cotizacion,fecha,subtotal,iva,total,status,periodo',
+        ]);
+    }
+
+    public function modificar_valores_en_bd_para_actualizacion_rama20220214correciones(){
+        //Configuracion columnas tabla cxp       
+        Configuracion_Tabla::where('tabla', 'CuentasPorPagar')
+        ->update([
+            'campos_activados'=>'Pago,Status,Fecha,Proveedor,Transferencia,Abono,Periodo,Banco,NombreProveedor,Compras,Facturas',
+            'campos_desactivados'=>'Equipo,MotivoBaja,Folio,Serie,Cheque,Beneficiario,CuentaDeposito,Anotacion,Usuario,NumeroBanco,NombreBanco,CuentaBanco,NumeroProveedor,RfcProveedor,CodigoPostalProveedor,PlazoProveedor,TelefonosProveedor,Email1Proveedor',
+            'columnas_ordenadas'=>'Pago,Proveedor,NombreProveedor,Abono,Compras,Facturas,Transferencia,Status,Fecha,Banco,Periodo',
+        ]);
+        //Configuracion columnas tabla cxc       
+        Configuracion_Tabla::where('tabla', 'CuentasPorCobrar')
+        ->update([
+            'campos_activados'=>'Pago,Fecha,UUID,FechaPago,Abono,Cliente,NombreCliente,RfcCliente,FormaPago,NombreFormaPago,Esquema,Status,MotivoBaja,Usuario,Equipo,Periodo,Facturas',
+            'campos_desactivados'=>'Serie,Folio,Corte,Banco,Anotacion,Moneda,TipoCambio,EmisorRfc,EmisorNombre,LugarExpedicion,RegimenFiscal,ReceptorRfc,ReceptorNombre,NumOperacion,RfcEmisorCtaOrd,NomBancoOrdExt,CtaOrdenante,RfcEmisorCtaBen,CtaBeneficiario,TipoCadPago,CertPago,CadPago,SelloPago,Hora,TipoRelacion,NumeroCliente,NumeroFormaPago,ClaveFormaPago',
+            'columnas_ordenadas'=>'Pago,Fecha,UUID,FechaPago,Abono,Facturas,Cliente,NombreCliente,RfcCliente,FormaPago,NombreFormaPago,Esquema,Status,MotivoBaja,Usuario,Equipo,Periodo',
         ]);
     }
 

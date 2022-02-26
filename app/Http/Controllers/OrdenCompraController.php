@@ -91,18 +91,39 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                         return $data->sum('Total');
                     })
                     ->addColumn('operaciones', function($data) use ($tipousuariologueado){
+                        /*$operaciones =  '<a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Orden .'\')" >'.
+                                            '<i class="material-icons" data-toggle="tooltip" data-placement="top" data-original-title="CAMBIOS">mode_edit</i>'.
+                                        '</a>'.
+                                        '<a href="javascript:void(0);" onclick="desactivar(\''.$data->Orden .'\')" >'.
+                                            '<i class="material-icons" data-toggle="tooltip" data-placement="top" data-original-title="BAJAS">cancel</i>'.
+                                        '</a>'.
+                                        '<a href="javascript:void(0);" onclick="autorizarordencompra(\''.$data->Orden .'\')" >'.
+                                            '<i class="material-icons" data-toggle="tooltip" data-placement="top" data-original-title="AUTORIZAR ORDEN">assignment_turned_in</i>'.
+                                        '</a>'.
+                                        '<a href="javascript:void(0);" onclick="quitarautorizacionordencompra(\''.$data->Orden .'\')" >'.
+                                            '<i class="material-icons" data-toggle="tooltip" data-placement="top" data-original-title="QUITAR AUTORIZACION">assignment_returned</i>'.
+                                        '</a>'.
+                                        '<a href="'.route('ordenes_compra_generar_pdfs_indiv',$data->Orden).'" target="_blank">'.
+                                            '<i class="material-icons" data-toggle="tooltip" data-placement="top" data-original-title="VER DOCUMENTO PDF">picture_as_pdf</i>'.
+                                        '</a>'.
+                                        '<a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Orden .'\')">'.
+                                            '<i class="material-icons" data-toggle="tooltip" data-placement="top" data-original-title="ENVIAR DOCUMENTO POR CORREO">mail_outline</i>'.
+                                        '</a>'.
+                                        '<a href="javascript:void(0);" onclick="generardocumentoeniframe(\''.$data->Orden .'\')">'.
+                                            '<i class="material-icons" data-toggle="tooltip" data-placement="top" data-original-title="IMPRIMIR DOCUMENTO PDF">print</i>'.
+                                        '</a>';*/
                         $operaciones = '<div class="dropdown">'.
                                             '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
                                                 'OPERACIONES <span class="caret"></span>'.
                                             '</button>'.
                                             '<ul class="dropdown-menu">'.
-                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Orden .'\')">Cambios</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="autorizarordencompra(\''.$data->Orden .'\')">Autorizar</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="quitarautorizacionordencompra(\''.$data->Orden .'\')">Quitar Autorización</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Orden .'\')">Bajas</a></li>'.
-                                                '<li><a href="'.route('ordenes_compra_generar_pdfs_indiv',$data->Orden).'" target="_blank">Ver Documento PDF</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Orden .'\')">Enviar Documento por Correo</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="generardocumentoeniframe(\''.$data->Orden .'\')">Imprimir Documento PDF</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Orden .'\')">Cambios</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="autorizarordencompra(\''.$data->Orden .'\')">Autorizar</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="quitarautorizacionordencompra(\''.$data->Orden .'\')">Quitar Autorización</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->Orden .'\')">Bajas</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="'.route('ordenes_compra_generar_pdfs_indiv',$data->Orden).'" target="_blank">Ver Documento PDF</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Orden .'\')">Enviar Documento por Correo</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="generardocumentoeniframe(\''.$data->Orden .'\')">Imprimir Documento PDF</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;

@@ -30,6 +30,7 @@ use App\Firma_Rel_Documento;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
 use Storage; 
 use ZipArchive;
+use File;
 
 class AsignacionHerramientaController extends ConfiguracionSistemaController{
 
@@ -74,9 +75,10 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                                                 'OPERACIONES <span class="caret"></span>'.
                                             '</button>'.
                                             '<ul class="dropdown-menu">'.
-                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->asignacion .'\')">Cambios</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->asignacion .'\')">Bajas</a></li>'.
-                                                //'<li><a href="javascript:void(0);" onclick="autorizarasignacion(\''.$data->asignacion .'\')">Autorizar Asignación</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->asignacion .'\')">Cambios</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->asignacion .'\')">Bajas</a></li>'.
+                                                //'<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="autorizarasignacion(\''.$data->asignacion .'\')">Autorizar Asignación</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="generardocumentoeniframe(\''.$data->asignacion .'\')">Imprimir Documento PDF</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;
@@ -449,13 +451,17 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
         Helpers::eliminararchivospdfsgenerados();
         //primero eliminar todos los archivos zip
         Helpers::eliminararchivoszipgenerados();
-        $tipogeneracionpdf = $request->tipogeneracionpdf;
-        if($tipogeneracionpdf == 0){
-            $asignacionesherramientas = VistaAsignacionHerramienta::whereIn('asignacion', $request->arraypdf)->orderBy('id', 'ASC')->take(500)->get(); 
+        if($request->imprimirdirectamente == 1){
+            $asignacionesherramientas = VistaAsignacionHerramienta::where('asignacion', $request->arraypdf)->get(); 
         }else{
-            $fechainiciopdf = date($request->fechainiciopdf);
-            $fechaterminacionpdf = date($request->fechaterminacionpdf);
-            $asignacionesherramientas = VistaAsignacionHerramienta::whereBetween('fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('id', 'ASC')->take(500)->get();
+            $tipogeneracionpdf = $request->tipogeneracionpdf;
+            if($tipogeneracionpdf == 0){
+                $asignacionesherramientas = VistaAsignacionHerramienta::whereIn('asignacion', $request->arraypdf)->orderBy('id', 'ASC')->take(500)->get(); 
+            }else{
+                $fechainiciopdf = date($request->fechainiciopdf);
+                $fechaterminacionpdf = date($request->fechaterminacionpdf);
+                $asignacionesherramientas = VistaAsignacionHerramienta::whereBetween('fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('id', 'ASC')->take(500)->get();
+            }
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $arrayfilespdf = array();
@@ -517,31 +523,38 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
             array_push($arrayfilespdf,$ArchivoPDF);
         }
         $pdfMerger->merge(); //unirlos
-        if($request->descargar_xml == 0){
-            $pdfMerger->save("AsignacionesHerramienta.pdf", "browser");//mostrarlos en el navegador
+        if($request->imprimirdirectamente == 1){
+            $archivoacopiar = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
+            $carpetacopias = public_path('xml_descargados/'.$ArchivoPDF);
+            File::copy($archivoacopiar, $carpetacopias);
+            return response()->json($ArchivoPDF);
         }else{
-            //carpeta donde se guardara el archivo zip
-            $public_dir=public_path();
-            // Zip File Name
-            $zipFileName = 'DocumentosPDF.zip';
-            // Crear Objeto ZipArchive
-            $zip = new ZipArchive;
-            if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
-                // Agregar archivos que se comprimiran
-                foreach($arrayfilespdf as $afp) {
-                    $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
-                }     
-                //terminar proceso   
-                $zip->close();
-            }
-            // Set Encabezados para descargar
-            $headers = array(
-                'Content-Type' => 'application/octet-stream',
-            );
-            $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
-            // Create Download Response
-            if(file_exists($filetopath)){
-                return response()->download($filetopath,$zipFileName,$headers);
+            if($request->descargar_xml == 0){
+                $pdfMerger->save("AsignacionesHerramienta.pdf", "browser");//mostrarlos en el navegador
+            }else{
+                //carpeta donde se guardara el archivo zip
+                $public_dir=public_path();
+                // Zip File Name
+                $zipFileName = 'DocumentosPDF.zip';
+                // Crear Objeto ZipArchive
+                $zip = new ZipArchive;
+                if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
+                    // Agregar archivos que se comprimiran
+                    foreach($arrayfilespdf as $afp) {
+                        $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
+                    }     
+                    //terminar proceso   
+                    $zip->close();
+                }
+                // Set Encabezados para descargar
+                $headers = array(
+                    'Content-Type' => 'application/octet-stream',
+                );
+                $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
+                // Create Download Response
+                if(file_exists($filetopath)){
+                    return response()->download($filetopath,$zipFileName,$headers);
+                }
             }
         }
     }

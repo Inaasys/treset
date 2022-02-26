@@ -149,5 +149,6 @@ class ExistenciaController extends ConfiguracionSistemaController{
         }
         return redirect()->route('existencias');
     }
+
     
 }

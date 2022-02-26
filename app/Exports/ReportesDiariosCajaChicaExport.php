@@ -76,6 +76,7 @@ class ReportesDiariosCajaChicaExport implements FromView,WithTitle
                 "movimientocompra"=>$c->Compra,
                 "proveedor"=>$c->EmisorNombre,
                 "UUID"=>$c->UUID,
+                "Factura"=>$c->Factura,
                 "conceptopago"=>"",
                 "observacionescompra"=>$c->Obs,
                 "subtotal"=>number_format(Helpers::convertirvalorcorrecto($c->SubTotal), $this->numerodecimales),

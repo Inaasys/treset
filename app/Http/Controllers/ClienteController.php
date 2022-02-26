@@ -20,6 +20,7 @@ use App\Agente;
 use App\FormaPago;
 use App\MetodoPago;
 use App\UsoCFDI;
+use App\c_RegimenFiscal;
 use App\Empresa;
 use App\Marca;
 use App\ProductoPrecio;
@@ -62,8 +63,8 @@ class ClienteController extends ConfiguracionSistemaController{
                                                 'OPERACIONES <span class="caret"></span>'.
                                             '</button>'.
                                             '<ul class="dropdown-menu">'.
-                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos('.$data->Numero.')">Cambios</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="desactivar('.$data->Numero.')">Bajas</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos('.$data->Numero.')">Cambios</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar('.$data->Numero.')">Bajas</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;
@@ -303,6 +304,37 @@ class ClienteController extends ConfiguracionSistemaController{
         return response()->json($data); 
     }
     
+    //obtener regimenes fiscales
+    public function clientes_obtener_regimenes_fiscales(Request $request){
+        if($request->ajax()){
+            $data = c_RegimenFiscal::query();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarregimenfiscal(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }  
+    } 
+    //obtener por clave
+    public  function clientes_obtener_regimenfiscal_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existeregimenfiscal = c_RegimenFiscal::where('Clave', $request->claveregimenfiscal)->count();
+        if($existeregimenfiscal > 0){
+            $regimenfiscal = c_RegimenFiscal::where('Clave', $request->claveregimenfiscal)->first();
+            $clave = $regimenfiscal->Clave;
+            $nombre = $regimenfiscal->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+
+    }
+    
     //obtener productos
     public function clientes_obtener_productos(Request $request){
         if($request->ajax()){
@@ -394,6 +426,7 @@ class ClienteController extends ConfiguracionSistemaController{
             $Cliente->Cuenta=$request->cuentaref;
             $Cliente->CuentaServicio=$request->cuentaser;
             $Cliente->Anotaciones=$request->anotaciones;
+            $Cliente->RegimenFiscal=$request->claveregimenfiscal;
             $Cliente->Status='ALTA';
             Log::channel('cliente')->info('Se registro un nuevo cliente: '.$Cliente.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
 		    $Cliente->save();
@@ -431,6 +464,8 @@ class ClienteController extends ConfiguracionSistemaController{
         $metododepago = MetodoPago::where('Clave', $clavemetododepago)->first();
         $claveusocfdi = $cliente->UsoCfdi;
         $usocfdi = UsoCFDI::where('Clave', $claveusocfdi)->first();
+        $claveregimenfiscal = $cliente->RegimenFiscal;
+        $regimenfiscal = c_RegimenFiscal::where('Clave', $claveregimenfiscal)->first();
         $claveagente = $cliente->Agente;
         $agente = Agente::where('Numero', $claveagente)->first();
         //tab utilidades
@@ -485,6 +520,7 @@ class ClienteController extends ConfiguracionSistemaController{
             "formadepago" => $formadepago,
             "metododepago" => $metododepago,
             "usocfdi" => $usocfdi,
+            "regimenfiscal" => $regimenfiscal,
             "agente" => $agente,
             "filasutilidadesmarcas" => $filasutilidadesmarcas,
             "filaspreciosproductos" => $filaspreciosproductos,
@@ -531,7 +567,8 @@ class ClienteController extends ConfiguracionSistemaController{
                 'Email3' => $request->email3,
                 'Cuenta' => $request->cuentaref,
                 'CuentaServicio' => $request->cuentaser,
-                'Anotaciones' => $request->anotaciones
+                'Anotaciones' => $request->anotaciones,
+                'RegimenFiscal' => $request->claveregimenfiscal
             ]);
             /*
             //modificar registro

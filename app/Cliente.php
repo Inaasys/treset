@@ -98,6 +98,7 @@ class Cliente extends Model
         'UnidadBUS',
         'UnidadTRUCK',
         'Prospecto',
-        'Status'
+        'Status',
+        'RegimenFiscal'
     ];
 }

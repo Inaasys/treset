@@ -397,7 +397,11 @@ class Helpers{
         if($contar_configuracion_tabla > 0){
             $configuracion_tabla = Configuracion_Tabla::where('tabla', $tipodocumento)->where('IdUsuario', $idusuariologueado)->first();
         }else{
-            $configuracion_tabla = Configuracion_Tabla::where('tabla', $tipodocumento)->where('IdUsuario', NULL)->first();
+            $configuracion_tabla = Configuracion_Tabla::where('tabla', $tipodocumento)
+                                                        ->where(function($q){
+                                                            $q->where('IdUsuario', NULL)
+                                                            ->orWhere('IdUsuario',0);
+                                                        })->first();       
         }
         //consultas ordenadas
         $campos_consulta = [];

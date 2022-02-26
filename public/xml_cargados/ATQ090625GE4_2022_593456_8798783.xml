@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cfdi:Comprobante xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cfdi="http://www.sat.gob.mx/cfd/3" xsi:schemaLocation="http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv33.xsd" Version="3.3" Serie="R3" Folio="8798783" Fecha="2022-02-21T19:06:50" Sello="i8FntYiAzl4ol/X+j8JG6MYs3M9wFjHDp33Dy5YApXLHp2fgEpygazNVixQEeivPqO8M1etEcbEuibi5zGZ1x/7WUBSlFPfm1/CpJgxgzjD5LZBlwec1lHl+hrJCmh+M1fjpBpY6XV1LE3/Y8/bqcPcvKmzjRMV1dRlCUCki9UDnNjXM5A/R+weuiztbvIjZQtDPO67nVJsXbYMvMqqN22qN8oq119czOsEObz/34z0ws/hSQIbSneQ1iB/RERa+f2AbFWi2l1nbwzsCTJbNgbzSOiShf1ahYunUUpWVm5L54K4LxTbc49r0wFnTkvIGI+Vmw+eetcb4m4VJgQXmRw==" FormaPago="01" NoCertificado="00001000000509416226" Certificado="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" SubTotal="3747.33" Descuento="930.03" Moneda="MXN" Total="2817.3" TipoDeComprobante="I" MetodoPago="PUE" LugarExpedicion="76000">
+  <cfdi:Emisor Rfc="GEQ790916MJ0" Nombre="PODER EJECUTIVO DEL ESTADO DE QUERETARO" RegimenFiscal="603"/>
+  <cfdi:Receptor Rfc="ATQ090625GE4" Nombre="AUTOBUSES Y TRACTOCAMIONES DE QUERETARO SA DE CV" UsoCFDI="G03"/>
+  <cfdi:Conceptos>
+    <cfdi:Concepto ClaveProdServ="93161700" Cantidad="1" ClaveUnidad="C62" Descripcion="DERECHOS POR CONTROL VEHICULAR" ValorUnitario="865.98" Importe="865.98" NoIdentificacion="2022/593456" Descuento="59.40">
+      <cfdi:Impuestos>
+        <cfdi:Traslados>
+          <cfdi:Traslado Base="865.98" Impuesto="002" TipoFactor="Exento"/>
+        </cfdi:Traslados>
+      </cfdi:Impuestos>
+    </cfdi:Concepto>
+    <cfdi:Concepto ClaveProdServ="93161700" Cantidad="1" ClaveUnidad="C62" Descripcion="IMPTO TENENCIA VEHICULOS  HASTA 10 AÑOS" ValorUnitario="379.63" Importe="379.63" NoIdentificacion="2022/593456">
+      <cfdi:Impuestos>
+        <cfdi:Traslados>
+          <cfdi:Traslado Base="379.63" Impuesto="002" TipoFactor="Exento"/>
+        </cfdi:Traslados>
+      </cfdi:Impuestos>
+    </cfdi:Concepto>
+    <cfdi:Concepto ClaveProdServ="93161700" Cantidad="1" ClaveUnidad="C62" Descripcion="NUEVAS PLACAS" ValorUnitario="2501.72" Importe="2501.72" NoIdentificacion="2022/593456" Descuento="870.63">
+      <cfdi:Impuestos>
+        <cfdi:Traslados>
+          <cfdi:Traslado Base="2501.72" Impuesto="002" TipoFactor="Exento"/>
+        </cfdi:Traslados>
+      </cfdi:Impuestos>
+    </cfdi:Concepto>
+  </cfdi:Conceptos>
+  <cfdi:Complemento>
+    <tfd:TimbreFiscalDigital xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tfd="http://www.sat.gob.mx/TimbreFiscalDigital" xsi:schemaLocation="http://www.sat.gob.mx/TimbreFiscalDigital http://www.sat.gob.mx/sitio_internet/cfd/TimbreFiscalDigital/TimbreFiscalDigitalv11.xsd" Version="1.1" UUID="5EFD31D6-EB79-C243-8AE5-64330FC39D93" FechaTimbrado="2022-02-21T19:11:52" RfcProvCertif="SCD110105654" SelloCFD="i8FntYiAzl4ol/X+j8JG6MYs3M9wFjHDp33Dy5YApXLHp2fgEpygazNVixQEeivPqO8M1etEcbEuibi5zGZ1x/7WUBSlFPfm1/CpJgxgzjD5LZBlwec1lHl+hrJCmh+M1fjpBpY6XV1LE3/Y8/bqcPcvKmzjRMV1dRlCUCki9UDnNjXM5A/R+weuiztbvIjZQtDPO67nVJsXbYMvMqqN22qN8oq119czOsEObz/34z0ws/hSQIbSneQ1iB/RERa+f2AbFWi2l1nbwzsCTJbNgbzSOiShf1ahYunUUpWVm5L54K4LxTbc49r0wFnTkvIGI+Vmw+eetcb4m4VJgQXmRw==" SelloSAT="JvTESnc+HfrntpAtV10svBJVJJ9zDeM0eXzQmHxRSbYqzaf5y/rQNg9LgqHWuy7nBqCLwROTBqrl64gbMjShibyl4YkCkv+H4KrV9cANp4Ixth7xAYG1jYg8ESGoRF9sAAU4KfRkX7OdoaKkB18fQcAQZD23FylXUnf9yEPURItz72SBu4zNQr/X2XukZgQSdkTCHkj0a8F6mNJuJXf3SYxAL69Q+x9n12b83xmhzK+C1FUG0laHDBmQAGZ0Ror44X9aw1mWN6bpMxknU292C5/vnW8VYvNcczfAYVkz7385zVGRmn8DMTVt+l+o2N9nixoADnfMnZPmp4N5StECtQ==" NoCertificadoSAT="00001000000502000436"/>
+  </cfdi:Complemento>
+  <cfdi:Addenda xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cfdi="http://www.sat.gob.mx/cfd/3" xsi:schemaLocation="http://www.planeacion.aplicanet.gob.mx http://www.planeacion.aplicanet.gob.mx/scfd/Recaudacion/addendaXSD.xsd">
+    <cfdi:Observaciones Nota="NO PLACA: ST4159B. Derivado de lo dispuesto por la fracción VIII del artículo tercero transitorio de las reformas a la Ley de Hacienda del Estado de Querétaro, vigente para el ejercicio fiscal 2022,  la tarjeta de circulación que hubiese sido expedida para los ejercicios fiscales 2013, 2014, 2015, 2016, 2017, 2018, 2019,  2020 y 2021, continuarán vigentes hasta el 31 de julio de 2022." fechaPagoOperacion="21-FEB-22"/>
+    <cfdi:DomicilioFiscalReceptor pais="México"/>
+    <cfdi:DomicilioFiscalEmisor calle="5 de Mayo Esq. Pasteur" noExterior="SN" colonia="CENTRO" municipio="QUERÉTARO" estado="QUERÉTARO" pais="MÉXICO" codigoPostal="76000"/>
+  </cfdi:Addenda>
+</cfdi:Comprobante>
+

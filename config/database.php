@@ -106,6 +106,32 @@ return [
             'prefix_indexes' => true,
         ],
 
+        'sqlsrv3' => [
+            'driver' => 'sqlsrv',
+            'url' => env('DATABASE_URL'),
+            'host' => env('DB3_HOST'),
+            'port' => env('DB3_PORT'),
+            'database' => env('DB3_DATABASE'),
+            'username' => env('DB3_USERNAME'),
+            'password' => env('DB3_PASSWORD'),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+        ],
+
+        'sqlsrv4' => [
+            'driver' => 'sqlsrv',
+            'url' => env('DATABASE_URL'),
+            'host' => env('DB4_HOST'),
+            'port' => env('DB4_PORT'),
+            'database' => env('DB4_DATABASE'),
+            'username' => env('DB4_USERNAME'),
+            'password' => env('DB4_PASSWORD'),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+        ],
+
     ],
 
     /*

@@ -231,6 +231,9 @@ class EmpresaController extends ConfiguracionSistemaController{
             'ModificarConsecutivoFolioEnRemisiones' => $request->modificarconsecutivofolioenremisiones,
             'ModificarCostosDeProductos' => $modificarcostosdeproductos,
             'ValidarUtilidadNegativa' => $request->validarutilidadnegativa,
+            'PedirObligatoriamenteReferenciaEnRemisiones' => $request->pedirobligatoriamentereferenciarnremisiones,
+            'PedirObligatoriamenteOrdenServicioEnRemisiones' => $request->pedirobligatoriamenteordenservicioenremisiones,
+            'PedirObligatoriamenteEquipoEnRemisiones' => $request->pedirobligatoriamenteequipoenremisiones,
         ]);
         return response()->json($request->all());
     }

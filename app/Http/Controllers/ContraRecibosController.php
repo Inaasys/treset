@@ -71,10 +71,10 @@ class ContraRecibosController extends ConfiguracionSistemaController{
                                                 'OPERACIONES <span class="caret"></span>'.
                                             '</button>'.
                                             '<ul class="dropdown-menu">'.
-                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->ContraRecibo .'\')">Cambios</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->ContraRecibo .'\')">Bajas</a></li>'.
-                                                '<li><a href="'.route('contrarecibos_generar_pdfs_indiv',$data->ContraRecibo).'" target="_blank">Ver Documento PDF</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->ContraRecibo .'\')">Enviar Documento por Correo</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->ContraRecibo .'\')">Cambios</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->ContraRecibo .'\')">Bajas</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="'.route('contrarecibos_generar_pdfs_indiv',$data->ContraRecibo).'" target="_blank">Ver Documento PDF</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->ContraRecibo .'\')">Enviar Documento por Correo</a></li>'.
                                             '</ul>'.
                                         '</div>';
                     return $operaciones;

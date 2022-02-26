@@ -94,7 +94,7 @@ class ListaPrecioVolvoController extends ConfiguracionSistemaController{
                                                 'OPERACIONES <span class="caret"></span>'.
                                             '</button>'.
                                             '<ul class="dropdown-menu">'.
-                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Numero .'\')">Bajas</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->Numero .'\')">Bajas</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;

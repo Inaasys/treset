@@ -164,6 +164,7 @@ function listar(){
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {
                 $('#tbllistado').DataTable().search( this.value ).draw();
+                $(".inputbusquedageneral").val(""); 
               }
           });
         }
@@ -1196,7 +1197,7 @@ function agregarfilaservicio(Codigo, Servicio, Unidad, Costo, Venta, Cantidad, C
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxl anotacionespartida" name="anotacionespartida[]" data-parsley-length="[1, 255]" autocomplete="off"></td>'+
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxs statuspartida" name="statuspartida[]" readonly></td>'+
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxs itempartida" name="itempartida[]" value="'+item+'" readonly></td>'+
-                        '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida1" name="numerotecnicopartida1[]" value="0" readonly><input type="text" class="form-control divorinputmodl tecnicopartida1" name="tecnicopartida1[]" value="0" readonly></td>'+
+                        '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida1" name="numerotecnicopartida1[]" value="0" readonly><input type="text" class="form-control divorinputmodl tecnicopartida1" name="tecnicopartida1[]" value="0" data-parsley-tecnico="[5, 1000]" readonly></td>'+
                         '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida2" name="numerotecnicopartida2[]" value="0" readonly><input type="text" class="form-control divorinputmodl tecnicopartida2" name="tecnicopartida2[]" value="0" readonly></td>'+
                         '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida3" name="numerotecnicopartida3[]" value="0" readonly><input type="text" class="form-control divorinputmodl tecnicopartida3" name="tecnicopartida3[]" value="0" readonly></td>'+
                         '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida4" name="numerotecnicopartida4[]" value="0" readonly><input type="text" class="form-control divorinputmodl tecnicopartida4" name="tecnicopartida4[]" value="0" readonly></td>'+
@@ -3086,6 +3087,38 @@ function buscarstringlike(){
       var data = tablafolenc.row( this ).data();
       agregararraypdf(data.Orden);
   });
+}
+//generar documento en iframe
+function generardocumentoeniframe(Orden){
+  var arraypdf = new Array();
+  var folios = [Orden];
+  arraypdf.push(folios);
+  var form_data = new FormData();
+  form_data.append('arraypdf', arraypdf); 
+  form_data.append('tipogeneracionpdf', 0);
+  form_data.append('numerodecimalesdocumento', 2);
+  form_data.append('imprimirdirectamente', 1);
+  $.ajax({
+    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+    url:ordenes_trabajo_generar_pdfs,
+    data: form_data,
+    type: 'POST',
+    contentType: false,
+    processData: false,
+    success: function (data) {
+      $('#pdfiframe').attr("src", urlpdfsimpresionesrapidas+data);
+      setTimeout(function(){imprimirdirecto();},500);    
+    },
+    error: function (data) {
+      console.log(data);
+    }
+  });
+}
+//imprimir documento pdf directamente
+function imprimirdirecto(){
+  var pdfFrame = window.frames["pdfiframe"];
+  pdfFrame.focus();
+  pdfFrame.print();
 }
 //configurar tabla
 function configurar_tabla(){

@@ -7,7 +7,7 @@ function init(){
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
-    $.get(folios_comprobantes_facturas_obtener_ultimo_numero, function(numero){
+    $.get(folios_comprobantes_cartasporte_obtener_ultimo_numero, function(numero){
       $("#numero").val(numero);
     })  
 }
@@ -69,7 +69,7 @@ function listar(){
             'processing': '<div class="spinner"></div>'
         },
         serverSide: true,
-        ajax: folios_comprobantes_facturas_obtener,
+        ajax: folios_comprobantes_cartasporte_obtener,
         columns: [
             { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
             { data: 'Numero', name: 'Numero', orderable: false, searchable: true },
@@ -77,7 +77,6 @@ function listar(){
             { data: 'Esquema', name: 'Esquema', orderable: false, searchable: true },
             { data: 'FolioInicial', name: 'FolioInicial', orderable: false, searchable: true },
             { data: 'Titulo', name: 'Titulo', orderable: false, searchable: true },
-            { data: 'Depto', name: 'Depto', orderable: false, searchable: true },
             { data: 'ValidoDesde', name: 'ValidoDesde', orderable: false, searchable: true },
             { data: 'ValidoHasta', name: 'ValidoHasta', orderable: false, searchable: true },
             { data: 'Empresa', name: 'Empresa', orderable: false, searchable: true },
@@ -100,6 +99,7 @@ function listar(){
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {
                 $('#tbllistado').DataTable().search( this.value ).draw();
+                $(".inputbusquedageneral").val(""); 
               }
           });
         }
@@ -139,7 +139,7 @@ function tipoesquema(){
 }
 //alta
 function alta(){
-    $("#titulomodal").html('Alta Folio Fiscal Factura');
+    $("#titulomodal").html('Alta Folio Fiscal Traslado');
     mostrarmodalformulario('ALTA');
     mostrarformulario();
     //formulario alta
@@ -150,20 +150,19 @@ function alta(){
                     '</div>'+
                     '<div class="col-md-3">'+
                         '<label>Serie</label>'+
-                        '<input type="text" class="form-control" name="serie" id="serie" value="F"  onkeyup="tipoLetra(this)" required data-parsley-length="[1, 10]">'+
+                        '<input type="text" class="form-control" name="serie" id="serie" value="T"  onkeyup="tipoLetra(this)" required data-parsley-length="[1, 10]">'+
                     '</div>'+
                     '<div class="col-md-3">'+
                         '<label>Esquema</label>'+
                         '<select name="esquema" id="esquema" class="form-control select2" style="width:100%" onchange="tipoesquema();" required>'+
                             '<option selected disabled hidden>Selecciona...</option>'+
                             '<option value="CFDI" selected>CFDI</option>'+
-                            '<option value="INTERNA">INTERNA</option>'+
-                            '<option value="NOTA">NOTA</option>'+
+                            '<option value="TRASLADO">TRASLADO</option>'+
                         '</select>'+
                     '</div>'+
                     '<div class="col-md-3">'+
                         '<label>Titulo</label>'+
-                        '<input type="text" class="form-control" name="titulo" id="titulo" value="FACTURA" onkeyup="tipoLetra(this)" required data-parsley-length="[1, 20]">'+
+                        '<input type="text" class="form-control" name="titulo" id="titulo" value="TRASLADO" onkeyup="tipoLetra(this)" required data-parsley-length="[1, 20]">'+
                     '</div>'+
                 '</div>'+
                 '<div class="row">'+
@@ -176,21 +175,12 @@ function alta(){
                                 '<a href="#domiciliotab" data-toggle="tab">Domicilio</a>'+
                             '</li>'+
                             '<li role="presentation">'+
-                                '<a href="#pagaretab" data-toggle="tab">Pagaré</a>'+
+                                '<a href="#pagaretab" data-toggle="tab">Leyenda</a>'+
                             '</li>'+
                         '</ul>'+
                         '<div class="tab-content">'+
                             '<div role="tabpanel" class="tab-pane fade in active" id="foliostab">'+
                                 '<div class="row">'+
-                                    '<div class="col-md-6">'+
-                                        '<label>Departamento</label>'+
-                                        '<select name="departamento" id="departamento" class="form-control select2" style="width:100%" required>'+
-                                            '<option selected disabled hidden>Selecciona...</option>'+
-                                            '<option value="PRODUCTOS" selected>PRODUCTOS</option>'+
-                                            '<option value="LIBRE">LIBRE</option>'+
-                                            '<option value="SERVICIO">SERVICIO</option>'+
-                                        '</select>'+
-                                    '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Folio Inicial (Las Facturas empiezan con este folio)</label>'+
                                         '<input type="text" class="form-control" name="folioinicial" id="folioinicial" value="1" required >'+
@@ -258,7 +248,7 @@ function alta(){
                                     '</div>'+
                                     '<div class="col-md-12">'+
                                         '<label>Pagare</label>'+
-                                        '<textarea class="form-control" name="pagare" id="pagare" onkeyup="tipoLetra(this);" rows="15" ></textarea>'+
+                                        '<textarea class="form-control" name="leyenda" id="leyenda" onkeyup="tipoLetra(this);" rows="15" ></textarea>'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
@@ -283,7 +273,7 @@ function validararchivostimbrado(){
     var formData = new FormData($("#formparsley")[0]);
     $.ajax({
         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-        url:folios_comprobantes_facturas_enviar_archivos_timbrado,
+        url:folios_comprobantes_cartasporte_enviar_archivos_timbrado,
         type: "post",
         dataType: "html",
         data: formData,
@@ -316,7 +306,7 @@ $("#btnGuardar").on('click', function (e) {
         $('.page-loader-wrapper').css('display', 'block');
         $.ajax({
             headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-            url:folios_comprobantes_facturas_guardar,
+            url:folios_comprobantes_cartasporte_guardar,
             type: "post",
             dataType: "html",
             data: formData,
@@ -360,7 +350,7 @@ $("#aceptar").on('click', function(e){
         $('.page-loader-wrapper').css('display', 'block');
         $.ajax({
             headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-            url:folios_comprobantes_facturas_alta_o_baja,
+            url:folios_comprobantes_cartasporte_alta_o_baja,
             type: "post",
             dataType: "html",
             data: formData,
@@ -405,10 +395,12 @@ function mostrardivcertificados(){
     }
 }
 function obtenerdatos(numerofolio){
-    $("#titulomodal").html('Modificación Folio Fiscal Factura');
+    $("#titulomodal").html('Modificación Folio Fiscal Traslado');
     $('.page-loader-wrapper').css('display', 'block');
-    $.get(folios_comprobantes_facturas_obtener_folio,{numerofolio:numerofolio },function(data){
+    $.get(folios_comprobantes_cartasporte_obtener_folio,{numerofolio:numerofolio },function(data){
     //formulario modificacion
+    
+    //formulario alta
     var tabs =  '<div class="row">'+
                     '<div class="col-md-3">'+
                         '<label>Número</label>'+
@@ -416,17 +408,17 @@ function obtenerdatos(numerofolio){
                     '</div>'+
                     '<div class="col-md-3">'+
                         '<label>Serie</label>'+
-                        '<input type="text" class="form-control" name="serie" id="serie" value="F"  onkeyup="tipoLetra(this)" required data-parsley-length="[1, 10]" readonly>'+
+                        '<input type="text" class="form-control" name="serie" id="serie" value="T"  onkeyup="tipoLetra(this)" required data-parsley-length="[1, 10]" readonly>'+
                     '</div>'+
                     '<div class="col-md-3">'+
                         '<label>Esquema</label>'+
-                        '<select name="esquema" id="esquema" class="form-control select2" style="width:100%"  required>'+
-                            '<option value="'+data.FolioComprobanteFactura.Esquema+'" selected>'+data.FolioComprobanteFactura.Esquema+'</option>'+
+                        '<select name="esquema" id="esquema" class="form-control select2" style="width:100%" onchange="tipoesquema();" required>'+
+                            '<option value="'+data.FolioComprobanteTraslado.Esquema+'" selected>'+data.FolioComprobanteTraslado.Esquema+'</option>'+
                         '</select>'+
                     '</div>'+
                     '<div class="col-md-3">'+
                         '<label>Titulo</label>'+
-                        '<input type="text" class="form-control" name="titulo" id="titulo" value="FACTURA" onkeyup="tipoLetra(this)" required data-parsley-length="[1, 20]">'+
+                        '<input type="text" class="form-control" name="titulo" id="titulo" value="TRASLADO" onkeyup="tipoLetra(this)" required data-parsley-length="[1, 20]">'+
                     '</div>'+
                 '</div>'+
                 '<div class="row">'+
@@ -439,21 +431,12 @@ function obtenerdatos(numerofolio){
                                 '<a href="#domiciliotab" data-toggle="tab">Domicilio</a>'+
                             '</li>'+
                             '<li role="presentation">'+
-                                '<a href="#pagaretab" data-toggle="tab">Pagaré</a>'+
+                                '<a href="#pagaretab" data-toggle="tab">Leyenda</a>'+
                             '</li>'+
                         '</ul>'+
                         '<div class="tab-content">'+
                             '<div role="tabpanel" class="tab-pane fade in active" id="foliostab">'+
                                 '<div class="row">'+
-                                    '<div class="col-md-6">'+
-                                        '<label>Departamento</label>'+
-                                        '<select name="departamento" id="departamento" class="form-control select2" style="width:100%" required>'+
-                                            '<option selected disabled hidden>Selecciona...</option>'+
-                                            '<option value="PRODUCTOS" selected>PRODUCTOS</option>'+
-                                            '<option value="LIBRE">LIBRE</option>'+
-                                            '<option value="SERVICIO">SERVICIO</option>'+
-                                        '</select>'+
-                                    '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Folio Inicial (Las Facturas empiezan con este folio)</label>'+
                                         '<input type="text" class="form-control" name="folioinicial" id="folioinicial" value="1" required readonly>'+
@@ -468,23 +451,23 @@ function obtenerdatos(numerofolio){
                                 '<div class="row" id="divcertificadosempresa" hidden>'+ 
                                     '<div class="col-md-6">'+
                                         '<label>Archivo de Certificado (*.cer)</label>'+
-                                        '<input type="file" name="archivocertificado" id="archivocertificado"  class="dropify"  data-parsley-length="[1, 100]" data-allowed-file-extensions="cer" data-height="100" onchange="validararchivostimbrado();" />'+
+                                        '<input type="file" name="archivocertificado" id="archivocertificado"  class="dropify" required data-parsley-length="[1, 100]" data-allowed-file-extensions="cer" data-height="100" onchange="validararchivostimbrado();" />'+
                                     '</div>'+ 
                                     '<div class="col-md-6">'+
                                         '<label>Archivo Llave Privada (*.key)</label>'+
-                                        '<input type="file" name="archivollaveprivada" id="archivollaveprivada"  class="dropify"  data-parsley-length="[1, 100]" data-allowed-file-extensions="key" data-height="100" onchange="validararchivostimbrado();" />'+
+                                        '<input type="file" name="archivollaveprivada" id="archivollaveprivada"  class="dropify" required data-parsley-length="[1, 100]" data-allowed-file-extensions="key" data-height="100" onchange="validararchivostimbrado();" />'+
                                     '</div>'+
                                     '<div class="col-md-4">'+
                                         '<label>Contraseña Llave Privada</label>'+
-                                        '<input type="password" class="form-control" name="contrasenallaveprivada" id="contrasenallaveprivada"  data-parsley-length="[1, 100]" onchange="validararchivostimbrado();">'+
+                                        '<input type="password" class="form-control" name="contrasenallaveprivada" id="contrasenallaveprivada" required data-parsley-length="[1, 100]" onchange="validararchivostimbrado();">'+
                                     '</div>'+ 
                                     '<div class="col-md-4">'+
                                         '<label>Certificado Válido Desde</label>'+
-                                        '<input type="text" class="form-control" name="certificadovalidodesde" id="certificadovalidodesde"  readonly>'+
+                                        '<input type="text" class="form-control" name="certificadovalidodesde" id="certificadovalidodesde" required readonly>'+
                                     '</div>'+ 
                                     '<div class="col-md-4">'+
                                         '<label>Certificado Válido Hasta</label>'+
-                                        '<input type="text" class="form-control" name="certificadovalidohasta" id="certificadovalidohasta"  readonly>'+
+                                        '<input type="text" class="form-control" name="certificadovalidohasta" id="certificadovalidohasta" required readonly>'+
                                     '</div>'+ 
                                 '</div>'+   
                             '</div>'+
@@ -527,7 +510,7 @@ function obtenerdatos(numerofolio){
                                     '</div>'+
                                     '<div class="col-md-12">'+
                                         '<label>Pagare</label>'+
-                                        '<textarea class="form-control" name="pagare" id="pagare" onkeyup="tipoLetra(this);" rows="15" ></textarea>'+
+                                        '<textarea class="form-control" name="leyenda" id="leyenda" onkeyup="tipoLetra(this);" rows="15" ></textarea>'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
@@ -544,27 +527,19 @@ function obtenerdatos(numerofolio){
     $("#tabsform").html(tabs);
     //colocar autocomplette off  todo el formulario
     $(".form-control").attr('autocomplete','off');
-    $("#numero").val(data.FolioComprobanteFactura.Numero);
-    $("#serie").val(data.FolioComprobanteFactura.Serie);
-    $("#titulo").val(data.FolioComprobanteFactura.Titulo);
-    $("#departamento").val(data.FolioComprobanteFactura.Depto).change();
-    $("#folioinicial").val(data.FolioComprobanteFactura.FolioInicial);
-    /*if(data.FolioComprobanteFactura.Esquema == 'CFDI'){
-        $('#archivocertificado').attr("data-default-file", "C:/xampp/htdocs/inaasys/public/archivos_timbrado_empresa/"+data.FolioComprobanteFactura.ArchivoCertificado);
-        $('#archivollaveprivada').attr("data-default-file", "C:/xampp/htdocs/inaasys/public/archivos_timbrado_empresa/"+data.FolioComprobanteFactura.ArchivoLlave);
-        $("#contrasenallaveprivada").val(data.FolioComprobanteFactura.Contraseña);
-        $("#certificadovalidodesde").val(data.FolioComprobanteFactura.ValidoDesde);
-        $("#certificadovalidohasta").val(data.FolioComprobanteFactura.ValidoHasta);
-    }*/
-    if(data.FolioComprobanteFactura.Esquema != 'CFDI'){
+    $("#numero").val(data.FolioComprobanteTraslado.Numero);
+    $("#serie").val(data.FolioComprobanteTraslado.Serie);
+    $("#titulo").val(data.FolioComprobanteTraslado.Titulo);
+    $("#folioinicial").val(data.FolioComprobanteTraslado.FolioInicial);
+    if(data.FolioComprobanteTraslado.Esquema != 'CFDI'){
         $("#idactualizarcertificado").attr('onclick','javascript: return false');
     }
-    $("#empresa").val(data.FolioComprobanteFactura.Empresa);
-    $("#domicilio").val(data.FolioComprobanteFactura.Domicilio);
-    $("#leyenda1").val(data.FolioComprobanteFactura.Leyenda1);
-    $("#leyenda2").val(data.FolioComprobanteFactura.Leyenda2);
-    $("#leyenda3").val(data.FolioComprobanteFactura.Leyenda3);
-    $("#pagare").val(data.FolioComprobanteFactura.Pagare);
+    $("#empresa").val(data.FolioComprobanteTraslado.Empresa);
+    $("#domicilio").val(data.FolioComprobanteTraslado.Domicilio);
+    $("#leyenda1").val(data.FolioComprobanteTraslado.Leyenda1);
+    $("#leyenda2").val(data.FolioComprobanteTraslado.Leyenda2);
+    $("#leyenda3").val(data.FolioComprobanteTraslado.Leyenda3);
+    $("#leyenda").val(data.FolioComprobanteTraslado.Leyenda);
     $('.dropify').dropify();
     mostrarmodalformulario('MODIFICACION');
     $('.page-loader-wrapper').css('display', 'none');
@@ -582,7 +557,7 @@ $("#btnGuardarModificacion").on('click', function (e) {
         $('.page-loader-wrapper').css('display', 'block');
         $.ajax({
             headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-            url:folios_comprobantes_facturas_guardar_modificacion,
+            url:folios_comprobantes_cartasporte_guardar_modificacion,
             type: "post",
             dataType: "html",
             data: formData,
@@ -623,7 +598,7 @@ $("#btnpredeterminar").on('click', function(e){
         $('.page-loader-wrapper').css('display', 'block');
         $.ajax({
             headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-            url:folios_comprobantes_facturas_predeterminar,
+            url:folios_comprobantes_cartasporte_predeterminar,
             type: "post",
             dataType: "html",
             data: formData,

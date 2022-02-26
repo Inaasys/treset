@@ -1000,12 +1000,13 @@ function armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbus
                 '</div>';
     return tabs;
 }
+//BLOQUEAR MENU DE OPCIONES EN EL NAVEGADRO CLICK DERECHO PARA EVITAR QUE USUARIOS ABRAN LA CONSOLA
+if(rol_de_usuario_logueado_en_sistema == 2){
+    window.addEventListener('contextmenu', function (e) { 
+        e.preventDefault(); 
+    }, false);
+}
 //////////////////////////////FIN FUNCIONES PARA CONFIGURACION DE COLUMNAS DE TABLAS/////////////////////////////////////////
-
-
-
-
-
 ////////////////////////////////////////ATAJOS SISTEMA/////////////////////////////////////////////////
 //ordene compras
 $(document).bind('keydown', 'Shift+o', function(){

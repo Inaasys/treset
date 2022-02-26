@@ -122,6 +122,7 @@ function listar(){
         { data: 'movimientocompra', name: 'movimientocompra' },
         { data: 'proveedor', name: 'proveedor' },
         { data: 'UUID', name: 'UUID' },
+        { data: 'Factura', name: 'Factura' },
         { data: 'conceptopago', name: 'conceptopago' },
         { data: 'observacionescompra', name: 'observacionescompra' },
         { data: 'subtotal', name: 'subtotal'},

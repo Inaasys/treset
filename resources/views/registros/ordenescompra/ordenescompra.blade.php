@@ -73,7 +73,7 @@
                         <div class="body">
                             <div class="row" hidden>
                                 <div class="col-md-12">
-                                    <iframe  id="pdfiframe" name="pdfiframe" src="octest.pdf"></iframe>
+                                    <iframe  id="pdfiframe" name="pdfiframe" src="#"></iframe>
                                 </div>
                             </div>
                             <div class="table-responsive">

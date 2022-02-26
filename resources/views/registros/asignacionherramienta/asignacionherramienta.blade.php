@@ -66,6 +66,11 @@
                             </div>
                         </div>
                         <div class="body">
+                            <div class="row" hidden>
+                                <div class="col-md-12">
+                                    <iframe  id="pdfiframe" name="pdfiframe" src="#"></iframe>
+                                </div>
+                            </div>
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap" >
                                     <thead class="{{$empresa->background_tables}}">
@@ -265,6 +270,7 @@
         var background_tables = '{{$empresa->background_tables}}';
         var urlgenerarplantilla = '{{$urlgenerarplantilla}}';       
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
+        var urlpdfsimpresionesrapidas = '{{asset("xml_descargados/")}}/';
         var asignacion_herramienta_obtener = '{!!URL::to('asignacion_herramienta_obtener')!!}';
         var asignacion_herramienta_descargar_plantilla = '{!!URL::to('asignacion_herramienta_descargar_plantilla')!!}';
         var asignacion_herramienta_cargar_partidas_excel = '{!!URL::to('asignacion_herramienta_cargar_partidas_excel')!!}';
@@ -286,6 +292,7 @@
         var asignacion_herramienta_obtener_asignacion_herramienta = '{!!URL::to('asignacion_herramienta_obtener_asignacion_herramienta')!!}'; 
         var asignacion_herramienta_guardar_modificacion = '{!!URL::to('asignacion_herramienta_guardar_modificacion')!!}';
         var asignacion_herramienta_alta_o_baja = '{!!URL::to('asignacion_herramienta_alta_o_baja')!!}'; 
+        var asignacion_herramienta_generar_pdfs = '{!!URL::to('asignacion_herramienta_generar_pdfs')!!}'; 
         var asignacion_herramienta_buscar_id_string_like = '{!!URL::to('asignacion_herramienta_buscar_id_string_like')!!}';
         var asignacion_herramienta_generar_excel_obtener_personal = '{!!URL::to('asignacion_herramienta_generar_excel_obtener_personal')!!}';
         var asignacion_herramienta_obtener_herramienta_personal = '{!!URL::to('asignacion_herramienta_obtener_herramienta_personal')!!}';

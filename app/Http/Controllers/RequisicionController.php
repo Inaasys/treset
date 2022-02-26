@@ -107,10 +107,10 @@ class RequisicionController extends ConfiguracionSistemaController{
                                         'OPERACIONES <span class="caret"></span>'.
                                     '</button>'.
                                     '<ul class="dropdown-menu">'.
-                                        '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Requisicion .'\')">Cambios</a></li>'.
-                                        '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Requisicion .'\')">Bajas</a></li>'.
-                                        '<li><a href="'.route('requisiciones_generar_pdfs_indiv',$data->Requisicion).'" target="_blank">Ver Documento PDF</a></li>'.
-                                        '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Requisicion .'\')">Enviar Documento por Correo</a></li>'.
+                                        '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Requisicion .'\')">Cambios</a></li>'.
+                                        '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->Requisicion .'\')">Bajas</a></li>'.
+                                        '<li><a class="paddingmenuopciones" href="'.route('requisiciones_generar_pdfs_indiv',$data->Requisicion).'" target="_blank">Ver Documento PDF</a></li>'.
+                                        '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Requisicion .'\')">Enviar Documento por Correo</a></li>'.
                                     '</ul>'.
                                 '</div>';
                         return $operaciones;

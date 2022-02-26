@@ -62,6 +62,11 @@
                             </div>
                         </div>
                         <div class="body">
+                            <div class="row" hidden>
+                                <div class="col-md-12">
+                                    <iframe  id="pdfiframe" name="pdfiframe" src="#"></iframe>
+                                </div>
+                            </div>
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap" style=" width:100% !important;" >
                                     <thead class="{{$empresa->background_tables}}">
@@ -182,6 +187,7 @@
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';       
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
+        var urlpdfsimpresionesrapidas = '{{asset("xml_descargados/")}}/';
         var cuentas_por_pagar_obtener = '{!!URL::to('cuentas_por_pagar_obtener')!!}';
         var cuentas_por_pagar_obtener_series_documento = '{!!URL::to('cuentas_por_pagar_obtener_series_documento')!!}';
         var cuentas_por_pagar_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('cuentas_por_pagar_obtener_ultimo_folio_serie_seleccionada')!!}';
@@ -199,7 +205,8 @@
         var cuentas_por_pagar_obtener_cuenta_por_pagar =  '{!!URL::to('cuentas_por_pagar_obtener_cuenta_por_pagar')!!}';
         var cuentas_por_pagar_guardar_modificacion = '{!!URL::to('cuentas_por_pagar_guardar_modificacion')!!}';
         var cuentas_por_pagar_obtener_datos_envio_email = '{!!URL::to('cuentas_por_pagar_obtener_datos_envio_email')!!}';
-        var cuentas_por_pagar_enviar_pdfs_email = '{!!URL::to('cuentas_por_pagar_enviar_pdfs_email')!!}';
+        var cuentas_por_pagar_enviar_pdfs_email = '{!!URL::to('cuentas_por_pagar_enviar_pdfs_email')!!}';    
+        var cuentas_por_pagar_generar_pdfs = '{!!URL::to('cuentas_por_pagar_generar_pdfs')!!}';
         var cuentas_por_pagar_buscar_folio_string_like =  '{!!URL::to('cuentas_por_pagar_buscar_folio_string_like')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')

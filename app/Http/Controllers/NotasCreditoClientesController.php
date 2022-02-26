@@ -46,6 +46,7 @@ use Facturapi\Facturapi;
 use Storage;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
 use ZipArchive;
+use File;
 
 class NotasCreditoClientesController extends ConfiguracionSistemaController{
 
@@ -122,12 +123,13 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                                                 'OPERACIONES <span class="caret"></span>'.
                                             '</button>'.
                                             '<ul class="dropdown-menu">'.
-                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Nota .'\')">Cambios</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Nota .'\')">Bajas</a></li>'.
-                                                '<li><a href="'.route('notas_credito_clientes_generar_pdfs_indiv',$data->Nota).'" target="_blank">Ver Documento PDF</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Nota .'\')">Enviar Documento por Correo</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="timbrarnota(\''.$data->Nota .'\')">Timbrar Nota</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="cancelartimbre(\''.$data->Nota .'\')">Cancelar Timbre</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Nota .'\')">Cambios</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->Nota .'\')">Bajas</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="'.route('notas_credito_clientes_generar_pdfs_indiv',$data->Nota).'" target="_blank">Ver Documento PDF</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Nota .'\')">Enviar Documento por Correo</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="timbrarnota(\''.$data->Nota .'\')">Timbrar Nota</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="cancelartimbre(\''.$data->Nota .'\')">Cancelar Timbre</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="generardocumentoeniframe(\''.$data->Nota .'\')">Imprimir Documento PDF</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;
@@ -1557,14 +1559,18 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
         Helpers::eliminararchivosxmlsgenerados();
         //primero eliminar todos los archivos zip
         Helpers::eliminararchivoszipgenerados();
-        $tipogeneracionpdf = $request->tipogeneracionpdf;
-        if($tipogeneracionpdf == 0){
-            $notascreditocliente = NotaCliente::whereIn('Nota', $request->arraypdf)->orderBy('Folio', 'ASC')->take(250)->get(); 
+        if($request->imprimirdirectamente == 1){
+            $notascreditocliente = NotaCliente::where('Nota', $request->arraypdf)->get(); 
         }else{
-            //$contrarecibos = ContraRecibo::where('Fecha', $request->anopdf)->get(); 
-            $fechainiciopdf = date($request->fechainiciopdf);
-            $fechaterminacionpdf = date($request->fechaterminacionpdf);
-            $notascreditocliente = NotaCliente::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(250)->get();
+            $tipogeneracionpdf = $request->tipogeneracionpdf;
+            if($tipogeneracionpdf == 0){
+                $notascreditocliente = NotaCliente::whereIn('Nota', $request->arraypdf)->orderBy('Folio', 'ASC')->take(250)->get(); 
+            }else{
+                //$contrarecibos = ContraRecibo::where('Fecha', $request->anopdf)->get(); 
+                $fechainiciopdf = date($request->fechainiciopdf);
+                $fechaterminacionpdf = date($request->fechaterminacionpdf);
+                $notascreditocliente = NotaCliente::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(250)->get();
+            }
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $arrayfiles = array();
@@ -1654,34 +1660,41 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             array_push($arrayfilespdf,$ArchivoPDF);
         }
         $pdfMerger->merge(); //unirlos
-        if($request->descargar_xml == 0){
-            $pdfMerger->save("NotasCreditoCliente.pdf", "browser");//mostrarlos en el navegador
+        if($request->imprimirdirectamente == 1){
+            $archivoacopiar = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
+            $carpetacopias = public_path('xml_descargados/'.$ArchivoPDF);
+            File::copy($archivoacopiar, $carpetacopias);
+            return response()->json($ArchivoPDF);
         }else{
-            //carpeta donde se guardara el archivo zip
-            $public_dir=public_path();
-            // Zip File Name
-            $zipFileName = 'NotasCreditoClientes.zip';
-            // Crear Objeto ZipArchive
-            $zip = new ZipArchive;
-            if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
-                // Agregar archivos que se comprimiran
-                foreach($arrayfiles as $af) {
-                    $zip->addFile(Storage::disk('local2')->getAdapter()->applyPathPrefix($af),$af);
-                }  
-                foreach($arrayfilespdf as $afp) {
-                    $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
-                }     
-                //terminar proceso   
-                $zip->close();
-            }
-            // Set Encabezados para descargar
-            $headers = array(
-                'Content-Type' => 'application/octet-stream',
-            );
-            $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
-            // Create Download Response
-            if(file_exists($filetopath)){
-                return response()->download($filetopath,$zipFileName,$headers);
+            if($request->descargar_xml == 0){
+                $pdfMerger->save("NotasCreditoCliente.pdf", "browser");//mostrarlos en el navegador
+            }else{
+                //carpeta donde se guardara el archivo zip
+                $public_dir=public_path();
+                // Zip File Name
+                $zipFileName = 'NotasCreditoClientes.zip';
+                // Crear Objeto ZipArchive
+                $zip = new ZipArchive;
+                if ($zip->open($public_dir . '/xml_descargados/' . $zipFileName, ZipArchive::CREATE) === TRUE) {
+                    // Agregar archivos que se comprimiran
+                    foreach($arrayfiles as $af) {
+                        $zip->addFile(Storage::disk('local2')->getAdapter()->applyPathPrefix($af),$af);
+                    }  
+                    foreach($arrayfilespdf as $afp) {
+                        $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
+                    }     
+                    //terminar proceso   
+                    $zip->close();
+                }
+                // Set Encabezados para descargar
+                $headers = array(
+                    'Content-Type' => 'application/octet-stream',
+                );
+                $filetopath=$public_dir.'/xml_descargados/'.$zipFileName;
+                // Create Download Response
+                if(file_exists($filetopath)){
+                    return response()->download($filetopath,$zipFileName,$headers);
+                }
             }
         }
     }
@@ -2097,14 +2110,35 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
         $cliente = Cliente::where('Numero', $nota->Cliente)->first();
         $arraydet = array();
         foreach($detallesnota as $dn){
-            array_push($arraydet,   array(
-                                        "description" => $dn->Descripcion,
-                                        "product_key" => $dn->ClaveProducto,
-                                        "price" => Helpers::convertirvalorcorrecto($dn->Precio),
-                                        "tax_included" => false,
-                                        "sku" => $dn->Codigo
-                                    )                    
-            );
+
+            if($dn->Impuesto == 0.000000){
+
+                array_push($arraydet,   array(
+                                            "description" => $dn->Descripcion,
+                                            "product_key" => $dn->ClaveProducto,
+                                            "unit_key" => $dn->ClaveUnidad,
+                                            "price" => Helpers::convertirvalorcorrecto($dn->Precio),
+                                            "tax_included" => false,
+                                            "taxability" => "01",
+                                            "taxes" => [],
+                                            "sku" => $dn->Codigo
+                                        )                    
+                );
+
+            }else{
+
+                array_push($arraydet,   array(
+                                            "description" => $dn->Descripcion,
+                                            "product_key" => $dn->ClaveProducto,
+                                            "unit_key" => $dn->ClaveUnidad,
+                                            "price" => Helpers::convertirvalorcorrecto($dn->Precio),
+                                            "tax_included" => false,
+                                            "sku" => $dn->Codigo
+                                        )                    
+                );
+
+            }
+            
         }  
         $arraydoc = array();
         foreach($detallesdocumentosnota as $ddn){

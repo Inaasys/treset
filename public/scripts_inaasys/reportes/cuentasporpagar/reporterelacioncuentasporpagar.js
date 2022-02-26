@@ -23,23 +23,6 @@ function asignarfechaactual(){
   $('#fechafinalreporte').val(hoy);
   $('#fechainicialreporte').val(hoy);
 }
-//validar fechas incio y final de reporte
-function validafechas(){
-    var fechainicialreporte = $('#fechainicialreporte').val();
-    var fechafinalreporte = $('#fechafinalreporte').val();
-    var fechahoy = new Date();
-    var dia = ("0" + fechahoy.getDate()).slice(-2);
-    var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
-    var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia);
-    if(fechafinalreporte > hoy){
-        var msj = 'fechafinalmayorahoy';
-    }else if(fechainicialreporte > fechafinalreporte){
-        var msj ='fechainicialmayorafechafinal';
-    }else{
-        var msj ='ok';
-    }
-    return msj;
-}
 //detectar cuando en el input de objetivo mensual cambie y se presione enter para actualizar la busqueda
 function activarrelistarreporteenterfechainicial(){
     var fechainicialreporte = $('#fechainicialreporte');
@@ -197,8 +180,6 @@ function regresarnumeroproveedor(){
     var numeroproveedoranterior = $("#numeroproveedoranterior").val();
     $("#numeroproveedor").val(numeroproveedoranterior);
 }
-
-
 //obtener registros de bancos
 function obtenerbancos(){
     $("#ModalFormulario").modal('show');
@@ -297,24 +278,12 @@ function regresarnumerobanco(){
     var numerobancoanterior = $("#numerobancoanterior").val();
     $("#numerobanco").val(numerobancoanterior);
 }
-
 //actualizar reporte
 function generar_reporte(){
     var form = $("#formreporte");
     if (form.parsley().isValid()){
-        var result = validafechas();
-        if(result == 'fechafinalmayorahoy'){
-            msjfechafinalmayorahoy();
-            $('#fechafinalreporte').val("");
-        }else if(result == 'fechainicialmayorafechafinal'){
-            msjfechainicialmayorafechafinal();
-            $('#fechainicialreporte').val("");
-        }else if(result == 'ok'){
-            $('#tbllistado').DataTable().clear().destroy();
-            listar();
-            //var tabla = $('.tbllistado').DataTable();
-            //tabla.ajax.reload();
-        }
+        $('#tbllistado').DataTable().clear().destroy();
+        listar();
     }else{
         form.parsley().validate();
     }

@@ -134,6 +134,7 @@ function listar(){
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {
                 $('#tbllistado').DataTable().search( this.value ).draw();
+                $(".inputbusquedageneral").val(""); 
               }
           });
         }

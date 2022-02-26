@@ -94,6 +94,7 @@ function listar(){
       $buscar.bind('keyup change', function(e) {
           if(e.keyCode == 13 || this.value == "") {
             $('#tbllistado').DataTable().search( this.value ).draw();
+            $(".inputbusquedageneral").val(""); 
           }
       });
     }
@@ -133,9 +134,10 @@ function obtenerpaises(){
                     '</div>';
   $("#contenidomodaltablas").html(tablapaises);
   var tpai = $('#tbllistadopais').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
-      "sScrollY": "300px",
+      "sScrollY": "370px",
       "bScrollCollapse": true,  
       processing: true,
       'language': {
@@ -159,8 +161,7 @@ function obtenerpaises(){
               $('#tbllistadopais').DataTable().search( this.value ).draw();
             }
         });
-      },
-      "iDisplayLength": 8,
+      }
   }); 
   //seleccionar registro al dar doble click
   $('#tbllistadopais tbody').on('dblclick', 'tr', function () {
@@ -232,9 +233,10 @@ function obtenerestados() {
                     '</div>';
   $("#contenidomodaltablas").html(tablaestados);
   var test = $('#tbllistadoestado').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
-      "sScrollY": "300px",
+      "sScrollY": "370px",
       "bScrollCollapse": true,  
       processing: true,
       'language': {
@@ -263,8 +265,7 @@ function obtenerestados() {
               $('#tbllistadoestado').DataTable().search( this.value ).draw();
             }
         });
-      },
-      "iDisplayLength": 8,
+      }
   }); 
   //seleccionar registro al dar doble click
   $('#tbllistadoestado tbody').on('dblclick', 'tr', function () {
@@ -314,9 +315,10 @@ function obtenercodigospostales() {
                               '</div>';  
   $("#contenidomodaltablas").html(tablacodigospostales);
   var tcp = $('#tbllistadocodigopostal').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
-      "sScrollY": "300px",
+      "sScrollY": "370px",
       "bScrollCollapse": true,  
       processing: true,
       'language': {
@@ -344,8 +346,7 @@ function obtenercodigospostales() {
               $('#tbllistadocodigopostal').DataTable().search( this.value ).draw();
             }
         });
-      },
-      "iDisplayLength": 8,
+      }
   });  
   //seleccionar registro al dar doble click
   $('#tbllistadocodigopostal tbody').on('dblclick', 'tr', function () {
@@ -395,9 +396,10 @@ function obtenermunicipios() {
                         '</div>';
   $("#contenidomodaltablas").html(tablamunicipios);
   var tmun = $('#tbllistadomunicipio').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
-      "sScrollY": "300px",
+      "sScrollY": "370px",
       "bScrollCollapse": true,  
       processing: true,
       'language': {
@@ -425,8 +427,7 @@ function obtenermunicipios() {
               $('#tbllistadomunicipio').DataTable().search( this.value ).draw();
             }
         });
-      },
-      "iDisplayLength": 8,
+      }
   });    
   //seleccionar registro al dar doble click
   $('#tbllistadomunicipio tbody').on('dblclick', 'tr', function () {
@@ -476,9 +477,10 @@ function obteneragentes(){
                       '</div>';  
   $("#contenidomodaltablas").html(tablaagentes);  
   var tage = $('#tbllistadoagente').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
-      "sScrollY": "300px",
+      "sScrollY": "370px",
       "bScrollCollapse": true,  
       processing: true,
       'language': {
@@ -503,8 +505,7 @@ function obteneragentes(){
               $('#tbllistadoagente').DataTable().search( this.value ).draw();
             }
         });
-      },
-      "iDisplayLength": 8,
+      }
   });   
   //seleccionar registro al dar doble click
   $('#tbllistadoagente tbody').on('dblclick', 'tr', function () {
@@ -574,9 +575,10 @@ function obtenerformaspago(){
                         '</div>';
   $("#contenidomodaltablas").html(tablaformaspago);   
   var tforpag = $('#tbllistadoformapago').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
-      "sScrollY": "300px",
+      "sScrollY": "370px",
       "bScrollCollapse": true,  
       processing: true,
       'language': {
@@ -600,8 +602,7 @@ function obtenerformaspago(){
               $('#tbllistadoformapago').DataTable().search( this.value ).draw();
             }
         });
-      },
-      "iDisplayLength": 8,
+      }
   });  
   //seleccionar registro al dar doble click
   $('#tbllistadoformapago tbody').on('dblclick', 'tr', function () {
@@ -671,9 +672,10 @@ function obtenermetodospago(){
                           '</div>';
   $("#contenidomodaltablas").html(tablasmetodospago);   
   var tmetpag = $('#tbllistadometodopago').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
-      "sScrollY": "300px",
+      "sScrollY": "370px",
       "bScrollCollapse": true,  
       processing: true,
       'language': {
@@ -697,8 +699,7 @@ function obtenermetodospago(){
               $('#tbllistadometodopago').DataTable().search( this.value ).draw();
             }
         });
-      },
-      "iDisplayLength": 8,
+      }
   });  
   //seleccionar registro al dar doble click
   $('#tbllistadometodopago tbody').on('dblclick', 'tr', function () {
@@ -770,9 +771,10 @@ function obtenerusoscfdi(){
                         '</div>';
   $("#contenidomodaltablas").html(tablasusoscfdi); 
   var tusocfdi = $('#tbllistadousocfdi').DataTable({
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
-      "sScrollY": "300px",
+      "sScrollY": "370px",
       "bScrollCollapse": true,  
       processing: true,
       'language': {
@@ -798,8 +800,7 @@ function obtenerusoscfdi(){
               $('#tbllistadousocfdi').DataTable().search( this.value ).draw();
             }
         });
-      },
-      "iDisplayLength": 8,
+      }
   });   
   //seleccionar registro al dar doble click
   $('#tbllistadousocfdi tbody').on('dblclick', 'tr', function () {
@@ -840,6 +841,103 @@ function regresarclaveusocfdi(){
   var claveusocfdianterior = $("#claveusocfdianterior").val();
   $("#claveusocfdi").val(claveusocfdianterior);
 }
+//obtener registros
+function obtenerregimenesfiscales(){
+  ocultarformulario();
+  var tablaregimenesfiscales = '<div class="modal-header '+background_forms_and_modals+'">'+
+                                  '<h4 class="modal-title">Regimenes Fiscales</h4>'+
+                                '</div>'+
+                                '<div class="modal-body">'+
+                                  '<div class="row">'+
+                                      '<div class="col-md-12">'+
+                                          '<div class="table-responsive">'+
+                                              '<table id="tbllistadoregimenfiscal" class="tbllistadoregimenfiscal table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                                  '<thead class="'+background_tables+'">'+
+                                                      '<tr>'+
+                                                          '<th>Operaciones</th>'+
+                                                          '<th>Clave</th>'+
+                                                          '<th>Nombre</th>'+
+                                                      '</tr>'+
+                                                  '</thead>'+
+                                                  '<tbody></tbody>'+
+                                              '</table>'+
+                                          '</div>'+
+                                      '</div>'+   
+                                  '</div>'+
+                                '</div>'+
+                                '<div class="modal-footer">'+
+                                  '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                                '</div>';
+  $("#contenidomodaltablas").html(tablaregimenesfiscales);
+  var tregfis = $('#tbllistadoregimenfiscal').DataTable({
+    "lengthMenu": [ 10, 50, 100, 250, 500 ],
+    "pageLength": 250,
+    "sScrollX": "110%",
+    "sScrollY": "370px",
+    "bScrollCollapse": true,  
+    processing: true,
+      'language': {
+        'loadingRecords': '&nbsp;',
+        'processing': '<div class="spinner"></div>'
+      },
+      serverSide: true,
+      ajax: {
+        url: clientes_obtener_regimenes_fiscales,
+      },
+      columns: [
+          { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+          { data: 'Clave', name: 'Clave' },
+          { data: 'Nombre', name: 'Nombre' }
+      ],
+      "initComplete": function() {
+        var $buscar = $('div.dataTables_filter input');
+        $buscar.unbind();
+        $buscar.bind('keyup change', function(e) {
+            if(e.keyCode == 13 || this.value == "") {
+              $('#tbllistadoregimenfiscal').DataTable().search( this.value ).draw();
+            }
+        });
+      }
+  });  
+  //seleccionar registro al dar doble click
+  $('#tbllistadoregimenfiscal tbody').on('dblclick', 'tr', function () {
+      var data = tregfis.row( this ).data();
+      seleccionarregimenfiscal(data.Clave, data.Nombre);
+  });
+} 
+function seleccionarregimenfiscal(Clave, Nombre){
+  var claveregimenfiscalanterior = $("#claveregimenfiscalanterior").val();
+  var claveregimenfiscal = Clave;
+  if(claveregimenfiscalanterior != claveregimenfiscal){
+      $("#claveregimenfiscal").val(Clave);
+      $("#claveregimenfiscalanterior").val(Clave);
+      if(Nombre != null){
+        $("#textonombreregimenfiscal").html(Nombre.substring(0, 40));
+      }
+      mostrarformulario();
+  }
+}
+//obtener por clave
+function obtenerregimenfiscalporclave(){
+  var claveregimenfiscalanterior = $("#claveregimenfiscalanterior").val();
+  var claveregimenfiscal= $("#claveregimenfiscal").val();
+  if(claveregimenfiscalanterior != claveregimenfiscal){
+      if($("#claveregimenfiscal").parsley().isValid()){
+          $.get(clientes_obtener_regimenfiscal_por_clave, {claveregimenfiscal:claveregimenfiscal}, function(data){
+              $("#claveregimenfiscal").val(data.clave);
+              $("#claveregimenfiscalanterior").val(data.clave);
+              if(data.nombre != null){
+                  $("#textonombreregimenfiscal").html(data.nombre.substring(0, 40));
+              }
+          }) 
+      }
+  }
+}
+//regresar clave
+function regresarclaveregimenfiscal(){
+  var claveregimenfiscalanterior = $("#claveregimenfiscalanterior").val();
+  $("#claveregimenfiscal").val(claveregimenfiscalanterior);
+}
 //buscar si el rfc escrito ya esta en catalogo
 function buscarrfcencatalogo(){
   var rfc = $("#rfc").val();
@@ -879,16 +977,16 @@ function alta(){
                           '<label>Calle <b style="color:#F44336 !important;">*</b></label>'+
                           '<input type="text" class="form-control inputnext" name="calle" id="calle" required data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
-                      '<div class="col-md-4">'+
+                      '<div class="col-md-2">'+
                           '<label>No. Exterior <b style="color:#F44336 !important;">*</b></label>'+
                           '<input type="text" class="form-control inputnext" name="noexterior" id="noexterior" required data-parsley-length="[1, 10]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
-                  '</div>'+
-                  '<div class="row">'+
-                      '<div class="col-md-4">'+
+                      '<div class="col-md-2">'+
                           '<label>No. Interior</label>'+
                           '<input type="text" class="form-control inputnext" name="nointerior" id="nointerior" data-parsley-length="[1, 10]" onkeyup="tipoLetra(this);">'+
-                      '</div>'+
+                      '</div>'+ 
+                  '</div>'+
+                  '<div class="row">'+
                       '<div class="col-md-4">'+
                           '<label>Colonia<b style="color:#F44336 !important;">*</b></label>'+
                           '<input type="text" class="form-control inputnext" name="colonia" id="colonia" required data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
@@ -897,12 +995,12 @@ function alta(){
                           '<label>Localidad<b style="color:#F44336 !important;">*</b></label>'+
                           '<input type="text" class="form-control inputnext" name="localidad" id="localidad" required data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
-                  '</div>'+
-                  '<div class="row">'+
                       '<div class="col-md-4">'+
                           '<label>Referencia</label>'+
                           '<input type="text" class="form-control inputnext" name="referencia" id="referencia" data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
+                  '</div>'+
+                  '<div class="row">'+
                       '<div class="col-md-4">'+
                         '<label>País<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombrepais"></span></label>'+
                         '<div class="row">'+
@@ -937,8 +1035,6 @@ function alta(){
                           '</div>'+     
                         '</div>'+
                       '</div>'+
-                  '</div>'+
-                  '<div class="row">'+
                     '<div class="col-md-4">'+
                       '<label>Municipio<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombremunicipio"></span></label>'+
                       '<div class="row">'+
@@ -955,6 +1051,8 @@ function alta(){
                         '</div>'+     
                       '</div>'+
                     '</div>'+
+                  '</div>'+
+                  '<div class="row">'+
                     '<div class="col-md-4">'+
                       '<label>Código Postal<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombrecp"></span></label>'+
                       '<div class="row">'+
@@ -975,8 +1073,6 @@ function alta(){
                       '<label>Plazo (días)</label>'+
                       '<input type="text" class="form-control inputnext" name="plazo" id="plazo" value="1" onkeyup="tipoLetra(this);">'+
                     '</div>'+
-                  '</div>'+
-                  '<div class="row">'+
                     '<div class="col-md-4">'+
                       '<label>Agente<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombreagente"></span></label>'+
                       '<div class="row">'+
@@ -994,6 +1090,8 @@ function alta(){
                         '</div>'+     
                       '</div>'+
                     '</div>'+
+                  '</div>'+
+                  '<div class="row">'+
                     '<div class="col-md-4">'+
                       '<label>Forma de Pago<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombreformapago"></span></label>'+
                       '<div class="row">'+
@@ -1028,9 +1126,7 @@ function alta(){
                         '</div>'+     
                       '</div>'+
                     '</div>'+
-                  '</div>'+
-                  '<div class="row">'+
-                      '<div class="col-md-4">'+
+                    '<div class="col-md-4">'+
                         '<label>Uso Cfdi<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombreusocfdi"></span></label>'+
                         '<div class="row">'+
                           '<div class="col-md-4">'+
@@ -1046,15 +1142,34 @@ function alta(){
                             '</div>'+
                           '</div>'+     
                         '</div>'+
+                    '</div>'+
+                  '</div>'+
+                  '<div class="row">'+
+                    '<div class="col-md-4">'+
+                      '<label>Regimen Fiscal<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombreregimenfiscal"></span></label>'+
+                      '<div class="row">'+
+                        '<div class="col-md-4">'+
+                          '<span class="input-group-btn">'+
+                            '<div id="buscarregimenesfiscales" class="btn bg-blue waves-effect" onclick="obtenerregimenesfiscales()">Seleccionar</div>'+
+                          '</span>'+
+                        '</div>'+  
+                        '<div class="col-md-8">'+  
+                          '<div class="form-line">'+
+                            '<input type="text" class="form-control inputnext" name="claveregimenfiscal" id="claveregimenfiscal" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'+
+                            '<input type="hidden" class="form-control" name="regimenfiscal" id="regimenfiscal" readonly>'+
+                            '<input type="hidden" class="form-control" name="claveregimenfiscalanterior" id="claveregimenfiscalanterior" readonly data-parsley-length="[1, 5]">'+
+                          '</div>'+
+                        '</div>'+     
                       '</div>'+
-                      '<div class="col-md-4">'+
+                    '</div>'+
+                    '<div class="col-md-4">'+
                           '<label>Tipo</label>'+
                           '<input type="text" class="form-control inputnext" name="tipo" id="tipo" onkeyup="tipoLetra(this);">'+
-                      '</div>'+
-                      '<div class="col-md-4">'+
+                    '</div>'+
+                    '<div class="col-md-4">'+
                           '<label>Crédito Máximo</label>'+
                           '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="creditomaximo" id="creditomaximo" value="10000.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
-                      '</div>'+
+                    '</div>'+
                   '</div>'+   
                 '</div>'+
                 '<div role="tabpanel" class="tab-pane fade" id="telefonostabs">'+
@@ -1166,6 +1281,18 @@ function alta(){
   //regresar clave
   $('#claveusocfdi').on('change', function(e) {
       regresarclaveusocfdi();
+  });
+  //activar busqueda
+  $('#claveregimenfiscal').on('keypress', function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      obtenerregimenfiscalporclave();
+    }
+  });
+  //regresar clave
+  $('#claveregimenfiscal').on('change', function(e) {
+    regresarclaveregimenfiscal();
   });
   //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
   $(".inputnext").keypress(function (e) {
@@ -1419,16 +1546,16 @@ function obtenerdatos(numerocliente){
                             '<label>Calle <b style="color:#F44336 !important;">*</b></label>'+
                             '<input type="text" class="form-control inputnext" name="calle" id="calle" required data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
-                        '<div class="col-md-4">'+
+                        '<div class="col-md-2">'+
                             '<label>No. Exterior <b style="color:#F44336 !important;">*</b></label>'+
                             '<input type="text" class="form-control inputnext" name="noexterior" id="noexterior" required data-parsley-length="[1, 10]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
-                    '</div>'+
-                    '<div class="row">'+
-                        '<div class="col-md-4">'+
+                        '<div class="col-md-2">'+
                             '<label>No. Interior</label>'+
                             '<input type="text" class="form-control inputnext" name="nointerior" id="nointerior" data-parsley-length="[1, 10]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
+                      '</div>'+
+                      '<div class="row">'+
                         '<div class="col-md-4">'+
                             '<label>Colonia<b style="color:#F44336 !important;">*</b></label>'+
                             '<input type="text" class="form-control inputnext" name="colonia" id="colonia" required data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
@@ -1437,12 +1564,12 @@ function obtenerdatos(numerocliente){
                             '<label>Localidad<b style="color:#F44336 !important;">*</b></label>'+
                             '<input type="text" class="form-control inputnext" name="localidad" id="localidad" required data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
-                    '</div>'+
-                    '<div class="row">'+
                         '<div class="col-md-4">'+
                             '<label>Referencia</label>'+
                             '<input type="text" class="form-control inputnext" name="referencia" id="referencia" data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
+                      '</div>'+
+                      '<div class="row">'+
                         '<div class="col-md-4">'+
                           '<label>País<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombrepais"></span></label>'+
                           '<div class="row">'+
@@ -1477,99 +1604,97 @@ function obtenerdatos(numerocliente){
                             '</div>'+     
                           '</div>'+
                         '</div>'+
-                    '</div>'+
-                    '<div class="row">'+
-                      '<div class="col-md-4">'+
-                        '<label>Municipio<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombremunicipio"></span></label>'+
-                        '<div class="row">'+
-                          '<div class="col-md-4">'+
-                            '<span class="input-group-btn">'+
-                              '<div id="buscarmunicipios" class="btn bg-blue waves-effect" onclick="obtenermunicipios()">Seleccionar</div>'+
-                            '</span>'+
-                          '</div>'+  
-                          '<div class="col-md-8">'+  
-                            '<div class="form-line">'+
-                              '<input type="text" class="form-control inputnext" name="municipio" id="municipio" required data-parsley-length="[1, 100]" onkeyup="tipoLetra(this)">'+
-                              '<input type="hidden" class="form-control" name="municipioanterior" id="municipioanterior" readonly data-parsley-length="[1, 100]">'+
-                            '</div>'+
-                          '</div>'+     
+                        '<div class="col-md-4">'+
+                          '<label>Municipio<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombremunicipio"></span></label>'+
+                          '<div class="row">'+
+                            '<div class="col-md-4">'+
+                              '<span class="input-group-btn">'+
+                                '<div id="buscarmunicipios" class="btn bg-blue waves-effect" onclick="obtenermunicipios()">Seleccionar</div>'+
+                              '</span>'+
+                            '</div>'+  
+                            '<div class="col-md-8">'+  
+                              '<div class="form-line">'+
+                                '<input type="text" class="form-control inputnext" name="municipio" id="municipio" required data-parsley-length="[1, 100]" onkeyup="tipoLetra(this)">'+
+                                '<input type="hidden" class="form-control" name="municipioanterior" id="municipioanterior" readonly data-parsley-length="[1, 100]">'+
+                              '</div>'+
+                            '</div>'+     
+                          '</div>'+
                         '</div>'+
                       '</div>'+
-                      '<div class="col-md-4">'+
-                        '<label>Código Postal<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombrecp"></span></label>'+
-                        '<div class="row">'+
-                          '<div class="col-md-4">'+
-                            '<span class="input-group-btn">'+
-                              '<div id="buscarcodigospostales" class="btn bg-blue waves-effect" onclick="obtenercodigospostales()">Seleccionar</div>'+
-                            '</span>'+
-                          '</div>'+  
-                          '<div class="col-md-8">'+  
-                            '<div class="form-line">'+
-                              '<input type="text" class="form-control inputnext" name="codigopostal" id="codigopostal" required data-parsley-codigopostal="^[0-9]{5}$" data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'+
-                              '<input type="hidden" class="form-control" name="codigopostalanterior" id="codigopostalanterior" data-parsley-codigopostal="^[0-9]{5}$" data-parsley-length="[1, 5]">'+
-                            '</div>'+
-                          '</div>'+     
+                      '<div class="row">'+
+                        '<div class="col-md-4">'+
+                          '<label>Código Postal<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombrecp"></span></label>'+
+                          '<div class="row">'+
+                            '<div class="col-md-4">'+
+                              '<span class="input-group-btn">'+
+                                '<div id="buscarcodigospostales" class="btn bg-blue waves-effect" onclick="obtenercodigospostales()">Seleccionar</div>'+
+                              '</span>'+
+                            '</div>'+  
+                            '<div class="col-md-8">'+  
+                              '<div class="form-line">'+
+                                '<input type="text" class="form-control inputnext" name="codigopostal" id="codigopostal" required data-parsley-codigopostal="^[0-9]{5}$" data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'+
+                                '<input type="hidden" class="form-control" name="codigopostalanterior" id="codigopostalanterior" data-parsley-codigopostal="^[0-9]{5}$" data-parsley-length="[1, 5]">'+
+                              '</div>'+
+                            '</div>'+     
+                          '</div>'+
+                        '</div>'+
+                        '<div class="col-md-4">'+
+                          '<label>Plazo (días)</label>'+
+                          '<input type="text" class="form-control inputnext" name="plazo" id="plazo" value="1" onkeyup="tipoLetra(this);">'+
+                        '</div>'+
+                        '<div class="col-md-4">'+
+                          '<label>Agente<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombreagente"></span></label>'+
+                          '<div class="row">'+
+                            '<div class="col-md-4">'+
+                              '<span class="input-group-btn">'+
+                                '<div id="buscaragentes" class="btn bg-blue waves-effect" onclick="obteneragentes()">Seleccionar</div>'+
+                              '</span>'+
+                            '</div>'+  
+                            '<div class="col-md-8">'+  
+                              '<div class="form-line">'+
+                                '<input type="text" class="form-control inputnext" name="agente" id="agente" required onkeyup="tipoLetra(this)">'+
+                                '<input type="hidden" class="form-control" name="nombreagente" id="nombreagente"  readonly>'+
+                                '<input type="hidden" class="form-control" name="agenteanterior" id="agenteanterior" readonly>'+
+                              '</div>'+
+                            '</div>'+     
+                          '</div>'+
                         '</div>'+
                       '</div>'+
-                      '<div class="col-md-4">'+
-                        '<label>Plazo (días)</label>'+
-                        '<input type="text" class="form-control inputnext" name="plazo" id="plazo" value="1" onkeyup="tipoLetra(this);">'+
-                      '</div>'+
-                    '</div>'+
-                    '<div class="row">'+
-                      '<div class="col-md-4">'+
-                        '<label>Agente<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombreagente"></span></label>'+
-                        '<div class="row">'+
-                          '<div class="col-md-4">'+
-                            '<span class="input-group-btn">'+
-                              '<div id="buscaragentes" class="btn bg-blue waves-effect" onclick="obteneragentes()">Seleccionar</div>'+
-                            '</span>'+
-                          '</div>'+  
-                          '<div class="col-md-8">'+  
-                            '<div class="form-line">'+
-                              '<input type="text" class="form-control inputnext" name="agente" id="agente" required onkeyup="tipoLetra(this)">'+
-                              '<input type="hidden" class="form-control" name="nombreagente" id="nombreagente"  readonly>'+
-                              '<input type="hidden" class="form-control" name="agenteanterior" id="agenteanterior" readonly>'+
-                            '</div>'+
-                          '</div>'+     
+                      '<div class="row">'+
+                        '<div class="col-md-4">'+
+                          '<label>Forma de Pago<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombreformapago"></span></label>'+
+                          '<div class="row">'+
+                            '<div class="col-md-4">'+
+                              '<span class="input-group-btn">'+
+                                '<div id="buscarformaspago" class="btn bg-blue waves-effect" onclick="obtenerformaspago()">Seleccionar</div>'+
+                              '</span>'+
+                            '</div>'+  
+                            '<div class="col-md-8">'+  
+                              '<div class="form-line">'+
+                                '<input type="text" class="form-control inputnext" name="claveformapago" id="claveformapago"  required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'+
+                                '<input type="hidden" class="form-control" name="formapago" id="formapago" readonly>'+
+                                '<input type="hidden" class="form-control" name="claveformapagoanterior" id="claveformapagoanterior" readonly data-parsley-length="[1, 5]">'+
+                              '</div>'+
+                            '</div>'+     
+                          '</div>'+
                         '</div>'+
-                      '</div>'+
-                      '<div class="col-md-4">'+
-                        '<label>Forma de Pago<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombreformapago"></span></label>'+
-                        '<div class="row">'+
-                          '<div class="col-md-4">'+
-                            '<span class="input-group-btn">'+
-                              '<div id="buscarformaspago" class="btn bg-blue waves-effect" onclick="obtenerformaspago()">Seleccionar</div>'+
-                            '</span>'+
-                          '</div>'+  
-                          '<div class="col-md-8">'+  
-                            '<div class="form-line">'+
-                              '<input type="text" class="form-control inputnext" name="claveformapago" id="claveformapago"  required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'+
-                              '<input type="hidden" class="form-control" name="formapago" id="formapago" readonly>'+
-                              '<input type="hidden" class="form-control" name="claveformapagoanterior" id="claveformapagoanterior" readonly data-parsley-length="[1, 5]">'+
-                            '</div>'+
-                          '</div>'+     
+                        '<div class="col-md-4">'+
+                          '<label>Método de Pago<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombremetodopago"></span></label>'+
+                          '<div class="row">'+
+                            '<div class="col-md-4">'+
+                              '<span class="input-group-btn">'+
+                                '<div id="buscarmetodospago" class="btn bg-blue waves-effect" onclick="obtenermetodospago()">Seleccionar</div>'+
+                              '</span>'+
+                            '</div>'+  
+                            '<div class="col-md-8">'+  
+                              '<div class="form-line">'+
+                                '<input type="text" class="form-control inputnext" name="clavemetodopago" id="clavemetodopago" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'+
+                                '<input type="hidden" class="form-control" name="metodopago" id="metodopago" readonly >'+
+                                '<input type="hidden" class="form-control" name="clavemetodopagoanterior" id="clavemetodopagoanterior" readonly data-parsley-length="[1, 5]">'+
+                              '</div>'+
+                            '</div>'+     
+                          '</div>'+
                         '</div>'+
-                      '</div>'+
-                      '<div class="col-md-4">'+
-                        '<label>Método de Pago<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombremetodopago"></span></label>'+
-                        '<div class="row">'+
-                          '<div class="col-md-4">'+
-                            '<span class="input-group-btn">'+
-                              '<div id="buscarmetodospago" class="btn bg-blue waves-effect" onclick="obtenermetodospago()">Seleccionar</div>'+
-                            '</span>'+
-                          '</div>'+  
-                          '<div class="col-md-8">'+  
-                            '<div class="form-line">'+
-                              '<input type="text" class="form-control inputnext" name="clavemetodopago" id="clavemetodopago" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'+
-                              '<input type="hidden" class="form-control" name="metodopago" id="metodopago" readonly >'+
-                              '<input type="hidden" class="form-control" name="clavemetodopagoanterior" id="clavemetodopagoanterior" readonly data-parsley-length="[1, 5]">'+
-                            '</div>'+
-                          '</div>'+     
-                        '</div>'+
-                      '</div>'+
-                    '</div>'+
-                    '<div class="row">'+
                         '<div class="col-md-4">'+
                           '<label>Uso Cfdi<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombreusocfdi"></span></label>'+
                           '<div class="row">'+
@@ -1587,6 +1712,25 @@ function obtenerdatos(numerocliente){
                             '</div>'+     
                           '</div>'+
                         '</div>'+
+                      '</div>'+
+                      '<div class="row">'+
+                        '<div class="col-md-4">'+
+                          '<label>Regimen Fiscal<b style="color:#F44336 !important;">*</b><span class="label label-danger" id="textonombreregimenfiscal"></span></label>'+
+                          '<div class="row">'+
+                            '<div class="col-md-4">'+
+                              '<span class="input-group-btn">'+
+                                '<div id="buscarregimenesfiscales" class="btn bg-blue waves-effect" onclick="obtenerregimenesfiscales()">Seleccionar</div>'+
+                              '</span>'+
+                            '</div>'+  
+                            '<div class="col-md-8">'+  
+                              '<div class="form-line">'+
+                                '<input type="text" class="form-control inputnext" name="claveregimenfiscal" id="claveregimenfiscal" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'+
+                                '<input type="hidden" class="form-control" name="regimenfiscal" id="regimenfiscal" readonly>'+
+                                '<input type="hidden" class="form-control" name="claveregimenfiscalanterior" id="claveregimenfiscalanterior" readonly data-parsley-length="[1, 5]">'+
+                              '</div>'+
+                            '</div>'+     
+                          '</div>'+
+                        '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Tipo</label>'+
                             '<input type="text" class="form-control inputnext" name="tipo" id="tipo" onkeyup="tipoLetra(this);">'+
@@ -1595,7 +1739,7 @@ function obtenerdatos(numerocliente){
                             '<label>Crédito Máximo</label>'+
                             '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="creditomaximo" id="creditomaximo" value="10000.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                         '</div>'+
-                    '</div>'+   
+                      '</div>'+   
                   '</div>'+
                   '<div role="tabpanel" class="tab-pane fade" id="telefonostabs">'+
                     '<div class="row">'+
@@ -1762,6 +1906,12 @@ function obtenerdatos(numerocliente){
       $("#claveusocfdianterior").val(data.usocfdi.Clave);
       $("#textonombreusocfdi").html(data.usocfdi.Nombre);
     }
+    if(data.regimenfiscal != null){
+      $("#regimenfiscal").val(data.regimenfiscal.Nombre);
+      $("#claveregimenfiscal").val(data.regimenfiscal.Clave);
+      $("#claveregimenfiscalanterior").val(data.regimenfiscal.Clave);
+      $("#textonombreregimenfiscal").html(data.regimenfiscal.Nombre);
+    }
     if(data.agente != null){
       $("#agente").val(data.agente.Numero);
       $("#agenteanterior").val(data.agente.Numero);
@@ -1836,6 +1986,18 @@ function obtenerdatos(numerocliente){
     //regresar clave
     $('#claveusocfdi').on('change', function(e) {
         regresarclaveusocfdi();
+    });
+    //activar busqueda
+    $('#claveregimenfiscal').on('keypress', function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        obtenerregimenfiscalporclave();
+      }
+    });
+    //regresar clave
+    $('#claveregimenfiscal').on('change', function(e) {
+      regresarclaveregimenfiscal();
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
     $(".inputnext").keypress(function (e) {

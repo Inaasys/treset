@@ -165,6 +165,12 @@ return [
     //usuariis que puedes modificar insumos
     'usuariosamodificarinsumos' => '',
     'modificarcostosdeproductos' => '',
+    'suc2' => 'SocasaRefaccionaria',
+    'connsuc2' => 'sqlsrv2',
+    'suc3' => 'SocasaXonacatlan',
+    'connsuc3' => 'sqlsrv3',
+    'suc4' => 'Tecnodiesel',
+    'connsuc4' => 'sqlsrv4',
 
     /*
     |--------------------------------------------------------------------------

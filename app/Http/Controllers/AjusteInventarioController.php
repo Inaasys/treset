@@ -75,10 +75,10 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
                                                 'OPERACIONES <span class="caret"></span>'.
                                             '</button>'.
                                             '<ul class="dropdown-menu">'.
-                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Ajuste .'\')">Cambios</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Ajuste .'\')">Bajas</a></li>'.
-                                                '<li><a href="'.route('ajustesinventario_generar_pdfs_indiv',$data->Ajuste).'" target="_blank">Ver Documento PDF</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Ajuste .'\')">Enviar Documento por Correo</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Ajuste .'\')">Cambios</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->Ajuste .'\')">Bajas</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="'.route('ajustesinventario_generar_pdfs_indiv',$data->Ajuste).'" target="_blank">Ver Documento PDF</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Ajuste .'\')">Enviar Documento por Correo</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;
@@ -157,7 +157,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
                         $existencianuevapartida = $parsleymax + $entradas - $salidas;
                         $filasdetallesajuste= $filasdetallesajuste.
                         '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
-                            '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
+                            '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfilas" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodmd codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]"></td>'.
                             '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'.htmlspecialchars($producto->Producto, ENT_QUOTES).'" readonly data-parsley-length="[1, 255]"></td>'.
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodsm unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'.$producto->Unidad.'" readonly data-parsley-length="[1, 5]"></td>'.
@@ -562,7 +562,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
                 $parsleymax = $Existencia->Existencias+$da->Salidas;
                 $filasdetallesajuste= $filasdetallesajuste.
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
-                    '<td class="tdmod"><div class="btn btn-danger btn-xs" >X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$da->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
+                    '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfilas" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$da->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodmd codigoproductopartida" name="codigoproductopartida[]" value="'.$da->Codigo.'" readonly data-parsley-length="[1, 20]"></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxl inputnextdet nombreproductopartida" name="nombreproductopartida[]" value="'.htmlspecialchars($da->Descripcion, ENT_QUOTES).'" readonly data-parsley-length="[1, 255]"></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm unidadproductopartida" name="unidadproductopartida[]" value="'.$da->Unidad.'" readonly data-parsley-length="[1, 5]"></td>'.
@@ -767,19 +767,47 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
                 }else{
                     //si la partida no se agrego en la modificacion solo se modifican los datos
                     //modificar detalle
-                    //modificar las existencias del código en la tabla de existencias
+                    //ENTRADAS
+                    //restar las entradas ajuste antes de modificar
+                    $Existencia = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
+                    $NuevaExistenciaEntradas = $Existencia->Existencias-$request->entradaspartidadb [$key];
                     Existencia::where('Codigo', $codigoproductopartida)
-                                ->where('Almacen', $request->numeroalmacen)
-                                ->update([
-                                    'Existencias' => Helpers::convertirvalorcorrecto($request->existencianuevapartida [$key])
-                                ]);
+                    ->where('Almacen', $request->numeroalmacen)
+                    ->update([
+                        'Existencias' => Helpers::convertirvalorcorrecto($NuevaExistenciaEntradas)
+                    ]);
+                    //sumar las nuevas entradas de ajuste
+                    $Existencia = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
+                    $NuevaExistenciaEntradas = $Existencia->Existencias+$request->entradaspartida [$key];
+                    Existencia::where('Codigo', $codigoproductopartida)
+                    ->where('Almacen', $request->numeroalmacen)
+                    ->update([
+                        'Existencias' => Helpers::convertirvalorcorrecto($NuevaExistenciaEntradas)
+                    ]);
+                    //SALIDAS
+                    //sumar las salidas de ajuste antes de modificar
+                    $Existencia = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
+                    $NuevaExistenciaEntradas = $Existencia->Existencias+$request->salidaspartidadb [$key];
+                    Existencia::where('Codigo', $codigoproductopartida)
+                    ->where('Almacen', $request->numeroalmacen)
+                    ->update([
+                        'Existencias' => Helpers::convertirvalorcorrecto($NuevaExistenciaEntradas)
+                    ]);
+                    //restar las nuevas salidas del ajuste
+                    $Existencia = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
+                    $NuevaExistenciaEntradas = $Existencia->Existencias-$request->salidaspartida [$key];
+                    Existencia::where('Codigo', $codigoproductopartida)
+                    ->where('Almacen', $request->numeroalmacen)
+                    ->update([
+                        'Existencias' => Helpers::convertirvalorcorrecto($NuevaExistenciaEntradas)
+                    ]);
                     //existencias actuales
-                    $existenciaactualpartida = $request->existenciaactualpartida [$key] + $request->salidaspartidadb [$key] - $request->entradaspartidadb [$key];
+                    //$existenciaactualpartida = $request->existenciaactualpartida [$key] + $request->salidaspartidadb [$key] - $request->entradaspartidadb [$key];
                     AjusteInventarioDetalle::where('Ajuste', $ajuste)
                     ->where('Item', $request->itempartida [$key])
                     ->update([
                         'Fecha' => Carbon::parse($request->fecha)->toDateTimeString(),
-                        'Existencias' => $request->existenciaactualpartida [$key],
+                        //'Existencias' => $request->existenciaactualpartida [$key],
                         'Entradas' => $request->entradaspartida [$key],
                         'Salidas' => $request->salidaspartida  [$key],
                         'Real' => $request->existencianuevapartida [$key],

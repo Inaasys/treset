@@ -9302,7 +9302,7 @@ html.ie11 .bs-searchbox .form-control {
   font-family: 'Material Icons';
   font-weight: normal;
   font-style: normal;
-  font-size: 24px;
+  font-size: 20px;
   line-height: 1;
   letter-spacing: normal;
   text-transform: none;
@@ -9350,4 +9350,8 @@ html.ie11 .bs-searchbox .form-control {
 .toast-message { 
   font-size: 13px !important;
   font-weight: bold !important;
+}
+/*estilos para que el menu de opciones se vea mejor y no tan separado*/
+.paddingmenuopciones {
+  padding: 0px 18px !important;
 }

@@ -32,6 +32,7 @@ Parsley.addMessages('es', {
   minlength:          "Este valor es muy corto. La longitud mínima es de %s caracteres.",
   maxlength:          "Este valor es muy largo. La longitud máxima es de %s caracteres.",
   length:             "La longitud de este valor debe estar entre %s y %s caracteres.",
+  tecnico:            "Debes asignar un tecnico al servicio.",
   mincheck:           "Debe seleccionar al menos %s opciones.",
   maxcheck:           "Debe seleccionar %s opciones o menos.",
   check:              "Debe seleccionar entre %s y %s opciones.",

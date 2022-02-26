@@ -61,6 +61,11 @@
                             </div>
                         </div>
                         <div class="body">
+                            <div class="row" hidden>
+                                <div class="col-md-12">
+                                    <iframe  id="pdfiframe" name="pdfiframe" src="#"></iframe>
+                                </div>
+                            </div>
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap">
                                     <thead class="{{$empresa->background_tables}}">
@@ -215,6 +220,7 @@
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';       
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
+        var urlpdfsimpresionesrapidas = '{{asset("xml_descargados/")}}/';
         var notas_credito_proveedores_obtener = '{!!URL::to('notas_credito_proveedores_obtener')!!}';
         var notas_credito_proveedores_obtener_series_documento = '{!!URL::to('notas_credito_proveedores_obtener_series_documento')!!}';
         var notas_credito_proveedores_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('notas_credito_proveedores_obtener_ultimo_folio_serie_seleccionada')!!}';
@@ -242,7 +248,8 @@
         var notas_credito_proveedores_guardar_modificacion = '{!!URL::to('notas_credito_proveedores_guardar_modificacion')!!}';
         var notas_credito_proveedores_obtener_datos_envio_email = '{!!URL::to('notas_credito_proveedores_obtener_datos_envio_email')!!}';
         var notas_credito_proveedores_enviar_pdfs_email = '{!!URL::to('notas_credito_proveedores_enviar_pdfs_email')!!}';
-        var notas_credito_proveedores_buscar_folio_string_like = '{!!URL::to('notas_credito_proveedores_buscar_folio_string_like')!!}'; 
+        var notas_credito_proveedores_buscar_folio_string_like = '{!!URL::to('notas_credito_proveedores_buscar_folio_string_like')!!}';    
+        var notas_credito_proveedores_generar_pdfs = '{!!URL::to('notas_credito_proveedores_generar_pdfs')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="scripts_inaasys/registros/notascreditoproveedores/notascreditoproveedores.js"></script>

@@ -546,6 +546,42 @@
                                                                     </div>
                                                                 </td>
                                                             </tr>
+                                                            <tr>
+                                                                <td class="col-md-2">Remisiones</td>
+                                                                <td class="col-md-5">Pedir obligatoriamente una referencia</td>
+                                                                <td class="col-md-4">
+                                                                    <div class="col-md-12 form-check">
+                                                                        <input type="radio" name="pedirobligatoriamentereferenciarnremisiones" id="pedirobligatoriamentereferenciarnremisiones" value="S">
+                                                                        <label for="pedirobligatoriamentereferenciarnremisiones">SI</label>
+                                                                        <input type="radio" name="pedirobligatoriamentereferenciarnremisiones" id="pedirobligatoriamentereferenciarnremisiones1" value="N">
+                                                                        <label for="pedirobligatoriamentereferenciarnremisiones1">NO</label>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="col-md-2">Remisiones</td>
+                                                                <td class="col-md-5">Pedir obligatoriamente una orden servico</td>
+                                                                <td class="col-md-4">
+                                                                    <div class="col-md-12 form-check">
+                                                                        <input type="radio" name="pedirobligatoriamenteordenservicioenremisiones" id="pedirobligatoriamenteordenservicioenremisiones" value="S">
+                                                                        <label for="pedirobligatoriamenteordenservicioenremisiones">SI</label>
+                                                                        <input type="radio" name="pedirobligatoriamenteordenservicioenremisiones" id="pedirobligatoriamenteordenservicioenremisiones1" value="N">
+                                                                        <label for="pedirobligatoriamenteordenservicioenremisiones1">NO</label>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="col-md-2">Remisiones</td>
+                                                                <td class="col-md-5">Pedir obligatoriamente un equipo</td>
+                                                                <td class="col-md-4">
+                                                                    <div class="col-md-12 form-check">
+                                                                        <input type="radio" name="pedirobligatoriamenteequipoenremisiones" id="pedirobligatoriamenteequipoenremisiones" value="S">
+                                                                        <label for="pedirobligatoriamenteequipoenremisiones">SI</label>
+                                                                        <input type="radio" name="pedirobligatoriamenteequipoenremisiones" id="pedirobligatoriamenteequipoenremisiones1" value="N">
+                                                                        <label for="pedirobligatoriamenteequipoenremisiones1">NO</label>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -977,6 +1013,9 @@
         var controlarconsecutivonumrequisicion = '{{$empresa->ControlarConsecutivoNumeroRequisicionEnRemisiones}}';
         var colocarobservacionesremisionenfactura = '{{$empresa->ColocarObservacionesDeRemisionEnFactura}}';
         var pedirobligatoriamenteobservacionenfactura = '{{$empresa->PedirObligatoriamenteObservacionEnFactura}}';
+        var pedirobligatoriamentereferenciarnremisiones = '{{$empresa->PedirObligatoriamenteReferenciaEnRemisiones}}';
+        var pedirobligatoriamenteordenservicioenremisiones = '{{$empresa->PedirObligatoriamenteOrdenServicioEnRemisiones}}';
+        var pedirobligatoriamenteequipoenremisiones = '{{$empresa->PedirObligatoriamenteEquipoEnRemisiones}}';
         var colocarencerocantidadenpartidasderemisiones = '{{$empresa->ColocarEnCeroCantidadEnPartidasDeRemisiones}}';
         var mostrartotalesdecolumnasendocumentos = '{{$empresa->MostrarTotalesDeColumnasEnDocumentos}}';
         var mostrarinsumoporpartidaenremisiones = '{{$empresa->MostrarInsumoPorPartidaEnCapturaDeRemisiones}}';

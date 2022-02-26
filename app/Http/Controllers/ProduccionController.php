@@ -81,11 +81,11 @@ class ProduccionController extends ConfiguracionSistemaController{
                                                 'OPERACIONES <span class="caret"></span>'.
                                             '</button>'.
                                             '<ul class="dropdown-menu">'.
-                                                '<li><a href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Produccion .'\')">Cambios</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="producir(\''.$data->Produccion .'\')">Producir</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="desactivar(\''.$data->Produccion .'\')">Bajas</a></li>'.
-                                                '<li><a href="'.route('produccion_generar_pdfs_indiv',$data->Produccion).'" target="_blank">Ver Documento PDF</a></li>'.
-                                                '<li><a href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Produccion .'\')">Enviar Documento por Correo</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Produccion .'\')">Cambios</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="producir(\''.$data->Produccion .'\')">Producir</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->Produccion .'\')">Bajas</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="'.route('produccion_generar_pdfs_indiv',$data->Produccion).'" target="_blank">Ver Documento PDF</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Produccion .'\')">Enviar Documento por Correo</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;
@@ -229,6 +229,8 @@ class ProduccionController extends ConfiguracionSistemaController{
         $partida = 1;
         $tipo = $request->tipooperacion;
         $productoterminado = "";
+        $costopt = "";
+        $contarproductos = 0;
         $contarcatproducto = Producto::where('Codigo', $codigoabuscar)->where('Pt', 'S')->count();
         if($contarcatproducto > 0){
             $ContarExistencia = Existencia::where('Codigo', $codigoabuscar)->where('Almacen', $numeroalmacen)->count();
@@ -277,16 +279,30 @@ class ProduccionController extends ConfiguracionSistemaController{
             }else{
                 $filasdetallesproduccion = '';
             }  
+            
+            $data = array(
+                'productoterminado' => $productoterminado,
+                'costopt' => Helpers::convertirvalorcorrecto($productoterminado->Costo),
+                'filasdetallesproduccion' => $filasdetallesproduccion,
+                'contadorproductos' => $contadorproductos,
+                'contadorfilas' => $contadorfilas,
+                'contarproductos' => $contarproductos,
+                'partida' => $partida
+            );
+
+        }else{
+            
+            $data = array(
+                'productoterminado' => $productoterminado,
+                'costopt' => Helpers::convertirvalorcorrecto($costopt),
+                'filasdetallesproduccion' => $filasdetallesproduccion,
+                'contadorproductos' => $contadorproductos,
+                'contadorfilas' => $contadorfilas,
+                'contarproductos' => $contarproductos,
+                'partida' => $partida
+            );
+            
         }
-        $data = array(
-            'productoterminado' => $productoterminado,
-            'costopt' => Helpers::convertirvalorcorrecto($productoterminado->Costo),
-            'filasdetallesproduccion' => $filasdetallesproduccion,
-            'contadorproductos' => $contadorproductos,
-            'contadorfilas' => $contadorfilas,
-            'contarproductos' => $contarproductos,
-            'partida' => $partida
-        );
         return response()->json($data);
     }
     //obtener existencias

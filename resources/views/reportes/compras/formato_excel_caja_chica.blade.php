@@ -40,6 +40,7 @@
                 <th style="background-color:#98cfe4;width:8px;border: 1px solid black;font-weight: bold;font-size:8px;text-align:center;">MOV <br> COMPRA</th>
                 <th style="background-color:#98cfe4;width:35px;border: 1px solid black;font-weight: bold;font-size:8px;text-align:center;">PROVEEDOR</th>
                 <th style="background-color:#98cfe4;width:31px;border: 1px solid black;font-weight: bold;font-size:8px;text-align:center;">UUID</th>
+                <th style="background-color:#98cfe4;width:31px;border: 1px solid black;font-weight: bold;font-size:8px;text-align:center;">FACTURA</th>
                 <th style="background-color:#98cfe4;width:15px;border: 1px solid black;font-weight: bold;font-size:8px;text-align:center;">CONCEPTO DE PAGO</th>
                 <th style="background-color:#98cfe4;width:45px;border: 1px solid black;font-weight: bold;font-size:8px;text-align:center;">OBSERVACIONES</th>
                 <th style="background-color:#98cfe4;width:10px;border: 1px solid black;font-weight: bold;font-size:8px;text-align:center;">SUBTOTAL</th>
@@ -57,6 +58,7 @@
                     <td style="border: 1px solid black;font-size:8px;text-align:center;">{{$d['movimientocompra']}}</td>
                     <td style="border: 1px solid black;font-size:8px;text-align:center;">{{$d['proveedor']}}</td>
                     <td style="border: 1px solid black;font-size:8px;text-align:center;">{{$d['UUID']}}</td>
+                    <td style="border: 1px solid black;font-size:8px;text-align:center;">{{$d['Factura']}}</td>
                     <td style="border: 1px solid black;font-size:8px;text-align:center;"></td>
                     <td style="border: 1px solid black;font-size:8px;text-align:center;">{{$d['observacionescompra']}}</td>
                     <td style="border: 1px solid black;font-size:8px;text-align:center;">$ {{$d['subtotal']}}</td>
@@ -69,7 +71,7 @@
                 </tr>
             @endforeach
             <tr>
-                <td colspan="5"></td>
+                <td colspan="6"></td>
                 <td style="border: 1px solid black;font-weight: bold;font-size:9px;">TOTAL A COMPROBAR</td>
                 <td style="border: 1px solid black;font-weight: bold;font-size:9px;">$ {{$d['sumasubtotal']}}</td>
                 <td style="border: 1px solid black;font-weight: bold;font-size:9px;">$ {{$d['sumaiva']}}</td>

@@ -133,6 +133,7 @@ function listar(){
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {
                 $('#tbllistado').DataTable().search( this.value ).draw();
+                $(".inputbusquedageneral").val(""); 
               }
           });
         }
@@ -548,6 +549,7 @@ function seleccionarproducto(Codigo){
             $('.page-loader-wrapper').css('display', 'none');
         }else{
           msjnoseencontroningunproducto();
+          $("#codigoabuscar").val("");
         }
         //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
         $(".inputnextdet").keypress(function (e) {
@@ -591,6 +593,7 @@ function obtenerproductoporcodigo(){
         });
     }else{
       msjnoseencontroningunproducto();
+      $("#codigoabuscar").val("");
     }
   }) 
 }
