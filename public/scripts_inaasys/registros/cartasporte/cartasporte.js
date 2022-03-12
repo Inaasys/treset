@@ -14,12 +14,13 @@ function asignarfechaactual(){
     $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechas){
       $("#fecha").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
       $("#fechasalida").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
+      $("#fechallegada").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
     }) 
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
   var serie = $("#serie").val();
-  $.get(notas_credito_clientes_obtener_ultimo_folio, {serie:serie}, function(folio){
+  $.get(carta_porte_obtener_obtener_ultimo_folio, {serie:serie}, function(folio){
     $("#folio").val(folio);
   })
 }
@@ -115,7 +116,7 @@ function listar(){
     },
     serverSide: true,
     ajax: {
-        url: notas_credito_clientes_obtener,
+        url: carta_porte_obtener,
         data: function (d) {
             d.periodo = $("#periodo").val();
         }
@@ -196,7 +197,7 @@ function obtenerclientes(){
         },
         serverSide: true,
         ajax: {
-            url: notas_credito_clientes_obtener_clientes,
+            url: carta_porte_obtener_clientes,
         },
         columns: [
             { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
@@ -221,11 +222,11 @@ function obtenerclientes(){
     //seleccionar registro al dar doble click
     $('#tbllistadocliente tbody').on('dblclick', 'tr', function () {
         var data = tcli.row( this ).data();
-        seleccionarcliente(data.Numero, data.Nombre, data.Plazo, data.Rfc, data.ClaveFormaPago, data.NombreFormaPago, data.ClaveMetodoPago, data.NombreMetodoPago, data.ClaveUsoCfdi, data.NombreUsoCfdi, "", "");
+        seleccionarcliente(data.Numero, data.Nombre, data.Plazo, data.Rfc, data.ClaveFormaPago, data.NombreFormaPago, data.ClaveMetodoPago, data.NombreMetodoPago, data.ClaveUsoCfdi, data.NombreUsoCfdi, "", "", data.Calle, data.NoExterior, data.NoInterior, data.Colonia, data.Localidad, data.Referencia, data.Municipio, data.Estado, data.CodigoPostal);
     }); 
 } 
 //seleccionar proveedor
-function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapago, clavemetodopago, metodopago, claveusocfdi, usocfdi, claveresidenciafiscal, residenciafiscal){
+function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapago, clavemetodopago, metodopago, claveusocfdi, usocfdi, claveresidenciafiscal, residenciafiscal, calle, noexterior, nointerior, colonia, localidad, referencia, municipio, estado, codigopostal){
   var numeroclienteanterior = $("#numeroclienteanterior").val();
   var numerocliente = Numero;
   if(numeroclienteanterior != numerocliente){ 
@@ -235,10 +236,20 @@ function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapag
     if(Nombre != null){
       $("#textonombrecliente").html(Nombre.substring(0, 40));
     }
-    $("#rfccliente").val(Rfc);
     //datos pestaña receptor o cliente
-    $("#receptorrfc").val(Rfc);
-    $("#receptornombre").val(Nombre);
+    $("#rfcdestinatario").val(Rfc);
+    $("#nombredestinatario").val(Nombre);
+    $("#calledestinatario").val(calle);
+    $("#numeroextdestinatario").val(noexterior);
+    $("#numerointdestinatario").val(nointerior);
+    $("#coloniadestinatario").val(colonia);
+    $("#localidaddestinatario").val(localidad);
+    $("#referenciadestinatario").val(referencia);
+    $("#municipiodestinatario").val(municipio);
+    $("#estadodestinatario").val(estado);
+    $("#paisdestinatario").val(residenciafiscal);
+    $("#cpdestinatario").val(codigopostal);
+    /*
     $("#claveformapago").val(claveformapago);
     $("#formapago").val(formapago);
     if(formapago != null){
@@ -259,9 +270,491 @@ function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapag
     if(residenciafiscal != null){
       $("#textonombreresidenciafiscal").html(residenciafiscal.substring(0, 40));
     }
+    */
     mostrarformulario();
   }
 }
+//obtener registros de mun
+function obtenermunicipios(tipo){
+  ocultarformulario();
+  var tablamunicipios = '<div class="modal-header '+background_forms_and_modals+'">'+
+                          '<h4 class="modal-title">Municipios</h4>'+
+                        '</div>'+
+                        '<div class="modal-body">'+
+                            '<div class="row">'+
+                                '<div class="col-md-12">'+
+                                    '<div class="table-responsive">'+
+                                        '<table id="tbllistadomunicipio" class="tbllistadomunicipio table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                            '<thead class="'+background_tables+'">'+
+                                                '<tr>'+
+                                                    '<th>Operaciones</th>'+
+                                                    '<th>Numero</th>'+
+                                                    '<th>Municipio</th>'+
+                                                    '<th>Estado</th>'+
+                                                '</tr>'+
+                                            '</thead>'+
+                                            '<tbody></tbody>'+
+                                        '</table>'+
+                                    '</div>'+
+                                '</div>'+   
+                            '</div>'+
+                        '</div>'+
+                        '<div class="modal-footer">'+
+                            '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                        '</div>';
+    $("#contenidomodaltablas").html(tablamunicipios);
+    var talmun = $('#tbllistadomunicipio').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,  
+        processing: true,
+        'language': {
+            'loadingRecords': '&nbsp;',
+            'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+            url: carta_porte_obtener_municipios,
+            data: function (d) {
+                d.tipo = tipo;
+            }
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Numero', name: 'Numero' },
+            { data: 'Nombre', name: 'Nombre' },
+            { data: 'Estado', name: 'Estado' }
+        ],
+        "initComplete": function() {
+            var $buscar = $('div.dataTables_filter input');
+            $buscar.unbind();
+            $buscar.bind('keyup change', function(e) {
+                if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistadomunicipio').DataTable().search( this.value ).draw();
+                }
+            });
+        },
+    }); 
+    //seleccionar registro al dar doble click
+    $('#tbllistadomunicipio tbody').on('dblclick', 'tr', function () {
+        var data = talmun.row( this ).data();
+        seleccionarmunicipio(data.Numero, data.Nombre, tipo);
+    }); 
+} 
+//seleccionar mun
+function seleccionarmunicipio(Numero, Nombre, tipo){
+  switch(tipo){
+    case 'remitente':
+        var numeromunicipioremitenteanterior = $("#numeromunicipioremitenteanterior").val();
+        var numeromunicipioremitente = Numero;
+        if(numeromunicipioremitenteanterior != numeromunicipioremitente){
+          $("#numeromunicipioremitente").val(Numero);
+          $("#numeromunicipioremitenteanterior").val(Numero);
+          $("#municipioremitente").val(Nombre);
+          if(Nombre != null){
+            $("#textonombremunicipioremitente").html(Nombre.substring(0, 40));
+          }
+          mostrarformulario();
+        }
+      break;
+    case 'destinatario':
+        var numeromunicipiodestinatarioanterior = $("#numeromunicipiodestinatarioanterior").val();
+        var numeromunicipiodestinatario = Numero;
+        if(numeromunicipiodestinatarioanterior != numeromunicipiodestinatario){
+          $("#numeromunicipiodestinatario").val(Numero);
+          $("#numeromunicipiodestinatarioanterior").val(Numero);
+          $("#municipiodestinatario").val(Nombre);
+          if(Nombre != null){
+            $("#textonombremunicipiodestinatario").html(Nombre.substring(0, 40));
+          }
+          mostrarformulario();
+        }
+      break;
+  }
+}
+//obtener registros de est
+function obtenerestados(tipo){
+  ocultarformulario();
+  var tablaestados = '<div class="modal-header '+background_forms_and_modals+'">'+
+                          '<h4 class="modal-title">Estados</h4>'+
+                        '</div>'+
+                        '<div class="modal-body">'+
+                            '<div class="row">'+
+                                '<div class="col-md-12">'+
+                                    '<div class="table-responsive">'+
+                                        '<table id="tbllistadoestado" class="tbllistadoestado table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                            '<thead class="'+background_tables+'">'+
+                                                '<tr>'+
+                                                    '<th>Operaciones</th>'+
+                                                    '<th>Numero</th>'+
+                                                    '<th>Estado</th>'+
+                                                    '<th>Pais</th>'+
+                                                '</tr>'+
+                                            '</thead>'+
+                                            '<tbody></tbody>'+
+                                        '</table>'+
+                                    '</div>'+
+                                '</div>'+   
+                            '</div>'+
+                        '</div>'+
+                        '<div class="modal-footer">'+
+                            '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                        '</div>';
+    $("#contenidomodaltablas").html(tablaestados);
+    var talest = $('#tbllistadoestado').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,  
+        processing: true,
+        'language': {
+            'loadingRecords': '&nbsp;',
+            'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+            url: carta_porte_obtener_estados,
+            data: function (d) {
+                d.tipo = tipo;
+            }
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Numero', name: 'Numero' },
+            { data: 'Nombre', name: 'Nombre' },
+            { data: 'Pais', name: 'Pais' }
+        ],
+        "initComplete": function() {
+            var $buscar = $('div.dataTables_filter input');
+            $buscar.unbind();
+            $buscar.bind('keyup change', function(e) {
+                if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistadoestado').DataTable().search( this.value ).draw();
+                }
+            });
+        },
+    }); 
+    //seleccionar registro al dar doble click
+    $('#tbllistadoestado tbody').on('dblclick', 'tr', function () {
+        var data = talest.row( this ).data();
+        seleccionarestado(data.Numero, data.Nombre, tipo);
+    }); 
+} 
+//seleccionar est
+function seleccionarestado(Numero, Nombre, tipo){
+  switch(tipo){
+    case 'remitente':
+        var numeroestadoremitenteanterior = $("#numeroestadoremitenteanterior").val();
+        var numeroestadoremitente = Numero;
+        if(numeroestadoremitenteanterior != numeroestadoremitente){
+          $("#numeroestadoremitente").val(Numero);
+          $("#numeroestadoremitenteanterior").val(Numero);
+          $("#estadoremitente").val(Nombre);
+          if(Nombre != null){
+            $("#textonombreestadoremitente").html(Nombre.substring(0, 40));
+          }
+          mostrarformulario();
+        }
+      break;
+    case 'destinatario':
+        var numeroestadodestinatarioanterior = $("#numeroestadodestinatarioanterior").val();
+        var numeroestadodestinatario = Numero;
+        if(numeroestadodestinatarioanterior != numeroestadodestinatario){
+          $("#numeroestadodestinatario").val(Numero);
+          $("#numeroestadodestinatarioanterior").val(Numero);
+          $("#estadodestinatario").val(Nombre);
+          if(Nombre != null){
+            $("#textonombreestadodestinatario").html(Nombre.substring(0, 40));
+          }
+          mostrarformulario();
+        }
+      break;
+  }
+}
+//obtener registros de pai
+function obtenerpaises(tipo){
+  ocultarformulario();
+  var tablapaises = '<div class="modal-header '+background_forms_and_modals+'">'+
+                          '<h4 class="modal-title">Paises</h4>'+
+                        '</div>'+
+                        '<div class="modal-body">'+
+                            '<div class="row">'+
+                                '<div class="col-md-12">'+
+                                    '<div class="table-responsive">'+
+                                        '<table id="tbllistadopais" class="tbllistadopais table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                            '<thead class="'+background_tables+'">'+
+                                                '<tr>'+
+                                                    '<th>Operaciones</th>'+
+                                                    '<th>Numero</th>'+
+                                                    '<th>Pais</th>'+
+                                                '</tr>'+
+                                            '</thead>'+
+                                            '<tbody></tbody>'+
+                                        '</table>'+
+                                    '</div>'+
+                                '</div>'+   
+                            '</div>'+
+                        '</div>'+
+                        '<div class="modal-footer">'+
+                            '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                        '</div>';
+    $("#contenidomodaltablas").html(tablapaises);
+    var talpai = $('#tbllistadopais').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,  
+        processing: true,
+        'language': {
+            'loadingRecords': '&nbsp;',
+            'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+            url: carta_porte_obtener_paises,
+            data: function (d) {
+                d.tipo = tipo;
+            }
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Numero', name: 'Numero' },
+            { data: 'Nombre', name: 'Nombre' },
+        ],
+        "initComplete": function() {
+            var $buscar = $('div.dataTables_filter input');
+            $buscar.unbind();
+            $buscar.bind('keyup change', function(e) {
+                if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistadopais').DataTable().search( this.value ).draw();
+                }
+            });
+        },
+    }); 
+    //seleccionar registro al dar doble click
+    $('#tbllistadopais tbody').on('dblclick', 'tr', function () {
+        var data = talpai.row( this ).data();
+        seleccionarpais(data.Numero, data.Nombre, tipo);
+    }); 
+} 
+//seleccionar pai
+function seleccionarpais(Numero, Nombre, tipo){
+  switch(tipo){
+    case 'remitente':
+        var numeropaisremitenteanterior = $("#numeropaisremitenteanterior").val();
+        var numeropaisremitente = Numero;
+        if(numeropaisremitenteanterior != numeropaisremitente){
+          $("#numeropaisremitente").val(Numero);
+          $("#numeropaisremitenteanterior").val(Numero);
+          $("#paisremitente").val(Nombre);
+          if(Nombre != null){
+            $("#textonombrepaisremitente").html(Nombre.substring(0, 40));
+          }
+          mostrarformulario();
+        }
+      break;
+    case 'destinatario':
+        var numeropaisdestinatarioanterior = $("#numeropaisdestinatarioanterior").val();
+        var numeropaisdestinatario = Numero;
+        if(numeropaisdestinatarioanterior != numeropaisdestinatario){
+          $("#numeropaisdestinatario").val(Numero);
+          $("#numeropaisdestinatarioanterior").val(Numero);
+          $("#paisdestinatario").val(Nombre);
+          if(Nombre != null){
+            $("#textonombrepaisdestinatario").html(Nombre.substring(0, 40));
+          }
+          mostrarformulario();
+        }
+      break;
+  }
+}
+//obtener registros de cp
+function obtenercps(tipo){
+  ocultarformulario();
+  var tablacps = '<div class="modal-header '+background_forms_and_modals+'">'+
+                          '<h4 class="modal-title">Códigos Postales</h4>'+
+                        '</div>'+
+                        '<div class="modal-body">'+
+                            '<div class="row">'+
+                                '<div class="col-md-12">'+
+                                    '<div class="table-responsive">'+
+                                        '<table id="tbllistadocp" class="tbllistadocp table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                            '<thead class="'+background_tables+'">'+
+                                                '<tr>'+
+                                                    '<th>Operaciones</th>'+
+                                                    '<th>Numero</th>'+
+                                                    '<th>Clave</th>'+
+                                                    '<th>Estado</th>'+
+                                                '</tr>'+
+                                            '</thead>'+
+                                            '<tbody></tbody>'+
+                                        '</table>'+
+                                    '</div>'+
+                                '</div>'+   
+                            '</div>'+
+                        '</div>'+
+                        '<div class="modal-footer">'+
+                            '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                        '</div>';
+    $("#contenidomodaltablas").html(tablacps);
+    var talcps = $('#tbllistadocp').DataTable({
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,  
+        processing: true,
+        'language': {
+            'loadingRecords': '&nbsp;',
+            'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+            url: carta_porte_obtener_codigospostales,
+            data: function (d) {
+                d.tipo = tipo;
+            }
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Numero', name: 'Numero' },
+            { data: 'Clave', name: 'Clave' },
+            { data: 'Estado', name: 'Estado' },
+        ],
+        "initComplete": function() {
+            var $buscar = $('div.dataTables_filter input');
+            $buscar.unbind();
+            $buscar.bind('keyup change', function(e) {
+                if(e.keyCode == 13 || this.value == "") {
+                  $('#tbllistadocp').DataTable().search( this.value ).draw();
+                }
+            });
+        },
+    }); 
+    //seleccionar registro al dar doble click
+    $('#tbllistadocp tbody').on('dblclick', 'tr', function () {
+        var data = talcps.row( this ).data();
+        seleccionarcp(data.Numero, data.Clave, tipo);
+    }); 
+} 
+//seleccionar est
+function seleccionarcp(Numero, Clave, tipo){
+  switch(tipo){
+    case 'remitente':
+        var numerocpremitenteanterior = $("#numerocpremitenteanterior").val();
+        var numerocpremitente = Numero;
+        if(numerocpremitenteanterior != numerocpremitente){
+          $("#numerocpremitente").val(Numero);
+          $("#numerocpremitenteanterior").val(Numero);
+          $("#cpremitente").val(Clave);
+          if(Clave != null){
+            $("#textonombrecpremitente").html(Clave.substring(0, 40));
+          }
+          mostrarformulario();
+        }
+      break;
+    case 'destinatario':
+        var numerocpdestinatarioanterior = $("#numerocpdestinatarioanterior").val();
+        var numerocpdestinatario = Numero;
+        if(numerocpdestinatarioanterior != numerocpdestinatario){
+          $("#numerocpdestinatario").val(Numero);
+          $("#numerocpdestinatarioanterior").val(Numero);
+          $("#cpdestinatario").val(Clave);
+          if(Clave != null){
+            $("#textonombrecpdestinatario").html(Clave.substring(0, 40));
+          }
+          mostrarformulario();
+        }
+      break;
+  }
+}
+//obtener registros de config auto
+function obtenerconfigautotransporte(){
+    ocultarformulario();
+    var tablaconfigauto = '<div class="modal-header '+background_forms_and_modals+'">'+
+                            '<h4 class="modal-title">Configuración Autotransporte</h4>'+
+                        '</div>'+
+                        '<div class="modal-body">'+
+                            '<div class="row">'+
+                                '<div class="col-md-12">'+
+                                    '<div class="table-responsive">'+
+                                        '<table id="tbllistadoconfigautotransporte" class="tbllistadoconfigautotransporte table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                            '<thead class="'+background_tables+'">'+
+                                                '<tr>'+
+                                                    '<th>Operaciones</th>'+
+                                                    '<th>Numero</th>'+
+                                                    '<th>Clave</th>'+
+                                                    '<th>Descripción</th>'+
+                                                '</tr>'+
+                                            '</thead>'+
+                                            '<tbody></tbody>'+
+                                        '</table>'+
+                                    '</div>'+
+                                '</div>'+   
+                            '</div>'+
+                        '</div>'+
+                        '<div class="modal-footer">'+
+                            '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                        '</div>';
+      $("#contenidomodaltablas").html(tablaconfigauto);
+      var tconfauto = $('#tbllistadoconfigautotransporte').DataTable({
+          "lengthMenu": [ 10, 50, 100, 250, 500 ],
+          "pageLength": 250,
+          "sScrollX": "110%",
+          "sScrollY": "370px",
+          "bScrollCollapse": true,  
+          processing: true,
+          'language': {
+              'loadingRecords': '&nbsp;',
+              'processing': '<div class="spinner"></div>'
+          },
+          serverSide: true,
+          ajax: {
+              url: carta_porte_obtener_coonfiguracionesautotransporte,
+          },
+          columns: [
+              { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+              { data: 'Numero', name: 'Numero' },
+              { data: 'Clave', name: 'Clave' },
+              { data: 'Descripcion', name: 'Descripcion' }
+          ],
+          "initComplete": function() {
+              var $buscar = $('div.dataTables_filter input');
+              $buscar.unbind();
+              $buscar.bind('keyup change', function(e) {
+                  if(e.keyCode == 13 || this.value == "") {
+                  $('#tbllistadoconfigautotransporte').DataTable().search( this.value ).draw();
+                  }
+              });
+          },
+      }); 
+      //seleccionar registro al dar doble click
+      $('#tbllistadoconfigautotransporte tbody').on('dblclick', 'tr', function () {
+          var data = tconfauto.row( this ).data();
+          seleccionarconfigautotransporte(data.Numero, data.Clave, data.Descripcion);
+      }); 
+} 
+//seleccionar almacen
+function seleccionarconfigautotransporte(Numero, Clave, Descripcion){
+  var claveconfigautotransporteanterior = $("#claveconfigautotransporteanterior").val();
+  var claveconfigautotransporte = Numero;
+  if(claveconfigautotransporteanterior != claveconfigautotransporte){
+    $("#claveconfigautotransporte").val(Clave);
+    $("#claveconfigautotransporteanterior").val(Clave);
+    $("#configautotransporte").val(Descripcion);
+    if(Descripcion != null){
+      $("#textonombreconfigautotransporte").html(Descripcion.substring(0, 40));
+    }
+    mostrarformulario();
+  }
+}
+
+
+
 //obtener registros de almacenes
 function obteneralmacenes(){
     ocultarformulario();
@@ -939,7 +1432,7 @@ function obtenerfoliosnotas(){
       },
       serverSide: true,
       ajax: {
-        url: notas_credito_clientes_obtener_folios_fiscales
+        url: carta_porte_obtener_folios_fiscales
       },
       columns: [
           { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
@@ -970,7 +1463,7 @@ function seleccionarfoliofiscal(Serie, Esquema){
     var confirmacion = true;
   }
   if (confirmacion == true) { 
-    $.get(notas_credito_clientes_obtener_ultimo_folio_serie_seleccionada, {Serie:Serie,Esquema:Esquema}, function(folio){
+    $.get(carta_porte_obtener_ultimo_folio_serie_seleccionada, {Serie:Serie,Esquema:Esquema}, function(folio){
       $("#folio").val(folio);
       $("#serie").val(Serie);
       $("#esquema").val(Esquema);
@@ -1216,17 +1709,28 @@ function obtenerclientepornumero(){
   var numerocliente = $("#numerocliente").val();
   if(numeroclienteanterior != numerocliente){
     if($("#numerocliente").parsley().isValid()){
-      $.get(notas_credito_clientes_obtener_cliente_por_numero, {numerocliente:numerocliente}, function(data){
+      $.get(carta_porte_obtener_cliente_por_numero, {numerocliente:numerocliente}, function(data){
         $("#numerocliente").val(data.numero);
         $("#numeroclienteanterior").val(data.numero);
         $("#cliente").val(data.nombre);
         if(data.nombre != null){
           $("#textonombrecliente").html(data.nombre.substring(0, 40));
         }
-        $("#rfccliente").val(data.rfc);
+        console.log(data);
         //datos pestaña receptor o cliente
-        $("#receptorrfc").val(data.rfc);
-        $("#receptornombre").val(data.nombre);
+        $("#rfcdestinatario").val(data.rfc);
+        $("#nombredestinatario").val(data.nombre);
+        $("#calledestinatario").val(data.calle);
+        $("#numeroextdestinatario").val(data.noexterior);
+        $("#numerointdestinatario").val(data.nointerior);
+        $("#coloniadestinatario").val(data.colonia);
+        $("#localidaddestinatario").val(data.localidad);
+        $("#referenciadestinatario").val(data.referencia);
+        $("#municipiodestinatario").val(data.municipio);
+        $("#estadodestinatario").val(data.estado);
+        $("#paisdestinatario").val(data.residenciafiscal);
+        $("#cpdestinatario").val(data.codigopostal);
+        /*
         $("#claveformapago").val(data.claveformapago);
         $("#claveformapagoanterior").val(data.claveformapago);
         $("#formapago").val(data.formapago);
@@ -1251,6 +1755,7 @@ function obtenerclientepornumero(){
         if(data.residenciafiscal != null){
           $("#textonombreresidenciafiscal").html(data.residenciafiscal.substring(0, 40));
         }
+        */
         mostrarformulario();
       }) 
     }
@@ -1980,6 +2485,32 @@ function alta(){
                                         '<input type="hidden" class="form-control" name="diferenciatotales" id="diferenciatotales" readonly required>'+
                                         '<input type="hidden" class="form-control" name="esquema" id="esquema" value="'+esquema+'" readonly data-parsley-length="[1, 10]">'+
                                     '</div>'+  
+                                    '<div class="col-md-3">'+
+                                      '<label>Cliente <span class="label label-danger" id="textonombrecliente"></span></label>'+
+                                      '<table class="col-md-12">'+
+                                        '<tr>'+
+                                          '<td>'+
+                                            '<div class="btn bg-blue waves-effect" id="btnobtenerclientes" onclick="obtenerclientes()">Seleccionar</div>'+
+                                          '</td>'+
+                                          '<td>'+
+                                            '<div class="form-line">'+
+                                              '<input type="text" class="form-control inputnext" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
+                                              '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
+                                              '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
+                                              '<input type="hidden" class="form-control" name="rfccliente" id="rfccliente" required readonly>'+
+                                            '</div>'+
+                                          '</td>'+    
+                                        '</tr>'+    
+                                      '</table>'+
+                                    '</div>'+ 
+                                    '<div class="col-md-3">'+
+                                        '<label>Fecha</label>'+
+                                        '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required  data-parsley-excluded="true" onkeydown="return false">'+
+                                        '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
+                                        '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
+                                    '</div>'+   
+                                '</div>'+
+                                '<div class="row">'+   
                                     '<div class="col-md-2">'+
                                       '<label>Transporte Internacional</label>'+
                                       '<select name="transporteinternacional" id="transporteinternacional" class="form-control select2" style="width:100% !important;" required>'+ 
@@ -1995,14 +2526,6 @@ function alta(){
                                         '<label>Total mercancias</label>'+
                                         '<input type="number" class="form-control inputnext" name="numerototalmercancias" id="numerototalmercancias" value="0" required readonly>'+
                                     '</div>'+
-                                    '<div class="col-md-3">'+
-                                        '<label>Fecha</label>'+
-                                        '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required  onkeydown="return false">'+
-                                        '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
-                                        '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
-                                    '</div>'+   
-                                '</div>'+
-                                '<div class="row">'+   
                                     '<div class="col-md-3" id="divbuscarcodigoproducto">'+
                                       '<label>Escribe el código y presiona la tecla ENTER</label>'+
                                       '<table class="col-md-12">'+
@@ -2032,68 +2555,126 @@ function alta(){
                                     '</div>'+
                                     '<div class="col-md-2">'+
                                         '<label>Fecha y Hora Salida</label>'+
-                                        '<input type="datetime-local" class="form-control" name="fechasalida" id="fechasalida" required  onkeydown="return false">'+
+                                        '<input type="datetime-local" class="form-control" name="fechasalida" id="fechasalida" required data-parsley-excluded="true" onkeydown="return false">'+
                                     '</div>'+
                                     '<div class="col-md-4">'+
                                         '<label>Calle</label>'+
-                                        '<input type="text" class="form-control inputnexttabem" name="calleremitente" id="calleremitente" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnexttabem" name="calleremitente" id="calleremitente" value="'+calleempresa+'" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
                                     '<div class="col-md-1">'+
                                         '<label>Número Ext</label>'+
-                                        '<input type="text" class="form-control inputnexttabem" name="numeroextremitente" id="numeroextremitente" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnexttabem" name="numeroextremitente" id="numeroextremitente" value="'+noexteriorempresa+'" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                     '<div class="col-md-1">'+
                                         '<label>Número Int</label>'+
-                                        '<input type="text" class="form-control inputnexttabem" name="numerointremitente" id="numerointremitente" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnexttabem" name="numerointremitente" id="numerointremitente" value="'+nointeriorempresa+'" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                     '<div class="col-md-2">'+
                                         '<label>Colonia</label>'+
-                                        '<input type="text" class="form-control inputnexttabem" name="coloniaremitente" id="coloniaremitente" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnexttabem" name="coloniaremitente" id="coloniaremitente" value="'+coloniaempresa+'" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                     '<div class="col-md-2">'+
                                         '<label>Localidad</label>'+
-                                        '<input type="text" class="form-control inputnexttabem" name="localidadremitente" id="localidadremitente" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnexttabem" name="localidadremitente" id="localidadremitente" value="'+localidadempresa+'" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
-                                    '<div class="col-md-4">'+
+                                    '<div class="col-md-3">'+
                                         '<label>Referencia</label>'+
-                                        '<input type="text" class="form-control inputnexttabem" name="referenciaremitente" id="referenciaremitente" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnexttabem" name="referenciaremitente" id="referenciaremitente" value="'+referenciaempresa+'" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
-                                    '<div class="col-md-2">'+
-                                        '<label>Municipio</label>'+
-                                        '<input type="text" class="form-control inputnexttabem" name="municipioremitente" id="municipioremitente" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
-                                    '</div>'+
-                                    '<div class="col-md-2">'+
-                                        '<label>Estado</label>'+
-                                        '<input type="text" class="form-control inputnexttabem" name="estadoremitente" id="estadoremitente" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
-                                    '</div>'+
-                                    '<div class="col-md-2">'+
-                                        '<label>País de origen</label>'+
-                                        '<input type="text" class="form-control inputnexttabem" name="paisremitente" id="paisremitente" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
-                                    '</div>'+
-                                    '<div class="col-md-2">'+
-                                        '<label>Código postal</label>'+
-                                        '<input type="text" class="form-control inputnexttabem" name="cpremitente" id="cpremitente" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
-                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                      '<label>Municipio <span class="label label-danger" id="textonombremunicipioremitente"></span></label>'+
+                                      '<table class="col-md-12">'+
+                                        '<tr>'+
+                                          '<td>'+
+                                            '<div class="btn bg-blue waves-effect" id="btnobtenermunicipiosremitente" onclick="obtenermunicipios('+"'remitente'"+')">Seleccionar</div>'+
+                                          '</td>'+
+                                          '<td>'+
+                                            '<div class="form-line">'+
+                                              '<input type="hidden" class="form-control inputnexttabem" name="numeromunicipioremitente" id="numeromunicipioremitente" required data-parsley-type="integer" autocomplete="off">'+
+                                              '<input type="hidden" class="form-control" name="numeromunicipioremitenteanterior" id="numeromunicipioremitenteanterior" required data-parsley-type="integer">'+
+                                              '<input type="text" class="form-control" name="municipioremitente" id="municipioremitente" value="'+municipioempresa+'" required>'+
+                                            '</div>'+
+                                          '</td>'+    
+                                        '</tr>'+    
+                                      '</table>'+
+                                    '</div>'+ 
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-md-3">'+
+                                      '<label>Estado <span class="label label-danger" id="textonombreestadoremitente"></span></label>'+
+                                      '<table class="col-md-12">'+
+                                        '<tr>'+
+                                          '<td>'+
+                                            '<div class="btn bg-blue waves-effect" id="btnobtenerestadosremitente" onclick="obtenerestados('+"'remitente'"+')">Seleccionar</div>'+
+                                          '</td>'+
+                                          '<td>'+
+                                            '<div class="form-line">'+
+                                              '<input type="hidden" class="form-control inputnexttabem" name="numeroestadoremitente" id="numeroestadoremitente" required data-parsley-type="integer" autocomplete="off">'+
+                                              '<input type="hidden" class="form-control" name="numeroestadoremitenteanterior" id="numeroestadoremitenteanterior" required data-parsley-type="integer">'+
+                                              '<input type="text" class="form-control" name="estadoremitente" id="estadoremitente" value="'+estadoempresa+'" required>'+
+                                            '</div>'+
+                                          '</td>'+    
+                                        '</tr>'+    
+                                      '</table>'+
+                                    '</div>'+ 
+                                    '<div class="col-md-3">'+
+                                      '<label>Pais <span class="label label-danger" id="textonombrepaisremitente"></span></label>'+
+                                      '<table class="col-md-12">'+
+                                        '<tr>'+
+                                          '<td>'+
+                                            '<div class="btn bg-blue waves-effect" id="btnobtenerpaisesremitente" onclick="obtenerpaises('+"'remitente'"+')">Seleccionar</div>'+
+                                          '</td>'+
+                                          '<td>'+
+                                            '<div class="form-line">'+
+                                              '<input type="hidden" class="form-control inputnexttabem" name="numeropaisremitente" id="numeropaisremitente" required data-parsley-type="integer" autocomplete="off">'+
+                                              '<input type="hidden" class="form-control" name="numeropaisremitenteanterior" id="numeropaisremitenteanterior" required data-parsley-type="integer">'+
+                                              '<input type="text" class="form-control" name="paisremitente" id="paisremitente" value="'+paisempresa+'" required>'+
+                                            '</div>'+
+                                          '</td>'+    
+                                        '</tr>'+    
+                                      '</table>'+
+                                    '</div>'+ 
+                                    '<div class="col-md-3">'+
+                                      '<label>Código Postal <span class="label label-danger" id="textonombrecpremitente"></span></label>'+
+                                      '<table class="col-md-12">'+
+                                        '<tr>'+
+                                          '<td>'+
+                                            '<div class="btn bg-blue waves-effect" id="btnobtenercpsremitente" onclick="obtenercps('+"'remitente'"+')">Seleccionar</div>'+
+                                          '</td>'+
+                                          '<td>'+
+                                            '<div class="form-line">'+
+                                              '<input type="hidden" class="form-control inputnexttabem" name="numerocpremitente" id="numerocpremitente" required data-parsley-type="integer" autocomplete="off">'+
+                                              '<input type="hidden" class="form-control" name="numerocpremitenteanterior" id="numerocpremitenteanterior" required data-parsley-type="integer">'+
+                                              '<input type="text" class="form-control" name="cpremitente" id="cpremitente" value="'+cpempresa+'" required>'+
+                                            '</div>'+
+                                          '</td>'+    
+                                        '</tr>'+    
+                                      '</table>'+
+                                    '</div>'+ 
                                 '</div>'+
                             '</div>'+ 
                             '<div role="tabpanel" class="tab-pane fade" id="destinotab">'+
                               '<div class="row">'+
                                   '<div class="col-md-2">'+
                                       '<label>R.F.C.</label>'+
-                                      '<input type="text" class="form-control inputnexttabem" name="rfcdestinatario" id="rfcdestinatario" value="'+rfcempresa+'"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                      '<input type="text" class="form-control inputnexttabem" name="rfcdestinatario" id="rfcdestinatario"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                   '</div>'+
                                   '<div class="col-md-4">'+
                                       '<label>Nombre</label>'+
-                                      '<input type="text" class="form-control inputnexttabem" name="nombredestinatario" id="nombredestinatario" value="'+nombreempresa+'" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                      '<input type="text" class="form-control inputnexttabem" name="nombredestinatario" id="nombredestinatario" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                   '</div>'+
                                   '<div class="col-md-2">'+
                                       '<label>Fecha y Hora Llegada</label>'+
-                                      '<input type="datetime-local" class="form-control" name="fechallegada" id="fechallegada" required  onkeydown="return false">'+
+                                      '<input type="datetime-local" class="form-control" name="fechallegada" id="fechallegada" required  data-parsley-excluded="true" onkeydown="return false">'+
                                   '</div>'+
                                   '<div class="col-md-4">'+
                                       '<label>Calle</label>'+
                                       '<input type="text" class="form-control inputnexttabem" name="calledestinatario" id="calledestinatario" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                   '</div>'+
+                              '</div>'+
+                              '<div class="row">'+
                                   '<div class="col-md-1">'+
                                       '<label>Número Ext</label>'+
                                       '<input type="text" class="form-control inputnexttabem" name="numeroextdestinatario" id="numeroextdestinatario" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
@@ -2110,84 +2691,159 @@ function alta(){
                                       '<label>Localidad</label>'+
                                       '<input type="text" class="form-control inputnexttabem" name="localidaddestinatario" id="localidaddestinatario" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                   '</div>'+
-                                  '<div class="col-md-4">'+
+                                  '<div class="col-md-3">'+
                                       '<label>Referencia</label>'+
                                       '<input type="text" class="form-control inputnexttabem" name="referenciadestinatario" id="referenciadestinatario" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                   '</div>'+
-                                  '<div class="col-md-2">'+
-                                      '<label>Municipio</label>'+
-                                      '<input type="text" class="form-control inputnexttabem" name="municipiodestinatario" id="municipiodestinatario" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
-                                  '</div>'+
-                                  '<div class="col-md-2">'+
-                                      '<label>Estado</label>'+
-                                      '<input type="text" class="form-control inputnexttabem" name="estadodestinatario" id="estadodestinatario" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
-                                  '</div>'+
-                                  '<div class="col-md-2">'+
-                                      '<label>País de origen</label>'+
-                                      '<input type="text" class="form-control inputnexttabem" name="paisdestinatario" id="paisdestinatario" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
-                                  '</div>'+
-                                  '<div class="col-md-2">'+
-                                      '<label>Código postal</label>'+
-                                      '<input type="text" class="form-control inputnexttabem" name="cpdestinatario" id="cpdestinatario" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
-                                  '</div>'+
+                                  '<div class="col-md-3">'+
+                                    '<label>Municipio <span class="label label-danger" id="textonombremunicipiodestinatario"></span></label>'+
+                                    '<table class="col-md-12">'+
+                                      '<tr>'+
+                                        '<td>'+
+                                          '<div class="btn bg-blue waves-effect" id="btnobtenermunicipiosdestinatario" onclick="obtenermunicipios('+"'destinatario'"+')">Seleccionar</div>'+
+                                        '</td>'+
+                                        '<td>'+
+                                          '<div class="form-line">'+
+                                            '<input type="hidden" class="form-control inputnexttabem" name="numeromunicipiodestinatario" id="numeromunicipiodestinatario" required data-parsley-type="integer" autocomplete="off">'+
+                                            '<input type="hidden" class="form-control" name="numeromunicipiodestinatarioanterior" id="numeromunicipiodestinatarioanterior" required data-parsley-type="integer">'+
+                                            '<input type="text" class="form-control" name="municipiodestinatario" id="municipiodestinatario" required>'+
+                                          '</div>'+
+                                        '</td>'+    
+                                      '</tr>'+    
+                                    '</table>'+
+                                  '</div>'+ 
+                              '</div>'+
+                              '<div class="row">'+
+                                  '<div class="col-md-3">'+
+                                    '<label>Estado <span class="label label-danger" id="textonombreestadodestinatario"></span></label>'+
+                                    '<table class="col-md-12">'+
+                                      '<tr>'+
+                                        '<td>'+
+                                          '<div class="btn bg-blue waves-effect" id="btnobtenerestadosdestinatario" onclick="obtenerestados('+"'destinatario'"+')">Seleccionar</div>'+
+                                        '</td>'+
+                                        '<td>'+
+                                          '<div class="form-line">'+
+                                            '<input type="hidden" class="form-control inputnexttabem" name="numeroestadodestinatario" id="numeroestadodestinatario" required data-parsley-type="integer" autocomplete="off">'+
+                                            '<input type="hidden" class="form-control" name="numeroestadodestinatarioanterior" id="numeroestadodestinatarioanterior" required data-parsley-type="integer">'+
+                                            '<input type="text" class="form-control" name="estadodestinatario" id="estadodestinatario" required>'+
+                                          '</div>'+
+                                        '</td>'+    
+                                      '</tr>'+    
+                                    '</table>'+
+                                  '</div>'+ 
+                                  '<div class="col-md-3">'+
+                                    '<label>Pais <span class="label label-danger" id="textonombrepaisdestinatario"></span></label>'+
+                                    '<table class="col-md-12">'+
+                                      '<tr>'+
+                                        '<td>'+
+                                          '<div class="btn bg-blue waves-effect" id="btnobtenerpaisesdestinatario" onclick="obtenerpaises('+"'destinatario'"+')">Seleccionar</div>'+
+                                        '</td>'+
+                                        '<td>'+
+                                          '<div class="form-line">'+
+                                            '<input type="hidden" class="form-control inputnexttabem" name="numeropaisdestinatario" id="numeropaisdestinatario" required data-parsley-type="integer" autocomplete="off">'+
+                                            '<input type="hidden" class="form-control" name="numeropaisdestinatarioanterior" id="numeropaisdestinatarioanterior" required data-parsley-type="integer">'+
+                                            '<input type="text" class="form-control" name="paisdestinatario" id="paisdestinatario" required>'+
+                                          '</div>'+
+                                        '</td>'+    
+                                      '</tr>'+    
+                                    '</table>'+
+                                  '</div>'+ 
+                                  '<div class="col-md-3">'+
+                                    '<label>Código Postal <span class="label label-danger" id="textonombrecpdestinatario"></span></label>'+
+                                    '<table class="col-md-12">'+
+                                      '<tr>'+
+                                        '<td>'+
+                                          '<div class="btn bg-blue waves-effect" id="btnobtenercpsdestinatario" onclick="obtenercps('+"'destinatario'"+')">Seleccionar</div>'+
+                                        '</td>'+
+                                        '<td>'+
+                                          '<div class="form-line">'+
+                                            '<input type="hidden" class="form-control inputnexttabem" name="numerocpdestinatario" id="numerocpdestinatario" required data-parsley-type="integer" autocomplete="off">'+
+                                            '<input type="hidden" class="form-control" name="numerocpdestinatarioanterior" id="numerocpdestinatarioanterior" required data-parsley-type="integer">'+
+                                            '<input type="text" class="form-control" name="cpdestinatario" id="cpdestinatario" required>'+
+                                          '</div>'+
+                                        '</td>'+    
+                                      '</tr>'+    
+                                    '</table>'+
+                                  '</div>'+ 
                               '</div>'+
                             '</div>'+
                             '<div role="tabpanel" class="tab-pane fade" id="autotransportetab">'+
-                              '<div class="col-md-3">'+
-                                  '<label>Permiso de la SCT</label>'+
-                                  '<input type="text" class="form-control inputnexttabem" name="permisosct" id="permisosct" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                              '<div class="row">'+
+                                '<div class="col-md-3">'+
+                                    '<label>Permiso de la SCT</label>'+
+                                    '<input type="text" class="form-control inputnexttabem" name="permisosct" id="permisosct" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                                '<div class="col-md-3">'+
+                                    '<label>Número de Permiso de la SCT</label>'+
+                                    '<input type="text" class="form-control inputnexttabem" name="numeropermisosct" id="numeropermisosct" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                                '<div class="col-md-3">'+
+                                    '<label>Nombre de Aseguradora</label>'+
+                                    '<input type="text" class="form-control inputnexttabem" name="nombreaseguradora" id="nombreaseguradora" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                                '<div class="col-md-3">'+
+                                    '<label>Número de Póliza de Seguro</label>'+
+                                    '<input type="text" class="form-control inputnexttabem" name="numeropolizaseguro" id="numeropolizaseguro" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
                               '</div>'+
-                              '<div class="col-md-3">'+
-                                  '<label>Número de Permiso de la SCT</label>'+
-                                  '<input type="text" class="form-control inputnexttabem" name="numeropermisosct" id="numeropermisosct" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
-                              '</div>'+
-                              '<div class="col-md-3">'+
-                                  '<label>Nombre de Aseguradora</label>'+
-                                  '<input type="text" class="form-control inputnexttabem" name="nombreaseguradora" id="nombreaseguradora" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
-                              '</div>'+
-                              '<div class="col-md-3">'+
-                                  '<label>Número de póliza de seguro</label>'+
-                                  '<input type="text" class="form-control inputnexttabem" name="numeropolizaseguro" id="numeropolizaseguro" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
-                              '</div>'+
-                              '<div class="col-md-2">'+
-                                  '<label>Configuración vehicular</label>'+
-                                  '<input type="text" class="form-control inputnexttabem" name="configuracionvehicular" id="configuracionvehicular" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
-                              '</div>'+
-                              '<div class="col-md-2">'+
-                                  '<label>Placa Vehículo Motor</label>'+
-                                  '<input type="text" class="form-control inputnexttabem" name="placavehiculo" id="placavehiculo" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
-                              '</div>'+
-                              '<div class="col-md-2">'+
-                                  '<label>Año Modelo Vehículo Motor</label>'+
-                                  '<input type="text" class="form-control inputnexttabem" name="anovehiculo" id="anovehiculo" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
-                              '</div>'+
-                              '<div class="col-md-2">'+
-                                  '<label>SubTipo de remolque</label>'+
-                                  '<input type="text" class="form-control inputnexttabem" name="subtiporemolque" id="subtiporemolque" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
-                              '</div>'+
-                              '<div class="col-md-2">'+
-                                  '<label>Placa</label>'+
-                                  '<input type="text" class="form-control inputnexttabem" name="placaremolque" id="placaremolque" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                              '<div class="row">'+
+
+                              
+                                '<div class="col-md-3">'+
+                                  '<label>Configuración Vehicular <span class="label label-danger" id="textonombreconfigautotransporte"></span></label>'+
+                                  '<table class="col-md-12">'+
+                                    '<tr>'+
+                                      '<td>'+
+                                        '<div class="btn bg-blue waves-effect" id="btnobtenerconfigautotransporte" onclick="obtenerconfigautotransporte()">Seleccionar</div>'+
+                                      '</td>'+
+                                      '<td>'+
+                                        '<div class="form-line">'+
+                                          '<input type="text" class="form-control inputnext" name="claveconfigautotransporte" id="claveconfigautotransporte" required data-parsley-type="integer" autocomplete="off">'+
+                                          '<input type="hidden" class="form-control" name="claveconfigautotransporteanterior" id="claveconfigautotransporteanterior" required data-parsley-type="integer">'+
+                                          '<input type="hidden" class="form-control" name="configautotransporte" id="configautotransporte" required readonly>'+
+                                        '</div>'+
+                                      '</td>'+    
+                                    '</tr>'+    
+                                  '</table>'+
+                                '</div>'+ 
+                                '<div class="col-md-2">'+
+                                    '<label>Placa Vehículo Motor</label>'+
+                                    '<input type="text" class="form-control inputnexttabem" name="placavehiculo" id="placavehiculo" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                                '<div class="col-md-2">'+
+                                    '<label>Año Modelo Vehículo Motor</label>'+
+                                    '<input type="text" class="form-control inputnexttabem" name="anovehiculo" id="anovehiculo" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                                '<div class="col-md-2">'+
+                                    '<label>SubTipo de Remolque</label>'+
+                                    '<input type="text" class="form-control inputnexttabem" name="subtiporemolque" id="subtiporemolque" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                                '<div class="col-md-2">'+
+                                    '<label>Placa</label>'+
+                                    '<input type="text" class="form-control inputnexttabem" name="placaremolque" id="placaremolque" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+  
                               '</div>'+
                             '</div>'+
                             '<div role="tabpanel" class="tab-pane fade" id="operadortab">'+
                               '<div class="row">'+
                                 '<div class="col-md-2">'+
                                     '<label>Clave de Transporte</label>'+
-                                    '<input type="text" class="form-control inputnexttabem" name="rfcoperador" id="rfcoperador" value="'+rfcempresa+'"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                    '<input type="text" class="form-control inputnexttabem" name="rfcoperador" id="rfcoperador"  required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                 '</div>'+
                                 '<div class="col-md-2">'+
                                     '<label>R.F.C.</label>'+
-                                    '<input type="text" class="form-control inputnexttabem" name="rfcoperador" id="rfcoperador" value="'+rfcempresa+'"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                    '<input type="text" class="form-control inputnexttabem" name="rfcoperador" id="rfcoperador" required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                 '</div>'+
                                 '<div class="col-md-4">'+
                                     '<label>Nombre</label>'+
-                                    '<input type="text" class="form-control inputnexttabem" name="nombreoperador" id="nombreoperador" value="'+nombreempresa+'" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '<input type="text" class="form-control inputnexttabem" name="nombreoperador" id="nombreoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                                 '<div class="col-md-4">'+
                                     '<label>Número de Licencia</label>'+
-                                    '<input type="text" class="form-control inputnexttabem" name="nombreoperador" id="nombreoperador" value="'+nombreempresa+'" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '<input type="text" class="form-control inputnexttabem" name="nombreoperador" id="nombreoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
+                              '</div>'+
+                              '<div class="row">'+
                                 '<div class="col-md-4">'+
                                     '<label>Calle</label>'+
                                     '<input type="text" class="form-control inputnexttabem" name="calleoperador" id="calleoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
@@ -2208,10 +2864,12 @@ function alta(){
                                     '<label>Localidad</label>'+
                                     '<input type="text" class="form-control inputnexttabem" name="localidadoperador" id="localidadoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
-                                '<div class="col-md-4">'+
+                                '<div class="col-md-2">'+
                                     '<label>Referencia</label>'+
                                     '<input type="text" class="form-control inputnexttabem" name="referenciaoperador" id="referenciaoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
+                              '</div>'+
+                              '<div class="row">'+
                                 '<div class="col-md-2">'+
                                     '<label>Municipio</label>'+
                                     '<input type="text" class="form-control inputnexttabem" name="municipiooperador" id="municipiooperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
@@ -2221,11 +2879,11 @@ function alta(){
                                     '<input type="text" class="form-control inputnexttabem" name="estadooperador" id="estadooperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                                 '<div class="col-md-2">'+
-                                    '<label>País de origen</label>'+
+                                    '<label>País</label>'+
                                     '<input type="text" class="form-control inputnexttabem" name="paisoperador" id="paisoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                                 '<div class="col-md-2">'+
-                                    '<label>Código postal</label>'+
+                                    '<label>Código Postal</label>'+
                                     '<input type="text" class="form-control inputnexttabem" name="cpoperador" id="cpoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                             '</div>'+
@@ -2237,7 +2895,7 @@ function alta(){
                     '<div class="col-md-12">'+
                         '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
                             '<li role="presentation" class="active">'+
-                                '<a href="#productostab" data-toggle="tab">Códigos ó DPPP</a>'+
+                                '<a href="#productostab" data-toggle="tab">Códigos</a>'+
                             '</li>'+
                         '</ul>'+
                         '<div class="tab-content">'+
@@ -2254,9 +2912,9 @@ function alta(){
                                                   '<th class="customercolortheadth">Cantidad</th>'+
                                                   '<th class="customercolortheadth">Precio $</th>'+
                                                   '<th class="'+background_tables+'">Importe $</th>'+
-                                                  '<th class="customercolortheadth">Dcto %</th>'+
-                                                  '<th class="customercolortheadth">Dcto $</th>'+
-                                                  '<th class="'+background_tables+'">Importe Descuento $</th>'+
+                                                  '<th class="customercolortheadth" hidden>Dcto %</th>'+
+                                                  '<th class="customercolortheadth" hidden>Dcto $</th>'+
+                                                  '<th class="'+background_tables+'" hidden>Importe Descuento $</th>'+
                                                   '<th class="customercolortheadth" hidden>Ieps %</th>'+
                                                   '<th class="'+background_tables+'" hidden>Traslado Ieps $</th>'+
                                                   '<th class="'+background_tables+'">SubTotal $</th>'+
@@ -2269,7 +2927,9 @@ function alta(){
                                                   '<th class="customercolortheadth" hidden>Retención Ieps %</th>'+
                                                   '<th class="'+background_tables+'" hidden>Retención Ieps $</th>'+
                                                   '<th class="'+background_tables+'">Total $</th>'+
-                                                  '<th class="customercolortheadth">Partida</th>'+
+                                                  '<th class="customercolortheadth">Material Peligroso</th>'+
+                                                  '<th class="customercolortheadth">Peso en KG</th>'+
+                                                  '<th class="customercolortheadth">Moneda</th>'+
                                                   '<th class="customercolortheadth">ClaveProducto</th>'+
                                                   '<th class="'+background_tables+'">Nombre ClaveProducto</th>'+
                                                   '<th class="customercolortheadth">ClaveUnidad</th>'+
@@ -2289,20 +2949,6 @@ function alta(){
                               '<textarea class="form-control inputnextdet inputnextdetfac" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
                           '</div>'+ 
                           '<div class="col-md-3">'+
-                              '<table class="table table-striped table-hover">'+
-                                  '<tr>'+
-                                      '<td class="tdmod">Total Nota</td>'+
-                                      '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="totalnota" id="totalnota" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                  '</tr>'+
-                                  '<tr>'+
-                                      '<td class="tdmod">Descuentos</td>'+
-                                      '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="descuentofacturas" id="descuentofacturas" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                  '</tr>'+
-                                  '<tr>'+
-                                      '<td class="tdmod">Diferencia</td>'+
-                                      '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="diferencia" id="diferencia" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                  '</tr>'+
-                              '</table>'+
                           '</div>'+
                           '<div class="col-md-3">'+
                               '<table class="table table-striped table-hover">'+
@@ -2310,7 +2956,7 @@ function alta(){
                                       '<td class="tdmod">Importe</td>'+
                                       '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="importe" id="importe" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
                                   '</tr>'+
-                                  '<tr>'+
+                                  '<tr hidden>'+
                                       '<td class="tdmod">Descuento</td>'+
                                       '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="descuento" id="descuento" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
                                   '</tr>'+

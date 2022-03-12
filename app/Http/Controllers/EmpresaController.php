@@ -234,6 +234,7 @@ class EmpresaController extends ConfiguracionSistemaController{
             'PedirObligatoriamenteReferenciaEnRemisiones' => $request->pedirobligatoriamentereferenciarnremisiones,
             'PedirObligatoriamenteOrdenServicioEnRemisiones' => $request->pedirobligatoriamenteordenservicioenremisiones,
             'PedirObligatoriamenteEquipoEnRemisiones' => $request->pedirobligatoriamenteequipoenremisiones,
+            'GenerarFormatoRequisicionTYT' => $request->generarformatorequisiciontyt
         ]);
         return response()->json($request->all());
     }

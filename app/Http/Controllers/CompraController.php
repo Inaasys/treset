@@ -170,9 +170,17 @@ class CompraController extends ConfiguracionSistemaController{
     }
     //obtener tipos ordenes de compra
     public function compras_obtener_tipos_ordenes_compra(Request $request){
+        $almacen = $request->almacen;
         switch ($request->tipoalta) {
             case "GASTOS":
-                $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->where('Nombre', 'GASTOS')->get();
+                $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->where('Nombre', 'GASTOS')->orWhere('Nombre', 'CAJA CHICA')->get();
+                break;
+            case "CAJA CHICA":
+                if($almacen > 0){
+                    $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->where('Nombre', '<>', 'GASTOS')->Where('Nombre', '<>', 'TOT')->get();
+                }else{
+                    $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->where('Nombre', 'GASTOS')->orWhere('Nombre', 'CAJA CHICA')->get();
+                }
                 break;
             case "TOT":
                 $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->where('Nombre', 'TOT')->get();
@@ -444,7 +452,7 @@ class CompraController extends ConfiguracionSistemaController{
             $codigoabuscar = $request->codigoabuscar;
             $numeroalmacen = $request->numeroalmacen;
             $tipooperacion = $request->tipooperacion;
-            switch ($request->tipo) {
+            switch ($request->tipoalta) {
                 case "GASTOS":
                     $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->where('TipoProd', 'GASTOS');
                     break;
@@ -475,7 +483,7 @@ class CompraController extends ConfiguracionSistemaController{
     //obtener producto por codigo
     public function compras_obtener_producto_por_codigo(Request $request){
         $codigoabuscar = $request->codigoabuscar;
-        switch ($request->tipo) {
+        switch ($request->tipoalta) {
             case "GASTOS":
                 $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('TipoProd', 'GASTOS')->count();
                 break;
@@ -486,7 +494,7 @@ class CompraController extends ConfiguracionSistemaController{
                 $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('TipoProd', '<>', 'GASTOS')->Where('TipoProd', '<>', 'TOT')->count();
         } 
         if($contarproductos > 0){
-            switch ($request->tipo) {
+            switch ($request->tipoalta) {
                 case "GASTOS":
                     $producto = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('TipoProd', 'GASTOS')->first();
                     break;
@@ -568,7 +576,11 @@ class CompraController extends ConfiguracionSistemaController{
                                             $query->where('Status', 'POR SURTIR')
                                             ->orWhere('Status', 'BACKORDER');
                                         })
-                                        ->where('Tipo', 'GASTOS')
+                                        ->where(function ($query) {
+                                            $query->where('Tipo', 'GASTOS')
+                                            ->orWhere('Tipo', 'CAJA CHICA');
+                                        })
+                                        ->where('Almacen', 0)
                                         ->orderBy('Folio', 'DESC')
                                         ->get();
                     break;
@@ -592,6 +604,7 @@ class CompraController extends ConfiguracionSistemaController{
                                         })
                                         ->where('Tipo', '<>', 'GASTOS')
                                         ->where('Tipo', '<>', 'TOT')
+                                        ->where('Almacen', '>', 0)
                                         ->orderBy('Folio', 'DESC')
                                         ->get();
             } 
@@ -778,7 +791,7 @@ class CompraController extends ConfiguracionSistemaController{
             $Compra->Serie=$request->serie;
             $Compra->Folio=$folio;
             $Compra->Proveedor=$request->numeroproveedor;
-            switch ($request->tipo){
+            switch ($request->tipocompra){
                 case "TOT":
                     $Compra->Movimiento="TOT";
                     break;
@@ -997,6 +1010,27 @@ class CompraController extends ConfiguracionSistemaController{
                         $UltimaPartida++;
                         break;
                     case "GASTOS":
+                        break;
+                    case "CAJA CHICA":
+                        if($request->numeroalmacen > 0){
+                            //sumar existencias al almacen
+                            $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
+                            if($ContarExistenciaAlmacen > 0){
+                                    $ExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
+                                    $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias + $request->cantidadpartida [$key];
+                                    Existencia::where('Codigo', $codigoproductopartida)
+                                                ->where('Almacen', $request->numeroalmacen)
+                                                ->update([
+                                                    'Existencias' => Helpers::convertirvalorcorrecto($ExistenciaNuevaAlmacen)
+                                                ]);
+                            }else{
+                                    $ExistenciaAlmacen = new Existencia;
+                                    $ExistenciaAlmacen->Codigo = $codigoproductopartida;
+                                    $ExistenciaAlmacen->Almacen = $request->numeroalmacen;
+                                    $ExistenciaAlmacen->Existencias = $request->cantidadpartida [$key];
+                                    $ExistenciaAlmacen->save();
+                            }  
+                        }
                         break;
                     default:
                         //sumar existencias al almacen
@@ -1222,6 +1256,22 @@ class CompraController extends ConfiguracionSistemaController{
             case "GASTOS":
                 $nuevaexistencia = $request->cantidadpartida;
                 break;
+            case "CAJA CHICA":
+                if($compra->Almacen > 0){
+                    $existencias = Existencia::select('Existencias')->where('Codigo', $request->codigopartida)->where('Almacen', $request->almacen)->first();
+                    $compra = $request->folio.'-'.$request->serie;
+                    $detallecompra = CompraDetalle::where('Compra', $compra)->where('Codigo', $request->codigopartida)->count();
+                    $nuevaexistencia = 0;
+                    if($detallecompra > 0){
+                        $detallecompra = CompraDetalle::where('Compra', $compra)->where('Codigo', $request->codigopartida)->first();
+                        $nuevaexistencia = $existencias->Existencias + $detallecompra->Cantidad;
+                    }else{
+                        $nuevaexistencia = $existencias->Existencias;
+                    }
+                }else{
+                    $nuevaexistencia = $request->cantidadpartida;
+                }
+                break;
             default:
                 $existencias = Existencia::select('Existencias')->where('Codigo', $request->codigopartida)->where('Almacen', $request->almacen)->first();
                 $compra = $request->folio.'-'.$request->serie;
@@ -1334,6 +1384,18 @@ class CompraController extends ConfiguracionSistemaController{
                             break;
                         case "GASTOS":
                             break;
+                        case "CAJA CHICA":
+                            if($request->numeroalmacen > 0){
+                                //restar existencias a almacen principal
+                                $RestarExistenciaAlmacen = Existencia::where('Codigo', $explode_d[1])->where('Almacen', $request->numeroalmacen)->first();
+                                $RestarExistenciaNuevaAlmacen = $RestarExistenciaAlmacen->Existencias - $detallecompra->Cantidad;
+                                Existencia::where('Codigo', $explode_d[1])
+                                            ->where('Almacen', $request->numeroalmacen)
+                                            ->update([
+                                                'Existencias' => Helpers::convertirvalorcorrecto($RestarExistenciaNuevaAlmacen)
+                                            ]);
+                            }
+                            break;
                         default:
                             //restar existencias a almacen principal
                             $RestarExistenciaAlmacen = Existencia::where('Codigo', $explode_d[1])->where('Almacen', $request->numeroalmacen)->first();
@@ -1363,6 +1425,13 @@ class CompraController extends ConfiguracionSistemaController{
                     break;
                 case "GASTOS";
                     $movimiento="GASTOS";
+                    break;
+                case "CAJA CHICA";
+                    if($request->numeroalmacen > 0){
+                        $movimiento="ALMACEN".$request->numeroalmacen;
+                    }else{
+                        $movimiento="GASTOS";
+                    }
                     break;
                 default:
                     $movimiento="ALMACEN".$request->numeroalmacen;
@@ -1534,6 +1603,27 @@ class CompraController extends ConfiguracionSistemaController{
                             break;
                         case "GASTOS":
                             break;
+                        case "CAJA CHICA":
+                            if($request->numeroalmacen > 0){
+                                //sumar existencias al almacen
+                                $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
+                                if($ContarExistenciaAlmacen > 0){
+                                        $ExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
+                                        $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias + $request->cantidadpartida [$key];
+                                        Existencia::where('Codigo', $codigoproductopartida)
+                                                    ->where('Almacen', $request->numeroalmacen)
+                                                    ->update([
+                                                        'Existencias' => Helpers::convertirvalorcorrecto($ExistenciaNuevaAlmacen)
+                                                    ]);
+                                }else{
+                                        $ExistenciaAlmacen = new Existencia;
+                                        $ExistenciaAlmacen->Codigo = $codigoproductopartida;
+                                        $ExistenciaAlmacen->Almacen = $request->numeroalmacen;
+                                        $ExistenciaAlmacen->Existencias = $request->cantidadpartida [$key];
+                                        $ExistenciaAlmacen->save();
+                                }  
+                            }
+                            break;
                         default:
                             //sumar existencias al almacen
                             $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
@@ -1638,6 +1728,29 @@ class CompraController extends ConfiguracionSistemaController{
                             break;
                         case "GASTOS":
                             break;
+                        case "CAJA CHICA":
+                            if($request->numeroalmacen > 0){
+                                //restar existencias del almacen 
+                                $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
+                                if($ContarExistenciaAlmacen > 0){
+                                    $ExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
+                                    $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias - $request->cantidadpartidadb [$key];
+                                    Existencia::where('Codigo', $codigoproductopartida)
+                                                ->where('Almacen', $request->numeroalmacen)
+                                                ->update([
+                                                    'Existencias' => Helpers::convertirvalorcorrecto($ExistenciaNuevaAlmacen)
+                                                ]);
+                                }
+                                //sumar existencias a almacen principal
+                                $SumarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
+                                $SumarExistenciaNuevaAlmacen = $SumarExistenciaAlmacen->Existencias + $request->cantidadpartida [$key];
+                                Existencia::where('Codigo', $codigoproductopartida)
+                                            ->where('Almacen', $request->numeroalmacen)
+                                            ->update([
+                                                'Existencias' => Helpers::convertirvalorcorrecto($SumarExistenciaNuevaAlmacen)
+                                            ]); 
+                            }
+                            break;
                         default:
                             //restar existencias del almacen 
                             $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
@@ -1738,6 +1851,20 @@ class CompraController extends ConfiguracionSistemaController{
                     break;
                 case "GASTOS":
                     break;
+                case "CAJA CHICA":
+                    if($comprabaja->Almacen > 0){
+                        $ContarExistenciaAlmacen = Existencia::where('Codigo', $detallecomprabaja->Codigo)->where('Almacen', $comprabaja->Almacen)->count();
+                        if($ContarExistenciaAlmacen > 0){
+                            $existencias = Existencia::select('Existencias')->where('Codigo', $detallecomprabaja->Codigo)->where('Almacen', $comprabaja->Almacen)->first();
+                            $existenciascodigo = $existencias->Existencias;
+                        }else{
+                            $existenciascodigo = 0;
+                        }
+                        if($detallecomprabaja->Cantidad > $existenciascodigo){
+                            $numerodetallesconexistenciasinsuficientes++;
+                        }
+                    }
+                    break;
                 default:
                     $ContarExistenciaAlmacen = Existencia::where('Codigo', $detallecomprabaja->Codigo)->where('Almacen', $comprabaja->Almacen)->count();
                     if($ContarExistenciaAlmacen > 0){
@@ -1830,6 +1957,18 @@ class CompraController extends ConfiguracionSistemaController{
                     $eliminarrefacciones = OrdenTrabajoDetalle::where('Compra', $request->compradesactivar)->where('Codigo', $detalle->Codigo)->forceDelete();
                     break;
                 case "GASTOS":
+                    break;
+                case "CAJA CHICA":
+                    if($Compra->Almacen > 0){
+                        //restar existencias al almacen
+                        $ExistenciaAlmacen = Existencia::where('Codigo', $detalle->Codigo)->where('Almacen', $Compra->Almacen)->first();
+                        $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias-$detalle->Cantidad;
+                        Existencia::where('Codigo', $detalle->Codigo)
+                                    ->where('Almacen', $Compra->Almacen)
+                                    ->update([
+                                        'Existencias' => Helpers::convertirvalorcorrecto($ExistenciaNuevaAlmacen)
+                                    ]);
+                    }
                     break;
                 default:
                     //restar existencias al almacen

@@ -254,6 +254,7 @@
         var pedirobligatoriamentereferenciarnremisiones = '{{$empresa->PedirObligatoriamenteReferenciaEnRemisiones}}';
         var pedirobligatoriamenteordenservicioenremisiones = '{{$empresa->PedirObligatoriamenteOrdenServicioEnRemisiones}}';
         var pedirobligatoriamenteequipoenremisiones = '{{$empresa->PedirObligatoriamenteEquipoEnRemisiones}}';
+        var generarformatorequisiciontyt = '{{$empresa->GenerarFormatoRequisicionTYT}}';
         var urlpdfsimpresionesrapidas = '{{asset("xml_descargados/")}}/';
         var remisiones_obtener = '{!!URL::to('remisiones_obtener')!!}';
         var remisiones_descargar_plantilla = '{!!URL::to('remisiones_descargar_plantilla')!!}';
@@ -284,6 +285,7 @@
         var remisiones_verificar_baja = '{!!URL::to('remisiones_verificar_baja')!!}';
         var remisiones_alta_o_baja = '{!!URL::to('remisiones_alta_o_baja')!!}'; 
         var remisiones_obtener_remision = '{!!URL::to('remisiones_obtener_remision')!!}'; 
+        var remisiones_generar_formato_req_tyt_en_modificacion_remision = '{!!URL::to('remisiones_generar_formato_req_tyt_en_modificacion_remision')!!}'; 
         var remisiones_guardar_modificacion = '{!!URL::to('remisiones_guardar_modificacion')!!}';
         var remisiones_obtener_datos_generales = '{!!URL::to('remisiones_obtener_datos_generales')!!}';
         var remisiones_guardar_modificacion_datos_generales = '{!!URL::to('remisiones_guardar_modificacion_datos_generales')!!}';

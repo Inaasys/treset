@@ -1283,8 +1283,8 @@ class FacturaController extends ConfiguracionSistemaController{
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm remisionpartida" name="remisionpartida[]"  value="" readonly></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm cartaportepartida" name="cartaportepartida[]"  value="" readonly></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm ordenpartida" name="ordenpartida[]"  value="'.$detalle->Orden.'" readonly></td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm departamentopartida" name="departamentopartida[]"  value="SERVICIO" readonly></td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm cargopartida" name="cargopartida[]"  value="SERVICIO" readonly></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm departamentopartida" name="departamentopartida[]"  value="'.$detalle->Departamento.'" readonly></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm cargopartida" name="cargopartida[]"  value="'.$detalle->Cargo.'" readonly></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm partida" name="partida[]" value="'.$detalle->Item.'" readonly></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm tiendapartida" name="tiendapartida[]"  value="" readonly></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm pedidopartida" name="pedidopartida[]"  value="" readonly></td>'.
@@ -1826,7 +1826,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                     '<td class="tdmod"><div class="numeropartida">'.$partida.'</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$df->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$df->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$df->Codigo.'</b></td>'.
-                    '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($df->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($df->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);">'.htmlspecialchars($df->Descripcion, ENT_QUOTES).'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="'.$df->Unidad.'" required data-parsley-length="[1, 5]">'.$df->Unidad.'</td>'.
                     '<td class="tdmod">'.
                         '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($df->Cantidad).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" readonly>'.
@@ -2048,11 +2048,11 @@ class FacturaController extends ConfiguracionSistemaController{
         //detalles
         foreach ($request->codigopartida as $key => $codigopartida){  
             //modificar detalle
-            FacturaDetalle::where('Factura', $factura)
+            /*FacturaDetalle::where('Factura', $factura)
                             ->where('Item', $request->itempartida [$key])
                             ->update([
                                 'Descripcion' => $request->descripcionpartida [$key]
-                            ]);               
+                            ]);    */           
         }
         //detalles documentos
         if($request->numerofilasuuid > 0){

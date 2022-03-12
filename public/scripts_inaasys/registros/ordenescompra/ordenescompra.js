@@ -174,14 +174,14 @@ $("#btnenviarpartidasexcel").on('click', function(e){
   for (var i = 0; i < lista.length; i++) {
     arraycodigospartidas.push(lista[i].value);
   }
-  var tipo = $("#tipo").val();
+  var tipoalta = $("#tipoalta").val();
   var partidasexcel = $('#partidasexcel')[0].files[0];
   var form_data = new FormData();
   form_data.append('partidasexcel', partidasexcel); 
   form_data.append('contadorproductos', contadorproductos);
   form_data.append('contadorfilas', contadorfilas);
   form_data.append('arraycodigospartidas', arraycodigospartidas);
-  form_data.append('tipo', tipo);
+  form_data.append('tipoalta', tipoalta);
   $.ajax({
     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
     url:ordenes_compra_cargar_partidas_excel,
@@ -212,8 +212,8 @@ $("#btnenviarpartidasexcel").on('click', function(e){
   });                      
 });
 //obtener tipos ordenes de compra
-function obtenertiposordenescompra(tipoalta){
-  $.get(ordenes_compra_obtener_tipos_ordenes_compra, {tipoalta:tipoalta}, function(select_tipos_ordenes_compra){
+function obtenertiposordenescompra(tipoalta, almacen){
+  $.get(ordenes_compra_obtener_tipos_ordenes_compra, {tipoalta:tipoalta, almacen:almacen}, function(select_tipos_ordenes_compra){
     $("#tipo").html(select_tipos_ordenes_compra);
   })  
 }
@@ -661,7 +661,7 @@ function listarproductos(){
         d.codigoabuscar = $("#codigoabuscar").val();
         d.tipooperacion = $("#tipooperacion").val();
         d.numeroalmacen = $("#numeroalmacen").val();
-        d.tipo = $("#tipo").val();
+        d.tipoalta = $("#tipoalta").val();
       }
     },
     columns: [
@@ -695,9 +695,9 @@ function listarproductos(){
 function obtenerproductoporcodigo(){
   var codigoabuscar = $("#codigoabuscar").val();
   var tipooperacion = $("#tipooperacion").val();
-  var tipo = $("#tipo").val();
+  var tipoalta = $("#tipoalta").val();
   if(codigoabuscar != ""){
-    $.get(ordenes_compra_obtener_producto_por_codigo,{codigoabuscar:codigoabuscar,tipo:tipo}, function(data){
+    $.get(ordenes_compra_obtener_producto_por_codigo,{codigoabuscar:codigoabuscar,tipoalta:tipoalta}, function(data){
       if(parseInt(data.contarproductos) > 0){
         agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, tipooperacion);
       }else{
@@ -822,7 +822,7 @@ function obtenerproductoporcodigo(){
           //colocar autocomplette off  todo el formulario
           $(".form-control").attr('autocomplete','off');
           $("#codigo").val(codigoabuscar);
-          obtenertipos(tipo);
+          obtenertipos(tipoalta);
           $("#ModalFormularioProducto").modal('show');
           $("#ModalFormularioProducto").css('overflow', 'auto');
           $("#ModalFormulario").modal('hide');
@@ -894,9 +894,9 @@ function obtenerproductoporcodigo(){
   }
 }
 //obtener tipos prod
-function obtenertipos(tipo){
+function obtenertipos(tipoalta){
   var select_tipos_ordenes_compra = "";
-  switch (tipo) {
+  switch (tipoalta) {
     case "GASTOS":
         select_tipos_ordenes_compra = select_tipos_ordenes_compra + "<option value='GASTOS' selected>GASTOS</option>";
         break;
@@ -1578,6 +1578,7 @@ function alta(tipoalta){
                   '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" data-parsley-length="[0, 10]" required readonly>'+
                   '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
                   '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
+                  '<input type="hidden" class="form-control" name="tipoalta" id="tipoalta" value="'+tipoalta+'" readonly>'+
                 '</div>'+  
                 '<div class="col-md-2">'+
                   '<label>Plazo Días (proveedor)</label>'+
@@ -1752,8 +1753,21 @@ function alta(tipoalta){
   $('[data-toggle="tooltip"]').tooltip({
     container: 'body'
   });
+
+  //verificar que tipo de alta se realizara genera existencias
+  switch (tipoalta) {
+    case 'GASTOS':
+      var generaexistencias = 0;
+      break;
+    case 'TOT':
+      var generaexistencias = 0;
+      break;
+    default:
+      var generaexistencias = 1;
+  }
+
   obtenultimonumero();
-  obtenertiposordenescompra(tipoalta);
+  obtenertiposordenescompra(tipoalta, generaexistencias);
   asignarfechaactual();
   //reiniciar los contadores
   contadorproductos=0;
@@ -2113,6 +2127,7 @@ function obtenerdatos(ordenmodificar){
                     '<input type="hidden" class="form-control" name="serie" id="serie"  data-parsley-length="[0, 10]" required readonly>'+
                     '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion"  readonly>'+
                     '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
+                    '<input type="hidden" class="form-control" name="tipoalta" id="tipoalta" value="" readonly>'+
                   '</div>'+  
                   '<div class="col-md-2">'+
                     '<label>Plazo Días (proveedor)</label>'+
@@ -2305,6 +2320,32 @@ function obtenerdatos(ordenmodificar){
         $("#btnobteneralmacenes").hide();
         $("#busquedaordenestrabajo").hide();
         break;
+      case 'CAJA CHICA':
+        if(data.ordencompra.Almacen > 0){
+          $("#numeroalmacen").val(data.almacen.Numero);
+          $("#numeroalmacenanterior").val(data.almacen.Numero);
+          $("#almacen").val(data.almacen.Nombre);
+          if(data.almacen.Nombre != null){
+            $("#textonombrealmacen").html(data.almacen.Nombre.substring(0, 60));
+          }
+          //activar busqueda
+          $('#numeroalmacen').on('keypress', function(e) {
+            //recomentable para mayor compatibilidad entre navegadores.
+            var code = (e.keyCode ? e.keyCode : e.which);
+            if(code==13){
+              obteneralmacenpornumero();
+            }
+          });
+          $("#busquedaordenestrabajo").hide();
+        }else{
+          //desabilitar almacen
+          $("#numeroalmacen").val(0).attr('readonly', 'readonly');
+          $("#numeroalmacenanterior").val(0).attr('readonly', 'readonly');
+          $("#almacen").val(0).attr('readonly', 'readonly');
+          $("#btnobteneralmacenes").hide();
+          $("#busquedaordenestrabajo").hide();
+        }
+        break;
       case 'TOT':
         //colocar required a campo orden
         $("#ordentrabajo").val(data.ordencompra.OrdenTrabajo).attr('required', 'required').addClass('inputnext');
@@ -2432,7 +2473,7 @@ function obtenerdatos(ordenmodificar){
     //btnCopyText.addEventListener('click', () => copyEl(elText));
     btnCopyTable.addEventListener('dblclick', () => copyEl(elTable));
     //fin copias tabla detalles modulo
-    obtenertiposordenescompra(data.ordencompra.Tipo);
+    obtenertiposordenescompra(data.ordencompra.Tipo, data.ordencompra.Almacen);
     seleccionartipoordencompra(data);
   }).fail( function() {
     msj_errorajax();

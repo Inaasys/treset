@@ -173,7 +173,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             $data = Proveedor::where('Status', 'ALTA')->orderBy("Numero", "DESC")->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarproveedor('.$data->Numero.',\''.$data->Nombre .'\','.$data->Plazo.',\''.$data->Rfc .'\')">Seleccionar</div>';
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarproveedor('.$data->Numero.',\''.$data->Nombre .'\','.$data->Plazo.',\''.$data->Rfc .'\',\''.$data->SolicitarXML .'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->rawColumns(['operaciones'])
@@ -187,6 +187,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
         $nombre = '';
         $plazo = '';
         $rfc = '';
+        $SolicitarXML = 0;
         $existeproveedor = Proveedor::where('Numero', $request->numeroproveedor)->where('Status', 'ALTA')->count();
         if($existeproveedor > 0){
             $proveedor = Proveedor::where('Numero', $request->numeroproveedor)->where('Status', 'ALTA')->first();
@@ -194,12 +195,14 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             $nombre = $proveedor->Nombre;
             $plazo = $proveedor->Plazo;
             $rfc = $proveedor->Rfc;
+            $SolicitarXML = $proveedor->SolicitarXML;
         }
         $data = array(
             'numero' => $numero,
             'nombre' => $nombre,
             'plazo' => $plazo,
-            'rfc' => $rfc
+            'rfc' => $rfc,
+            'SolicitarXML' => $SolicitarXML
         );
         return response()->json($data); 
     }
@@ -609,8 +612,9 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
     public function notas_credito_proveedor_guardar(Request $request){
         ini_set('max_input_vars','20000' );
         $uuid=$request->uuid;
+        $solicitarxml=$request->solicitarxml;
 	    $ExisteUUID = NotaProveedor::where('UUID', $uuid )->where('Status', '<>', 'BAJA')->first();
-	    if($ExisteUUID == true){
+	    if($ExisteUUID == true && $solicitarxml == 1){
 	        $NotaProveedor = 1;
 	    }else{  
             //obtener el ultimo id de la tabla
@@ -623,7 +627,13 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             $NotaProveedor->Folio=$folio;
             $NotaProveedor->Proveedor=$request->numeroproveedor;
             $NotaProveedor->Fecha=Carbon::parse($request->fecha)->toDateTimeString();
-            $NotaProveedor->UUID=$request->uuid;
+            if($solicitarxml == 1){
+                $NotaProveedor->UUID=$request->uuid;
+                $NotaProveedor->FechaEmitida=$request->fechaemitida;
+            }else{
+                $NotaProveedor->UUID="N/A";
+                $NotaProveedor->FechaEmitida=Helpers::fecha_exacta_accion_datetimestring();
+            }
             $NotaProveedor->NotaProveedor=$request->notaproveedor;
             $NotaProveedor->Almacen=$request->numeroalmacen; 
             $NotaProveedor->Importe=$request->importe;
@@ -638,7 +648,6 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             $NotaProveedor->Obs=$request->observaciones;
             $NotaProveedor->Moneda=$request->moneda;
             $NotaProveedor->TipoCambio=$request->pesosmoneda;
-            $NotaProveedor->FechaEmitida=$request->fechaemitida;
             $NotaProveedor->EmisorRfc=$request->emisorrfc;
             $NotaProveedor->EmisorNombre=$request->emisornombre;
             $NotaProveedor->ReceptorRfc=$request->receptorrfc;

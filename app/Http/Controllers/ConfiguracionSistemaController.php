@@ -69,7 +69,8 @@ class ConfiguracionSistemaController extends Controller
                                             'ValidarUtilidadNegativa',
                                             'PedirObligatoriamenteReferenciaEnRemisiones',
                                             'PedirObligatoriamenteOrdenServicioEnRemisiones',
-                                            'PedirObligatoriamenteEquipoEnRemisiones')
+                                            'PedirObligatoriamenteEquipoEnRemisiones',
+                                            'GenerarFormatoRequisicionTYT')
                                 ->where('Numero', 1)->first();
         //actualizar datos de configuracion global
         config(['app.periodoincialmodulos' => $this->empresa->Periodo_Inicial_Modulos]);

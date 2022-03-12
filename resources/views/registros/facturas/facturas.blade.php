@@ -375,7 +375,6 @@
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var urlpdfsimpresionesrapidas = '{{asset("xml_descargados/")}}/';
         var urliconossistema = '{{asset("images/")}}/';
-
         var pedirobligatoriamenteobservacionenfactura = '{{$empresa->PedirObligatoriamenteObservacionEnFactura}}';
         var validarutilidadnegativa = '{{$validarutilidadnegativa}}';
         var facturas_obtener = '{!!URL::to('facturas_obtener')!!}';

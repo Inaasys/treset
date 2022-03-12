@@ -49,6 +49,7 @@ function setvaluesselects(){
     $("input[name=pedirobligatoriamentereferenciarnremisiones][value='"+pedirobligatoriamentereferenciarnremisiones+"']").prop("checked",true);  
     $("input[name=pedirobligatoriamenteordenservicioenremisiones][value='"+pedirobligatoriamenteordenservicioenremisiones+"']").prop("checked",true);  
     $("input[name=pedirobligatoriamenteequipoenremisiones][value='"+pedirobligatoriamenteequipoenremisiones+"']").prop("checked",true);  
+    $("input[name=generarformatorequisiciontyt][value='"+generarformatorequisiciontyt+"']").prop("checked",true);      
 }
 //obtener ususarios que pueden modificar insumos en remisiones
 function obtenerusuarios(){

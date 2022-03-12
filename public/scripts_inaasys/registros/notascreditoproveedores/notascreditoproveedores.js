@@ -301,11 +301,11 @@ function obtenerproveedores(){
     //seleccionar registro al dar doble click
     $('#tbllistadoproveedor tbody').on('dblclick', 'tr', function () {
       var data = tprov.row( this ).data();
-      seleccionarproveedor(data.Numero, data.Nombre, data.Plazo, data.Rfc);
+      seleccionarproveedor(data.Numero, data.Nombre, data.Plazo, data.Rfc, data.SolicitarXML);
     });
 } 
 //seleccionar proveedor
-function seleccionarproveedor(Numero, Nombre, Plazo, Rfc){
+function seleccionarproveedor(Numero, Nombre, Plazo, Rfc, SolicitarXML){
   var numeroproveedoranterior = $("#numeroproveedoranterior").val();
   var numeroproveedor = Numero;
   if(numeroproveedoranterior != numeroproveedor){
@@ -316,6 +316,15 @@ function seleccionarproveedor(Numero, Nombre, Plazo, Rfc){
       $("#textonombreproveedor").html(Nombre.substring(0, 40));
     }
     $("#rfcproveedor").val(Rfc);
+
+
+    if(parseInt(SolicitarXML) == 0){
+      $("#emisornombre").val(Nombre);
+      $("#emisorrfc").val(Rfc);
+    }
+
+
+    $("#solicitarxml").val(SolicitarXML);
     mostrarformulario();
   }
 }
@@ -685,7 +694,12 @@ function obtenerproveedorpornumero(){
         if(data.nombre != null){
           $("#textonombreproveedor").html(data.nombre.substring(0, 40));
         }
-        $("#rfcproveedor").val(data.rfc);
+        $("#rfcproveedor").val(data.rfc);    
+        if(parseInt(data.SolicitarXML) == 0){
+          $("#emisornombre").val(data.nombre);
+          $("#emisorrfc").val(data.rfc);
+        }
+        $("#solicitarxml").val(data.SolicitarXML);
         mostrarformulario();
       }) 
     }
@@ -1236,6 +1250,7 @@ function alta(){
                                         '<input type="hidden" class="form-control" name="numerofilascompras" id="numerofilascompras" readonly>'+
                                         '<input type="hidden" class="form-control" name="tipodetalles" id="tipodetalles" readonly>'+
                                         '<input type="hidden" class="form-control" name="diferenciatotales" id="diferenciatotales" readonly required>'+
+                                        '<input type="hidden" class="form-control" name="solicitarxml" id="solicitarxml" readonly>'+
                                     '</div>'+  
                                     '<div class="col-md-4">'+
                                         '<label>Proveedor  <span class="label label-danger" id="textonombreproveedor"></span></label>'+
@@ -1335,12 +1350,12 @@ function alta(){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Receptor R.F.C.</label>'+
-                                        '<input type="hidden" class="form-control" name="rfcempresa" id="rfcempresa"  value="'+rfcempresa+'" required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
-                                        '<input type="text" class="form-control inputnexttabem" name="receptorrfc" id="receptorrfc"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                        '<input type="hidden" class="form-control" name="rfcempresa" id="rfcempresa"  value="'+rfcreceptor+'" required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                        '<input type="text" class="form-control inputnexttabem" name="receptorrfc" id="receptorrfc" value="'+rfcreceptor+'" required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Receptor Nombre</label>'+
-                                        '<input type="text" class="form-control inputnexttabem" name="receptornombre" id="receptornombre" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnexttabem" name="receptornombre" id="receptornombre" value="'+nombrereceptor+'" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
@@ -1797,6 +1812,16 @@ function calculartotal(){
   $("#retencioniva").val(number_format(round(retencioniva, numerodecimales), numerodecimales, '.', ''));
   $("#retencionisr").val(number_format(round(retencionisr, numerodecimales), numerodecimales, '.', ''));
   $("#retencionieps").val(number_format(round(retencionieps, numerodecimales), numerodecimales, '.', ''));
+
+  var solicitarxml = $("#solicitarxml").val();
+  if(solicitarxml == 0){
+    $("#importexml").val(number_format(round(importe, numerodecimales), numerodecimales, '.', ''));
+    $("#descuentoxml").val(number_format(round(descuento, numerodecimales), numerodecimales, '.', ''));
+    $("#subtotalxml").val(number_format(round(subtotal, numerodecimales), numerodecimales, '.', ''));
+    $("#ivaxml").val(number_format(round(iva, numerodecimales), numerodecimales, '.', ''));
+    $("#totalxml").val(number_format(round(total, numerodecimales), numerodecimales, '.', ''));
+  }
+
   //machar totales factura proveedor y note de credito
   var totalxml = $("#totalxml").val();
   if(parseFloat(total) > parseFloat(totalxml)){
@@ -1935,7 +1960,6 @@ function comprobarexistenciaspartida(almacen, codigopartida, folio, serie, strin
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
   e.preventDefault();
-  
   var formData = new FormData($("#formparsley")[0]);
   var form = $("#formparsley");
   if (form.parsley().isValid()){

@@ -582,6 +582,18 @@
                                                                     </div>
                                                                 </td>
                                                             </tr>
+                                                            <tr>
+                                                                <td class="col-md-2">Remisiones</td>
+                                                                <td class="col-md-5">Generar Formato de Requisición TYT</td>
+                                                                <td class="col-md-4">
+                                                                    <div class="col-md-12 form-check">
+                                                                        <input type="radio" name="generarformatorequisiciontyt" id="generarformatorequisiciontyt" value="S">
+                                                                        <label for="generarformatorequisiciontyt">SI</label>
+                                                                        <input type="radio" name="generarformatorequisiciontyt" id="generarformatorequisiciontyt1" value="N">
+                                                                        <label for="generarformatorequisiciontyt1">NO</label>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1021,6 +1033,7 @@
         var mostrarinsumoporpartidaenremisiones = '{{$empresa->MostrarInsumoPorPartidaEnCapturaDeRemisiones}}';
         var modificarconsecutivofolioenremisiones = '{{$empresa->ModificarConsecutivoFolioEnRemisiones}}';
         var validarutilidadnegativa = '{{$empresa->ValidarUtilidadNegativa}}';
+        var generarformatorequisiciontyt = '{{$empresa->GenerarFormatoRequisicionTYT}}';
         var empresa_obtener_usuarios_a_modificar_insumos = '{!!URL::to('empresa_obtener_usuarios_a_modificar_insumos')!!}';
         var empresa_obtener_usuarios_a_modificar_costos_productos = '{!!URL::to('empresa_obtener_usuarios_a_modificar_costos_productos')!!}';
         var empresa_obtener_paises = '{!!URL::to('empresa_obtener_paises')!!}';

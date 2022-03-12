@@ -54,11 +54,11 @@
                                     </div>
                                     <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
                                         <label>Fecha Inicial</label>
-                                        <input type="date" class="form-control" name="fechainicialreporte" id="fechainicialreporte" onchange="generar_reporte()" required>
+                                        <input type="date" class="form-control" name="fechainicialreporte" id="fechainicialreporte" required>
                                     </div>  
                                     <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
                                         <label>Fecha Final</label>
-                                        <input type="date" class="form-control" name="fechafinalreporte" id="fechafinalreporte" onchange="generar_reporte()" required>
+                                        <input type="date" class="form-control" name="fechafinalreporte" id="fechafinalreporte" required>
                                     </div> 
                                     <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
                                         <label>Tipo</label>

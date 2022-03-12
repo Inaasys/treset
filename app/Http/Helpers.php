@@ -126,11 +126,26 @@ class Helpers{
         Carbon::setLocale(config('app.locale'));
         Carbon::setUTF8(true);
         setlocale(LC_TIME, 'es_Es');
-        $fecha = Carbon::parse($fechadocumento);
-        $primerdia = $fecha->firstOfMonth()->toDateString();
-        $ultimodia = $fecha->endOfMonth()->toDateString();
-        $fechamax = Carbon::parse($ultimodia)->format('Y-m-d')."T23:59";
-        $fechamin = Carbon::parse($primerdia)->format('Y-m-d')."T00:00";
+        $fechaactual = Carbon::now();
+        $fechaaltadocumento = Carbon::parse($fechadocumento);
+        if( $fechaactual->year == $fechaaltadocumento->year && $fechaactual->month == $fechaaltadocumento->month ){
+            if($fechaactual->day <= 5){
+                $ultimodiamescaptura = Carbon::now()->endOfMonth()->toDateString();
+                $fechamax = Carbon::parse($ultimodiamescaptura)->format('Y-m-d')."T23:59";
+                $primerdiamesanterior = new Carbon('first day of last month');
+                $fechamin = Carbon::parse($primerdiamesanterior)->format('Y-m-d')."T00:00";
+            }else{
+                $ultimodiamescaptura = Carbon::now()->endOfMonth()->toDateString();
+                $fechamax = Carbon::parse($ultimodiamescaptura)->format('Y-m-d')."T23:59";
+                $primerdiamescaptura = Carbon::now()->firstOfMonth()->toDateString();
+                $fechamin = Carbon::parse($primerdiamescaptura)->format('Y-m-d')."T00:00";
+            }
+        }else{
+            $ultimodiamescaptura = Carbon::parse($fechaaltadocumento)->endOfMonth()->toDateString();
+            $fechamax = Carbon::parse($ultimodiamescaptura)->format('Y-m-d')."T23:59";
+            $primerdiamescaptura = Carbon::parse($fechaaltadocumento)->firstOfMonth()->toDateString();
+            $fechamin = Carbon::parse($primerdiamescaptura)->format('Y-m-d')."T00:00";
+        }
         $data = array(
             'fechamax' => $fechamax,
             'fechamin' => $fechamin

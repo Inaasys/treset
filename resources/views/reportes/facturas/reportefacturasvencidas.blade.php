@@ -85,7 +85,7 @@
                                     </div> 
                                     <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
                                         <label>Fecha de corte</label>
-                                        <input type="date" class="form-control" name="fechacorte" id="fechacorte" onchange="generar_reporte()" required>
+                                        <input type="date" class="form-control" name="fechacorte" id="fechacorte" required>
                                     </div>  
                                     <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
                                         <label>Reporte</label>

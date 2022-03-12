@@ -391,7 +391,7 @@ function alta(){
                         '<div class="col-md-3">'+
                             '<label>Fecha Contrarecibo</label>'+
                             '<input type="datetime-local" class="form-control" name="fecha" id="fecha" onchange="asignafechapagoproveedor();" data-parsley-excluded="true" onkeydown="return false" required>'+
-                            '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="{{$periodohoy}}">'+
+                            '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                         '</div>'+
                         '<div class="col-md-3">'+
                             '<label>Fecha del Pago al Proveedor</label>'+
@@ -515,37 +515,39 @@ function allchecked(){
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
     e.preventDefault();
-    var formData = new FormData($("#formparsley")[0]);
     var form = $("#formparsley");
     if (form.parsley().isValid()){
         if($("#numerofacturas").val() == 0){
             msj_errorentradacontrarecibo();
         }else{
             $('.page-loader-wrapper').css('display', 'block');
-            $.ajax({
-                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                url:contrarecibos_guardar,
-                type: "post",
-                dataType: "html",
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                success:function(data){
-                    msj_datosguardadoscorrectamente();
-                    limpiar();
-                    ocultarmodalformulario();
-                    limpiarmodales();
-                    $('.page-loader-wrapper').css('display', 'none');
-                },
-                error:function(data){
-                    if(data.status == 403){
-                        msj_errorenpermisos();
-                    }else{
-                        msj_errorajax();
+            enviarfilasutilizadas().then(resultado=>{
+                var formData = new FormData($("#formparsley")[0]);
+                $.ajax({
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    url:contrarecibos_guardar,
+                    type: "post",
+                    dataType: "html",
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success:function(data){
+                        msj_datosguardadoscorrectamente();
+                        limpiar();
+                        ocultarmodalformulario();
+                        limpiarmodales();
+                        $('.page-loader-wrapper').css('display', 'none');
+                    },
+                    error:function(data){
+                        if(data.status == 403){
+                            msj_errorenpermisos();
+                        }else{
+                            msj_errorajax();
+                        }
+                        $('.page-loader-wrapper').css('display', 'none');
                     }
-                    $('.page-loader-wrapper').css('display', 'none');
-                }
+                })
             })
         }
     }else{
@@ -554,6 +556,23 @@ $("#btnGuardar").on('click', function (e) {
     //validar formulario
     form.parsley().validate();
 });
+//funcion asincrona para buscar existencias de la partida
+function enviarfilasutilizadas(){
+    return new Promise((ejecuta)=>{
+        setTimeout(function(){ 
+            var cuentaFilas = 0;
+            $("tr.filascompras").each(function () {
+                var contrarecibocompra  = $(".contrarecibocompra ", this).val();
+                if(parseFloat(contrarecibocompra) == parseFloat(0)){
+                    $("#filacompra"+cuentaFilas).remove();
+                }
+                cuentaFilas++;
+            }); 
+            var resultado = true;
+            return ejecuta(resultado);
+        },4000);
+    })
+}
 //verificar si la orden de compra se esta utilzando en alguna orden de compra
 function desactivar(contrarecibodesactivar){
     $.get(contrarecibos_verificar_si_continua_baja,{contrarecibodesactivar:contrarecibodesactivar}, function(data){

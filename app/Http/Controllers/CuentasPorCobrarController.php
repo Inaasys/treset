@@ -794,7 +794,11 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             if($cuentaxcobrar->Status == 'BAJA'){
                 $modificacionpermitida = 0;
             }else{
-                $modificacionpermitida = 1;
+                if($cuentaxcobrar->UUID != ""){
+                    $modificacionpermitida = 0;
+                }else{
+                    $modificacionpermitida = 1;
+                }
             }
         }
         if(Auth::user()->role_id != 1){
@@ -805,7 +809,11 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                 if($resultadofechas != ''){
                     $modificacionpermitida = 0;
                 }else{
-                    $modificacionpermitida = 1;
+                    if($cuentaxcobrar->UUID != ""){
+                        $modificacionpermitida = 0;
+                    }else{
+                        $modificacionpermitida = 1;
+                    }
                 }
             }
         }

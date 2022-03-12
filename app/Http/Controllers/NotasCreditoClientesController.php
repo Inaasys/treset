@@ -1192,7 +1192,11 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             if($notacliente->Status == 'BAJA'){
                 $modificacionpermitida = 0;
             }else{
-                $modificacionpermitida = 1;
+                if($notacliente->UUID != ""){
+                    $modificacionpermitida = 0;
+                }else{
+                    $modificacionpermitida = 1;
+                }
             }
         }
         if(Auth::user()->role_id != 1){
@@ -1203,7 +1207,11 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                 if($resultadofechas != ''){
                     $modificacionpermitida = 0;
                 }else{
-                    $modificacionpermitida = 1;
+                    if($notacliente->UUID != ""){
+                        $modificacionpermitida = 0;
+                    }else{
+                        $modificacionpermitida = 1;
+                    }
                 }
             }
         }

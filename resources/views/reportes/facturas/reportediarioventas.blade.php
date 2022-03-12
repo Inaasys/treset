@@ -38,7 +38,7 @@
                                 <div class="row">
                                     <div class="col-md-2">
                                         <label>Fecha Final Reporte</label>
-                                        <input type="date" class="form-control" name="fechafinalreporte" id="fechafinalreporte" onchange="realizar_reporte()" required>
+                                        <input type="date" class="form-control" name="fechafinalreporte" id="fechafinalreporte"  required>
                                     </div>  
                                     <div class="col-md-2">
                                         <label>Objetivo Mensual en Pesos</label>

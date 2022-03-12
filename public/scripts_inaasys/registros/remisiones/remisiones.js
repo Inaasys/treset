@@ -155,6 +155,10 @@ function listar(){
                 $(".inputbusquedageneral").val(""); 
               }
           });
+          //esconder opcion de generar formato tyt segun la sucursal
+          if(generarformatorequisiciontyt == 'S'){
+            $(".operaciongenerarformatoreqtyt").show();
+          }
         }
     });
     //modificacion al dar doble click
@@ -1120,9 +1124,11 @@ function cambiodecantidadpartida(fila,tipo){
                 }
                 $("#filaproducto"+fila+" .cantidadpartida").attr('data-parsley-existencias',dataparsleymax);
                 $('.cantidadpartida', this).parsley().validate();
+                $("#filaproducto"+fila+" .utilidadpartida").attr('data-parsley-utilidad', '0.'+numerocerosconfiguradosinputnumberstep);
             }else{
                 $("#filaproducto"+fila+" .cantidadpartida").removeAttr('data-parsley-existencias');
                 $('.cantidadpartida', this).parsley().validate();
+                $("#filaproducto"+fila+" .utilidadpartida").removeAttr('data-parsley-utilidad');
             }
         })
     }  
@@ -1407,6 +1413,27 @@ function renumerarfilas(){
     lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculardescuentopesospartida("+i+')');
   }
 }  
+//generar formato tyt
+function actualizarurlexportarformatoreqtyt(){
+    var arraycodigosformatoreqtyt = new Array();   
+    $("tr.filasproductos").each(function () {
+        var arraydatoscodigosformatoreqtyt = new Array();   
+        var insumopartida = $('.insumopartida', this).val();
+        var codigoproductopartida = $('.codigoproductopartida', this).val();
+        var descripcionproductopartida = $('.descripcionproductopartida', this).val();
+        var cantidadpartida = $('.cantidadpartida', this).val();
+        arraydatoscodigosformatoreqtyt.push(insumopartida,codigoproductopartida,descripcionproductopartida,cantidadpartida);
+        arraycodigosformatoreqtyt.push(arraydatoscodigosformatoreqtyt);
+    });
+    var referencia = $("#referencia").val();
+    var ordenservicio = $("#ordenservicio").val();
+    var equipo = $("#equipo").val();
+    var fecha = $("#fecha").val();
+    $.get(remisiones_generar_formato_req_tyt_en_modificacion_remision, {arraycodigosformatoreqtyt:arraycodigosformatoreqtyt, referencia:referencia, ordenservicio:ordenservicio, equipo:equipo, fecha:fecha}, function(data){
+        $('#pdfiframe').attr("src", urlpdfsimpresionesrapidas+data);
+        setTimeout(function(){imprimirdirecto();},500);  
+    }) 
+}
 //alta
 function alta(){
   $("#titulomodal").html('Alta Remisión');
@@ -1546,11 +1573,11 @@ function alta(){
                                 '<label>Referencia</label>'+
                                 '<input type="text" class="form-control inputnexttabpe" name="referencia" id="referencia" onkeyup="tipoLetra(this);"  data-parsley-length="[1, 50]" autocomplete="off">'+
                             '</div>'+
-                            '<div class="col-md-3">'+
+                            '<div class="col-md-2">'+
                                 '<label>Orden Servicio</label>'+
                                 '<input type="text" class="form-control inputnexttabpe" name="ordenservicio" id="ordenservicio" onkeyup="tipoLetra(this);"  data-parsley-length="[1, 20]" autocomplete="off">'+
                             '</div>'+
-                            '<div class="col-md-3">'+
+                            '<div class="col-md-2">'+
                                 '<label>Equipo </label>'+
                                 '<input type="text" class="form-control inputnexttabpe" name="equipo" id="equipo" onkeyup="tipoLetra(this);"  data-parsley-length="[1, 20]" autocomplete="off">'+
                             '</div>'+
@@ -1574,6 +1601,10 @@ function alta(){
                                         '</td>'+
                                     '</tr>'+    
                                 '</table>'+
+                            '</div>'+
+                            '<div class="col-md-2" id="divbtngenerarformatoreqtyt" hidden>'+
+                                '<label>Generar Formato REQ TYT</label>'+
+                                '<div class="btn bg-blue waves-effect" id="btngenerarformatoreqtyt" onclick="actualizarurlexportarformatoreqtyt()">Generar Formato REQ TYT</div>'+
                             '</div>'+
                         '</div>'+
                     '</div>'+
@@ -1766,6 +1797,14 @@ function alta(){
         $("#revisioninsumosottab").hide();
         $("#tabrevisioninsumosottab").hide();
     }
+    /*
+    //ocultar o mostrar btoon para generar formato de req tyt
+    if(generarformatorequisiciontyt == 'S'){
+        $("#divbtngenerarformatoreqtyt").show();
+    }else{
+        $("#divbtngenerarformatoreqtyt").hide();
+    }
+    */
     //mostrar mensaje de bajar plantilla
     $('[data-toggle="tooltip"]').tooltip({
       container: 'body'
@@ -2147,16 +2186,14 @@ function obtenerdatos(remisionmodificar){
                                 '<label>Referencia</label>'+
                                 '<input type="text" class="form-control inputnexttabpe" name="referencia" id="referencia" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                             '</div>'+
-                            '<div class="col-md-3">'+
+                            '<div class="col-md-2">'+
                                 '<label>Orden Servicio</label>'+
                                 '<input type="text" class="form-control inputnexttabpe" name="ordenservicio" id="ordenservicio" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]" autocomplete="off">'+
                             '</div>'+
-                            '<div class="col-md-3">'+
+                            '<div class="col-md-2">'+
                                 '<label>Equipo </label>'+
                                 '<input type="text" class="form-control inputnexttabpe" name="equipo" id="equipo" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]" autocomplete="off">'+
                             '</div>'+
-
-
                             '<div class="col-md-3">'+
                                 '<label>Requisición</label>'+
                                 '<table class="col-md-12">'+
@@ -2178,8 +2215,10 @@ function obtenerdatos(remisionmodificar){
                                     '</tr>'+    
                                 '</table>'+
                             '</div>'+
-
-
+                            '<div class="col-md-2" id="divbtngenerarformatoreqtyt" hidden>'+
+                                '<label>Generar Formato REQ TYT</label>'+
+                                '<div class="btn bg-blue waves-effect" id="btngenerarformatoreqtyt" onclick="actualizarurlexportarformatoreqtyt()">Generar Formato REQ TYT</div>'+
+                            '</div>'+
                         '</div>'+
                     '</div>'+
                     '<div role="tabpanel" class="tab-pane fade" id="revisioninsumosottab">'+
@@ -2349,6 +2388,14 @@ function obtenerdatos(remisionmodificar){
         $("#revisioninsumosottab").hide();
         $("#tabrevisioninsumosottab").hide();
     }
+    /*
+    //ocultar o mostrar btoon para generar formato de req tyt
+    if(generarformatorequisiciontyt == 'S'){
+        $("#divbtngenerarformatoreqtyt").show();
+    }else{
+        $("#divbtngenerarformatoreqtyt").hide();
+    }
+    */
     $("#periodohoy").val(data.remision.Periodo);
     $("#folio").val(data.remision.Folio);
     $("#serie").val(data.remision.Serie);

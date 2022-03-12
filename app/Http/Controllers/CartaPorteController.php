@@ -36,10 +36,11 @@ Use App\Existencia;
 use App\ClaveProdServ;
 use App\ClaveUnidad;
 use App\Configuracion_Tabla;
-use App\VistaNotaCreditoCliente;
+use App\VistaCartaPorte;
 use App\VistaObtenerExistenciaProducto;
 use App\FolioComprobanteTraslado;
 use App\Comprobante;
+use App\c_ConfiguracionAutoTransporte;
 use Config;
 use Mail;
 use Facturapi\Facturapi;
@@ -50,21 +51,6 @@ class CartaPorteController extends ConfiguracionSistemaController{
 
     public function __construct(){
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
-        //CONFIGURACIONES DE LA TABLA DEL CATALOGO O MODULO//
-        $this->configuracion_tabla = Configuracion_Tabla::where('tabla', 'NotasCreditoCliente')->first();
-        $this->campos_consulta = [];
-        foreach (explode(",", $this->configuracion_tabla->columnas_ordenadas) as $campo){
-            array_push($this->campos_consulta, $campo);
-        }
-        //campos vista
-        $this->camposvista = [];
-        foreach (explode(",", $this->configuracion_tabla->campos_activados) as $campo){
-            array_push($this->camposvista, $campo);
-        }
-        foreach (explode(",", $this->configuracion_tabla->campos_desactivados) as $campo){
-            array_push($this->camposvista, $campo);
-        }
-        //FIN CONFIGURACIONES DE LA TABLA//
         //API FACTURAPI 
         $this->facturapi = new Facturapi( config('app.keyfacturapi') ); //
     }
@@ -80,7 +66,8 @@ class CartaPorteController extends ConfiguracionSistemaController{
             $serieusuario = $FolioComprobanteTraslado->Serie;
             $esquema = $FolioComprobanteTraslado->Esquema;
         }
-        $configuracion_tabla = $this->configuracion_tabla;
+        $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('CartaPorte', Auth::user()->id);
+        $configuracion_tabla = $configuraciones_tabla['configuracion_tabla'];
         $rutaconfiguraciontabla = route('notas_credito_clientes_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('notas_credito_clientes_exportar_excel');
         $rutacreardocumento = route('notas_credito_clientes_generar_pdfs');
@@ -95,23 +82,23 @@ class CartaPorteController extends ConfiguracionSistemaController{
         return view('registros.cartasporte.cartasporte', compact('serieusuario','esquema','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','rutacreardocumento','lugarexpedicion','claveregimenfiscal','regimenfiscal'));
     }
 
-    public function notas_credito_clientes_obtener(Request $request){
+    public function carta_porte_obtener(Request $request){
         if($request->ajax()){
+            $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('CartaPorte', Auth::user()->id);
             $fechahoy = Carbon::now()->toDateString();
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
-            //$data = VistaNotaCreditoCliente::select($this->campos_consulta)->where('Periodo', $periodo)->orderBy('Fecha', 'DESC')->orderBy('Serie', 'ASC')->orderBy('Folio', 'DESC')->get();
-            $data = VistaNotaCreditoCliente::select($this->campos_consulta)->where('Periodo', $periodo);
+            $data = VistaCartaPorte::select($configuraciones_tabla['campos_consulta'])->where('Periodo', $periodo);
             return DataTables::of($data)
                     ->order(function ($query) {
-                        if($this->configuracion_tabla->primerordenamiento != 'omitir'){
-                            $query->orderBy($this->configuracion_tabla->primerordenamiento, '' . $this->configuracion_tabla->formaprimerordenamiento . '');
+                        if($configuraciones_tabla['configuracion_tabla']->primerordenamiento != 'omitir'){
+                            $query->orderBy($configuraciones_tabla['configuracion_tabla']->primerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formaprimerordenamiento . '');
                         }
-                        if($this->configuracion_tabla->segundoordenamiento != 'omitir'){
-                            $query->orderBy($this->configuracion_tabla->segundoordenamiento, '' . $this->configuracion_tabla->formasegundoordenamiento . '');
+                        if($configuraciones_tabla['configuracion_tabla']->segundoordenamiento != 'omitir'){
+                            $query->orderBy($configuraciones_tabla['configuracion_tabla']->segundoordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formasegundoordenamiento . '');
                         }
-                        if($this->configuracion_tabla->tercerordenamiento != 'omitir'){
-                            $query->orderBy($this->configuracion_tabla->tercerordenamiento, '' . $this->configuracion_tabla->formatercerordenamiento . '');
+                        if($configuraciones_tabla['configuracion_tabla']->tercerordenamiento != 'omitir'){
+                            $query->orderBy($configuraciones_tabla['configuracion_tabla']->tercerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formatercerordenamiento . '');
                         }
                     })
                     ->addColumn('operaciones', function($data){
@@ -134,6 +121,9 @@ class CartaPorteController extends ConfiguracionSistemaController{
                     ->addColumn('SubTotal', function($data){ return $data->SubTotal; })
                     ->addColumn('Iva', function($data){ return $data->Iva; })
                     ->addColumn('Total', function($data){ return $data->Total; })
+                    ->addColumn('Abonos', function($data){ return $data->Abonos; })
+                    ->addColumn('Descuentos', function($data){ return $data->Descuentos; })
+                    ->addColumn('Saldo', function($data){ return $data->Saldo; })
                     ->addColumn('ImpLocTraslados', function($data){ return $data->ImpLocTraslados; })
                     ->addColumn('ImpLocRetenciones', function($data){ return $data->ImpLocRetenciones; })
                     ->addColumn('IepsRetencion', function($data){ return $data->IepsRetencion; })
@@ -143,19 +133,43 @@ class CartaPorteController extends ConfiguracionSistemaController{
                     ->addColumn('Descuento', function($data){ return $data->Descuento; })
                     ->addColumn('Importe', function($data){ return $data->Importe; })
                     ->addColumn('TipoCambio', function($data){ return $data->TipoCambio; })
+                    ->addColumn('Costo', function($data){ return $data->Costo; })
+                    ->addColumn('Comision', function($data){ return $data->Comision; })
+                    ->addColumn('Utilidad', function($data){ return $data->Utilidad; })
+                    ->addColumn('TotalDistanciaRecorrida', function($data){ return $data->TotalDistanciaRecorrida; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
     }
 
     //obtener ultimo folio
-    public function notas_credito_clientes_obtener_ultimo_folio(Request $request){
-        $folio = Helpers::ultimofolioserietablamodulos('App\NotaCliente', $request->serie);
+    public function carta_porte_obtener_obtener_ultimo_folio(Request $request){
+        $folio = Helpers::ultimofolioserietablamodulos('App\CartaPorte', $request->serie);
+        return response()->json($folio);
+    }
+
+    //obtener folios notas
+    public function carta_porte_obtener_folios_fiscales(Request $request){
+        if($request->ajax()){
+            $data = FolioComprobanteTraslado::where('Status', 'ALTA')->OrderBy('Numero', 'DESC')->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarfoliofiscal(\''.$data->Serie.'\',\''.$data->Esquema.'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+    
+    //obtener datos folio seleccionado
+    public function carta_porte_obtener_ultimo_folio_serie_seleccionada(Request $request){
+        $folio = Helpers::ultimofolioserietablamodulos('App\CartaPorte', $request->Serie);
         return response()->json($folio);
     }
 
     //obtener clientes
-    public function notas_credito_clientes_obtener_clientes(Request $request){
+    public function carta_porte_obtener_clientes(Request $request){
         if($request->ajax()){
             //$data = Cliente::where('Status', 'ALTA')->orderBy("Numero", "DESC")->get();
             $data = DB::table('Clientes as c')
@@ -163,13 +177,13 @@ class CartaPorteController extends ConfiguracionSistemaController{
             ->leftJoin('c_MetodoPago as mp', 'mp.Clave', '=', 'c.MetodoPago')
             ->leftJoin('c_UsoCFDI as uc', 'uc.Clave', '=', 'c.UsoCfdi')
             ->leftJoin('c_Pais as p', 'p.Clave', '=', 'c.Pais')
-            ->select('c.Numero', 'c.Nombre', 'c.Plazo', 'c.Rfc', 'c.Agente', 'c.Credito', 'c.Saldo', 'c.Status', 'c.Municipio', 'c.Tipo', 'fp.Clave AS ClaveFormaPago', 'fp.Nombre AS NombreFormaPago', 'mp.Clave AS ClaveMetodoPago', 'mp.Nombre AS NombreMetodoPago', 'uc.Clave AS ClaveUsoCfdi', 'uc.Nombre AS NombreUsoCfdi', 'p.Clave AS ClavePais', 'p.Nombre AS NombrePais')
+            ->select('c.Numero', 'c.Nombre', 'c.Plazo', 'c.Rfc', 'c.Agente', 'c.Credito', 'c.Saldo', 'c.Status', 'c.Municipio', 'c.Tipo', 'fp.Clave AS ClaveFormaPago', 'fp.Nombre AS NombreFormaPago', 'mp.Clave AS ClaveMetodoPago', 'mp.Nombre AS NombreMetodoPago', 'uc.Clave AS ClaveUsoCfdi', 'uc.Nombre AS NombreUsoCfdi', 'p.Clave AS ClavePais', 'p.Nombre AS NombrePais', 'c.Calle', 'c.NoExterior', 'c.NoInterior', 'c.Colonia', 'c.Localidad', 'c.Referencia', 'c.Municipio', 'c.Estado', 'c.CodigoPostal')
             ->where('c.Status', 'ALTA')
             ->orderBy("Numero", "DESC")
             ->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarcliente('.$data->Numero.',\''.$data->Nombre .'\','.$data->Plazo.',\''.$data->Rfc.'\',\''.$data->ClaveFormaPago.'\',\''.$data->NombreFormaPago.'\',\''.$data->ClaveMetodoPago.'\',\''.$data->NombreMetodoPago.'\',\''.$data->ClaveUsoCfdi.'\',\''.$data->NombreUsoCfdi.'\',\''.$data->ClavePais.'\',\''.$data->NombrePais.'\')">Seleccionar</div>';
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarcliente('.$data->Numero.',\''.$data->Nombre .'\','.$data->Plazo.',\''.$data->Rfc.'\',\''.$data->ClaveFormaPago.'\',\''.$data->NombreFormaPago.'\',\''.$data->ClaveMetodoPago.'\',\''.$data->NombreMetodoPago.'\',\''.$data->ClaveUsoCfdi.'\',\''.$data->NombreUsoCfdi.'\',\''.$data->ClavePais.'\',\''.$data->NombrePais.'\',\''.$data->Calle.'\',\''.$data->NoExterior.'\',\''.$data->NoInterior.'\',\''.$data->Colonia.'\',\''.$data->Localidad.'\',\''.$data->Referencia.'\',\''.$data->Municipio.'\',\''.$data->Estado.'\',\''.$data->CodigoPostal.'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->rawColumns(['operaciones'])
@@ -178,7 +192,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
     }
 
     //obtener cliente por numero
-    public function notas_credito_clientes_obtener_cliente_por_numero(Request $request){
+    public function carta_porte_obtener_cliente_por_numero(Request $request){
         $numero = '';
         $nombre = '';
         $rfc = '';
@@ -193,6 +207,15 @@ class CartaPorteController extends ConfiguracionSistemaController{
         $usocfdi = '';
         $claveresidenciafiscal = '';
         $residenciafiscal = '';
+        $calle = '';
+        $noexterior = '';
+        $nointerior = '';
+        $colonia = '';
+        $localidad = '';
+        $referencia = '';
+        $municipio = '';
+        $estado = '';
+        $codigopostal = '';
         $existecliente = Cliente::where('Numero', $request->numerocliente)->where('Status', 'ALTA')->count();
         if($existecliente > 0){
             $cliente = Cliente::where('Numero', $request->numerocliente)->where('Status', 'ALTA')->first();
@@ -201,7 +224,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             ->leftJoin('c_MetodoPago as mp', 'mp.Clave', '=', 'c.MetodoPago')
             ->leftJoin('c_UsoCFDI as uc', 'uc.Clave', '=', 'c.UsoCfdi')
             ->leftJoin('c_Pais as p', 'p.Clave', '=', 'c.Pais')
-            ->select('c.Numero', 'c.Status', 'fp.Clave AS claveformapago', 'fp.Nombre AS formapago', 'mp.Clave AS clavemetodopago', 'mp.Nombre AS metodopago', 'uc.Clave AS claveusocfdi', 'uc.Nombre AS usocfdi', 'p.Clave AS claveresidenciafiscal', 'p.Nombre AS residenciafiscal')
+            ->select('c.Numero', 'c.Status', 'fp.Clave AS claveformapago', 'fp.Nombre AS formapago', 'mp.Clave AS clavemetodopago', 'mp.Nombre AS metodopago', 'uc.Clave AS claveusocfdi', 'uc.Nombre AS usocfdi', 'p.Clave AS claveresidenciafiscal', 'p.Nombre AS residenciafiscal', 'c.Calle', 'c.NoExterior', 'c.NoInterior', 'c.Colonia', 'c.Localidad', 'c.Referencia', 'c.Municipio', 'c.Estado', 'c.CodigoPostal')
             ->where('c.Numero', $request->numerocliente)
             ->where('c.Status', 'ALTA')
             ->get();
@@ -219,6 +242,15 @@ class CartaPorteController extends ConfiguracionSistemaController{
             $plazo = $cliente->Plazo;
             $credito = Helpers::convertirvalorcorrecto($cliente->Credito);
             $saldo = Helpers::convertirvalorcorrecto($cliente->Saldo);
+            $calle = $datos[0]->Calle;
+            $noexterior = $datos[0]->NoExterior;
+            $nointerior = $datos[0]->NoInterior;
+            $colonia = $datos[0]->Colonia;
+            $localidad = $datos[0]->Localidad;
+            $referencia = $datos[0]->Referencia;
+            $municipio = $datos[0]->Municipio;
+            $estado = $datos[0]->Estado;
+            $codigopostal = $datos[0]->CodigoPostal;
         }
         $data = array(
             'numero' => $numero,
@@ -235,8 +267,93 @@ class CartaPorteController extends ConfiguracionSistemaController{
             'usocfdi' => $usocfdi,
             'claveresidenciafiscal' => $claveresidenciafiscal,
             'residenciafiscal' => $residenciafiscal,
+            'calle' => $calle,
+            'noexterior' => $noexterior,
+            'nointerior' => $nointerior,
+            'colonia' => $colonia,
+            'localidad' => $localidad,
+            'referencia' => $referencia,
+            'municipio' => $municipio,
+            'estado' => $estado,
+            'codigopostal' => $codigopostal,
         );
         return response()->json($data);
+    }
+
+    //obtener municipios
+    public function carta_porte_obtener_municipios(Request $request){
+        if($request->ajax()){
+            $tipo = $request->tipo;
+            $data = Municipio::query();
+            return DataTables::of($data)
+                ->addColumn('operaciones', function($data) use ($tipo){
+                    $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarmunicipio('.$data->Numero.',\''.$data->Nombre .'\',\''.$tipo.'\')">Seleccionar</div>';
+                    return $boton;
+                })
+                ->rawColumns(['operaciones'])
+                ->make(true);
+        }
+    }
+
+    //obtener est
+    public function carta_porte_obtener_estados(Request $request){
+        if($request->ajax()){
+            $tipo = $request->tipo;
+            $data = Estado::query();
+            return DataTables::of($data)
+                ->addColumn('operaciones', function($data) use ($tipo){
+                    $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarestado('.$data->Numero.',\''.$data->Nombre .'\',\''.$tipo.'\')">Seleccionar</div>';
+                    return $boton;
+                })
+                ->rawColumns(['operaciones'])
+                ->make(true);
+        }
+    }
+
+    //obtener pai
+    public function carta_porte_obtener_paises(Request $request){
+        if($request->ajax()){
+            $tipo = $request->tipo;
+            $data = Pais::query();
+            return DataTables::of($data)
+                ->addColumn('operaciones', function($data) use ($tipo){
+                    $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarpais('.$data->Numero.',\''.$data->Nombre .'\',\''.$tipo.'\')">Seleccionar</div>';
+                    return $boton;
+                })
+                ->rawColumns(['operaciones'])
+                ->make(true);
+        }
+    }
+
+    //obtener cp
+    public function carta_porte_obtener_codigospostales(Request $request){
+        if($request->ajax()){
+            $tipo = $request->tipo;
+            $data = CodigoPostal::query();
+            return DataTables::of($data)
+                ->addColumn('operaciones', function($data) use ($tipo){
+                    $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarcp('.$data->Numero.',\''.$data->Clave .'\',\''.$tipo.'\')">Seleccionar</div>';
+                    return $boton;
+                })
+                ->rawColumns(['operaciones'])
+                ->make(true);
+        }
+    }
+
+    //obtener config autotransporte
+    public function carta_porte_obtener_coonfiguracionesautotransporte(Request $request){
+        if($request->ajax()){
+            $tipo = $request->tipo;
+            $data = c_ConfiguracionAutoTransporte::query();
+            return DataTables::of($data)
+                ->addColumn('operaciones', function($data) use ($tipo){
+                    $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarconfigautotransporte('.$data->Numero.',\''.$data->Clave .'\',\''.$data->Descripcion.'\')">Seleccionar</div>';
+                    return $boton;
+                })
+                ->rawColumns(['operaciones'])
+                ->make(true);
+        }
+
     }
 
     //obtener almacenes

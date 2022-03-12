@@ -4,7 +4,6 @@ var form;
 //funcion que se ejecuta al inicio
 function init(){
   asignarfechaactual(); 
-  activarrelistarreporteenterfechacorte();
   listar();
 }
 //mostrar formulario
@@ -20,17 +19,6 @@ function asignarfechaactual(){
   var mes = ("0" + (fechahoy.getMonth() + 1)).slice(-2);
   var hoy = fechahoy.getFullYear()+"-"+(mes)+"-"+(dia) ;
   $('#fechacorte').val(hoy);
-}
-//detectar cuando en el input de objetivo mensual cambie y se presione enter para actualizar la busqueda
-function activarrelistarreporteenterfechacorte(){
-    var fechacorte = $('#fechacorte');
-    fechacorte.unbind();
-    fechacorte.bind('keyup change', function(e) {
-        var code = (e.keyCode ? e.keyCode : e.which);
-        if(code==13){
-            generar_reporte();
-        }
-    });
 }
 //activar busquedas
 $(document).ready(function() {
@@ -59,6 +47,16 @@ $(document).ready(function() {
     //regresar numero
     $('#claveserie').on('change', function(e) {
         regresarclaveserie();
+    });
+    //cargar reporte al dar enter en las fechas
+    //activar busqueda
+    $('#fechacorte').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            generar_reporte();
+            e.preventDefault();
+        }
     });
 });
 //obtener clientes
@@ -320,7 +318,7 @@ function listar(){
     if( $('#idsaldomayor').prop('checked') ) {
         var saldomayor = 1;
     }else{
-        saldomayor = 0;
+        var saldomayor = 0;
     }
     var campos_tabla  = [];
     var cabecerastablareporte = "";

@@ -216,6 +216,16 @@
         var campos_busquedas = '{{$configuracion_tabla->campos_busquedas}}';
         var rfcempresa = '{{$empresa->Rfc}}';
         var nombreempresa = '{{$empresa->Nombre}}';
+        var calleempresa = '{{$empresa->Calle}}';
+        var noexteriorempresa = '{{$empresa->NoExterior}}';
+        var nointeriorempresa = '{{$empresa->NoInterior}}';
+        var coloniaempresa = '{{$empresa->Colonia}}';
+        var localidadempresa = '{{$empresa->Localidad}}';
+        var referenciaempresa = '{{$empresa->Referencia}}';
+        var municipioempresa = '{{$empresa->Municipio}}';
+        var estadoempresa = '{{$empresa->Estado}}';
+        var paisempresa = '{{$empresa->Pais}}';
+        var cpempresa = '{{$empresa->LugarExpedicion}}';
         var lugarexpedicion = '{{$lugarexpedicion}}';
         var claveregimenfiscal = '{{$claveregimenfiscal}}';
         var regimenfiscal = '{{$regimenfiscal}}';
@@ -224,11 +234,22 @@
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';       
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
-        var notas_credito_clientes_obtener = '{!!URL::to('notas_credito_clientes_obtener')!!}';
-        var notas_credito_clientes_obtener_ultimo_folio = '{!!URL::to('notas_credito_clientes_obtener_ultimo_folio')!!}';
+        var carta_porte_obtener = '{!!URL::to('carta_porte_obtener')!!}';
+        var carta_porte_obtener_obtener_ultimo_folio = '{!!URL::to('carta_porte_obtener_obtener_ultimo_folio')!!}';
         var ordenes_compra_obtener_fecha_actual_datetimelocal = '{!!URL::to('ordenes_compra_obtener_fecha_actual_datetimelocal')!!}';
-        var notas_credito_clientes_obtener_clientes = '{!!URL::to('notas_credito_clientes_obtener_clientes')!!}';
-        var notas_credito_clientes_obtener_cliente_por_numero = '{!!URL::to('notas_credito_clientes_obtener_cliente_por_numero')!!}';
+        var carta_porte_obtener_folios_fiscales = '{!!URL::to('carta_porte_obtener_folios_fiscales')!!}';
+        var carta_porte_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('carta_porte_obtener_ultimo_folio_serie_seleccionada')!!}';
+        var carta_porte_obtener_clientes = '{!!URL::to('carta_porte_obtener_clientes')!!}';
+        var carta_porte_obtener_cliente_por_numero = '{!!URL::to('carta_porte_obtener_cliente_por_numero')!!}';
+        var carta_porte_obtener_municipios = '{!!URL::to('carta_porte_obtener_municipios')!!}';
+        var carta_porte_obtener_estados = '{!!URL::to('carta_porte_obtener_estados')!!}';
+        var carta_porte_obtener_paises = '{!!URL::to('carta_porte_obtener_paises')!!}';
+        var carta_porte_obtener_codigospostales = '{!!URL::to('carta_porte_obtener_codigospostales')!!}';
+
+
+        var carta_porte_obtener_coonfiguracionesautotransporte = '{!!URL::to('carta_porte_obtener_coonfiguracionesautotransporte')!!}';
+
+
         var notas_credito_clientes_obtener_almacenes = '{!!URL::to('notas_credito_clientes_obtener_almacenes')!!}';
         var notas_credito_clientes_obtener_almacen_por_numero = '{!!URL::to('notas_credito_clientes_obtener_almacen_por_numero')!!}';
         var notas_credito_clientes_obtener_codigos_postales = '{!!URL::to('notas_credito_clientes_obtener_codigos_postales')!!}';
@@ -253,8 +274,6 @@
         var notas_credito_clientes_obtener_claves_unidades = '{!!URL::to('notas_credito_clientes_obtener_claves_unidades')!!}';
         var notas_credito_clientes_obtener_datos_almacen  = '{!!URL::to('notas_credito_clientes_obtener_datos_almacen')!!}';
         var notas_credito_cliente_comprobar_cantidad_nota_vs_cantidad_factura = '{!!URL::to('notas_credito_cliente_comprobar_cantidad_nota_vs_cantidad_factura')!!}';
-        var notas_credito_clientes_obtener_folios_fiscales = '{!!URL::to('notas_credito_clientes_obtener_folios_fiscales')!!}';
-        var notas_credito_clientes_obtener_ultimo_folio_serie_seleccionada = '{!!URL::to('notas_credito_clientes_obtener_ultimo_folio_serie_seleccionada')!!}';
         var notas_credito_clientes_guardar = '{!!URL::to('notas_credito_clientes_guardar')!!}';
         var notas_credito_clientes_verificar_si_continua_baja = '{!!URL::to('notas_credito_clientes_verificar_si_continua_baja')!!}';
         var notas_credito_clientes_alta_o_baja = '{!!URL::to('notas_credito_clientes_alta_o_baja')!!}'; 

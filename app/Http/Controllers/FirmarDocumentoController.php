@@ -397,26 +397,28 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
         $item = 1;
         $existenfirmas = 0; 
         foreach ($request->tipodocumentopartida as $key => $tipodocumentopartida){  
-            $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
-                                                            ->where('Documento',$request->documentopartida [$key])
-                                                            ->where('ReferenciaPosicion',$request->titulofirmapartida [$key])
-                                                            ->where('IdUsuario',Auth::user()->id)
-                                                            ->where('Status', 'ALTA')
-                                                            ->count();
-            if($existefirmaendocumento == 0){
-                $Firma_Rel_Documento=new Firma_Rel_Documento;
-                $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
-                $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
-                $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
-                $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
-                $Firma_Rel_Documento->ReferenciaPosicion = $request->titulofirmapartida [$key];
-                $Firma_Rel_Documento->Status = "ALTA";
-                $Firma_Rel_Documento->Usuario = Auth::user()->user;
-                $Firma_Rel_Documento->Periodo =  $this->periodohoy;
-                $Firma_Rel_Documento->save();
-                $item++;
-            }else{
-                $existenfirmas++;
+            foreach($request->titulofirmapartida as $titulofirma){
+                $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
+                                                                ->where('Documento',$request->documentopartida [$key])
+                                                                ->where('ReferenciaPosicion',$titulofirma)
+                                                                ->where('IdUsuario',Auth::user()->id)
+                                                                ->where('Status', 'ALTA')
+                                                                ->count();
+                if($existefirmaendocumento == 0){
+                    $Firma_Rel_Documento=new Firma_Rel_Documento;
+                    $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
+                    $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
+                    $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
+                    $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
+                    $Firma_Rel_Documento->ReferenciaPosicion = $titulofirma;
+                    $Firma_Rel_Documento->Status = "ALTA";
+                    $Firma_Rel_Documento->Usuario = Auth::user()->user;
+                    $Firma_Rel_Documento->Periodo =  $this->periodohoy;
+                    $Firma_Rel_Documento->save();
+                    $item++;
+                }else{
+                    $existenfirmas++;
+                }
             }
         }
     	return response()->json($existenfirmas); 
@@ -427,26 +429,28 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
         $item = 1;
         $existenfirmas = 0; 
         foreach ($request->tipodocumentopartida as $key => $tipodocumentopartida){  
-            $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
-                                                            ->where('Documento',$request->documentopartida [$key])
-                                                            ->where('ReferenciaPosicion',$request->titulofirmapartida [$key])
-                                                            ->where('IdUsuario',Auth::user()->id)
-                                                            ->where('Status', 'ALTA')
-                                                            ->count();
-            if($existefirmaendocumento == 0){
-                $Firma_Rel_Documento=new Firma_Rel_Documento;
-                $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
-                $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
-                $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
-                $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
-                $Firma_Rel_Documento->ReferenciaPosicion = $request->titulofirmapartida [$key];
-                $Firma_Rel_Documento->Status = "ALTA";
-                $Firma_Rel_Documento->Usuario = Auth::user()->user;
-                $Firma_Rel_Documento->Periodo =  $this->periodohoy;
-                $Firma_Rel_Documento->save();
-                $item++;
-            }else{
-                $existenfirmas++;
+            foreach($request->titulofirmapartida as $titulofirma){
+                $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
+                                                                ->where('Documento',$request->documentopartida [$key])
+                                                                ->where('ReferenciaPosicion',$titulofirma)
+                                                                ->where('IdUsuario',Auth::user()->id)
+                                                                ->where('Status', 'ALTA')
+                                                                ->count();
+                if($existefirmaendocumento == 0){
+                    $Firma_Rel_Documento=new Firma_Rel_Documento;
+                    $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
+                    $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
+                    $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
+                    $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
+                    $Firma_Rel_Documento->ReferenciaPosicion = $titulofirma;
+                    $Firma_Rel_Documento->Status = "ALTA";
+                    $Firma_Rel_Documento->Usuario = Auth::user()->user;
+                    $Firma_Rel_Documento->Periodo =  $this->periodohoy;
+                    $Firma_Rel_Documento->save();
+                    $item++;
+                }else{
+                    $existenfirmas++;
+                }
             }
         }
     	return response()->json($existenfirmas); 
@@ -457,26 +461,28 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
         $item = 1;
         $existenfirmas = 0; 
         foreach ($request->tipodocumentopartida as $key => $tipodocumentopartida){  
-            $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
-                                                            ->where('Documento',$request->documentopartida [$key])
-                                                            ->where('ReferenciaPosicion',$request->titulofirmapartida [$key])
-                                                            ->where('IdUsuario',Auth::user()->id)
-                                                            ->where('Status', 'ALTA')
-                                                            ->count();
-            if($existefirmaendocumento == 0){
-                $Firma_Rel_Documento=new Firma_Rel_Documento;
-                $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
-                $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
-                $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
-                $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
-                $Firma_Rel_Documento->ReferenciaPosicion = $request->titulofirmapartida [$key];
-                $Firma_Rel_Documento->Status = "ALTA";
-                $Firma_Rel_Documento->Usuario = Auth::user()->user;
-                $Firma_Rel_Documento->Periodo =  $this->periodohoy;
-                $Firma_Rel_Documento->save();
-                $item++;
-            }else{
-                $existenfirmas++;
+            foreach($request->titulofirmapartida as $titulofirma){
+                $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
+                                                                ->where('Documento',$request->documentopartida [$key])
+                                                                ->where('ReferenciaPosicion',$titulofirma)
+                                                                ->where('IdUsuario',Auth::user()->id)
+                                                                ->where('Status', 'ALTA')
+                                                                ->count();
+                if($existefirmaendocumento == 0){
+                    $Firma_Rel_Documento=new Firma_Rel_Documento;
+                    $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
+                    $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
+                    $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
+                    $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
+                    $Firma_Rel_Documento->ReferenciaPosicion = $titulofirma;
+                    $Firma_Rel_Documento->Status = "ALTA";
+                    $Firma_Rel_Documento->Usuario = Auth::user()->user;
+                    $Firma_Rel_Documento->Periodo =  $this->periodohoy;
+                    $Firma_Rel_Documento->save();
+                    $item++;
+                }else{
+                    $existenfirmas++;
+                }
             }
         }
     	return response()->json($existenfirmas); 
@@ -487,26 +493,28 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
         $item = 1;
         $existenfirmas = 0; 
         foreach ($request->tipodocumentopartida as $key => $tipodocumentopartida){  
-            $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
-                                                            ->where('Documento',$request->documentopartida [$key])
-                                                            ->where('ReferenciaPosicion',$request->titulofirmapartida [$key])
-                                                            ->where('IdUsuario',Auth::user()->id)
-                                                            ->where('Status', 'ALTA')
-                                                            ->count();
-            if($existefirmaendocumento == 0){
-                $Firma_Rel_Documento=new Firma_Rel_Documento;
-                $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
-                $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
-                $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
-                $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
-                $Firma_Rel_Documento->ReferenciaPosicion = $request->titulofirmapartida [$key];
-                $Firma_Rel_Documento->Status = "ALTA";
-                $Firma_Rel_Documento->Usuario = Auth::user()->user;
-                $Firma_Rel_Documento->Periodo =  $this->periodohoy;
-                $Firma_Rel_Documento->save();
-                $item++;
-            }else{
-                $existenfirmas++;
+            foreach($request->titulofirmapartida as $titulofirma){
+                $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
+                                                                ->where('Documento',$request->documentopartida [$key])
+                                                                ->where('ReferenciaPosicion',$titulofirma)
+                                                                ->where('IdUsuario',Auth::user()->id)
+                                                                ->where('Status', 'ALTA')
+                                                                ->count();
+                if($existefirmaendocumento == 0){
+                    $Firma_Rel_Documento=new Firma_Rel_Documento;
+                    $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
+                    $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
+                    $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
+                    $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
+                    $Firma_Rel_Documento->ReferenciaPosicion = $titulofirma;
+                    $Firma_Rel_Documento->Status = "ALTA";
+                    $Firma_Rel_Documento->Usuario = Auth::user()->user;
+                    $Firma_Rel_Documento->Periodo =  $this->periodohoy;
+                    $Firma_Rel_Documento->save();
+                    $item++;
+                }else{
+                    $existenfirmas++;
+                }
             }
         }
     	return response()->json($existenfirmas); 
@@ -517,26 +525,28 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
         $item = 1;
         $existenfirmas = 0; 
         foreach ($request->tipodocumentopartida as $key => $tipodocumentopartida){  
-            $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
-                                                            ->where('Documento',$request->documentopartida [$key])
-                                                            ->where('ReferenciaPosicion',$request->titulofirmapartida [$key])
-                                                            ->where('IdUsuario',Auth::user()->id)
-                                                            ->where('Status', 'ALTA')
-                                                            ->count();
-            if($existefirmaendocumento == 0){
-                $Firma_Rel_Documento=new Firma_Rel_Documento;
-                $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
-                $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
-                $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
-                $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
-                $Firma_Rel_Documento->ReferenciaPosicion = $request->titulofirmapartida [$key];
-                $Firma_Rel_Documento->Status = "ALTA";
-                $Firma_Rel_Documento->Usuario = Auth::user()->user;
-                $Firma_Rel_Documento->Periodo =  $this->periodohoy;
-                $Firma_Rel_Documento->save();
-                $item++;
-            }else{
-                $existenfirmas++;
+            foreach($request->titulofirmapartida as $titulofirma){
+                $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
+                                                                ->where('Documento',$request->documentopartida [$key])
+                                                                ->where('ReferenciaPosicion',$titulofirma)
+                                                                ->where('IdUsuario',Auth::user()->id)
+                                                                ->where('Status', 'ALTA')
+                                                                ->count();
+                if($existefirmaendocumento == 0){
+                    $Firma_Rel_Documento=new Firma_Rel_Documento;
+                    $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
+                    $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
+                    $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
+                    $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
+                    $Firma_Rel_Documento->ReferenciaPosicion = $titulofirma;
+                    $Firma_Rel_Documento->Status = "ALTA";
+                    $Firma_Rel_Documento->Usuario = Auth::user()->user;
+                    $Firma_Rel_Documento->Periodo =  $this->periodohoy;
+                    $Firma_Rel_Documento->save();
+                    $item++;
+                }else{
+                    $existenfirmas++;
+                }
             }
         }
     	return response()->json($existenfirmas); 
@@ -547,26 +557,28 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
         $item = 1;
         $existenfirmas = 0; 
         foreach ($request->tipodocumentopartida as $key => $tipodocumentopartida){  
-            $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
-                                                            ->where('Documento',$request->documentopartida [$key])
-                                                            ->where('ReferenciaPosicion',$request->titulofirmapartida [$key])
-                                                            ->where('IdUsuario',Auth::user()->id)
-                                                            ->where('Status', 'ALTA')
-                                                            ->count();
-            if($existefirmaendocumento == 0){
-                $Firma_Rel_Documento=new Firma_Rel_Documento;
-                $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
-                $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
-                $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
-                $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
-                $Firma_Rel_Documento->ReferenciaPosicion = $request->titulofirmapartida [$key];
-                $Firma_Rel_Documento->Status = "ALTA";
-                $Firma_Rel_Documento->Usuario = Auth::user()->user;
-                $Firma_Rel_Documento->Periodo =  $this->periodohoy;
-                $Firma_Rel_Documento->save();
-                $item++;
-            }else{
-                $existenfirmas++;
+            foreach($request->titulofirmapartida as $titulofirma){
+                $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
+                                                                ->where('Documento',$request->documentopartida [$key])
+                                                                ->where('ReferenciaPosicion',$titulofirma)
+                                                                ->where('IdUsuario',Auth::user()->id)
+                                                                ->where('Status', 'ALTA')
+                                                                ->count();
+                if($existefirmaendocumento == 0){
+                    $Firma_Rel_Documento=new Firma_Rel_Documento;
+                    $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
+                    $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
+                    $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
+                    $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
+                    $Firma_Rel_Documento->ReferenciaPosicion = $titulofirma;
+                    $Firma_Rel_Documento->Status = "ALTA";
+                    $Firma_Rel_Documento->Usuario = Auth::user()->user;
+                    $Firma_Rel_Documento->Periodo =  $this->periodohoy;
+                    $Firma_Rel_Documento->save();
+                    $item++;
+                }else{
+                    $existenfirmas++;
+                }
             }
         }
     	return response()->json($existenfirmas); 
@@ -577,26 +589,28 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
         $item = 1;
         $existenfirmas = 0; 
         foreach ($request->tipodocumentopartida as $key => $tipodocumentopartida){  
-            $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
-                                                            ->where('Documento',$request->documentopartida [$key])
-                                                            ->where('ReferenciaPosicion',$request->titulofirmapartida [$key])
-                                                            ->where('IdUsuario',Auth::user()->id)
-                                                            ->where('Status', 'ALTA')
-                                                            ->count();
-            if($existefirmaendocumento == 0){
-                $Firma_Rel_Documento=new Firma_Rel_Documento;
-                $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
-                $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
-                $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
-                $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
-                $Firma_Rel_Documento->ReferenciaPosicion = $request->titulofirmapartida [$key];
-                $Firma_Rel_Documento->Status = "ALTA";
-                $Firma_Rel_Documento->Usuario = Auth::user()->user;
-                $Firma_Rel_Documento->Periodo =  $this->periodohoy;
-                $Firma_Rel_Documento->save();
-                $item++;
-            }else{
-                $existenfirmas++;
+            foreach($request->titulofirmapartida as $titulofirma){
+                $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
+                                                                ->where('Documento',$request->documentopartida [$key])
+                                                                ->where('ReferenciaPosicion',$titulofirma)
+                                                                ->where('IdUsuario',Auth::user()->id)
+                                                                ->where('Status', 'ALTA')
+                                                                ->count();
+                if($existefirmaendocumento == 0){
+                    $Firma_Rel_Documento=new Firma_Rel_Documento;
+                    $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
+                    $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
+                    $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
+                    $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
+                    $Firma_Rel_Documento->ReferenciaPosicion = $titulofirma;
+                    $Firma_Rel_Documento->Status = "ALTA";
+                    $Firma_Rel_Documento->Usuario = Auth::user()->user;
+                    $Firma_Rel_Documento->Periodo =  $this->periodohoy;
+                    $Firma_Rel_Documento->save();
+                    $item++;
+                }else{
+                    $existenfirmas++;
+                }
             }
         }
     	return response()->json($existenfirmas); 
@@ -608,26 +622,28 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
         $item = 1;
         $existenfirmas = 0; 
         foreach ($request->tipodocumentopartida as $key => $tipodocumentopartida){  
-            $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
-                                                            ->where('Documento',$request->documentopartida [$key])
-                                                            ->where('ReferenciaPosicion',$request->titulofirmapartida [$key])
-                                                            ->where('IdUsuario',Auth::user()->id)
-                                                            ->where('Status', 'ALTA')
-                                                            ->count();
-            if($existefirmaendocumento == 0){
-                $Firma_Rel_Documento=new Firma_Rel_Documento;
-                $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
-                $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
-                $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
-                $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
-                $Firma_Rel_Documento->ReferenciaPosicion = $request->titulofirmapartida [$key];
-                $Firma_Rel_Documento->Status = "ALTA";
-                $Firma_Rel_Documento->Usuario = Auth::user()->user;
-                $Firma_Rel_Documento->Periodo =  $this->periodohoy;
-                $Firma_Rel_Documento->save();
-                $item++;
-            }else{
-                $existenfirmas++;
+            foreach($request->titulofirmapartida as $titulofirma){
+                $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
+                                                                ->where('Documento',$request->documentopartida [$key])
+                                                                ->where('ReferenciaPosicion',$titulofirma)
+                                                                ->where('IdUsuario',Auth::user()->id)
+                                                                ->where('Status', 'ALTA')
+                                                                ->count();
+                if($existefirmaendocumento == 0){
+                    $Firma_Rel_Documento=new Firma_Rel_Documento;
+                    $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
+                    $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
+                    $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
+                    $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
+                    $Firma_Rel_Documento->ReferenciaPosicion = $titulofirma;
+                    $Firma_Rel_Documento->Status = "ALTA";
+                    $Firma_Rel_Documento->Usuario = Auth::user()->user;
+                    $Firma_Rel_Documento->Periodo =  $this->periodohoy;
+                    $Firma_Rel_Documento->save();
+                    $item++;
+                }else{
+                    $existenfirmas++;
+                }
             }
         }
     	return response()->json($existenfirmas); 
@@ -638,26 +654,28 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
         $item = 1;
         $existenfirmas = 0; 
         foreach ($request->tipodocumentopartida as $key => $tipodocumentopartida){  
-            $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
-                                                            ->where('Documento',$request->documentopartida [$key])
-                                                            ->where('ReferenciaPosicion',$request->titulofirmapartida [$key])
-                                                            ->where('IdUsuario',Auth::user()->id)
-                                                            ->where('Status', 'ALTA')
-                                                            ->count();
-            if($existefirmaendocumento == 0){
-                $Firma_Rel_Documento=new Firma_Rel_Documento;
-                $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
-                $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
-                $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
-                $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
-                $Firma_Rel_Documento->ReferenciaPosicion = $request->titulofirmapartida [$key];
-                $Firma_Rel_Documento->Status = "ALTA";
-                $Firma_Rel_Documento->Usuario = Auth::user()->user;
-                $Firma_Rel_Documento->Periodo =  $this->periodohoy;
-                $Firma_Rel_Documento->save();
-                $item++;
-            }else{
-                $existenfirmas++;
+            foreach($request->titulofirmapartida as $titulofirma){
+                $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
+                                                                ->where('Documento',$request->documentopartida [$key])
+                                                                ->where('ReferenciaPosicion',$titulofirma)
+                                                                ->where('IdUsuario',Auth::user()->id)
+                                                                ->where('Status', 'ALTA')
+                                                                ->count();
+                if($existefirmaendocumento == 0){
+                    $Firma_Rel_Documento=new Firma_Rel_Documento;
+                    $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
+                    $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
+                    $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
+                    $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
+                    $Firma_Rel_Documento->ReferenciaPosicion = $titulofirma;
+                    $Firma_Rel_Documento->Status = "ALTA";
+                    $Firma_Rel_Documento->Usuario = Auth::user()->user;
+                    $Firma_Rel_Documento->Periodo =  $this->periodohoy;
+                    $Firma_Rel_Documento->save();
+                    $item++;
+                }else{
+                    $existenfirmas++;
+                }
             }
         }
     	return response()->json($existenfirmas); 
@@ -669,26 +687,28 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
         $item = 1;
         $existenfirmas = 0; 
         foreach ($request->tipodocumentopartida as $key => $tipodocumentopartida){  
-            $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
-                                                            ->where('Documento',$request->documentopartida [$key])
-                                                            ->where('ReferenciaPosicion',$request->titulofirmapartida [$key])
-                                                            ->where('IdUsuario',Auth::user()->id)
-                                                            ->where('Status', 'ALTA')
-                                                            ->count();
-            if($existefirmaendocumento == 0){
-                $Firma_Rel_Documento=new Firma_Rel_Documento;
-                $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
-                $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
-                $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
-                $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
-                $Firma_Rel_Documento->ReferenciaPosicion = $request->titulofirmapartida [$key];
-                $Firma_Rel_Documento->Status = "ALTA";
-                $Firma_Rel_Documento->Usuario = Auth::user()->user;
-                $Firma_Rel_Documento->Periodo =  $this->periodohoy;
-                $Firma_Rel_Documento->save();
-                $item++;
-            }else{
-                $existenfirmas++;
+            foreach($request->titulofirmapartida as $titulofirma){
+                $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
+                                                                ->where('Documento',$request->documentopartida [$key])
+                                                                ->where('ReferenciaPosicion',$titulofirma)
+                                                                ->where('IdUsuario',Auth::user()->id)
+                                                                ->where('Status', 'ALTA')
+                                                                ->count();
+                if($existefirmaendocumento == 0){
+                    $Firma_Rel_Documento=new Firma_Rel_Documento;
+                    $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
+                    $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
+                    $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
+                    $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
+                    $Firma_Rel_Documento->ReferenciaPosicion = $titulofirma;
+                    $Firma_Rel_Documento->Status = "ALTA";
+                    $Firma_Rel_Documento->Usuario = Auth::user()->user;
+                    $Firma_Rel_Documento->Periodo =  $this->periodohoy;
+                    $Firma_Rel_Documento->save();
+                    $item++;
+                }else{
+                    $existenfirmas++;
+                }
             }
         }
     	return response()->json($existenfirmas); 
@@ -699,27 +719,29 @@ class FirmarDocumentoController extends ConfiguracionSistemaController{
         //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
         $item = 1;
         $existenfirmas = 0; 
-        foreach ($request->tipodocumentopartida as $key => $tipodocumentopartida){  
-            $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
-                                                            ->where('Documento',$request->documentopartida [$key])
-                                                            ->where('ReferenciaPosicion',$request->titulofirmapartida [$key])
-                                                            ->where('IdUsuario',Auth::user()->id)
-                                                            ->where('Status', 'ALTA')
-                                                            ->count();
-            if($existefirmaendocumento == 0){
-                $Firma_Rel_Documento=new Firma_Rel_Documento;
-                $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
-                $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
-                $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
-                $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
-                $Firma_Rel_Documento->ReferenciaPosicion = $request->titulofirmapartida [$key];
-                $Firma_Rel_Documento->Status = "ALTA";
-                $Firma_Rel_Documento->Usuario = Auth::user()->user;
-                $Firma_Rel_Documento->Periodo =  $this->periodohoy;
-                $Firma_Rel_Documento->save();
-                $item++;
-            }else{
-                $existenfirmas++;
+        foreach ($request->tipodocumentopartida as $key => $tipodocumentopartida){ 
+            foreach($request->titulofirmapartida as $titulofirma){ 
+                $existefirmaendocumento = Firma_Rel_Documento::where('TipoDocumento',$tipodocumentopartida)
+                                                                ->where('Documento',$request->documentopartida [$key])
+                                                                ->where('ReferenciaPosicion',$titulofirma)
+                                                                ->where('IdUsuario',Auth::user()->id)
+                                                                ->where('Status', 'ALTA')
+                                                                ->count();
+                if($existefirmaendocumento == 0){
+                    $Firma_Rel_Documento=new Firma_Rel_Documento;
+                    $Firma_Rel_Documento->TipoDocumento = $tipodocumentopartida;
+                    $Firma_Rel_Documento->Documento = $request->documentopartida [$key];
+                    $Firma_Rel_Documento->IdUsuario = Auth::user()->id;
+                    $Firma_Rel_Documento->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
+                    $Firma_Rel_Documento->ReferenciaPosicion = $titulofirma;
+                    $Firma_Rel_Documento->Status = "ALTA";
+                    $Firma_Rel_Documento->Usuario = Auth::user()->user;
+                    $Firma_Rel_Documento->Periodo =  $this->periodohoy;
+                    $Firma_Rel_Documento->save();
+                    $item++;
+                }else{
+                    $existenfirmas++;
+                }
             }
         }
     	return response()->json($existenfirmas); 

@@ -68,6 +68,19 @@ function generar_formato_excel(){
     form.parsley().validate();
   }
 }
+//activar busquedas
+$(document).ready(function() {
+    //cargar reporte al dar enter en las fechas
+    //activar busqueda
+    $('#fechafinalreporte').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+          realizar_reporte();
+            e.preventDefault();
+        }
+    });
+});
 //listar tabla reporte
 function listar(){
   tabla=$('#tbllistado').DataTable({

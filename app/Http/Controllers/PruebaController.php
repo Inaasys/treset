@@ -43,6 +43,30 @@ class PruebaController extends ConfiguracionSistemaController{
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
     }
 
+    public function migrarubicacionesproductos(Request $request){
+        
+        $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('ubicaciones1.xlsx'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 1){
+                $ExisteProducto = Producto::where('Codigo', ''.$partida[0].'' )->count();
+                if($ExisteProducto > 0){   
+                    Producto::where('Codigo', ''.$partida[0].'')
+                        ->update([
+                            //datos producto
+                            'Ubicacion' => $partida[4],
+                        ]);
+                }    
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        return response()->json($rowexcel); 
+    }
+    
+
     public function pruebaswebscraping(){
 
 
@@ -246,22 +270,25 @@ class PruebaController extends ConfiguracionSistemaController{
         foreach($partidasexcel as $partida){
             if($rowexcel > 4){
                 $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[4]))->toDateTimeString();
+                DB::unprepared('SET IDENTITY_INSERT c_ClaveProdServCP OFF');
                 DB::table('c_ClaveProdServCP')->insert(
                     [
+                        //'Numero' => $numerofila,
                         'Clave' => $partida[0], 
                         'Descripcion' => $partida[1],
                         'PalabrasSimilares' => $partida[2],
                         'MaterialPeligroso' => $partida[3],
                         'FechaDeInicioDeVigencia' => $fecha,
                         'FechaDeFinDeVigencia' => $partida[5],
-                        'Numero' => $numerofila,
                     ]
                 );
+                DB::unprepared('SET IDENTITY_INSERT c_ClaveProdServCP ON');
                 $numerofila++;
             }
             $rowexcel++;
         }
         */
+        
         /*
         //CATALOGO c_ClaveUnidadPeso
         $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('c_ClaveUnidadPeso.xls'));
@@ -271,9 +298,10 @@ class PruebaController extends ConfiguracionSistemaController{
         foreach($partidasexcel as $partida){
             if($rowexcel > 4){
                 $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[4]))->toDateTimeString();
+                DB::unprepared('SET IDENTITY_INSERT c_ClaveUnidadPeso OFF');
                 DB::table('c_ClaveUnidadPeso')->insert(
                     [
-                        'Numero' => $numerofila,
+                        //'Numero' => $numerofila,
                         'Clave' => $partida[0], 
                         'Nombre' => $partida[1],
                         'Descripcion' => $partida[2],
@@ -284,12 +312,14 @@ class PruebaController extends ConfiguracionSistemaController{
                         'Bandera' => $partida[7]
                     ]
                 );
+                DB::unprepared('SET IDENTITY_INSERT c_ClaveUnidadPeso ON');
                 $numerofila++;
             }
             $rowexcel++;
         }
         */
         /*
+        
         //CATALOGO c_ConfigAutotransporte
         $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('c_ConfigAutotransporte.xls'));
         $partidasexcel = $arrayexcel[0];
@@ -298,9 +328,10 @@ class PruebaController extends ConfiguracionSistemaController{
         foreach($partidasexcel as $partida){
             if($rowexcel > 4){
                 $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[5]))->toDateTimeString();
+                //DB::unprepared('SET IDENTITY_INSERT c_ConfigAutotransporte OFF');
                 DB::table('c_ConfigAutotransporte')->insert(
                     [
-                        'Numero' => $numerofila,
+                        //'Numero' => $numerofila,
                         'Clave' => $partida[0], 
                         'Descripcion' => $partida[1],
                         'NumeroEjes' => $partida[2],
@@ -310,6 +341,7 @@ class PruebaController extends ConfiguracionSistemaController{
                         'FechaDeFinDeVigencia' => $partida[6],
                     ]
                 );
+                //DB::unprepared('SET IDENTITY_INSERT c_ConfigAutotransporte ON');
                 $numerofila++;
             }
             $rowexcel++;
@@ -324,15 +356,17 @@ class PruebaController extends ConfiguracionSistemaController{
         foreach($partidasexcel as $partida){
             if($rowexcel > 4){
                 $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[2]))->toDateTimeString();
+                DB::unprepared('SET IDENTITY_INSERT c_CveTransporte OFF');
                 DB::table('c_CveTransporte')->insert(
                     [
-                        'Numero' => $numerofila,
+                        //'Numero' => $numerofila,
                         'Clave' => $partida[0], 
                         'Descripcion' => $partida[1],
                         'FechaDeInicioDeVigencia' => $fecha,
                         'FechaDeFinDeVigencia' => $partida[3],
                     ]
                 );
+                DB::unprepared('SET IDENTITY_INSERT c_CveTransporte ON');
                 $numerofila++;
             }
             $rowexcel++;
@@ -347,9 +381,10 @@ class PruebaController extends ConfiguracionSistemaController{
         foreach($partidasexcel as $partida){
             if($rowexcel > 4){
                 $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[6]))->toDateTimeString();
+                DB::unprepared('SET IDENTITY_INSERT c_Estaciones OFF');
                 DB::table('c_Estaciones')->insert(
                     [
-                        'Numero' => $numerofila,
+                        //'Numero' => $numerofila,
                         'Clave' => $partida[0], 
                         'Descripcion' => $partida[1],
                         'ClaveTransporte' => $partida[2],
@@ -360,6 +395,7 @@ class PruebaController extends ConfiguracionSistemaController{
                         'FechaDeFinDeVigencia' => $partida[7],
                     ]
                 );
+                DB::unprepared('SET IDENTITY_INSERT c_Estaciones ON');
                 $numerofila++;
             }
             $rowexcel++;
@@ -374,15 +410,17 @@ class PruebaController extends ConfiguracionSistemaController{
         foreach($partidasexcel as $partida){
             if($rowexcel > 4){
                 $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[2]))->toDateTimeString();
+                DB::unprepared('SET IDENTITY_INSERT c_FiguraTransporte OFF');
                 DB::table('c_FiguraTransporte')->insert(
                     [
-                        'Numero' => $numerofila,
+                        //'Numero' => $numerofila,
                         'Clave' => $partida[0], 
                         'Descripcion' => $partida[1],
                         'FechaDeInicioDeVigencia' => $fecha,
                         'FechaDeFinDeVigencia' => $partida[3],
                     ]
                 );
+                DB::unprepared('SET IDENTITY_INSERT c_FiguraTransporte ON');
                 $numerofila++;
             }
             $rowexcel++;
@@ -397,9 +435,10 @@ class PruebaController extends ConfiguracionSistemaController{
         foreach($partidasexcel as $partida){
             if($rowexcel > 4){
                 $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[5]))->toDateTimeString();
+                DB::unprepared('SET IDENTITY_INSERT c_MaterialPeligroso OFF');
                 DB::table('c_MaterialPeligroso')->insert(
                     [
-                        'Numero' => $numerofila,
+                        //'Numero' => $numerofila,
                         'Clave' => $partida[0], 
                         'Descripcion' => $partida[1],
                         'ClaseODiv' => $partida[2],
@@ -409,6 +448,7 @@ class PruebaController extends ConfiguracionSistemaController{
                         'FechaDeFinDeVigencia' => $partida[6],
                     ]
                 );
+                DB::unprepared('SET IDENTITY_INSERT c_MaterialPeligroso ON');
                 $numerofila++;
             }
             $rowexcel++;
@@ -423,15 +463,17 @@ class PruebaController extends ConfiguracionSistemaController{
         foreach($partidasexcel as $partida){
             if($rowexcel > 4){
                 $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[2]))->toDateTimeString();
+                DB::unprepared('SET IDENTITY_INSERT c_ParteTransporte OFF');
                 DB::table('c_ParteTransporte')->insert(
                     [
-                        'Numero' => $numerofila,
+                        //'Numero' => $numerofila,
                         'Clave' => $partida[0], 
                         'Descripcion' => $partida[1],
                         'FechaDeInicioDeVigencia' => $fecha,
                         'FechaDeFinDeVigencia' => $partida[3],
                     ]
                 );
+                DB::unprepared('SET IDENTITY_INSERT c_ParteTransporte ON');
                 $numerofila++;
             }
             $rowexcel++;
@@ -446,15 +488,17 @@ class PruebaController extends ConfiguracionSistemaController{
         foreach($partidasexcel as $partida){
             if($rowexcel > 4){
                 $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[2]))->toDateTimeString();
+                DB::unprepared('SET IDENTITY_INSERT c_SubTipoRem OFF');
                 DB::table('c_SubTipoRem')->insert(
                     [
-                        'Numero' => $numerofila,
+                        //'Numero' => $numerofila,
                         'Clave' => $partida[0], 
                         'RemolqueOSemiremolque' => $partida[1],
                         'FechaDeInicioDeVigencia' => $fecha,
                         'FechaDeFinDeVigencia' => $partida[3],
                     ]
                 );
+                DB::unprepared('SET IDENTITY_INSERT c_SubTipoRem ON');
                 $numerofila++;
             }
             $rowexcel++;
@@ -469,15 +513,17 @@ class PruebaController extends ConfiguracionSistemaController{
         foreach($partidasexcel as $partida){
             if($rowexcel > 4){
                 $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[2]))->toDateTimeString();
+                DB::unprepared('SET IDENTITY_INSERT c_TipoEmbalaje OFF');
                 DB::table('c_TipoEmbalaje')->insert(
                     [
-                        'Numero' => $numerofila,
+                        //'Numero' => $numerofila,
                         'Clave' => $partida[0], 
                         'Descripcion' => $partida[1],
                         'FechaDeInicioDeVigencia' => $fecha,
                         'FechaDeFinDeVigencia' => $partida[3],
                     ]
                 );
+                DB::unprepared('SET IDENTITY_INSERT c_TipoEmbalaje ON');
                 $numerofila++;
             }
             $rowexcel++;
@@ -492,9 +538,10 @@ class PruebaController extends ConfiguracionSistemaController{
         foreach($partidasexcel as $partida){
             if($rowexcel > 4){
                 $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[3]))->toDateTimeString();
+                DB::unprepared('SET IDENTITY_INSERT c_TipoEstacion OFF');
                 DB::table('c_TipoEstacion')->insert(
                     [
-                        'Numero' => $numerofila,
+                        //'Numero' => $numerofila,
                         'Clave' => $partida[0], 
                         'Descripcion' => $partida[1],
                         'ClaveTransporte' => $partida[2],
@@ -502,6 +549,7 @@ class PruebaController extends ConfiguracionSistemaController{
                         'FechaDeFinDeVigencia' => $partida[4],
                     ]
                 );
+                DB::unprepared('SET IDENTITY_INSERT c_TipoEstacion ON');
                 $numerofila++;
             }
             $rowexcel++;
@@ -516,9 +564,10 @@ class PruebaController extends ConfiguracionSistemaController{
         foreach($partidasexcel as $partida){
             if($rowexcel > 4){
                 $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[3]))->toDateTimeString();
+                DB::unprepared('SET IDENTITY_INSERT c_TipoPermiso OFF');
                 DB::table('c_TipoPermiso')->insert(
                     [
-                        'Numero' => $numerofila,
+                        //'Numero' => $numerofila,
                         'Clave' => $partida[0], 
                         'Descripcion' => $partida[1],
                         'ClaveTransporte' => $partida[2],
@@ -526,13 +575,14 @@ class PruebaController extends ConfiguracionSistemaController{
                         'FechaDeFinDeVigencia' => $partida[4],
                     ]
                 );
+                DB::unprepared('SET IDENTITY_INSERT c_TipoPermiso ON');
                 $numerofila++;
             }
             $rowexcel++;
         }
         */
 
-        //return response()->json($rowexcel); 
+        return response()->json($rowexcel); 
         
     }
 
@@ -1071,6 +1121,16 @@ class PruebaController extends ConfiguracionSistemaController{
             'campos_activados'=>'Pago,Fecha,UUID,FechaPago,Abono,Cliente,NombreCliente,RfcCliente,FormaPago,NombreFormaPago,Esquema,Status,MotivoBaja,Usuario,Equipo,Periodo,Facturas',
             'campos_desactivados'=>'Serie,Folio,Corte,Banco,Anotacion,Moneda,TipoCambio,EmisorRfc,EmisorNombre,LugarExpedicion,RegimenFiscal,ReceptorRfc,ReceptorNombre,NumOperacion,RfcEmisorCtaOrd,NomBancoOrdExt,CtaOrdenante,RfcEmisorCtaBen,CtaBeneficiario,TipoCadPago,CertPago,CadPago,SelloPago,Hora,TipoRelacion,NumeroCliente,NumeroFormaPago,ClaveFormaPago',
             'columnas_ordenadas'=>'Pago,Fecha,UUID,FechaPago,Abono,Facturas,Cliente,NombreCliente,RfcCliente,FormaPago,NombreFormaPago,Esquema,Status,MotivoBaja,Usuario,Equipo,Periodo',
+        ]);
+    }
+
+    public function modificar_valores_en_bd_para_actualizacion_rama20220228correciones(){
+        //Configuracion columnas tabla productos       
+        Configuracion_Tabla::where('tabla', 'Productos')
+        ->update([
+            'campos_activados'=>'Codigo,ClaveProducto,ClaveUnidad,Producto,Unidad,Ubicacion,Costo,CostoDeLista,Moneda,CostoDeVenta,Utilidad,SubTotal,Iva,Total,Marca,Linea,Status,NombreMarca,NombreLinea,Existencias,Insumo,UltimoProveedorCompra',
+            'campos_desactivados'=>'Supercedido,Grupo,Precio,Impuesto,TasaIeps,Venta,FechaUltimaCompra,FechaUltimaVenta,UltimoCosto,UltimaVenta,NumeroMarca,Utilidad1Marca,Utilidad2Marca,Utilidad3Marca,Utilidad4Marca,Utilidad5Marca,NumeroLinea,Almacen',
+            'columnas_ordenadas'=>'Codigo,Insumo,ClaveProducto,ClaveUnidad,Producto,Unidad,Ubicacion,Existencias,Costo,CostoDeLista,Moneda,CostoDeVenta,Utilidad,SubTotal,Iva,Total,Marca,Linea,Status,NombreMarca,NombreLinea,UltimoProveedorCompra',
         ]);
     }
 

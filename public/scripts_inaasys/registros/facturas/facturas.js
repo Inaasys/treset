@@ -1741,6 +1741,7 @@ $(document).ready(function(){
 });
 //obtener por numero
 function obtenerclientepornumero(remisioneseleccionadas){
+  //alert(remisioneseleccionadas);
   var numeroclienteanterior = $("#numeroclienteanterior").val();
   var numerocliente = $("#numerocliente").val();
   if(numeroclienteanterior != numerocliente){
@@ -1753,7 +1754,7 @@ function obtenerclientepornumero(remisioneseleccionadas){
             var confirmacion = true;
           //}
           if (confirmacion == true) { 
-            if(remisioneseleccionadas == 0){
+            //if(remisioneseleccionadas == 0){
               //validar si el RFC del cliente es igual al de la empresa si es asi la seria de la factura debe ser con el depto INTERNA 
               var emisorrfc = $("#emisorrfc").val();
               if(emisorrfc == data.rfc){
@@ -1781,7 +1782,7 @@ function obtenerclientepornumero(remisioneseleccionadas){
                     partida = 1;
                   }) 
               }
-            }else{
+            /*}else{
               $.get(facturas_obtener_serie_interna, function(datos){
                 $("#tabladetallesfactura tbody").html("");
                 $("#folio").val(datos.Folio);
@@ -1802,7 +1803,7 @@ function obtenerclientepornumero(remisioneseleccionadas){
                 contadorfilas = 0;
                 partida = 1;
               }) 
-            }
+            }*/
             //$("#tabladetallesfactura tbody").html("");
             $("#numerocliente").val(data.numero);
             $("#numeroclienteanterior").val(data.numero);

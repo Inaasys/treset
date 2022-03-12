@@ -1042,13 +1042,17 @@ function permisos(id){
                                     '<div class="col-md-6">'+
                                         '<label>Compras</label>'+
                                         '<div class="col-md-12 form-check">'+
-                                            '<div class="col-md-6">'+
+                                            '<div class="col-md-4">'+
                                                 '<input type="checkbox" name="menureportescomprascajachica" id="idmenureportescomprascajachica" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
                                                 '<label for="idmenureportescomprascajachica">Caja Chica</label>'+
                                             '</div>'+
-                                            '<div class="col-md-6">'+
+                                            '<div class="col-md-4">'+
                                                 '<input type="checkbox" name="menureporterelacioncompras" id="idmenureporterelacioncompras" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
                                                 '<label for="idmenureporterelacioncompras">Relación Compras</label>'+
+                                            '</div>'+
+                                            '<div class="col-md-4">'+
+                                                '<input type="checkbox" name="menureporteproductosmascomprados" id="idmenureporteproductosmascomprados" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                                '<label for="idmenureporteproductosmascomprados">Productos más Comprados</label>'+
                                             '</div>'+
                                         '</div>'+
                                     '</div>'+
@@ -1109,7 +1113,11 @@ function permisos(id){
                                             '<div class="col-md-3">'+
                                                 '<input type="checkbox" name="menureportefacturasvencidas" id="idmenureportefacturasvencidas" class="filled-in submenu accesoreportes" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
                                                 '<label for="idmenureportefacturasvencidas">Facturas Vencidas</label>'+    
-                                            '</div>'+                                
+                                            '</div>'+   
+                                            '<div class="col-md-3">'+
+                                                '<input type="checkbox" name="menureporteproductosmasvendidos" id="idmenureporteproductosmasvendidos" class="filled-in submenu accesoreportes" value="1"  onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                                '<label for="idmenureporteproductosmasvendidos">Productos más Vendidos</label>'+
+                                            '</div>'+                             
                                         '</div>'+
                                     '</div>'+
                                     '<div class="col-md-6">'+

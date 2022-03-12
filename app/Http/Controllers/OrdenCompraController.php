@@ -158,7 +158,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                 }else{
                     $codigoabuscar = $partida[0];
                     $cantidadpartida = $partida[1];
-                    switch ($request->tipo) {
+                    switch ($request->tipoalta) {
                         case "GASTOS":
                             $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', ''.$codigoabuscar.'')->where('TipoProd', 'GASTOS')->count();
                             break;
@@ -175,7 +175,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                             })->count();
                     } 
                     if($contarproductos > 0){
-                        switch ($request->tipo) {
+                        switch ($request->tipoalta) {
                             case "GASTOS":
                                 $producto = VistaObtenerExistenciaProducto::where('Codigo', ''.$codigoabuscar.'')->where('TipoProd', 'GASTOS')->first();
                                 break;
@@ -270,9 +270,17 @@ class OrdenCompraController extends ConfiguracionSistemaController{
     }
     //obtener tipos ordenes de compra
     public function ordenes_compra_obtener_tipos_ordenes_compra(Request $request){
+        $almacen = $request->almacen;
         switch ($request->tipoalta) {
             case "GASTOS":
-                $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->where('Nombre', 'GASTOS')->get();
+                $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->where('Nombre', 'GASTOS')->orWhere('Nombre', 'CAJA CHICA')->get();
+                break;
+            case "CAJA CHICA":
+                if($almacen > 0){
+                    $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->where('Nombre', '<>', 'GASTOS')->Where('Nombre', '<>', 'TOT')->get();
+                }else{
+                    $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->where('Nombre', 'GASTOS')->orWhere('Nombre', 'CAJA CHICA')->get();
+                }
                 break;
             case "TOT":
                 $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->where('Nombre', 'TOT')->get();
@@ -360,7 +368,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             $codigoabuscar = $request->codigoabuscar;
             $tipooperacion = $request->tipooperacion;
             $numeroalmacen = $request->numeroalmacen;
-            switch ($request->tipo) {
+            switch ($request->tipoalta) {
                 case "GASTOS":
                     $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->where('TipoProd', 'GASTOS');
                     break;
@@ -398,7 +406,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
     //obtener producto por codigo
     public function ordenes_compra_obtener_producto_por_codigo(Request $request){
         $codigoabuscar = $request->codigoabuscar;
-        switch ($request->tipo) {
+        switch ($request->tipoalta) {
             case "GASTOS":
                 $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('TipoProd', 'GASTOS')->count();
                 break;
@@ -415,7 +423,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                 })->count();
         } 
         if($contarproductos > 0){
-            switch ($request->tipo) {
+            switch ($request->tipoalta) {
                 case "GASTOS":
                     $producto = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('TipoProd', 'GASTOS')->first();
                     break;

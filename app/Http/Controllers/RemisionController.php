@@ -116,7 +116,7 @@ class RemisionController extends ConfiguracionSistemaController{
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->Remision .'\')">Bajas</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="'.route('remisiones_generar_pdfs_indiv',$data->Remision).'" target="_blank">Ver Documento PDF</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Remision .'\')">Enviar Documento por Correo</a></li>'.
-                                                '<li><a class="paddingmenuopciones" href="'.route('remisiones_generar_pdfs_indiv_requisicion_tyt',$data->Remision).'" target="_blank">Generar Formato Requisición TYT</a></li>'.
+                                                '<li class="operaciongenerarformatoreqtyt" hidden><a class="paddingmenuopciones" href="'.route('remisiones_generar_pdfs_indiv_requisicion_tyt',$data->Remision).'" target="_blank">Generar Formato Requisición TYT</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="modificardatosgeneralesdocumento(\''.$data->Remision .'\')">Modificar Datos Generales</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="generardocumentoeniframe(\''.$data->Remision .'\')">Imprimir Documento PDF</a></li>'.                                                
                                             '</ul>'.
@@ -1566,6 +1566,50 @@ class RemisionController extends ConfiguracionSistemaController{
         ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
         return $pdf->stream();
+    }
+
+    //generar formato req tyt desde modificacion
+    public function remisiones_generar_formato_req_tyt_en_modificacion_remision(Request $request){
+        //primero eliminar todos los archivos de la carpeta
+        Helpers::eliminararchivospdfsgenerados();
+        $remisiones = $request->arraycodigosformatoreqtyt; 
+        $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $data=array();
+            $remisiondetalle = $request->arraycodigosformatoreqtyt;
+            $datadetalle=array();
+            foreach($remisiondetalle as $rd){
+                $datadetalle[]=array(
+                    "cantidaddetalle"=> Helpers::convertirvalorcorrecto($rd[3]),
+                    "codigodetalle"=>$rd[1],
+                    "insumodetalle"=>$rd[0],
+                    "descripciondetalle"=>$rd[2]
+                );
+            } 
+            $fecha = Carbon::parse($request->fecha)->toDateTimeString();
+            $data[]=array(
+                      "referencia"=>$request->referencia,
+                      "ordenservicio"=>$request->ordenservicio,
+                      "equipo"=>$request->equipo,
+                      "fechaformato"=> $fechaformato,
+                      "dia" => Carbon::parse($request->fecha)->format('d'),
+                      "mes" => Carbon::parse($request->fecha)->format('m'),
+                      "anio" => Carbon::parse($request->fecha)->format('Y'),
+                      "datadetalle" => $datadetalle,
+                      "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
+            );
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $pdf = PDF::loadView('registros.remisiones.formato_requisicion_tyt_en_mod', compact('data'))
+        ->setPaper('Letter')
+        ->setOption('margin-left', 2)
+        ->setOption('margin-right', 2)
+        ->setOption('margin-bottom', 10);
+        $ArchivoPDF = "PDFREQTYT".$request->referencia."-".$request->ordenservicio.".pdf";
+        $pdf->save(storage_path('archivos_pdf_documentos_generados/'.$ArchivoPDF));
+        $archivoacopiar = storage_path('/archivos_pdf_documentos_generados/'.$ArchivoPDF);
+        $carpetacopias = public_path('xml_descargados/'.$ArchivoPDF);
+        File::copy($archivoacopiar, $carpetacopias);
+        return response()->json($ArchivoPDF);
     }
 
     //obtener datos para enviar email

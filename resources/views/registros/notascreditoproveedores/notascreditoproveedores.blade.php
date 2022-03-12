@@ -215,6 +215,8 @@
         var campos_busquedas = '{{$configuracion_tabla->campos_busquedas}}';
         var nombreempresa = '{{$empresa->Nombre}}';
         var rfcempresa = '{{$empresa->Rfc}}';
+        var rfcreceptor = '{{$empresa->Rfc}}';
+        var nombrereceptor = '{{$empresa->Nombre}}';
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';

@@ -243,8 +243,8 @@ class ContraRecibosController extends ConfiguracionSistemaController{
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
         foreach ($request->compra as $key => $c){  
-            $checkbox = isset($request->contrarecibocompra [$key]) ? $request->contrarecibocompra [$key] : 0;
-            if($checkbox == 1){
+            //$checkbox = isset($request->contrarecibocompra [$key]) ? $request->contrarecibocompra [$key] : 0;
+            //if($checkbox == 1){
                 $ContraReciboDetalle = new ContraReciboDetalle;
                 $ContraReciboDetalle->ContraRecibo = $contrarecibo;
                 $ContraReciboDetalle->Fecha = $request->fechafacturacompra [$key];
@@ -256,7 +256,7 @@ class ContraRecibosController extends ConfiguracionSistemaController{
                 $ContraReciboDetalle->FechaAPagar = $request->fechapagarproveedor [$key];
                 $ContraReciboDetalle->Total = $request->totalcompra [$key];
                 $ContraReciboDetalle->save();
-            }   
+            //}   
         }
     	return response()->json($ContraRecibo);
     }

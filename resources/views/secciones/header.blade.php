@@ -184,8 +184,8 @@
                 <li><a  href="{{route('reporte_relacion_compras')}}" id="menureporterelacioncompras">Relación de Compras por Proveedor</a></li>                        
                 <li><a  href="{{route('reporte_caja_chica')}}" id="menureportescomprascajachica">Caja Chica</a></li>   
                 <!--<li><a  href="#">Proyección de Pagos a Proveedores</a></li>
-                <li><a  href="#">Cartera Vencida a Proveedores</a></li>                      
-                <li><a  href="#">Productos + Comprados</a></li>-->
+                <li><a  href="#">Cartera Vencida a Proveedores</a></li>   -->                   
+                <li><a  href="{{route('reporte_productos_mas_comprados')}}" id="menureporteproductosmascomprados">Productos + Comprados</a></li>
               </ul>
             </li>
             <li class="dropdown-submenu">
@@ -216,6 +216,7 @@
                 <li><a  href="{{route('reporte_antiguedad_saldos')}}" id="menureportefacturasantiguedadsaldos">Antiguedad de Saldos</a></li>                     
                 <li><a  href="{{route('reporte_relacion_timbres_utilizados')}}" id="menureporterelaciontimbresutilizados">Relación Timbres Utilizados</a></li>
                 <li><a  href="{{route('reporte_facturas_vencidas')}}" id="menureportefacturasvencidas">Facturas Vencidas</a></li>
+                <li><a  href="{{route('reporte_productos_mas_vendidos')}}" id="menureporteproductosmasvendidos">Productos + Vendidos</a></li>
               </ul>
             </li>            
             <li class="dropdown-submenu">

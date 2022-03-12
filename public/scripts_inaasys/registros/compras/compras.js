@@ -162,8 +162,8 @@ function listar(){
   });
 }
 //obtener tipos ordenes de compra
-function obtenertiposordenescompra(tipoalta){
-    $.get(compras_obtener_tipos_ordenes_compra, {tipoalta:tipoalta}, function(select_tipos_ordenes_compra){
+function obtenertiposordenescompra(tipoalta, almacen){
+    $.get(compras_obtener_tipos_ordenes_compra, {tipoalta:tipoalta, almacen:almacen}, function(select_tipos_ordenes_compra){
       $("#tipo").html(select_tipos_ordenes_compra);
     })  
 }
@@ -1024,7 +1024,7 @@ function listarproductos(){
         d.codigoabuscar = $("#codigoabuscar").val();
         d.numeroalmacen = $("#numeroalmacen").val();
         d.tipooperacion = $("#tipooperacion").val();
-        d.tipo = $("#tipo").val();
+        d.tipoalta = $("#tipocompra").val();
       }
     },
     columns: [
@@ -1058,8 +1058,8 @@ function listarproductos(){
 function obtenerproductoporcodigo(){
   var codigoabuscar = $("#codigoabuscar").val();
   var tipooperacion = $("#tipooperacion").val();
-  var tipo = $("#tipo").val();
-  $.get(compras_obtener_producto_por_codigo,{codigoabuscar:codigoabuscar,tipo:tipo}, function(data){
+  var tipoalta = $("#tipocompra").val();
+  $.get(compras_obtener_producto_por_codigo,{codigoabuscar:codigoabuscar,tipoalta:tipoalta}, function(data){
     if(parseInt(data.contarproductos) > 0){
       agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, data.SubTotal, data.Existencias, tipooperacion, data.Insumo, data.ClaveProducto, data.ClaveUnidad, data.NombreClaveProducto, data.NombreClaveUnidad, data.CostoDeLista);
     }else{
@@ -1783,7 +1783,20 @@ function alta(tipoalta){
   //colocar autocomplette off  todo el formulario
   $(".form-control").attr('autocomplete','off');
   obtenultimonumero();
-  obtenertiposordenescompra(tipoalta);
+
+  //verificar que tipo de alta se realizara genera existencias
+  switch (tipoalta) {
+    case 'GASTOS':
+      var generaexistencias = 0;
+      break;
+    case 'TOT':
+      var generaexistencias = 0;
+      break;
+    default:
+      var generaexistencias = 1;
+  }
+
+  obtenertiposordenescompra(tipoalta, generaexistencias);
   asignarfechaactual();
   //ocultar buscador de productos
   mostrarbuscadorcodigoproducto();
@@ -2255,6 +2268,23 @@ function obtenerdatos(compramodificar){
         $("#btnobteneralmacenes").hide();
         $("#busquedaordenestrabajo").hide();
         break;
+      case 'CAJA CHICA':
+        if(data.compra.Almacen > 0){
+          $("#almacen").val(data.almacen.Nombre);
+          if(data.almacen.Nombre != null){
+            $("#textonombrealmacen").html(data.almacen.Nombre.substring(0, 40));
+          }
+          $("#numeroalmacen").val(data.almacen.Numero);
+          $("#numeroalmacenanterior").val(data.almacen.Numero);
+        }else{
+          //desabilitar almacen
+          $("#numeroalmacen").val(0).attr('readonly', 'readonly');
+          $("#numeroalmacenanterior").val(0).attr('readonly', 'readonly');
+          $("#almacen").val(0).attr('readonly', 'readonly');
+          $("#btnobteneralmacenes").hide();
+          $("#busquedaordenestrabajo").hide();
+        }
+        break;
       case 'TOT':
         //colocar required a campo orden
         $("#ordentrabajo").attr('required', 'required').addClass('inputnext');
@@ -2363,7 +2393,7 @@ function obtenerdatos(compramodificar){
     //asignar el tipo de operacion que se realizara
     $("#tipooperacion").val("modificacion");
     //se deben asignar los valores a los contadores para que las sumas resulten correctas
-    obtenertiposordenescompra(data.compra.Tipo);
+    obtenertiposordenescompra(data.compra.Tipo, data.compra.Almacen);
     seleccionartipocompra(data);
   }).fail( function() {
     msj_errorajax();

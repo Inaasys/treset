@@ -5,8 +5,6 @@ var form;
 function init(){
   asignarfechaactual(); 
   obtenertiposordenescompra();
-  activarrelistarreporteenterfechainicial();
-  activarrelistarreporteenterfechafinal();
   listar();
 }
 //mostrar formulario
@@ -41,28 +39,6 @@ function validafechas(){
     }
     return msj;
 }
-//detectar cuando en el input de objetivo mensual cambie y se presione enter para actualizar la busqueda
-function activarrelistarreporteenterfechainicial(){
-    var fechainicialreporte = $('#fechainicialreporte');
-    fechainicialreporte.unbind();
-    fechainicialreporte.bind('keyup change', function(e) {
-        var code = (e.keyCode ? e.keyCode : e.which);
-        if(code==13){
-            generar_reporte();
-        }
-    });
-}
-//detectar cuando en el input de objetivo mensual cambie y se presione enter para actualizar la busqueda
-function activarrelistarreporteenterfechafinal(){
-    var fechafinalreporte = $('#fechafinalreporte');
-    fechafinalreporte.unbind();
-    fechafinalreporte.bind('keyup change', function(e) {
-        var code = (e.keyCode ? e.keyCode : e.which);
-        if(code==13){
-            generar_reporte();
-        }
-    });
-}
 //activar busquedas
 $(document).ready(function() {
     //activar busqueda
@@ -90,6 +66,25 @@ $(document).ready(function() {
     //regresar numero
     $('#numeroalmacen').on('change', function(e) {
         regresarnumeroalmacen();
+    });
+    //cargar reporte al dar enter en las fechas
+    //activar busqueda
+    $('#fechainicialreporte').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            generar_reporte();
+            e.preventDefault();
+        }
+    });
+    //activar busqueda
+    $('#fechafinalreporte').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            generar_reporte();
+            e.preventDefault();
+        }
     });
 });
 //obtener tipos ordenes de compra
