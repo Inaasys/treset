@@ -29,6 +29,8 @@ function setvaluesselects(){
     //tab configurar
     obtenerusuarios();
     obtenerusuariosmodificarcostosproductos();
+    obtenerusuariosmodificarcreditoclientes();
+    obtenerusuariosmodificarcostoyventaservicios();
     $("#numerodecimalessistema").val(numerodecimales).trigger("change");
     $("#numerodecilamesdocumentospdfsistema").val(numerodecimalesendocumentos).trigger("change");
     $("input[name=utilizarmayusculasistema][value='"+mayusculas_sistema+"']").prop("checked",true);  
@@ -61,6 +63,18 @@ function obtenerusuarios(){
 function obtenerusuariosmodificarcostosproductos(){
   $.get(empresa_obtener_usuarios_a_modificar_costos_productos, function(select_usuarios_modificar_costos){
     $("#modificarcostosdeproductos").html(select_usuarios_modificar_costos);
+  }) 
+}
+//obtener usuarios a modificar credito clientes
+function obtenerusuariosmodificarcreditoclientes(){
+  $.get(empresa_obtener_usuarios_a_modificar_credito_clientes, function(select_usuarios_modificar_costos){
+    $("#modificarcreditodeclientes").html(select_usuarios_modificar_costos);
+  }) 
+}
+//obtener usuarios a modificar costo y venta de servicios
+function obtenerusuariosmodificarcostoyventaservicios(){
+  $.get(empresa_obtener_usuarios_a_modificar_costo_y_venta_servicio, function(select_usuarios_modificar_costos){
+    $("#modificarcostoyventadeservicios").html(select_usuarios_modificar_costos);
   }) 
 }
 //ocultar modal formulario

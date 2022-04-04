@@ -119,13 +119,18 @@ class AgenteController extends ConfiguracionSistemaController{
         $numeroagente=$request->numeroagente;
 	    $Agente = Agente::where('Numero', $numeroagente )->first();
 	    if($Agente->Status == 'ALTA'){
-           $Agente->Status = 'BAJA';
+            Agente::where('Numero', $numeroagente)
+            ->update([
+                'Status' => 'BAJA'
+            ]);
            Log::channel('agente')->info('El agente fue dado de baja: '.$Agente.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
 	    }else{
-           $Agente->Status = 'ALTA';
+            Agente::where('Numero', $numeroagente)
+            ->update([
+                'Status' => 'ALTA'
+            ]);
            Log::channel('agente')->info('El agente fue dado de alta: '.$Agente.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
 	    }
-	    $Agente->save();
 	    return response()->json($Agente);
     } 
     //obtener datos del catalogo

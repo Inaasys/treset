@@ -596,13 +596,18 @@ class ProductoController extends ConfiguracionSistemaController{
         $codigoproducto=$request->codigoproducto;
 	    $Producto = Producto::where('Codigo', $codigoproducto )->first();
 	    if($Producto->Status == 'ALTA'){
-	       $Producto->Status = 'BAJA';
+           Producto::where('Codigo', $codigoproducto)
+           ->update([
+               'Status' => 'BAJA'
+           ]);
            Log::channel('producto')->info('El producto fue dado de baja: '.$Producto.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
         }else{
-	       $Producto->Status = 'ALTA';
-           Log::channel('producto')->info('El producto fue dado de alta: '.$Producto.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
+            Producto::where('Codigo', $codigoproducto)
+                ->update([
+                    'Status' => 'ALTA'
+                ]);
+            Log::channel('producto')->info('El producto fue dado de alta: '.$Producto.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
         }
-	    $Producto->save();
 	    return response()->json($Producto);
     } 
     //obtener datos del catalogo

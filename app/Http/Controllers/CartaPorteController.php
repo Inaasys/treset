@@ -41,6 +41,7 @@ use App\VistaObtenerExistenciaProducto;
 use App\FolioComprobanteTraslado;
 use App\Comprobante;
 use App\c_ConfiguracionAutoTransporte;
+use App\c_CveTransporte;
 use Config;
 use Mail;
 use Facturapi\Facturapi;
@@ -118,25 +119,25 @@ class CartaPorteController extends ConfiguracionSistemaController{
                         return $operaciones;
                     })
                     ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
-                    ->addColumn('SubTotal', function($data){ return $data->SubTotal; })
-                    ->addColumn('Iva', function($data){ return $data->Iva; })
-                    ->addColumn('Total', function($data){ return $data->Total; })
-                    ->addColumn('Abonos', function($data){ return $data->Abonos; })
-                    ->addColumn('Descuentos', function($data){ return $data->Descuentos; })
-                    ->addColumn('Saldo', function($data){ return $data->Saldo; })
+                    //->addColumn('SubTotal', function($data){ return $data->SubTotal; })
+                    //->addColumn('Iva', function($data){ return $data->Iva; })
+                    //->addColumn('Total', function($data){ return $data->Total; })
+                    //->addColumn('Abonos', function($data){ return $data->Abonos; })
+                    //->addColumn('Descuentos', function($data){ return $data->Descuentos; })
+                    //->addColumn('Saldo', function($data){ return $data->Saldo; })
                     ->addColumn('ImpLocTraslados', function($data){ return $data->ImpLocTraslados; })
                     ->addColumn('ImpLocRetenciones', function($data){ return $data->ImpLocRetenciones; })
                     ->addColumn('IepsRetencion', function($data){ return $data->IepsRetencion; })
                     ->addColumn('IsrRetencion', function($data){ return $data->IsrRetencion; })
                     ->addColumn('IvaRetencion', function($data){ return $data->IvaRetencion; })
                     ->addColumn('Ieps', function($data){ return $data->Ieps; })
-                    ->addColumn('Descuento', function($data){ return $data->Descuento; })
-                    ->addColumn('Importe', function($data){ return $data->Importe; })
+                    //->addColumn('Descuento', function($data){ return $data->Descuento; })
+                    //->addColumn('Importe', function($data){ return $data->Importe; })
                     ->addColumn('TipoCambio', function($data){ return $data->TipoCambio; })
-                    ->addColumn('Costo', function($data){ return $data->Costo; })
-                    ->addColumn('Comision', function($data){ return $data->Comision; })
-                    ->addColumn('Utilidad', function($data){ return $data->Utilidad; })
-                    ->addColumn('TotalDistanciaRecorrida', function($data){ return $data->TotalDistanciaRecorrida; })
+                    //->addColumn('Costo', function($data){ return $data->Costo; })
+                    //->addColumn('Comision', function($data){ return $data->Comision; })
+                    //->addColumn('Utilidad', function($data){ return $data->Utilidad; })
+                    //->addColumn('TotalDistanciaRecorrida', function($data){ return $data->TotalDistanciaRecorrida; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
@@ -353,7 +354,56 @@ class CartaPorteController extends ConfiguracionSistemaController{
                 ->rawColumns(['operaciones'])
                 ->make(true);
         }
+    }
 
+    //obtener por clave
+    public function carta_porte_obtener_configuracionautotransporte_por_clave(Request $request){
+        $clave = '';
+        $descripcion = '';
+        $existeconfiguraciontransporte = c_ConfiguracionAutoTransporte::where('Clave', $request->claveconfigautotransporte)->count();
+        if($existeconfiguraciontransporte > 0){
+            $configuraciontransporte = c_ConfiguracionAutoTransporte::where('Clave', $request->claveconfigautotransporte)->first();
+            $clave = $configuraciontransporte->Clave;
+            $descripcion = $configuraciontransporte->Descripcion;
+        }
+        $data = array(
+            'clave' => $clave,
+            'descripcion' => $descripcion
+        );
+        return response()->json($data); 
+    }
+
+    //obtener claves transportes
+    public function carta_porte_obtener_clavestransporte(Request $request){
+        if($request->ajax()){
+            $tipo = $request->tipo;
+            $data = c_CveTransporte::query();
+            return DataTables::of($data)
+                ->addColumn('operaciones', function($data) use ($tipo){
+                    $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarclavetransporte('.$data->Numero.',\''.$data->Clave .'\',\''.$data->Descripcion.'\')">Seleccionar</div>';
+                    return $boton;
+                })
+                ->rawColumns(['operaciones'])
+                ->make(true);
+        }
+
+    }
+
+    //obtener por clave
+    public function carta_porte_obtener_clavetransporte_por_clave(Request $request){
+        $clave = '';
+        $descripcion = '';
+        $existeclavetransporte = c_CveTransporte::where('Clave', $request->clavetransporte)->count();
+        if($existeclavetransporte > 0){
+            $clavetransporte = c_CveTransporte::where('Clave', $request->clavetransporte)->first();
+            $clave = $clavetransporte->Clave;
+            $descripcion = $clavetransporte->Descripcion;
+        }
+        $data = array(
+            'clave' => $clave,
+            'descripcion' => $descripcion
+        );
+        return response()->json($data); 
     }
 
     //obtener almacenes

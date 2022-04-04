@@ -149,7 +149,7 @@ class ReportesFacturasController extends ConfiguracionSistemaController{
                 $data = DB::table('Facturas as f')
                 ->leftjoin('Clientes as c', 'f.Cliente', '=', 'c.Numero')
                 ->leftjoin('Agentes as a', 'f.Agente', '=', 'a.Numero')
-                ->select("f.Factura", "f.Serie", "f.Folio", "f.Depto", "f.Tipo", "f.Cliente", "c.Nombre as NombreCliente", "f.Agente", "a.Nombre as NombreAgente", "f.Fecha", "f.Plazo", "f.Pedido", "f.Importe", "f.Descuento", "f.SubTotal", "f.Iva", "f.Total", "f.Abonos", "f.Descuentos", "f.Saldo", "f.Costo", "f.Utilidad", "f.Moneda", "f.TipoCambio", "f.Obs", "f.Status", "f.MotivoBaja", "f.Usuario")
+                ->select("f.Factura", "f.UUID", "f.Serie", "f.Folio", "f.Depto", "f.Tipo", "f.Cliente", "c.Nombre as NombreCliente", "f.Agente", "a.Nombre as NombreAgente", "f.Fecha", "f.Plazo", "f.Pedido", "f.Importe", "f.Descuento", "f.SubTotal", "f.Iva", "f.Total", "f.Abonos", "f.Descuentos", "f.Saldo", "f.Costo", "f.Utilidad", "f.Moneda", "f.TipoCambio", "f.Obs", "f.Status", "f.MotivoBaja", "f.Usuario")
                 //->whereBetween('f.Fecha', [$fechainicio, $fechaterminacion])
                 ->whereDate('f.Fecha', '>=', $fechainicio)->whereDate('f.Fecha', '<=', $fechaterminacion)
                 ->where(function($q) use ($numerocliente) {

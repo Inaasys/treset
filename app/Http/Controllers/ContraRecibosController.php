@@ -80,7 +80,7 @@ class ContraRecibosController extends ConfiguracionSistemaController{
                     return $operaciones;
                 })
                 ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
-                ->addColumn('Total', function($data){ return $data->Total; })
+                //->addColumn('Total', function($data){ return $data->Total; })
                 ->rawColumns(['operaciones','Total'])
                 ->make(true);
         } 

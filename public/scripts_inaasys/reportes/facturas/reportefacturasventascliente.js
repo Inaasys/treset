@@ -447,7 +447,7 @@ function listar(){
         case "UTILIDAD":
             break;
         case "GENERAL":
-            var columnas = new Array("Factura", "Serie", "Folio", "Depto", "Tipo", "Cliente", "NombreCliente", "Agente", "NombreAgente", "Fecha", "Plazo", "Pedido", "Importe", "Descuento", "SubTotal", "Iva", "Total", "Abonos", "Descuentos", "Saldo", "Costo", "Utilidad", "Moneda", "TipoCambio", "Obs", "Status", "MotivoBaja", "Usuario");
+            var columnas = new Array("Factura", "UUID", "Serie", "Folio", "Depto", "Tipo", "Cliente", "NombreCliente", "Agente", "NombreAgente", "Fecha", "Plazo", "Pedido", "Importe", "Descuento", "SubTotal", "Iva", "Total", "Abonos", "Descuentos", "Saldo", "Costo", "Utilidad", "Moneda", "TipoCambio", "Obs", "Status", "MotivoBaja", "Usuario");
             break;
         case "PRODUCTOS":
             var columnas = new Array("Factura", "Fecha", "Cliente", "NombreCliente", "Agente", "Tipo", "NombreAgente", "Plazo", "Codigo", "Descripcion", "Unidad", "Cantidad", "Precio", "Importe", "Dcto", "Descuento", "SubTotal", "Impuesto", "Iva", "Total", "Costo", "CostoTotal", "Utilidad", "Facturar", "Remision", "Orden", "Departamento", "Cargo", "Almacen", "Partida", "Item");

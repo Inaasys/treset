@@ -121,7 +121,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     return $operaciones;
                 })
                 ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
-                ->addColumn('Abono', function($data){ return $data->Abono; })
+                //->addColumn('Abono', function($data){ return $data->Abono; })
                 ->addColumn('TipoCambio', function($data){ return $data->TipoCambio; })
                 ->addColumn('Facturas', function($data){ return substr($data->Facturas, 0, 70); })
                 ->rawColumns(['operaciones'])
@@ -1398,7 +1398,17 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                                         "amount" => Helpers::convertirvalorcorrecto($dp->Abono),
                                         "currency" => $dp->MonedaDR,
                                         "folio_number" => $dp->Folio,
-                                        "series" => $dp->Serie
+                                        "series" => $dp->Serie,
+                                        /*
+                                        //version 2.0 facturapi cdfi 4.0
+                                        "taxes" => array(
+                                            array(
+                                                "base" => 0.000001, 
+                                                "type" => "IVA",
+                                                "rate" => 0.000000
+                                            )
+                                        )
+                                        */
                                     )
             );
         }        
@@ -1407,8 +1417,18 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             "type" => \Facturapi\InvoiceType::PAGO,
             "customer" => array(
                 "legal_name" => $cliente->Nombre,
-                "tax_id" => $cliente->Rfc
+                "tax_id" => $cliente->Rfc,
+                /*
+                //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
+                "tax_system" => $cliente->RegimenFiscal,
+                "address" => 
+                    array(
+                        "zip" => $cliente->CodigoPostal,
+                    )
+                //fin cfdi 4.0
+                */
             ),
+            //facturapi version 1.0
             "payments" => array(
                 array(
                     "payment_form" => $CXC->FormaPago,
@@ -1418,6 +1438,24 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     "related" => $arraydet
                 )
             ),
+            /*
+            //facturapi version 2.0
+            "complements" => array(
+                //"type" => "P",
+                array(
+                    "type" => "pago",
+                    "data" => array(
+                        array(
+                            "payment_form" => $CXC->FormaPago,
+                            "currency" => $CXC->Moneda,
+                            "exchange" => Helpers::convertirvalorcorrecto($CXC->TipoCambio),
+                            "date" => Helpers::formatoinputdatetime($CXC->FechaPago),
+                            "related_documents" =>  $arraydet
+                        )
+                    )
+                )
+            ),
+            */
             "date" => Helpers::formatoinputdatetime($CXC->Fecha),
             "folio_number" => $CXC->Folio,
             "series" => $CXC->Serie,
@@ -1455,6 +1493,9 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $Comprobante = new Comprobante;
             $Comprobante->Comprobante = 'Pago';
             $Comprobante->Tipo = $new_invoice->type;
+            //version 4.0
+            //$Comprobante->Version = '4.0';
+            //version 3.3
             $Comprobante->Version = '3.3';
             $Comprobante->Serie = $new_invoice->series;
             $Comprobante->Folio = $new_invoice->folio_number;
@@ -1520,15 +1561,40 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
     }
     //cancelar timbre
     public function cuentas_por_cobrar_baja_timbre(Request $request){
-        //colocar fecha de cancelacion en tabla comprobante
-        $factura = CuentaXCobrar::where('Pago', $request->facturabajatimbre)->first();
-        Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $factura->Folio . '')->where('Serie', '' . $factura->Serie . '')
-        ->update([
-            'FechaCancelacion' => Helpers::fecha_exacta_accion_datetimestring()
-        ]);
         //cancelar timbre facturapi
-        $timbrecancelado = $this->facturapi->Invoices->cancel($request->iddocumentofacturapi);
-        return response()->json($timbrecancelado);
+        //con version 1.0 facturapi sin motivo de baja
+        //$timbrecancelado = $this->facturapi->Invoices->cancel($request->iddocumentofacturapi);
+        // con version 2.0 facturapi con motivo de baja
+        $timbrecancelado = $this->facturapi->Invoices->cancel(
+            $request->iddocumentofacturapi,
+            [
+              "motive" => $request->motivobajatimbre
+            ]
+        );
+        $result = json_encode($timbrecancelado);
+        $result2 = json_decode($result, true);
+        if(array_key_exists('ok', $result2) == true){
+            $mensaje = $timbrecancelado->message;
+            $tipomensaje = "error";
+            $data = array(
+                        'mensaje' => "Error, ".$mensaje,
+                        'tipomensaje' => $tipomensaje 
+                    );
+            return response()->json($data);
+        }else{
+            //colocar fecha de cancelacion en tabla comprobante
+            $factura = CuentaXCobrar::where('Pago', $request->facturabajatimbre)->first();
+            Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $factura->Folio . '')->where('Serie', '' . $factura->Serie . '')
+            ->update([
+                'FechaCancelacion' => Helpers::fecha_exacta_accion_datetimestring()
+            ]);
+            $mensaje = "Correcto, se cancelo el timbre correctamente";
+            $tipomensaje = "success";
+            $data = array(
+                        'mensaje' => $mensaje,
+                        'tipomensaje' => $tipomensaje 
+                    );
+            return response()->json($data);
+        }
     }
-
 }

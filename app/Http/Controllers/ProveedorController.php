@@ -112,13 +112,18 @@ class ProveedorController extends ConfiguracionSistemaController{
         $numeroproveedor=$request->numeroproveedor;
 	    $Proveedor = Proveedor::where('Numero', $numeroproveedor )->first();
 	    if($Proveedor->Status == 'ALTA'){
-           $Proveedor->Status = 'BAJA';
+            Proveedor::where('Numero', $numeroproveedor)
+            ->update([
+                'Status' => 'BAJA'
+            ]);
            Log::channel('proveedor')->info('El proveedor fue dado de baja: '.$Proveedor.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
 	    }else{
-	       $Proveedor->Status = 'ALTA';
+            Proveedor::where('Numero', $numeroproveedor)
+            ->update([
+                'Status' => 'ALTA'
+            ]);
            Log::channel('proveedor')->info('El proveedor fue dado de alta: '.$Proveedor.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
         }
-	    $Proveedor->save();
 	    return response()->json($Proveedor);
     } 
     //obtener datos del catalogo

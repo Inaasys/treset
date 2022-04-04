@@ -176,13 +176,18 @@ class ServicioController extends ConfiguracionSistemaController{
         $codigoservicio=$request->codigoservicio;
 	    $Servicio = Servicio::where('Codigo', $codigoservicio )->first();
 	    if($Servicio->Status == 'ALTA'){
-           $Servicio->Status = 'BAJA';
+            Servicio::where('Codigo', $codigoservicio)
+            ->update([
+                'Status' => 'BAJA'
+            ]);
            Log::channel('servicio')->info('El servicio fue dado de baja: '.$Servicio.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
 	    }else{
-	       $Servicio->Status = 'ALTA';
+            Servicio::where('Codigo', $codigoservicio)
+            ->update([
+                'Status' => 'ALTA'
+            ]);
            Log::channel('servicio')->info('El servicio fue dado de alta: '.$Servicio.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
         }
-	    $Servicio->save();
 	    return response()->json($Servicio);
     } 
     //obtener datos del catalogo

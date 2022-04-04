@@ -78,6 +78,34 @@ class EmpresaController extends ConfiguracionSistemaController{
         return response()->json($select_usuarios);
 
     }
+    //obtener usuarios a modificar credito clientes
+    public function empresa_obtener_usuarios_a_modificar_credito_clientes(Request $request){
+        $usuarios = User::all();
+        $select_usuarios = "<option disabled hidden>Selecciona...</option>";
+        foreach($usuarios as $usuario){
+            if (in_array(strtoupper($usuario->user), explode(",",$this->modificarcreditodeclientes))) {
+                $select_usuarios = $select_usuarios."<option value='".$usuario->user."' selected>".$usuario->user."</option>"; 
+            }else{
+                $select_usuarios = $select_usuarios."<option value='".$usuario->user."'>".$usuario->user."</option>";
+            }
+        }
+        return response()->json($select_usuarios);
+
+    }
+    //obtener usuarios a modificar costo y venta servicio
+    public function empresa_obtener_usuarios_a_modificar_costo_y_venta_servicio(Request $request){
+        $usuarios = User::all();
+        $select_usuarios = "<option disabled hidden>Selecciona...</option>";
+        foreach($usuarios as $usuario){
+            if (in_array(strtoupper($usuario->user), explode(",",$this->modificarcostoyventadeservicios))) {
+                $select_usuarios = $select_usuarios."<option value='".$usuario->user."' selected>".$usuario->user."</option>"; 
+            }else{
+                $select_usuarios = $select_usuarios."<option value='".$usuario->user."'>".$usuario->user."</option>";
+            }
+        }
+        return response()->json($select_usuarios);
+
+    }
     //obtener paises
     public function empresa_obtener_paises(Request $request){
         if($request->ajax()){
@@ -210,6 +238,16 @@ class EmpresaController extends ConfiguracionSistemaController{
         }else{
             $modificarcostosdeproductos = "";
         }
+        if ($request->has("modificarcreditodeclientes")){
+            $modificarcreditodeclientes = implode(",", $request->modificarcreditodeclientes);
+        }else{
+            $modificarcreditodeclientes = "";
+        }
+        if ($request->has("modificarcostoyventadeservicios")){
+            $modificarcostoyventadeservicios = implode(",", $request->modificarcostoyventadeservicios);
+        }else{
+            $modificarcostoyventadeservicios = "";
+        }
         $Empresa = Empresa::where('Numero', 1)->first();
         Empresa::where('Numero', 1)
         ->update([
@@ -234,7 +272,9 @@ class EmpresaController extends ConfiguracionSistemaController{
             'PedirObligatoriamenteReferenciaEnRemisiones' => $request->pedirobligatoriamentereferenciarnremisiones,
             'PedirObligatoriamenteOrdenServicioEnRemisiones' => $request->pedirobligatoriamenteordenservicioenremisiones,
             'PedirObligatoriamenteEquipoEnRemisiones' => $request->pedirobligatoriamenteequipoenremisiones,
-            'GenerarFormatoRequisicionTYT' => $request->generarformatorequisiciontyt
+            'GenerarFormatoRequisicionTYT' => $request->generarformatorequisiciontyt,
+            'ModificarCreditoDeClientes' => $modificarcreditodeclientes,
+            'ModificarCostoyVentaDeServicios' => $modificarcostoyventadeservicios,
         ]);
         return response()->json($request->all());
     }

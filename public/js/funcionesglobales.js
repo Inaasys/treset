@@ -790,12 +790,22 @@ function msj_documentotimbradocorrectamente(mensaje, tipomensaje){
     }
 }
 //mensaje timbre cancelado correctamente
-function msj_timbrecanceladocorrectamente(){
-    toastr.success( "Correcto, se cancelo correctamente el timbre del documento", "Mensaje", {
-        "timeOut": "6000",
-        "progressBar": true,
-        "extendedTImeout": "6000"
-    });  
+function msj_timbrecanceladocorrectamente(mensaje, tipomensaje){
+    if(tipomensaje == "error"){
+        toastr.error( mensaje, "Mensaje", {
+            "timeOut": "6000",
+            "progressBar": true,
+            "extendedTImeout": "6000"
+        });  
+    }else{
+        toastr.success( mensaje, "Mensaje", {
+            "timeOut": "6000",
+            "progressBar": true,
+            "extendedTImeout": "6000"
+        });  
+        var tabla = $('.tbllistado').DataTable();
+        tabla.ajax.reload();
+    }
 }
 //mensaje tabla copiada correctamente
 function msj_tablacopiadacorrectamente(){

@@ -85,9 +85,9 @@ class CotizacionController extends ConfiguracionSistemaController{
                         return $operaciones;
                     })
                     ->addColumn('fecha', function($data){ return Carbon::parse($data->fecha)->toDateString(); })
-                    ->addColumn('subtotal', function($data){ return $data->subtotal; })
-                    ->addColumn('iva', function($data){ return $data->iva; })
-                    ->addColumn('total', function($data){ return $data->total; })
+                    //->addColumn('subtotal', function($data){ return $data->subtotal; })
+                    //->addColumn('iva', function($data){ return $data->iva; })
+                    //->addColumn('total', function($data){ return $data->total; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 

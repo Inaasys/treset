@@ -114,7 +114,7 @@ function listar(){
         },
         columns: campos_tabla,
         "drawCallback": function( data ) {
-            $("#sumaabonofiltrado").html(data.json.sumaabono);
+            $("#sumaabonofiltrado").html(number_format(round(data.json.sumaabono, numerodecimales), numerodecimales, '.', ''));
         },
         initComplete: function () {
           // Aplicar busquedas por columna

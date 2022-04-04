@@ -29,6 +29,7 @@ use App\Configuracion_Tabla;
 use App\VistaNotaCreditoProveedor;
 use App\VistaObtenerExistenciaProducto;
 use App\Firma_Rel_Documento;
+use App\User_Rel_Almacen;
 use Config;
 use Mail;
 use App\Serie;
@@ -119,18 +120,18 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                         return $operaciones;
                     })
                     ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
-                    ->addColumn('SubTotal', function($data){ return $data->SubTotal; })
-                    ->addColumn('Iva', function($data){ return $data->Iva; })
-                    ->addColumn('Total', function($data){ return $data->Total; })
+                    //->addColumn('SubTotal', function($data){ return $data->SubTotal; })
+                    //->addColumn('Iva', function($data){ return $data->Iva; })
+                    //->addColumn('Total', function($data){ return $data->Total; })
                     ->addColumn('ImpLocTraslados', function($data){ return $data->ImpLocTraslados; })
                     ->addColumn('ImpLocRetenciones', function($data){ return $data->ImpLocRetenciones; })
                     ->addColumn('IepsRetencion', function($data){ return $data->IepsRetencion; })
                     ->addColumn('IsrRetencion', function($data){ return $data->IsrRetencion; })
                     ->addColumn('IvaRetencion', function($data){ return $data->IvaRetencion; })
                     ->addColumn('Ieps', function($data){ return $data->Ieps; })
-                    ->addColumn('Descuento', function($data){ return $data->Descuento; })
-                    ->addColumn('Importe', function($data){ return $data->Importe; })
-                    ->addColumn('TipoCambio', function($data){ return $data->TipoCambio; })
+                    //->addColumn('Descuento', function($data){ return $data->Descuento; })
+                    //->addColumn('Importe', function($data){ return $data->Importe; })
+                    //->addColumn('TipoCambio', function($data){ return $data->TipoCambio; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
@@ -210,14 +211,24 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
     //obtener almacenes
     public function notas_credito_proveedores_obtener_almacenes(Request $request){
         if($request->ajax()){
-            $data = Almacen::where('Status', 'ALTA')->orderBy("Numero", "ASC")->get();
+            $contaralmacenesasignadosausuario = User_Rel_Almacen::where('user_id', Auth::user()->id)->count();
+            if($contaralmacenesasignadosausuario > 0){
+                $data = DB::table('user_rel_almacenes as ura')
+                ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
+                ->select('ura.id', 'a.Numero', 'a.Nombre')
+                ->where('a.Status', 'ALTA')
+                ->orderby('a.Numero', 'ASC')
+                ->get();
+            }else{
+                $data = Almacen::where('Status', 'ALTA')->orderBy("Numero", "ASC")->get();
+            }
             return DataTables::of($data)
-                ->addColumn('operaciones', function($data){
-                    $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionaralmacen('.$data->Numero.',\''.$data->Nombre .'\')">Seleccionar</div>';
-                    return $boton;
-                })
-                ->rawColumns(['operaciones'])
-                ->make(true);
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionaralmacen('.$data->Numero.',\''.$data->Nombre .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
         }
     }
 
@@ -225,11 +236,33 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
     public function notas_credito_proveedores_obtener_almacen_por_numero(Request $request){
         $numero = '';
         $nombre = '';
-        $existealmacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->count();
-        if($existealmacen > 0){
-            $almacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->first();
-            $numero = $almacen->Numero;
-            $nombre = $almacen->Nombre;
+        $plazo = '';
+        $contaralmacenesasignadosausuario = User_Rel_Almacen::where('user_id', Auth::user()->id)->count();
+        if($contaralmacenesasignadosausuario > 0){
+            $existealmacen = DB::table('user_rel_almacenes as ura')
+            ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
+            ->select('ura.id', 'a.Numero', 'a.Nombre')
+            ->where('a.Numero', $request->numeroalmacen)
+            ->where('a.Status', 'ALTA')
+            ->count();
+            if($existealmacen > 0){
+                $almacen = DB::table('user_rel_almacenes as ura')
+                ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
+                ->select('ura.id', 'a.Numero', 'a.Nombre')
+                ->where('a.Numero', $request->numeroalmacen)
+                ->where('a.Status', 'ALTA')
+                ->orderby('a.Numero', 'DESC')
+                ->first();
+                $numero = $almacen->Numero;
+                $nombre = $almacen->Nombre;
+            }
+        }else{
+            $existealmacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->count();
+            if($existealmacen > 0){
+                $almacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->first();
+                $numero = $almacen->Numero;
+                $nombre = $almacen->Nombre;
+            }
         }
         $data = array(
             'numero' => $numero,

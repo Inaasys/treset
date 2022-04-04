@@ -18,6 +18,10 @@ use App\Role;
 use App\Permiso;
 use App\User_Rel_Permiso;
 use App\User_Rel_Menu;
+use App\User_Rel_Almacen;
+use App\User_Rel_Serie;
+use App\Almacen;
+use App\FolioComprobanteFactura;
 use Mail;
 use App\Personal;
 use App\Serie;
@@ -231,10 +235,34 @@ class UserController extends ConfiguracionSistemaController
               );
 
         }
+        //almacenes
+        $almacenes = Almacen::where('Status', 'ALTA')->get();
+        $select_almacenes_asignados = "<option disabled hidden>Selecciona...</option>";
+        foreach($almacenes as $a){
+            $tiene_almacen_asignado= User_Rel_Almacen::where('almacen_id', $a->Numero)->where('user_id', $request->id)->count();
+            if ($tiene_almacen_asignado > 0) {
+                $select_almacenes_asignados = $select_almacenes_asignados."<option value='".$a->Numero."' selected>".$a->Nombre."</option>"; 
+            }else{
+                $select_almacenes_asignados = $select_almacenes_asignados."<option value='".$a->Numero."'>".$a->Nombre."</option>";
+            }
+        }
+        //series facturas
+        $series_facturas = FolioComprobanteFactura::where('Status', 'ALTA')->get();
+        $select_series_asignados_facturas = "<option disabled hidden>Selecciona...</option>";
+        foreach($series_facturas as $sf){
+            $tiene_serie_asignada = User_Rel_Serie::where('serie_id', $sf->Numero)->where('user_id', $request->id)->where('documento_serie', 'FACTURAS')->count();
+            if ($tiene_serie_asignada > 0) {
+                $select_series_asignados_facturas = $select_series_asignados_facturas."<option value='".$sf->Numero."' selected>".$sf->Serie."</option>"; 
+            }else{
+                $select_series_asignados_facturas = $select_series_asignados_facturas."<option value='".$sf->Numero."'>".$sf->Serie."</option>";
+            }
+        }
         $data = array(
             "array_submenus" => $array_submenus,
             "array_permisos_crud" => $array_permisos_crud,
-            "name" => $user->name
+            "name" => $user->name,
+            "select_almacenes_asignados" => $select_almacenes_asignados,
+            "select_series_asignados_facturas" => $select_series_asignados_facturas
         );
         return response()->json($data);
     }
@@ -280,6 +308,43 @@ class UserController extends ConfiguracionSistemaController
             $User_Rel_Permiso->save();
             if (App::environment('local') || App::environment('production')) {
                 DB::unprepared('SET IDENTITY_INSERT user_rel_permisos OFF');
+            }
+        }
+        //almacenes asignados
+        $eliminaralmacenesasignados = User_Rel_Almacen::where('user_id', $request->id_usuario_permisos)->forceDelete();
+        if ($request->has("almacenesasignados")){
+            foreach($request->almacenesasignados as $almacen_asignado){
+                $id = Helpers::ultimoidregistrotabla('App\User_Rel_Almacen');
+                if (App::environment('local') || App::environment('production')) {
+                    DB::unprepared('SET IDENTITY_INSERT user_rel_almacenes ON');
+                }
+                $User_Rel_Almacen = new User_Rel_Almacen;
+                $User_Rel_Almacen->id = $id;
+                $User_Rel_Almacen->user_id = $request->id_usuario_permisos;
+                $User_Rel_Almacen->almacen_id = $almacen_asignado;
+                $User_Rel_Almacen->save();
+                if (App::environment('local') || App::environment('production')) {
+                    DB::unprepared('SET IDENTITY_INSERT user_rel_almacenes OFF');
+                }
+            }
+        }
+        //series asignadas facturas
+        $eliminarseriesasignadasfacturas = User_Rel_Serie::where('user_id', $request->id_usuario_permisos)->where('documento_serie', 'FACTURAS')->forceDelete();
+        if ($request->has("seriesfacturacionasignadas")){
+            foreach($request->seriesfacturacionasignadas as $serie_factura_asignada){
+                $id = Helpers::ultimoidregistrotabla('App\User_Rel_Serie');
+                if (App::environment('local') || App::environment('production')) {
+                    DB::unprepared('SET IDENTITY_INSERT user_rel_series ON');
+                }
+                $User_Rel_Serie = new User_Rel_Serie;
+                $User_Rel_Serie->id = $id;
+                $User_Rel_Serie->user_id = $request->id_usuario_permisos;
+                $User_Rel_Serie->serie_id = $serie_factura_asignada;
+                $User_Rel_Serie->documento_serie='FACTURAS';
+                $User_Rel_Serie->save();
+                if (App::environment('local') || App::environment('production')) {
+                    DB::unprepared('SET IDENTITY_INSERT user_rel_series OFF');
+                }
             }
         }
         return response()->json($User_Rel_Menu);

@@ -112,7 +112,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="terminar(\''.$data->Orden .'\')">Terminar OT</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="abrirnuevamente(\''.$data->Orden .'\')">Abrir Nuevamente OT</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->Orden .'\')">Bajas</a></li>'.
-                                                '<li><a class="paddingmenuopciones" href="'.route('ordenes_trabajo_generar_pdfs_indiv',$data->Orden).'" target="_blank">Generar Documento</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="'.route('ordenes_trabajo_generar_pdfs_indiv',$data->Orden).'" target="_blank">Ver Documento PDF</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Orden .'\')">Enviar Documento por Correo</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="modificardatosgeneralesorden(\''.$data->Orden .'\')">Modificar Datos Generales</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="generardocumentoeniframe(\''.$data->Orden .'\')">Imprimir Documento PDF</a></li>'.
@@ -121,19 +121,19 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                         return $operaciones;
                     })
                     ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
-                    ->addColumn('Total', function($data){ return $data->Total; })
-                    ->addColumn('Kilometros', function($data){ return $data->Kilometros; })
-                    ->addColumn('Impuesto', function($data){ return $data->Impuesto; })
-                    ->addColumn('Importe', function($data){ return $data->Importe; })
-                    ->addColumn('Descuento', function($data){ return $data->Descuento; })
-                    ->addColumn('SubTotal', function($data){ return $data->SubTotal; })
-                    ->addColumn('Iva', function($data){ return $data->Iva; })
-                    ->addColumn('Facturado', function($data){ return $data->Facturado; })
-                    ->addColumn('Costo', function($data){ return $data->Costo; })
-                    ->addColumn('Comision', function($data){ return $data->Comision; })
-                    ->addColumn('Utilidad', function($data){ return $data->Utilidad; })
+                    //->addColumn('Total', function($data){ return $data->Total; })
+                    //->addColumn('Kilometros', function($data){ return $data->Kilometros; })
+                    //->addColumn('Impuesto', function($data){ return $data->Impuesto; })
+                    //->addColumn('Importe', function($data){ return $data->Importe; })
+                    //->addColumn('Descuento', function($data){ return $data->Descuento; })
+                    //->addColumn('SubTotal', function($data){ return $data->SubTotal; })
+                    //->addColumn('Iva', function($data){ return $data->Iva; })
+                    //->addColumn('Facturado', function($data){ return $data->Facturado; })
+                    //->addColumn('Costo', function($data){ return $data->Costo; })
+                    //->addColumn('Comision', function($data){ return $data->Comision; })
+                    //->addColumn('Utilidad', function($data){ return $data->Utilidad; })
                     ->addColumn('HorasReales', function($data){ return $data->HorasReales; })
-                    ->addColumn('KmProximoServicio', function($data){ return $data->KmProximoServicio; })
+                    //->addColumn('KmProximoServicio', function($data){ return $data->KmProximoServicio; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
@@ -836,6 +836,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                         $readonly = 'readonly="readonly"';
                         $readonlyprecio = 'readonly="readonly"';
                     }
+                    $solicitartecnico = 'data-parsley-tecnico="[3, 1000]"';
                 }else{
                     $botonasignartecnicos = '';
                     $botoneliminarfila = '';
@@ -845,6 +846,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                         $readonlyprecio = 'readonly="readonly"';
                     }
                     $readonly = 'readonly="readonly"';
+                    $solicitartecnico = '';
                 }
                 $filasdetallesordentrabajo=$filasdetallesordentrabajo. 
                 '<tr class="filasservicios" id="filaservicio'.$contadorservicios.'">'.
@@ -879,7 +881,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxl anotacionespartida" name="anotacionespartida[]" value="'.$dot->Anotaciones.'" '.$readonly.'  data-parsley-length="[1, 255]"></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodxs statuspartida" name="statuspartida[]" value="'.$dot->Status.'" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodxs itempartidabd" name="itempartidabd[]" value="'.$dot->Item.'" readonly><input type="text" class="form-control divorinputmodxs itempartida" name="itempartida[]" value="'.$dot->Item.'" readonly></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida1" name="numerotecnicopartida1[]" value="'.$dot->Tecnico1.'" readonly><input type="text" class="form-control divorinputmodl tecnicopartida1" name="tecnicopartida1[]" value="'.$tecnico1.'" data-parsley-tecnico="[3, 1000]" readonly></td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida1" name="numerotecnicopartida1[]" value="'.$dot->Tecnico1.'" readonly><input type="text" class="form-control divorinputmodl tecnicopartida1" name="tecnicopartida1[]" value="'.$tecnico1.'" '.$solicitartecnico.' readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida2" name="numerotecnicopartida2[]" value="'.$dot->Tecnico2.'" readonly><input type="text" class="form-control divorinputmodl tecnicopartida2" name="tecnicopartida2[]" value="'.$tecnico2.'" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida3" name="numerotecnicopartida3[]" value="'.$dot->Tecnico3.'" readonly><input type="text" class="form-control divorinputmodl tecnicopartida3" name="tecnicopartida3[]" value="'.$tecnico3.'" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodl numerotecnicopartida4" name="numerotecnicopartida4[]" value="'.$dot->Tecnico4.'" readonly><input type="text" class="form-control divorinputmodl tecnicopartida4" name="tecnicopartida4[]" value="'.$tecnico4.'" readonly></td>'.
@@ -894,7 +896,9 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                 '</tr>';
                 $contadorservicios++;
                 $contadorfilas++;
-                $item++;
+                //$item++;
+                $item = $dot->Item + 1;
+                $partida = $dot->Partida +1;
             }
         }else{
             $filasdetallesordentrabajo = '';
@@ -921,6 +925,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             "contadorservicios" => $contadorservicios,
             "contadorfilas" => $contadorfilas,
             "item" => $item,
+            "partida" => $partida,
             "modificacionpermitida" => $modificacionpermitida,
             "cliente" => $cliente,
             "delcliente" => $delcliente,
@@ -1055,7 +1060,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                         'Cargo' => $request->cargopartida [$key],
                         'Traspaso' => $request->traspasopartida [$key],
                         'Compra' => $request->comprapartida [$key],
-                        'Item' => $request->itempartida [$key],
+                        //'Item' => $request->itempartida [$key],
                         'Usuario' => $request->usuariopartida [$key],
                         'Tecnico1' => $request->numerotecnicopartida1 [$key],
                         'Tecnico2' => $request->numerotecnicopartida2 [$key],
@@ -1069,7 +1074,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                         'Status' => $request->statuspartida [$key],
                         'Almacen' => $request->almacenpartida [$key],
                         'Cotizacion' => $request->cotizacionpartida [$key],
-                        'Partida' => $request->partidapartida [$key]
+                        //'Partida' => $request->partidapartida [$key]
                     ]);
                 }elseif($request->tipofila [$key] == 'agregado'){
                     //agregar todas las partidas agregadas en la modificación

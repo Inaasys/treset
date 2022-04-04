@@ -245,11 +245,10 @@
         var carta_porte_obtener_estados = '{!!URL::to('carta_porte_obtener_estados')!!}';
         var carta_porte_obtener_paises = '{!!URL::to('carta_porte_obtener_paises')!!}';
         var carta_porte_obtener_codigospostales = '{!!URL::to('carta_porte_obtener_codigospostales')!!}';
-
-
         var carta_porte_obtener_coonfiguracionesautotransporte = '{!!URL::to('carta_porte_obtener_coonfiguracionesautotransporte')!!}';
-
-
+        var carta_porte_obtener_configuracionautotransporte_por_clave = '{!!URL::to('carta_porte_obtener_configuracionautotransporte_por_clave')!!}';
+        var carta_porte_obtener_clavestransporte = '{!!URL::to('carta_porte_obtener_clavestransporte')!!}';
+        var carta_porte_obtener_clavetransporte_por_clave = '{!!URL::to('carta_porte_obtener_clavetransporte_por_clave')!!}';
         var notas_credito_clientes_obtener_almacenes = '{!!URL::to('notas_credito_clientes_obtener_almacenes')!!}';
         var notas_credito_clientes_obtener_almacen_por_numero = '{!!URL::to('notas_credito_clientes_obtener_almacen_por_numero')!!}';
         var notas_credito_clientes_obtener_codigos_postales = '{!!URL::to('notas_credito_clientes_obtener_codigos_postales')!!}';

@@ -139,14 +139,14 @@ function listar(){
         },
         columns: campos_tabla,
         "drawCallback": function( data ) {
-            $("#sumaimportefiltrado").html(data.json.sumaimporte);
-            $("#sumadescuentofiltrado").html(data.json.sumadescuento);
-            $("#sumasubtotalfiltrado").html(data.json.sumasubtotal);
-            $("#sumaivafiltrado").html(data.json.sumaiva);
-            $("#sumatotalfiltrado").html(data.json.sumatotal);
-            $("#sumacostofiltrado").html(data.json.sumacosto);
-            $("#sumacomisionfiltrado").html(data.json.sumacomision);
-            $("#sumautilidadfiltrado").html(data.json.sumautilidad); 
+            $("#sumaimportefiltrado").html(number_format(round(data.json.sumaimporte, numerodecimales), numerodecimales, '.', ''));
+            $("#sumadescuentofiltrado").html(number_format(round(data.json.sumadescuento, numerodecimales), numerodecimales, '.', ''));
+            $("#sumasubtotalfiltrado").html(number_format(round(data.json.sumasubtotal, numerodecimales), numerodecimales, '.', ''));
+            $("#sumaivafiltrado").html(number_format(round(data.json.sumaiva, numerodecimales), numerodecimales, '.', ''));
+            $("#sumatotalfiltrado").html(number_format(round(data.json.sumatotal, numerodecimales), numerodecimales, '.', ''));
+            $("#sumacostofiltrado").html(number_format(round(data.json.sumacosto, numerodecimales), numerodecimales, '.', ''));
+            $("#sumacomisionfiltrado").html(number_format(round(data.json.sumacomision, numerodecimales), numerodecimales, '.', ''));
+            $("#sumautilidadfiltrado").html(number_format(round(data.json.sumautilidad, numerodecimales), numerodecimales, '.', '')); 
         },
         initComplete: function () {
           // Aplicar busquedas por columna
@@ -1158,6 +1158,7 @@ function calculartotalordentrabajo(){
 var contadorservicios=0;
 var contadorfilas = 0;
 var item = 1;
+var partida = 1;
 function agregarfilaservicio(Codigo, Servicio, Unidad, Costo, Venta, Cantidad, ClaveProducto, ClaveUnidad, tipooperacion){
     var impuesto = "16."+numerocerosconfigurados;
     var importepartida = new Decimal(Cantidad).times(Venta);
@@ -1206,13 +1207,14 @@ function agregarfilaservicio(Codigo, Servicio, Unidad, Costo, Venta, Cantidad, C
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm horaspartida3" name="horaspartida3[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)" readonly></td>'+
                         '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm horaspartida4" name="horaspartida4[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this)" readonly></td>'+
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxs promocionpartida" name="promocionpartida[]" readonly></td>'+
-                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxs partidapartida" name="partidapartida[]" value="'+item+'" readonly></td>'+
+                        '<td class="tdmod"><input type="text" class="form-control divorinputmodxs partidapartida" name="partidapartida[]" value="'+partida+'" readonly></td>'+
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxs almacenpartida" name="almacenpartida[]" value="0" readonly></td>'+
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodxs cotizacionpartida" name="cotizacionpartida[]" readonly data-parsley-length="[1, 20]"></td>'+
                 '</tr>';
     contadorservicios++;
     contadorfilas++;
     item++;
+    partida++;
     $("#tablaserviciosordentrabajo").append(fila);
     $("#numerofilastablaservicios").val(contadorservicios);
     $("#numerofilas").val(contadorservicios);
@@ -2069,9 +2071,9 @@ function eliminarfila(numerofila){
     }else{
       //eliminar fila
       $("#filaservicio"+numerofila).remove();
-      contadorfilas--; //importante para todos los calculo en el modulo se debe restar al contadorfilas la fila que se acaba de eliminar
-      contadorservicios--;
-      item--;
+      //contadorfilas--; //importante para todos los calculo en el modulo se debe restar al contadorfilas la fila que se acaba de eliminar
+      //contadorservicios--;
+      //item--;
       renumerarfilasordentrabajo();//importante para todos los calculo en el modulo
       calculartotalordentrabajo();
       $("#numerofilastablaservicios").val(contadorservicios);
@@ -2109,7 +2111,7 @@ function renumerarfilasordentrabajo(){
     lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilasordentrabajo("+i+')');
   }
   //renumerar item
-  lista = document.getElementsByClassName("itempartida");
+  /*lista = document.getElementsByClassName("itempartida");
   for (var i = 0; i < lista.length; i++) {
     lista[i].setAttribute("value", i+parseInt(1));
   }
@@ -2118,6 +2120,7 @@ function renumerarfilasordentrabajo(){
   for (var i = 0; i < lista.length; i++) {
     lista[i].setAttribute("value", i+parseInt(1));
   }
+  */
 }  
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
@@ -2648,6 +2651,7 @@ function obtenerdatos(ordenmodificar){
     contadorservicios = data.contadorservicios;
     contadorfilas = data.contadorfilas;
     item = data.item;
+    partida = data.partida;
     //asignar el tipo de operacion que se realizara
     $("#tipooperacion").val("modificacion");
     //activar busquedas

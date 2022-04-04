@@ -165,12 +165,16 @@ return [
     //usuariis que puedes modificar insumos
     'usuariosamodificarinsumos' => '',
     'modificarcostosdeproductos' => '',
-    'suc2' => 'SocasaRefaccionaria',
+    'modificarcreditodeclientes' => '',
+    'modificarcostoyventadeservicios' => '',
+    'suc2' => env('DB2_DATABASE'),
     'connsuc2' => 'sqlsrv2',
-    'suc3' => 'SocasaXonacatlan',
+    'suc3' => env('DB3_DATABASE'),
     'connsuc3' => 'sqlsrv3',
-    'suc4' => 'Tecnodiesel',
+    'suc4' => env('DB4_DATABASE'),
     'connsuc4' => 'sqlsrv4',
+
+    
 
     /*
     |--------------------------------------------------------------------------

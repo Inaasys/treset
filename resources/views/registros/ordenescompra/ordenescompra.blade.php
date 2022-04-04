@@ -13,7 +13,7 @@
             <div class="row clearfix">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="card" id="listadoregistros">
-                        <div class="header {{$empresa->background_forms_and_modals}}">
+                        <div class="header {{$empresa->background_forms_and_modals}}" >
                             <div class="row clearfix">
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
                                     <h5>&nbsp;&nbsp;&nbsp;ORDENES DE COMPRA&nbsp;&nbsp;&nbsp;</h5>
@@ -79,15 +79,6 @@
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap">
                                     <thead class="{{$empresa->background_tables}}">
-                                        @if($mostrartotalesdecolumnasendocumentos == 'S')
-                                            <tr>
-                                                <th class="bg-light-green">Importe: <b id="sumaimportefiltrado"></b></th>
-                                                <th class="bg-light-green">Descuento: <b id="sumadescuentofiltrado"></b></th>
-                                                <th class="bg-light-green">SubTotal: <b id="sumasubtotalfiltrado"></b></th>
-                                                <th class="bg-light-green">Iva: <b id="sumaivafiltrado"></b></th>
-                                                <th class="bg-light-green">Total: <b id="sumatotalfiltrado"></b></th>
-                                            </tr>  
-                                        @endif
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
@@ -105,6 +96,19 @@
                                         </tr>
                                     </tfoot>
                                 </table>
+                                @if($mostrartotalesdecolumnasendocumentos == 'S')
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped table-hover display nowrap" style="font-size:10px;">
+                                                <tr class="{{$empresa->background_forms_and_modals}}">
+                                                    <th>Sum Importe: <b id="sumaimportefiltrado"></b></th>
+                                                    <th>Sum Descuento: <b id="sumadescuentofiltrado"></b></th>
+                                                    <th>Sum SubTotal: <b id="sumasubtotalfiltrado"></b></th>
+                                                    <th>Sum Iva: <b id="sumaivafiltrado"></b></th>
+                                                    <th>Sum Total: <b id="sumatotalfiltrado"></b></th>
+                                                </tr>   
+                                            </table>
+                                        </div>
+                                @endif 
                             </div>
                         </div>
                     </div>

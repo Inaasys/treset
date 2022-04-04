@@ -87,7 +87,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                         return $operaciones;
                     })
                     ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
-                    ->addColumn('Abono', function($data){ return $data->Abono; })
+                    //->addColumn('Abono', function($data){ return $data->Abono; })
                     ->addColumn('Compras', function($data){ return substr($data->Compras, 0, 70); })
                     ->addColumn('Facturas', function($data){ return substr($data->Facturas, 0, 70); })
                     ->rawColumns(['operaciones'])

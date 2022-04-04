@@ -13,7 +13,7 @@
             <div class="row clearfix">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="card" id="listadoregistros">
-                        <div class="header bg-red table-responsive button-demo">
+                        <div class="header {{$empresa->background_forms_and_modals}} table-responsive button-demo">
                         	<table>
                         		<tr>
                         			<td >
@@ -97,7 +97,7 @@
                                 </div>
                             </form>
                             <div class="table-responsive">
-                                <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover" style="width:100% !important;">
+                                <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap" style="width:100% !important;">
                                     <thead class="customercolor">
                                         <tr id="cabecerastablareporte">
                                         </tr>

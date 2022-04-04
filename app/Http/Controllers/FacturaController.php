@@ -51,6 +51,7 @@ use App\CuentaXCobrarDetalle;
 use App\NotaCliente;
 use App\NotaClienteDetalle;
 use App\NotaClienteDocumento;
+use App\User_Rel_Serie;
 use Config;
 use Mail;
 use Facturapi\Facturapi;
@@ -69,17 +70,45 @@ class FacturaController extends ConfiguracionSistemaController{
     }
     
     public function facturas(){
-        $contarserieusuario = FolioComprobanteFactura::where('Predeterminar', '+')->count();
-        if($contarserieusuario == 0){
-            $FolioComprobanteFactura = FolioComprobanteFactura::orderBy('Numero','DESC')->take(1)->get();
-            $serieusuario = $FolioComprobanteFactura[0]->Serie;
-            $esquema = $FolioComprobanteFactura[0]->Esquema;
-            $depto = $FolioComprobanteFactura[0]->Depto;
+        $contarseriesasignadasausuario = User_Rel_Serie::where('user_id', Auth::user()->id)->where('documento_serie', 'FACTURAS')->count();
+        if($contarseriesasignadasausuario > 0){
+            $contarserieusuario = DB::table('user_rel_series as urs')
+            ->join('Folios Comprobantes Facturas as fcf', 'urs.serie_id', '=', 'fcf.Numero')
+            ->select('urs.id', 'fcf.Numero', 'fcf.Serie', 'fcf.Esquema', 'fcf.Depto', 'fcf.Predeterminar')
+            ->where('fcf.Predeterminar', '+')
+            ->count();
+            if($contarserieusuario == 0){
+                $FolioComprobanteFactura = DB::table('user_rel_series as urs')
+                ->join('Folios Comprobantes Facturas as fcf', 'urs.serie_id', '=', 'fcf.Numero')
+                ->select('urs.id', 'fcf.Numero', 'fcf.Serie', 'fcf.Esquema', 'fcf.Depto', 'fcf.Predeterminar')
+                ->orderBy('fcf.Numero', 'DESC')
+                ->take(1)->get();
+                $serieusuario = $FolioComprobanteFactura[0]->Serie;
+                $esquema = $FolioComprobanteFactura[0]->Esquema;
+                $depto = $FolioComprobanteFactura[0]->Depto;
+            }else{
+                $FolioComprobanteFactura = DB::table('user_rel_series as urs')
+                ->join('Folios Comprobantes Facturas as fcf', 'urs.serie_id', '=', 'fcf.Numero')
+                ->select('urs.id', 'fcf.Numero', 'fcf.Serie', 'fcf.Esquema', 'fcf.Depto', 'fcf.Predeterminar')
+                ->where('fcf.Predeterminar', '+')
+                ->first();
+                $serieusuario = $FolioComprobanteFactura->Serie;
+                $esquema = $FolioComprobanteFactura->Esquema;
+                $depto = $FolioComprobanteFactura->Depto;
+            }
         }else{
-            $FolioComprobanteFactura = FolioComprobanteFactura::where('Predeterminar', '+')->first();
-            $serieusuario = $FolioComprobanteFactura->Serie;
-            $esquema = $FolioComprobanteFactura->Esquema;
-            $depto = $FolioComprobanteFactura->Depto;
+            $contarserieusuario = FolioComprobanteFactura::where('Predeterminar', '+')->count();
+            if($contarserieusuario == 0){
+                $FolioComprobanteFactura = FolioComprobanteFactura::orderBy('Numero','DESC')->take(1)->get();
+                $serieusuario = $FolioComprobanteFactura[0]->Serie;
+                $esquema = $FolioComprobanteFactura[0]->Esquema;
+                $depto = $FolioComprobanteFactura[0]->Depto;
+            }else{
+                $FolioComprobanteFactura = FolioComprobanteFactura::where('Predeterminar', '+')->first();
+                $serieusuario = $FolioComprobanteFactura->Serie;
+                $esquema = $FolioComprobanteFactura->Esquema;
+                $depto = $FolioComprobanteFactura->Depto;
+            }
         }
         $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Facturas', Auth::user()->id);
         $configuracion_tabla = $configuraciones_tabla['configuracion_tabla'];
@@ -216,24 +245,24 @@ class FacturaController extends ConfiguracionSistemaController{
                         return $operaciones;
                     })
                     ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
-                    ->addColumn('SubTotal', function($data){ return $data->SubTotal; })
-                    ->addColumn('Iva', function($data){ return $data->Iva; })
-                    ->addColumn('Total', function($data){ return $data->Total; })
-                    ->addColumn('Abonos', function($data){ return $data->Abonos; })
-                    ->addColumn('Descuentos', function($data){ return $data->Descuentos; })
-                    ->addColumn('Saldo', function($data){ return $data->Saldo; })
+                    //->addColumn('SubTotal', function($data){ return $data->SubTotal; })
+                    //->addColumn('Iva', function($data){ return $data->Iva; })
+                    //->addColumn('Total', function($data){ return $data->Total; })
+                    //->addColumn('Abonos', function($data){ return $data->Abonos; })
+                    //->addColumn('Descuentos', function($data){ return $data->Descuentos; })
+                    //->addColumn('Saldo', function($data){ return $data->Saldo; })
                     ->addColumn('ImpLocTraslados', function($data){ return $data->ImpLocTraslados; })
                     ->addColumn('ImpLocRetenciones', function($data){ return $data->ImpLocRetenciones; })
                     ->addColumn('IepsRetencion', function($data){ return $data->IepsRetencion; })
                     ->addColumn('IsrRetencion', function($data){ return $data->IsrRetencion; })
                     ->addColumn('IvaRetencion', function($data){ return $data->IvaRetencion; })
                     ->addColumn('Ieps', function($data){ return $data->Ieps; })
-                    ->addColumn('Descuento', function($data){ return $data->Descuento; })
-                    ->addColumn('Importe', function($data){ return $data->Importe; })
+                    //->addColumn('Descuento', function($data){ return $data->Descuento; })
+                    //->addColumn('Importe', function($data){ return $data->Importe; })
                     ->addColumn('TipoCambio', function($data){ return $data->TipoCambio; })
-                    ->addColumn('Costo', function($data){ return $data->Costo; })
-                    ->addColumn('Comision', function($data){ return $data->Comision; })
-                    ->addColumn('Utilidad', function($data){ return $data->Utilidad; })
+                    //->addColumn('Costo', function($data){ return $data->Costo; })
+                    //->addColumn('Comision', function($data){ return $data->Comision; })
+                    //->addColumn('Utilidad', function($data){ return $data->Utilidad; })
                     ->rawColumns(['operaciones'])
                     ->make();
         } 
@@ -753,7 +782,17 @@ class FacturaController extends ConfiguracionSistemaController{
     //obtener folios fiscales
     public function facturas_obtener_folios_fiscales(Request $request){
         if($request->ajax()){
-            $data = FolioComprobanteFactura::where('Status', 'ALTA')->OrderBy('Numero', 'DESC')->get();
+            $contarseriesasignadasausuario = User_Rel_Serie::where('user_id', Auth::user()->id)->where('documento_serie', 'FACTURAS')->count();
+            if($contarseriesasignadasausuario > 0){
+                $data = DB::table('user_rel_series as urs')
+                ->join('Folios Comprobantes Facturas as fcf', 'urs.serie_id', '=', 'fcf.Numero')
+                ->select('urs.id', 'fcf.Numero', 'fcf.Serie', 'fcf.Esquema', 'fcf.Depto', 'fcf.Status')
+                ->where('fcf.Status', 'ALTA')
+                ->orderby('fcf.Numero', 'DESC')
+                ->get();
+            }else{
+                $data = FolioComprobanteFactura::where('Status', 'ALTA')->OrderBy('Numero', 'DESC')->get();
+            }
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarfoliofiscal(\''.$data->Serie.'\',\''.$data->Esquema.'\',\''.$data->Depto.'\')">Seleccionar</div>';
@@ -773,9 +812,7 @@ class FacturaController extends ConfiguracionSistemaController{
     //obtener serie interna
     public function facturas_obtener_serie_interna(){
         $foliointernofactura = FolioComprobanteFactura::where('Esquema', 'INTERNA')->orderby('Numero', 'ASC')->take(1)->get();
-
         $serieesquemainterno = Factura::select("Folio")->where('Serie', ''.$foliointernofactura[0]->Serie.'')->orderBy("Folio", "DESC")->take(1)->get();
-        
         if(sizeof($serieesquemainterno) == 0 || sizeof($serieesquemainterno) == "" || sizeof($serieesquemainterno) == null){
             $folio = 1;
         }else{
@@ -2319,11 +2356,16 @@ class FacturaController extends ConfiguracionSistemaController{
                                 $claveunidad = ClaveUnidad::where('Clave', $dfr->ClaveUnidad)->first();
                                 $producto = Producto::where('Codigo', $dfr->Codigo)->first();
                                 $insumodet = RemisionDetalle::where('Remision', $dfr->Remision)->where('Codigo', $dfr->Codigo)->first();
+                                if($insumodet == null){
+                                    $insumodetalle = "";
+                                }else{
+                                    $insumodetalle = $insumodet->Insumo;
+                                }
                                 $datadetalle[]=array(
                                     "cantidaddetalle"=> Helpers::convertirvalorcorrecto($dfr->Cantidad),
                                     "codigodetalle"=>$dfr->Codigo,
                                     "descripciondetalle"=>$dfr->Descripcion,
-                                    "insumodetalle"=>$insumodet->Insumo,
+                                    "insumodetalle"=>$insumodetalle,
                                     "preciodetalle" => Helpers::convertirvalorcorrecto($dfr->Precio),
                                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($dfr->SubTotal),
                                     "impuestodetalle" => Helpers::convertirvalorcorrecto($dfr->Impuesto),
@@ -2414,6 +2456,7 @@ class FacturaController extends ConfiguracionSistemaController{
             }else{
                 $est = $cliente->Estado;
             }
+            $regimenfiscalcliente = c_RegimenFiscal::where('Clave', $cliente->RegimenFiscal)->first();
             $agente = Agente::where('Numero', $f->Agente)->first();
             $formapago = FormaPago::where('Clave', $f->FormaPago)->first();
             $metodopago = MetodoPago::where('Clave', $f->MetodoPago)->first();
@@ -2424,6 +2467,8 @@ class FacturaController extends ConfiguracionSistemaController{
             $formatter = new NumeroALetras;
             $formatter->conector = 'PESOS';
             $totalletras = $formatter->toInvoice($f->Total, 2, 'M.N.');
+            $documentosrelacionados = FacturaDocumento::where('Factura', $f->Factura)->first();
+            //dd($documentosrelacionados);
             $foliofiscalfactura = FolioComprobanteFactura::where('Serie', $f->Serie)->where('Esquema', $f->Esquema)->first();
             $pagares = $foliofiscalfactura->Pagare;
             $reemplazarbeneficiario = str_replace("%beneficiario", $this->empresa->Empresa, $pagares);
@@ -2439,8 +2484,10 @@ class FacturaController extends ConfiguracionSistemaController{
             $pagare = $reemplazarbr;
             $data[]=array(
                 "factura"=>$f,
+                "documentosrelacionados" => $documentosrelacionados,
                 "datageneral" => $datageneral,
                 "cliente" => $cliente,
+                "regimenfiscalcliente" => $regimenfiscalcliente,
                 "est" => $est,
                 "agente" => $agente,
                 "formapago" => $formapago,
@@ -2563,11 +2610,16 @@ class FacturaController extends ConfiguracionSistemaController{
                                 $claveunidad = ClaveUnidad::where('Clave', $dfr->ClaveUnidad)->first();
                                 $producto = Producto::where('Codigo', $dfr->Codigo)->first();
                                 $insumodet = RemisionDetalle::where('Remision', $dfr->Remision)->where('Codigo', $dfr->Codigo)->first();
+                                if($insumodet == null){
+                                    $insumodetalle = "";
+                                }else{
+                                    $insumodetalle = $insumodet->Insumo;
+                                }
                                 $datadetalle[]=array(
                                     "cantidaddetalle"=> Helpers::convertirvalorcorrecto($dfr->Cantidad),
                                     "codigodetalle"=>$dfr->Codigo,
                                     "descripciondetalle"=>$dfr->Descripcion,
-                                    "insumodetalle"=>$insumodet->Insumo,
+                                    "insumodetalle"=>$insumodetalle,
                                     "preciodetalle" => Helpers::convertirvalorcorrecto($dfr->Precio),
                                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($dfr->SubTotal),
                                     "impuestodetalle" => Helpers::convertirvalorcorrecto($dfr->Impuesto),
@@ -2647,6 +2699,7 @@ class FacturaController extends ConfiguracionSistemaController{
             }else{
                 $est = $cliente->Estado;
             }
+            $regimenfiscalcliente = c_RegimenFiscal::where('Clave', $cliente->RegimenFiscal)->first();
             $agente = Agente::where('Numero', $f->Agente)->first();
             $formapago = FormaPago::where('Clave', $f->FormaPago)->first();
             $metodopago = MetodoPago::where('Clave', $f->MetodoPago)->first();
@@ -2657,6 +2710,8 @@ class FacturaController extends ConfiguracionSistemaController{
             $formatter = new NumeroALetras;
             $formatter->conector = 'PESOS';
             $totalletras = $formatter->toInvoice($f->Total, 2, 'M.N.');
+            $documentosrelacionados = FacturaDocumento::where('Factura', $f->Factura)->first();
+            //dd($documentosrelacionados);
             $foliofiscalfactura = FolioComprobanteFactura::where('Serie', $f->Serie)->where('Esquema', $f->Esquema)->first();
             $pagares = $foliofiscalfactura->Pagare;
             $reemplazarbeneficiario = str_replace("%beneficiario", $this->empresa->Empresa, $pagares);
@@ -2672,8 +2727,10 @@ class FacturaController extends ConfiguracionSistemaController{
             $pagare = $reemplazarbr;
             $data[]=array(
                 "factura"=>$f,
+                "documentosrelacionados"=>$documentosrelacionados,
                 "datageneral" => $datageneral,
                 "cliente" => $cliente,
+                "regimenfiscalcliente" => $regimenfiscalcliente,
                 "est" => $est,
                 "agente" => $agente,
                 "formapago" => $formapago,
@@ -2774,11 +2831,16 @@ class FacturaController extends ConfiguracionSistemaController{
                                 $claveunidad = ClaveUnidad::where('Clave', $dfr->ClaveUnidad)->first();
                                 $producto = Producto::where('Codigo', $dfr->Codigo)->first();
                                 $insumodet = RemisionDetalle::where('Remision', $dfr->Remision)->where('Codigo', $dfr->Codigo)->first();
+                                if($insumodet == null){
+                                    $insumodetalle = "";
+                                }else{
+                                    $insumodetalle = $insumodet->Insumo;
+                                }
                                 $datadetalle[]=array(
                                     "cantidaddetalle"=> Helpers::convertirvalorcorrecto($dfr->Cantidad),
                                     "codigodetalle"=>$dfr->Codigo,
                                     "descripciondetalle"=>$dfr->Descripcion,
-                                    "insumodetalle"=>$insumodet->Insumo,
+                                    "insumodetalle"=>$insumodetalle,
                                     "preciodetalle" => Helpers::convertirvalorcorrecto($dfr->Precio),
                                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($dfr->SubTotal),
                                     "impuestodetalle" => Helpers::convertirvalorcorrecto($dfr->Impuesto),
@@ -2858,6 +2920,7 @@ class FacturaController extends ConfiguracionSistemaController{
             }else{
                 $est = $cliente->Estado;
             }
+            $regimenfiscalcliente = c_RegimenFiscal::where('Clave', $cliente->RegimenFiscal)->first();
             $agente = Agente::where('Numero', $f->Agente)->first();
             $formapago = FormaPago::where('Clave', $f->FormaPago)->first();
             $metodopago = MetodoPago::where('Clave', $f->MetodoPago)->first();
@@ -2868,6 +2931,8 @@ class FacturaController extends ConfiguracionSistemaController{
             $formatter = new NumeroALetras;
             $formatter->conector = 'PESOS';
             $totalletras = $formatter->toInvoice($f->Total, 2, 'M.N.');
+            $documentosrelacionados = FacturaDocumento::where('Factura', $f->Factura)->first();
+            //dd($documentosrelacionados);
             $foliofiscalfactura = FolioComprobanteFactura::where('Serie', $f->Serie)->where('Esquema', $f->Esquema)->first();
             $pagares = $foliofiscalfactura->Pagare;
             $reemplazarbeneficiario = str_replace("%beneficiario", $this->empresa->Empresa, $pagares);
@@ -2883,8 +2948,10 @@ class FacturaController extends ConfiguracionSistemaController{
             $pagare = $reemplazarbr;
             $data[]=array(
                 "factura"=>$f,
+                "documentosrelacionados"=>$documentosrelacionados,
                 "datageneral" => $datageneral,
                 "cliente" => $cliente,
+                "regimenfiscalcliente" => $regimenfiscalcliente,
                 "est" => $est,
                 "agente" => $agente,
                 "formapago" => $formapago,
@@ -3136,11 +3203,16 @@ class FacturaController extends ConfiguracionSistemaController{
                                 $claveunidad = ClaveUnidad::where('Clave', $dfr->ClaveUnidad)->first();
                                 $producto = Producto::where('Codigo', $dfr->Codigo)->first();
                                 $insumodet = RemisionDetalle::where('Remision', $dfr->Remision)->where('Codigo', $dfr->Codigo)->first();
+                                if($insumodet == null){
+                                    $insumodetalle = "";
+                                }else{
+                                    $insumodetalle = $insumodet->Insumo;
+                                }
                                 $datadetalle[]=array(
                                     "cantidaddetalle"=> Helpers::convertirvalorcorrecto($dfr->Cantidad),
                                     "codigodetalle"=>$dfr->Codigo,
                                     "descripciondetalle"=>$dfr->Descripcion,
-                                    "insumodetalle"=>$insumodet->Insumo,
+                                    "insumodetalle"=>$insumodetalle,
                                     "preciodetalle" => Helpers::convertirvalorcorrecto($dfr->Precio),
                                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($dfr->SubTotal),
                                     "impuestodetalle" => Helpers::convertirvalorcorrecto($dfr->Impuesto),
@@ -3220,6 +3292,7 @@ class FacturaController extends ConfiguracionSistemaController{
             }else{
                 $est = $cliente->Estado;
             }
+            $regimenfiscalcliente = c_RegimenFiscal::where('Clave', $cliente->RegimenFiscal)->first();
             $agente = Agente::where('Numero', $f->Agente)->first();
             $formapago = FormaPago::where('Clave', $f->FormaPago)->first();
             $metodopago = MetodoPago::where('Clave', $f->MetodoPago)->first();
@@ -3230,6 +3303,8 @@ class FacturaController extends ConfiguracionSistemaController{
             $formatter = new NumeroALetras;
             $formatter->conector = 'PESOS';
             $totalletras = $formatter->toInvoice($f->Total, 2, 'M.N.');
+            $documentosrelacionados = FacturaDocumento::where('Factura', $f->Factura)->first();
+            //dd($documentosrelacionados);
             $foliofiscalfactura = FolioComprobanteFactura::where('Serie', $f->Serie)->where('Esquema', $f->Esquema)->first();
             $pagares = $foliofiscalfactura->Pagare;
             $reemplazarbeneficiario = str_replace("%beneficiario", $this->empresa->Empresa, $pagares);
@@ -3245,8 +3320,10 @@ class FacturaController extends ConfiguracionSistemaController{
             $pagare = $reemplazarbr;
             $data[]=array(
                 "factura"=>$f,
+                "documentosrelacionados"=>$documentosrelacionados,
                 "datageneral" => $datageneral,
                 "cliente" => $cliente,
+                "regimenfiscalcliente"=> $regimenfiscalcliente,
                 "est" => $est,
                 "agente" => $agente,
                 "formapago" => $formapago,
@@ -3321,11 +3398,16 @@ class FacturaController extends ConfiguracionSistemaController{
                                 $claveunidad = ClaveUnidad::where('Clave', $dfr->ClaveUnidad)->first();
                                 $producto = Producto::where('Codigo', $dfr->Codigo)->first();
                                 $insumodet = RemisionDetalle::where('Remision', $dfr->Remision)->where('Codigo', $dfr->Codigo)->first();
+                                if($insumodet == null){
+                                    $insumodetalle = "";
+                                }else{
+                                    $insumodetalle = $insumodet->Insumo;
+                                }
                                 $datadetalle[]=array(
                                     "cantidaddetalle"=> Helpers::convertirvalorcorrecto($dfr->Cantidad),
                                     "codigodetalle"=>$dfr->Codigo,
                                     "descripciondetalle"=>$dfr->Descripcion,
-                                    "insumodetalle"=>$insumodet->Insumo,
+                                    "insumodetalle"=>$insumodetalle,
                                     "preciodetalle" => Helpers::convertirvalorcorrecto($dfr->Precio),
                                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($dfr->SubTotal),
                                     "impuestodetalle" => Helpers::convertirvalorcorrecto($dfr->Impuesto),
@@ -3405,6 +3487,7 @@ class FacturaController extends ConfiguracionSistemaController{
             }else{
                 $est = $cliente->Estado;
             }
+            $regimenfiscalcliente = c_RegimenFiscal::where('Clave', $cliente->RegimenFiscal)->first();
             $agente = Agente::where('Numero', $f->Agente)->first();
             $formapago = FormaPago::where('Clave', $f->FormaPago)->first();
             $metodopago = MetodoPago::where('Clave', $f->MetodoPago)->first();
@@ -3415,6 +3498,8 @@ class FacturaController extends ConfiguracionSistemaController{
             $formatter = new NumeroALetras;
             $formatter->conector = 'PESOS';
             $totalletras = $formatter->toInvoice($f->Total, 2, 'M.N.');
+            $documentosrelacionados = FacturaDocumento::where('Factura', $f->Factura)->first();
+            //dd($documentosrelacionados);
             $foliofiscalfactura = FolioComprobanteFactura::where('Serie', $f->Serie)->where('Esquema', $f->Esquema)->first();
             $pagares = $foliofiscalfactura->Pagare;
             $reemplazarbeneficiario = str_replace("%beneficiario", $this->empresa->Empresa, $pagares);
@@ -3430,8 +3515,10 @@ class FacturaController extends ConfiguracionSistemaController{
             $pagare = $reemplazarbr;
             $data[]=array(
                 "factura"=>$f,
+                "documentosrelacionados"=>$documentosrelacionados,
                 "datageneral" => $datageneral,
                 "cliente" => $cliente,
+                "regimenfiscalcliente"=>$regimenfiscalcliente,
                 "est" => $est,
                 "agente" => $agente,
                 "formapago" => $formapago,
@@ -3747,31 +3834,43 @@ class FacturaController extends ConfiguracionSistemaController{
                 );
             }
         }
-
         if($factura->TipoRelacion != ""){
             $arraydoc = array();
             foreach($detallesdocumentosfactura as $ddf){
                 array_push($arraydoc, $ddf->UUID);
             } 
-            
             //FACTURA
             // Crea una nueva factura
             $invoice = array(
                 "customer" => array(
                     "legal_name" => $cliente->Nombre,
                     "tax_id" => $cliente->Rfc,
-                    /*"tax_system" => $cliente->RegimenFiscal,
+                    /*
+                    //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
+                    "tax_system" => $cliente->RegimenFiscal,
                     "address" => 
                         array(
                             "zip" => $cliente->CodigoPostal,
                         )
+                    //fin cfdi 4.0
                     */
                 ),
                 "items" => $arraytest,
                 "payment_form" => $factura->FormaPago,
                 "payment_method" => $factura->MetodoPago,
+                /*
+                //se debe cambiar la forma de relacion los documentos y en lugar de mandar arra products, se manda array items como en las facturas de ingreso con facturapi 2.0
+                "related_documents" => array(
+                    array(
+                        "relationship" => $factura->TipoRelacion,
+                        "documents" => $arraydoc
+                    )
+                ),
+                */
+                //datos para facturar en facturapi 1.0
                 "relation" => $factura->TipoRelacion,
                 "related" => $arraydoc,
+                //datos para facturar en facturapi 1.0
                 "folio_number" => $factura->Folio,
                 "series" => $factura->Serie,
                 "currency" => $factura->Moneda,
@@ -3779,18 +3878,20 @@ class FacturaController extends ConfiguracionSistemaController{
                 "conditions" => $factura->CondicionesDePago
             );
         }else{
-
             //FACTURA
             // Crea una nueva factura
             $invoice = array(
                 "customer" => array(
                     "legal_name" => $cliente->Nombre,
                     "tax_id" => $cliente->Rfc,
-                    /*"tax_system" => $cliente->RegimenFiscal,
+                    /*
+                    //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
+                    "tax_system" => $cliente->RegimenFiscal,
                     "address" => 
                         array(
                             "zip" => $cliente->CodigoPostal,
                         )
+                    //fin cfdi 4.0
                     */
                 ),
                 "items" => $arraytest,
@@ -3802,7 +3903,6 @@ class FacturaController extends ConfiguracionSistemaController{
                 "exchange" => Helpers::convertirvalorcorrecto($factura->TipoCambio),
                 "conditions" => $factura->CondicionesDePago
             );
-
         }
         $new_invoice = $this->facturapi->Invoices->create( $invoice );
         $result = json_encode($new_invoice);
@@ -3837,6 +3937,9 @@ class FacturaController extends ConfiguracionSistemaController{
             $Comprobante = new Comprobante;
             $Comprobante->Comprobante = 'Factura';
             $Comprobante->Tipo = $new_invoice->type;
+            //version 4.0
+            //$Comprobante->Version = '4.0';
+            //version 3.3
             $Comprobante->Version = '3.3';
             $Comprobante->Serie = $new_invoice->series;
             $Comprobante->Folio = $new_invoice->folio_number;
@@ -3906,14 +4009,15 @@ class FacturaController extends ConfiguracionSistemaController{
     //cancelar timbre
     public function facturas_baja_timbre(Request $request){
         //cancelar timbre facturapi
+        //con version 1.0 facturapi sin motivo de baja
         //$timbrecancelado = $this->facturapi->Invoices->cancel($request->iddocumentofacturapi);
+        //con version 2.0 facturapi con motivo de baja
         $timbrecancelado = $this->facturapi->Invoices->cancel(
             $request->iddocumentofacturapi,
             [
               "motive" => $request->motivobajatimbre
             ]
         );
-        //$new_invoice = $this->facturapi->Invoices->create( $invoice );
         $result = json_encode($timbrecancelado);
         $result2 = json_decode($result, true);
         if(array_key_exists('ok', $result2) == true){

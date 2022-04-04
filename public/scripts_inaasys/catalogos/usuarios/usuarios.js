@@ -373,6 +373,9 @@ function permisos(id){
                         '<li role="presentation">'+
                             '<a href="#tabtimbrar" data-toggle="tab">Timbrar</a>'+
                         '</li>'+
+                        '<li role="presentation">'+
+                            '<a href="#tabalmacenesyseries" data-toggle="tab">Asignar Almacenes y Series</a>'+
+                        '</li>'+
                     '</ul>'+
                     '<div class="tab-content">'+
                         '<div role="tabpanel" class="tab-pane fade in active" id="tabregistros" >'+
@@ -468,6 +471,15 @@ function permisos(id){
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
+                                        '<label>Lista Precios Fleetguard</label>'+
+                                        '<div class="col-md-12 form-check">'+
+                                            '<input type="checkbox" name="menuregistroslistapreciosfleetguard" id="idmenuregistroslistapreciosfleetguard" class="filled-in submenu accesoregistros" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                            '<label for="idmenuregistroslistapreciosfleetguard">Acceso</label>'+
+                                            '&nbsp;&nbsp;<input type="checkbox" name="registros.listafleetguard.cambios" id="idregistros.listafleetguard.cambios" class="filled-in crudregistros permisoscrud" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();" />'+
+                                            '<label for="idregistros.listafleetguard.cambios">Cambios</label>'+
+                                        '</div>'+
+                                    '</div>'+
+                                    '<div class="col-md-6">'+
                                         '<label>Cotizaciones Productos</label>'+
                                         '<div class="col-md-12 form-check">'+
                                             '<input type="checkbox" name="menuregistroscotizacionesproductos" id="idmenuregistroscotizacionesproductos" class="filled-in submenu accesoregistros" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
@@ -482,6 +494,8 @@ function permisos(id){
                                             '<label for="idregistros.cotizaciones.productos.firmar">Firmar</label>'+ 
                                         '</div>'+
                                     '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Cotizaciones Servicios</label>'+
                                         '<div class="col-md-12 form-check">'+
@@ -497,8 +511,6 @@ function permisos(id){
                                             '<label for="idregistros.cotizaciones.servicios.firmar">Firmar</label>'+ 
                                         '</div>'+
                                     '</div>'+
-                                '</div>'+
-                                '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Remisiones</label>'+
                                         '<div class="col-md-12 form-check">'+
@@ -514,6 +526,8 @@ function permisos(id){
                                             '<label for="idregistros.remisiones.firmar">Firmar</label>'+ 
                                         '</div>'+
                                     '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Facturas</label>'+
                                         '<div class="col-md-12 form-check">'+
@@ -529,8 +543,6 @@ function permisos(id){
                                             '<label for="idregistros.facturas.firmar">Firmar</label>'+ 
                                         '</div>'+
                                     '</div>'+
-                                '</div>'+
-                                '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Producción</label>'+
                                         '<div class="col-md-12 form-check">'+
@@ -546,6 +558,8 @@ function permisos(id){
                                             '<label for="idregistros.produccion.firmar">Firmar</label>'+ 
                                         '</div>'+
                                     '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Traspasos</label>'+
                                         '<div class="col-md-12 form-check">'+
@@ -561,8 +575,6 @@ function permisos(id){
                                             '<label for="idregistros.traspasos.firmar">Firmar</label>'+ 
                                         '</div>'+
                                     '</div>'+
-                                '</div>'+
-                                '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Requisiciones</label>'+
                                         '<div class="col-md-12 form-check">'+
@@ -578,6 +590,8 @@ function permisos(id){
                                             '<label for="idregistros.requisiciones.firmar">Firmar</label>'+ 
                                         '</div>'+
                                     '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Ordenes de Trabajo</label>'+
                                         '<div class="col-md-12 form-check">'+
@@ -595,8 +609,6 @@ function permisos(id){
                                             '<label for="idregistros.ordenes.trabajo.firmar">Firmar</label>'+
                                         '</div>'+
                                     '</div>'+
-                                '</div>'+
-                                '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Cuentas x Cobrar</label>'+
                                         '<div class="col-md-12 form-check">'+
@@ -612,6 +624,8 @@ function permisos(id){
                                             '<label for="idregistros.cuentas.x.cobrar.firmar">Firmar</label>'+ 
                                         '</div>'+
                                     '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Cuentas x Pagar</label>'+
                                         '<div class="col-md-12 form-check">'+
@@ -627,8 +641,6 @@ function permisos(id){
                                             '<label for="idregistros.cuentas.x.pagar.firmar">Firmar</label>'+ 
                                         '</div>'+
                                     '</div>'+
-                                '</div>'+
-                                '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Notas Crédito Clientes</label>'+
                                         '<div class="col-md-12 form-check">'+
@@ -644,6 +656,8 @@ function permisos(id){
                                             '<label for="idregistros.notas.credito.clientes.firmar">Firmar</label>'+ 
                                         '</div>'+
                                     '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Notas Crédito Proveedores</label>'+
                                         '<div class="col-md-12 form-check">'+
@@ -659,8 +673,6 @@ function permisos(id){
                                             '<label for="idregistros.notas.credito.proveedores.firmar">Firmar</label>'+ 
                                         '</div>'+
                                     '</div>'+
-                                '</div>'+
-                                '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Carta Porte</label>'+
                                         '<div class="col-md-12 form-check">'+
@@ -676,6 +688,8 @@ function permisos(id){
                                             '<label for="idregistros.cartasporte.firmar">Firmar</label>'+ 
                                         '</div>'+
                                     '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Ajustes de Inventario</label>'+
                                         '<div class="col-md-12 form-check">'+
@@ -691,8 +705,6 @@ function permisos(id){
                                             '<label for="idregistros.ajustes.inventario.firmar">Firmar</label>'+ 
                                         '</div>'+
                                     '</div>'+
-                                '</div>'+
-                                '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Asignación de Herramienta</label>'+
                                         '<div class="col-md-12 form-check">'+
@@ -712,6 +724,8 @@ function permisos(id){
                                             '<label for="idregistros.asignacion.herramienta.firmar">Firmar</label>'+
                                         '</div>'+
                                     '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Prestamo de Herramienta</label>'+
                                         '<div class="col-md-12 form-check">'+
@@ -729,8 +743,6 @@ function permisos(id){
                                             '<label for="idregistros.prestamo.herramienta.firmar">Firmar</label>'+ 
                                         '</div>'+
                                     '</div>'+
-                                '</div>'+
-                                '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Firmar Documentos</label>'+
                                         '<div class="col-md-12 form-check">'+
@@ -1153,6 +1165,10 @@ function permisos(id){
                                             '<div class="col-md-6">'+
                                                 '<input type="checkbox" name="menureportesordenestrabajohorastecnico" id="idmenureportesordenestrabajohorastecnico" class="filled-in submenu accesoreportes" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
                                                 '<label for="idmenureportesordenestrabajohorastecnico">Horas Técnico</label>'+ 
+                                            '</div>'+  
+                                            '<div class="col-md-6">'+
+                                                '<input type="checkbox" name="menureporteunidadesservicio" id="idmenureporteunidadesservicio" class="filled-in submenu accesoreportes" value="1" onchange="construirarraysubmenus();construirarraypermisoscrud();"/>'+
+                                                '<label for="idmenureporteunidadesservicio">Unidades Servicio</label>'+ 
                                             '</div>'+                                      
                                         '</div>'+
                                     '</div>'+
@@ -1337,6 +1353,36 @@ function permisos(id){
                                 '</div>'+
                             '</div>'+
                         '</div>'+ 
+                        '<div role="tabtimbrar" class="tab-pane fade" id="tabalmacenesyseries">'+
+                            '<div style="height: 450px;overflow-y: scroll;padding: 0px 0px;">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-6">'+
+                                        '<label>Almacenes Asignados a este Usuario</label>'+
+                                        '<select  name="almacenesasignados[]" id="almacenesasignados" class="form-control select2" multiple="multiple" style="width:100% !important;" >'+
+                                        data.select_almacenes_asignados+
+                                        '</select>'+
+                                    '</div>'+
+                                    '<div class="col-md-6">'+
+                                        '<label>Series a Utilizar en Facturación</label>'+
+                                        '<select  name="seriesfacturacionasignadas[]" id="seriesfacturacionasignadas" class="form-control select2" multiple="multiple" style="width:100% !important;" >'+
+                                        data.select_series_asignados_facturas+
+                                        '</select>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-md-6">'+
+                                        '<label>Series a Utilizar en Notas Crédito Clientes</label>'+
+                                        '<select  name="seriesnotasasignadas[]" id="seriesnotasasignadas" class="form-control select2" multiple="multiple" style="width:100% !important;" ></select>'+
+                                    '</div>'+
+                                    '<div class="col-md-6">'+
+                                        '<label>Series a Utilizar en Cuentas Por Cobrar</label>'+
+                                        '<select  name="seriespagosasignadas[]" id="seriespagosasignadas" class="form-control select2" multiple="multiple" style="width:100% !important;" ></select>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                            '<div>'+
+                            '</div>'+
+                        '</div>'+ 
                     '</div>';
         $("#tabsformpermisos").html(tabs);
         $("#ModalPermisos").modal('show');
@@ -1356,6 +1402,7 @@ function permisos(id){
         });
         construirarraysubmenus();
         construirarraypermisoscrud();
+        $('.select2').select2();
     }).fail( function() {
         msj_errorajax();
         $('.page-loader-wrapper').css('display', 'none');

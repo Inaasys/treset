@@ -41,6 +41,7 @@ class RemisionDetalle extends Model
         'InteresMeses',
         'InteresTasa',
         'InteresMonto',
-        'PrecioNeto'
+        'PrecioNeto',
+        'PorRemisionar'
     ];
 }

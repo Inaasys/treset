@@ -127,14 +127,14 @@ function listar(){
         },
         columns: campos_tabla,
         "drawCallback": function( data ) {
-            $("#sumaimportefiltrado").html(data.json.sumaimporte);
-            $("#sumadescuentofiltrado").html(data.json.sumadescuento);
-            $("#sumasubtotalfiltrado").html(data.json.sumasubtotal);
-            $("#sumaivafiltrado").html(data.json.sumaiva);
-            $("#sumatotalfiltrado").html(data.json.sumatotal);
-            $("#sumacostofiltrado").html(data.json.sumacosto);
-            $("#sumacomisionfiltrado").html(data.json.sumacomision);
-            $("#sumautilidadfiltrado").html(data.json.sumautilidad); 
+            $("#sumaimportefiltrado").html(number_format(round(data.json.sumaimporte, numerodecimales), numerodecimales, '.', ''));
+            $("#sumadescuentofiltrado").html(number_format(round(data.json.sumadescuento, numerodecimales), numerodecimales, '.', ''));
+            $("#sumasubtotalfiltrado").html(number_format(round(data.json.sumasubtotal, numerodecimales), numerodecimales, '.', ''));
+            $("#sumaivafiltrado").html(number_format(round(data.json.sumaiva, numerodecimales), numerodecimales, '.', ''));
+            $("#sumatotalfiltrado").html(number_format(round(data.json.sumatotal, numerodecimales), numerodecimales, '.', ''));
+            $("#sumacostofiltrado").html(number_format(round(data.json.sumacosto, numerodecimales), numerodecimales, '.', ''));
+            $("#sumacomisionfiltrado").html(number_format(round(data.json.sumacomision, numerodecimales), numerodecimales, '.', ''));
+            $("#sumautilidadfiltrado").html(number_format(round(data.json.sumautilidad, numerodecimales), numerodecimales, '.', '')); 
         },
         initComplete: function () {
           // Aplicar busquedas por columna
@@ -243,6 +243,11 @@ $("#btnenviarpartidasexcel").on('click', function(e){
         }
         //dar cambio en cantidad para colocar data parsley existencias de forma correcta
         $(".cantidadpartida").change();
+        //ver si la opcion agregar iva al precio esta seleccionada
+        if( $('#agregarivaalprecio').prop('checked') ) {
+            //agregar al costo el iva
+            colocarcostomasivaenpartidas();
+        }
     },
     error: function (data) {
       console.log(data);
@@ -401,17 +406,18 @@ function obtenerclientes(){
         //seleccionar registro al dar doble click
         $('#tbllistadocliente tbody').on('dblclick', 'tr', function () {
             var data = tcli.row( this ).data();
-            seleccionarcliente(data.Numero, data.Nombre, data.Credito, data.Saldo, data.NumeroAgente, data.NombreAgente);
+            seleccionarcliente(data.Numero, data.Nombre, data.Rfc, data.Credito, data.Saldo, data.NumeroAgente, data.NombreAgente);
         });  
 } 
 //obtener datos de remision seleccionada
-function seleccionarcliente(Numero, Nombre, Credito, Saldo, NumeroAgente, Agente){
+function seleccionarcliente(Numero, Nombre, Rfc, Credito, Saldo, NumeroAgente, Agente){
     var numeroclienteanterior = $("#numeroclienteanterior").val();
     var numerocliente = Numero;
     if(numeroclienteanterior != numerocliente){
         $("#numerocliente").val(Numero);
         $("#numeroclienteanterior").val(Numero);
         $("#cliente").val(Nombre);
+        $("#rfccliente").val(Rfc);
         if(Nombre != null){
             $("#textonombrecliente").html(Nombre.substring(0, 40));
         }
@@ -427,6 +433,16 @@ function seleccionarcliente(Numero, Nombre, Credito, Saldo, NumeroAgente, Agente
         mostrarformulario();
         mostrarbuscadorcodigoproducto();
         calculartotal();//para calcular nuevo saldo
+        //ver si el cliente tiene el mismo rfc que la empresa
+        var rfcempresa = $("#rfcempresa").val();
+        var rfccliente = $("#rfccliente").val();
+        if(rfcempresa == rfccliente){                    
+            setTimeout(function(){$("#agregarivaalprecio").prop('checked', true);},500);
+            colocarcostomasivaenpartidas();
+        }else{
+            setTimeout(function(){$("#agregarivaalprecio").prop('checked', false);},500);
+            colocarcostosinivaenpartidas();
+        }
     }
 }
 //obtener agentes
@@ -614,6 +630,7 @@ function obtenerclientepornumero(){
                 $("#numerocliente").val(data.numero);
                 $("#numeroclienteanterior").val(data.numero);
                 $("#cliente").val(data.nombre);
+                $("#rfccliente").val(data.rfc);
                 if(data.nombre != null){
                     $("#textonombrecliente").html(data.nombre.substring(0, 40));
                 }
@@ -629,6 +646,22 @@ function obtenerclientepornumero(){
                 mostrarformulario();
                 mostrarbuscadorcodigoproducto();
                 calculartotal();//para obtener nuevo saldo
+                //ver si el cliente tiene el mismo rfc que la empresa
+                var rfcempresa = $("#rfcempresa").val();
+                var rfccliente = $("#rfccliente").val();
+                if(rfcempresa == rfccliente){                    
+                    setTimeout(function(){$("#agregarivaalprecio").prop('checked', true);},500);
+                    colocarcostomasivaenpartidas();
+                    $("#idcapturaprecioneto").attr('disabled', 'disabled');
+                    
+                    $("#agregarivaalprecio").removeAttr('disabled');
+                }else{
+                    setTimeout(function(){$("#agregarivaalprecio").prop('checked', false);},500);
+                    colocarcostosinivaenpartidas();
+                    
+                    $("#idcapturaprecioneto").removeAttr('disabled');
+                    $("#agregarivaalprecio").attr('disabled', 'disabled');
+                }
             }) 
         }
     }
@@ -917,6 +950,11 @@ function seleccionarcotizacion(Folio, Cotizacion){
         }
         //dar cambio en cantidad para colocar data parsley existencias de forma correcta
         $(".cantidadpartida").change();
+        //ver si la opcion agregar iva al precio esta seleccionada
+        if( $('#agregarivaalprecio').prop('checked') ) {
+            //agregar al costo el iva
+            colocarcostomasivaenpartidas();
+        }
     })  
 }
 async function seleccionartipocotizacion(data){
@@ -1251,71 +1289,10 @@ function obtenerdatosagregarfilaproducto(Codigo){
 //agregar una fila en la tabla de precios productos
 var contadorproductos=0;
 var contadorfilas = 0;
-//function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal, Existencias, tipooperacion, Insumo, ClaveProducto, ClaveUnidad, CostoDeLista){
 function agregarfilaproducto(data,Codigo){
     $('.page-loader-wrapper').css('display', 'block');
     var result = evaluarproductoexistente(Codigo);
     if(result == false){
-        /*
-        var multiplicacioncostoimpuesto =  new Decimal(SubTotal).times(Impuesto);      
-        var ivapesos = new Decimal(multiplicacioncostoimpuesto/100);
-        var total = new Decimal(SubTotal).plus(ivapesos);
-        var preciopartida = SubTotal;
-        var comisionporcentaje = new Decimal(SubTotal).times(0);
-        var comisionespesos= new Decimal(comisionporcentaje/100);
-        var utilidad = new Decimal(SubTotal).minus(Costo).minus(comisionespesos);
-        var tipo = "alta";
-        var fila=   '<tr class="filasproductos" id="filaproducto'+contadorproductos+'">'+
-                          '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('+contadorproductos+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
-                          '<td class="tdmod tdinsumospartidas"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'+Insumo+'" data-parsley-length="[1, 20]"></td>'+
-                          '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'+Codigo+'</b></td>'+
-                          '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionproductopartida" name="descripcionproductopartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
-                          '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'+Unidad+'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'+Unidad+'</td>'+
-                            '<td class="tdmod">'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-existencias="'+Existencias+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');cambiodecantidadpartida('+contadorfilas+',\''+tipo +'\');">'+
-                                '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'+                           
-                            '</td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');cambiodepreciopartida('+contadorfilas+',\''+tipo +'\');"></td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('+contadorfilas+');"></td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentoporcentajepartida('+contadorfilas+');"></td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'+Impuesto+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');"></td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm ivapesospartida" name="ivapesospartida[]" value="'+number_format(round(ivapesos, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'+number_format(round(total, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'+Costo+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="'+Costo+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm comisionporcentajepartida" name="comisionporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('+contadorfilas+');" required></td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm comisionespesospartida" name="comisionespesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'+number_format(round(utilidad, numerodecimales), numerodecimales, '.', '')+'" data-parsley-utilidad="0.'+numerocerosconfiguradosinputnumberstep+'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                          '<td class="tdmod"><input type="text" class="form-control divorinputmodsm monedapartida" name="monedapartida[]" value="MXN" readonly data-parsley-length="[1, 3]" autocomplete="off"></td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costolistapartida" name="costolistapartida[]" value="'+CostoDeLista+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm tipocambiopartida" name="tipocambiopartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                          '<td class="tdmod"><input type="text" class="form-control divorinputmodsm cotizacionpartida" name="cotizacionpartida[]" value="" readonly data-parsley-length="[1, 20]"></td>'+
-                          '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveprodutopartida" name="claveprodutopartida[]" value="'+ClaveProducto+'" readonly required></td>'+
-                          '<td class="tdmod"><input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]" value="'+ClaveUnidad+'" readonly required></td>'+
-                          '<td class="tdmod"><input type="text" class="form-control divorinputmodsm mesespartida" name="mesespartida[]" value="0" readonly></td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm tasainterespartida" name="tasainterespartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm montointerespartida" name="montointerespartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                    '</tr>';
-        contadorproductos++;
-        contadorfilas++;
-        $("#tablaproductosremisiones").append(fila);
-        mostrarformulario();      
-        comprobarfilas();
-        calculartotal();
-        $("#codigoabuscar").val("");
-        //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-        $(".inputnextdet").keypress(function (e) {
-          //recomentable para mayor compatibilidad entre navegadores.
-          var code = (e.keyCode ? e.keyCode : e.which);
-          if(code==13){
-            var index = $(this).index(".inputnextdet");          
-            $(".inputnextdet").eq(index + 1).focus().select(); 
-          }
-        });
-        $('.page-loader-wrapper').css('display', 'none');
-        */
         contadorfilas = data.contadorfilas;
         contadorproductos = data.contadorproductos;
         $("#tablaproductosremisiones tbody").append(data.filasdetallesremision);
@@ -1359,7 +1336,29 @@ function agregarfilaproducto(data,Codigo){
     }else{
         msj_errorproductoyaagregado();
         $('.page-loader-wrapper').css('display', 'none');
-    }  
+    }
+    //ver si la opcion agregar iva al precio esta seleccionada
+    if( $('#agregarivaalprecio').prop('checked') ) {
+        //agregar al costo el iva
+        colocarcostomasivaenpartidas();
+    }
+}
+function colocarcostomasivaenpartidas(){
+    $("tr.filasproductos").each(function () {
+        var preciopartidaop = $('.preciopartidaop', this).val();
+        var costomasiva = new Decimal(preciopartidaop).times(1.16);
+        $('.ivaporcentajepartida', this).val(number_format(round(0, numerodecimales), numerodecimales, '.', ''));
+        $('.preciopartida', this).val(number_format(round(costomasiva, numerodecimales), numerodecimales, '.', ''));
+        $('.preciopartida', this).change();
+    });
+}
+function colocarcostosinivaenpartidas(){
+    $("tr.filasproductos").each(function () {
+        var preciopartidaop = $('.preciopartidaop', this).val();
+        $('.ivaporcentajepartida', this).val(number_format(round(16, numerodecimales), numerodecimales, '.', ''));
+        $('.preciopartida', this).val(number_format(round(preciopartidaop, numerodecimales), numerodecimales, '.', ''));
+        $('.preciopartida', this).change();
+    });
 }
 //eliminar una fila en la tabla de precios clientes
 function eliminarfila(numerofila){
@@ -1461,6 +1460,7 @@ function alta(){
                                 '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                                 '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
                                 '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
+                                '<input type="hidden" class="form-control" name="rfcempresa" id="rfcempresa" value="'+rfcempresa+'" readonly>'+
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Cliente <span class="label label-danger" id="textonombrecliente"></span></label>'+
@@ -1474,6 +1474,7 @@ function alta(){
                                                 '<input type="text" class="form-control inputnext" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
                                                 '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
                                                 '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
+                                                '<input type="hidden" class="form-control" name="rfccliente" id="rfccliente" required readonly>'+
                                             '</div>'+
                                         '</td>'+
                                     '</tr>'+  
@@ -1645,6 +1646,7 @@ function alta(){
                                           '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
                                           '<th class="'+background_tables+'"><div style="width:400px !important;">Descripción</div></th>'+
                                           '<th class="'+background_tables+'">Unidad</th>'+
+                                          '<th class="customercolortheadth">Por Remisionar</th>'+
                                           '<th class="customercolortheadth">Cantidad</th>'+
                                           '<th class="customercolortheadth">Precio $</th>'+
                                           '<th class="'+background_tables+'">Importe $</th>'+
@@ -1692,6 +1694,12 @@ function alta(){
                           '</div>'+ 
                             '<div class="col-md-3">'+
                                 '<table class="table table-striped table-hover">'+
+                                    '<tr>'+
+                                        '<td style="padding:0px !important;" colspan="2">'+
+                                            '<input type="checkbox" name="tipoprecio" id="agregarivaalprecio" class="filled-in datotabla" value="1" />'+
+                                            '<label for="agregarivaalprecio">Agregar Iva al Precio</label>'+
+                                        '</td>'+
+                                    '</tr>'+
                                     '<tr>'+
                                         '<td style="padding:0px !important;" colspan="2">'+
                                             '<input type="checkbox" name="capturaprecioneto" id="idcapturaprecioneto" class="filled-in datotabla" value="1" />'+
@@ -2258,6 +2266,7 @@ function obtenerdatos(remisionmodificar){
                                           '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
                                           '<th class="'+background_tables+'"><div style="width:400px !important;">Descripción</div></th>'+
                                           '<th class="'+background_tables+'">Unidad</th>'+
+                                          '<th class="customercolortheadth">Por Remisionar</th>'+
                                           '<th class="customercolortheadth">Cantidad</th>'+
                                           '<th class="customercolortheadth">Precio $</th>'+
                                           '<th class="'+background_tables+'">Importe $</th>'+
@@ -2295,6 +2304,12 @@ function obtenerdatos(remisionmodificar){
                           '</div>'+ 
                             '<div class="col-md-3">'+
                                 '<table class="table table-striped table-hover">'+
+                                    '<tr>'+
+                                        '<td style="padding:0px !important;" colspan="2">'+
+                                            '<input type="checkbox" name="tipoprecio" id="agregarivaalprecio" class="filled-in datotabla" value="1" />'+
+                                            '<label for="agregarivaalprecio">Agregar Iva al Precio</label>'+
+                                        '</td>'+
+                                    '</tr>'+
                                     '<tr>'+
                                         '<td style="padding:0px !important;" colspan="2">'+
                                             '<input type="checkbox" name="capturaprecioneto" id="idcapturaprecioneto" class="filled-in datotabla" value="1" />'+

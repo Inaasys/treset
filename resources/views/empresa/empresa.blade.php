@@ -594,6 +594,22 @@
                                                                     </div>
                                                                 </td>
                                                             </tr>
+                                                            <tr>
+                                                                <td class="col-md-2">Cientes</td>
+                                                                <td class="col-md-5">Permitir modificar el crédito de clientes</td>
+                                                                <td class="col-md-4">
+                                                                    <select  name="modificarcreditodeclientes[]" id="modificarcreditodeclientes" class="form-control select2" multiple="multiple" style="width:100% !important;" >
+                                                                    </select>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="col-md-2">Servicios</td>
+                                                                <td class="col-md-5">Permitir modificar el costo y venta en servicios</td>
+                                                                <td class="col-md-4">
+                                                                    <select  name="modificarcostoyventadeservicios[]" id="modificarcostoyventadeservicios" class="form-control select2" multiple="multiple" style="width:100% !important;" >
+                                                                    </select>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1034,9 +1050,13 @@
         var modificarconsecutivofolioenremisiones = '{{$empresa->ModificarConsecutivoFolioEnRemisiones}}';
         var validarutilidadnegativa = '{{$empresa->ValidarUtilidadNegativa}}';
         var generarformatorequisiciontyt = '{{$empresa->GenerarFormatoRequisicionTYT}}';
+        var modificarcreditodeclientes = '{{$empresa->ModificarCreditoDeClientes}}';
+        var modificarcostoyventadeservicios = '{{$empresa->ModificarCostoyVentaDeServicios}}';
         var empresa_obtener_usuarios_a_modificar_insumos = '{!!URL::to('empresa_obtener_usuarios_a_modificar_insumos')!!}';
         var empresa_obtener_usuarios_a_modificar_costos_productos = '{!!URL::to('empresa_obtener_usuarios_a_modificar_costos_productos')!!}';
-        var empresa_obtener_paises = '{!!URL::to('empresa_obtener_paises')!!}';
+        var empresa_obtener_usuarios_a_modificar_credito_clientes = '{!!URL::to('empresa_obtener_usuarios_a_modificar_credito_clientes')!!}';
+        var empresa_obtener_usuarios_a_modificar_costo_y_venta_servicio = '{!!URL::to('empresa_obtener_usuarios_a_modificar_costo_y_venta_servicio')!!}';
+        var empresa_obtener_pases = '{!!URL::to('empresa_obtener_paises')!!}';
         var empresa_obtener_estados = '{!!URL::to('empresa_obtener_estados')!!}';
         var empresa_obtener_municipios = '{!!URL::to('empresa_obtener_municipios')!!}';
         var empresa_obtener_lugares_expedicion = '{!!URL::to('empresa_obtener_lugares_expedicion')!!}';

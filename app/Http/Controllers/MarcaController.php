@@ -95,13 +95,18 @@ class MarcaController extends ConfiguracionSistemaController{
         $numeromarca=$request->numeromarca;
 	    $Marca = Marca::where('Numero', $numeromarca )->first();
 	    if($Marca->Status == 'ALTA'){
-	       $Marca->Status = 'BAJA';
+            Marca::where('Numero', $numeromarca)
+            ->update([
+                'Status' => 'BAJA'
+            ]);
            Log::channel('marca')->info('La marca fue dada de baja: '.$Marca.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
         }else{
-	       $Marca->Status = 'ALTA';
+            Marca::where('Numero', $numeromarca)
+            ->update([
+                'Status' => 'ALTA'
+            ]);
            Log::channel('marca')->info('La marca fue dada de alta: '.$Marca.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
         }
-	    $Marca->save();
 	    return response()->json($Marca);
     } 
     //obtener datos del catalogo

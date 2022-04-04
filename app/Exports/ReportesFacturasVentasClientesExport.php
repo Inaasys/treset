@@ -48,7 +48,7 @@ class ReportesFacturasVentasClientesExport implements FromCollection,WithHeading
             case "UTILIDAD":
                 break;
             case "GENERAL":
-                $this->campos_consulta = array("Factura", "Serie", "Folio", "Depto", "Tipo", "Cliente", "NombreCliente", "Agente", "NombreAgente", "Fecha", "Plazo", "Pedido", "Importe", "Descuento", "SubTotal", "Iva", "Total", "Abonos", "Descuentos", "Saldo", "Costo", "Utilidad", "Moneda", "TipoCambio", "Obs", "Status", "MotivoBaja", "Usuario");
+                $this->campos_consulta = array("Factura", "UUID", "Serie", "Folio", "Depto", "Tipo", "Cliente", "NombreCliente", "Agente", "NombreAgente", "Fecha", "Plazo", "Pedido", "Importe", "Descuento", "SubTotal", "Iva", "Total", "Abonos", "Descuentos", "Saldo", "Costo", "Utilidad", "Moneda", "TipoCambio", "Obs", "Status", "MotivoBaja", "Usuario");
                 break;
             case "PRODUCTOS":
                 $this->campos_consulta = array("Factura", "Fecha", "Cliente", "NombreCliente", "Agente", "Tipo", "NombreAgente", "Plazo", "Codigo", "Descripcion", "Unidad", "Cantidad", "Precio", "Importe", "Dcto", "Descuento", "SubTotal", "Impuesto", "Iva", "Total", "Costo", "CostoTotal", "Utilidad", "Facturar", "Remision", "Orden", "Departamento", "Cargo", "Almacen", "Partida", "Item");
@@ -199,7 +199,7 @@ class ReportesFacturasVentasClientesExport implements FromCollection,WithHeading
                 $data = DB::table('Facturas as f')
                 ->leftjoin('Clientes as c', 'f.Cliente', '=', 'c.Numero')
                 ->leftjoin('Agentes as a', 'f.Agente', '=', 'a.Numero')
-                ->select("f.Factura", "f.Serie", "f.Folio", "f.Depto", "f.Tipo", "f.Cliente", "c.Nombre as NombreCliente", "f.Agente", "a.Nombre as NombreAgente", DB::raw("FORMAT(f.Fecha, 'yyyy-MM-dd') as Fecha"), "f.Plazo", "f.Pedido", "f.Importe", "f.Descuento", "f.SubTotal", "f.Iva", "f.Total", "f.Abonos", "f.Descuentos", "f.Saldo", "f.Costo", "f.Utilidad", "f.Moneda", "f.TipoCambio", "f.Obs", "f.Status", "f.MotivoBaja", "f.Usuario")
+                ->select("f.Factura", "f.UUID", "f.Serie", "f.Folio", "f.Depto", "f.Tipo", "f.Cliente", "c.Nombre as NombreCliente", "f.Agente", "a.Nombre as NombreAgente", DB::raw("FORMAT(f.Fecha, 'yyyy-MM-dd') as Fecha"), "f.Plazo", "f.Pedido", "f.Importe", "f.Descuento", "f.SubTotal", "f.Iva", "f.Total", "f.Abonos", "f.Descuentos", "f.Saldo", "f.Costo", "f.Utilidad", "f.Moneda", "f.TipoCambio", "f.Obs", "f.Status", "f.MotivoBaja", "f.Usuario")
                 //->whereBetween('f.Fecha', [$fechainicio, $fechaterminacion])
                 ->whereDate('f.Fecha', '>=', $fechainicio)->whereDate('f.Fecha', '<=', $fechaterminacion)
                 ->where(function($q) use ($numerocliente) {

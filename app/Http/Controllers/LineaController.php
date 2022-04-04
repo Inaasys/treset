@@ -70,13 +70,18 @@ class LineaController extends ConfiguracionSistemaController{
         $numerolinea=$request->numerolinea;
 	    $Linea = Linea::where('Numero', $numerolinea )->first();
 	    if($Linea->Status == 'ALTA'){
-	       $Linea->Status = 'BAJA';
+            Linea::where('Numero', $numerolinea)
+            ->update([
+                'Status' => 'BAJA'
+            ]);
            Log::channel('linea')->info('La linea fue dada de baja: '.$Linea.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
         }else{
-	       $Linea->Status = 'ALTA';
+            Linea::where('Numero', $numerolinea)
+            ->update([
+                'Status' => 'ALTA'
+            ]);
            Log::channel('linea')->info('La linea fue dada de alta: '.$Linea.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
         }
-	    $Linea->save();
 	    return response()->json($Linea);
     } 
     //obtener datos del catalogo

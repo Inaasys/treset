@@ -74,7 +74,7 @@ class PrestamoHerramientaController extends ConfiguracionSistemaController{
                         return $operaciones;
                     })
                     ->addColumn('fecha', function($data){ return Carbon::parse($data->fecha)->toDateTimeString(); })
-                    ->addColumn('total', function($data){ return $data->total; })
+                    //->addColumn('total', function($data){ return $data->total; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 

@@ -114,8 +114,8 @@ function listar(){
         },
         columns: campos_tabla,
         "drawCallback": function( data ) {
-            $("#sumatotalfiltrado").html(data.json.sumatotal);
-            $("#sumacostofiltrado").html(data.json.sumacosto);
+            $("#sumatotalfiltrado").html(number_format(round(data.json.sumatotal, numerodecimales), numerodecimales, '.', ''));
+            $("#sumacostofiltrado").html(number_format(round(data.json.sumacosto, numerodecimales), numerodecimales, '.', ''));
         },
         initComplete: function () {
           // Aplicar busquedas por columna

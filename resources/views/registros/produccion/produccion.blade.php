@@ -64,12 +64,6 @@
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap">
                                     <thead class="{{$empresa->background_tables}}">
-                                        @if($mostrartotalesdecolumnasendocumentos == 'S')
-                                            <tr>
-                                                <th class="bg-light-green">Total: <b id="sumatotalfiltrado"></b></th>
-                                                <th class="bg-light-green">Costo: <b id="sumacostofiltrado"></b></th>
-                                            </tr>  
-                                        @endif
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
                     						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
@@ -87,6 +81,16 @@
                                         </tr>
                                     </tfoot>
                                 </table>
+                                @if($mostrartotalesdecolumnasendocumentos == 'S')
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped table-hover display nowrap" style="font-size:10px;">
+                                                <tr class="{{$empresa->background_forms_and_modals}}">
+                                                    <th>Sum Total: <b id="sumatotalfiltrado"></b></th>
+                                                    <th>Sum Costo: <b id="sumacostofiltrado"></b></th>
+                                                </tr>   
+                                            </table>
+                                        </div>
+                                @endif 
                             </div>
                         </div>
                     </div>

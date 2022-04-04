@@ -40,6 +40,7 @@ use App\VistaNotaCreditoCliente;
 use App\VistaObtenerExistenciaProducto;
 use App\FolioComprobanteNota;
 use App\Comprobante;
+use App\User_Rel_Almacen;
 use Config;
 use Mail;
 use Facturapi\Facturapi;
@@ -135,17 +136,17 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                         return $operaciones;
                     })
                     ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
-                    ->addColumn('SubTotal', function($data){ return $data->SubTotal; })
-                    ->addColumn('Iva', function($data){ return $data->Iva; })
-                    ->addColumn('Total', function($data){ return $data->Total; })
+                    //->addColumn('SubTotal', function($data){ return $data->SubTotal; })
+                    //->addColumn('Iva', function($data){ return $data->Iva; })
+                    //->addColumn('Total', function($data){ return $data->Total; })
                     ->addColumn('ImpLocTraslados', function($data){ return $data->ImpLocTraslados; })
                     ->addColumn('ImpLocRetenciones', function($data){ return $data->ImpLocRetenciones; })
                     ->addColumn('IepsRetencion', function($data){ return $data->IepsRetencion; })
                     ->addColumn('IsrRetencion', function($data){ return $data->IsrRetencion; })
                     ->addColumn('IvaRetencion', function($data){ return $data->IvaRetencion; })
                     ->addColumn('Ieps', function($data){ return $data->Ieps; })
-                    ->addColumn('Descuento', function($data){ return $data->Descuento; })
-                    ->addColumn('Importe', function($data){ return $data->Importe; })
+                    //->addColumn('Descuento', function($data){ return $data->Descuento; })
+                    //->addColumn('Importe', function($data){ return $data->Importe; })
                     ->addColumn('TipoCambio', function($data){ return $data->TipoCambio; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
@@ -246,14 +247,24 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
     //obtener almacenes
     public function notas_credito_clientes_obtener_almacenes(Request $request){
         if($request->ajax()){
-            $data = Almacen::where('Status', 'ALTA')->orderBy("Numero", "ASC")->get();
+            $contaralmacenesasignadosausuario = User_Rel_Almacen::where('user_id', Auth::user()->id)->count();
+            if($contaralmacenesasignadosausuario > 0){
+                $data = DB::table('user_rel_almacenes as ura')
+                ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
+                ->select('ura.id', 'a.Numero', 'a.Nombre')
+                ->where('a.Status', 'ALTA')
+                ->orderby('a.Numero', 'ASC')
+                ->get();
+            }else{
+                $data = Almacen::where('Status', 'ALTA')->orderBy("Numero", "ASC")->get();
+            }
             return DataTables::of($data)
-                ->addColumn('operaciones', function($data){
-                    $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionaralmacen('.$data->Numero.',\''.$data->Nombre .'\')">Seleccionar</div>';
-                    return $boton;
-                })
-                ->rawColumns(['operaciones'])
-                ->make(true);
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionaralmacen('.$data->Numero.',\''.$data->Nombre .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
         }
     }
 
@@ -261,11 +272,33 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
     public function notas_credito_clientes_obtener_almacen_por_numero(Request $request){
         $numero = '';
         $nombre = '';
-        $existealmacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->count();
-        if($existealmacen > 0){
-            $almacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->first();
-            $numero = $almacen->Numero;
-            $nombre = $almacen->Nombre;
+        $plazo = '';
+        $contaralmacenesasignadosausuario = User_Rel_Almacen::where('user_id', Auth::user()->id)->count();
+        if($contaralmacenesasignadosausuario > 0){
+            $existealmacen = DB::table('user_rel_almacenes as ura')
+            ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
+            ->select('ura.id', 'a.Numero', 'a.Nombre')
+            ->where('a.Numero', $request->numeroalmacen)
+            ->where('a.Status', 'ALTA')
+            ->count();
+            if($existealmacen > 0){
+                $almacen = DB::table('user_rel_almacenes as ura')
+                ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
+                ->select('ura.id', 'a.Numero', 'a.Nombre')
+                ->where('a.Numero', $request->numeroalmacen)
+                ->where('a.Status', 'ALTA')
+                ->orderby('a.Numero', 'DESC')
+                ->first();
+                $numero = $almacen->Numero;
+                $nombre = $almacen->Nombre;
+            }
+        }else{
+            $existealmacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->count();
+            if($existealmacen > 0){
+                $almacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->first();
+                $numero = $almacen->Numero;
+                $nombre = $almacen->Nombre;
+            }
         }
         $data = array(
             'numero' => $numero,
@@ -2118,10 +2151,30 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
         $cliente = Cliente::where('Numero', $nota->Cliente)->first();
         $arraydet = array();
         foreach($detallesnota as $dn){
-
             if($dn->Impuesto == 0.000000){
-
+                /*
+                //facturapi version 2.0
+                array_push($arraydet,  array(
+                                            "quantity" => Helpers::convertirvalorcorrecto($dn->Cantidad),
+                                            "discount" => Helpers::convertirvalorcorrecto($dn->Descuento),
+                                            "product" => 
+                                                array(
+                                                    "description" => $dn->Descripcion,
+                                                    "product_key" => $dn->ClaveProducto,
+                                                    "unit_key" => $dn->ClaveUnidad,
+                                                    "price" => Helpers::convertirvalorcorrecto($dn->Precio),
+                                                    "tax_included" => false,
+                                                    "taxability" => "01",
+                                                    "taxes" => [],
+                                                    "sku" => $dn->Codigo
+                                                )
+                                        )
+                );
+                */
+                //facturapi version 1.0
                 array_push($arraydet,   array(
+                                            "quantity" => Helpers::convertirvalorcorrecto($dn->Cantidad),
+                                            "discount" => Helpers::convertirvalorcorrecto($dn->Descuento),
                                             "description" => $dn->Descripcion,
                                             "product_key" => $dn->ClaveProducto,
                                             "unit_key" => $dn->ClaveUnidad,
@@ -2130,12 +2183,30 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                                             "taxability" => "01",
                                             "taxes" => [],
                                             "sku" => $dn->Codigo
-                                        )                    
+                                        )                
                 );
-
             }else{
-
+                /*
+                //facturapi version 2.0
+                array_push($arraydet,  array(
+                                    "quantity" => Helpers::convertirvalorcorrecto($dn->Cantidad),
+                                    "discount" => Helpers::convertirvalorcorrecto($dn->Descuento),
+                                    "product" => 
+                                        array(
+                                            "description" => $dn->Descripcion,
+                                            "product_key" => $dn->ClaveProducto,
+                                            "unit_key" => $dn->ClaveUnidad,
+                                            "price" => Helpers::convertirvalorcorrecto($dn->Precio),
+                                            "tax_included" => false,
+                                            "sku" => $dn->Codigo
+                                        )
+                                )
+                );
+                */
+                //facturapi version 1.0
                 array_push($arraydet,   array(
+                                            "quantity" => Helpers::convertirvalorcorrecto($dn->Cantidad),
+                                            "discount" => Helpers::convertirvalorcorrecto($dn->Descuento),
                                             "description" => $dn->Descripcion,
                                             "product_key" => $dn->ClaveProducto,
                                             "unit_key" => $dn->ClaveUnidad,
@@ -2144,9 +2215,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                                             "sku" => $dn->Codigo
                                         )                    
                 );
-
             }
-            
         }  
         $arraydoc = array();
         foreach($detallesdocumentosnota as $ddn){
@@ -2157,10 +2226,32 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             "type" => \Facturapi\InvoiceType::EGRESO,
             "customer" => array(
                 "legal_name" => $cliente->Nombre,
-                "tax_id" => $cliente->Rfc
+                "tax_id" => $cliente->Rfc,
+                /*
+                //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
+                "tax_system" => $cliente->RegimenFiscal,
+                "address" => 
+                    array(
+                        "zip" => $cliente->CodigoPostal,
+                    )
+                //fin cfdi 4.0
+                */
             ),
             "payment_form" => $nota->FormaPago,
             "payment_method" => $nota->MetodoPago,
+            /*
+            //version facturapi 2.0
+            //se debe cambiar la forma de relacion los documentos y en lugar de mandar arra products, se manda array items como en las facturas de ingreso con facturapi 2.0
+            "related_documents" => array(
+                    array(
+                        "relationship" => $nota->TipoRelacion,
+                        "documents" => $arraydoc
+                    )
+            
+            ),
+            "items" => $arraydet,
+            */
+            //datos para facturar en facturapi 1.0
             "relation" => $nota->TipoRelacion,
             "related" => $arraydoc,
             "products" => $arraydet,
@@ -2203,6 +2294,9 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $Comprobante = new Comprobante;
             $Comprobante->Comprobante = 'Nota';
             $Comprobante->Tipo = $new_invoice->type;
+            //version 4.0
+            //$Comprobante->Version = '4.0';
+            //version 3.3
             $Comprobante->Version = '3.3';
             $Comprobante->Serie = $new_invoice->series;
             $Comprobante->Folio = $new_invoice->folio_number;
@@ -2271,15 +2365,41 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
     }
     //cancelar timbre
     public function notas_credito_clientes_baja_timbre(Request $request){
-        //colocar fecha de cancelacion en tabla comprobante
-        $factura = NotaCliente::where('Nota', $request->facturabajatimbre)->first();
-        Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $factura->Folio . '')->where('Serie', '' . $factura->Serie . '')
-        ->update([
-            'FechaCancelacion' => Helpers::fecha_exacta_accion_datetimestring()
-        ]);
         //cancelar timbre facturapi
-        $timbrecancelado = $this->facturapi->Invoices->cancel($request->iddocumentofacturapi);
-        return response()->json($timbrecancelado);
+        //con version 1.0 facturapi sin motivo de baja
+        //$timbrecancelado = $this->facturapi->Invoices->cancel($request->iddocumentofacturapi);
+        // con version 2.0 facturapi con motivo de baja
+        $timbrecancelado = $this->facturapi->Invoices->cancel(
+            $request->iddocumentofacturapi,
+            [
+              "motive" => $request->motivobajatimbre
+            ]
+        );
+        $result = json_encode($timbrecancelado);
+        $result2 = json_decode($result, true);
+        if(array_key_exists('ok', $result2) == true){
+            $mensaje = $timbrecancelado->message;
+            $tipomensaje = "error";
+            $data = array(
+                        'mensaje' => "Error, ".$mensaje,
+                        'tipomensaje' => $tipomensaje 
+                    );
+            return response()->json($data);
+        }else{
+            //colocar fecha de cancelacion en tabla comprobante
+            $factura = NotaCliente::where('Nota', $request->facturabajatimbre)->first();
+            Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $factura->Folio . '')->where('Serie', '' . $factura->Serie . '')
+            ->update([
+                'FechaCancelacion' => Helpers::fecha_exacta_accion_datetimestring()
+            ]);
+            $mensaje = "Correcto, se cancelo el timbre correctamente";
+            $tipomensaje = "success";
+            $data = array(
+                        'mensaje' => $mensaje,
+                        'tipomensaje' => $tipomensaje 
+                    );
+            return response()->json($data);
+        }
     }
 
 }

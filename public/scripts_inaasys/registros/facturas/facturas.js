@@ -142,17 +142,17 @@ function listar(){
     },
     columns: campos_tabla,
     "drawCallback": function( data ) {
-        $("#sumaimportefiltrado").html(data.json.sumaimporte);
-        $("#sumadescuentofiltrado").html(data.json.sumadescuento);
-        $("#sumasubtotalfiltrado").html(data.json.sumasubtotal);
-        $("#sumaivafiltrado").html(data.json.sumaiva);
-        $("#sumatotalfiltrado").html(data.json.sumatotal);
-        $("#sumaabonosfiltrado").html(data.json.sumaabonos);
-        $("#sumadescuentosfiltrado").html(data.json.sumadescuentos);
-        $("#sumasaldofiltrado").html(data.json.sumasaldo); 
-        $("#sumacostofiltrado").html(data.json.sumacosto);
-        $("#sumacomisionfiltrado").html(data.json.sumacomision);
-        $("#sumautilidadfiltrado").html(data.json.sumautilidad); 
+        $("#sumaimportefiltrado").html(number_format(round(data.json.sumaimporte, numerodecimales), numerodecimales, '.', ''));
+        $("#sumadescuentofiltrado").html(number_format(round(data.json.sumadescuento, numerodecimales), numerodecimales, '.', ''));
+        $("#sumasubtotalfiltrado").html(number_format(round(data.json.sumasubtotal, numerodecimales), numerodecimales, '.', ''));
+        $("#sumaivafiltrado").html(number_format(round(data.json.sumaiva, numerodecimales), numerodecimales, '.', ''));
+        $("#sumatotalfiltrado").html(number_format(round(data.json.sumatotal, numerodecimales), numerodecimales, '.', ''));
+        $("#sumaabonosfiltrado").html(number_format(round(data.json.sumaabonos, numerodecimales), numerodecimales, '.', ''));
+        $("#sumadescuentosfiltrado").html(number_format(round(data.json.sumadescuentos, numerodecimales), numerodecimales, '.', ''));
+        $("#sumasaldofiltrado").html(number_format(round(data.json.sumasaldo, numerodecimales), numerodecimales, '.', '')); 
+        $("#sumacostofiltrado").html(number_format(round(data.json.sumacosto, numerodecimales), numerodecimales, '.', ''));
+        $("#sumacomisionfiltrado").html(number_format(round(data.json.sumacomision, numerodecimales), numerodecimales, '.', ''));
+        $("#sumautilidadfiltrado").html(number_format(round(data.json.sumautilidad, numerodecimales), numerodecimales, '.', '')); 
     },
     initComplete: function () {
       // Aplicar busquedas por columna
@@ -1424,16 +1424,6 @@ function construirarrayremisionesseleccionadas(Remision){
     EliminarElementoArrayPorValor(arrayremisionesseleccionadas,Remision);
     $("#stringremisionesseleccionadas").val(arrayremisionesseleccionadas.sort());
   }
-  /*
-  var arrayremisionesseleccionadas = [];
-  var lista = document.getElementsByClassName("remisionesseleccionadas");
-  for (var i = 0; i < lista.length; i++) {
-    if(lista[i].checked){
-      arrayremisionesseleccionadas.push(lista[i].value);
-    }
-  }
-  $("#stringremisionesseleccionadas").val(arrayremisionesseleccionadas.sort());
-  */
 }
 var arrayclientesremisionesseleccionadas = [];
 //obtener todos los datos de la orden de compra seleccionada
@@ -1459,6 +1449,11 @@ function seleccionarremision(Folio,Remision,Cliente){
 }
 //cargar remisiones
 function cargarremisionesseleccionadas(){
+  $('.page-loader-wrapper').css('display', 'block');
+  //colocar strings vacios
+  //$("#stringremisionesseleccionadas").val("");
+  //$("#stringordenesseleccionadas").val("");
+  contadorproductos = 0;
   contadorfilas = 0;
   partida = 1;
   $("#tabladetallesfactura tbody").html("");
@@ -1467,43 +1462,11 @@ function cargarremisionesseleccionadas(){
   $.get(facturas_obtener_remision, {stringremisionesseleccionadas:stringremisionesseleccionadas, contadorfilas:contadorfilas, partida:partida, tipooperacion:tipooperacion}, function(data){
     //cargar datos cliente
     $("#numerocliente").val(data.cliente);
-    obtenerclientepornumero(1);
+    $("#numeroclienteanterior").val("");
+    obtenerclienteremisionesseleccionadas();
     seleccionarclienteremisionesseleccionadas(data);
-    /*
-    $("#tabladetallesfactura tbody").append(data.filasremisiones);
-    //array de remisiones seleccionadas
-    construirarrayremisionesseleccionadas();
-    //comprobar numero de filas en la tabla
-    comprobarfilas();
-    //calcular totales compras nota proveedor
-    calculartotal();
-    contadorfilas = data.contadorfilas;
-    partida = data.partida;
-    remisionagregadacorrectamente();
-    mostrarformulario();
-    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnextdet").keypress(function (e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var index = $(this).index(".inputnextdet");          
-        $(".inputnextdet").eq(index + 1).focus().select(); 
-      }
-    });
-    //colocar o no dataparsleyutilidad segun la configuracion de la empresa
-    if(validarutilidadnegativa == 'S'){
-        $(".utilidadpartida").removeAttr('data-parsley-utilidad');
-        $("#utilidad").removeAttr('data-parsley-decimalesconfigurados');
-    }else{
-        $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
-        $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
-    }
-    */
   })
 }
-
-
-
 async function seleccionarclienteremisionesseleccionadas(data){
   await retrasoremisionesseleccionadas();
   $("#tabladetallesfactura tbody").append(data.filasremisiones);
@@ -1511,7 +1474,7 @@ async function seleccionarclienteremisionesseleccionadas(data){
   construirarrayremisionesseleccionadas();
   //comprobar numero de filas en la tabla
   comprobarfilas();
-  //calcular totales compras nota proveedor
+  //calcular totales
   calculartotal();
   contadorfilas = data.contadorfilas;
   partida = data.partida;
@@ -1534,10 +1497,8 @@ async function seleccionarclienteremisionesseleccionadas(data){
       $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
       $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
   }
+  $('.page-loader-wrapper').css('display', 'none');
 } 
-
-
-
 //listar todas las facturas
 function listarordenes(){
   ocultarformulario();
@@ -1646,16 +1607,6 @@ function construirarrayordenesseleccionadas(Orden){
     EliminarElementoArrayPorValor(arrayordenesseleccionadas,Orden);
     $("#stringordenesseleccionadas").val(arrayordenesseleccionadas.sort());
   }
-  /*
-  var arrayordenesseleccionadas = [];
-  var lista = document.getElementsByClassName("ordenesseleccionadas");
-  for (var i = 0; i < lista.length; i++) {
-    if(lista[i].checked){
-      arrayordenesseleccionadas.push(lista[i].value);
-    }
-  }
-  $("#stringordenesseleccionadas").val(arrayordenesseleccionadas.sort());
-  */
 }
 var arrayclientesordenesseleccionadas = [];
 //obtener todos los datos de la orden de compra seleccionada
@@ -1702,7 +1653,8 @@ function cargarserviciosseleccionadas(){
     mostrarformulario();
     //cargar datos cliente
     $("#numerocliente").val(data.cliente);
-    obtenerclientepornumero(0);
+    $("#numeroclienteanterior").val("");
+    obtenerclienteserviciosseleccionados();
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
     $(".inputnextdet").keypress(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
@@ -1740,71 +1692,27 @@ $(document).ready(function(){
 });
 });
 //obtener por numero
-function obtenerclientepornumero(remisioneseleccionadas){
-  //alert(remisioneseleccionadas);
+function obtenerclientepornumero(){
   var numeroclienteanterior = $("#numeroclienteanterior").val();
   var numerocliente = $("#numerocliente").val();
   if(numeroclienteanterior != numerocliente){
     if($("#numerocliente").parsley().isValid()){
       $.get(facturas_obtener_cliente_por_numero, {numerocliente:numerocliente}, function(data){
-          //var numerofilas = $("#numerofilas").val()
-          //if(parseInt(numerofilas) > 0){
-            //var confirmacion = confirm("Esta seguro de cambiar el cliente, esto eliminara las partidas agregadas (Remisiones ó Servicios)?"); 
-          //}else{
-            var confirmacion = true;
-          //}
+          var confirmacion = true;
           if (confirmacion == true) { 
-            //if(remisioneseleccionadas == 0){
               //validar si el RFC del cliente es igual al de la empresa si es asi la seria de la factura debe ser con el depto INTERNA 
               var emisorrfc = $("#emisorrfc").val();
               if(emisorrfc == data.rfc){
-                var confirmacionrfcigual = confirm("El cliente seleccionado tiene el mismo RFC que el emisor de la FACTURA por lo tanto la serie debe ser INTERNA esta seguro de seguir con los cambios?"); 
-              }
-              if(confirmacionrfcigual == true){
                   $.get(facturas_obtener_serie_interna, function(datos){
-                    $("#tabladetallesfactura tbody").html("");
                     $("#folio").val(datos.Folio);
                     $("#serie").val(datos.Serie);
                     $("#esquema").val(datos.Esquema);
                     $("#depto").val(datos.Depto);
                     $("#serietexto").html("Serie: "+datos.Serie);
                     $("#esquematexto").html("Esquema: "+datos.Esquema);
-                    comprobartiposerie(datos.Depto);
-                    //comprobar numero de filas en la tabla
-                    comprobarfilas();
-                    //calcular totales compras nota proveedor
-                    calculartotal();
-                    //colocar strings vacios
-                    $("#stringremisionesseleccionadas").val("");
-                    $("#stringordenesseleccionadas").val("");
-                    contadorproductos = 0;
-                    contadorfilas = 0;
-                    partida = 1;
                   }) 
               }
-            /*}else{
-              $.get(facturas_obtener_serie_interna, function(datos){
-                $("#tabladetallesfactura tbody").html("");
-                $("#folio").val(datos.Folio);
-                $("#serie").val(datos.Serie);
-                $("#esquema").val(datos.Esquema);
-                $("#depto").val(datos.Depto);
-                $("#serietexto").html("Serie: "+datos.Serie);
-                $("#esquematexto").html("Esquema: "+datos.Esquema);
-                comprobartiposerie(datos.Depto);
-                //comprobar numero de filas en la tabla
-                comprobarfilas();
-                //calcular totales compras nota proveedor
-                calculartotal();
-                //colocar strings vacios
-                $("#stringremisionesseleccionadas").val("");
-                $("#stringordenesseleccionadas").val("");
-                contadorproductos = 0;
-                contadorfilas = 0;
-                partida = 1;
-              }) 
-            }*/
-            //$("#tabladetallesfactura tbody").html("");
+            $("#tabladetallesfactura tbody").html("");
             $("#numerocliente").val(data.numero);
             $("#numeroclienteanterior").val(data.numero);
             $("#cliente").val(data.nombre);
@@ -1859,11 +1767,163 @@ function obtenerclientepornumero(remisioneseleccionadas){
             //calcular totales compras nota proveedor
             calculartotal();
             //colocar strings vacios
-            //$("#stringremisionesseleccionadas").val("");
-            //$("#stringordenesseleccionadas").val("");
-            //contadorproductos = 0;
-            //contadorfilas = 0;
-            //partida = 1;
+            $("#stringremisionesseleccionadas").val("");
+            $("#stringordenesseleccionadas").val("");
+            contadorproductos = 0;
+            contadorfilas = 0;
+            partida = 1;
+            mostrarformulario();
+          }
+      }) 
+    }
+  }
+}
+//obtener cliente de las remisiones seleccionadas
+function obtenerclienteremisionesseleccionadas(){
+  var numeroclienteanterior = $("#numeroclienteanterior").val();
+  var numerocliente = $("#numerocliente").val();
+  if(numeroclienteanterior != numerocliente){
+    if($("#numerocliente").parsley().isValid()){
+      $.get(facturas_obtener_cliente_por_numero, {numerocliente:numerocliente}, function(data){
+          var confirmacion = true;
+          if (confirmacion == true) { 
+              //validar si el RFC del cliente es igual al de la empresa si es asi la seria de la factura debe ser con el depto INTERNA 
+              var emisorrfc = $("#emisorrfc").val();
+              if(emisorrfc == data.rfc){
+                  $.get(facturas_obtener_serie_interna, function(datos){
+                    $("#folio").val(datos.Folio);
+                    $("#serie").val(datos.Serie);
+                    $("#esquema").val(datos.Esquema);
+                    $("#depto").val(datos.Depto);
+                    $("#serietexto").html("Serie: "+datos.Serie);
+                    $("#esquematexto").html("Esquema: "+datos.Esquema);
+                  }) 
+              }
+            $("#numerocliente").val(data.numero);
+            $("#numeroclienteanterior").val(data.numero);
+            $("#cliente").val(data.nombre);
+            if(data.nombre != null){
+              $("#textonombrecliente").html(data.nombre.substring(0, 40));
+            }
+            $("#rfccliente").val(data.rfc);
+            $("#plazo").val(data.plazo);
+            //credito y saldo
+            $("#credito").val(number_format(round(data.credito, numerodecimales), numerodecimales, '.', ''));
+            $("#saldo").val(number_format(round(data.saldo, numerodecimales), numerodecimales, '.', ''));
+            //datos pestaña receptor o cliente
+            $("#receptorrfc").val(data.rfc);
+            $("#receptornombre").val(data.nombre);
+            $("#claveformapago").val(data.claveformapago);
+            $("#claveformapagoanterior").val(data.claveformapago);
+            $("#formapago").val(data.formapago);
+            if(data.formapago != null){
+              $("#textonombreformapago").html(data.formapago.substring(0, 40));
+            }
+            $("#clavemetodopago").val(data.clavemetodopago);
+            $("#clavemetodopagoanterior").val(data.clavemetodopago);
+            $("#metodopago").val(data.metodopago);
+            if(data.metodopago != null){
+              $("#textonombremetodopago").html(data.metodopago.substring(0, 40));
+            }
+            $("#claveusocfdi").val(data.claveusocfdi);
+            $("#claveusocfdianterior").val(data.claveusocfdi);
+            $("#usocfdi").val(data.usocfdi);
+            if(data.usocfdi != null){
+              $("#textonombreusocfdi").html(data.usocfdi.substring(0, 40));
+            }
+            $("#claveresidenciafiscal").val(data.claveresidenciafiscal);
+            $("#claveresidenciafiscalanterior").val(data.claveresidenciafiscal);
+            $("#residenciafiscal").val(data.residenciafiscal);
+            if(data.residenciafiscal != null){
+              $("#textonombreresidenciafiscal").html(data.residenciafiscal.substring(0, 40));
+            }
+            //datos agente
+            $("#numeroagente").val(data.numeroagente);
+            $("#numeroagenteanterior").val(data.numeroagente);
+            $("#rfcagente").val(data.rfcagente);
+            $("#agente").val(data.nombreagente);
+            if(data.nombreagente != null){
+              $("#textonombreagente").html(data.nombreagente.substring(0, 40));
+            }
+            //comprobar si mostrar botones
+            var Depto = $("#depto").val();
+            comprobartiposerie(Depto);
+            mostrarformulario();
+          }
+      }) 
+    }
+  }
+}
+//obtener cliente de los servicios seleccionados
+function obtenerclienteserviciosseleccionados(){
+  var numeroclienteanterior = $("#numeroclienteanterior").val();
+  var numerocliente = $("#numerocliente").val();
+  if(numeroclienteanterior != numerocliente){
+    if($("#numerocliente").parsley().isValid()){
+      $.get(facturas_obtener_cliente_por_numero, {numerocliente:numerocliente}, function(data){
+          var confirmacion = true;
+          if (confirmacion == true) { 
+              //validar si el RFC del cliente es igual al de la empresa si es asi la seria de la factura debe ser con el depto INTERNA 
+              var emisorrfc = $("#emisorrfc").val();
+              if(emisorrfc == data.rfc){
+                  $.get(facturas_obtener_serie_interna, function(datos){
+                    $("#folio").val(datos.Folio);
+                    $("#serie").val(datos.Serie);
+                    $("#esquema").val(datos.Esquema);
+                    $("#depto").val(datos.Depto);
+                    $("#serietexto").html("Serie: "+datos.Serie);
+                    $("#esquematexto").html("Esquema: "+datos.Esquema);
+                  }) 
+              }
+            $("#numerocliente").val(data.numero);
+            $("#numeroclienteanterior").val(data.numero);
+            $("#cliente").val(data.nombre);
+            if(data.nombre != null){
+              $("#textonombrecliente").html(data.nombre.substring(0, 40));
+            }
+            $("#rfccliente").val(data.rfc);
+            $("#plazo").val(data.plazo);
+            //credito y saldo
+            $("#credito").val(number_format(round(data.credito, numerodecimales), numerodecimales, '.', ''));
+            $("#saldo").val(number_format(round(data.saldo, numerodecimales), numerodecimales, '.', ''));
+            //datos pestaña receptor o cliente
+            $("#receptorrfc").val(data.rfc);
+            $("#receptornombre").val(data.nombre);
+            $("#claveformapago").val(data.claveformapago);
+            $("#claveformapagoanterior").val(data.claveformapago);
+            $("#formapago").val(data.formapago);
+            if(data.formapago != null){
+              $("#textonombreformapago").html(data.formapago.substring(0, 40));
+            }
+            $("#clavemetodopago").val(data.clavemetodopago);
+            $("#clavemetodopagoanterior").val(data.clavemetodopago);
+            $("#metodopago").val(data.metodopago);
+            if(data.metodopago != null){
+              $("#textonombremetodopago").html(data.metodopago.substring(0, 40));
+            }
+            $("#claveusocfdi").val(data.claveusocfdi);
+            $("#claveusocfdianterior").val(data.claveusocfdi);
+            $("#usocfdi").val(data.usocfdi);
+            if(data.usocfdi != null){
+              $("#textonombreusocfdi").html(data.usocfdi.substring(0, 40));
+            }
+            $("#claveresidenciafiscal").val(data.claveresidenciafiscal);
+            $("#claveresidenciafiscalanterior").val(data.claveresidenciafiscal);
+            $("#residenciafiscal").val(data.residenciafiscal);
+            if(data.residenciafiscal != null){
+              $("#textonombreresidenciafiscal").html(data.residenciafiscal.substring(0, 40));
+            }
+            //datos agente
+            $("#numeroagente").val(data.numeroagente);
+            $("#numeroagenteanterior").val(data.numeroagente);
+            $("#rfcagente").val(data.rfcagente);
+            $("#agente").val(data.nombreagente);
+            if(data.nombreagente != null){
+              $("#textonombreagente").html(data.nombreagente.substring(0, 40));
+            }
+            //comprobar si mostrar botones
+            var Depto = $("#depto").val();
+            comprobartiposerie(Depto);
             mostrarformulario();
           }
       }) 
@@ -2977,10 +3037,6 @@ function alta(){
                                 '<label>Refactura</label>'+
                                 '<input type="text" class="form-control inputnexttabot" name="refactura" id="refactura"  readonly data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                               '</div>'+
-                              '<div class="col-md-4">'+
-                                '<label>Descripción</label>'+
-                                '<textarea class="form-control inputnexttabot" name="descripcion" id="descripcion" rows="3" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]"></textarea>'+
-                              '</div>'+
                             '</div>'+
                           '</div>'+
                         '</div>'+
@@ -3066,10 +3122,14 @@ function alta(){
                           '</div>'+ 
                         '</div>'+
                         '<div class="row">'+
-                          '<div class="col-md-6">'+   
+                          '<div class="col-md-3">'+   
                             '<label>Observaciones</label>'+
                             '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]"></textarea>'+
                           '</div>'+ 
+                          '<div class="col-md-3">'+
+                            '<label>Comentarios</label>'+
+                            '<textarea class="form-control inputnexttabot" name="descripcion" id="descripcion" rows="5" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]"></textarea>'+
+                          '</div>'+
                           '<div class="col-md-3">'+
                             '<table class="table table-striped table-hover">'+
                               '<tr>'+
@@ -3178,7 +3238,7 @@ function alta(){
     //recomentable para mayor compatibilidad entre navegadores.
     var code = (e.keyCode ? e.keyCode : e.which);
     if(code==13){
-    obtenerclientepornumero(0);
+    obtenerclientepornumero();
     }
   });
   //regresar numero cliente
@@ -4045,10 +4105,6 @@ function obtenerdatos(facturamodificar){
                           '<label>Refactura</label>'+
                           '<input type="text" class="form-control inputnexttabot" name="refactura" id="refactura"  readonly data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                         '</div>'+
-                        '<div class="col-md-4">'+
-                          '<label>Descripción</label>'+
-                          '<textarea class="form-control inputnexttabot" name="descripcion" id="descripcion" rows="3" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
-                        '</div>'+
                       '</div>'+
                     '</div>'+
                   '</div>'+
@@ -4124,10 +4180,14 @@ function obtenerdatos(facturamodificar){
                     '</div>'+ 
                   '</div>'+
                   '<div class="row">'+
-                    '<div class="col-md-6">'+   
+                    '<div class="col-md-3">'+   
                       '<label>Observaciones</label>'+
                       '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]"></textarea>'+
                     '</div>'+ 
+                    '<div class="col-md-3">'+
+                      '<label>Comentarios</label>'+
+                      '<textarea class="form-control inputnexttabot" name="descripcion" id="descripcion" rows="5" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
+                    '</div>'+
                     '<div class="col-md-3">'+
                       '<table class="table table-striped table-hover">'+
                         '<tr>'+

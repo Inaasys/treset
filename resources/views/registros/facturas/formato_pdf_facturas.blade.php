@@ -33,7 +33,7 @@
             <section>
                 <div id ="contenedor">
                     <div style="float:left;width:19%;text-align: left;">
-                    <img src="{!! public_path('logotipo_empresa/') !!}{{$empresa->Logo}}" width="125px" height="80px">
+                        <img src="{!! public_path('logotipo_empresa/') !!}{{$empresa->Logo}}" style="object-fit: contain;width:50%;height:auto;">
                     </div>
                     <div style="float:left;width:59%;text-align: center;">
                         <b style="font-size:13px;color:#122b40;">{{$empresa->Empresa}}</b><br>
@@ -50,7 +50,7 @@
                     <hr></hr>
                 </div>
                 <div id ="contenedor" style="margin-top:10px;">
-                    <div style="width:50%; height:120px;float:left;text-align:left;border-style:groove;">    
+                    <div style="width:50%; height:125px;float:left;text-align:left;border-style:groove;">    
                         <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
                             <li style="font-size:10px; margin-left: 5px;"> Nombre: {{$d['cliente']->Nombre}} ({{$d['cliente']->Numero}})</li>
                             <li style="font-size:10px; margin-left: 5px;"> Dirección: {{$d['cliente']->Calle}} {{$d['cliente']->noExterior}} {{$d['cliente']->noInterior}}</b></li>
@@ -60,11 +60,12 @@
                             <li style="font-size:10px; margin-left: 5px;"> Agente: {{$d['agente']->Nombre}}</li>
                             <li style="font-size:10px; margin-left: 5px;"> EmisorRfc: {{$d['factura']->EmisorRfc}}</li>
                             <li style="font-size:10px; margin-left: 5px;"> ReceptorRfc: {{$d['factura']->ReceptorRfc}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> ReceptorRegimenFiscal: @if($d['regimenfiscalcliente'] != null) {{$d['regimenfiscalcliente']->Nombre}} ({{$d['regimenfiscalcliente']->Clave}}) @endif</li>
                         </ul>
                     </div>
                     <div style="width:1%; float:left;">
                     </div>
-                    <div style="width:48%; height:120px; float:left; text-align: left; border-style: groove;">
+                    <div style="width:48%; height:125px; float:left; text-align: left; border-style: groove;">
                         <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
                             <li style="font-size:18px; margin-left: 5px;"><b>Factura:</b> <b style="color:red">{{$d['factura']->Factura}}</b></li>
                             <li style="font-size:10px; margin-left: 5px;">Plazo: {{$d['factura']->Plazo}} Días</li>
@@ -211,9 +212,13 @@
                 <div id ="contenedor" style="margin-top:20px;">
                     <div style="width:100%;">
                         <table style="width: 100%;max-width: 100%;">
+                            @if($d['factura']->Obs != "")
+                                <tr><td style="font-size:9px;">{{$d['factura']->Obs}}</td></tr>
+                            @endif
                             <tr><td style="font-size:9px;">{{ number_format($d['tipocambiofactura'], $d['numerodecimalesdocumento']) }} {{$d['factura']->Moneda}}</td></tr>
                             <tr><td style="font-size:9px;">{{$d['totalletras']}}</td></tr>
                             <tr><td style="font-size:9px;">La reproducción no autorizada de este comprobante constituye un delito en los términos de las disposiciones fiscales</td></tr>
+                            @if($d['documentosrelacionados'] != null)<tr><td style="font-size:9px;">Tipo Relación ({{$d['factura']->TipoRelacion}}) {{$d['documentosrelacionados']->UUID}} Factura: {{$d['documentosrelacionados']->Factura}}</td></tr>@endif
                             <tr><td style="font-size:9px;color:red;">Este documento es una representación impresa de un CFDI</td></tr>
                         </table>
                     </div>

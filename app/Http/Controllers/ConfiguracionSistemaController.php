@@ -70,7 +70,9 @@ class ConfiguracionSistemaController extends Controller
                                             'PedirObligatoriamenteReferenciaEnRemisiones',
                                             'PedirObligatoriamenteOrdenServicioEnRemisiones',
                                             'PedirObligatoriamenteEquipoEnRemisiones',
-                                            'GenerarFormatoRequisicionTYT')
+                                            'GenerarFormatoRequisicionTYT',
+                                            'ModificarCreditoDeClientes',
+                                            'ModificarCostoyVentaDeServicios')
                                 ->where('Numero', 1)->first();
         //actualizar datos de configuracion global
         config(['app.periodoincialmodulos' => $this->empresa->Periodo_Inicial_Modulos]);
@@ -96,6 +98,8 @@ class ConfiguracionSistemaController extends Controller
         config(['app.correodefault2enviodocumentos' => $this->empresa->CorreoDefault2EnvioDocumentos]);
         config(['app.usuariosamodificarinsumos' => $this->empresa->UsuariosModificarInsumo]);
         config(['app.modificarcostosdeproductos' => $this->empresa->ModificarCostosDeProductos]);
+        config(['app.modificarcreditodeclientes' => $this->empresa->ModificarCreditoDeClientes]);
+        config(['app.modificarcostoyventadeservicios' => $this->empresa->ModificarCostoyVentaDeServicios]);
         ////////////OBTENER CONFIGURACIONES DEL SISTEMA////////////////
         $this->numerocerosconfigurados = Helpers::numerocerosconfiguracion(); //obtienes los ceros que se deben colocar con base a los decimales configurados en el sistemas ejemplo decimales para el sistema = 3 numero de ceros = 000
         $this->numerocerosconfiguradosinputnumberstep = Helpers::numerocerosconfiguracioninputnumberstep(); //obtienes los ceros que se deben colocar en los input type number con base a los decimales configurados en el sistemas ejemplo decimales para el sistema = 3 numero de ceros = 001
@@ -130,6 +134,10 @@ class ConfiguracionSistemaController extends Controller
         $this->usuariosamodificarinsumos = config('app.usuariosamodificarinsumos');
         //usuarios que pueden modificar costos en productos
         $this->modificarcostosdeproductos = config('app.modificarcostosdeproductos');
+        //usuarios ue puedes modificar credito clientes 
+        $this->modificarcreditodeclientes = config('app.modificarcreditodeclientes');
+        //usuarios que pueden modificar costo y venta servicio
+        $this->modificarcostoyventadeservicios = config('app.modificarcostoyventadeservicios');
         //conexiones a otras bases
         $this->suc2 = config('app.suc2');
         $this->connsuc2 = config('app.connsuc2');    

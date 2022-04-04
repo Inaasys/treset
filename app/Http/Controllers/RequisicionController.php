@@ -116,14 +116,14 @@ class RequisicionController extends ConfiguracionSistemaController{
                         return $operaciones;
                     })
                     ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
-                    ->addColumn('subtotal', function($data){ return $data->SubTotal; })
-                    ->addColumn('iva', function($data){ return $data->Iva; })
-                    ->addColumn('total', function($data){ return $data->Total; })
-                    ->addColumn('importe', function($data){ return $data->Importe; })
-                    ->addColumn('descuento', function($data){ return $data->Descuento; })
-                    ->addColumn('costo', function($data){ return $data->Costo; })
-                    ->addColumn('comision', function($data){ return $data->Comision; })
-                    ->addColumn('utilidad', function($data){ return $data->Utilidad; })
+                    //->addColumn('subtotal', function($data){ return $data->SubTotal; })
+                    //->addColumn('iva', function($data){ return $data->Iva; })
+                    //->addColumn('total', function($data){ return $data->Total; })
+                    //->addColumn('importe', function($data){ return $data->Importe; })
+                    //->addColumn('descuento', function($data){ return $data->Descuento; })
+                    //->addColumn('costo', function($data){ return $data->Costo; })
+                    //->addColumn('comision', function($data){ return $data->Comision; })
+                    //->addColumn('utilidad', function($data){ return $data->Utilidad; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 

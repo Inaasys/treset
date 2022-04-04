@@ -25,6 +25,7 @@ use App\Configuracion_Tabla;
 use App\VistaAjusteInventario;
 use App\VistaObtenerExistenciaProducto;
 use App\Firma_Rel_Documento;
+use App\User_Rel_Almacen;
 use Config;
 use Mail;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
@@ -84,7 +85,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
                         return $operaciones;
                     })
                     ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
-                    ->addColumn('Total', function($data){ return $data->Total; })
+                    //->addColumn('Total', function($data){ return $data->Total; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
@@ -217,7 +218,17 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
     //obtener almacenes
     public function ajustesinventario_obtener_almacenes(Request $request){
         if($request->ajax()){
-            $data = Almacen::where('Status', 'ALTA')->orderBy("Numero", "ASC")->get();
+            $contaralmacenesasignadosausuario = User_Rel_Almacen::where('user_id', Auth::user()->id)->count();
+            if($contaralmacenesasignadosausuario > 0){
+                $data = DB::table('user_rel_almacenes as ura')
+                ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
+                ->select('ura.id', 'a.Numero', 'a.Nombre')
+                ->where('a.Status', 'ALTA')
+                ->orderby('a.Numero', 'ASC')
+                ->get();
+            }else{
+                $data = Almacen::where('Status', 'ALTA')->orderBy("Numero", "ASC")->get();
+            }
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionaralmacen('.$data->Numero.',\''.$data->Nombre .'\')">Seleccionar</div>';
@@ -232,17 +243,39 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
     public function ajustesinventario_obtener_almacen_por_numero(Request $request){
         $numero = '';
         $nombre = '';
-        $existealmacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->count();
-        if($existealmacen > 0){
-            $almacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->first();
-            $numero = $almacen->Numero;
-            $nombre = $almacen->Nombre;
+        $plazo = '';
+        $contaralmacenesasignadosausuario = User_Rel_Almacen::where('user_id', Auth::user()->id)->count();
+        if($contaralmacenesasignadosausuario > 0){
+            $existealmacen = DB::table('user_rel_almacenes as ura')
+            ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
+            ->select('ura.id', 'a.Numero', 'a.Nombre')
+            ->where('a.Numero', $request->numeroalmacen)
+            ->where('a.Status', 'ALTA')
+            ->count();
+            if($existealmacen > 0){
+                $almacen = DB::table('user_rel_almacenes as ura')
+                ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
+                ->select('ura.id', 'a.Numero', 'a.Nombre')
+                ->where('a.Numero', $request->numeroalmacen)
+                ->where('a.Status', 'ALTA')
+                ->orderby('a.Numero', 'DESC')
+                ->first();
+                $numero = $almacen->Numero;
+                $nombre = $almacen->Nombre;
+            }
+        }else{
+            $existealmacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->count();
+            if($existealmacen > 0){
+                $almacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->first();
+                $numero = $almacen->Numero;
+                $nombre = $almacen->Nombre;
+            }
         }
         $data = array(
             'numero' => $numero,
             'nombre' => $nombre,
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener productos

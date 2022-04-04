@@ -27,6 +27,7 @@ use App\Existencia;
 use App\Almacen;
 use App\Serie;
 use App\Firma_Rel_Documento;
+use App\User_Rel_Almacen;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
 use Storage; 
 use ZipArchive;
@@ -84,7 +85,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                         return $operaciones;
                     })
                     ->addColumn('fecha', function($data){ return Carbon::parse($data->fecha)->toDateTimeString(); })
-                    ->addColumn('total', function($data){ return $data->total; })
+                    //->addColumn('total', function($data){ return $data->total; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
@@ -103,14 +104,19 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
         $contadorfilas = $request->contadorfilas;
         $numeroalmacen = 1;
         $tipooperacion = 'alta';
-        $almacenes = Almacen::where('status', 'ALTA')->get();
+        $contaralmacenesasignadosausuario = User_Rel_Almacen::where('user_id', Auth::user()->id)->count();
+        if($contaralmacenesasignadosausuario > 0){
+            $almacenes = DB::table('user_rel_almacenes as ura')
+            ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
+            ->select('ura.id', 'a.Numero', 'a.Nombre')
+            ->where('a.Status', 'ALTA')
+            ->get();
+        }else{
+            $almacenes = Almacen::where('status', 'ALTA')->get();
+        }
         $selectalmacenes = "<option selected disabled hidden>Selecciona el almacén</option>";
         foreach($almacenes as $a){
-            //if($a->Numero == 1){
-              //  $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.' selected>'.$a->Nombre;
-            //}else{
-                $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.'>'.$a->Nombre;
-            //}
+            $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.'>'.$a->Nombre;
         }
         $arraycodigosyaagregados = $porciones = explode(",", $request->arraycodigospartidas);
         foreach($partidasexcel as $partida){
@@ -151,7 +157,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                                 $selectalmacenes.
                             '</select>'.
                             '</td>'. 
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm existenciasalmacenpartida" name="existenciasalmacenpartida[]" id="existenciasalmacenpartida[]" value="'.$Existencias.'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm existenciasalmacenpartida" name="existenciasalmacenpartida[]" id="existenciasalmacenpartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($cantidad).'" data-parsley-min="0.1" data-parsley-existencias="'.$Existencias.'" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" required></td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" id="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($preciopartida).'" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');"></td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" id="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto($totalpesospartida).'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
@@ -266,14 +272,19 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
             $codigoabuscar = $request->codigoabuscar;
             $tipooperacion = $request->tipooperacion;
             $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%');
-            $almacenes = Almacen::where('status', 'ALTA')->get();
-            $selectalmacenes = "";
+            $contaralmacenesasignadosausuario = User_Rel_Almacen::where('user_id', Auth::user()->id)->count();
+            if($contaralmacenesasignadosausuario > 0){
+                $almacenes = DB::table('user_rel_almacenes as ura')
+                ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
+                ->select('ura.id', 'a.Numero', 'a.Nombre')
+                ->where('a.Status', 'ALTA')
+                ->get();
+            }else{
+                $almacenes = Almacen::where('status', 'ALTA')->get();
+            }
+            $selectalmacenes = "<option selected disabled hidden>Selecciona el almacén</option>";
             foreach($almacenes as $a){
-                //if($a->Numero == 1){
-                    //$selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.' selected>'.$a->Nombre;
-                //}else{
-                    $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.'>'.$a->Nombre;
-                //}
+                $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.'>'.$a->Nombre;
             }
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($selectalmacenes, $tipooperacion){
@@ -300,15 +311,19 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
 
     //obtener select almacenes
     public function asignacion_herramienta_obtener_selectalmacenes(){
-        
-        $almacenes = Almacen::where('status', 'ALTA')->get();
+        $contaralmacenesasignadosausuario = User_Rel_Almacen::where('user_id', Auth::user()->id)->count();
+        if($contaralmacenesasignadosausuario > 0){
+            $almacenes = DB::table('user_rel_almacenes as ura')
+            ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
+            ->select('ura.id', 'a.Numero', 'a.Nombre')
+            ->where('a.Status', 'ALTA')
+            ->get();
+        }else{
+            $almacenes = Almacen::where('status', 'ALTA')->get();
+        }
         $selectalmacenes = "<option selected disabled hidden>Selecciona el almacén</option>";
         foreach($almacenes as $a){
-            if($a->Numero == 1){
-                $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.' selected>'.$a->Nombre;
-            }else{
-                $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.'>'.$a->Nombre;
-            }
+            $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.'>'.$a->Nombre;
         }
         return response()->json($selectalmacenes);
     }
@@ -317,14 +332,19 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
         $codigoabuscar = $request->codigoabuscar;
         $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->count();
         if($contarproductos > 0){
-            $almacenes = Almacen::where('status', 'ALTA')->get();
+            $contaralmacenesasignadosausuario = User_Rel_Almacen::where('user_id', Auth::user()->id)->count();
+            if($contaralmacenesasignadosausuario > 0){
+                $almacenes = DB::table('user_rel_almacenes as ura')
+                ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
+                ->select('ura.id', 'a.Numero', 'a.Nombre')
+                ->where('a.Status', 'ALTA')
+                ->get();
+            }else{
+                $almacenes = Almacen::where('status', 'ALTA')->get();
+            }
             $selectalmacenes = "<option selected disabled hidden>Selecciona el almacén</option>";
             foreach($almacenes as $a){
-                    if($a->Numero == 1){
-                        $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.' selected>'.$a->Nombre;
-                    }else{
-                        $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.'>'.$a->Nombre;
-                    }
+                $selectalmacenes = $selectalmacenes.'<option value='.$a->Numero.'>'.$a->Nombre;
             }
             $contarexistencia = Existencia::where('Codigo', ''.$codigoabuscar.'')->where('Almacen', 1)->count();
             if($contarexistencia > 0){
@@ -670,8 +690,17 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                     $opciones = '<option value="Nuevo">Nuevo</option>'.
                     '<option value="Usado" selected>Usado</option>';
                 }
+                $contaralmacenesasignadosausuario = User_Rel_Almacen::where('user_id', Auth::user()->id)->count();
+                if($contaralmacenesasignadosausuario > 0){
+                    $almacenes = DB::table('user_rel_almacenes as ura')
+                    ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
+                    ->select('ura.id', 'a.Numero', 'a.Nombre')
+                    ->where('a.Status', 'ALTA')
+                    ->get();
+                }else{
+                    $almacenes = Almacen::where('status', 'ALTA')->get();
+                }
                 //almacen seleccionado 
-                $almacenes = Almacen::where('status', 'ALTA')->get();
                 $selectalmacenes = "<option selected disabled hidden>Selecciona el almacén</option>";
                 foreach($almacenes as $a){
                     if($a->Numero == $ahd->id_almacen){

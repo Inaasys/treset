@@ -33,6 +33,7 @@ use App\Configuracion_Tabla;
 use App\VistaTraspaso;
 use App\VistaObtenerExistenciaProducto;
 use App\Firma_Rel_Documento;
+use App\User_Rel_Almacen;
 use Config;
 use Mail;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
@@ -113,14 +114,14 @@ class TraspasoController extends ConfiguracionSistemaController{
                         return $operaciones;
                     })
                     ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
-                    ->addColumn('subtotal', function($data){ return $data->SubTotal; })
-                    ->addColumn('iva', function($data){ return $data->Iva; })
-                    ->addColumn('total', function($data){ return $data->Total; })
-                    ->addColumn('importe', function($data){ return $data->Importe; })
-                    ->addColumn('descuento', function($data){ return $data->Descuento; })
-                    ->addColumn('costo', function($data){ return $data->Costo; })
-                    ->addColumn('comision', function($data){ return $data->Comision; })
-                    ->addColumn('utilidad', function($data){ return $data->Utilidad; })
+                    //->addColumn('subtotal', function($data){ return $data->SubTotal; })
+                    //->addColumn('iva', function($data){ return $data->Iva; })
+                    //->addColumn('total', function($data){ return $data->Total; })
+                    //->addColumn('importe', function($data){ return $data->Importe; })
+                    //->addColumn('descuento', function($data){ return $data->Descuento; })
+                    //->addColumn('costo', function($data){ return $data->Costo; })
+                    //->addColumn('comision', function($data){ return $data->Comision; })
+                    //->addColumn('utilidad', function($data){ return $data->Utilidad; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
         } 
@@ -270,7 +271,18 @@ class TraspasoController extends ConfiguracionSistemaController{
     //obtener almacenes
     public function traspasos_obtener_almacenes(Request $request){
         if($request->ajax()){
-            $data = Almacen::where('Status', 'ALTA')->where('Numero', '<>', $request->numeroalmacena)->orderBy("Numero", "ASC")->get();
+            $contaralmacenesasignadosausuario = User_Rel_Almacen::where('user_id', Auth::user()->id)->count();
+            if($contaralmacenesasignadosausuario > 0){
+                $data = DB::table('user_rel_almacenes as ura')
+                ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
+                ->select('ura.id', 'a.Numero', 'a.Nombre')
+                ->where('a.Status', 'ALTA')
+                ->orderby('a.Numero', 'ASC')
+                ->where('a.Numero', '<>', $request->numeroalmacena)
+                ->get();
+            }else{
+                $data = Almacen::where('Status', 'ALTA')->where('Numero', '<>', $request->numeroalmacena)->orderBy("Numero", "ASC")->get();
+            }
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionaralmacen('.$data->Numero.',\''.$data->Nombre .'\')">Seleccionar</div>';
@@ -285,15 +297,39 @@ class TraspasoController extends ConfiguracionSistemaController{
     public function  traspasos_obtener_almacen_de_por_numero(Request $request){
         $numero = '';
         $nombre = '';
-        $existealmacen = Almacen::where('Numero', $request->numeroalmacende)->where('Numero', '<>', $request->numeroalmacena)->where('Status', 'ALTA')->count();
-        if($existealmacen > 0){
-            $almacen = Almacen::where('Numero', $request->numeroalmacende)->where('Numero', '<>', $request->numeroalmacena)->where('Status', 'ALTA')->first();
-            $numero = $almacen->Numero;
-            $nombre = $almacen->Nombre;
+        $plazo = '';
+        $contaralmacenesasignadosausuario = User_Rel_Almacen::where('user_id', Auth::user()->id)->count();
+        if($contaralmacenesasignadosausuario > 0){
+            $existealmacen = DB::table('user_rel_almacenes as ura')
+            ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
+            ->select('ura.id', 'a.Numero', 'a.Nombre')
+            ->where('a.Numero', $request->numeroalmacende)
+            ->where('a.Numero', '<>', $request->numeroalmacena)
+            ->where('a.Status', 'ALTA')
+            ->count();
+            if($existealmacen > 0){
+                $almacen = DB::table('user_rel_almacenes as ura')
+                ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
+                ->select('ura.id', 'a.Numero', 'a.Nombre')
+                ->where('a.Numero', $request->numeroalmacende)
+                ->where('a.Numero', '<>', $request->numeroalmacena)
+                ->where('a.Status', 'ALTA')
+                ->orderby('a.Numero', 'DESC')
+                ->first();
+                $numero = $almacen->Numero;
+                $nombre = $almacen->Nombre;
+            }
+        }else{
+            $existealmacen = Almacen::where('Numero', $request->numeroalmacende)->where('Numero', '<>', $request->numeroalmacena)->where('Status', 'ALTA')->count();
+            if($existealmacen > 0){
+                $almacen = Almacen::where('Numero', $request->numeroalmacende)->where('Numero', '<>', $request->numeroalmacena)->where('Status', 'ALTA')->first();
+                $numero = $almacen->Numero;
+                $nombre = $almacen->Nombre;
+            }
         }
         $data = array(
             'numero' => $numero,
-            'nombre' => $nombre
+            'nombre' => $nombre,
         );
         return response()->json($data); 
     }
@@ -301,7 +337,18 @@ class TraspasoController extends ConfiguracionSistemaController{
     //obtener alamcenes foraneos
     public function traspasos_obtener_almacenes_foraneos(Request $request){
         if($request->ajax()){
-            $data = Almacen::where('Status', 'ALTA')->where('Numero', '<>', $request->numeroalmacende)->orderBy("Numero", "ASC")->get();
+            $contaralmacenesasignadosausuario = User_Rel_Almacen::where('user_id', Auth::user()->id)->count();
+            if($contaralmacenesasignadosausuario > 0){
+                $data = DB::table('user_rel_almacenes as ura')
+                ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
+                ->select('ura.id', 'a.Numero', 'a.Nombre')
+                ->where('a.Status', 'ALTA')
+                ->orderby('a.Numero', 'ASC')
+                ->where('a.Numero', '<>', $request->numeroalmacende)
+                ->get();
+            }else{
+                $data = Almacen::where('Status', 'ALTA')->where('Numero', '<>', $request->numeroalmacende)->orderBy("Numero", "ASC")->get();
+            }
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionaralmacenforaneo('.$data->Numero.',\''.$data->Nombre .'\')">Seleccionar</div>';
@@ -316,15 +363,39 @@ class TraspasoController extends ConfiguracionSistemaController{
     public function traspasos_obtener_almacen_a_por_numero(Request $request){
         $numero = '';
         $nombre = '';
-        $existealmacen = Almacen::where('Numero', $request->numeroalmacena)->where('Numero', '<>', $request->numeroalmacende)->where('Status', 'ALTA')->count();
-        if($existealmacen > 0){
-            $almacen = Almacen::where('Numero', $request->numeroalmacena)->where('Numero', '<>', $request->numeroalmacende)->where('Status', 'ALTA')->first();
-            $numero = $almacen->Numero;
-            $nombre = $almacen->Nombre;
+        $plazo = '';
+        $contaralmacenesasignadosausuario = User_Rel_Almacen::where('user_id', Auth::user()->id)->count();
+        if($contaralmacenesasignadosausuario > 0){
+            $existealmacen = DB::table('user_rel_almacenes as ura')
+            ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
+            ->select('ura.id', 'a.Numero', 'a.Nombre')
+            ->where('a.Numero', $request->numeroalmacena)
+            ->where('a.Numero', '<>', $request->numeroalmacende)
+            ->where('a.Status', 'ALTA')
+            ->count();
+            if($existealmacen > 0){
+                $almacen = DB::table('user_rel_almacenes as ura')
+                ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
+                ->select('ura.id', 'a.Numero', 'a.Nombre')
+                ->where('a.Numero', $request->numeroalmacena)
+                ->where('a.Numero', '<>', $request->numeroalmacende)
+                ->where('a.Status', 'ALTA')
+                ->orderby('a.Numero', 'DESC')
+                ->first();
+                $numero = $almacen->Numero;
+                $nombre = $almacen->Nombre;
+            }
+        }else{
+            $existealmacen = Almacen::where('Numero', $request->numeroalmacena)->where('Numero', '<>', $request->numeroalmacende)->where('Status', 'ALTA')->count();
+            if($existealmacen > 0){
+                $almacen = Almacen::where('Numero', $request->numeroalmacena)->where('Numero', '<>', $request->numeroalmacende)->where('Status', 'ALTA')->first();
+                $numero = $almacen->Numero;
+                $nombre = $almacen->Nombre;
+            }
         }
         $data = array(
             'numero' => $numero,
-            'nombre' => $nombre
+            'nombre' => $nombre,
         );
         return response()->json($data); 
     }

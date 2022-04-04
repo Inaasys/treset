@@ -21,7 +21,7 @@
                 <li><a href="{{ route('cotizaciones') }}" id="menuregistroscotizaciones">Cotizaciones</a></li>
                 <li><a  href="{{ route('lista_precios_volvo') }}" id="menuregistroslistapreciosvolvo">Lista Precio Volvo</a></li>
                 <li><a  href="{{ route('lista_precios_cummins') }}" id="menuregistroslistaprecioscummins">Lista Precio Cummins</a></li>
-                <li><a  href="{{ route('lista_precios_fleetguard') }}" id="menuregistroslistaprecioscummins">Lista Precio Fleetguard</a></li>
+                <li><a  href="{{ route('lista_precios_fleetguard') }}" id="menuregistroslistapreciosfleetguard">Lista Precio Fleetguard</a></li>
               </ul>
             </li>  
             <li class="dropdown-submenu">
@@ -107,12 +107,9 @@
         <!--<li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">SAT <span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="#">Comprobantes</a></li>
-            <li><a href="#">Comprobantes Descarga XML SAT</a></li>
             <li class="dropdown-submenu">
               <a class="test"  href="#">Catálogos Definidos por el SAT <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a  href="#">1. Aduana</a></li>
                 <li class="dropdown-submenu">
                   <a class="test" href="#">2. Producto o Servicio <span class="caret"></span></a>
                   <ul class="dropdown-menu">
@@ -152,21 +149,6 @@
                 </li>
               </ul>
             </li>
-            <li class="dropdown-submenu">
-              <a class="test"  href="#">Catálogos Internos del Sistema <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a  href="#">Conceptos</a></li>
-                <li><a  href="#">Departamentos</a></li>
-                <li><a  href="#">Familia</a></li>
-                <li><a  href="#">Obsoletos</a></li>
-                <li><a  href="#">Piensa</a></li>
-                <li><a  href="#">Tipos Cliente</a></li>
-                <li><a  href="#">Tipos Proveedor</a></li>
-                <li><a  href="#">Tipos Orden Trabajo</a></li>
-                <li><a  href="#">Tipos Unidades</a></li>
-              </ul>
-            </li>            
-            <li><a href="#">Tipos de Cambio</a></li>
           </ul>
         </li>-->
         <li class="dropdown">
@@ -242,10 +224,7 @@
               <ul class="dropdown-menu">
                 <!--<li><a  href="#">Avance Unidades en Reparación</a></li>-->
                 <li><a  href="{{route('reporte_ordenes_trabajo_horas_tecnico')}}" id="menureportesordenestrabajohorastecnico">Horas Técnico</a></li>
-                <!--
-                <li><a  href="#">Unidades Servicio</a></li>
-                <li><a  href="#">Relación de Encuestas</a></li>
-                <li><a  href="#">Precios Mano de Obra</a></li> --> 
+                <li><a  href="{{route('reporte_unidades_servicio')}}" id="menureporteunidadesservicio">Unidades Servicio</a></li>
               </ul>
             </li>             
             <li class="dropdown-submenu">
@@ -276,9 +255,9 @@
             <li class="dropdown-submenu">
               <a class="test" href="#">Inventario <span class="caret"></span></a>
               <ul class="dropdown-menu " style="margin-top: -150px !important;">
-                <!--<li><a  href="#" id="menureportecostoinventario">Costo del Inventario </a></li>
+                <li><a  href="#" id="menureportecostoinventario">Costo del Inventario </a></li>
                 <li><a  href="#" id="menureportecostoinventarioparametros">Costo del Inventario (Costo Ultimo, Promedio y Más Alto)</a></li>
-                <li><a  href="#" id="menureporteproductossincomprasyventas">Productos sin Movimiento de Compras y Ventas </a></li>
+                <!--<li><a  href="#" id="menureporteproductossincomprasyventas">Productos sin Movimiento de Compras y Ventas </a></li>
                 <li><a  href="#" id="menureportemovimientosalinventario">Movimientos al Inventario </a></li>
                 <li><a  href="#" id="menureporteultimafechaycostosproductoscomprados">Ultima Fecha y Costos de Productos Comprados </a></li>
                 <li><a  href="#" id="menureporteultimafechaypreciosproductosfacturados">Ultima Fecha y Precios de Productos Facturados </a></li>
@@ -302,27 +281,6 @@
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Utilerias <span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <!--<li><a href="#">Visor de Archivos XML</a></li>       
-            <li class="dropdown-submenu">
-              <a class="test"  href="#">Importar y Predeterminar <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a  href="#">Catálogos Definidos del SAT</a></li>
-                <li><a  href="#">Catálogos del Sistema</a></li>                
-                <li><a  href="#">Comprobantes Descargados del SAT</a></li>            
-                <li><a  href="#">Predeterminar Columnas</a></li>
-              </ul>
-            </li>                
-            <li class="dropdown-submenu">
-              <a class="test"  href="#">Mantenimiento <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a  href="#">Inventarios y Existencias de los Almacenes</a></li>
-                <li><a  href="#">Saldos y Pagos de Clientes y Proveedores</a></li>
-                <li><a  href="#">Actualizar Periodos en Documentos</a></li>
-                <li><a  href="#">Actualizar al Ultimo Costo de Compra en Catálogo de Productos</a></li>                  
-                <li><a  href="#">Actualizar Precios Netos a Usar en Punto de Venta de Utilidad Marcas</a></li>
-                <li><a  href="#">Ingresar Precios Netos a Usar en Punto de Venta</a></li>
-              </ul>
-            </li>-->
             @if(Auth::user()->role_id == 1)
               <li><a href="{{ route('empresa') }}">Empresa</a></li>
               <li><a href="{{ route('errors_inaasys') }}"><b>LOGS-ERRORS</b></a></li>

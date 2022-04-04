@@ -124,14 +124,14 @@ function listar(){
         },
         columns: campos_tabla,
         "drawCallback": function( data ) {
-            $("#sumaimportefiltrado").html(data.json.sumaimporte);
-            $("#sumadescuentofiltrado").html(data.json.sumadescuento);
-            $("#sumasubtotalfiltrado").html(data.json.sumasubtotal);
-            $("#sumaivafiltrado").html(data.json.sumaiva);
-            $("#sumatotalfiltrado").html(data.json.sumatotal);
-            $("#sumacostofiltrado").html(data.json.sumacosto);
-            $("#sumacomisionfiltrado").html(data.json.sumacomision);
-            $("#sumautilidadfiltrado").html(data.json.sumautilidad); 
+            $("#sumaimportefiltrado").html(number_format(round(data.json.sumaimporte, numerodecimales), numerodecimales, '.', ''));
+            $("#sumadescuentofiltrado").html(number_format(round(data.json.sumadescuento, numerodecimales), numerodecimales, '.', ''));
+            $("#sumasubtotalfiltrado").html(number_format(round(data.json.sumasubtotal, numerodecimales), numerodecimales, '.', ''));
+            $("#sumaivafiltrado").html(number_format(round(data.json.sumaiva, numerodecimales), numerodecimales, '.', ''));
+            $("#sumatotalfiltrado").html(number_format(round(data.json.sumatotal, numerodecimales), numerodecimales, '.', ''));
+            $("#sumacostofiltrado").html(number_format(round(data.json.sumacosto, numerodecimales), numerodecimales, '.', ''));
+            $("#sumacomisionfiltrado").html(number_format(round(data.json.sumacomision, numerodecimales), numerodecimales, '.', ''));
+            $("#sumautilidadfiltrado").html(number_format(round(data.json.sumautilidad, numerodecimales), numerodecimales, '.', '')); 
         },
         initComplete: function () {
           // Aplicar busquedas por columna

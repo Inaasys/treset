@@ -33,7 +33,7 @@
             <section>
                 <div id ="contenedor">
                     <div style="float:left;width:20%;text-align: left;">
-                    <img src="{!! public_path('logotipo_empresa/') !!}{{$empresa->Logo}}" width="125px" height="80px">
+                    <img src="{!! public_path('logotipo_empresa/') !!}{{$empresa->Logo}}" style="object-fit: contain;width:50%;height:auto;">
                     </div>
                     <div style="float:left;width:60%;text-align: center;">
                         <b style="font-size:13px;color:#122b40;">{{$empresa->Empresa}}</b><br>
@@ -125,6 +125,7 @@
                             <tr><td style="font-size:9px;">{{$d['totalletras']}}</td></tr>
                             <tr><td style="font-size:9px;">La reproducción no autorizada de este comprobante constituye un delito en los términos de las disposiciones fiscales</td></tr>
                             <tr><td style="font-size:9px;">Tipo Relación ({{$d['notacreditocliente']->TipoRelacion}}) {{$d['notaclientedocumento']->UUID}} Factura: {{$d['notaclientedocumento']->Factura}}</td></tr>
+                            <tr><td style="font-size:9px;color:red;">Este documento es una representación impresa de un CFDI</td></tr>
                         </table>
                     </div>
                 </div>

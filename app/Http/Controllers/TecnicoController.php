@@ -90,13 +90,18 @@ class TecnicoController extends ConfiguracionSistemaController{
         $numerotecnico=$request->numerotecnico;
 	    $Tecnico = Tecnico::where('Numero', $numerotecnico )->first();
 	    if($Tecnico->Status == 'ALTA'){
-	       $Tecnico->Status = 'BAJA';
+            Tecnico::where('Numero', $numerotecnico)
+            ->update([
+                'Status' => 'BAJA'
+            ]);
            Log::channel('tecnico')->info('El tecnico fue dado de baja: '.$Tecnico.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
         }else{
-	       $Tecnico->Status = 'ALTA';
+            Tecnico::where('Numero', $numerotecnico)
+            ->update([
+                'Status' => 'ALTA'
+            ]);
            Log::channel('tecnico')->info('El tecnico fue dado de alta: '.$Tecnico.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
         }
-        $Tecnico->save();
 	    return response()->json($Tecnico);
     } 
     //obtener datos del catalogo

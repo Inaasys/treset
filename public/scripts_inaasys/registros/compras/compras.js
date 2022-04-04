@@ -125,14 +125,14 @@ function listar(){
     },
     columns: campos_tabla,
     "drawCallback": function( data ) {
-        $("#sumaimportefiltrado").html(data.json.sumaimporte);
-        $("#sumadescuentofiltrado").html(data.json.sumadescuento);
-        $("#sumasubtotalfiltrado").html(data.json.sumasubtotal);
-        $("#sumaivafiltrado").html(data.json.sumaiva);
-        $("#sumatotalfiltrado").html(data.json.sumatotal);
-        $("#sumaabonosfiltrado").html(data.json.sumaabonos);
-        $("#sumadescuentosfiltrado").html(data.json.sumadescuentos);
-        $("#sumasaldofiltrado").html(data.json.sumasaldo); 
+        $("#sumaimportefiltrado").html(number_format(round(data.json.sumaimporte, numerodecimales), numerodecimales, '.', ''));
+        $("#sumadescuentofiltrado").html(number_format(round(data.json.sumadescuento, numerodecimales), numerodecimales, '.', ''));
+        $("#sumasubtotalfiltrado").html(number_format(round(data.json.sumasubtotal, numerodecimales), numerodecimales, '.', ''));
+        $("#sumaivafiltrado").html(number_format(round(data.json.sumaiva, numerodecimales), numerodecimales, '.', ''));
+        $("#sumatotalfiltrado").html(number_format(round(data.json.sumatotal, numerodecimales), numerodecimales, '.', ''));
+        $("#sumaabonosfiltrado").html(number_format(round(data.json.sumaabonos, numerodecimales), numerodecimales, '.', ''));
+        $("#sumadescuentosfiltrado").html(number_format(round(data.json.sumadescuentos, numerodecimales), numerodecimales, '.', ''));
+        $("#sumasaldofiltrado").html(number_format(round(data.json.sumasaldo, numerodecimales), numerodecimales, '.', '')); 
     },
     initComplete: function () {
       // Aplicar busquedas por columna

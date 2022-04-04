@@ -70,13 +70,18 @@ class AlmacenController extends ConfiguracionSistemaController{
         $numeroalmacen=$request->numeroalmacen;
 	    $Almacen = Almacen::where('Numero', $numeroalmacen )->first();
 	    if($Almacen->Status == 'ALTA'){
-	       $Almacen->Status = 'BAJA';
+            Almacen::where('Numero', $numeroalmacen)
+            ->update([
+                'Status' => 'BAJA'
+            ]);
            Log::channel('almacen')->info('El almacen fue dado de baja: '.$Almacen.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
         }else{
-	       $Almacen->Status = 'ALTA';
+            Almacen::where('Numero', $numeroalmacen)
+            ->update([
+                'Status' => 'ALTA'
+            ]);
            Log::channel('almacen')->info('El almacen fue dado de alta: '.$Almacen.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
         }
-	    $Almacen->save();
 	    return response()->json($Almacen);
     } 
     //obtener datos del catalogo

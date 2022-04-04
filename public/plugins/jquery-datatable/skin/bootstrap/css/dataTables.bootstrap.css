@@ -3,7 +3,7 @@ table.dataTable {
   margin-top: 6px !important;
   margin-bottom: 6px !important;
   max-width: none !important;
-  font-size: 11px;
+  font-size: 10px;
 }
 table.dataTable td,
 table.dataTable th {
@@ -17,7 +17,7 @@ table.dataTable.nowrap td {
 }
 
 div.dataTables_wrapper div.dataTables_length label {
-  font-size: 12px;
+  font-size: 11px;
   text-align: left;
   white-space: nowrap;
 }
@@ -30,7 +30,7 @@ div.dataTables_wrapper div.dataTables_filter {
   /*margin-top: -28px !important;*/
 }
 div.dataTables_wrapper div.dataTables_filter label {
-  font-size: 12px;
+  font-size: 11px;
   white-space: nowrap;
   text-align: left;
 }

@@ -130,11 +130,11 @@ function listar(){
     },
     columns: campos_tabla,
     "drawCallback": function( data ) {
-        $("#sumaimportefiltrado").html(data.json.sumaimporte);
-        $("#sumadescuentofiltrado").html(data.json.sumadescuento);
-        $("#sumasubtotalfiltrado").html(data.json.sumasubtotal);
-        $("#sumaivafiltrado").html(data.json.sumaiva);
-        $("#sumatotalfiltrado").html(data.json.sumatotal);
+        $("#sumaimportefiltrado").html(number_format(round(data.json.sumaimporte, numerodecimales), numerodecimales, '.', ''));
+        $("#sumadescuentofiltrado").html(number_format(round(data.json.sumadescuento, numerodecimales), numerodecimales, '.', ''));
+        $("#sumasubtotalfiltrado").html(number_format(round(data.json.sumasubtotal, numerodecimales), numerodecimales, '.', ''));
+        $("#sumaivafiltrado").html(number_format(round(data.json.sumaiva, numerodecimales), numerodecimales, '.', ''));
+        $("#sumatotalfiltrado").html(number_format(round(data.json.sumatotal, numerodecimales), numerodecimales, '.', ''));
     },
     initComplete: function () {
       // Aplicar busquedas por columna
@@ -3785,6 +3785,7 @@ function cancelartimbre(facturabajatimbre){
           $("#facturabajatimbre").val(0);
           $("#iddocumentofacturapi").val(0);
           $("#textomodalbajatimbre").html('Aviso, el timbre de la factura No.' + facturabajatimbre +' ya esta cancelado');
+          $("#divmotivobajatimbre").hide();
           $("#btnbajatimbre").hide();
           $('#modalbajatimbre').modal('show');
         }else if(data.obtener_factura.status == "valid"){
@@ -3792,20 +3793,24 @@ function cancelartimbre(facturabajatimbre){
             $("#facturabajatimbre").val(0);
             $("#iddocumentofacturapi").val(0);
             $("#textomodalbajatimbre").html('Aviso, el timbre de la factura No.' + facturabajatimbre +' ya se solicito su baja pero esta en espera de confirmación por parte del cliente');
+            $("#divmotivobajatimbre").hide();
             $("#btnbajatimbre").hide();
             $('#modalbajatimbre').modal('show');
+          }else if(data.obtener_factura.cancellation_status == "none"){
+            $("#facturabajatimbre").val(facturabajatimbre);
+            $("#iddocumentofacturapi").val(data.obtener_factura.id);
+            $("#textomodalbajatimbre").html('Esta seguro de dar de baja el timbre de la factura No.'+ facturabajatimbre);
+            $("#divmotivobajatimbre").show();
+            $("#motivobajatimbre").html("<option value='01'>01 - Comprobante emitido con errores con relación</option><option value='02'>02 - Comprobante emitido con errores sin relación</option><option value='03'>03 - No se llevó a cabo la operación</option><option value='04'>04 - Operación nominativa relacionada en la factura global</option> ");
+            $("#btnbajatimbre").show();
+            $('#modalbajatimbre').modal('show');
           }
-        }else{
-          $("#facturabajatimbre").val(facturabajatimbre);
-          $("#iddocumentofacturapi").val(data.obtener_factura.id);
-          $("#textomodalbajatimbre").html('Esta seguro de dar de baja el timbre de la factura No.'+ facturabajatimbre);
-          $("#btnbajatimbre").show();
-          $('#modalbajatimbre').modal('show');
         }
       }else{
         $("#facturabajatimbre").val(0);
         $("#iddocumentofacturapi").val(0);
         $("#textomodalbajatimbre").html('Aviso, la Nota No.'+ facturabajatimbre +' no esta timbrada en el nuevo sistema');
+        $("#divmotivobajatimbre").hide();
         $("#btnbajatimbre").hide();
         $('#modalbajatimbre').modal('show');
       }
@@ -3813,6 +3818,7 @@ function cancelartimbre(facturabajatimbre){
       $("#facturabajatimbre").val(0);
       $("#iddocumentofacturapi").val(0);
       $("#textomodalbajatimbre").html('Aviso, la Nota No.'+ facturabajatimbre +' no esta timbrada');
+      $("#divmotivobajatimbre").hide();
       $("#btnbajatimbre").hide();
       $('#modalbajatimbre').modal('show');
     }
@@ -3835,7 +3841,8 @@ $("#btnbajatimbre").on('click', function(e){
       processData: false,
       success:function(data){
         $('#modalbajatimbre').modal('hide');
-        msj_timbrecanceladocorrectamente();
+        var results = JSON.parse(data);
+        msj_timbrecanceladocorrectamente(results.mensaje, results.tipomensaje);
         $('.page-loader-wrapper').css('display', 'none');
       },
       error:function(data){

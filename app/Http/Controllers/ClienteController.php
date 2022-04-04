@@ -438,13 +438,18 @@ class ClienteController extends ConfiguracionSistemaController{
         $numerocliente=$request->numerocliente;
 	    $Cliente = Cliente::where('Numero', $numerocliente )->first();
 	    if($Cliente->Status == 'ALTA'){
-           $Cliente->Status = 'BAJA';
+            Cliente::where('Numero', $numerocliente)
+            ->update([
+                'Status' => 'BAJA'
+            ]);
            Log::channel('cliente')->info('El cliente fue dado de baja: '.$Cliente.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
 	    }else{
-	       $Cliente->Status = 'ALTA';
+            Cliente::where('Numero', $numerocliente)
+            ->update([
+                'Status' => 'ALTA'
+            ]);
            Log::channel('cliente')->info('El cliente fue dado de alta: '.$Cliente.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
         }
-	    $Cliente->save();
 	    return response()->json($Cliente);
     }
     //obtener datos del catalogo
