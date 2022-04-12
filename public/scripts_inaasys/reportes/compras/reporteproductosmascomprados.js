@@ -130,6 +130,7 @@ function obtenerproveedores(){
                             '</div>';
     $("#contenidomodaltablas").html(tablaproveedores);
     var tprov = $('#tbllistadoproveedor').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -155,6 +156,7 @@ function obtenerproveedores(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -200,6 +202,7 @@ function obteneralmacenes(){
                         '</div>';
     $("#contenidomodaltablas").html(tablaalmacenes);
     var talm = $('#tbllistadoalmacen').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -221,6 +224,7 @@ function obteneralmacenes(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -340,6 +344,7 @@ function obtenermarcas(){
                             '</div>';
     $("#contenidomodaltablas").html(tablamarcas);
     var tmar = $('#tbllistadomarca').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -361,6 +366,7 @@ function obtenermarcas(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -406,6 +412,7 @@ function obtenerlineas(){
                         '</div>';
     $("#contenidomodaltablas").html(tablalineas);
     var tlin = $('#tbllistadolinea').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -427,6 +434,7 @@ function obtenerlineas(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -583,6 +591,7 @@ function listar(){
     }
     $("#cabecerastablareporte").html(cabecerastablareporte);
     tabla=$('#tbllistado').DataTable({
+        keys: true,
         "lengthMenu": [ 500, 1000 ],
         "sScrollX": "110%",
         "sScrollY": "300px",
@@ -618,6 +627,7 @@ function listar(){
         columns: campos_tabla,
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {

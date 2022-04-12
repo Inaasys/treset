@@ -65,6 +65,7 @@ function obtenerclientesfacturara(){
                           '</div>';
         $("#contenidomodaltablas").html(tablaclientesfacturaa);
         var tclifaca = $('#tbllistadoclientefacturaa').DataTable({
+            keys: true,
             "lengthMenu": [ 10, 50, 100, 250, 500 ],
             "pageLength": 250,
             "sScrollX": "110%",
@@ -86,6 +87,7 @@ function obtenerclientesfacturara(){
             ],
             "initComplete": function() {
                 var $buscar = $('div.dataTables_filter input');
+                $buscar.focus();
                 $buscar.unbind();
                 $buscar.bind('keyup change', function(e) {
                     if(e.keyCode == 13 || this.value == "") {
@@ -131,6 +133,7 @@ function obtenerclientesdelcliente(){
                         '</div>';
     $("#contenidomodaltablas").html(tablaclientesdelcliente);
     var tclidelcli = $('#tbllistadoclientedelcliente').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -152,6 +155,7 @@ function obtenerclientesdelcliente(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -200,7 +204,8 @@ function obtenervines(){
                                   '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                                 '</div>';
       $("#contenidomodaltablas").html(tablavines);
-      var tvins = $('#tbllistadovines').DataTable({ 
+      var tvins = $('#tbllistadovines').DataTable({
+            keys: true, 
           "lengthMenu": [ 10, 50, 100, 250, 500 ],
           "pageLength": 250,
           "sScrollX": "110%",
@@ -226,6 +231,7 @@ function obtenervines(){
           ],
           "initComplete": function() {
               var $buscar = $('div.dataTables_filter input');
+              $buscar.focus();
               $buscar.unbind();
               $buscar.bind('keyup change', function(e) {
                   if(e.keyCode == 13 || this.value == "") {
@@ -489,6 +495,7 @@ function listar(){
     }
     $("#cabecerastablareporte").html(cabecerastablareporte);
     tabla=$('#tbllistado').DataTable({
+        keys: true,
         "lengthMenu": [ 500, 1000 ],
         "sScrollX": "110%",
         "sScrollY": "300px",
@@ -524,6 +531,7 @@ function listar(){
         columns: campos_tabla,
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {

@@ -92,6 +92,7 @@ function listar(){
   // armar columas para datatable se arma desde funcionesglobales.js
   var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
   tabla=$('#tbllistado').DataTable({
+    keys: true,
     "lengthMenu": [ 100, 250, 500, 1000 ],
     "pageLength": 100,
     "sScrollX": "110%",
@@ -175,6 +176,7 @@ function obtenerseriesdocumento(){
                             '</div>';  
   $("#contenidomodaltablas").html(tablaseriesdocumento);
   $('#tbllistadoseriedocumento').DataTable({
+      keys: true,
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -197,6 +199,7 @@ function obtenerseriesdocumento(){
       ],
       "initComplete": function() {
         var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
         $buscar.unbind();
         $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -251,6 +254,7 @@ function obtenerremisiones(){
                         '</div>';
     $("#contenidomodaltablas").html(tablaremisiones);
     $('#tbllistadoremision').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -282,6 +286,7 @@ function obtenerremisiones(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -291,12 +296,6 @@ function obtenerremisiones(){
         },
     }); 
 } 
-
-
-
-
-
-
 function construirarrayremisionesseleccionadas(){
   var arrayremisionesseleccionadas = [];
   var lista = document.getElementsByClassName("remisionesseleccionadas");
@@ -352,12 +351,20 @@ function cargarremisionesseleccionadas(){
     remisionagregadacorrectamente();
     mostrarformulario();
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnextdet").keypress(function (e) {
+    $(".inputnextdet").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var index = $(this).index(".inputnextdet");          
-        $(".inputnextdet").eq(index + 1).focus().select(); 
+      var index = $(this).index(".inputnextdet");          
+      switch(code){
+        case 13:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 39:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 37:
+          $(".inputnextdet").eq(index - 1).focus().select(); 
+          break;
       }
     });
   })
@@ -385,15 +392,6 @@ async function msjsuccesseliminacionpartidasremision(){
   comprobarfilas();
   calculartotal();
 }
-
-
-
-
-
-
-
-
-
 /*
 //obtener datos de remision seleccionada
 function seleccionarremision(Folio, Remision){
@@ -418,12 +416,20 @@ function seleccionarremision(Folio, Remision){
       //}
       $('.page-loader-wrapper').css('display', 'none');
       //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-      $(".inputnextdet").keypress(function (e) {
+      $(".inputnextdet").keyup(function (e) {
         //recomentable para mayor compatibilidad entre navegadores.
         var code = (e.keyCode ? e.keyCode : e.which);
-        if(code==13){
-          var index = $(this).index(".inputnextdet");          
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+        var index = $(this).index(".inputnextdet");          
+        switch(code){
+          case 13:
+            $(".inputnextdet").eq(index + 1).focus().select(); 
+            break;
+          case 39:
+            $(".inputnextdet").eq(index + 1).focus().select(); 
+            break;
+          case 37:
+            $(".inputnextdet").eq(index - 1).focus().select(); 
+            break;
         }
       });
     }) 
@@ -504,7 +510,7 @@ function alta(){
               '<div class="row">'+
                 '<div class="col-md-3">'+
                   '<label>Cotización <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
-                  '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                  '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                   '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                   '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
                   '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
@@ -544,10 +550,10 @@ function alta(){
                             '<th class="'+background_tables+'">operaciones</th>'+
                             '<th class="'+background_tables+'">num remision</th>'+
                             '<th class="'+background_tables+'">insumo</th>'+
-                            '<th class="customercolortheadth"><div style="width:100px !important;">numero_parte</div></th>'+
+                            '<th class="'+background_tables+'"><div style="width:100px !important;">numero_parte</div></th>'+
                             '<th class="customercolortheadth"><div style="width:200px !important;">descripcion</div></th>'+
                             '<th class="customercolortheadth">cantidad</th>'+
-                            '<th class="customercolortheadth">unidad</th>'+
+                            '<th class="'+background_tables+'">unidad</th>'+
                             '<th class="'+background_tables+'">num equipo</th>'+
                             '<th class="'+background_tables+'">ot tyt</th>'+
                             '<th class="'+background_tables+'">ot tecnodiesel</th>'+
@@ -603,12 +609,20 @@ function alta(){
     }
   });
   //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-  $(".inputnextdet").keypress(function (e) {
+  $(".inputnextdet").keyup(function (e) {
     //recomentable para mayor compatibilidad entre navegadores.
     var code = (e.keyCode ? e.keyCode : e.which);
-    if(code==13){
-      var index = $(this).index(".inputnextdet");          
-      $(".inputnextdet").eq(index + 1).focus().select(); 
+    var index = $(this).index(".inputnextdet");          
+    switch(code){
+      case 13:
+        $(".inputnextdet").eq(index + 1).focus().select(); 
+        break;
+      case 39:
+        $(".inputnextdet").eq(index + 1).focus().select(); 
+        break;
+      case 37:
+        $(".inputnextdet").eq(index - 1).focus().select(); 
+        break;
     }
   });
   setTimeout(function(){$("#folio").focus();},500);
@@ -727,7 +741,7 @@ function obtenerdatos(cotizacionmodificar){
                 '<div class="row">'+
                   '<div class="col-md-3">'+
                     '<label>Cotización <b style="color:#F44336 !important;" id="serietexto"> Serie: </b></label>'+
-                    '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                    '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                     '<input type="hidden" class="form-control" name="serie" id="serie" required readonly data-parsley-length="[1, 10]">'+
                     '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
                     '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
@@ -858,12 +872,20 @@ function obtenerdatos(cotizacionmodificar){
       }
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnextdet").keypress(function (e) {
+    $(".inputnextdet").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var index = $(this).index(".inputnextdet");          
-        $(".inputnextdet").eq(index + 1).focus().select(); 
+      var index = $(this).index(".inputnextdet");          
+      switch(code){
+        case 13:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 39:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 37:
+          $(".inputnextdet").eq(index - 1).focus().select(); 
+          break;
       }
     });
     setTimeout(function(){$("#folio").focus();},500);
@@ -930,6 +952,7 @@ function buscarstringlike(){
                                         '</tr>';
   $("#columnastablafoliosencontrados").html(columnastablafoliosencontrados);
   tabla=$('#tablafoliosencontrados').DataTable({
+      keys: true,
       "paging":   false,
       "ordering": false,
       "info":     false,

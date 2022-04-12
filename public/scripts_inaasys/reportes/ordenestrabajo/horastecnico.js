@@ -151,6 +151,7 @@ function listar(){
     }
     $("#cabecerastablareporte").html(cabecerastablareporte);
     tabla=$('#tbllistado').DataTable({
+        keys: true,
         "lengthMenu": [ 500, 1000 ],
         "sScrollX": "110%",
         "sScrollY": "300px",
@@ -181,6 +182,7 @@ function listar(){
         columns: campos_tabla,
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -221,6 +223,7 @@ function listartecnicos(){
                         '</div>';   
     $("#contenidomodaltablas").html(tablatecnicos);
     $('#tbllistadocliente').DataTable({
+        keys: true,
         "sScrollX": "110%",
         "sScrollY": "300px",
         "bScrollCollapse": true,  
@@ -243,6 +246,7 @@ function listartecnicos(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {

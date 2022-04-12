@@ -15,6 +15,7 @@
         var ordenes_trabajo = '{!!URL::to('ordenes_trabajo')!!}';
         var clientes = '{!!URL::to('clientes')!!}';
         var proveedores = '{!!URL::to('proveedores')!!}';
+        var generar_documentos_obtener_series_disponibles_documentos = '{!!URL::to('generar_documentos_obtener_series_disponibles_documentos')!!}';
         
         /*TIPO USUARIO LOGUEADO EN EL SISTEMA*/
         var rol_de_usuario_logueado_en_sistema = '{{Auth::user()->role_id}}';

@@ -507,7 +507,11 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
             }else{
                 $fechainiciopdf = date($request->fechainiciopdf);
                 $fechaterminacionpdf = date($request->fechaterminacionpdf);
-                $cuentasporpagar = CuentaXPagar::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
+                if ($request->has("seriesdisponiblesdocumento")){
+                    $cuentasporpagar = CuentaXPagar::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->whereIn('Serie', $request->seriesdisponiblesdocumento)->orderBy('Folio', 'ASC')->take(1500)->get();
+                }else{
+                    $cuentasporpagar = CuentaXPagar::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
+                }
             }
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();

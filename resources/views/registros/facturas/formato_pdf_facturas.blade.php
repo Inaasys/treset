@@ -50,14 +50,14 @@
                     <hr></hr>
                 </div>
                 <div id ="contenedor" style="margin-top:10px;">
-                    <div style="width:50%; height:125px;float:left;text-align:left;border-style:groove;">    
+                    <div style="width:50%; height:135px;float:left;text-align:left;border-style:groove;">    
                         <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
                             <li style="font-size:10px; margin-left: 5px;"> Nombre: {{$d['cliente']->Nombre}} ({{$d['cliente']->Numero}})</li>
                             <li style="font-size:10px; margin-left: 5px;"> Dirección: {{$d['cliente']->Calle}} {{$d['cliente']->noExterior}} {{$d['cliente']->noInterior}}</b></li>
                             <li style="font-size:10px; margin-left: 5px;"> Colonia: {{$d['cliente']->Colonia}} {{$d['cliente']->Localidad}} C.P. {{$d['cliente']->CodigoPostal}}</li>
                             <li style="font-size:10px; margin-left: 5px;"> Estado: {{$d['est']}}</li>
                             <li style="font-size:10px; margin-left: 5px;"> Ciudad: {{$d['est']}} </li>
-                            <li style="font-size:10px; margin-left: 5px;"> Agente: {{$d['agente']->Nombre}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> Agente: {{$d['NombreAgente']}}</li>
                             <li style="font-size:10px; margin-left: 5px;"> EmisorRfc: {{$d['factura']->EmisorRfc}}</li>
                             <li style="font-size:10px; margin-left: 5px;"> ReceptorRfc: {{$d['factura']->ReceptorRfc}}</li>
                             <li style="font-size:10px; margin-left: 5px;"> ReceptorRegimenFiscal: @if($d['regimenfiscalcliente'] != null) {{$d['regimenfiscalcliente']->Nombre}} ({{$d['regimenfiscalcliente']->Clave}}) @endif</li>
@@ -65,7 +65,7 @@
                     </div>
                     <div style="width:1%; float:left;">
                     </div>
-                    <div style="width:48%; height:125px; float:left; text-align: left; border-style: groove;">
+                    <div style="width:48%; height:135px; float:left; text-align: left; border-style: groove;">
                         <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
                             <li style="font-size:18px; margin-left: 5px;"><b>Factura:</b> <b style="color:red">{{$d['factura']->Factura}}</b></li>
                             <li style="font-size:10px; margin-left: 5px;">Plazo: {{$d['factura']->Plazo}} Días</li>

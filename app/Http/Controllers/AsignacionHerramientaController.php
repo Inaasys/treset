@@ -110,6 +110,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
             ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
             ->select('ura.id', 'a.Numero', 'a.Nombre')
             ->where('a.Status', 'ALTA')
+            ->where('ura.user_id', Auth::user()->id)
             ->get();
         }else{
             $almacenes = Almacen::where('status', 'ALTA')->get();
@@ -153,7 +154,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                             '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'.htmlspecialchars($producto->Producto, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'.$producto->Unidad.'" readonly data-parsley-length="[1, 5]">'.$producto->Unidad.'</td>'.
                             '<td class="tdmod">'.
-                            '<select name="almacenpartida[]" class="form-control inputnextdet divorinputmodxl almacenpartida" style="width:100% !important;height: 28px !important;" onchange="obtenerexistenciasalmacen('.$contadorproductos.')" required>'.
+                            '<select name="almacenpartida[]" class="form-control divorinputmodxl almacenpartida" style="width:100% !important;height: 28px !important;" onchange="obtenerexistenciasalmacen('.$contadorproductos.')" required>'.
                                 $selectalmacenes.
                             '</select>'.
                             '</td>'. 
@@ -278,6 +279,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                 ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
                 ->select('ura.id', 'a.Numero', 'a.Nombre')
                 ->where('a.Status', 'ALTA')
+                ->where('ura.user_id', Auth::user()->id)
                 ->get();
             }else{
                 $almacenes = Almacen::where('status', 'ALTA')->get();
@@ -317,6 +319,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
             ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
             ->select('ura.id', 'a.Numero', 'a.Nombre')
             ->where('a.Status', 'ALTA')
+            ->where('ura.user_id', Auth::user()->id)
             ->get();
         }else{
             $almacenes = Almacen::where('status', 'ALTA')->get();
@@ -338,6 +341,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                 ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
                 ->select('ura.id', 'a.Numero', 'a.Nombre')
                 ->where('a.Status', 'ALTA')
+                ->where('ura.user_id', Auth::user()->id)
                 ->get();
             }else{
                 $almacenes = Almacen::where('status', 'ALTA')->get();
@@ -480,7 +484,11 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
             }else{
                 $fechainiciopdf = date($request->fechainiciopdf);
                 $fechaterminacionpdf = date($request->fechaterminacionpdf);
-                $asignacionesherramientas = VistaAsignacionHerramienta::whereBetween('fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('id', 'ASC')->take(500)->get();
+                if ($request->has("seriesdisponiblesdocumento")){
+                    $asignacionesherramientas = VistaAsignacionHerramienta::whereBetween('fecha', [$fechainiciopdf, $fechaterminacionpdf])->whereIn('Serie', $request->seriesdisponiblesdocumento)->orderBy('id', 'ASC')->take(500)->get();
+                }else{
+                    $asignacionesherramientas = VistaAsignacionHerramienta::whereBetween('fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('id', 'ASC')->take(500)->get();
+                }
             }
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
@@ -696,6 +704,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                     ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
                     ->select('ura.id', 'a.Numero', 'a.Nombre')
                     ->where('a.Status', 'ALTA')
+                    ->where('ura.user_id', Auth::user()->id)
                     ->get();
                 }else{
                     $almacenes = Almacen::where('status', 'ALTA')->get();
@@ -722,7 +731,7 @@ class AsignacionHerramientaController extends ConfiguracionSistemaController{
                     '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl nombreproductopartida" name="nombreproductopartida[]" id="nombreproductopartida[]" value="'.htmlspecialchars($ahd->descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'.$ahd->unidad.'" readonly data-parsley-length="[1, 5]">'.$ahd->unidad.'</td>'.
                     '<td class="tdmod">'.
-                        '<select name="almacenpartida[]" class="form-control inputnextdet divorinputmodxl almacenpartida" style="width:100% !important;height: 28px !important;" onchange="obtenerexistenciasalmacen('.$contadorproductos.')" required>'.
+                        '<select name="almacenpartida[]" class="form-control divorinputmodxl almacenpartida" style="width:100% !important;height: 28px !important;" onchange="obtenerexistenciasalmacen('.$contadorproductos.')" required>'.
                         $selectalmacenes.
                         '</select>'.
                     '</td>'. 

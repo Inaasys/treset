@@ -30,6 +30,16 @@ class Helpers{
         return $string_modificado;
     }
 
+    //armar el select de las series disponibles por documentos
+    public static function armarselectseriesdisponibles($documento){
+        $seriesdisponibles = $documento::select('Serie')->groupby('Serie')->get();
+        $select_series_disponibles = "";
+        foreach($seriesdisponibles as $sd){
+            $select_series_disponibles = $select_series_disponibles."<option value='".$sd->Serie."'>".$sd->Serie."</option>";
+        }
+        return $select_series_disponibles;
+    }
+
     //se obtiene la fecha de mexico en español correcta 
     public static function fecha_exacta_accion(){
         /*Carbon::setLocale(config('app.locale'));
@@ -151,6 +161,13 @@ class Helpers{
             'fechamin' => $fechamin
         );
         return $data;
+    }
+
+
+    //dar formato correcto a la fecha para input type date en vista
+    public static function fechaexactaaccioninputdate(){
+        $fecha = Carbon::now()->format('Y-m-d');
+        return $fecha;
     }
 
     //dar formato correcto a la fecha para input type date en vista

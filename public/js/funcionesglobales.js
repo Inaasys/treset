@@ -145,7 +145,12 @@ function destruirtablafoliosexportacion(){
     $('#tablafoliosencontrados').DataTable().clear().destroy();
 }
 //mostrar modal de generacion PDF
-function mostrarmodalgenerarpdf(seleccionformato,descargarxmls){
+function mostrarmodalgenerarpdf(seleccionformato,descargarxmls,documento){
+    $.get(generar_documentos_obtener_series_disponibles_documentos, {documento:documento}, function(data){
+        $("#fechainiciopdf").val(data.fechahoyinputdate);
+        $("#fechaterminacionpdf").val(data.fechahoyinputdate);
+        $("#seriesdisponiblesdocumento").html(data.select_series_disponibles)
+    }) 
     if(seleccionformato == 1){
         $("#divseleccionartipoformatocxc").show();
     }
@@ -1083,7 +1088,6 @@ $(document).bind('keydown', 'Alt+p', function(){
     var win = window.open(proveedores, '_blank');
     win.focus();
 });
-
 $(document).bind('keyup', 'insert', function(){
     alta("");
 });

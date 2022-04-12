@@ -59,6 +59,7 @@ function listar(){
       }
     });
     tabla=$('#tbllistado').DataTable({
+      keys: true,
       "lengthMenu": [ 100, 250, 500, 1000 ],
       "pageLength": 1000,
         "sScrollX": "110%",
@@ -140,16 +141,24 @@ function alta(){
   //colocar autocomplette off  todo el formulario
   $(".form-control").attr('autocomplete','off');
   obtenultimonumero();
-  setTimeout(function(){$("#nombre").focus();},500);   
+  setTimeout(function(){$("#nombre").focus();},500);  
   //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-  $(".inputnext").keypress(function (e) {
+  $(".inputnext").keyup(function (e) {
     //recomentable para mayor compatibilidad entre navegadores.
     var code = (e.keyCode ? e.keyCode : e.which);
-    if(code==13){
     var index = $(this).index(".inputnext");          
+    switch(code){
+      case 13:
         $(".inputnext").eq(index + 1).focus().select(); 
+        break;
+      case 39:
+        $(".inputnext").eq(index + 1).focus().select(); 
+        break;
+      case 37:
+        $(".inputnext").eq(index - 1).focus().select(); 
+        break;
     }
-  });  
+  });
 }
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
@@ -264,16 +273,24 @@ function obtenerdatos(numerotecnico){
     $("#nombre").val(data.tecnico.Nombre);
     $("#objetivo").val(data.objetivo);
     $("#planeacion").val(data.tecnico.Planeacion);
-    setTimeout(function(){$("#nombre").focus();},500);   
+    setTimeout(function(){$("#nombre").focus();},500);  
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnext").keypress(function (e) {
+    $(".inputnext").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
       var index = $(this).index(".inputnext");          
+      switch(code){
+        case 13:
           $(".inputnext").eq(index + 1).focus().select(); 
+          break;
+        case 39:
+          $(".inputnext").eq(index + 1).focus().select(); 
+          break;
+        case 37:
+          $(".inputnext").eq(index - 1).focus().select(); 
+          break;
       }
-    });  
+    }); 
     mostrarmodalformulario('MODIFICACION');
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {

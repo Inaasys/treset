@@ -78,14 +78,18 @@
                             </div>
                         </div>
                         <div id="tipofiltracionfechas" hidden>
-                            <div class="col-md-12">
-                                <label >Fecha Inicio</label>
-                                <input type="date"  name="fechainiciopdf" id="fechainiciopdf" onchange="validarrangofechascreaciondocumentos();" class="form-control"  style="min-width:95%;">
-                            </div>
-                            <div class="col-md-12">
-                            <label >Fecha Terminación</label>
-                                <input type="date"  name="fechaterminacionpdf" id="fechaterminacionpdf" onchange="validarrangofechascreaciondocumentos();" class="form-control"  style="min-width:95%;">
-                            </div>
+                                <div class="col-md-6">
+                                    <label >Fecha Inicio</label>
+                                    <input type="date"  name="fechainiciopdf" id="fechainiciopdf" onchange="validarrangofechascreaciondocumentos();" class="form-control"  style="min-width:95%;">
+                                </div>
+                                <div class="col-md-6">
+                                <label >Fecha Terminación</label>
+                                    <input type="date"  name="fechaterminacionpdf" id="fechaterminacionpdf" onchange="validarrangofechascreaciondocumentos();" class="form-control"  style="min-width:95%;">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Generar por Serie </label>
+                                    <select  name="seriesdisponiblesdocumento[]" id="seriesdisponiblesdocumento" class="form-control select2" multiple="multiple" style="width:100% !important;" ></select>
+                                </div>
                         </div>
                     </div>
                     <div class="modal-footer">

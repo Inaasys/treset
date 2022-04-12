@@ -22,6 +22,7 @@ function listar(){
     // armar columas para datatable se arma desde funcionesglobales.js
     var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
     tabla=$('#tbllistado').DataTable({
+        keys: true,
         "lengthMenu": [ 100, 250, 500, 1000 ],
         "pageLength": 500,
         "sScrollX": "110%",
@@ -35,14 +36,14 @@ function listar(){
         ajax: existencias_obtener,
         columns: campos_tabla,
         "drawCallback": function( data ) {
-            $("#sumacostofiltrado").html(data.json.sumacosto);
-            $("#sumasubtotalfiltrado").html(data.json.sumasubtotal);
-            $("#sumaivafiltrado").html(data.json.sumaiva);
-            $("#sumatotalfiltrado").html(data.json.sumatotal);
-            $("#sumatotalcostoinventariofiltrado").html(data.json.sumatotalcostoinventario);
-            $("#sumacostolistafiltrado").html(data.json.sumacostolista);
-            $("#sumacostoventafiltrado").html(data.json.sumacostoventa);
-            $("#sumaexistenciasfiltrado").html(data.json.sumaexistencias);
+            $("#sumacostofiltrado").html(number_format(round(data.json.sumacosto, numerodecimales), numerodecimales, '.', ''));
+            $("#sumasubtotalfiltrado").html(number_format(round(data.json.sumasubtotal, numerodecimales), numerodecimales, '.', ''));
+            $("#sumaivafiltrado").html(number_format(round(data.json.sumaiva, numerodecimales), numerodecimales, '.', ''));
+            $("#sumatotalfiltrado").html(number_format(round(data.json.sumatotal, numerodecimales), numerodecimales, '.', ''));
+            $("#sumatotalcostoinventariofiltrado").html(number_format(round(data.json.sumatotalcostoinventario, numerodecimales), numerodecimales, '.', ''));
+            $("#sumacostolistafiltrado").html(number_format(round(data.json.sumacostolista, numerodecimales), numerodecimales, '.', ''));
+            $("#sumacostoventafiltrado").html(number_format(round(data.json.sumacostoventa, numerodecimales), numerodecimales, '.', ''));
+            $("#sumaexistenciasfiltrado").html(number_format(round(data.json.sumaexistencias, numerodecimales), numerodecimales, '.', ''));
         },
         initComplete: function () {
           // Aplicar busquedas por columna
@@ -56,6 +57,7 @@ function listar(){
           });
           //Aplicar busqueda general
           var $buscar = $('div.dataTables_filter input');
+          $buscar.focus();
           $buscar.unbind();
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {

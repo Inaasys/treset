@@ -1266,7 +1266,11 @@ class CotizacionServicioController extends ConfiguracionSistemaController{
             }else{
                 $fechainiciopdf = date($request->fechainiciopdf);
                 $fechaterminacionpdf = date($request->fechaterminacionpdf);
-                $cotizacionesservicios = CotizacionServicio::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
+                if ($request->has("seriesdisponiblesdocumento")){
+                    $cotizacionesservicios = CotizacionServicio::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->whereIn('Serie', $request->seriesdisponiblesdocumento)->orderBy('Folio', 'ASC')->take(1500)->get();
+                }else{
+                    $cotizacionesservicios = CotizacionServicio::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
+                }
             }
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();

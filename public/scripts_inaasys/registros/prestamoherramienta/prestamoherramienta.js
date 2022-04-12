@@ -105,6 +105,7 @@ function listar(){
   // armar columas para datatable se arma desde funcionesglobales.js
   var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
   tabla=$('#tbllistado').DataTable({
+    keys: true,
     "lengthMenu": [ 100, 250, 500, 1000 ],
     "pageLength": 100,
     "sScrollX": "110%",
@@ -187,6 +188,7 @@ function obtenerseriesdocumento(){
                             '</div>';  
   $("#contenidomodaltablas").html(tablaseriesdocumento);
   var tserdoc = $('#tbllistadoseriedocumento').DataTable({
+      keys: true,
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -209,6 +211,7 @@ function obtenerseriesdocumento(){
       ],
       "initComplete": function() {
         var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
         $buscar.unbind();
         $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -263,6 +266,7 @@ function obtenerpersonalrecibe(){
                     '</div>';
     $("#contenidomodaltablas").html(tablapersonalrecibe);
     var tperreb = $('#tbllistadopersonalrecibe').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -290,6 +294,7 @@ function obtenerpersonalrecibe(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -442,6 +447,7 @@ function herramientaasignadapersonal(){
                                                           '</div>';
     $("#contenidomodaltablas").html(tablaherramientasasignadaspersonalseleccionado);
     var therasipersel = $('#tablaherramientasasignadaspersonalseleccionado').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -471,6 +477,7 @@ function herramientaasignadapersonal(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -509,10 +516,10 @@ function seleccionarherramientaasignada(iddetalleasignacionherramienta){
                             '<td class="tdmod"><div class="divorinputmodl"><input type="hidden" class="form-control descripcionpartida" name="descripcionpartida[]" value="'+data.descripcion+'" readonly>'+data.descripcion+'</div></td>'+
                             '<td class="tdmod"><input type="hidden" class="form-control unidadpartida" name="unidadpartida[]" value="'+data.unidad+'" readonly>'+data.unidad+'</td>'+
                             '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-max="'+data.cantidad+'" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('+contadorfilas+');" required></td>'+
-                            '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm preciopartida" name="preciopartida[]" value="'+data.precio+'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                            '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'+data.precio+'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                             '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm totalpartida" name="totalpartida[]" value="'+data.precio+'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                             '<td class="tdmod">'+
-                              '<select name="estadopartida[]" class="form-control inputnextdet" style="width:100% !important;height: 28px !important;" required readonly>'+
+                              '<select name="estadopartida[]" class="form-control" style="width:100% !important;height: 28px !important;" required readonly>'+
                                   data.estado_herramienta+
                               '</select>'+
                             '</td>'+    
@@ -524,12 +531,20 @@ function seleccionarherramientaasignada(iddetalleasignacionherramienta){
         evaluarnumerofilas();
         msj_herramientagregadocorrectamente();
         //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-        $(".inputnextdet").keypress(function (e) {
+        $(".inputnextdet").keyup(function (e) {
           //recomentable para mayor compatibilidad entre navegadores.
           var code = (e.keyCode ? e.keyCode : e.which);
-          if(code==13){
-            var index = $(this).index(".inputnextdet");          
-            $(".inputnextdet").eq(index + 1).focus().select(); 
+          var index = $(this).index(".inputnextdet");          
+          switch(code){
+            case 13:
+              $(".inputnextdet").eq(index + 1).focus().select(); 
+              break;
+            case 39:
+              $(".inputnextdet").eq(index + 1).focus().select(); 
+              break;
+            case 37:
+              $(".inputnextdet").eq(index - 1).focus().select(); 
+              break;
           }
         });
       }else{
@@ -570,7 +585,7 @@ function alta(){
               '<div class="row">'+
                 '<div class="col-md-3">'+
                   '<label>Asignación <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
-                  '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                  '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                   '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly>'+
                   '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion"  readonly>'+
                   '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
@@ -593,7 +608,7 @@ function alta(){
                       '</td>'+
                       '<td>'+
                         '<div class="form-line">'+
-                          '<input type="text" class="form-control inputnext" name="numeropersonalrecibe" id="numeropersonalrecibe" required data-parsley-type="integer" autocomplete="off">'+
+                          '<input type="text" class="form-control inputnextdet" name="numeropersonalrecibe" id="numeropersonalrecibe" required data-parsley-type="integer" autocomplete="off">'+
                           '<input type="hidden" class="form-control" name="numeropersonalrecibeanterior" id="numeropersonalrecibeanterior" required data-parsley-type="integer">'+
                           '<input type="hidden" class="form-control" name="personalrecibe" id="personalrecibe" required readonly>'+
                         '</div>'+
@@ -618,7 +633,7 @@ function alta(){
                 '</div>'+
                 '<div class="col-md-4">'+
                   '<label >correo notificaciones</label>'+
-                  '<input type="email" class="form-control inputnext" name="correo" id="correo" data-parsley-type="email" required  autocomplete="off">'+
+                  '<input type="email" class="form-control inputnextdet" name="correo" id="correo" data-parsley-type="email" required  autocomplete="off">'+
                 '</div>'+
               '</div>'+  
             '</div>'+
@@ -637,8 +652,8 @@ function alta(){
                           '<tr>'+
                             '<th class="'+background_tables+'">#</th>'+
                             '<th class="'+background_tables+'"><div style="width:100px !important;">Herramienta</div></th>'+
-                            '<th class="'+background_tables+'"><div style="width:200px !important;">Descripción</div></th>'+
-                            '<th class="customercolortheadth">Unidad</th>'+
+                            '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
+                            '<th class="'+background_tables+'">Unidad</th>'+
                             '<th class="customercolortheadth">Cantidad</th>'+
                             '<th class="customercolortheadth">Precio $</th>'+
                             '<th class="'+background_tables+'">Total $</th>'+
@@ -702,21 +717,20 @@ function alta(){
     regresarnumeropersonalrecibe();
   });
   //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-  $(".inputnext").keypress(function (e) {
+  $(".inputnextdet").keyup(function (e) {
     //recomentable para mayor compatibilidad entre navegadores.
     var code = (e.keyCode ? e.keyCode : e.which);
-    if(code==13){
-      var index = $(this).index(".inputnext");          
-      $(".inputnext").eq(index + 1).focus().select(); 
-    }
-  });
-  //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-  $(".inputnextdet").keypress(function (e) {
-    //recomentable para mayor compatibilidad entre navegadores.
-    var code = (e.keyCode ? e.keyCode : e.which);
-    if(code==13){
-      var index = $(this).index(".inputnextdet");          
-      $(".inputnextdet").eq(index + 1).focus().select(); 
+    var index = $(this).index(".inputnextdet");          
+    switch(code){
+      case 13:
+        $(".inputnextdet").eq(index + 1).focus().select(); 
+        break;
+      case 39:
+        $(".inputnextdet").eq(index + 1).focus().select(); 
+        break;
+      case 37:
+        $(".inputnextdet").eq(index - 1).focus().select(); 
+        break;
     }
   });
   //se debe motrar el input para buscar los productos
@@ -858,7 +872,7 @@ function obtenerdatos(prestamomodificar){
                 '<div class="row">'+
                   '<div class="col-md-3">'+
                     '<label>Asignación <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
-                    '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                    '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                     '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly>'+
                     '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion"  readonly>'+
                     '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
@@ -881,7 +895,7 @@ function obtenerdatos(prestamomodificar){
                         '</td>'+
                         '<td>'+
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control inputnext" name="numeropersonalrecibe" id="numeropersonalrecibe" required required data-parsley-type="integer" autocomplete="off">'+
+                            '<input type="text" class="form-control inputnextdet" name="numeropersonalrecibe" id="numeropersonalrecibe" required required data-parsley-type="integer" autocomplete="off">'+
                             '<input type="hidden" class="form-control" name="numeropersonalrecibeanterior" id="numeropersonalrecibeanterior" required data-parsley-type="integer">'+
                             '<input type="hidden" class="form-control" name="personalrecibe" id="personalrecibe" required readonly>'+
                           '</div>'+
@@ -906,7 +920,7 @@ function obtenerdatos(prestamomodificar){
                   '</div>'+
                   '<div class="col-md-4">'+
                     '<label >correo notificaciones</label>'+
-                    '<input type="email" class="form-control inputnext" name="correo" id="correo" data-parsley-type="email" required  autocomplete="off">'+
+                    '<input type="email" class="form-control inputnextdet" name="correo" id="correo" data-parsley-type="email" required  autocomplete="off">'+
                   '</div>'+
                 '</div>'+  
               '</div>'+
@@ -925,8 +939,8 @@ function obtenerdatos(prestamomodificar){
                             '<tr>'+
                               '<th class="'+background_tables+'">#</th>'+
                               '<th class="'+background_tables+'">Herramienta</th>'+
-                              '<th class="'+background_tables+'"><div style="width:200px !important;">Descripción</div></th>'+
-                              '<th class="customercolortheadth">Unidad</th>'+
+                              '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
+                              '<th class="'+background_tables+'">Unidad</th>'+
                               '<th class="customercolortheadth">Cantidad</th>'+
                               '<th class="customercolortheadth">Precio $</th>'+
                               '<th class="'+background_tables+'">Total $</th>'+
@@ -997,21 +1011,20 @@ function obtenerdatos(prestamomodificar){
       regresarnumeropersonalrecibe();
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnext").keypress(function (e) {
+    $(".inputnextdet").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var index = $(this).index(".inputnext");          
-        $(".inputnext").eq(index + 1).focus().select(); 
-      }
-    });
-    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnextdet").keypress(function (e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var index = $(this).index(".inputnextdet");          
-        $(".inputnextdet").eq(index + 1).focus().select(); 
+      var index = $(this).index(".inputnextdet");          
+      switch(code){
+        case 13:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 39:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 37:
+          $(".inputnextdet").eq(index - 1).focus().select(); 
+          break;
       }
     });
     //se debe esconder el input para buscar los productos porque en la modificacion no se permiten agregar productos

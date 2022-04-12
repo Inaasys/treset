@@ -52,15 +52,6 @@
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap" style="width:100% !important;">
                                     <thead class="{{$empresa->background_tables}}">
-                                        @if($mostrartotalesdecolumnasendocumentos == 'S')
-                                            <tr>
-                                                <th class="bg-light-green">Costo: <b id="sumacostofiltrado"></b></th>
-                                                <th class="bg-light-green">Ultimo Costo: <b id="sumaultimocostofiltrado"></b></th>
-                                                <th class="bg-light-green">Ultima Venta: <b id="sumaultimaventafiltrado"></b></th>
-                                                <th class="bg-light-green">Precio: <b id="sumapreciofiltrado"></b></th>
-                                                <th class="bg-light-green">Existencias: <b id="sumaexistenciasfiltrado"></b></th>
-                                            </tr>  
-                                        @endif
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
                                             @foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
@@ -78,6 +69,19 @@
                                         </tr>
                                     </tfoot>
                                 </table>
+                                @if($mostrartotalesdecolumnasendocumentos == 'S')
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped table-hover display nowrap" style="font-size:10px;">
+                                                <tr class="{{$empresa->background_forms_and_modals}}">
+                                                    <th> Sum Costo: <b id="sumacostofiltrado"></b></th>
+                                                    <th> Sum Ultimo Costo: <b id="sumaultimocostofiltrado"></b></th>
+                                                    <th> Sum Ultima Venta: <b id="sumaultimaventafiltrado"></b></th>
+                                                    <th> Sum Precio: <b id="sumapreciofiltrado"></b></th>
+                                                    <th> Sum Existencias: <b id="sumaexistenciasfiltrado"></b></th>
+                                                </tr>   
+                                            </table>
+                                        </div>
+                                @endif 
                             </div>
                         </div>
                     </div>

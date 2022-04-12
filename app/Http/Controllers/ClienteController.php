@@ -563,7 +563,6 @@ class ClienteController extends ConfiguracionSistemaController{
                 'MetodoPago' => $request->clavemetodopago,
                 'UsoCfdi' => $request->claveusocfdi,
                 'Tipo' => $request->tipo,
-                'Credito' => $request->creditomaximo,
                 'Contacto' => $request->contacto,
                 'Telefonos' => $request->telefonos,
                 'Celular' => $request->celular,
@@ -575,40 +574,14 @@ class ClienteController extends ConfiguracionSistemaController{
                 'Anotaciones' => $request->anotaciones,
                 'RegimenFiscal' => $request->claveregimenfiscal
             ]);
-            /*
-            //modificar registro
-            $Cliente = Cliente::where('Numero', $numerocliente )->first();
-		    $Cliente->Nombre=$request->nombre;
-		    $Cliente->Rfc=$request->rfc;
-		    $Cliente->Calle=$request->calle;
-            $Cliente->noExterior=$request->noexterior;
-		    $Cliente->noInterior=$request->nointerior;
-		    $Cliente->Colonia=$request->colonia;
-		    $Cliente->Localidad=$request->localidad;
-		    $Cliente->Referencia=$request->referencia;
-            $Cliente->Pais=$request->clavepais;
-            $Cliente->Estado=$request->estado;
-            $Cliente->Municipio=$request->municipio;  
-            $Cliente->CodigoPostal=$request->codigopostal;
-            $Cliente->Plazo=$request->plazo;
-            $Cliente->Agente=$request->agente;
-            $Cliente->FormaPago=$request->claveformapago;
-            $Cliente->MetodoPago=$request->clavemetodopago;
-            $Cliente->UsoCfdi=$request->claveusocfdi;
-            $Cliente->Tipo=$request->tipo;
-            $Cliente->Credito=$request->creditomaximo;
-            $Cliente->Contacto=$request->contacto;
-            $Cliente->Telefonos=$request->telefonos;
-            $Cliente->Celular=$request->celular;
-            $Cliente->Email1=$request->email1;
-            $Cliente->Email2=$request->email2;
-            $Cliente->Email3=$request->email3;
-            $Cliente->Cuenta=$request->cuentaref;
-            $Cliente->CuentaServicio=$request->cuentaser;
-            $Cliente->Anotaciones=$request->anotaciones;
-            */
+            //solo si el usuario esta autorizado en modificar el dato credito
+            if (in_array(strtoupper(Auth::user()->user), explode(",",$this->modificarcreditodeclientes))) {
+                Cliente::where('Numero', $numerocliente)
+                        ->update([
+                            'Credito' => $request->creditomaximo
+                        ]);
+            }
             Log::channel('cliente')->info('Se modifico el cliente: '.$Cliente.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
-            //$Cliente->save();
             //Tabla Precios Productos
             $eliminarpreciosproductos = ProductoPrecio::where('Cliente', $numerocliente)->forceDelete();
             if($request->numerofilaspreciosproducto > 0){

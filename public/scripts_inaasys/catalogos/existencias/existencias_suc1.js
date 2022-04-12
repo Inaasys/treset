@@ -39,6 +39,7 @@ function listar(){
     // armar columas para datatable se arma desde funcionesglobales.js
     var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
     tabla=$('#tbllistado').DataTable({
+        keys: true,
         "lengthMenu": [ 100, 250, 500, 1000 ],
         "pageLength": 500,
         "sScrollX": "110%",
@@ -56,6 +57,16 @@ function listar(){
             }
         },
         columns: campos_tabla,
+        "drawCallback": function( data ) {
+            $("#sumacostofiltrado").html(number_format(round(data.json.sumacosto, numerodecimales), numerodecimales, '.', ''));
+            $("#sumasubtotalfiltrado").html(number_format(round(data.json.sumasubtotal, numerodecimales), numerodecimales, '.', ''));
+            $("#sumaivafiltrado").html(number_format(round(data.json.sumaiva, numerodecimales), numerodecimales, '.', ''));
+            $("#sumatotalfiltrado").html(number_format(round(data.json.sumatotal, numerodecimales), numerodecimales, '.', ''));
+            $("#sumatotalcostoinventariofiltrado").html(number_format(round(data.json.sumatotalcostoinventario, numerodecimales), numerodecimales, '.', ''));
+            $("#sumacostolistafiltrado").html(number_format(round(data.json.sumacostolista, numerodecimales), numerodecimales, '.', ''));
+            $("#sumacostoventafiltrado").html(number_format(round(data.json.sumacostoventa, numerodecimales), numerodecimales, '.', ''));
+            $("#sumaexistenciasfiltrado").html(number_format(round(data.json.sumaexistencias, numerodecimales), numerodecimales, '.', ''));
+        },
         initComplete: function () {
           // Aplicar busquedas por columna
           this.api().columns().every( function () {
@@ -68,6 +79,7 @@ function listar(){
           });
           //Aplicar busqueda general
           var $buscar = $('div.dataTables_filter input');
+          $buscar.focus();
           $buscar.unbind();
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {

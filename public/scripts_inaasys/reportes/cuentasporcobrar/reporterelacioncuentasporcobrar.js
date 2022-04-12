@@ -126,6 +126,7 @@ function obtenerclientes(){
                           '</div>';
         $("#contenidomodaltablas").html(tablaclientes);
         $('#tbllistadocliente').DataTable({
+            keys: true,
             "lengthMenu": [ 10, 50, 100, 250, 500 ],
             "pageLength": 250,
             "sScrollX": "110%",
@@ -147,6 +148,7 @@ function obtenerclientes(){
             ],
             "initComplete": function() {
                 var $buscar = $('div.dataTables_filter input');
+                $buscar.focus();
                 $buscar.unbind();
                 $buscar.bind('keyup change', function(e) {
                     if(e.keyCode == 13 || this.value == "") {
@@ -188,6 +190,7 @@ function obteneragentes(){
                         '</div>';
     $("#contenidomodaltablas").html(tablaagentes);
     $('#tbllistadoagente').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -209,6 +212,7 @@ function obteneragentes(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -249,6 +253,7 @@ function obtenerbancos(){
                             '</div>';
     $("#contenidomodaltablas").html(tablabancos);
     $('#tbllistadobanco').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -270,6 +275,7 @@ function obtenerbancos(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -311,6 +317,7 @@ function obtenerformaspago(){
                         '</div>';
     $("#contenidomodaltablas").html(tablaformaspago);
     $('#tbllistadoformapago').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -333,6 +340,7 @@ function obtenerformaspago(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -570,6 +578,7 @@ function listar(){
     }
     $("#cabecerastablareporte").html(cabecerastablareporte);
     tabla=$('#tbllistado').DataTable({
+        keys: true,
         "lengthMenu": [ 500, 1000 ],
         "sScrollX": "110%",
         "sScrollY": "300px",
@@ -603,6 +612,7 @@ function listar(){
         columns: campos_tabla,
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {

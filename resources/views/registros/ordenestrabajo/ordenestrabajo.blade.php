@@ -28,7 +28,7 @@
                                                     </div>
                                                 </td>
                                                 <td >
-                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="mostrarmodalgenerarpdf(0,1)">
+                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="mostrarmodalgenerarpdf(0,1,'OrdenTrabajo')">
                                                         Generar Documento
                                                     </div>
                                                 </td>
@@ -265,23 +265,23 @@
                           </div>
                           <div class="col-md-2">
                                 <label >Orden</label>
-                                <input type="text" class="form-control inputnextdatosgenerales" id="ordenmodificardatosgenerales" name="ordenmodificardatosgenerales" readonly>
+                                <input type="text" class="form-control inputnextdet" id="ordenmodificardatosgenerales" name="ordenmodificardatosgenerales" readonly>
                           </div>
                           <div class="col-md-2">
                                 <label>Kilometros</label>
-                                <input type="text" class="form-control inputnextdatosgenerales" id="kilometrosdatosgenerales" name="kilometrosdatosgenerales" onkeyup="tipoLetra(this)">
+                                <input type="text" class="form-control inputnextdet" id="kilometrosdatosgenerales" name="kilometrosdatosgenerales" onkeyup="tipoLetra(this)">
                           </div>
                           <div class="col-md-2">
                                 <label>Placas</label>
-                                <input type="text" class="form-control inputnextdatosgenerales" id="placasdatosgenerales" name="placasdatosgenerales" onkeyup="tipoLetra(this)" >
+                                <input type="text" class="form-control inputnextdet" id="placasdatosgenerales" name="placasdatosgenerales" onkeyup="tipoLetra(this)" >
                           </div>
                           <div class="col-md-2">
                                 <label>Economico</label>
-                                <input type="text" class="form-control inputnextdatosgenerales" id="economicodatosgenerales" name="economicodatosgenerales" onkeyup="tipoLetra(this)">
+                                <input type="text" class="form-control inputnextdet" id="economicodatosgenerales" name="economicodatosgenerales" onkeyup="tipoLetra(this)">
                           </div>
                           <div class="col-md-2">
                                 <label>Orden Cliente</label>
-                                <input type="text" class="form-control inputnextdatosgenerales" id="ordenclientedatosgenerales" name="ordenclientedatosgenerales" onkeyup="tipoLetra(this)">
+                                <input type="text" class="form-control inputnextdet" id="ordenclientedatosgenerales" name="ordenclientedatosgenerales" onkeyup="tipoLetra(this)">
                           </div>
                       </div>                    
 		        </form>	

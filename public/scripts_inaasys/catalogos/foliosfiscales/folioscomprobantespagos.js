@@ -59,6 +59,7 @@ function listar(){
       }
     });
     tabla=$('#tbllistado').DataTable({
+        keys: true,
         "lengthMenu": [ 100, 250, 500, 1000 ],
         "pageLength": 1000,
         "sScrollX": "110%",
@@ -146,11 +147,11 @@ function alta(){
     var tabs =  '<div class="row">'+
                     '<div class="col-md-3">'+
                         '<label>Número</label>'+
-                        '<input type="text" class="form-control" name="numero" id="numero" required readonly>'+
+                        '<input type="text" class="form-control inputnext" name="numero" id="numero" required readonly>'+
                     '</div>'+
                     '<div class="col-md-3">'+
                         '<label>Serie</label>'+
-                        '<input type="text" class="form-control" name="serie" id="serie" value="P"  onkeyup="tipoLetra(this)" required data-parsley-length="[1, 10]">'+
+                        '<input type="text" class="form-control inputnext" name="serie" id="serie" value="P"  onkeyup="tipoLetra(this)" required data-parsley-length="[1, 10]">'+
                     '</div>'+
                     '<div class="col-md-3">'+
                         '<label>Esquema</label>'+
@@ -162,7 +163,7 @@ function alta(){
                     '</div>'+
                     '<div class="col-md-3">'+
                         '<label>Titulo</label>'+
-                        '<input type="text" class="form-control" name="titulo" id="titulo" value="PAGO" onkeyup="tipoLetra(this)" required data-parsley-length="[1, 20]">'+
+                        '<input type="text" class="form-control inputnext" name="titulo" id="titulo" value="PAGO" onkeyup="tipoLetra(this)" required data-parsley-length="[1, 20]">'+
                     '</div>'+
                 '</div>'+
                 '<div class="row">'+
@@ -183,7 +184,7 @@ function alta(){
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Folio Inicial (Los Pagos empiezan con este folio)</label>'+
-                                        '<input type="text" class="form-control" name="folioinicial" id="folioinicial" value="1" required >'+
+                                        '<input type="text" class="form-control inputnext" name="folioinicial" id="folioinicial" value="1" required >'+
                                     '</div>'+
                                 '</div>'+   
                                 '<div class="row" id="divcertificadosempresa">'+ 
@@ -197,15 +198,15 @@ function alta(){
                                     '</div>'+
                                     '<div class="col-md-4">'+
                                         '<label>Contraseña Llave Privada</label>'+
-                                        '<input type="password" class="form-control" name="contrasenallaveprivada" id="contrasenallaveprivada" required data-parsley-length="[1, 100]" onchange="validararchivostimbrado();">'+
+                                        '<input type="password" class="form-control inputnext" name="contrasenallaveprivada" id="contrasenallaveprivada" required data-parsley-length="[1, 100]" onchange="validararchivostimbrado();">'+
                                     '</div>'+ 
                                     '<div class="col-md-4">'+
                                         '<label>Certificado Válido Desde</label>'+
-                                        '<input type="text" class="form-control" name="certificadovalidodesde" id="certificadovalidodesde" required readonly>'+
+                                        '<input type="text" class="form-control inputnext" name="certificadovalidodesde" id="certificadovalidodesde" required readonly>'+
                                     '</div>'+ 
                                     '<div class="col-md-4">'+
                                         '<label>Certificado Válido Hasta</label>'+
-                                        '<input type="text" class="form-control" name="certificadovalidohasta" id="certificadovalidohasta" required readonly>'+
+                                        '<input type="text" class="form-control inputnext" name="certificadovalidohasta" id="certificadovalidohasta" required readonly>'+
                                     '</div>'+ 
                                 '</div>'+   
                             '</div>'+
@@ -217,21 +218,21 @@ function alta(){
                                     '</div>'+
                                     '<div class="col-md-12">'+
                                         '<label>Domicilio</label>'+
-                                        '<textarea class="form-control" name="domicilio" id="domicilio" onkeyup="tipoLetra(this);" rows="10" required>'+textareadomicilio+'</textarea>'+
+                                        '<textarea class="form-control inputnext" name="domicilio" id="domicilio" onkeyup="tipoLetra(this);" rows="10" required>'+textareadomicilio+'</textarea>'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-md-4">'+
                                         '<label>Leyenda 1</label>'+
-                                        '<input type="text" class="form-control" name="leyenda1" id="leyenda1" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]">'+
+                                        '<input type="text" class="form-control inputnext" name="leyenda1" id="leyenda1" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]">'+
                                     '</div>'+
                                     '<div class="col-md-4">'+
                                         '<label>Leyenda 2</label>'+
-                                        '<input type="text" class="form-control" name="leyenda2" id="leyenda2" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]">'+
+                                        '<input type="text" class="form-control inputnext" name="leyenda2" id="leyenda2" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]">'+
                                     '</div>'+
                                     '<div class="col-md-4">'+
                                         '<label>Leyenda 3</label>'+
-                                        '<input type="text" class="form-control" name="leyenda3" id="leyenda3" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]">'+
+                                        '<input type="text" class="form-control inputnext" name="leyenda3" id="leyenda3" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]">'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
@@ -245,7 +246,7 @@ function alta(){
                                     '</div>'+
                                     '<div class="col-md-12">'+
                                         '<label>Pagare</label>'+
-                                        '<textarea class="form-control" name="pagare" id="pagare" onkeyup="tipoLetra(this);" rows="15"></textarea>'+
+                                        '<textarea class="form-control inputnext" name="pagare" id="pagare" onkeyup="tipoLetra(this);" rows="15"></textarea>'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
@@ -264,6 +265,24 @@ function alta(){
     $(".form-control").attr('autocomplete','off');
     $('.dropify').dropify();
     obtenultimonumero();
+    setTimeout(function(){$("#numero").focus();},500);
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keyup(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      var index = $(this).index(".inputnext");          
+      switch(code){
+        case 13:
+          $(".inputnext").eq(index + 1).focus().select(); 
+          break;
+        case 39:
+          $(".inputnext").eq(index + 1).focus().select(); 
+          break;
+        case 37:
+          $(".inputnext").eq(index - 1).focus().select(); 
+          break;
+      }
+    });
 }
 //validar archivos para timbrado electronico
 function validararchivostimbrado(){
@@ -399,11 +418,11 @@ function obtenerdatos(numerofolio){
     var tabs =  '<div class="row">'+
                     '<div class="col-md-3">'+
                         '<label>Número</label>'+
-                        '<input type="text" class="form-control" name="numero" id="numero" required readonly>'+
+                        '<input type="text" class="form-control inputnext" name="numero" id="numero" required readonly>'+
                     '</div>'+
                     '<div class="col-md-3">'+
                         '<label>Serie</label>'+
-                        '<input type="text" class="form-control" name="serie" id="serie" value="P"  onkeyup="tipoLetra(this)" required readonly data-parsley-length="[1, 10]">'+
+                        '<input type="text" class="form-control inputnext" name="serie" id="serie" value="P"  onkeyup="tipoLetra(this)" required readonly data-parsley-length="[1, 10]">'+
                     '</div>'+
                     '<div class="col-md-3">'+
                         '<label>Esquema</label>'+
@@ -413,7 +432,7 @@ function obtenerdatos(numerofolio){
                     '</div>'+
                     '<div class="col-md-3">'+
                         '<label>Titulo</label>'+
-                        '<input type="text" class="form-control" name="titulo" id="titulo" value="PAGO" onkeyup="tipoLetra(this)" required data-parsley-length="[1, 20]">'+
+                        '<input type="text" class="form-control inputnext" name="titulo" id="titulo" value="PAGO" onkeyup="tipoLetra(this)" required data-parsley-length="[1, 20]">'+
                     '</div>'+
                 '</div>'+
                 '<div class="row">'+
@@ -434,7 +453,7 @@ function obtenerdatos(numerofolio){
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Folio Inicial (Los Pagos empiezan con este folio)</label>'+
-                                        '<input type="text" class="form-control" name="folioinicial" id="folioinicial" value="1" required >'+
+                                        '<input type="text" class="form-control inputnext" name="folioinicial" id="folioinicial" value="1" required >'+
                                     '</div>'+
                                 '</div>'+     
                                 '<div class="row">'+
@@ -454,15 +473,15 @@ function obtenerdatos(numerofolio){
                                     '</div>'+
                                     '<div class="col-md-4">'+
                                         '<label>Contraseña Llave Privada</label>'+
-                                        '<input type="password" class="form-control" name="contrasenallaveprivada" id="contrasenallaveprivada"  data-parsley-length="[1, 100]" onchange="validararchivostimbrado();">'+
+                                        '<input type="password" class="form-control inputnext" name="contrasenallaveprivada" id="contrasenallaveprivada"  data-parsley-length="[1, 100]" onchange="validararchivostimbrado();">'+
                                     '</div>'+ 
                                     '<div class="col-md-4">'+
                                         '<label>Certificado Válido Desde</label>'+
-                                        '<input type="text" class="form-control" name="certificadovalidodesde" id="certificadovalidodesde"  readonly>'+
+                                        '<input type="text" class="form-control inputnext" name="certificadovalidodesde" id="certificadovalidodesde"  readonly>'+
                                     '</div>'+ 
                                     '<div class="col-md-4">'+
                                         '<label>Certificado Válido Hasta</label>'+
-                                        '<input type="text" class="form-control" name="certificadovalidohasta" id="certificadovalidohasta"  readonly>'+
+                                        '<input type="text" class="form-control inputnext" name="certificadovalidohasta" id="certificadovalidohasta"  readonly>'+
                                     '</div>'+ 
                                 '</div>'+   
                             '</div>'+
@@ -470,25 +489,25 @@ function obtenerdatos(numerofolio){
                                 '<div class="row">'+
                                     '<div class="col-md-12">'+
                                         '<label>Empresa</label>'+
-                                        '<input type="text" class="form-control" name="empresa" id="empresa" value="'+nombreempresa+'" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]">'+
+                                        '<input type="text" class="form-control inputnext" name="empresa" id="empresa" value="'+nombreempresa+'" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]">'+
                                     '</div>'+
                                     '<div class="col-md-12">'+
                                         '<label>Domicilio</label>'+
-                                        '<textarea class="form-control" name="domicilio" id="domicilio" onkeyup="tipoLetra(this);" rows="10" required>'+textareadomicilio+'</textarea>'+
+                                        '<textarea class="form-control inputnext" name="domicilio" id="domicilio" onkeyup="tipoLetra(this);" rows="10" required>'+textareadomicilio+'</textarea>'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-md-4">'+
                                         '<label>Leyenda 1</label>'+
-                                        '<input type="text" class="form-control" name="leyenda1" id="leyenda1" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]">'+
+                                        '<input type="text" class="form-control inputnext" name="leyenda1" id="leyenda1" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]">'+
                                     '</div>'+
                                     '<div class="col-md-4">'+
                                         '<label>Leyenda 2</label>'+
-                                        '<input type="text" class="form-control" name="leyenda2" id="leyenda2" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]">'+
+                                        '<input type="text" class="form-control inputnext" name="leyenda2" id="leyenda2" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]">'+
                                     '</div>'+
                                     '<div class="col-md-4">'+
                                         '<label>Leyenda 3</label>'+
-                                        '<input type="text" class="form-control" name="leyenda3" id="leyenda3" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]">'+
+                                        '<input type="text" class="form-control inputnext" name="leyenda3" id="leyenda3" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]">'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
@@ -502,7 +521,7 @@ function obtenerdatos(numerofolio){
                                     '</div>'+
                                     '<div class="col-md-12">'+
                                         '<label>Pagare</label>'+
-                                        '<textarea class="form-control" name="pagare" id="pagare" onkeyup="tipoLetra(this);" rows="15"></textarea>'+
+                                        '<textarea class="form-control inputnext" name="pagare" id="pagare" onkeyup="tipoLetra(this);" rows="15"></textarea>'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
@@ -533,6 +552,24 @@ function obtenerdatos(numerofolio){
     $("#leyenda3").val(data.FolioComprobantePago.Leyenda3);
     $("#pagare").val(data.FolioComprobantePago.Leyenda);
     $('.dropify').dropify();
+    setTimeout(function(){$("#numero").focus();},500);
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keyup(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      var index = $(this).index(".inputnext");          
+      switch(code){
+        case 13:
+          $(".inputnext").eq(index + 1).focus().select(); 
+          break;
+        case 39:
+          $(".inputnext").eq(index + 1).focus().select(); 
+          break;
+        case 37:
+          $(".inputnext").eq(index - 1).focus().select(); 
+          break;
+      }
+    });
     mostrarmodalformulario('MODIFICACION');
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {

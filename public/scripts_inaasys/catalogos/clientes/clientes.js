@@ -66,6 +66,7 @@ function listar(){
   // armar columas para datatable se arma desde funcionesglobales.js
   var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
   tabla=$('#tbllistado').DataTable({
+    keys: true,
     "lengthMenu": [ 100, 250, 500, 1000 ],
     "pageLength": 1000,
     "sScrollX": "110%",
@@ -134,6 +135,7 @@ function obtenerpaises(){
                     '</div>';
   $("#contenidomodaltablas").html(tablapaises);
   var tpai = $('#tbllistadopais').DataTable({
+      keys: true,
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -155,6 +157,7 @@ function obtenerpaises(){
       ],
       "initComplete": function() {
         var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
         $buscar.unbind();
         $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -233,6 +236,7 @@ function obtenerestados() {
                     '</div>';
   $("#contenidomodaltablas").html(tablaestados);
   var test = $('#tbllistadoestado').DataTable({
+      keys: true,
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -259,6 +263,7 @@ function obtenerestados() {
       ],
       "initComplete": function() {
         var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
         $buscar.unbind();
         $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -315,6 +320,7 @@ function obtenercodigospostales() {
                               '</div>';  
   $("#contenidomodaltablas").html(tablacodigospostales);
   var tcp = $('#tbllistadocodigopostal').DataTable({
+      keys: true,
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -340,6 +346,7 @@ function obtenercodigospostales() {
       ],
       "initComplete": function() {
         var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
         $buscar.unbind();
         $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -396,6 +403,7 @@ function obtenermunicipios() {
                         '</div>';
   $("#contenidomodaltablas").html(tablamunicipios);
   var tmun = $('#tbllistadomunicipio').DataTable({
+      keys: true,
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -421,6 +429,7 @@ function obtenermunicipios() {
       ],
       "initComplete": function() {
         var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
         $buscar.unbind();
         $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -477,6 +486,7 @@ function obteneragentes(){
                       '</div>';  
   $("#contenidomodaltablas").html(tablaagentes);  
   var tage = $('#tbllistadoagente').DataTable({
+      keys: true,
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -499,6 +509,7 @@ function obteneragentes(){
       ],
       "initComplete": function() {
         var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
         $buscar.unbind();
         $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -575,6 +586,7 @@ function obtenerformaspago(){
                         '</div>';
   $("#contenidomodaltablas").html(tablaformaspago);   
   var tforpag = $('#tbllistadoformapago').DataTable({
+      keys: true,
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -596,6 +608,7 @@ function obtenerformaspago(){
       ],
       "initComplete": function() {
         var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
         $buscar.unbind();
         $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -672,6 +685,7 @@ function obtenermetodospago(){
                           '</div>';
   $("#contenidomodaltablas").html(tablasmetodospago);   
   var tmetpag = $('#tbllistadometodopago').DataTable({
+      keys: true,
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -693,6 +707,7 @@ function obtenermetodospago(){
       ],
       "initComplete": function() {
         var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
         $buscar.unbind();
         $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -771,6 +786,7 @@ function obtenerusoscfdi(){
                         '</div>';
   $("#contenidomodaltablas").html(tablasusoscfdi); 
   var tusocfdi = $('#tbllistadousocfdi').DataTable({
+      keys: true,
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -794,6 +810,7 @@ function obtenerusoscfdi(){
       ],
       "initComplete": function() {
         var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
         $buscar.unbind();
         $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -870,6 +887,7 @@ function obtenerregimenesfiscales(){
                                 '</div>';
   $("#contenidomodaltablas").html(tablaregimenesfiscales);
   var tregfis = $('#tbllistadoregimenfiscal').DataTable({
+    keys: true,
     "lengthMenu": [ 10, 50, 100, 250, 500 ],
     "pageLength": 250,
     "sScrollX": "110%",
@@ -891,6 +909,7 @@ function obtenerregimenesfiscales(){
       ],
       "initComplete": function() {
         var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
         $buscar.unbind();
         $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -1176,43 +1195,43 @@ function alta(){
                   '<div class="row">'+
                       '<div class="col-md-4">'+
                           '<label>Contacto</label>'+
-                          '<input type="text" class="form-control inputnexttabtel" name="contacto" id="contacto" data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
+                          '<input type="text" class="form-control inputnext" name="contacto" id="contacto" data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                       '<div class="col-md-4">'+
                           '<label>Teléfonos</label>'+
-                          '<input type="text" class="form-control inputnexttabtel" name="telefonos" id="telefonos" data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
+                          '<input type="text" class="form-control inputnext" name="telefonos" id="telefonos" data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                       '<div class="col-md-4">'+
                           '<label>Celular</label>'+
-                          '<input type="text" class="form-control inputnexttabtel" name="celular" id="celular" data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
+                          '<input type="text" class="form-control inputnext" name="celular" id="celular" data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                   '</div>'+
                   '<div class="row">'+
                       '<div class="col-md-4">'+
                           '<label>E-mail 1</label>'+
-                          '<input type="text" class="form-control inputnexttabtel" name="email1" id="email1"  data-parsley-type="email" data-parsley-length="[1, 100]">'+
+                          '<input type="text" class="form-control inputnext" name="email1" id="email1"  data-parsley-type="email" data-parsley-length="[1, 100]">'+
                       '</div>'+
                       '<div class="col-md-4">'+
                           '<label>E-mail 2</label>'+
-                          '<input type="text" class="form-control inputnexttabtel" name="email2" id="email2"  data-parsley-type="email" data-parsley-length="[1, 100]">'+
+                          '<input type="text" class="form-control inputnext" name="email2" id="email2"  data-parsley-type="email" data-parsley-length="[1, 100]">'+
                       '</div>'+
                       '<div class="col-md-4">'+
                           '<label>E-mail 3</label>'+
-                          '<input type="text" class="form-control inputnexttabtel" name="email3" id="email3"  data-parsley-type="email" data-parsley-length="[1, 100]">'+
+                          '<input type="text" class="form-control inputnext" name="email3" id="email3"  data-parsley-type="email" data-parsley-length="[1, 100]">'+
                       '</div>'+
                   '</div>'+
                   '<div class="row">'+
                       '<div class="col-md-4">'+
                           '<label>Cuenta Ref</label>'+
-                          '<input type="text" class="form-control inputnexttabtel" name="cuentaref" id="cuentaref" data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);">'+
+                          '<input type="text" class="form-control inputnext" name="cuentaref" id="cuentaref" data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                       '<div class="col-md-4">'+
                           '<label>Cuenta Ser</label>'+
-                          '<input type="text" class="form-control inputnexttabtel" name="cuentaser" id="cuentaser" data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);">'+
+                          '<input type="text" class="form-control inputnext" name="cuentaser" id="cuentaser" data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);">'+
                       '</div>'+
                       '<div class="col-md-4">'+
                           '<label>Anotaciones</label>'+
-                          '<textarea class="form-control inputnexttabtel" name="anotaciones" id="anotaciones"  data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
+                          '<textarea class="form-control inputnext" name="anotaciones" id="anotaciones"  data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
                       '</div>'+
                   '</div>'+
                 '</div>'+  
@@ -1295,21 +1314,20 @@ function alta(){
     regresarclaveregimenfiscal();
   });
   //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-  $(".inputnext").keypress(function (e) {
+  $(".inputnext").keyup(function (e) {
     //recomentable para mayor compatibilidad entre navegadores.
     var code = (e.keyCode ? e.keyCode : e.which);
-    if(code==13){
     var index = $(this).index(".inputnext");          
+    switch(code){
+      case 13:
         $(".inputnext").eq(index + 1).focus().select(); 
-    }
-  });
-  //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-  $(".inputnexttabtel").keypress(function (e) {
-    //recomentable para mayor compatibilidad entre navegadores.
-    var code = (e.keyCode ? e.keyCode : e.which);
-    if(code==13){
-    var index = $(this).index(".inputnexttabtel");          
-        $(".inputnexttabtel").eq(index + 1).focus().select(); 
+        break;
+      case 39:
+        $(".inputnext").eq(index + 1).focus().select(); 
+        break;
+      case 37:
+        $(".inputnext").eq(index - 1).focus().select(); 
+        break;
     }
   });
 }
@@ -1438,6 +1456,7 @@ function listarproductos(){
                       '</div>';   
   $("#contenidomodaltablas").html(tablaproductos);
   $('#tbllistadoproducto').DataTable({
+      keys: true,
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "300px",
@@ -1467,6 +1486,7 @@ function listarproductos(){
       ],
       "initComplete": function() {
         var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
         $buscar.unbind();
         $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -1745,43 +1765,43 @@ function obtenerdatos(numerocliente){
                     '<div class="row">'+
                         '<div class="col-md-4">'+
                             '<label>Contacto</label>'+
-                            '<input type="text" class="form-control inputnexttabtel" name="contacto" id="contacto" data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control inputnext" name="contacto" id="contacto" data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Teléfonos</label>'+
-                            '<input type="text" class="form-control inputnexttabtel" name="telefonos" id="telefonos" data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control inputnext" name="telefonos" id="telefonos" data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Celular</label>'+
-                            '<input type="text" class="form-control inputnexttabtel" name="celular" id="celular" data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control inputnext" name="celular" id="celular" data-parsley-length="[1, 100]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
                     '</div>'+
                     '<div class="row">'+
                         '<div class="col-md-4">'+
                             '<label>E-mail 1</label>'+
-                            '<input type="text" class="form-control inputnexttabtel" name="email1" id="email1"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 100]">'+
+                            '<input type="text" class="form-control inputnext" name="email1" id="email1"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 100]">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>E-mail 2</label>'+
-                            '<input type="text" class="form-control inputnexttabtel" name="email2" id="email2"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 100]">'+
+                            '<input type="text" class="form-control inputnext" name="email2" id="email2"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 100]">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>E-mail 3</label>'+
-                            '<input type="text" class="form-control inputnexttabtel" name="email3" id="email3"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 100]">'+
+                            '<input type="text" class="form-control inputnext" name="email3" id="email3"  data-parsley-regexemail="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/" data-parsley-length="[1, 100]">'+
                         '</div>'+
                     '</div>'+
                     '<div class="row">'+
                         '<div class="col-md-4">'+
                             '<label>Cuenta Ref</label>'+
-                            '<input type="text" class="form-control inputnexttabtel" name="cuentaref" id="cuentaref" data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control inputnext" name="cuentaref" id="cuentaref" data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Cuenta Ser</label>'+
-                            '<input type="text" class="form-control inputnexttabtel" name="cuentaser" id="cuentaser" data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control inputnext" name="cuentaser" id="cuentaser" data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);">'+
                         '</div>'+
                         '<div class="col-md-4">'+
                             '<label>Anotaciones</label>'+
-                            '<textarea class="form-control inputnexttabtel" name="anotaciones" id="anotaciones"  data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
+                            '<textarea class="form-control inputnext" name="anotaciones" id="anotaciones"  data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
                         '</div>'+
                     '</div>'+
                   '</div>'+  
@@ -2000,21 +2020,20 @@ function obtenerdatos(numerocliente){
       regresarclaveregimenfiscal();
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnext").keypress(function (e) {
+    $(".inputnext").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
       var index = $(this).index(".inputnext");          
+      switch(code){
+        case 13:
           $(".inputnext").eq(index + 1).focus().select(); 
-      }
-    });
-    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnexttabtel").keypress(function (e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-      var index = $(this).index(".inputnexttabtel");          
-          $(".inputnexttabtel").eq(index + 1).focus().select(); 
+          break;
+        case 39:
+          $(".inputnext").eq(index + 1).focus().select(); 
+          break;
+        case 37:
+          $(".inputnext").eq(index - 1).focus().select(); 
+          break;
       }
     });
   }).fail( function() {

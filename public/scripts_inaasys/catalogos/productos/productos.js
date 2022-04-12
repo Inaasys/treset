@@ -63,6 +63,7 @@ function listar(){
     // armar columas para datatable se arma desde funcionesglobales.js
     var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
     tabla=$('#tbllistado').DataTable({
+        keys: true,
         "lengthMenu": [ 100, 250, 500, 1000 ],
         "pageLength": 500,
         "sScrollX": "110%",
@@ -76,11 +77,11 @@ function listar(){
         ajax: productos_obtener,
         columns: campos_tabla,
         "drawCallback": function( data ) {
-            $("#sumacostofiltrado").html(data.json.sumacosto);
-            $("#sumaultimocostofiltrado").html(data.json.sumaultimocosto);
-            $("#sumaultimaventafiltrado").html(data.json.sumaultimaventa);
-            $("#sumapreciofiltrado").html(data.json.sumaprecio);
-            $("#sumaexistenciasfiltrado").html(data.json.sumaexistencias);
+            $("#sumacostofiltrado").html(number_format(round(data.json.sumacosto, numerodecimales), numerodecimales, '.', ''));
+            $("#sumaultimocostofiltrado").html(number_format(round(data.json.sumaultimocosto, numerodecimales), numerodecimales, '.', ''));
+            $("#sumaultimaventafiltrado").html(number_format(round(data.json.sumaultimaventa, numerodecimales), numerodecimales, '.', ''));
+            $("#sumapreciofiltrado").html(number_format(round(data.json.sumaprecio, numerodecimales), numerodecimales, '.', ''));
+            $("#sumaexistenciasfiltrado").html(number_format(round(data.json.sumaexistencias, numerodecimales), numerodecimales, '.', ''));
         },
         initComplete: function () {
           // Aplicar busquedas por columna
@@ -145,6 +146,7 @@ function listarclavesproductos(){
                                 '</div>';
     $("#contenidomodaltablas").html(tablaclavesproductos);
     var tclavprod = $('#tbllistadoclaveproducto').DataTable({
+        keys: true,
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "300px",
@@ -164,6 +166,7 @@ function listarclavesproductos(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -243,6 +246,7 @@ function listarclavesunidades(){
                                 '</div>';
     $("#contenidomodaltablas").html(tablaclavesunidades);
     var tclavuni = $('#tbllistadoclaveunidad').DataTable({
+        keys: true,
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "300px",
@@ -263,6 +267,7 @@ function listarclavesunidades(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -345,6 +350,7 @@ function listarmarcas(){
                         '</div>';
     $("#contenidomodaltablas").html(tablamarcas);
     var tmarc = $('#tbllistadomarca').DataTable({
+        keys: true,
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "300px",
@@ -368,6 +374,7 @@ function listarmarcas(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -446,6 +453,7 @@ function listarlineas(){
                         '</div>';   
     $("#contenidomodaltablas").html(tablalineas);
     var tlin = $('#tbllistadolinea').DataTable({
+        keys: true,
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "300px",
@@ -464,6 +472,7 @@ function listarlineas(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -541,6 +550,7 @@ function listarmonedas(){
                         '</div>';   
     $("#contenidomodaltablas").html(tablalineas);
     var tmon = $('#tbllistadomoneda').DataTable({
+        keys: true,
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "300px",
@@ -559,6 +569,7 @@ function listarmonedas(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -649,6 +660,7 @@ function listarclientes(){
                         '</div>';   
     $("#contenidomodaltablas").html(tablaclientes);
     $('#tbllistadocliente').DataTable({
+        keys: true,
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "300px",
@@ -674,6 +686,7 @@ function listarclientes(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -739,6 +752,7 @@ function listarproductos(){
                         '</div>';   
     $("#contenidomodaltablas").html(tablaconsumos);
     $('#tbllistadoconsumoproducto').DataTable({
+        keys: true,
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "300px",
@@ -760,7 +774,7 @@ function listarproductos(){
             { data: 'Codigo', name: 'Codigo' },
             { data: 'Marca', name: 'Marca', orderable: false, searchable: false  },
             { data: 'Producto', name: 'Producto', orderable: false, searchable: false },
-            { data: 'Ubicacion', name: 'Ubicacion', orderable: false, searchable: false },
+            { data: 'Almacen', name: 'Almacen', orderable: false, searchable: false },
             { data: 'Ubicacion', name: 'Ubicacion', orderable: false, searchable: false },
             { data: 'Existencias', name: 'Existencias', orderable: false, searchable: false },
             { data: 'Costo', name: 'Costo', orderable: false, searchable: false },
@@ -768,6 +782,7 @@ function listarproductos(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -947,25 +962,25 @@ function alta(){
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Código 1</label>'+
-                                '<input type="text" class="form-control inputnexttabca" name="codigo1" id="codigo1" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control inputnext" name="codigo1" id="codigo1" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Código 2</label>'+
-                                '<input type="text" class="form-control inputnexttabca" name="codigo2" id="codigo2" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control inputnext" name="codigo2" id="codigo2" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Código 3</label>'+
-                                '<input type="text" class="form-control inputnexttabca" name="codigo3" id="codigo3" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control inputnext" name="codigo3" id="codigo3" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Código 4</label>'+
-                                '<input type="text" class="form-control inputnexttabca" name="codigo4" id="codigo4" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control inputnext" name="codigo4" id="codigo4" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Código 5</label>'+
-                                '<input type="text" class="form-control inputnexttabca" name="codigo5" id="codigo5" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control inputnext" name="codigo5" id="codigo5" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                         '</div>'+
                     '</div>'+
@@ -1026,22 +1041,21 @@ function alta(){
         regresarlinea();
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnext").keypress(function (e) {
-        //recomentable para mayor compatibilidad entre navegadores.
-        var code = (e.keyCode ? e.keyCode : e.which);
-        if(code==13){
-        var index = $(this).index(".inputnext");          
-            $(".inputnext").eq(index + 1).focus().select(); 
-        }
-    });
-    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnexttabca").keypress(function (e) {
-        //recomentable para mayor compatibilidad entre navegadores.
-        var code = (e.keyCode ? e.keyCode : e.which);
-        if(code==13){
-        var index = $(this).index(".inputnexttabca");          
-            $(".inputnexttabca").eq(index + 1).focus().select(); 
-        }
+    $(".inputnext").keyup(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      var index = $(this).index(".inputnext");          
+      switch(code){
+        case 13:
+          $(".inputnext").eq(index + 1).focus().select(); 
+          break;
+        case 39:
+          $(".inputnext").eq(index + 1).focus().select(); 
+          break;
+        case 37:
+          $(".inputnext").eq(index - 1).focus().select(); 
+          break;
+      }
     });
 }
 //guardar el registro
@@ -1360,47 +1374,47 @@ function obtenerdatos(codigoproducto){
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Comisión %</label>'+
-                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabfe" name="fechascomision" id="fechascomision" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="fechascomision" id="fechascomision" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Descuento %</label>'+
-                                        '<input type="text" class="form-control inputnexttabfe" name="fechasdescuento" id="fechasdescuento" value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                        '<input type="text" class="form-control inputnext" name="fechasdescuento" id="fechasdescuento" value="0.'+numerocerosconfigurados+'" onkeyup="tipoLetra(this);" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Mínimos </label>'+
-                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabfe" name="fechasminimos" id="fechasminimos" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="fechasminimos" id="fechasminimos" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Máximos </label>'+
-                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabfe" name="fechasmaximos" id="fechasmaximos" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="fechasmaximos" id="fechasmaximos" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Costo Máximo </label>'+
-                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabfe" name="fechascostomaximo" id="fechascostomaximo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="fechascostomaximo" id="fechascostomaximo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Fecha Ultima Compra</label>'+
-                                        '<input type="date" class="form-control inputnexttabfe" name="fechasfechaultimacompra" id="fechasfechaultimacompra" readonly>'+
+                                        '<input type="date" class="form-control inputnext" name="fechasfechaultimacompra" id="fechasfechaultimacompra" readonly>'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Ultimo Costo $</label>'+
-                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabfe" name="fechasultimocosto" id="fechasultimocosto" readonly value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="fechasultimocosto" id="fechasultimocosto" readonly value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Fecha Ultima Venta</label>'+
-                                        '<input type="date" class="form-control inputnexttabfe" name="fechasfechaultimaventa" id="fechasfechaultimaventa" readonly>'+
+                                        '<input type="date" class="form-control inputnext" name="fechasfechaultimaventa" id="fechasfechaultimaventa" readonly>'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Ultima Venta $</label>'+
-                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnexttabfe" name="fechasultimaventa" id="fechasultimaventa" readonly value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="fechasultimaventa" id="fechasultimaventa" readonly value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
@@ -1408,17 +1422,17 @@ function obtenerdatos(codigoproducto){
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Supercedido </label>'+
-                                        '<input type="text" class="form-control inputnexttabfe" name="fechassupercedido" id="fechassupercedido" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" >'+
+                                        '<input type="text" class="form-control inputnext" name="fechassupercedido" id="fechassupercedido" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" >'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Insumo </label>'+
-                                        '<input type="text" class="form-control inputnexttabfe" name="fechasinsumo" id="fechasinsumo" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnext" name="fechasinsumo" id="fechasinsumo" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-md-12">'+
                                         '<label>Descripción </label>'+
-                                        '<textarea class="form-control inputnexttabfe" name="fechasdescripcion" id="fechasdescripcion" rows="1" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
+                                        '<textarea class="form-control inputnext" name="fechasdescripcion" id="fechasdescripcion" rows="1" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
@@ -1575,22 +1589,21 @@ function obtenerdatos(codigoproducto){
         regresarmoneda();
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnext").keypress(function (e) {
-        //recomentable para mayor compatibilidad entre navegadores.
-        var code = (e.keyCode ? e.keyCode : e.which);
-        if(code==13){
-        var index = $(this).index(".inputnext");          
-            $(".inputnext").eq(index + 1).focus().select(); 
-        }
-    });
-    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnexttabfe").keypress(function (e) {
-        //recomentable para mayor compatibilidad entre navegadores.
-        var code = (e.keyCode ? e.keyCode : e.which);
-        if(code==13){
-        var index = $(this).index(".inputnexttabfe");          
-            $(".inputnexttabfe").eq(index + 1).focus().select(); 
-        }
+    $(".inputnext").keyup(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      var index = $(this).index(".inputnext");          
+      switch(code){
+        case 13:
+          $(".inputnext").eq(index + 1).focus().select(); 
+          break;
+        case 39:
+          $(".inputnext").eq(index + 1).focus().select(); 
+          break;
+        case 37:
+          $(".inputnext").eq(index - 1).focus().select(); 
+          break;
+      }
     });
     seleccionartipo(data);
   }).fail( function() {

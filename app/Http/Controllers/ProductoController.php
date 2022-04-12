@@ -28,6 +28,7 @@ use App\Configuracion_Tabla;
 use App\VistaProducto;
 use App\ContraReciboDetalle;
 use App\TipoOrdenCompra;
+use App\VistaObtenerExistenciaProducto;
 use GuzzleHttp\Client;
 use DNS1D;
 use DNS2D;
@@ -486,15 +487,7 @@ class ProductoController extends ConfiguracionSistemaController{
     public function productos_obtener_productos_consumos(Request $request){
         if($request->ajax()){
             $codigoabuscar = $request->codigoabuscar;
-            $data = DB::table('Productos as t')
-            ->leftJoin('Marcas as m', 'm.Numero', '=', 't.Marca')
-            ->leftJoin(DB::raw("(select codigo, sum(existencias) as existencias from existencias group by codigo) as e"),
-            function($join){
-                $join->on("e.codigo","=","t.codigo");
-            })
-            ->select('t.Codigo as Codigo', 't.Producto as Producto', 't.Ubicacion as Ubicacion', 'e.Existencias as Existencias', 't.Costo as Costo', 't.SubTotal as SubTotal', 't.Marca as Marca', 't.Status as Status', 't.Unidad as Unidad', 't.Inventariable as Inventariable', 't.Venta as Venta')
-            ->where('t.Codigo', 'like', '%' . $codigoabuscar . '%')
-            ->get();
+            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->where('Pt', '<>', 'S');
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaconsumos(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad.'\',\''.$data->Inventariable.'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Venta).'\')">Seleccionar</div>';
@@ -866,7 +859,6 @@ class ProductoController extends ConfiguracionSistemaController{
         $utilidadpesos = $subtotalpesos - $request->costo;
         $ivapesos = $subtotalpesos * ($request->impuesto/100);
         $totalpesos = $subtotalpesos + $ivapesos;
-        
         //imagen
         if($request->hasFile('imagen')){
             $destinationPath="imagenes_productos";
@@ -889,7 +881,6 @@ class ProductoController extends ConfiguracionSistemaController{
             $ImagenProducto = Producto::where('Codigo', $codigo )->first();
             $img = $ImagenProducto->Imagen;
         }
-
         $Producto = Producto::where('Codigo', $codigo )->first();
         Producto::where('Codigo', $codigo)
         ->update([
@@ -939,68 +930,7 @@ class ProductoController extends ConfiguracionSistemaController{
                         'Insumo'=>$request->fechasinsumo
                     ]);
         }
-        /*
-        //modificar registro Tabla Productos
-        $Producto = Producto::where('Codigo', $codigo )->first();
-        //datos producto
-        $Producto->ClaveProducto=$request->claveproducto;
-        $Producto->ClaveUnidad=$request->claveunidad;
-        $Producto->Producto=$request->producto;
-        $Producto->Unidad=$request->unidad;
-        //tabs producto
-        $Producto->Marca=$request->marca;
-        $Producto->Linea=$request->linea;
-        $Producto->Impuesto=$request->impuesto;
-        $Producto->Costo=$request->costo;
-        $Producto->CostoDeVenta=$costodeventa;
-        $Producto->Utilidad=$marca->Utilidad1;
-        $Producto->SubTotal=$subtotalpesos;
-        $Producto->Iva=$ivapesos;
-        $Producto->Total=$totalpesos;
-        $Producto->Ubicacion=$request->ubicacion;
-        $Producto->TipoProd = $request->tipo;
-        $Producto->CostoDeLista=$request->costodelista;
-        $Producto->Moneda=$request->moneda;
-        //tabs codigos alternos
-        $Producto->Codigo1=$request->codigo1;
-        $Producto->Codigo2=$request->codigo2;
-        $Producto->Codigo3=$request->codigo3;
-        $Producto->Codigo4=$request->codigo4;
-        $Producto->Codigo5=$request->codigo5;   
-        //tabs consumo
-        $Producto->Pt=$request->consumosproductoterminado;
-        //tabs fechas
-        $Producto->Comision=$request->fechascomision;
-        $Producto->Descuento=$request->fechasdescuento;
-        $Producto->Min=$request->fechasminimos;
-        $Producto->Max=$request->fechasmaximos;
-        $Producto->CostoMaximo=$request->fechascostomaximo;
-        $Producto->Zona=$request->fechaszonadeimpresion;
-        $Producto->ProductoPeligroso=$request->fechasproductopeligroso;
-        $Producto->Supercedido=$request->fechassupercedido;
-        //solo si el usuario esta autorizado en modificar el dato insumo
-        if (in_array(strtoupper(Auth::user()->user), explode(",",$this->usuariosamodificarinsumos))) {
-            $Producto->Insumo=$request->fechasinsumo;
-        }
-        $Producto->Descripcion=$request->fechasdescripcion;
-        //tabs lpa
-        $Producto->Lpa1Subir=$request->lpasubircodigo;
-        $Producto->Lpa2Subir=$request->lpasubircodigo;
-        $Producto->Lpa1FechaCreacion=$request->lpafechacreacion;
-        $Producto->Lpa2FechaCreacion=$request->lpafechacreacion;
-        $Producto->Lpa1FechaUltimaVenta=$request->lpafechaultimaventa;
-        $Producto->Lpa2FechaUltimaVenta=$request->lpafechaultimaventa;
-        $Producto->Lpa1FechaUltimaCompra=$request->lpafechaultimacompra;
-        $Producto->Lpa2FechaUltimaCompra=$request->lpafechaultimacompra;
-        $Producto->Lpa1Identificacion=$request->lpaidentificacion;
-        $Producto->Lpa2Identificacion=$request->lpaidentificacion;
-        $Producto->Lpa1Ubicacion=$request->lpaubicacion;
-        $Producto->Lpa2Ubicacion=$request->lpaubicacion;
-        $Producto->Lpa1CodigoCompra=$request->lpacodigocompra;
-        $Producto->Lpa2CodigoCompra=$request->lpacodigocompra;
-        */
         Log::channel('producto')->info('Se modifico el producto: '.$Producto.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
-        //$Producto->save();
         //Tabla Productos Precios
         $eliminarpreciosproductos = ProductoPrecio::where('Codigo', $codigo)->forceDelete();
         if($request->numerofilasprecioscliente > 0){

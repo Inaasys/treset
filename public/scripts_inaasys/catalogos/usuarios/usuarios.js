@@ -62,6 +62,7 @@ function listar(){
       }
     });
     tabla=$('#tbllistado').DataTable({
+        keys: true,
         "lengthMenu": [ 100, 250, 500, 1000 ],
         "pageLength": 1000,
         "sScrollX": "110%",
@@ -135,23 +136,23 @@ function alta(){
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Nombre <b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="text" class="form-control" name="name" id="name" required onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="name" id="name" required onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Usuario <b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="text" class="form-control" name="user" id="user" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control inputnext" name="user" id="user" required onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Correo Electrónico <b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="text" class="form-control" name="email" id="email" required autocomplete="email" data-parsley-type="email"	>'+
+                                '<input type="text" class="form-control inputnext" name="email" id="email" required autocomplete="email" data-parsley-type="email"	>'+
                             '</div>'+
                             '<div class="col-md-6">'+
                                 '<label>Contraseña <b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="password" class="form-control" name="pass" id="pass" required autocomplete="new-password">'+
+                                '<input type="password" class="form-control inputnext" name="pass" id="pass" required autocomplete="new-password">'+
                             '</div>'+
                             '<div class="col-md-6">'+
                                 '<label>Confirmar Contraseña <b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="password" class="form-control" name="confirmarpass" id="confirmasrpass" required autocomplete="new-password" data-parsley-equalto="#pass">'+
+                                '<input type="password" class="form-control inputnext" name="confirmarpass" id="confirmasrpass" required autocomplete="new-password" data-parsley-equalto="#pass">'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
@@ -169,6 +170,24 @@ function alta(){
   $(".form-control").attr('autocomplete','off');
   obtenultimonumero();
   obtenerroles();
+  setTimeout(function(){$("#numero").focus();},500);
+  //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+  $(".inputnext").keyup(function (e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    var index = $(this).index(".inputnext");          
+    switch(code){
+      case 13:
+        $(".inputnext").eq(index + 1).focus().select(); 
+        break;
+      case 39:
+        $(".inputnext").eq(index + 1).focus().select(); 
+        break;
+      case 37:
+        $(".inputnext").eq(index - 1).focus().select(); 
+        break;
+    }
+  });
   $("#ModalAlta").modal('show');
 }
 //guardar el registro
@@ -270,23 +289,23 @@ function obtenerdatos(id){
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Nombre <b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="text" class="form-control" name="name" id="name" required onkeyup="tipoLetra(this);">'+
+                                '<input type="text" class="form-control inputnext" name="name" id="name" required onkeyup="tipoLetra(this);">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Usuario <b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="text" class="form-control" name="user" id="user" required readonly onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
+                                '<input type="text" class="form-control inputnext" name="user" id="user" required readonly onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Correo Electrónico <b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="text" class="form-control" name="email" id="email" autocomplete="email" required data-parsley-type="email">'+
+                                '<input type="text" class="form-control inputnext" name="email" id="email" autocomplete="email" required data-parsley-type="email">'+
                             '</div>'+
                             '<div class="col-md-6" hidden>'+
                                 '<label>Contraseña <b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="password" class="form-control" name="pass" id="pass" autocomplete="new-password" data-parsley-regexsafepassword="/^(?=.{8,}$)(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*\W).*$/">'+
+                                '<input type="password" class="form-control inputnext" name="pass" id="pass" autocomplete="new-password" data-parsley-regexsafepassword="/^(?=.{8,}$)(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*\W).*$/">'+
                             '</div>'+
                             '<div class="col-md-6" hidden>'+
                                 '<label>Confirmar Contraseña <b style="color:#F44336 !important;">*</b></label>'+
-                                '<input type="password" class="form-control" name="confirmarpass" id="confirmasrpass" autocomplete="new-password" data-parsley-equalto="#pass">'+
+                                '<input type="password" class="form-control inputnext" name="confirmarpass" id="confirmasrpass" autocomplete="new-password" data-parsley-equalto="#pass">'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
@@ -307,6 +326,24 @@ function obtenerdatos(id){
     $("#user").val(data.usuario.user);
     $("#email").val(data.usuario.email);
     $("#roles").html(data.roles);
+    setTimeout(function(){$("#numero").focus();},500);
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnext").keyup(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      var index = $(this).index(".inputnext");          
+      switch(code){
+        case 13:
+          $(".inputnext").eq(index + 1).focus().select(); 
+          break;
+        case 39:
+          $(".inputnext").eq(index + 1).focus().select(); 
+          break;
+        case 37:
+          $(".inputnext").eq(index - 1).focus().select(); 
+          break;
+      }
+    });
     mostrarmodalformulario('MODIFICACION');
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {
@@ -1372,11 +1409,15 @@ function permisos(id){
                                 '<div class="row">'+
                                     '<div class="col-md-6">'+
                                         '<label>Series a Utilizar en Notas Crédito Clientes</label>'+
-                                        '<select  name="seriesnotasasignadas[]" id="seriesnotasasignadas" class="form-control select2" multiple="multiple" style="width:100% !important;" ></select>'+
+                                        '<select  name="seriesnotasasignadas[]" id="seriesnotasasignadas" class="form-control select2" multiple="multiple" style="width:100% !important;" >'+
+                                        data.select_series_asignados_notas+
+                                        '</select>'+
                                     '</div>'+
                                     '<div class="col-md-6">'+
                                         '<label>Series a Utilizar en Cuentas Por Cobrar</label>'+
-                                        '<select  name="seriespagosasignadas[]" id="seriespagosasignadas" class="form-control select2" multiple="multiple" style="width:100% !important;" ></select>'+
+                                        '<select  name="seriespagosasignadas[]" id="seriespagosasignadas" class="form-control select2" multiple="multiple" style="width:100% !important;" >'+
+                                        data.select_series_asignados_pagos+
+                                        '</select>'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
@@ -1600,6 +1641,7 @@ function seriesusuariodocumentos(id,usuario){
                         '</div>';
     $("#tablasmodalserie").html(tablaseries);
     $('#tbllistadoseriedocumento').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -1627,6 +1669,7 @@ function seriesusuariodocumentos(id,usuario){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {

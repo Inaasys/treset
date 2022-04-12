@@ -94,6 +94,7 @@ function listar(){
     // armar columas para datatable se arma desde funcionesglobales.js
     var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
     tabla=$('#tbllistado').DataTable({
+        keys: true,
         "lengthMenu": [ 100, 250, 500, 1000 ],
         "pageLength": 100,
         "sScrollX": "110%",
@@ -176,6 +177,7 @@ function obtenerseriesdocumento(){
                                 '</div>';  
     $("#contenidomodaltablas").html(tablaseriesdocumento);
     var tserdoc = $('#tbllistadoseriedocumento').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -198,6 +200,7 @@ function obtenerseriesdocumento(){
         ],
         "initComplete": function() {
           var $buscar = $('div.dataTables_filter input');
+          $buscar.focus();
           $buscar.unbind();
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {
@@ -253,6 +256,7 @@ function obtenerproveedores(){
                             '</div>';
     $("#contenidomodaltablas").html(tablaproveedores);
     var tprov = $('#tbllistadoproveedor').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -278,6 +282,7 @@ function obtenerproveedores(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -366,7 +371,7 @@ function alta(){
                     '<div class="row">'+
                         '<div class="col-md-3">'+
                             '<label>Contrarecibo <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
-                            '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                             '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                             '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
                             '<input type="hidden" class="form-control" name="numerofacturas" id="numerofacturas" value="0" required readonly>'+
@@ -380,7 +385,7 @@ function alta(){
                                     '</td>'+
                                     '<td>'+
                                         '<div class="form-line">'+
-                                            '<input type="text" class="form-control inputnext" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer" autocomplete="off">'+
+                                            '<input type="text" class="form-control inputnextdet" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer" autocomplete="off">'+
                                             '<input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior" required data-parsley-type="integer">'+
                                             '<input type="hidden" class="form-control" name="proveedor" id="proveedor" required readonly>'+
                                         '</div>'+
@@ -431,7 +436,7 @@ function alta(){
                             '<div class="row">'+
                             '<div class="col-md-6">'+   
                                 '<label>Observaciones</label>'+
-                                '<textarea class="form-control inputnext" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" rows="2" required data-parsley-length="[1, 255]"></textarea>'+
+                                '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" rows="2" required data-parsley-length="[1, 255]"></textarea>'+
                             '</div>'+ 
                             '<div class="col-md-3 col-md-offset-3">'+
                                     '<table class="table table-striped table-hover">'+
@@ -469,6 +474,23 @@ function alta(){
       if(code==13){
         var index = $(this).index(".inputnext");          
         $(".inputnext").eq(index + 1).focus().select(); 
+      }
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnextdet").keyup(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      var index = $(this).index(".inputnextdet");          
+      switch(code){
+        case 13:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 39:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 37:
+          $(".inputnextdet").eq(index - 1).focus().select(); 
+          break;
       }
     });
     setTimeout(function(){$("#folio").focus();},500);
@@ -643,7 +665,7 @@ function obtenerdatos(contrarecibomodificar){
                     '<div class="row">'+
                         '<div class="col-md-3">'+
                             '<label>Contrarecibo <b style="color:#F44336 !important;" id="serietexto"> Serie:</b></label>'+
-                            '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                            '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                             '<input type="hidden" class="form-control" name="serie" id="serie" required readonly data-parsley-length="[1, 10]">'+
                             '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
                             '<input type="hidden" class="form-control" name="numerofacturas" id="numerofacturas" required readonly>'+
@@ -657,7 +679,7 @@ function obtenerdatos(contrarecibomodificar){
                                     '</td>'+
                                     '<td>'+
                                         '<div class="form-line">'+
-                                            '<input type="text" class="form-control inputnext" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer" autocomplete="off">'+
+                                            '<input type="text" class="form-control inputnextdet" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer" autocomplete="off">'+
                                             '<input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior"  required data-parsley-type="integer">'+
                                             '<input type="hidden" class="form-control" name="proveedor" id="proveedor" required readonly>'+
                                         '</div>'+
@@ -708,7 +730,7 @@ function obtenerdatos(contrarecibomodificar){
                             '<div class="row">'+
                             '<div class="col-md-6">'+   
                                 '<label>Observaciones</label>'+
-                                '<textarea class="form-control inputnext" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" rows="2" required data-parsley-length="[1, 255]"></textarea>'+
+                                '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" rows="2" required data-parsley-length="[1, 255]"></textarea>'+
                             '</div>'+ 
                             '<div class="col-md-3 col-md-offset-3">'+
                                     '<table class="table table-striped table-hover">'+
@@ -757,6 +779,23 @@ function obtenerdatos(contrarecibomodificar){
       if(code==13){
         var index = $(this).index(".inputnext");          
         $(".inputnext").eq(index + 1).focus().select(); 
+      }
+    });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnextdet").keyup(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      var index = $(this).index(".inputnextdet");          
+      switch(code){
+        case 13:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 39:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 37:
+          $(".inputnextdet").eq(index - 1).focus().select(); 
+          break;
       }
     });
     setTimeout(function(){$("#folio").focus();},500);
@@ -894,6 +933,7 @@ function buscarstringlike(){
       $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
     });
     var tablafolenc=$('#tablafoliosencontrados').DataTable({
+        keys: true,
         "pageLength": 100,
         'sDom': 't',
         "sScrollX": "100%",

@@ -59,6 +59,7 @@ function listar(){
       }
     });
     tabla=$('#tbllistado').DataTable({
+        keys: true,
         "lengthMenu": [ 100, 250, 500, 1000 ],
         "pageLength": 1000,
         "sScrollX": "110%",

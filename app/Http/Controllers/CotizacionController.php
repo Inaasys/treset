@@ -150,8 +150,6 @@ class CotizacionController extends ConfiguracionSistemaController{
         $partida = $request->partida;
         $tipooperacion = $request->tipooperacion;
         foreach(explode(",", $request->stringremisionesseleccionadas) as $r){
-
-
             $remision = Remision::where('Remision', $r)->first();
             //detalles remision
             $detallesremision = RemisionDetalle::where('Remision', $r)->get();
@@ -167,7 +165,7 @@ class CotizacionController extends ConfiguracionSistemaController{
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'.$producto->Insumo.'" readonly required></td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dr->Codigo.'" readonly data-parsley-length="[1, 50]"><b style="font-size:12px;">'.$dr->Codigo.'</b></td>'.
                             '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($dr->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Cantidad).'" data-parsley-min="0.1"  data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" readonly></td>'.  
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Cantidad).'" data-parsley-min="0.1"  data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" readonly></td>'.  
                             '<td class="tdmod"><input type="hidden" class="form-control unidadpartida" name="unidadpartida[]" value="'.$dr->Unidad.'" readonly data-parsley-length="[1, 50]">'.$dr->Unidad.'</td>'.
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodsm numeroequipopartida" name="numeroequipopartida[]" value="'.$remision->Eq.'" readonly required></td>'.
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodsm ottytpartida" name="ottytpartida[]" value="'.$remision->Os.'" readonly required></td>'.
@@ -178,7 +176,7 @@ class CotizacionController extends ConfiguracionSistemaController{
                             '<td></td>'.
                             '<td></td>'.
                             '<td class="tdmod">'.
-                                '<select name="estadopartida[]" class="form-control inputnextdet divorinputmodmd" style="width:100% !important;height: 28px !important;" required>'.
+                                '<select name="estadopartida[]" class="form-control divorinputmodmd" style="width:100% !important;height: 28px !important;" required>'.
                                     '<option value="Nuevo">Nuevo</option>'.
                                     '<option value="Usado">Usado</option>'.
                                     '<option value="Reparado">Reparado</option>'.
@@ -189,8 +187,6 @@ class CotizacionController extends ConfiguracionSistemaController{
                         $contadorfilas++;
                 }
             }
-
-
         }
         $data = array(
             "filasremisiones" => $filasremisiones,
@@ -198,7 +194,6 @@ class CotizacionController extends ConfiguracionSistemaController{
             "partida" => $partida,
         );
         return response()->json($data); 
-
     }
 
     //guardar registro
@@ -347,7 +342,7 @@ class CotizacionController extends ConfiguracionSistemaController{
                     '<td class="tdmod"><input type="hidden" class="form-control unidadpartida" name="unidadpartida[]" value="'.$dc->unidad.'" readonly data-parsley-length="[1, 50]">'.$dc->unidad.'</td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm insumopartida" name="insumopartida[]" value="'.$dc->insumo.'" readonly required></td>'.
                     '<td class="tdmod">'.
-                        '<select name="estadopartida[]" class="form-control inputnextdet divorinputmodmd" style="width:100% !important;height: 28px !important;" required>'.
+                        '<select name="estadopartida[]" class="form-control divorinputmodmd" style="width:100% !important;height: 28px !important;" required>'.
                             $opciones.
                         '</select>'.
                     '</td>'.

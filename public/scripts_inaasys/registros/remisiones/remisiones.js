@@ -105,6 +105,7 @@ function listar(){
     // armar columas para datatable se arma desde funcionesglobales.js
     var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
     tabla=$('#tbllistado').DataTable({
+        keys: true,
         "lengthMenu": [ 100, 250, 500, 1000 ],
         "pageLength": 100,
         "sScrollX": "110%",
@@ -212,13 +213,21 @@ $("#btnenviarpartidasexcel").on('click', function(e){
         calculartotal();
         $("#codigoabuscar").val("");
         //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-        $(".inputnextdet").keypress(function (e) {
-            //recomentable para mayor compatibilidad entre navegadores.
-            var code = (e.keyCode ? e.keyCode : e.which);
-            if(code==13){
-            var index = $(this).index(".inputnextdet");          
-            $(".inputnextdet").eq(index + 1).focus().select(); 
-            }
+        $(".inputnextdet").keyup(function (e) {
+          //recomentable para mayor compatibilidad entre navegadores.
+          var code = (e.keyCode ? e.keyCode : e.which);
+          var index = $(this).index(".inputnextdet");          
+          switch(code){
+            case 13:
+              $(".inputnextdet").eq(index + 1).focus().select(); 
+              break;
+            case 39:
+              $(".inputnextdet").eq(index + 1).focus().select(); 
+              break;
+            case 37:
+              $(".inputnextdet").eq(index - 1).focus().select(); 
+              break;
+          }
         });
         //mostrar o no insumos en partidas segun la configuracion de la empresa
         if(mostrarinsumoporpartidaenremisiones == 'S'){
@@ -301,6 +310,7 @@ function obtenerseriesdocumento(){
                                 '</div>';  
     $("#contenidomodaltablas").html(tablaseriesdocumento);
     var tserdoc = $('#tbllistadoseriedocumento').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -323,6 +333,7 @@ function obtenerseriesdocumento(){
         ],
         "initComplete": function() {
           var $buscar = $('div.dataTables_filter input');
+          $buscar.focus();
           $buscar.unbind();
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {
@@ -374,6 +385,7 @@ function obtenerclientes(){
                           '</div>';
         $("#contenidomodaltablas").html(tablaclientes);
         var tcli = $('#tbllistadocliente').DataTable({
+            keys: true,
             "lengthMenu": [ 10, 50, 100, 250, 500 ],
             "pageLength": 250,
             "sScrollX": "110%",
@@ -395,6 +407,7 @@ function obtenerclientes(){
             ],
             "initComplete": function() {
                 var $buscar = $('div.dataTables_filter input');
+                $buscar.focus();
                 $buscar.unbind();
                 $buscar.bind('keyup change', function(e) {
                     if(e.keyCode == 13 || this.value == "") {
@@ -474,6 +487,7 @@ function obteneragentes(){
                           '</div>';
     $("#contenidomodaltablas").html(tablaagentes);
     var tagen = $('#tbllistadoagente').DataTable({
+            keys: true,
             "lengthMenu": [ 10, 50, 100, 250, 500 ],
             "pageLength": 250,
           "sScrollX": "110%",
@@ -495,6 +509,7 @@ function obteneragentes(){
           ],
           "initComplete": function() {
               var $buscar = $('div.dataTables_filter input');
+              $buscar.focus();
               $buscar.unbind();
               $buscar.bind('keyup change', function(e) {
                   if(e.keyCode == 13 || this.value == "") {
@@ -553,6 +568,7 @@ function obteneralmacenes(){
                         '</div>';
     $("#contenidomodaltablas").html(tablaalmacenes);
     var talm = $('#tbllistadoalmacen').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -577,6 +593,7 @@ function obteneralmacenes(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -790,6 +807,7 @@ function listarseriesrequisiciones(){
                                     '</div>';
     $("#contenidomodaltablas").html(tablaseriesrequisiciones);
     var tserrq = $('#tbllistadoserierequisicion').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -810,6 +828,7 @@ function listarseriesrequisiciones(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -865,6 +884,7 @@ function listarcotizaciones (){
                             '</div>';
     $("#contenidomodaltablas").html(tablacotizaciones);
     var tcots = $('#tbllistadocotizacion').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -893,6 +913,7 @@ function listarcotizaciones (){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -965,12 +986,20 @@ async function seleccionartipocotizacion(data){
     mostrarformulario();
     $('.page-loader-wrapper').css('display', 'none');
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnextdet").keypress(function (e) {
+    $(".inputnextdet").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var index = $(this).index(".inputnextdet");          
-        $(".inputnextdet").eq(index + 1).focus().select(); 
+      var index = $(this).index(".inputnextdet");          
+      switch(code){
+        case 13:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 39:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 37:
+          $(".inputnextdet").eq(index - 1).focus().select(); 
+          break;
       }
     });
 } 
@@ -1009,6 +1038,7 @@ function listarproductos(){
                           '</div>';   
     $("#contenidomodaltablas").html(tablaproductos);
     var tprod = $('#tbllistadoproducto').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -1041,6 +1071,7 @@ function listarproductos(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -1301,12 +1332,20 @@ function agregarfilaproducto(data,Codigo){
         mostrarformulario();      
         $("#codigoabuscar").val("");
         //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-        $(".inputnextdet").keypress(function (e) {
+        $(".inputnextdet").keyup(function (e) {
           //recomentable para mayor compatibilidad entre navegadores.
           var code = (e.keyCode ? e.keyCode : e.which);
-          if(code==13){
-            var index = $(this).index(".inputnextdet");          
-            $(".inputnextdet").eq(index + 1).focus().select(); 
+          var index = $(this).index(".inputnextdet");          
+          switch(code){
+            case 13:
+              $(".inputnextdet").eq(index + 1).focus().select(); 
+              break;
+            case 39:
+              $(".inputnextdet").eq(index + 1).focus().select(); 
+              break;
+            case 37:
+              $(".inputnextdet").eq(index - 1).focus().select(); 
+              break;
           }
         });
         //mostrar o no insumos en partidas segun la configuracion de la empresa
@@ -1456,7 +1495,7 @@ function alta(){
                         '<div class="row">'+
                             '<div class="col-md-3">'+
                                 '<label>Remisión <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
-                                '<input type="text" class="form-control inputnext" name="folio" id="folio" required onkeyup="tipoLetra(this);"  ondblclick="obtenultimonumero()">'+
+                                '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required onkeyup="tipoLetra(this);"  ondblclick="obtenultimonumero()">'+
                                 '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                                 '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
                                 '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
@@ -1471,7 +1510,7 @@ function alta(){
                                         '</td>'+
                                         '<td>'+
                                             '<div class="form-line">'+
-                                                '<input type="text" class="form-control inputnext" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
+                                                '<input type="text" class="form-control inputnextdet" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
                                                 '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
                                                 '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
                                                 '<input type="hidden" class="form-control" name="rfccliente" id="rfccliente" required readonly>'+
@@ -1489,7 +1528,7 @@ function alta(){
                                         '</td>'+
                                         '<td>'+
                                             '<div class="form-line">'+
-                                                '<input type="text" class="form-control inputnext" name="numeroagente" id="numeroagente"  required data-parsley-type="integer" autocomplete="off">'+
+                                                '<input type="text" class="form-control inputnextdet" name="numeroagente" id="numeroagente"  required data-parsley-type="integer" autocomplete="off">'+
                                                 '<input type="hidden" class="form-control" name="numeroagenteanterior" id="numeroagenteanterior"  required data-parsley-type="integer">'+
                                                 '<input type="hidden" class="form-control" name="agente" id="agente" required readonly>'+
                                             '</div>'+
@@ -1513,7 +1552,7 @@ function alta(){
                                         '</td>'+
                                         '<td>'+
                                             '<div class="form-line">'+
-                                                '<input type="text" class="form-control inputnext" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer" autocomplete="off">'+
+                                                '<input type="text" class="form-control inputnextdet" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer" autocomplete="off">'+
                                                 '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required data-parsley-type="integer">'+
                                                 '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
                                             '</div>'+
@@ -1531,7 +1570,7 @@ function alta(){
                             '</div>'+
                             '<div class="col-md-1">'+
                                 '<label>Plazo Días </label>'+
-                                '<input type="text" class="form-control inputnext" name="plazo" id="plazo" value="5" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                                '<input type="text" class="form-control inputnextdet" name="plazo" id="plazo" value="5" onkeyup="tipoLetra(this);" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-3" id="divbuscarcodigoproducto" hidden>'+
                               '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
@@ -1542,7 +1581,7 @@ function alta(){
                                   '</td>'+
                                   '<td>'+ 
                                     '<div class="form-line">'+
-                                      '<input type="text" class="form-control inputnext" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                                      '<input type="text" class="form-control inputnextdet" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
                                     '</div>'+
                                   '</td>'+
                                 '</tr>'+    
@@ -1558,29 +1597,29 @@ function alta(){
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Pedido</label>'+
-                                '<input type="text" class="form-control inputnexttabpe" name="pedido" id="pedido" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
+                                '<input type="text" class="form-control inputnextdet" name="pedido" id="pedido" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Solicitado por</label>'+
-                                '<input type="text" class="form-control inputnexttabpe" name="solicitadopor" id="solicitadopor" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
+                                '<input type="text" class="form-control inputnextdet" name="solicitadopor" id="solicitadopor" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Destino del Pedido </label>'+
-                                '<input type="text" class="form-control inputnexttabpe" name="destinodelpedido" id="destinodelpedido" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]" autocomplete="off">'+
+                                '<input type="text" class="form-control inputnextdet" name="destinodelpedido" id="destinodelpedido" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]" autocomplete="off">'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-3">'+
                                 '<label>Referencia</label>'+
-                                '<input type="text" class="form-control inputnexttabpe" name="referencia" id="referencia" onkeyup="tipoLetra(this);"  data-parsley-length="[1, 50]" autocomplete="off">'+
+                                '<input type="text" class="form-control inputnextdet" name="referencia" id="referencia" onkeyup="tipoLetra(this);"  data-parsley-length="[1, 50]" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-2">'+
                                 '<label>Orden Servicio</label>'+
-                                '<input type="text" class="form-control inputnexttabpe" name="ordenservicio" id="ordenservicio" onkeyup="tipoLetra(this);"  data-parsley-length="[1, 20]" autocomplete="off">'+
+                                '<input type="text" class="form-control inputnextdet" name="ordenservicio" id="ordenservicio" onkeyup="tipoLetra(this);"  data-parsley-length="[1, 20]" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-2">'+
                                 '<label>Equipo </label>'+
-                                '<input type="text" class="form-control inputnexttabpe" name="equipo" id="equipo" onkeyup="tipoLetra(this);"  data-parsley-length="[1, 20]" autocomplete="off">'+
+                                '<input type="text" class="form-control inputnextdet" name="equipo" id="equipo" onkeyup="tipoLetra(this);"  data-parsley-length="[1, 20]" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Requisición</label>'+
@@ -1591,13 +1630,13 @@ function alta(){
                                         '</td>'+
                                         '<td>'+ 
                                             '<div class="form-line">'+
-                                                '<input type="text" class="form-control inputnext" name="serierequisicion" id="serierequisicion" placeholder="Serie" autocomplete="off" onkeyup="tipoLetra(this);">'+
-                                                '<input type="hidden" class="form-control inputnext" name="serierequisicionanterior" id="serierequisicionanterior" placeholder="Serie" autocomplete="off" onkeyup="tipoLetra(this);">'+
+                                                '<input type="text" class="form-control inputnextdet" name="serierequisicion" id="serierequisicion" placeholder="Serie" autocomplete="off" onkeyup="tipoLetra(this);">'+
+                                                '<input type="hidden" class="form-control" name="serierequisicionanterior" id="serierequisicionanterior" placeholder="Serie" autocomplete="off" onkeyup="tipoLetra(this);">'+
                                             '</div>'+
                                         '</td>'+
                                         '<td>'+ 
                                             '<div class="form-line">'+
-                                            '<input type="text" class="form-control inputnext" name="requisicion" id="requisicion" placeholder="Número" autocomplete="off">'+
+                                            '<input type="text" class="form-control inputnextdet" name="requisicion" id="requisicion" placeholder="Número" autocomplete="off">'+
                                             '</div>'+
                                         '</td>'+
                                     '</tr>'+    
@@ -1642,9 +1681,9 @@ function alta(){
                                     '<thead class="'+background_tables+'">'+
                                         '<tr>'+
                                           '<th class="'+background_tables+'">#</th>'+
-                                          '<th class="'+background_tables+'" id="thinsumospartidas">Insumo</th>'+
+                                          '<th class="customercolortheadth" id="thinsumospartidas">Insumo</th>'+
                                           '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
-                                          '<th class="'+background_tables+'"><div style="width:400px !important;">Descripción</div></th>'+
+                                          '<th class="customercolortheadth"><div style="width:400px !important;">Descripción</div></th>'+
                                           '<th class="'+background_tables+'">Unidad</th>'+
                                           '<th class="customercolortheadth">Por Remisionar</th>'+
                                           '<th class="customercolortheadth">Cantidad</th>'+
@@ -1665,8 +1704,8 @@ function alta(){
                                           '<th class="'+background_tables+'">Costo de Lista</th>'+
                                           '<th class="'+background_tables+'">Tipo de Cambio</th>'+
                                           '<th class="'+background_tables+'">Cotización</th>'+
-                                          '<th class="'+background_tables+'">ClaveProducto</th>'+
-                                          '<th class="'+background_tables+'">ClaveUnidad</th>'+
+                                          '<th class="customercolortheadth">ClaveProducto</th>'+
+                                          '<th class="customercolortheadth">ClaveUnidad</th>'+
                                           '<th class="'+background_tables+'">Meses</th>'+
                                           '<th class="'+background_tables+'">TasaInteres</th>'+
                                           '<th class="'+background_tables+'">MontoInteres</th>'+
@@ -1900,30 +1939,20 @@ function alta(){
         obtenerserierqporserie();
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnext").keypress(function (e) {
+    $(".inputnextdet").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var index = $(this).index(".inputnext");          
-        $(".inputnext").eq(index + 1).focus().select(); 
-      }
-    });
-    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PEDIDO
-    $(".inputnexttabpe").keypress(function (e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var index = $(this).index(".inputnexttabpe");          
-        $(".inputnexttabpe").eq(index + 1).focus().select(); 
-      }
-    });
-    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnextdet").keypress(function (e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var index = $(this).index(".inputnextdet");          
-        $(".inputnextdet").eq(index + 1).focus().select(); 
+      var index = $(this).index(".inputnextdet");          
+      switch(code){
+        case 13:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 39:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 37:
+          $(".inputnextdet").eq(index - 1).focus().select(); 
+          break;
       }
     });
     setTimeout(function(){$("#folio").focus();},500);
@@ -2082,10 +2111,11 @@ function obtenerdatos(remisionmodificar){
                         '<div class="row">'+
                             '<div class="col-md-3">'+
                                 '<label>Remisión <b style="color:#F44336 !important;" id="serietexto"> Serie:</b></label>'+
-                                '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);" ondblclick="obtenultimonumero()">'+
+                                '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);" ondblclick="obtenultimonumero()">'+
                                 '<input type="hidden" class="form-control" name="serie" id="serie" required readonly data-parsley-length="[1, 10]">'+
                                 '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
                                 '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
+                                '<input type="hidden" class="form-control" name="rfcempresa" id="rfcempresa" value="'+rfcempresa+'" readonly>'+
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Cliente <span class="label label-danger" id="textonombrecliente"></span></label>'+
@@ -2096,9 +2126,10 @@ function obtenerdatos(remisionmodificar){
                                         '</td>'+
                                         '<td>'+
                                             '<div class="form-line">'+
-                                                '<input type="text" class="form-control inputnext" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
+                                                '<input type="text" class="form-control inputnextdet" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
                                                 '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
                                                 '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
+                                                '<input type="hidden" class="form-control" name="rfccliente" id="rfccliente" required readonly>'+
                                             '</div>'+
                                         '</td>'+
                                     '</tr>'+  
@@ -2113,7 +2144,7 @@ function obtenerdatos(remisionmodificar){
                                         '</td>'+
                                         '<td>'+
                                             '<div class="form-line">'+
-                                                '<input type="text" class="form-control inputnext" name="numeroagente" id="numeroagente"  required data-parsley-type="integer" autocomplete="off">'+
+                                                '<input type="text" class="form-control inputnextdet" name="numeroagente" id="numeroagente"  required data-parsley-type="integer" autocomplete="off">'+
                                                 '<input type="hidden" class="form-control" name="numeroagenteanterior" id="numeroagenteanterior"  required data-parsley-type="integer">'+
                                                 '<input type="hidden" class="form-control" name="agente" id="agente"  readonly>'+
                                             '</div>'+
@@ -2137,7 +2168,7 @@ function obtenerdatos(remisionmodificar){
                                         '</td>'+
                                         '<td>'+
                                             '<div class="form-line">'+
-                                                '<input type="text" class="form-control inputnext" name="numeroalmacen" id="numeroalmacen" required readonly data-parsley-type="integer" autocomplete="off">'+
+                                                '<input type="text" class="form-control inputnextdet" name="numeroalmacen" id="numeroalmacen" required readonly data-parsley-type="integer" autocomplete="off">'+
                                                 '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required data-parsley-type="integer">'+
                                                 '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
                                             '</div>'+
@@ -2155,7 +2186,7 @@ function obtenerdatos(remisionmodificar){
                             '</div>'+
                             '<div class="col-md-2">'+
                                 '<label>Plazo Días </label>'+
-                                '<input type="text" class="form-control inputnext" name="plazo" id="plazo" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                                '<input type="text" class="form-control inputnextdet" name="plazo" id="plazo" onkeyup="tipoLetra(this);" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-3" id="divbuscarcodigoproducto" hidden>'+
                               '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
@@ -2166,7 +2197,7 @@ function obtenerdatos(remisionmodificar){
                                   '</td>'+
                                   '<td>'+ 
                                     '<div class="form-line">'+
-                                      '<input type="text" class="form-control inputnext" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                                      '<input type="text" class="form-control inputnextdet" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
                                     '</div>'+
                                   '</td>'+
                                 '</tr>'+    
@@ -2178,29 +2209,29 @@ function obtenerdatos(remisionmodificar){
                         '<div class="row">'+
                             '<div class="col-md-4">'+
                                 '<label>Pedido</label>'+
-                                '<input type="text" class="form-control inputnexttabpe" name="pedido" id="pedido" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
+                                '<input type="text" class="form-control inputnextdet" name="pedido" id="pedido" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Solicitado por</label>'+
-                                '<input type="text" class="form-control inputnexttabpe" name="solicitadopor" id="solicitadopor" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
+                                '<input type="text" class="form-control inputnextdet" name="solicitadopor" id="solicitadopor" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-4">'+
                                 '<label>Destino del Pedido </label>'+
-                                '<input type="text" class="form-control inputnexttabpe" name="destinodelpedido" id="destinodelpedido" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]" autocomplete="off">'+
+                                '<input type="text" class="form-control inputnextdet" name="destinodelpedido" id="destinodelpedido" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]" autocomplete="off">'+
                             '</div>'+
                         '</div>'+
                         '<div class="row">'+
                             '<div class="col-md-3">'+
                                 '<label>Referencia</label>'+
-                                '<input type="text" class="form-control inputnexttabpe" name="referencia" id="referencia" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
+                                '<input type="text" class="form-control inputnextdet" name="referencia" id="referencia" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-2">'+
                                 '<label>Orden Servicio</label>'+
-                                '<input type="text" class="form-control inputnexttabpe" name="ordenservicio" id="ordenservicio" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]" autocomplete="off">'+
+                                '<input type="text" class="form-control inputnextdet" name="ordenservicio" id="ordenservicio" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-2">'+
                                 '<label>Equipo </label>'+
-                                '<input type="text" class="form-control inputnexttabpe" name="equipo" id="equipo" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]" autocomplete="off">'+
+                                '<input type="text" class="form-control inputnextdet" name="equipo" id="equipo" onkeyup="tipoLetra(this);" data-parsley-length="[1, 20]" autocomplete="off">'+
                             '</div>'+
                             '<div class="col-md-3">'+
                                 '<label>Requisición</label>'+
@@ -2211,13 +2242,13 @@ function obtenerdatos(remisionmodificar){
                                         '</td>'+
                                         '<td>'+ 
                                             '<div class="form-line">'+
-                                                '<input type="text" class="form-control inputnext" name="serierequisicion" id="serierequisicion" placeholder="Serie" autocomplete="off" onkeyup="tipoLetra(this);">'+
-                                                '<input type="hidden" class="form-control inputnext" name="serierequisicionanterior" id="serierequisicionanterior" placeholder="Serie" autocomplete="off" onkeyup="tipoLetra(this);">'+
+                                                '<input type="text" class="form-control inputnextdet" name="serierequisicion" id="serierequisicion" placeholder="Serie" autocomplete="off" onkeyup="tipoLetra(this);">'+
+                                                '<input type="hidden" class="form-control" name="serierequisicionanterior" id="serierequisicionanterior" placeholder="Serie" autocomplete="off" onkeyup="tipoLetra(this);">'+
                                             '</div>'+
                                         '</td>'+
                                         '<td>'+ 
                                             '<div class="form-line">'+
-                                            '<input type="text" class="form-control inputnext" name="requisicion" id="requisicion" placeholder="Número" autocomplete="off">'+
+                                            '<input type="text" class="form-control inputnextdet" name="requisicion" id="requisicion" placeholder="Número" autocomplete="off">'+
                                             '</div>'+
                                         '</td>'+
                                     '</tr>'+    
@@ -2262,9 +2293,9 @@ function obtenerdatos(remisionmodificar){
                                     '<thead class="'+background_tables+'">'+
                                         '<tr>'+
                                           '<th class="'+background_tables+'">#</th>'+
-                                          '<th class="'+background_tables+'" id="thinsumospartidas">Insumo</th>'+
+                                          '<th class="customercolortheadth" id="thinsumospartidas">Insumo</th>'+
                                           '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
-                                          '<th class="'+background_tables+'"><div style="width:400px !important;">Descripción</div></th>'+
+                                          '<th class="customercolortheadth"><div style="width:400px !important;">Descripción</div></th>'+
                                           '<th class="'+background_tables+'">Unidad</th>'+
                                           '<th class="customercolortheadth">Por Remisionar</th>'+
                                           '<th class="customercolortheadth">Cantidad</th>'+
@@ -2285,8 +2316,8 @@ function obtenerdatos(remisionmodificar){
                                           '<th class="'+background_tables+'">Costo de Lista</th>'+
                                           '<th class="'+background_tables+'">Tipo de Cambio</th>'+
                                           '<th class="'+background_tables+'">Cotización</th>'+
-                                          '<th class="'+background_tables+'">ClaveProducto</th>'+
-                                          '<th class="'+background_tables+'">ClaveUnidad</th>'+
+                                          '<th class="customercolortheadth">ClaveProducto</th>'+
+                                          '<th class="customercolortheadth">ClaveUnidad</th>'+
                                           '<th class="'+background_tables+'">Meses</th>'+
                                           '<th class="'+background_tables+'">TasaInteres</th>'+
                                           '<th class="'+background_tables+'">MontoInteres</th>'+
@@ -2531,30 +2562,20 @@ function obtenerdatos(remisionmodificar){
         obtenerserierqporserie();
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnext").keypress(function (e) {
+    $(".inputnextdet").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var index = $(this).index(".inputnext");          
-        $(".inputnext").eq(index + 1).focus().select(); 
-      }
-    });
-    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PEDIDO
-    $(".inputnexttabpe").keypress(function (e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var index = $(this).index(".inputnexttabpe");          
-        $(".inputnexttabpe").eq(index + 1).focus().select(); 
-      }
-    });
-    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnextdet").keypress(function (e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var index = $(this).index(".inputnextdet");          
-        $(".inputnextdet").eq(index + 1).focus().select(); 
+      var index = $(this).index(".inputnextdet");          
+      switch(code){
+        case 13:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 39:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 37:
+          $(".inputnextdet").eq(index - 1).focus().select(); 
+          break;
       }
     });
     //mostrar o no insumos en partidas segun la configuracion de la empresa
@@ -2722,13 +2743,21 @@ function modificardatosgeneralesdocumento(Remision){
     $("#equipodatosgenerales").val(data.Eq);
     setTimeout(function(){$("#remisiondatosgenerales").focus();},500);
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnextdatosgenerales").keypress(function (e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var index = $(this).index(".inputnextdatosgenerales");          
-        $(".inputnextdatosgenerales").eq(index + 1).focus().select(); 
-      }
+    $(".inputnextdet").keyup(function (e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        var index = $(this).index(".inputnextdet");          
+        switch(code){
+            case 13:
+                $(".inputnextdet").eq(index + 1).focus().select(); 
+                break;
+            case 39:
+                $(".inputnextdet").eq(index + 1).focus().select(); 
+                break;
+            case 37:
+                $(".inputnextdet").eq(index - 1).focus().select(); 
+                break;
+        }
     });
   });
 }
@@ -2788,6 +2817,7 @@ function buscarstringlike(){
     $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
   });
   var tablafolenc=$('#tablafoliosencontrados').DataTable({
+        keys: true,
       "pageLength": 100,
       'sDom': 't',
       "sScrollX": "100%",

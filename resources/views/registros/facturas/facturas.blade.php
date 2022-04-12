@@ -28,7 +28,7 @@
                                                         </div>
                                                     </td>
                                                     <td >
-                                                        <div class="btn bg-blue btn-xs waves-effect" onclick="mostrarmodalgenerarpdf(0,1)">
+                                                        <div class="btn bg-blue btn-xs waves-effect" onclick="mostrarmodalgenerarpdf(0,1,'Factura')">
                                                             Generar Documento
                                                         </div>
                                                     </td>
@@ -318,11 +318,11 @@
                             </div>
                             <div class="col-md-2">
                                     <label >Factura</label>
-                                    <input type="text" class="form-control inputnextdatosgenerales" id="facturadatosgenerales" name="facturadatosgenerales" readonly>
+                                    <input type="text" class="form-control inputnextdet" id="facturadatosgenerales" name="facturadatosgenerales" readonly>
                             </div>
                             <div class="col-md-2">
                                     <label>Pedido</label>
-                                    <input type="text" class="form-control inputnextdatosgenerales" id="pedidodatosgenerales" name="pedidodatosgenerales" onkeyup="tipoLetra(this)">
+                                    <input type="text" class="form-control inputnextdet" id="pedidodatosgenerales" name="pedidodatosgenerales" onkeyup="tipoLetra(this)">
                             </div>
                         </div>                    
                     </form>	

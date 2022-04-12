@@ -28,7 +28,7 @@
                                                     </div>
                                                 </td>
                                                 <td >
-                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="mostrarmodalgenerarpdf(0,1)">
+                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="mostrarmodalgenerarpdf(0,1,'Remision')">
                                                         Generar Documento
                                                     </div>
                                                 </td>
@@ -191,15 +191,15 @@
                           </div>
                           <div class="col-md-2">
                                 <label >Remision</label>
-                                <input type="text" class="form-control inputnextdatosgenerales" id="remisiondatosgenerales" name="remisiondatosgenerales" readonly>
+                                <input type="text" class="form-control inputnextdet" id="remisiondatosgenerales" name="remisiondatosgenerales" readonly>
                           </div>
                           <div class="col-md-2">
                                 <label>Orden Servicio</label>
-                                <input type="text" class="form-control inputnextdatosgenerales" id="ordenserviciodatosgenerales" name="ordenserviciodatosgenerales" onkeyup="tipoLetra(this)">
+                                <input type="text" class="form-control inputnextdet" id="ordenserviciodatosgenerales" name="ordenserviciodatosgenerales" onkeyup="tipoLetra(this)">
                           </div>
                           <div class="col-md-2">
                                 <label>Equipo</label>
-                                <input type="text" class="form-control inputnextdatosgenerales" id="equipodatosgenerales" name="equipodatosgenerales" onkeyup="tipoLetra(this)">
+                                <input type="text" class="form-control inputnextdet" id="equipodatosgenerales" name="equipodatosgenerales" onkeyup="tipoLetra(this)">
                           </div>
                       </div>                    
 		        </form>	

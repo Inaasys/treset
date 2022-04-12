@@ -85,6 +85,7 @@ function listar(){
     // armar columas para datatable se arma desde funcionesglobales.js
     var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
     tabla=$('#tbllistado').DataTable({
+        keys: true,
         "lengthMenu": [ 100, 250, 500, 1000 ],
         "pageLength": 100,
         "sScrollX": "110%",
@@ -167,6 +168,7 @@ function obtenerfoliosdocumento(){
                                 '</div>';  
     $("#contenidomodaltablas").html(tablaseriesdocumento);
     var tserdoc = $('#tbllistadoseriedocumento').DataTable({
+        keys: true,
         "lengthMenu": [ 500, 1000, 1500, 2000, 2500 ],
         "pageLength": 2000,
         "sScrollX": "110%",
@@ -195,6 +197,7 @@ function obtenerfoliosdocumento(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -254,13 +257,18 @@ function cargardocumentosseleccionados(){
         partida = data.partida;
         mostrarformulario();
         //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-        $(".inputnextdet").keypress(function (e) {
-            //recomentable para mayor compatibilidad entre navegadores.
-            var code = (e.keyCode ? e.keyCode : e.which);
-            if(code==13){
-                var index = $(this).index(".inputnextdet");          
-                $(".inputnextdet").eq(index + 1).focus().select(); 
-            }
+        $(".inputnextdet").keyup(function (e) {
+          //recomentable para mayor compatibilidad entre navegadores.
+          var code = (e.keyCode ? e.keyCode : e.which);
+          var index = $(this).index(".inputnextdet");          
+          switch(code){
+            case 39:
+              $(".inputnextdet").eq(index + 1).focus().select(); 
+              break;
+            case 37:
+              $(".inputnextdet").eq(index - 1).focus().select(); 
+              break;
+          }
         });
     })
 }

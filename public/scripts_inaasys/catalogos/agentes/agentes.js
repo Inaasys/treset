@@ -59,6 +59,7 @@ function listar(){
     }
   });
   tabla=$('#tbllistado').DataTable({
+    keys: true,
     "lengthMenu": [ 100, 250, 500, 1000 ],
     "pageLength": 1000,
     "sScrollX": "110%",
@@ -132,6 +133,7 @@ function listaralmacenes(){
                         '</div>';
   $("#contenidomodaltablas").html(tablaalmacenes);
   var talm = $('#tbllistadoalmacen').DataTable({
+      keys: true,
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "300px",
@@ -150,6 +152,7 @@ function listaralmacenes(){
       ],
       "initComplete": function() {
         var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
         $buscar.unbind();
         $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -301,12 +304,20 @@ function alta(){
         regresarnumeroalmacen();
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnext").keypress(function (e) {
+    $(".inputnext").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
       var index = $(this).index(".inputnext");          
+      switch(code){
+        case 13:
           $(".inputnext").eq(index + 1).focus().select(); 
+          break;
+        case 39:
+          $(".inputnext").eq(index + 1).focus().select(); 
+          break;
+        case 37:
+          $(".inputnext").eq(index - 1).focus().select(); 
+          break;
       }
     });
 }
@@ -508,12 +519,20 @@ function obtenerdatos(numeroagente){
         regresarnumeroalmacen();
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnext").keypress(function (e) {
+    $(".inputnext").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
       var index = $(this).index(".inputnext");          
+      switch(code){
+        case 13:
           $(".inputnext").eq(index + 1).focus().select(); 
+          break;
+        case 39:
+          $(".inputnext").eq(index + 1).focus().select(); 
+          break;
+        case 37:
+          $(".inputnext").eq(index - 1).focus().select(); 
+          break;
       }
     });
     mostrarmodalformulario('MODIFICACION');

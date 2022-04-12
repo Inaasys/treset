@@ -38,7 +38,7 @@
                                                     </div>
                                                 </td>
                                                 <td >
-                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="mostrarmodalgenerarpdf(0,1)">
+                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="mostrarmodalgenerarpdf(0,1,'Compra')">
                                                         Generar Documento
                                                     </div>
                                                 </td>

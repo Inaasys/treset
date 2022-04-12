@@ -92,6 +92,7 @@ function listar(){
     // armar columas para datatable se arma desde funcionesglobales.js
     var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
     tabla=$('#tbllistado').DataTable({
+        keys: true,
         "lengthMenu": [ 100, 250, 500, 1000 ],
         "pageLength": 100,
         "sScrollX": "110%",
@@ -174,6 +175,7 @@ function obtenerseriesdocumento(){
                                 '</div>';  
     $("#contenidomodaltablas").html(tablaseriesdocumento);
     var tserdoc = $('#tbllistadoseriedocumento').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -196,6 +198,7 @@ function obtenerseriesdocumento(){
         ],
         "initComplete": function() {
           var $buscar = $('div.dataTables_filter input');
+          $buscar.focus();
           $buscar.unbind();
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {
@@ -251,6 +254,7 @@ function obtenerproveedores(){
                     '</div>';
     $("#contenidomodaltablas").html(tablaproveedores);
     var tprov = $('#tbllistadoproveedor').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -276,6 +280,7 @@ function obtenerproveedores(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -319,6 +324,7 @@ function obtenerbancos(){
                         '</div>';
       $("#contenidomodaltablas").html(tablabancos);
       var tban = $('#tbllistadobanco').DataTable({
+            keys: true,
             "lengthMenu": [ 10, 50, 100, 250, 500 ],
             "pageLength": 250,
             "sScrollX": "110%",
@@ -340,6 +346,7 @@ function obtenerbancos(){
             ],
             "initComplete": function() {
                 var $buscar = $('div.dataTables_filter input');
+                $buscar.focus();
                 $buscar.unbind();
                 $buscar.bind('keyup change', function(e) {
                     if(e.keyCode == 13 || this.value == "") {
@@ -1111,6 +1118,7 @@ function buscarstringlike(){
       $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
     });
     var tablafolenc=$('#tablafoliosencontrados').DataTable({
+        keys: true,
         "pageLength": 100,
         'sDom': 't',
         "sScrollX": "100%",

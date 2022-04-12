@@ -93,6 +93,7 @@ function listar(){
     // armar columas para datatable se arma desde funcionesglobales.js
     var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
     tabla=$('#tbllistado').DataTable({
+        keys: true,
         "lengthMenu": [ 100, 250, 500, 1000 ],
         "pageLength": 100,
         "sScrollX": "110%",
@@ -178,6 +179,7 @@ function obtenerclientes(){
                       '</div>';
     $("#contenidomodaltablas").html(tablaclientes);
     var tcli = $('#tbllistadocliente').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -204,6 +206,7 @@ function obtenerclientes(){
             ],
             "initComplete": function() {
                 var $buscar = $('div.dataTables_filter input');
+                $buscar.focus();
                 $buscar.unbind();
                 $buscar.bind('keyup change', function(e) {
                     if(e.keyCode == 13 || this.value == "") {
@@ -279,6 +282,7 @@ function obtenerbancos(){
                         '</div>';
       $("#contenidomodaltablas").html(tablabancos);
       var tban = $('#tbllistadobanco').DataTable({
+            keys: true,
             "lengthMenu": [ 10, 50, 100, 250, 500 ],
             "pageLength": 250,
             "sScrollX": "110%",
@@ -300,6 +304,7 @@ function obtenerbancos(){
           ],
           "initComplete": function() {
               var $buscar = $('div.dataTables_filter input');
+              $buscar.focus();
               $buscar.unbind();
               $buscar.bind('keyup change', function(e) {
                   if(e.keyCode == 13 || this.value == "") {
@@ -357,6 +362,7 @@ function obtenerlugaresexpedicion(){
                                 '</div>';  
     $("#contenidomodaltablas").html(tablacodigospostales);
     var tcodpost = $('#tbllistadocodigopostal').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -382,6 +388,7 @@ function obtenerlugaresexpedicion(){
         ],
         "initComplete": function() {
           var $buscar = $('div.dataTables_filter input');
+          $buscar.focus();
           $buscar.unbind();
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {
@@ -440,6 +447,7 @@ function obtenerregimenesfiscales(){
                                 '</div>';  
     $("#contenidomodaltablas").html(tablaregimenesfiscales);
     var tregfis = $('#tbllistadoregimenfiscal').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -463,6 +471,7 @@ function obtenerregimenesfiscales(){
         ],
         "initComplete": function() {
           var $buscar = $('div.dataTables_filter input');
+          $buscar.focus();
           $buscar.unbind();
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {
@@ -520,6 +529,7 @@ function obtenertiposrelaciones(){
                                 '</div>';  
     $("#contenidomodaltablas").html(tablatiposrelaciones);
     var ttiprel = $('#tbllistadotiporelacion').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -541,6 +551,7 @@ function obtenertiposrelaciones(){
         ],
         "initComplete": function() {
           var $buscar = $('div.dataTables_filter input');
+          $buscar.focus();
           $buscar.unbind();
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {
@@ -599,6 +610,7 @@ function obtenerformaspago(){
                                 '</div>';  
     $("#contenidomodaltablas").html(tablaformaspago);
     var tforpag = $('#tbllistadoformapago').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -621,6 +633,7 @@ function obtenerformaspago(){
         ],
         "initComplete": function() {
           var $buscar = $('div.dataTables_filter input');
+          $buscar.focus();
           $buscar.unbind();
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {
@@ -678,6 +691,7 @@ function listarmetodospago(fila){
                             '</div>';   
     $("#contenidomodaltablas").html(tablametodospago);
     var tmetpag = $('#tbllistadometodopago').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -702,6 +716,7 @@ function listarmetodospago(fila){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -750,6 +765,7 @@ function obtenerfoliosnotas(){
                                 '</div>';  
     $("#contenidomodaltablas").html(tablafoliosfiscales);
     var tfolfis = $('#tbllistadofoliofiscal').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -771,6 +787,7 @@ function obtenerfoliosnotas(){
         ],
         "initComplete": function() {
           var $buscar = $('div.dataTables_filter input');
+          $buscar.focus();
           $buscar.unbind();
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {
@@ -991,6 +1008,7 @@ function listarfacturas (){
                         '</div>';
       $("#contenidomodaltablas").html(tablafacturas);
       var tfact = $('#tbllistadofactura').DataTable({
+            keys: true,
             "lengthMenu": [ 10, 50, 100, 250, 500 ],
             "pageLength": 250,
             "sScrollX": "110%",
@@ -1023,6 +1041,7 @@ function listarfacturas (){
             ],
             "initComplete": function() {
                 var $buscar = $('div.dataTables_filter input');
+                $buscar.focus();
                 $buscar.unbind();
                 $buscar.bind('keyup change', function(e) {
                     if(e.keyCode == 13 || this.value == "") {
@@ -2376,6 +2395,7 @@ function buscarstringlike(){
       $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
     });
     var tablafolenc=$('#tablafoliosencontrados').DataTable({
+        keys: true,
         "pageLength": 100,
         'sDom': 't',
         "sScrollX": "100%",

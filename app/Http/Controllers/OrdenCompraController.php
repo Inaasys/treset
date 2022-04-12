@@ -210,7 +210,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                         $tipo = "alta";
                         $filasdetallesordencompra= $filasdetallesordencompra.
                         '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
-                            '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
+                            '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$producto->Codigo.'</b></td>'.
                             '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet nombreproductopartida" name="nombreproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($producto->Producto, ENT_QUOTES).'</textarea></td>'.                    
                             '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'.$producto->Unidad.'" readonly data-parsley-length="[1, 5]">'.$producto->Unidad.'</td>'.
@@ -218,10 +218,10 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($cantidad).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" id="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($preciopartida).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" id="importepartida[]" value="'.Helpers::convertirvalorcorrecto($importepartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" id="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('.$contadorfilas.');"></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" id="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentoporcentajepartida('.$contadorfilas.');"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" id="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('.$contadorfilas.');"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" id="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentoporcentajepartida('.$contadorfilas.');"></td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" id="subtotalpartida[]" value="'.Helpers::convertirvalorcorrecto($subtotalpartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" id="ivaporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($producto->Impuesto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('.$contadorfilas.');"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" id="ivaporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($producto->Impuesto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('.$contadorfilas.');"></td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm ivapesospartida" name="ivapesospartida[]" id="ivapesospartida[]" value="'.Helpers::convertirvalorcorrecto($ivapesospartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" id="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto($totalpesospartida).'"data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                         '</tr>';
@@ -253,6 +253,72 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     ->make(true);
         }
     }
+    //obtener series disponibles del documentos enviado
+    public function generar_documentos_obtener_series_disponibles_documentos(Request $request){
+        switch ($request->documento) {
+            case 'OrdenCompra':
+                $select_series_disponibles = Helpers::armarselectseriesdisponibles('App\OrdenCompra');
+                break;
+            case 'Factura':
+                $select_series_disponibles = Helpers::armarselectseriesdisponibles('App\Factura');
+                break;
+            case 'Compra':
+                $select_series_disponibles = Helpers::armarselectseriesdisponibles('App\Compra');
+                break;
+            case 'ContraRecibo':
+                $select_series_disponibles = Helpers::armarselectseriesdisponibles('App\ContraRecibo');
+                break;
+            case 'CotizacionProducto':
+                $select_series_disponibles = Helpers::armarselectseriesdisponibles('App\CotizacionProducto');
+                break;
+            case 'CotizacionServicio':
+                $select_series_disponibles = Helpers::armarselectseriesdisponibles('App\CotizacionServicio');
+                break;
+            case 'Remision':
+                $select_series_disponibles = Helpers::armarselectseriesdisponibles('App\Remision');
+                break;
+            case 'Produccion':
+                $select_series_disponibles = Helpers::armarselectseriesdisponibles('App\Produccion');
+                break;
+            case 'Requisicion':
+                $select_series_disponibles = Helpers::armarselectseriesdisponibles('App\Requisicion');
+                break;
+            case 'Traspaso':
+                $select_series_disponibles = Helpers::armarselectseriesdisponibles('App\Traspaso');
+                break;
+            case 'OrdenTrabajo':
+                $select_series_disponibles = Helpers::armarselectseriesdisponibles('App\OrdenTrabajo');
+                break;
+            case 'CuentaXPagar':
+                $select_series_disponibles = Helpers::armarselectseriesdisponibles('App\CuentaXPagar');
+                break;
+            case 'CuentaXCobrar':
+                $select_series_disponibles = Helpers::armarselectseriesdisponibles('App\CuentaXCobrar');
+                break;
+            case 'NotaCliente':
+                $select_series_disponibles = Helpers::armarselectseriesdisponibles('App\NotaCliente');
+                break;
+            case 'NotaProveedor':
+                $select_series_disponibles = Helpers::armarselectseriesdisponibles('App\NotaProveedor');
+                break;
+            case 'CartaPorte':
+                $select_series_disponibles = Helpers::armarselectseriesdisponibles('App\CartaPorte');
+                break;
+            case 'Asignacion_Herramienta':
+                $select_series_disponibles = Helpers::armarselectseriesdisponibles('App\Asignacion_Herramienta');
+                break;
+            case 'AjusteInventario':
+                $select_series_disponibles = Helpers::armarselectseriesdisponibles('App\AjusteInventario');
+                break;
+        }
+        $fechahoyinputdate = Helpers::fechaexactaaccioninputdate();
+        $data = array(
+            'fechahoyinputdate' => $fechahoyinputdate,
+            'select_series_disponibles' => $select_series_disponibles
+        );
+        return response()->json($data);
+    }
+
     //obtener ultimo folio de la serie seleccionada
     public function ordenes_compra_obtener_ultimo_folio_serie_seleccionada(Request $request){
         $folio = Helpers::ultimofolioserietablamodulos('App\OrdenCompra',$request->Serie);
@@ -266,7 +332,6 @@ class OrdenCompraController extends ConfiguracionSistemaController{
     //obtener fecha date time actual
     public function ordenes_compra_obtener_fecha_actual_datetimelocal(Request $request){
         $fechas = Helpers::fecha_exacta_accion_datetimelocal();
-        
         return response()->json($fechas);
     }
     //obtener tipos ordenes de compra
@@ -318,6 +383,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                 ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
                 ->select('ura.id', 'a.Numero', 'a.Nombre')
                 ->where('a.Status', 'ALTA')
+                ->where('ura.user_id', Auth::user()->id)
                 ->orderby('a.Numero', 'ASC')
                 ->get();
             }else{
@@ -502,6 +568,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             ->select('ura.id', 'a.Numero', 'a.Nombre')
             ->where('a.Numero', $request->numeroalmacen)
             ->where('a.Status', 'ALTA')
+            ->where('ura.user_id', Auth::user()->id)
             ->count();
             if($existealmacen > 0){
                 $almacen = DB::table('user_rel_almacenes as ura')
@@ -509,6 +576,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                 ->select('ura.id', 'a.Numero', 'a.Nombre')
                 ->where('a.Numero', $request->numeroalmacen)
                 ->where('a.Status', 'ALTA')
+                ->where('ura.user_id', Auth::user()->id)
                 ->orderby('a.Numero', 'DESC')
                 ->first();
                 $numero = $almacen->Numero;
@@ -760,10 +828,10 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadyasurtidapartida"  name="cantidadyasurtidapartida[]" value="'.Helpers::convertirvalorcorrecto($cantidadyasurtidapartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" ></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida"  name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Precio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculartotalesfilasordencompra('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo .'\');formatocorrectoinputcantidades(this);"></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida"  name="importepartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Importe).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentoporcentajepartida"  name="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Dcto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculardescuentopesospartida('.$contadorfilas.');formatocorrectoinputcantidades(this);" ></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm descuentopesospartida"  name="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Descuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculardescuentoporcentajepartida('.$contadorfilas.');formatocorrectoinputcantidades(this);" ></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm descuentoporcentajepartida"  name="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Dcto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculardescuentopesospartida('.$contadorfilas.');formatocorrectoinputcantidades(this);" ></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm descuentopesospartida"  name="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Descuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculardescuentoporcentajepartida('.$contadorfilas.');formatocorrectoinputcantidades(this);" ></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm subtotalpartida"  name="subtotalpartida[]" value="'.Helpers::convertirvalorcorrecto($doc->SubTotal).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm ivaporcentajepartida"  name="ivaporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Impuesto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculartotalesfilasordencompra('.$contadorfilas.');formatocorrectoinputcantidades(this);" ></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm ivaporcentajepartida"  name="ivaporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Impuesto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculartotalesfilasordencompra('.$contadorfilas.');formatocorrectoinputcantidades(this);" ></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm ivapesospartida"  name="ivapesospartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Iva).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida"  name="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Total).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                 '</tr>';
@@ -982,7 +1050,11 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             }else{
                 $fechainiciopdf = date($request->fechainiciopdf);
                 $fechaterminacionpdf = date($request->fechaterminacionpdf);
-                $ordenescompra = OrdenCompra::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
+                if ($request->has("seriesdisponiblesdocumento")){
+                    $ordenescompra = OrdenCompra::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->whereIn('Serie', $request->seriesdisponiblesdocumento)->orderBy('Folio', 'ASC')->take(1500)->get();
+                }else{
+                    $ordenescompra = OrdenCompra::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
+                }
             }
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();

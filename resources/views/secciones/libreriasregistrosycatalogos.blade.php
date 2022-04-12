@@ -9,6 +9,8 @@
     <!-- Jquery DataTable Plugin Js -->
     <script src="plugins/jquery-datatable/jquery.dataTables.js"></script>
     <script src="plugins/jquery-datatable/skin/bootstrap/js/dataTables.bootstrap.js"></script>
+    <!-- focus en td table-->
+    <script src="plugins/jquery-datatable-keytable/dataTables.keyTable.min.js"></script>
     <!-- Jquery Nestable ORDERNAR COLUMNAS TABLAS -->
     <script src="plugins/nestable/jquery.nestable.js"></script>
     <!-- Custom Js -->

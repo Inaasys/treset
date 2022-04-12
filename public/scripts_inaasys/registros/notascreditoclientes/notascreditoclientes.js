@@ -109,6 +109,7 @@ function listar(){
   // armar columas para datatable se arma desde funcionesglobales.js
   var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
   tabla=$('#tbllistado').DataTable({
+    keys: true,
     "lengthMenu": [ 100, 250, 500, 1000 ],
     "pageLength": 100,
     "sScrollX": "110%",
@@ -197,6 +198,7 @@ function obtenerclientes(){
                     '</div>';
     $("#contenidomodaltablas").html(tablaclientes);
     var tcli = $('#tbllistadocliente').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -223,6 +225,7 @@ function obtenerclientes(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -304,6 +307,7 @@ function obteneralmacenes(){
                         '</div>';
       $("#contenidomodaltablas").html(tablaalmacenes);
       var talm = $('#tbllistadoalmacen').DataTable({
+          keys: true,
           "lengthMenu": [ 10, 50, 100, 250, 500 ],
           "pageLength": 250,
           "sScrollX": "110%",
@@ -325,6 +329,7 @@ function obteneralmacenes(){
           ],
           "initComplete": function() {
               var $buscar = $('div.dataTables_filter input');
+              $buscar.focus();
               $buscar.unbind();
               $buscar.bind('keyup change', function(e) {
                   if(e.keyCode == 13 || this.value == "") {
@@ -384,6 +389,7 @@ function obtenerlugaresexpedicion(){
                               '</div>';  
   $("#contenidomodaltablas").html(tablacodigospostales);
   var tcodpost = $('#tbllistadocodigopostal').DataTable({
+      keys: true,
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -409,6 +415,7 @@ function obtenerlugaresexpedicion(){
       ],
       "initComplete": function() {
         var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
         $buscar.unbind();
         $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -464,6 +471,7 @@ function obtenerregimenesfiscales(){
                               '</div>';  
   $("#contenidomodaltablas").html(tablaregimenesfiscales);
   var tregfis = $('#tbllistadoregimenfiscal').DataTable({
+      keys: true,
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -487,6 +495,7 @@ function obtenerregimenesfiscales(){
       ],
       "initComplete": function() {
         var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
         $buscar.unbind();
         $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -544,6 +553,7 @@ function obtenertiposrelaciones(){
                               '</div>';  
   $("#contenidomodaltablas").html(tablatiposrelaciones);
   var ttiprel = $('#tbllistadotiporelacion').DataTable({
+      keys: true,
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -565,6 +575,7 @@ function obtenertiposrelaciones(){
       ],
       "initComplete": function() {
         var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
         $buscar.unbind();
         $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -623,6 +634,7 @@ function obtenerformaspago(){
                               '</div>';  
   $("#contenidomodaltablas").html(tablaformaspago);
   var tforpag = $('#tbllistadoformapago').DataTable({
+      keys: true,
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -645,6 +657,7 @@ function obtenerformaspago(){
       ],
       "initComplete": function() {
         var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
         $buscar.unbind();
         $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -702,6 +715,7 @@ function obtenermetodospago(){
                               '</div>';  
   $("#contenidomodaltablas").html(tablametodospago);
   var tmetpag = $('#tbllistadometodopago').DataTable({
+      keys: true,
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -723,6 +737,7 @@ function obtenermetodospago(){
       ],
       "initComplete": function() {
         var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
         $buscar.unbind();
         $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -782,6 +797,7 @@ function obtenerusoscfdi(){
                               '</div>';  
   $("#contenidomodaltablas").html(tablausoscfdi);
   var tusocfdi = $('#tbllistadousocfdi').DataTable({
+      keys: true,
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -805,6 +821,7 @@ function obtenerusoscfdi(){
       ],
       "initComplete": function() {
         var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
         $buscar.unbind();
         $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -862,6 +879,7 @@ function obtenerresidenciasfiscales(){
                               '</div>';  
   $("#contenidomodaltablas").html(tablaresidenciasfiscales);
   var tresfis = $('#tbllistadoresidencialfiscal').DataTable({
+      keys: true,
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -883,6 +901,7 @@ function obtenerresidenciasfiscales(){
       ],
       "initComplete": function() {
         var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
         $buscar.unbind();
         $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -940,6 +959,7 @@ function obtenerfoliosnotas(){
                               '</div>';  
   $("#contenidomodaltablas").html(tablafoliosfiscales);
   var tfolfis = $('#tbllistadofoliofiscal').DataTable({
+      keys: true,
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -961,6 +981,7 @@ function obtenerfoliosnotas(){
       ],
       "initComplete": function() {
         var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
         $buscar.unbind();
         $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -1030,6 +1051,7 @@ function listarfacturas (){
                       '</div>';
     $("#contenidomodaltablas").html(tablafacturas);
     var tfact = $('#tbllistadofactura').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -1063,6 +1085,7 @@ function listarfacturas (){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -1095,12 +1118,20 @@ function seleccionarfactura(Folio, Factura){
       eliminarfilascodigos();
       $('.page-loader-wrapper').css('display', 'none');
       //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-      $(".inputnextdetfac").keypress(function (e) {
+      $(".inputnextdet").keyup(function (e) {
         //recomentable para mayor compatibilidad entre navegadores.
         var code = (e.keyCode ? e.keyCode : e.which);
-        if(code==13){
-          var index = $(this).index(".inputnextdetfac");          
-          $(".inputnextdetfac").eq(index + 1).focus().select(); 
+        var index = $(this).index(".inputnextdet");          
+        switch(code){
+          case 13:
+            $(".inputnextdet").eq(index + 1).focus().select(); 
+            break;
+          case 39:
+            $(".inputnextdet").eq(index + 1).focus().select(); 
+            break;
+          case 37:
+            $(".inputnextdet").eq(index - 1).focus().select(); 
+            break;
         }
       });
       contadorfilasfacturas++;
@@ -1506,6 +1537,7 @@ function listarproductos(){
                             '</div>';   
       $("#contenidomodaltablas").html(tablaproductos);
       var tprod = $('#tbllistadoproducto').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -1539,6 +1571,7 @@ function listarproductos(){
         ],
         "initComplete": function() {
           var $buscar = $('div.dataTables_filter input');
+          $buscar.focus();
           $buscar.unbind();
           $buscar.bind('keyup change', function(e) {
             if(e.keyCode == 13 || this.value == "") {
@@ -1610,6 +1643,7 @@ function listarclavesproductos(fila){
                             '</div>';   
   $("#contenidomodaltablas").html(tablaclavesproducto);
   var tclavprod = $('#tbllistadoclaveproducto').DataTable({
+      keys: true,
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -1634,6 +1668,7 @@ function listarclavesproductos(fila){
       ],
       "initComplete": function() {
           var $buscar = $('div.dataTables_filter input');
+          $buscar.focus();
           $buscar.unbind();
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {
@@ -1683,6 +1718,7 @@ function listarclavesunidades(fila){
                             '</div>';   
   $("#contenidomodaltablas").html(tablaclavesunidades);
   var tclavuni = $('#tbllistadoclaveunidad').DataTable({
+      keys: true,
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -1707,6 +1743,7 @@ function listarclavesunidades(fila){
       ],
       "initComplete": function() {
           var $buscar = $('div.dataTables_filter input');
+          $buscar.focus();
           $buscar.unbind();
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {
@@ -1792,19 +1829,19 @@ function agregarfiladppp(){
                 '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfila" onclick="eliminarfila('+contadorfilas+')" >X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
                 '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="DPPP" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">DPPP</b></td>'+         
                 '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="DESCUENTO POR PRONTO PAGO" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
-                '<td class="tdmod"><input type="text" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="ACTIV" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
+                '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxs unidadpartida" name="unidadpartida[]" value="ACTIV" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
                 '<td class="tdmod">'+
                     '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-max="1.0"  data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');">'+
                 '</td>'+
                 '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');"></td>'+
                 '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
-                '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" ></td>'+
+                '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" ></td>'+
                 '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm importedescuentopesospartida" name="importedescuentopesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                 '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm iepsporcentajepartida" name="iepsporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" readonly></td>'+
                 '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm trasladoiepspesospartida" name="trasladoiepspesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                 '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
-                '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="16.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');"></td>'+
+                '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="16.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');"></td>'+
                 '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm trasladoivapesospartida" name="trasladoivapesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
                 '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencionivaporcentajepartida" name="retencionivaporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" readonly></td>'+
                 '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencionivapesospartida" name="retencionivapesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
@@ -1821,7 +1858,7 @@ function agregarfiladppp(){
                       '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('+contadorfilas+');" ><i class="material-icons">remove_red_eye</i></div>'+
                     '</div>'+
                     '<div class="col-xs-10 col-sm-10 col-md-10">'+    
-                      '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="84111506" readonly data-parsley-length="[1, 20]">'+
+                      '<input type="text" class="form-control inputnextdet divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="84111506" readonly data-parsley-length="[1, 20]">'+
                     '</div>'+
                   '</div>'+
                 '</td>'+
@@ -1832,7 +1869,7 @@ function agregarfiladppp(){
                       '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('+contadorfilas+');" ><i class="material-icons">remove_red_eye</i></div>'+
                     '</div>'+
                     '<div class="col-xs-10 col-sm-10 col-md-10">'+    
-                      '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="ACT" readonly data-parsley-length="[1, 5]">'+
+                      '<input type="text" class="form-control inputnextdet divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="ACT" readonly data-parsley-length="[1, 5]">'+
                     '</div>'+
                   '</div>'+
                 '</td>'+
@@ -1851,12 +1888,20 @@ function agregarfiladppp(){
     comprobarfilasfacturanotacliente();
     $("#codigoabuscar").val("");
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnextdet").keypress(function (e) {
+    $(".inputnextdet").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var index = $(this).index(".inputnextdet");          
-        $(".inputnextdet").eq(index + 1).focus().select(); 
+      var index = $(this).index(".inputnextdet");          
+      switch(code){
+        case 13:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 39:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 37:
+          $(".inputnextdet").eq(index - 1).focus().select(); 
+          break;
       }
     });
     $('.page-loader-wrapper').css('display', 'none');
@@ -1878,7 +1923,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
                     '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfila" onclick="eliminarfila('+contadorfilas+')" >X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
                     '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'+Codigo+'</b></td>'+         
                     '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="'+Unidad+'" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
+                    '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxs unidadpartida" name="unidadpartida[]" value="'+Unidad+'" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
                     '<td class="tdmod">'+
                         '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');revisarcantidadnotavscantidadfactura('+contadorfilas+');">'+
                         '<input type="hidden" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
@@ -1888,13 +1933,13 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
                     '</td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'+preciopartida+'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');"></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
-                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" ></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" ></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm importedescuentopesospartida" name="importedescuentopesospartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                     '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm iepsporcentajepartida" name="iepsporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" readonly></td>'+
                     '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm trasladoiepspesospartida" name="trasladoiepspesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
-                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'+Impuesto+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" ></td>'+
+                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'+Impuesto+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" ></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm trasladoivapesospartida" name="trasladoivapesospartida[]" value="'+number_format(round(ivapesos, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
                     '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencionivaporcentajepartida" name="retencionivaporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" readonly></td>'+
                     '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencionivapesospartida" name="retencionivapesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
@@ -1911,7 +1956,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
                           '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('+contadorfilas+');" ><i class="material-icons">remove_red_eye</i></div>'+
                         '</div>'+
                         '<div class="col-xs-10 col-sm-10 col-md-10">'+    
-                          '<input type="text" class="form-control divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'+ClaveProducto+'" readonly data-parsley-length="[1, 20]">'+
+                          '<input type="text" class="form-control inputnextdet divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'+ClaveProducto+'" readonly data-parsley-length="[1, 20]">'+
                         '</div>'+
                       '</div>'+
                     '</td>'+
@@ -1922,7 +1967,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
                           '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('+contadorfilas+');" ><i class="material-icons">remove_red_eye</i></div>'+
                         '</div>'+
                         '<div class="col-xs-10 col-sm-10 col-md-10">'+    
-                          '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'+ClaveUnidad+'" readonly data-parsley-length="[1, 5]">'+
+                          '<input type="text" class="form-control inputnextdet divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'+ClaveUnidad+'" readonly data-parsley-length="[1, 5]">'+
                         '</div>'+
                       '</div>'+
                     '</td>'+
@@ -1941,12 +1986,20 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
         comprobarfilasfacturanotacliente();
         $("#codigoabuscar").val("");
         //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-        $(".inputnextdet").keypress(function (e) {
+        $(".inputnextdet").keyup(function (e) {
           //recomentable para mayor compatibilidad entre navegadores.
           var code = (e.keyCode ? e.keyCode : e.which);
-          if(code==13){
-            var index = $(this).index(".inputnextdet");          
-            $(".inputnextdet").eq(index + 1).focus().select(); 
+          var index = $(this).index(".inputnextdet");          
+          switch(code){
+            case 13:
+              $(".inputnextdet").eq(index + 1).focus().select(); 
+              break;
+            case 39:
+              $(".inputnextdet").eq(index + 1).focus().select(); 
+              break;
+            case 37:
+              $(".inputnextdet").eq(index - 1).focus().select(); 
+              break;
           }
         });
         $('.page-loader-wrapper').css('display', 'none');
@@ -1979,7 +2032,7 @@ function alta(){
                                 '<div class="row">'+
                                     '<div class="col-md-3">'+
                                         '<label>Nota <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp; <b style="color:#F44336 !important;" id="esquematexto"> Esquema: '+esquema+'</b>  <div class="btn btn-xs bg-red waves-effect" id="btnobtenerfoliosnotas" onclick="obtenerfoliosnotas()">Cambiar</div></label>'+
-                                        '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                                         '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                                         '<input type="hidden" class="form-control" name="stringfacturasseleccionadas" id="stringfacturasseleccionadas" readonly required>'+
                                         '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
@@ -1998,7 +2051,7 @@ function alta(){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control inputnext" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
+                                                        '<input type="text" class="form-control inputnextdet" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
                                                         '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
                                                         '<input type="hidden" class="form-control" name="rfccliente" id="rfccliente" required readonly>'+
@@ -2016,7 +2069,7 @@ function alta(){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control inputnext" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer" autocomplete="off">'+
+                                                        '<input type="text" class="form-control inputnextdet" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior"  required data-parsley-type="integer">'+
                                                         '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
                                                     '</div>'+
@@ -2045,7 +2098,7 @@ function alta(){
                                           '</td>'+
                                           '<td>'+
                                             '<label>Pesos</label>'+
-                                            '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="pesosmoneda" id="pesosmoneda" value="1.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                            '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet" name="pesosmoneda" id="pesosmoneda" value="1.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                           '</td>'+
                                         '</tr>'+
                                       '</table>'+
@@ -2063,7 +2116,7 @@ function alta(){
                                           '</td>'+
                                           '<td>'+ 
                                             '<div class="form-line">'+
-                                              '<input type="text" class="form-control inputnext" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" readonly autocomplete="off">'+
+                                              '<input type="text" class="form-control inputnextdet" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" readonly autocomplete="off">'+
                                             '</div>'+
                                           '</td>'+
                                         '</tr>'+    
@@ -2075,15 +2128,15 @@ function alta(){
                                 '<div class="row">'+
                                     '<div class="col-md-4">'+
                                         '<label>R.F.C.</label>'+
-                                        '<input type="text" class="form-control inputnexttabem" name="emisorrfc" id="emisorrfc" value="'+rfcempresa+'"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                        '<input type="text" class="form-control inputnextdet" name="emisorrfc" id="emisorrfc" value="'+rfcempresa+'"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                     '</div>'+
                                     '<div class="col-md-4">'+
                                         '<label>Emisor Nombre</label>'+
-                                        '<input type="text" class="form-control inputnexttabem" name="emisornombre" id="emisornombre" value="'+nombreempresa+'" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnextdet" name="emisornombre" id="emisornombre" value="'+nombreempresa+'" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                     '<div class="col-md-4">'+
                                         '<label>Confirmación</label>'+
-                                        '<input type="text" class="form-control inputnexttabem" name="confirmacion" id="confirmacion" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                                        '<input type="text" class="form-control inputnextdet" name="confirmacion" id="confirmacion" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
@@ -2096,7 +2149,7 @@ function alta(){
                                               '</td>'+
                                               '<td>'+
                                                   '<div class="form-line">'+
-                                                      '<input type="text" class="form-control inputnexttabem" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" required autocomplete="off">'+
+                                                      '<input type="text" class="form-control inputnextdet" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" required autocomplete="off">'+
                                                       '<input type="hidden" class="form-control" name="lugarexpedicionanterior" id="lugarexpedicionanterior" value="'+lugarexpedicion+'" required>'+
                                                   '</div>'+
                                               '</td>'+
@@ -2112,7 +2165,7 @@ function alta(){
                                               '</td>'+
                                               '<td>'+
                                                   '<div class="form-line">'+
-                                                      '<input type="text" class="form-control inputnexttabem" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" required onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                                      '<input type="text" class="form-control inputnextdet" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" required onkeyup="tipoLetra(this)" autocomplete="off">'+
                                                       '<input type="hidden" class="form-control" name="claveregimenfiscalanterior" id="claveregimenfiscalanterior" value="'+claveregimenfiscal+'" required>'+
                                                       '<input type="hidden" class="form-control" name="regimenfiscal" id="regimenfiscal" value="'+regimenfiscal+'" required readonly>'+
                                                   '</div>'+
@@ -2129,7 +2182,7 @@ function alta(){
                                               '</td>'+
                                               '<td>'+
                                                   '<div class="form-line">'+
-                                                      '<input type="text" class="form-control inputnexttabem" name="clavetiporelacion" id="clavetiporelacion" onkeyup="tipoLetra(this)" required autocomplete="off">'+
+                                                      '<input type="text" class="form-control inputnextdet" name="clavetiporelacion" id="clavetiporelacion" onkeyup="tipoLetra(this)" required autocomplete="off">'+
                                                       '<input type="hidden" class="form-control" name="clavetiporelacionanterior" id="clavetiporelacionanterior" onkeyup="tipoLetra(this)">'+
                                                       '<input type="hidden" class="form-control" name="tiporelacion" id="tiporelacion" readonly>'+
                                                   '</div>'+
@@ -2143,11 +2196,11 @@ function alta(){
                                 '<div class="row">'+
                                     '<div class="col-md-3">'+
                                         '<label>R.F.C.</label>'+
-                                        '<input type="text" class="form-control inputnexttabre" name="receptorrfc" id="receptorrfc"   required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                        '<input type="text" class="form-control inputnextdet" name="receptorrfc" id="receptorrfc"   required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Nombre</label>'+
-                                        '<input type="text" class="form-control inputnexttabre" name="receptornombre" id="receptornombre"  required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnextdet" name="receptornombre" id="receptornombre"  required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Forma de Pago  <span class="label label-danger" id="textonombreformapago"></span></label>'+
@@ -2158,7 +2211,7 @@ function alta(){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control inputnexttabre" name="claveformapago" id="claveformapago" required onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                                        '<input type="text" class="form-control inputnextdet" name="claveformapago" id="claveformapago" required onkeyup="tipoLetra(this)" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="claveformapagoanterior" id="claveformapagoanterior" required readonly onkeyup="tipoLetra(this)">'+
                                                         '<input type="hidden" class="form-control" name="formapago" id="formapago" required readonly>'+
                                                     '</div>'+
@@ -2175,7 +2228,7 @@ function alta(){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control inputnexttabre" name="clavemetodopago" id="clavemetodopago" required onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                                        '<input type="text" class="form-control inputnextdet" name="clavemetodopago" id="clavemetodopago" required onkeyup="tipoLetra(this)" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="clavemetodopagoanterior" id="clavemetodopagoanterior" required readonly onkeyup="tipoLetra(this)">'+
                                                         '<input type="hidden" class="form-control" name="metodopago" id="metodopago" required readonly>'+
                                                     '</div>'+
@@ -2185,7 +2238,7 @@ function alta(){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Condiciones de Pago</label>'+
-                                        '<input type="text" class="form-control inputnexttabre" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                                        '<input type="text" class="form-control inputnextdet" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Uso CFDI <span class="label label-danger" id="textonombreusocfdi"></span></label>'+
@@ -2196,7 +2249,7 @@ function alta(){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control inputnexttabre" name="claveusocfdi" id="claveusocfdi" required onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                                        '<input type="text" class="form-control inputnextdet" name="claveusocfdi" id="claveusocfdi" required onkeyup="tipoLetra(this)" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="claveusocfdianterior" id="claveusocfdianterior" required readonly onkeyup="tipoLetra(this)">'+
                                                         '<input type="hidden" class="form-control" name="usocfdi" id="usocfdi" required readonly>'+
                                                     '</div>'+
@@ -2213,7 +2266,7 @@ function alta(){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control inputnexttabre" name="claveresidenciafiscal" id="claveresidenciafiscal" required onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                                        '<input type="text" class="form-control inputnextdet" name="claveresidenciafiscal" id="claveresidenciafiscal" required onkeyup="tipoLetra(this)" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="claveresidenciafiscalanterior" id="claveresidenciafiscalanterior" required readonly onkeyup="tipoLetra(this)">'+
                                                         '<input type="hidden" class="form-control" name="residenciafiscal" id="residenciafiscal" required readonly>'+
                                                     '</div>'+
@@ -2223,7 +2276,7 @@ function alta(){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Num Reg Id Trib</label>'+
-                                        '<input type="text" class="form-control inputnexttabre" name="numeroregidtrib" id="numeroregidtrib"  data-parsley-length="[1, 40]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                                        '<input type="text" class="form-control inputnextdet" name="numeroregidtrib" id="numeroregidtrib"  data-parsley-length="[1, 40]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                                     '</div>'+
                                 '</div>'+
                                 '</div>'+
@@ -2249,7 +2302,7 @@ function alta(){
                                             '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
                                                   '<th class="'+background_tables+'">#</th>'+
-                                                  '<th class="customercolortheadth"><div style="width:100px !important;">Código</div></th>'+
+                                                  '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
                                                   '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
                                                   '<th class="customercolortheadth">Uda</th>'+
                                                   '<th class="customercolortheadth">Cantidad</th>'+
@@ -2270,7 +2323,7 @@ function alta(){
                                                   '<th class="customercolortheadth" hidden>Retención Ieps %</th>'+
                                                   '<th class="'+background_tables+'" hidden>Retención Ieps $</th>'+
                                                   '<th class="'+background_tables+'">Total $</th>'+
-                                                  '<th class="customercolortheadth">Partida</th>'+
+                                                  '<th class="'+background_tables+'">Partida</th>'+
                                                   '<th class="customercolortheadth">ClaveProducto</th>'+
                                                   '<th class="'+background_tables+'">Nombre ClaveProducto</th>'+
                                                   '<th class="customercolortheadth">ClaveUnidad</th>'+
@@ -2290,7 +2343,7 @@ function alta(){
                                         '<thead class="'+background_tables+'">'+
                                             '<tr>'+
                                             '<th class="'+background_tables+'">#</th>'+
-                                            '<th class="customercolortheadth">Factura</th>'+
+                                            '<th class="'+background_tables+'">Factura</th>'+
                                             '<th class="'+background_tables+'">Fecha</th>'+
                                             '<th class="'+background_tables+'">UUID</th>'+
                                             '<th class="'+background_tables+'">Total $</th>'+
@@ -2310,7 +2363,7 @@ function alta(){
                         '<div class="row">'+
                           '<div class="col-md-6">'+   
                               '<label>Observaciones</label>'+
-                              '<textarea class="form-control inputnextdet inputnextdetfac" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
+                              '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
                           '</div>'+ 
                           '<div class="col-md-3">'+
                               '<table class="table table-striped table-hover">'+
@@ -2492,48 +2545,20 @@ function alta(){
     regresarclaveresidenciafiscal();
   });
   //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-  $(".inputnext").keypress(function (e) {
+  $(".inputnextdet").keyup(function (e) {
     //recomentable para mayor compatibilidad entre navegadores.
     var code = (e.keyCode ? e.keyCode : e.which);
-    if(code==13){
-      var index = $(this).index(".inputnext");          
-      $(".inputnext").eq(index + 1).focus().select(); 
-    }
-  });
-  //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB EMISOR
-  $(".inputnexttabem").keypress(function (e) {
-    //recomentable para mayor compatibilidad entre navegadores.
-    var code = (e.keyCode ? e.keyCode : e.which);
-    if(code==13){
-      var index = $(this).index(".inputnexttabem");          
-      $(".inputnexttabem").eq(index + 1).focus().select(); 
-    }
-  });
-  //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB RECEPTOR
-  $(".inputnexttabre").keypress(function (e) {
-    //recomentable para mayor compatibilidad entre navegadores.
-    var code = (e.keyCode ? e.keyCode : e.which);
-    if(code==13){
-      var index = $(this).index(".inputnexttabre");          
-      $(".inputnexttabre").eq(index + 1).focus().select(); 
-    }
-  });
-  //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-  $(".inputnextdet").keypress(function (e) {
-    //recomentable para mayor compatibilidad entre navegadores.
-    var code = (e.keyCode ? e.keyCode : e.which);
-    if(code==13){
-      var index = $(this).index(".inputnextdet");          
-      $(".inputnextdet").eq(index + 1).focus().select(); 
-    }
-  });
-  //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-  $(".inputnextdetfac").keypress(function (e) {
-    //recomentable para mayor compatibilidad entre navegadores.
-    var code = (e.keyCode ? e.keyCode : e.which);
-    if(code==13){
-      var index = $(this).index(".inputnextdetfac");          
-      $(".inputnextdetfac").eq(index + 1).focus().select(); 
+    var index = $(this).index(".inputnextdet");          
+    switch(code){
+      case 13:
+        $(".inputnextdet").eq(index + 1).focus().select(); 
+        break;
+      case 39:
+        $(".inputnextdet").eq(index + 1).focus().select(); 
+        break;
+      case 37:
+        $(".inputnextdet").eq(index - 1).focus().select(); 
+        break;
     }
   });
   setTimeout(function(){$("#folio").focus();},500);
@@ -2868,7 +2893,7 @@ function obtenerdatos(notamodificar){
                                 '<div class="row">'+
                                     '<div class="col-md-3">'+
                                         '<label>Nota <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp;<b style="color:#F44336 !important;" id="esquematexto"> Esquema: '+esquema+'</b>  <div class="btn btn-xs bg-red waves-effect" id="btnobtenerfoliosnotas" onclick="obtenerfoliosnotas()">Cambiar</div></label>'+
-                                        '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                                         '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                                         '<input type="hidden" class="form-control" name="stringfacturasseleccionadas" id="stringfacturasseleccionadas" readonly required>'+
                                         '<input type="hidden" class="form-control" name="notaclientebd" id="notaclientebd" readonly>'+
@@ -2906,7 +2931,7 @@ function obtenerdatos(notamodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control inputnext" name="numeroalmacen" id="numeroalmacen" required readonly onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                                        '<input type="text" class="form-control inputnextdet" name="numeroalmacen" id="numeroalmacen" required readonly onkeyup="tipoLetra(this)" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior"  required data-parsley-type="integer">'+
                                                         '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
                                                     '</div>'+
@@ -2935,7 +2960,7 @@ function obtenerdatos(notamodificar){
                                           '</td>'+
                                           '<td>'+
                                             '<label>Pesos</label>'+
-                                            '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnext" name="pesosmoneda" id="pesosmoneda" value="1.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                            '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet" name="pesosmoneda" id="pesosmoneda" value="1.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                                           '</td>'+
                                         '</tr>'+
                                       '</table>'+
@@ -2953,7 +2978,7 @@ function obtenerdatos(notamodificar){
                                           '</td>'+
                                           '<td>'+ 
                                             '<div class="form-line">'+
-                                              '<input type="text" class="form-control inputnext" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" readonly autocomplete="off">'+
+                                              '<input type="text" class="form-control inputnextdet" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" readonly autocomplete="off">'+
                                             '</div>'+
                                           '</td>'+
                                         '</tr>'+    
@@ -2965,15 +2990,15 @@ function obtenerdatos(notamodificar){
                                 '<div class="row">'+
                                     '<div class="col-md-4">'+
                                         '<label>R.F.C.</label>'+
-                                        '<input type="text" class="form-control inputnexttabem" name="emisorrfc" id="emisorrfc" value="'+rfcempresa+'"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                        '<input type="text" class="form-control inputnextdet" name="emisorrfc" id="emisorrfc" value="'+rfcempresa+'"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                     '</div>'+
                                     '<div class="col-md-4">'+
                                         '<label>Emisor Nombre</label>'+
-                                        '<input type="text" class="form-control inputnexttabem" name="emisornombre" id="emisornombre" value="'+nombreempresa+'" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnextdet" name="emisornombre" id="emisornombre" value="'+nombreempresa+'" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                     '<div class="col-md-4">'+
                                         '<label>Confirmación</label>'+
-                                        '<input type="text" class="form-control inputnexttabem" name="confirmacion" id="confirmacion" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnextdet" name="confirmacion" id="confirmacion" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
@@ -2986,7 +3011,7 @@ function obtenerdatos(notamodificar){
                                               '</td>'+
                                               '<td>'+
                                                   '<div class="form-line">'+
-                                                      '<input type="text" class="form-control inputnexttabem" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" required autocomplete="off">'+
+                                                      '<input type="text" class="form-control inputnextdet" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" required autocomplete="off">'+
                                                       '<input type="hidden" class="form-control" name="lugarexpedicionanterior" id="lugarexpedicionanterior" value="'+lugarexpedicion+'" required>'+
                                                   '</div>'+
                                               '</td>'+
@@ -3002,7 +3027,7 @@ function obtenerdatos(notamodificar){
                                               '</td>'+
                                               '<td>'+
                                                   '<div class="form-line">'+
-                                                      '<input type="text" class="form-control inputnexttabem" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" required onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                                      '<input type="text" class="form-control inputnextdet" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" required onkeyup="tipoLetra(this)" autocomplete="off">'+
                                                       '<input type="hidden" class="form-control" name="claveregimenfiscalanterior" id="claveregimenfiscalanterior" value="'+claveregimenfiscal+'" required readonly onkeyup="tipoLetra(this)">'+
                                                       '<input type="hidden" class="form-control" name="regimenfiscal" id="regimenfiscal" value="'+regimenfiscal+'" required readonly>'+
                                                   '</div>'+
@@ -3019,7 +3044,7 @@ function obtenerdatos(notamodificar){
                                               '</td>'+
                                               '<td>'+
                                                   '<div class="form-line">'+
-                                                      '<input type="text" class="form-control inputnexttabem" name="clavetiporelacion" id="clavetiporelacion"  onkeyup="tipoLetra(this)" required autocomplete="off">'+
+                                                      '<input type="text" class="form-control inputnextdet" name="clavetiporelacion" id="clavetiporelacion"  onkeyup="tipoLetra(this)" required autocomplete="off">'+
                                                       '<input type="hidden" class="form-control" name="clavetiporelacionanterior" id="clavetiporelacionanterior"  readonly onkeyup="tipoLetra(this)">'+
                                                       '<input type="hidden" class="form-control" name="tiporelacion" id="tiporelacion" readonly>'+
                                                   '</div>'+
@@ -3033,11 +3058,11 @@ function obtenerdatos(notamodificar){
                                 '<div class="row">'+
                                     '<div class="col-md-3">'+
                                         '<label>R.F.C.</label>'+
-                                        '<input type="text" class="form-control inputnexttabre" name="receptorrfc" id="receptorrfc"   required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                        '<input type="text" class="form-control inputnextdet" name="receptorrfc" id="receptorrfc"   required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Nombre</label>'+
-                                        '<input type="text" class="form-control inputnexttabre" name="receptornombre" id="receptornombre"  required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnextdet" name="receptornombre" id="receptornombre"  required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Forma de Pago <span class="label label-danger" id="textonombreformapago"></span></label>'+
@@ -3048,7 +3073,7 @@ function obtenerdatos(notamodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control inputnexttabre" name="claveformapago" id="claveformapago" required onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                                        '<input type="text" class="form-control inputnextdet" name="claveformapago" id="claveformapago" required onkeyup="tipoLetra(this)" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="claveformapagoanterior" id="claveformapagoanterior" required readonly onkeyup="tipoLetra(this)">'+
                                                         '<input type="hidden" class="form-control" name="formapago" id="formapago" required readonly>'+
                                                     '</div>'+
@@ -3065,7 +3090,7 @@ function obtenerdatos(notamodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control inputnexttabre" name="clavemetodopago" id="clavemetodopago" required onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                                        '<input type="text" class="form-control inputnextdet" name="clavemetodopago" id="clavemetodopago" required onkeyup="tipoLetra(this)" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="clavemetodopagoanterior" id="clavemetodopagoanterior" required readonly onkeyup="tipoLetra(this)">'+
                                                         '<input type="hidden" class="form-control" name="metodopago" id="metodopago" required readonly>'+
                                                     '</div>'+
@@ -3075,7 +3100,7 @@ function obtenerdatos(notamodificar){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Condiciones de Pago</label>'+
-                                        '<input type="text" class="form-control inputnexttabre" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                                        '<input type="text" class="form-control inputnextdet" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Uso CFDI  <span class="label label-danger" id="textonombreusocfdi"></span></label>'+
@@ -3086,7 +3111,7 @@ function obtenerdatos(notamodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control inputnexttabre" name="claveusocfdi" id="claveusocfdi" required onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                                        '<input type="text" class="form-control inputnextdet" name="claveusocfdi" id="claveusocfdi" required onkeyup="tipoLetra(this)" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="claveusocfdianterior" id="claveusocfdianterior" required readonly onkeyup="tipoLetra(this)">'+
                                                         '<input type="hidden" class="form-control" name="usocfdi" id="usocfdi" required readonly>'+
                                                     '</div>'+
@@ -3103,7 +3128,7 @@ function obtenerdatos(notamodificar){
                                                 '</td>'+
                                                 '<td>'+
                                                     '<div class="form-line">'+
-                                                        '<input type="text" class="form-control inputnexttabre" name="claveresidenciafiscal" id="claveresidenciafiscal" required onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                                        '<input type="text" class="form-control inputnextdet" name="claveresidenciafiscal" id="claveresidenciafiscal" required onkeyup="tipoLetra(this)" autocomplete="off">'+
                                                         '<input type="hidden" class="form-control" name="claveresidenciafiscalanterior" id="claveresidenciafiscalanterior" required readonly onkeyup="tipoLetra(this)">'+
                                                         '<input type="hidden" class="form-control" name="residenciafiscal" id="residenciafiscal" required readonly>'+
                                                     '</div>'+
@@ -3113,7 +3138,7 @@ function obtenerdatos(notamodificar){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Num Reg Id Trib</label>'+
-                                        '<input type="text" class="form-control inputnexttabre" name="numeroregidtrib" id="numeroregidtrib" data-parsley-length="[1, 40]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                                        '<input type="text" class="form-control inputnextdet" name="numeroregidtrib" id="numeroregidtrib" data-parsley-length="[1, 40]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                                     '</div>'+
                                 '</div>'+
                                 '</div>'+
@@ -3139,7 +3164,7 @@ function obtenerdatos(notamodificar){
                                             '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
                                                   '<th class="'+background_tables+'">#</th>'+
-                                                  '<th class="customercolortheadth"><div style="width:100px !important;">Código</div></th>'+
+                                                  '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
                                                   '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
                                                   '<th class="customercolortheadth">Uda</th>'+
                                                   '<th class="customercolortheadth">Cantidad</th>'+
@@ -3160,7 +3185,7 @@ function obtenerdatos(notamodificar){
                                                   '<th class="customercolortheadth" hidden>Retención Ieps %</th>'+
                                                   '<th class="'+background_tables+'" hidden>Retención Ieps $</th>'+
                                                   '<th class="'+background_tables+'">Total $</th>'+
-                                                  '<th class="customercolortheadth">Partida</th>'+
+                                                  '<th class="'+background_tables+'">Partida</th>'+
                                                   '<th class="customercolortheadth">ClaveProducto</th>'+
                                                   '<th class="'+background_tables+'">Nombre ClaveProducto</th>'+
                                                   '<th class="customercolortheadth">ClaveUnidad</th>'+
@@ -3180,7 +3205,7 @@ function obtenerdatos(notamodificar){
                                         '<thead class="'+background_tables+'">'+
                                             '<tr>'+
                                             '<th class="'+background_tables+'">#</th>'+
-                                            '<th class="customercolortheadth">Factura</th>'+
+                                            '<th class="'+background_tables+'">Factura</th>'+
                                             '<th class="'+background_tables+'">Fecha</th>'+
                                             '<th class="'+background_tables+'">UUID</th>'+
                                             '<th class="'+background_tables+'">Total $</th>'+
@@ -3200,7 +3225,7 @@ function obtenerdatos(notamodificar){
                         '<div class="row">'+
                           '<div class="col-md-6">'+   
                               '<label>Observaciones</label>'+
-                              '<textarea class="form-control inputnextdet inputnextdetfac" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
+                              '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
                           '</div>'+ 
                           '<div class="col-md-3">'+
                               '<table class="table table-striped table-hover">'+
@@ -3471,48 +3496,20 @@ function obtenerdatos(notamodificar){
       regresarclaveresidenciafiscal();
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnext").keypress(function (e) {
+    $(".inputnextdet").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var index = $(this).index(".inputnext");          
-        $(".inputnext").eq(index + 1).focus().select(); 
-      }
-    });
-    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB EMISOR
-    $(".inputnexttabem").keypress(function (e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var index = $(this).index(".inputnexttabem");          
-        $(".inputnexttabem").eq(index + 1).focus().select(); 
-      }
-    });
-    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB RECEPTOR
-    $(".inputnexttabre").keypress(function (e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var index = $(this).index(".inputnexttabre");          
-        $(".inputnexttabre").eq(index + 1).focus().select(); 
-      }
-    });
-    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnextdet").keypress(function (e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var index = $(this).index(".inputnextdet");          
-        $(".inputnextdet").eq(index + 1).focus().select(); 
-      }
-    });
-    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnextdetfac").keypress(function (e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var index = $(this).index(".inputnextdetfac");          
-        $(".inputnextdetfac").eq(index + 1).focus().select(); 
+      var index = $(this).index(".inputnextdet");          
+      switch(code){
+        case 13:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 39:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 37:
+          $(".inputnextdet").eq(index - 1).focus().select(); 
+          break;
       }
     });
     setTimeout(function(){$("#folio").focus();},500);
@@ -3881,6 +3878,7 @@ function buscarstringlike(){
       $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
   });
   var tablafolenc=$('#tablafoliosencontrados').DataTable({
+        keys: true,
         "pageLength": 100,
         'sDom': 't',
         "sScrollX": "100%",

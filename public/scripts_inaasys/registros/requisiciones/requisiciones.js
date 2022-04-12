@@ -101,6 +101,7 @@ function listar(){
     // armar columas para datatable se arma desde funcionesglobales.js
     var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
     tabla=$('#tbllistado').DataTable({
+        keys: true,
         "lengthMenu": [ 100, 250, 500, 1000 ],
         "pageLength": 100,
         "sScrollX": "110%",
@@ -203,12 +204,20 @@ $("#btnenviarpartidasexcel").on('click', function(e){
       calculartotal();
       $("#codigoabuscar").val("");
       //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-      $(".inputnextdet").keypress(function (e) {
+      $(".inputnextdet").keyup(function (e) {
         //recomentable para mayor compatibilidad entre navegadores.
         var code = (e.keyCode ? e.keyCode : e.which);
-        if(code==13){
-          var index = $(this).index(".inputnextdet");          
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+        var index = $(this).index(".inputnextdet");          
+        switch(code){
+          case 13:
+            $(".inputnextdet").eq(index + 1).focus().select(); 
+            break;
+          case 39:
+            $(".inputnextdet").eq(index + 1).focus().select(); 
+            break;
+          case 37:
+            $(".inputnextdet").eq(index - 1).focus().select(); 
+            break;
         }
       });
     },
@@ -248,6 +257,7 @@ function obtenerseriesdocumento(){
                             '</div>';  
     $("#contenidomodaltablas").html(tablaseriesdocumento);
     var tserdoc = $('#tbllistadoseriedocumento').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -270,6 +280,7 @@ function obtenerseriesdocumento(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -324,6 +335,7 @@ function obtenerordenestrabajo(){
                           '</div>';
     $("#contenidomodaltablas").html(tablaordenes);
     var tots = $('#tbllistadorden').DataTable({
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -348,6 +360,7 @@ function obtenerordenestrabajo(){
         ],
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
             $buscar.unbind();
             $buscar.bind('keyup change', function(e) {
                 if(e.keyCode == 13 || this.value == "") {
@@ -459,6 +472,7 @@ function listarproductos(){
                           '</div>';   
     $("#contenidomodaltablas").html(tablaproductos);
     var tprod = $('#tbllistadoproducto').DataTable({
+      keys: true,
       "lengthMenu": [ 10, 50, 100, 250, 500 ],
       "pageLength": 250,
       "sScrollX": "110%",
@@ -490,6 +504,7 @@ function listarproductos(){
       ],
       "initComplete": function() {
         var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
         $buscar.unbind();
         $buscar.bind('keyup change', function(e) {
           if(e.keyCode == 13 || this.value == "") {
@@ -686,18 +701,18 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.'+numerocerosconfiguradosinputnumberstep+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');cambiodecantidadopreciopartida('+contadorfilas+',\''+tipo +'\');"></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'+number_format(round(preciopartida, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');cambiodecantidadopreciopartida('+contadorfilas+',\''+tipo +'\');"></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'+number_format(round(preciopartida, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('+contadorfilas+');"></td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentoporcentajepartida('+contadorfilas+');"></td>'+
+                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('+contadorfilas+');"></td>'+
+                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentoporcentajepartida('+contadorfilas+');"></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'+number_format(round(preciopartida, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'+Impuesto+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');"></td>'+
+                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'+Impuesto+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');"></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm ivapesospartida" name="ivapesospartida[]" value="'+number_format(round(ivapesos, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'+number_format(round(total, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'+Costo+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="'+Costo+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm comisionporcentajepartida" name="comisionporcentajepartida[]" value="'+number_format(round(comisionporcentaje, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                          '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm comisionporcentajepartida" name="comisionporcentajepartida[]" value="'+number_format(round(comisionporcentaje, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm comisionpesospartida" name="comisionpesospartida[]" value="'+number_format(round(comisionespesos, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'+number_format(round(utilidad, numerodecimales), numerodecimales, '.', '')+'" data-parsley-utilidad="0.'+numerocerosconfiguradosinputnumberstep+'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                          '<td class="tdmod"><input type="text" class="form-control divorinputmodxl observacionespartida" name="observacionespartida[]" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
+                          '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl observacionespartida" name="observacionespartida[]" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
                           '<td class="tdmod"><input type="text" class="form-control divorinputmodsm monedapartida" name="monedapartida[]" value="MXN" readonly data-parsley-length="[1, 3]"></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costodelistapartida" name="costodelistapartida[]" value="'+number_format(round(CostoDeLista, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
                           '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm tipodecambiopartida" name="tipodecambiopartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
@@ -710,12 +725,20 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
         calculartotal();
         $("#codigoabuscar").val("");
         //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-        $(".inputnextdet").keypress(function (e) {
+        $(".inputnextdet").keyup(function (e) {
           //recomentable para mayor compatibilidad entre navegadores.
           var code = (e.keyCode ? e.keyCode : e.which);
-          if(code==13){
-            var index = $(this).index(".inputnextdet");          
-            $(".inputnextdet").eq(index + 1).focus().select(); 
+          var index = $(this).index(".inputnextdet");          
+          switch(code){
+            case 13:
+              $(".inputnextdet").eq(index + 1).focus().select(); 
+              break;
+            case 39:
+              $(".inputnextdet").eq(index + 1).focus().select(); 
+              break;
+            case 37:
+              $(".inputnextdet").eq(index - 1).focus().select(); 
+              break;
           }
         });
         $('.page-loader-wrapper').css('display', 'none');
@@ -781,7 +804,7 @@ function alta(){
                 '<div class="row">'+
                   '<div class="col-md-3">'+
                     '<label>Traspaso <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
-                    '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                    '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                     '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                     '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
                     '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
@@ -802,7 +825,7 @@ function alta(){
                         '</td>'+
                         '<td>'+
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control inputnext" name="orden" id="orden" onkeyup="tipoLetra(this);" autocomplete="off" >'+
+                            '<input type="text" class="form-control inputnextdet" name="orden" id="orden" onkeyup="tipoLetra(this);" autocomplete="off" >'+
                             '<input type="hidden" class="form-control" name="ordenanterior" id="ordenanterior" >'+
                             '<input type="hidden" class="form-control" name="fechaorden" id="fechaorden"  readonly>'+
                             '<input type="hidden" class="form-control" name="tipo" id="tipo"  readonly>'+
@@ -814,11 +837,11 @@ function alta(){
                   '</div>'+
                   '<div class="col-md-2">'+
                     '<label>Status Orden</label>'+
-                    '<input type="text" class="form-control inputnext" name="statusorden" id="statusorden"  required readonly onkeyup="tipoLetra(this);" autocomplete="off">'+
+                    '<input type="text" class="form-control inputnextdet" name="statusorden" id="statusorden"  required readonly onkeyup="tipoLetra(this);" autocomplete="off">'+
                   '</div>'+
                   '<div class="col-md-2">'+
                     '<label>Cliente </label>'+
-                    '<input type="text" class="form-control inputnext" name="clienteorden" id="clienteorden"  required readonly onkeyup="tipoLetra(this);" autocomplete="off">'+
+                    '<input type="text" class="form-control inputnextdet" name="clienteorden" id="clienteorden"  required readonly onkeyup="tipoLetra(this);" autocomplete="off">'+
                   '</div>'+ 
                   '<div class="col-md-4" id="divbuscarcodigoproducto" hidden>'+
                     '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
@@ -829,7 +852,7 @@ function alta(){
                         '</td>'+
                         '<td>'+ 
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control inputnext" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                            '<input type="text" class="form-control inputnextdet" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
                           '</div>'+
                         '</td>'+
                       '</tr>'+    
@@ -852,7 +875,7 @@ function alta(){
                             '<tr>'+
                               '<th class="'+background_tables+'">#</th>'+
                               '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
-                              '<th class="'+background_tables+'"><div style="width:200px !important;">Descripción</div></th>'+
+                              '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
                               '<th class="'+background_tables+'">Unidad</th>'+
                               '<th class="'+background_tables+'">Por Surtir</th>'+
                               '<th class="customercolortheadth">Cantidad</th>'+
@@ -867,7 +890,7 @@ function alta(){
                               '<th class="'+background_tables+'">Costo $</th>'+
                               '<th class="'+background_tables+'">Costo Total $</th>'+
                               '<th class="customercolortheadth">Comisión %</th>'+
-                              '<th class="customercolortheadth">Comisión $</th>'+
+                              '<th class="'+background_tables+'">Comisión $</th>'+
                               '<th class="bg-amber">Utilidad $</th>'+
                               '<th class="customercolortheadth"><div style="width:200px !important;">Obs</div></th>'+
                               '<th class="'+background_tables+'">Moneda</th>'+
@@ -982,21 +1005,20 @@ function alta(){
     regresarfolioorden();
   });
   //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-  $(".inputnext").keypress(function (e) {
+  $(".inputnextdet").keyup(function (e) {
     //recomentable para mayor compatibilidad entre navegadores.
     var code = (e.keyCode ? e.keyCode : e.which);
-    if(code==13){
-      var index = $(this).index(".inputnext");          
-      $(".inputnext").eq(index + 1).focus().select(); 
-    }
-  });
-  //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-  $(".inputnextdet").keypress(function (e) {
-    //recomentable para mayor compatibilidad entre navegadores.
-    var code = (e.keyCode ? e.keyCode : e.which);
-    if(code==13){
-      var index = $(this).index(".inputnextdet");          
-      $(".inputnextdet").eq(index + 1).focus().select(); 
+    var index = $(this).index(".inputnextdet");          
+    switch(code){
+      case 13:
+        $(".inputnextdet").eq(index + 1).focus().select(); 
+        break;
+      case 39:
+        $(".inputnextdet").eq(index + 1).focus().select(); 
+        break;
+      case 37:
+        $(".inputnextdet").eq(index - 1).focus().select(); 
+        break;
     }
   });
   setTimeout(function(){$("#folio").focus();},500);
@@ -1126,7 +1148,7 @@ function obtenerdatos(requisicionmodificar){
                 '<div class="row">'+
                   '<div class="col-md-3">'+
                     '<label>Traspaso <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
-                    '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                    '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                     '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                     '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
                     '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
@@ -1147,7 +1169,7 @@ function obtenerdatos(requisicionmodificar){
                         '</td>'+
                         '<td>'+
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control inputnext" name="orden" id="orden" onkeyup="tipoLetra(this);" autocomplete="off" >'+
+                            '<input type="text" class="form-control inputnextdet" name="orden" id="orden" onkeyup="tipoLetra(this);" autocomplete="off" >'+
                             '<input type="hidden" class="form-control" name="ordenanterior" id="ordenanterior" >'+
                             '<input type="hidden" class="form-control" name="fechaorden" id="fechaorden"  readonly>'+
                             '<input type="hidden" class="form-control" name="tipo" id="tipo"  readonly>'+
@@ -1159,11 +1181,11 @@ function obtenerdatos(requisicionmodificar){
                   '</div>'+
                   '<div class="col-md-2">'+
                     '<label>Status Orden</label>'+
-                    '<input type="text" class="form-control inputnext" name="statusorden" id="statusorden"  required readonly onkeyup="tipoLetra(this);" autocomplete="off">'+
+                    '<input type="text" class="form-control inputnextdet" name="statusorden" id="statusorden"  required readonly onkeyup="tipoLetra(this);" autocomplete="off">'+
                   '</div>'+
                   '<div class="col-md-2">'+
                     '<label>Cliente </label>'+
-                    '<input type="text" class="form-control inputnext" name="clienteorden" id="clienteorden"  required readonly onkeyup="tipoLetra(this);" autocomplete="off">'+
+                    '<input type="text" class="form-control inputnextdet" name="clienteorden" id="clienteorden"  required readonly onkeyup="tipoLetra(this);" autocomplete="off">'+
                   '</div>'+ 
                   '<div class="col-md-4" id="divbuscarcodigoproducto" hidden>'+
                     '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
@@ -1174,7 +1196,7 @@ function obtenerdatos(requisicionmodificar){
                         '</td>'+
                         '<td>'+ 
                           '<div class="form-line">'+
-                            '<input type="text" class="form-control inputnext" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                            '<input type="text" class="form-control inputnextdet" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
                           '</div>'+
                         '</td>'+
                       '</tr>'+    
@@ -1197,7 +1219,7 @@ function obtenerdatos(requisicionmodificar){
                             '<tr>'+
                               '<th class="'+background_tables+'">#</th>'+
                               '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
-                              '<th class="'+background_tables+'"><div style="width:200px !important;">Descripción</div></th>'+
+                              '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
                               '<th class="'+background_tables+'">Unidad</th>'+
                               '<th class="'+background_tables+'">Por Surtir</th>'+
                               '<th class="customercolortheadth">Cantidad</th>'+
@@ -1212,7 +1234,7 @@ function obtenerdatos(requisicionmodificar){
                               '<th class="'+background_tables+'">Costo $</th>'+
                               '<th class="'+background_tables+'">Costo Total $</th>'+
                               '<th class="customercolortheadth">Comisión %</th>'+
-                              '<th class="customercolortheadth">Comisión $</th>'+
+                              '<th class="'+background_tables+'">Comisión $</th>'+
                               '<th class="bg-amber">Utilidad $</th>'+
                               '<th class="customercolortheadth"><div style="width:200px !important;">Obs</div></th>'+
                               '<th class="'+background_tables+'">Moneda</th>'+
@@ -1322,21 +1344,20 @@ function obtenerdatos(requisicionmodificar){
       regresarfolioorden();
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnext").keypress(function (e) {
+    $(".inputnextdet").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var index = $(this).index(".inputnext");          
-        $(".inputnext").eq(index + 1).focus().select(); 
-      }
-    });
-    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnextdet").keypress(function (e) {
-      //recomentable para mayor compatibilidad entre navegadores.
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var index = $(this).index(".inputnextdet");          
-        $(".inputnextdet").eq(index + 1).focus().select(); 
+      var index = $(this).index(".inputnextdet");          
+      switch(code){
+        case 13:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 39:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 37:
+          $(".inputnextdet").eq(index - 1).focus().select(); 
+          break;
       }
     });
     setTimeout(function(){$("#folio").focus();},500);
@@ -1473,6 +1494,7 @@ function buscarstringlike(){
     $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
   });
   var tablafolenc=$('#tablafoliosencontrados').DataTable({
+      keys: true,
       "pageLength": 100,
       'sDom': 't',
       "sScrollX": "100%",

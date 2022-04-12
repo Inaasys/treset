@@ -66,6 +66,7 @@ function listar(){
   // armar columas para datatable se arma desde funcionesglobales.js
   var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
     tabla=$('#tbllistado').DataTable({
+      keys: true,
       "lengthMenu": [ 100, 250, 500, 1000 ],
       "pageLength": 1000,
         "sScrollX": "110%",
@@ -134,6 +135,7 @@ function listarcodigospostales(){
                               '</div>';
     $("#contenidomodaltablas").html(tablacodigospostales);
     var tcp = $('#tbllistadocodigopostal').DataTable({
+        keys: true,
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "300px",
@@ -153,6 +155,7 @@ function listarcodigospostales(){
         ],
         "initComplete": function() {
           var $buscar = $('div.dataTables_filter input');
+          $buscar.focus();
           $buscar.unbind();
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {
@@ -251,15 +254,23 @@ function alta(){
   //inicializar los select con la libreria select2
   obtenultimonumero();
   setTimeout(function(){$("#nombre").focus();},500);
-    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnext").keypress(function (e) {
-        //recomentable para mayor compatibilidad entre navegadores.
-        var code = (e.keyCode ? e.keyCode : e.which);
-        if(code==13){
-        var index = $(this).index(".inputnext");          
-            $(".inputnext").eq(index + 1).focus().select(); 
-        }
-    });
+  //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+  $(".inputnext").keyup(function (e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    var index = $(this).index(".inputnext");          
+    switch(code){
+      case 13:
+        $(".inputnext").eq(index + 1).focus().select(); 
+        break;
+      case 39:
+        $(".inputnext").eq(index + 1).focus().select(); 
+        break;
+      case 37:
+        $(".inputnext").eq(index - 1).focus().select(); 
+        break;
+    }
+  });
 }
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
@@ -423,13 +434,21 @@ function obtenerdatos(numeroproveedor){
     $('.page-loader-wrapper').css('display', 'none');
     setTimeout(function(){$("#nombre").focus();},500);
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnext").keypress(function (e) {
-        //recomentable para mayor compatibilidad entre navegadores.
-        var code = (e.keyCode ? e.keyCode : e.which);
-        if(code==13){
-        var index = $(this).index(".inputnext");          
-            $(".inputnext").eq(index + 1).focus().select(); 
-        }
+    $(".inputnext").keyup(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      var index = $(this).index(".inputnext");          
+      switch(code){
+        case 13:
+          $(".inputnext").eq(index + 1).focus().select(); 
+          break;
+        case 39:
+          $(".inputnext").eq(index + 1).focus().select(); 
+          break;
+        case 37:
+          $(".inputnext").eq(index - 1).focus().select(); 
+          break;
+      }
     });
   }).fail( function() {
     msj_errorajax();

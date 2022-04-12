@@ -146,7 +146,7 @@ class ContraRecibosController extends ConfiguracionSistemaController{
                             '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm totalcompra" name="totalcompra[]" value="'.Helpers::convertirvalorcorrecto($c->Total).'" readonly>'.Helpers::convertirvalorcorrecto($c->Total).'</td>'.
                             '<td class="tdmod text-center">'.
                                 '<input type="checkbox" name="contrarecibocompra[]" id="idcontrarecibocompra'.$contadorfilas.'" class="contrarecibocompra filled-in" value="0" onchange="calculartotalcontrarecibo(\''.$tipo .'\');" required>'.
-                                '<label for="idcontrarecibocompra'.$contadorfilas.'" class="inputnext"></label>'.
+                                '<label for="idcontrarecibocompra'.$contadorfilas.'"></label>'.
                             '</td>'.
                         '</tr>';
                         $contadorfilas++;
@@ -192,7 +192,7 @@ class ContraRecibosController extends ConfiguracionSistemaController{
                                 '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm totalcompra" name="totalcompra[]" value="'.Helpers::convertirvalorcorrecto($c->Total).'" readonly>'.Helpers::convertirvalorcorrecto($c->Total).'</td>'.
                                 '<td class="tdmod text-center">'.
                                     '<input type="checkbox" name="contrarecibocompra[]" id="idcontrarecibocompra'.$contadorfilas.'" class="contrarecibocompra filled-in" value="0" onchange="calculartotalcontrarecibo(\''.$tipo .'\');" required>'.
-                                    '<label for="idcontrarecibocompra'.$contadorfilas.'" class="inputnext"></label>'.
+                                    '<label for="idcontrarecibocompra'.$contadorfilas.'"></label>'.
                                 '</td>'.
                             '</tr>';
                             $contadorfilas++;
@@ -458,7 +458,11 @@ class ContraRecibosController extends ConfiguracionSistemaController{
         }else{
             $fechainiciopdf = date($request->fechainiciopdf);
             $fechaterminacionpdf = date($request->fechaterminacionpdf);
-            $contrarecibos = ContraRecibo::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
+            if ($request->has("seriesdisponiblesdocumento")){
+                $contrarecibos = ContraRecibo::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->whereIn('Serie', $request->seriesdisponiblesdocumento)->orderBy('Folio', 'ASC')->take(1500)->get();
+            }else{
+                $contrarecibos = ContraRecibo::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
+            }
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $arrayfilespdf = array();

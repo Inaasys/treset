@@ -36,6 +36,7 @@ use App\c_RegimenFiscal;
 use App\c_TipoRelacion;
 use App\FolioComprobantePago;
 use App\Comprobante;
+use App\User_Rel_Serie;
 use Config;
 use Mail;
 use Facturapi\Facturapi;
@@ -53,15 +54,47 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
     }
 
     public function cuentas_por_cobrar(){
-        $contarserieusuario = FolioComprobantePago::where('Predeterminar', '+')->count();
-        if($contarserieusuario == 0){
-            $FolioComprobantePago = FolioComprobantePago::orderBy('Numero','DESC')->take(1)->get();
-            $serieusuario = $FolioComprobantePago[0]->Serie;
-            $esquema = $FolioComprobantePago[0]->Esquema;
+        $contarseriesasignadasausuario = User_Rel_Serie::where('user_id', Auth::user()->id)->where('documento_serie', 'PAGOS')->count();
+        if($contarseriesasignadasausuario > 0){
+            $contarserieusuario = DB::table('user_rel_series as urs')
+            ->join('Folios Comprobantes Pagos as fcf', 'urs.serie_id', '=', 'fcf.Numero')
+            ->select('urs.id', 'fcf.Numero', 'fcf.Serie', 'fcf.Esquema', 'fcf.Predeterminar')
+            ->where('fcf.Predeterminar', '+')
+            ->where('urs.user_id', Auth::user()->id)
+            ->where('urs.documento_serie', 'PAGOS')
+            ->count();
+            if($contarserieusuario == 0){
+                $FolioComprobanteFactura = DB::table('user_rel_series as urs')
+                ->join('Folios Comprobantes Pagos as fcf', 'urs.serie_id', '=', 'fcf.Numero')
+                ->select('urs.id', 'fcf.Numero', 'fcf.Serie', 'fcf.Esquema', 'fcf.Predeterminar')
+                ->where('urs.user_id', Auth::user()->id)
+                ->where('urs.documento_serie', 'PAGOS')
+                ->orderBy('fcf.Numero', 'DESC')
+                ->take(1)->get();
+                $serieusuario = $FolioComprobanteFactura[0]->Serie;
+                $esquema = $FolioComprobanteFactura[0]->Esquema;
+            }else{
+                $FolioComprobanteFactura = DB::table('user_rel_series as urs')
+                ->join('Folios Comprobantes Pagos as fcf', 'urs.serie_id', '=', 'fcf.Numero')
+                ->select('urs.id', 'fcf.Numero', 'fcf.Serie', 'fcf.Esquema', 'fcf.Predeterminar')
+                ->where('fcf.Predeterminar', '+')
+                ->where('urs.user_id', Auth::user()->id)
+                ->where('urs.documento_serie', 'PAGOS')
+                ->first();
+                $serieusuario = $FolioComprobanteFactura->Serie;
+                $esquema = $FolioComprobanteFactura->Esquema;
+            }
         }else{
-            $FolioComprobantePago = FolioComprobantePago::where('Predeterminar', '+')->first();
-            $serieusuario = $FolioComprobantePago->Serie;
-            $esquema = $FolioComprobantePago->Esquema;
+            $contarserieusuario = FolioComprobantePago::where('Predeterminar', '+')->count();
+            if($contarserieusuario == 0){
+                $FolioComprobantePago = FolioComprobantePago::orderBy('Numero','DESC')->take(1)->get();
+                $serieusuario = $FolioComprobantePago[0]->Serie;
+                $esquema = $FolioComprobantePago[0]->Esquema;
+            }else{
+                $FolioComprobantePago = FolioComprobantePago::where('Predeterminar', '+')->first();
+                $serieusuario = $FolioComprobantePago->Serie;
+                $esquema = $FolioComprobantePago->Esquema;
+            }
         }
         $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('CuentasPorCobrar', Auth::user()->id);
         $configuracion_tabla = $configuraciones_tabla['configuracion_tabla'];
@@ -572,8 +605,20 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
     //obtener folios notas
     public function cuentas_por_cobrar_obtener_folios_fiscales(Request $request){
         if($request->ajax()){
-            $data = FolioComprobantePago::where('Status', 'ALTA')->OrderBy('Numero', 'DESC')->get();
-            return DataTables::of($data)
+            $contarseriesasignadasausuario = User_Rel_Serie::where('user_id', Auth::user()->id)->where('documento_serie', 'PAGOS')->count();
+            if($contarseriesasignadasausuario > 0){
+                $data = DB::table('user_rel_series as urs')
+                ->join('Folios Comprobantes Pagos as fcf', 'urs.serie_id', '=', 'fcf.Numero')
+                ->select('urs.id', 'fcf.Numero', 'fcf.Serie', 'fcf.Esquema', 'fcf.Status')
+                ->where('fcf.Status', 'ALTA')
+                ->where('urs.user_id', Auth::user()->id)
+                ->where('urs.documento_serie', 'PAGOS')
+                ->orderby('fcf.Numero', 'DESC')
+                ->get();
+            }else{
+                $data = FolioComprobantePago::where('Status', 'ALTA')->OrderBy('Numero', 'DESC')->get();
+            }
+                return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarfoliofiscal(\''.$data->Serie.'\',\''.$data->Esquema.'\')">Seleccionar</div>';
                         return $boton;
@@ -901,7 +946,11 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             }else{
                 $fechainiciopdf = date($request->fechainiciopdf);
                 $fechaterminacionpdf = date($request->fechaterminacionpdf);
-                $cuentasporcobrar = CuentaXCobrar::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(150)->get();
+                if ($request->has("seriesdisponiblesdocumento")){
+                    $cuentasporcobrar = CuentaXCobrar::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->whereIn('Serie', $request->seriesdisponiblesdocumento)->orderBy('Folio', 'ASC')->take(150)->get();
+                }else{
+                    $cuentasporcobrar = CuentaXCobrar::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(150)->get();
+                }
             }
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();

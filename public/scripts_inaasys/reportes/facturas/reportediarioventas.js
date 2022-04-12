@@ -84,6 +84,7 @@ $(document).ready(function() {
 //listar tabla reporte
 function listar(){
   tabla=$('#tbllistado').DataTable({
+    keys: true,
     "sScrollX": "110%",
     "sScrollY": "350px",
     "bScrollCollapse": true,  
@@ -134,6 +135,7 @@ function listar(){
     ],
     "initComplete": function() {
       var $buscar = $('div.dataTables_filter input');
+      $buscar.focus();
       $buscar.unbind();
       $buscar.bind('keyup change', function(e) {
           if(e.keyCode == 13 || this.value == "") {
@@ -185,6 +187,7 @@ function listarclientes(){
                       '</div>';   
   $("#contenidomodaltablas").html(tablaclientes);
   $('#tbllistadocliente').DataTable({
+      keys: true,
       "sScrollX": "110%",
       "sScrollY": "300px",
       "bScrollCollapse": true,  
@@ -209,6 +212,7 @@ function listarclientes(){
       ],
       "initComplete": function() {
           var $buscar = $('div.dataTables_filter input');
+          $buscar.focus();
           $buscar.unbind();
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {

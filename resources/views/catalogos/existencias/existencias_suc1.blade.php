@@ -70,6 +70,22 @@
                                         </tr>
                                     </tfoot>
                                 </table>
+                                @if($mostrartotalesdecolumnasendocumentos == 'S')
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped table-hover display nowrap" style="font-size:10px;">
+                                                <tr class="{{$empresa->background_forms_and_modals}}">
+                                                    <th> Sum Costo: <b id="sumacostofiltrado"></b></th>
+                                                    <th> Sum SubTotal: <b id="sumasubtotalfiltrado"></b></th>
+                                                    <th> Sum Iva: <b id="sumaivafiltrado"></b></th>
+                                                    <th> Sum Total: <b id="sumatotalfiltrado"></b></th>
+                                                    <th> Sum Total Costo Inventario: <b id="sumatotalcostoinventariofiltrado"></b></th>
+                                                    <th> Sum Costo Lista: <b id="sumacostolistafiltrado"></b></th>
+                                                    <th> Sum Costo Venta: <b id="sumacostoventafiltrado"></b></th>
+                                                    <th> Sum Existencias: <b id="sumaexistenciasfiltrado"></b></th>
+                                                </tr>   
+                                            </table>
+                                        </div>
+                                @endif 
                             </div>
                         </div>
                     </div>

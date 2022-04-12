@@ -193,8 +193,8 @@
               <ul class="dropdown-menu">
                 <li><a  href="{{route('reporte_diario_ventas')}}" id="menureportesfacturasventasdiarias">Ventas Diarias</a></li>
                 <li><a  href="{{route('reporte_facturas_ventas_cliente')}}" id="menureporterelacionfacturasventasclientes">Relación de Ventas por Clientes</a></li>
-                <!--<li><a  href="#" id="menureporterelacionfacturasventasagentes">Relación de Ventas por Agentes</a></li>
-                <li><a  href="#" id="menureporterelacionfacturasventasmarcas">Relación de Ventas por Marcas</a></li>   -->                                    
+                <!--<li><a  href="#" id="menureporterelacionfacturasventasagentes">Relación de Ventas por Agentes</a></li>--> 
+                <li><a  href="{{route('reporte_facturas_ventas_marca')}}" id="menureporterelacionfacturasventasmarcas">Relación de Ventas por Marcas</a></li>                                      
                 <li><a  href="{{route('reporte_antiguedad_saldos')}}" id="menureportefacturasantiguedadsaldos">Antiguedad de Saldos</a></li>                     
                 <li><a  href="{{route('reporte_relacion_timbres_utilizados')}}" id="menureporterelaciontimbresutilizados">Relación Timbres Utilizados</a></li>
                 <li><a  href="{{route('reporte_facturas_vencidas')}}" id="menureportefacturasvencidas">Facturas Vencidas</a></li>
@@ -287,7 +287,7 @@
               <li><a href="{{ route('sesiones') }}"><b>SESIONES</b></a></li>
             @endif
             <li><a href="{{ route('ayuda') }}">Ayuda</a></li>
-            <li class="bg-deep-orange">
+            <li class="{{$empresa->background_forms_and_modals}}">
               <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                 <b>CERRAR SESIÓN</b>
               </a>

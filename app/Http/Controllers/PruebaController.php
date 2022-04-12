@@ -71,6 +71,7 @@ class PruebaController extends ConfiguracionSistemaController{
 
 
         /*modificar en ordenes de trabajo detalles el status colocar el numero de factura */
+        /*
         $ordenes = OrdenTrabajo::orderby('Fecha', 'DESC')->get();
         foreach($ordenes as $o){
             $buscarordenenfactura = FacturaDetalle::where('Orden', $o->Orden)->count();
@@ -82,6 +83,7 @@ class PruebaController extends ConfiguracionSistemaController{
                 ]);
             }
         }
+        */
 
         
         /*
@@ -138,7 +140,7 @@ class PruebaController extends ConfiguracionSistemaController{
 
 
         /*OBTENER EXISTENCIAS CORRECTA POR PRODUCTOS SUMANDO Y RESTANDO SU KARDEX*/        
-        /*
+        
         $numerodecimalesconfigurados = config('app.numerodedecimales');
         $data = array();
         $productos = Producto::all();
@@ -149,6 +151,13 @@ class PruebaController extends ConfiguracionSistemaController{
             $entradas = 0;
             $salidas = 0;
             $existencias = 0;
+            $contarexistenciasentabla = Existencia::where('Codigo', $p->Codigo)->where('Almacen', 1)->count();
+            if($contarexistenciasentabla > 0){
+                $existenciasentabla = Existencia::where('Codigo', $p->Codigo)->where('Almacen', 1)->first();
+                $exisentabla = $existenciasentabla->Existencias;
+            }else{
+                $exisentabla = 0;
+            }
             foreach(array_reverse($kardex) as $k){
                 $entradas = $entradas + $k->Entradas;
                 $salidas = $salidas + $k->Salidas;
@@ -161,21 +170,29 @@ class PruebaController extends ConfiguracionSistemaController{
                 "entradas"=> Helpers::convertirvalorcorrecto($entradas),
                 "salidas" => Helpers::convertirvalorcorrecto($salidas),
                 "existencias"=> round($existencias, $numerodecimalesconfigurados),
+                "exisentabla" => $exisentabla
             );
         }
         $filasmovimientos = '';
         foreach($data as $d){
-            $filasmovimientos= $filasmovimientos.
-            '<tr>'.
-                    '<td><b>'.$d['codigo'].'</b></td>'.
-                    '<td>'.$d['almacen'].'</td>'.
-                    '<td>'.$d['entradas'].'</td>'.
-                    '<td>'.$d['salidas'].'</td>'.
-                    '<td>'.$d['existencias'].'</td>'.
-            '</tr>';
+            $colorfila = '';
+            if($d['existencias'] != $d['exisentabla']){
+                $colorfila = 'red';
+                
+                $filasmovimientos= $filasmovimientos.
+                '<tr style="background-color:'.$colorfila.'">'.
+                        '<td><b>'.$d['codigo'].'</b></td>'.
+                        '<td>'.$d['almacen'].'</td>'.
+                        '<td>'.$d['entradas'].'</td>'.
+                        '<td>'.$d['salidas'].'</td>'.
+                        '<td>'.$d['existencias'].'</td>'.
+                        '<td>'.$d['exisentabla'].'</td>'.
+                '</tr>';
+            }
         }
-        echo '<table border="2"><tr><td>Codigo</td><td>Almacen</td><td>Entradas</td><td>Salidas</td><td>Existencias</td></tr>'.$filasmovimientos.'</table>';
-        */
+        echo '<table border="2"><tr><td>Codigo</td><td>Almacen</td><td>Entradas</td><td>Salidas</td><td>Existencias</td><td>exisentabla</td></tr>'.$filasmovimientos.'</table>';
+        
+
         //return response()->json($data);
         /*FIN OBTENER EXISTENCIAS CORRECTA POR PRODUCTOS SUMANDO Y RESTANDO SU KARDEX*/        
 
@@ -1131,6 +1148,20 @@ class PruebaController extends ConfiguracionSistemaController{
             'campos_activados'=>'Codigo,ClaveProducto,ClaveUnidad,Producto,Unidad,Ubicacion,Costo,CostoDeLista,Moneda,CostoDeVenta,Utilidad,SubTotal,Iva,Total,Marca,Linea,Status,NombreMarca,NombreLinea,Existencias,Insumo,UltimoProveedorCompra',
             'campos_desactivados'=>'Supercedido,Grupo,Precio,Impuesto,TasaIeps,Venta,FechaUltimaCompra,FechaUltimaVenta,UltimoCosto,UltimaVenta,NumeroMarca,Utilidad1Marca,Utilidad2Marca,Utilidad3Marca,Utilidad4Marca,Utilidad5Marca,NumeroLinea,Almacen',
             'columnas_ordenadas'=>'Codigo,Insumo,ClaveProducto,ClaveUnidad,Producto,Unidad,Ubicacion,Existencias,Costo,CostoDeLista,Moneda,CostoDeVenta,Utilidad,SubTotal,Iva,Total,Marca,Linea,Status,NombreMarca,NombreLinea,UltimoProveedorCompra',
+        ]);
+    }
+
+    public function modificar_valores_en_bd_para_actualizacion_rama20220404correciones(){
+        //Configuracion Tabla FirmarDocumentos        
+        Configuracion_Tabla::where('tabla', 'FirmarDocumentos')
+        ->update([
+            'primerordenamiento'=>'TipoDocumento',
+            'formaprimerordenamiento'=>'ASC',
+            'segundoordenamiento'=>'Documento',
+            'formasegundoordenamiento'=>'ASC',
+            'tercerordenamiento'=>'omitir',
+            'formatercerordenamiento'=>'ASC',
+            'campos_busquedas'=>'TipoDocumento,Documento,Status'
         ]);
     }
 

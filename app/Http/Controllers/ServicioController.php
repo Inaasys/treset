@@ -220,24 +220,19 @@ class ServicioController extends ConfiguracionSistemaController{
                         'Servicio' => $request->servicio,
                         'Unidad' => $request->unidad,
                         'Familia' => $request->familia,
-                        'Costo' => $request->costo,
-                        'Venta' => $request->venta,
                         'Cantidad' => $request->cantidad,
                         'ClaveProducto' => $request->claveproducto,
                         'ClaveUnidad' => $request->claveunidad
                     ]);
-        /*
-		$Servicio->Servicio=$request->servicio;
-		$Servicio->Unidad=$request->unidad;
-        $Servicio->Familia=$request->familia;
-        $Servicio->Costo=$request->costo;
-        $Servicio->Venta=$request->venta;
-        $Servicio->Cantidad=$request->cantidad;
-        $Servicio->ClaveProducto=$request->claveproducto;
-        $Servicio->ClaveUnidad=$request->claveunidad;	  
-        */
+                    //solo si el usuario esta autorizado en modificar el dato credito
+                    if (in_array(strtoupper(Auth::user()->user), explode(",",$this->modificarcostoyventadeservicios))) {
+                        Servicio::where('Codigo', $codigo)
+                                ->update([
+                                    'Costo' => $request->costo,
+                                    'Venta' => $request->venta
+                                ]);
+                    }
         Log::channel('servicio')->info('Se modifico el servicio: '.$Servicio.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());	      
-		//$Servicio->save();
     	return response()->json($Servicio); 
     }    
     //exportar a excel

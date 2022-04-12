@@ -22,6 +22,8 @@ use App\User_Rel_Almacen;
 use App\User_Rel_Serie;
 use App\Almacen;
 use App\FolioComprobanteFactura;
+use App\FolioComprobanteNota;
+use App\FolioComprobantePago;
 use Mail;
 use App\Personal;
 use App\Serie;
@@ -257,12 +259,36 @@ class UserController extends ConfiguracionSistemaController
                 $select_series_asignados_facturas = $select_series_asignados_facturas."<option value='".$sf->Numero."'>".$sf->Serie."</option>";
             }
         }
+        //series notas credito
+        $series_notas = FolioComprobanteNota::where('Status', 'ALTA')->get();
+        $select_series_asignados_notas = "<option disabled hidden>Selecciona...</option>";
+        foreach($series_notas as $sn){
+            $tiene_serie_asignada = User_Rel_Serie::where('serie_id', $sn->Numero)->where('user_id', $request->id)->where('documento_serie', 'NOTAS')->count();
+            if ($tiene_serie_asignada > 0) {
+                $select_series_asignados_notas = $select_series_asignados_notas."<option value='".$sn->Numero."' selected>".$sn->Serie."</option>"; 
+            }else{
+                $select_series_asignados_notas = $select_series_asignados_notas."<option value='".$sn->Numero."'>".$sn->Serie."</option>";
+            }
+        }
+        //series cuentas por cobrar
+        $series_pagos = FolioComprobantePago::where('Status', 'ALTA')->get();
+        $select_series_asignados_pagos = "<option disabled hidden>Selecciona...</option>";
+        foreach($series_pagos as $sp){
+            $tiene_serie_asignada = User_Rel_Serie::where('serie_id', $sp->Numero)->where('user_id', $request->id)->where('documento_serie', 'PAGOS')->count();
+            if ($tiene_serie_asignada > 0) {
+                $select_series_asignados_pagos = $select_series_asignados_pagos."<option value='".$sp->Numero."' selected>".$sp->Serie."</option>"; 
+            }else{
+                $select_series_asignados_pagos = $select_series_asignados_pagos."<option value='".$sp->Numero."'>".$sp->Serie."</option>";
+            }
+        }
         $data = array(
             "array_submenus" => $array_submenus,
             "array_permisos_crud" => $array_permisos_crud,
             "name" => $user->name,
             "select_almacenes_asignados" => $select_almacenes_asignados,
-            "select_series_asignados_facturas" => $select_series_asignados_facturas
+            "select_series_asignados_facturas" => $select_series_asignados_facturas,
+            "select_series_asignados_notas" => $select_series_asignados_notas,
+            "select_series_asignados_pagos" => $select_series_asignados_pagos
         );
         return response()->json($data);
     }
@@ -341,6 +367,44 @@ class UserController extends ConfiguracionSistemaController
                 $User_Rel_Serie->user_id = $request->id_usuario_permisos;
                 $User_Rel_Serie->serie_id = $serie_factura_asignada;
                 $User_Rel_Serie->documento_serie='FACTURAS';
+                $User_Rel_Serie->save();
+                if (App::environment('local') || App::environment('production')) {
+                    DB::unprepared('SET IDENTITY_INSERT user_rel_series OFF');
+                }
+            }
+        }
+        //series asignadas notas
+        $eliminarseriesasignadasnotas = User_Rel_Serie::where('user_id', $request->id_usuario_permisos)->where('documento_serie', 'NOTAS')->forceDelete();
+        if ($request->has("seriesnotasasignadas")){
+            foreach($request->seriesnotasasignadas as $serie_nota_asignada){
+                $id = Helpers::ultimoidregistrotabla('App\User_Rel_Serie');
+                if (App::environment('local') || App::environment('production')) {
+                    DB::unprepared('SET IDENTITY_INSERT user_rel_series ON');
+                }
+                $User_Rel_Serie = new User_Rel_Serie;
+                $User_Rel_Serie->id = $id;
+                $User_Rel_Serie->user_id = $request->id_usuario_permisos;
+                $User_Rel_Serie->serie_id = $serie_nota_asignada;
+                $User_Rel_Serie->documento_serie='NOTAS';
+                $User_Rel_Serie->save();
+                if (App::environment('local') || App::environment('production')) {
+                    DB::unprepared('SET IDENTITY_INSERT user_rel_series OFF');
+                }
+            }
+        }
+        //series asignadas pagos
+        $eliminarseriesasignadaspagos = User_Rel_Serie::where('user_id', $request->id_usuario_permisos)->where('documento_serie', 'PAGOS')->forceDelete();
+        if ($request->has("seriespagosasignadas")){
+            foreach($request->seriespagosasignadas as $serie_pago_asignada){
+                $id = Helpers::ultimoidregistrotabla('App\User_Rel_Serie');
+                if (App::environment('local') || App::environment('production')) {
+                    DB::unprepared('SET IDENTITY_INSERT user_rel_series ON');
+                }
+                $User_Rel_Serie = new User_Rel_Serie;
+                $User_Rel_Serie->id = $id;
+                $User_Rel_Serie->user_id = $request->id_usuario_permisos;
+                $User_Rel_Serie->serie_id = $serie_pago_asignada;
+                $User_Rel_Serie->documento_serie='PAGOS';
                 $User_Rel_Serie->save();
                 if (App::environment('local') || App::environment('production')) {
                     DB::unprepared('SET IDENTITY_INSERT user_rel_series OFF');

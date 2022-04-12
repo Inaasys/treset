@@ -42,18 +42,6 @@
                             <div class="table-responsive">
                                 <table id="tbllistado" class="tbllistado table table-bordered table-striped table-hover display nowrap" style="width:100% !important;">
                                     <thead class="{{$empresa->background_tables}}">
-                                        @if($mostrartotalesdecolumnasendocumentos == 'S')
-                                            <tr>
-                                                <th class="bg-light-green">Costo: <b id="sumacostofiltrado"></b></th>
-                                                <th class="bg-light-green">SubTotal: <b id="sumasubtotalfiltrado"></b></th>
-                                                <th class="bg-light-green">Iva: <b id="sumaivafiltrado"></b></th>
-                                                <th class="bg-light-green">Total: <b id="sumatotalfiltrado"></b></th>
-                                                <th class="bg-light-green">Total Costo Inventario: <b id="sumatotalcostoinventariofiltrado"></b></th>
-                                                <th class="bg-light-green">Costo Lista: <b id="sumacostolistafiltrado"></b></th>
-                                                <th class="bg-light-green">Costo Venta: <b id="sumacostoventafiltrado"></b></th>
-                                                <th class="bg-light-green">Existencias: <b id="sumaexistenciasfiltrado"></b></th>
-                                            </tr>  
-                                        @endif
                                         <tr>
                                             <th></th>
                                             @foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
@@ -71,6 +59,22 @@
                                         </tr>
                                     </tfoot>
                                 </table>
+                                @if($mostrartotalesdecolumnasendocumentos == 'S')
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped table-hover display nowrap" style="font-size:10px;">
+                                                <tr class="{{$empresa->background_forms_and_modals}}">
+                                                    <th> Sum Costo: <b id="sumacostofiltrado"></b></th>
+                                                    <th> Sum SubTotal: <b id="sumasubtotalfiltrado"></b></th>
+                                                    <th> Sum Iva: <b id="sumaivafiltrado"></b></th>
+                                                    <th> Sum Total: <b id="sumatotalfiltrado"></b></th>
+                                                    <th> Sum Total Costo Inventario: <b id="sumatotalcostoinventariofiltrado"></b></th>
+                                                    <th> Sum Costo Lista: <b id="sumacostolistafiltrado"></b></th>
+                                                    <th> Sum Costo Venta: <b id="sumacostoventafiltrado"></b></th>
+                                                    <th> Sum Existencias: <b id="sumaexistenciasfiltrado"></b></th>
+                                                </tr>   
+                                            </table>
+                                        </div>
+                                @endif 
                             </div>
                         </div>
                     </div>

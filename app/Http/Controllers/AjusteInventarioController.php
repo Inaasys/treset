@@ -224,6 +224,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
                 ->join('Almacenes as a', 'ura.almacen_id', '=', 'a.Numero')
                 ->select('ura.id', 'a.Numero', 'a.Nombre')
                 ->where('a.Status', 'ALTA')
+                ->where('ura.user_id', Auth::user()->id)
                 ->orderby('a.Numero', 'ASC')
                 ->get();
             }else{
@@ -251,6 +252,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
             ->select('ura.id', 'a.Numero', 'a.Nombre')
             ->where('a.Numero', $request->numeroalmacen)
             ->where('a.Status', 'ALTA')
+            ->where('ura.user_id', Auth::user()->id)
             ->count();
             if($existealmacen > 0){
                 $almacen = DB::table('user_rel_almacenes as ura')
@@ -258,6 +260,7 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
                 ->select('ura.id', 'a.Numero', 'a.Nombre')
                 ->where('a.Numero', $request->numeroalmacen)
                 ->where('a.Status', 'ALTA')
+                ->where('ura.user_id', Auth::user()->id)
                 ->orderby('a.Numero', 'DESC')
                 ->first();
                 $numero = $almacen->Numero;
@@ -913,7 +916,11 @@ class AjusteInventarioController extends ConfiguracionSistemaController{
         }else{
             $fechainiciopdf = date($request->fechainiciopdf);
             $fechaterminacionpdf = date($request->fechaterminacionpdf);
-            $ajustes = AjusteInventario::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(500)->get();
+            if ($request->has("seriesdisponiblesdocumento")){
+                $ajustes = AjusteInventario::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->whereIn('Serie', $request->seriesdisponiblesdocumento)->orderBy('Folio', 'ASC')->take(500)->get();
+            }else{
+                $ajustes = AjusteInventario::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(500)->get();
+            }
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $arrayfilespdf = array();
