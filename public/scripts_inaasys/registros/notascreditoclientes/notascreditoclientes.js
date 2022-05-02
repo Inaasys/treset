@@ -237,11 +237,11 @@ function obtenerclientes(){
     //seleccionar registro al dar doble click
     $('#tbllistadocliente tbody').on('dblclick', 'tr', function () {
         var data = tcli.row( this ).data();
-        seleccionarcliente(data.Numero, data.Nombre, data.Plazo, data.Rfc, data.ClaveFormaPago, data.NombreFormaPago, data.ClaveMetodoPago, data.NombreMetodoPago, data.ClaveUsoCfdi, data.NombreUsoCfdi, "", "");
+        seleccionarcliente(data.Numero, data.Nombre, data.Plazo, data.Rfc, data.ClaveFormaPago, data.NombreFormaPago, data.ClaveMetodoPago, data.NombreMetodoPago, data.ClaveUsoCfdi, data.NombreUsoCfdi, "", "", data.ClaveRegimenFiscal, data.RegimenFiscal);
     }); 
 } 
 //seleccionar proveedor
-function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapago, clavemetodopago, metodopago, claveusocfdi, usocfdi, claveresidenciafiscal, residenciafiscal){
+function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapago, clavemetodopago, metodopago, claveusocfdi, usocfdi, claveresidenciafiscal, residenciafiscal, claveregimenfiscalreceptor, regimenfiscalreceptor){
   var numeroclienteanterior = $("#numeroclienteanterior").val();
   var numerocliente = Numero;
   if(numeroclienteanterior != numerocliente){ 
@@ -274,6 +274,13 @@ function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapag
     $("#residenciafiscal").val(residenciafiscal);
     if(residenciafiscal != null){
       $("#textonombreresidenciafiscal").html(residenciafiscal.substring(0, 40));
+    }
+    //regimen fiscal
+    $("#claveregimenfiscalreceptor").val(claveregimenfiscalreceptor);
+    $("#claveregimenfiscalreceptoranterior").val(claveregimenfiscalreceptor);
+    $("#regimenfiscalreceptor").val(regimenfiscalreceptor);
+    if(regimenfiscalreceptor != null){
+        $("#textonombreregimenfiscalreceptor").html(regimenfiscalreceptor.substring(0, 15));            
     }
     mostrarformulario();
   }
@@ -1124,7 +1131,7 @@ function seleccionarfactura(Folio, Factura){
         var index = $(this).index(".inputnextdet");          
         switch(code){
           case 13:
-            $(".inputnextdet").eq(index + 1).focus().select(); 
+            //$(".inputnextdet").eq(index + 1).focus().select(); 
             break;
           case 39:
             $(".inputnextdet").eq(index + 1).focus().select(); 
@@ -1296,6 +1303,13 @@ function obtenerclientepornumero(){
         $("#residenciafiscal").val(data.residenciafiscal);
         if(data.residenciafiscal != null){
           $("#textonombreresidenciafiscal").html(data.residenciafiscal.substring(0, 40));
+        }
+        //regimen fiscal
+        $("#claveregimenfiscalreceptor").val(data.claveregimenfiscalreceptor);
+        $("#claveregimenfiscalreceptoranterior").val(data.claveregimenfiscalreceptor);
+        $("#regimenfiscalreceptor").val(data.regimenfiscalreceptor);
+        if(data.regimenfiscalreceptor != null){
+            $("#textonombreregimenfiscalreceptor").html(data.regimenfiscalreceptor.substring(0, 15));            
         }
         mostrarformulario();
       }) 
@@ -1490,6 +1504,113 @@ function obtenerresidenciafiscalporclave(){
 function regresarclaveresidenciafiscal(){
   var claveresidenciafiscalanterior = $("#claveresidenciafiscalanterior").val();
   $("#claveresidenciafiscal").val(claveresidenciafiscalanterior);
+}
+//obtener regimenes fiscales
+function obtenerregimenesfiscalesreceptor(){
+  ocultarformulario();
+  var tablaregimenesfiscales ='<div class="modal-header '+background_forms_and_modals+'">'+
+                                '<h4 class="modal-title">Regimenes Fiscales</h4>'+
+                              '</div>'+
+                              '<div class="modal-body">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-12">'+
+                                        '<div class="table-responsive">'+
+                                            '<table id="tbllistadoregimenfiscalreceptor" class="tbllistadoregimenfiscalreceptor table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                                '<thead class="'+background_tables+'">'+
+                                                    '<tr>'+
+                                                        '<th>Operaciones</th>'+
+                                                        '<th>Clave</th>'+
+                                                        '<th>Nombre</th>'+
+                                                        '<th>Física</th>'+
+                                                        '<th>Moral</th>'+
+                                                    '</tr>'+
+                                                '</thead>'+
+                                                '<tbody></tbody>'+
+                                            '</table>'+
+                                        '</div>'+
+                                    '</div>'+   
+                                '</div>'+
+                              '</div>'+
+                              '<div class="modal-footer">'+
+                                '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                              '</div>';  
+  $("#contenidomodaltablas").html(tablaregimenesfiscales);
+  var tregfis = $('#tbllistadoregimenfiscalreceptor').DataTable({
+      keys: true,
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
+      "sScrollX": "110%",
+      "sScrollY": "370px",
+      "bScrollCollapse": true,  
+      processing: true,
+      'language': {
+        'loadingRecords': '&nbsp;',
+        'processing': '<div class="spinner"></div>'
+      },
+      serverSide: true,
+      ajax: {
+        url: notas_credito_clientes_obtener_regimenes_fiscales_receptor
+      },
+      columns: [
+          { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+          { data: 'Clave', name: 'Clave' },
+          { data: 'Nombre', name: 'Nombre', orderable: false, searchable: false},
+          { data: 'Fisica', name: 'Fisica', orderable: false, searchable: false},
+          { data: 'Moral', name: 'Moral', orderable: false, searchable: false}
+      ],
+      "initComplete": function() {
+        var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
+        $buscar.unbind();
+        $buscar.bind('keyup change', function(e) {
+            if(e.keyCode == 13 || this.value == "") {
+              $('#tbllistadoregimenfiscalreceptor').DataTable().search( this.value ).draw();
+            }
+        });
+      }, 
+  });
+  //seleccionar registro al dar doble click
+  $('#tbllistadoregimenfiscalreceptor tbody').on('dblclick', 'tr', function () {
+      var data = tregfis.row( this ).data();
+      seleccionarregimenfiscalreceptor(data.Clave, data.Nombre);
+  }); 
+} 
+//seleccionar lugar expedicion
+function seleccionarregimenfiscalreceptor(Clave, Nombre){
+  var claveregimenfiscalreceptoranterior = $("#claveregimenfiscalreceptoranterior").val();
+  var claveregimenfiscalreceptor = Clave;
+  if(claveregimenfiscalreceptoranterior != claveregimenfiscalreceptor){
+    $("#claveregimenfiscalreceptor").val(Clave);
+    $("#claveregimenfiscalreceptoranterior").val(Clave);
+    $("#regimenfiscalreceptor").val(Nombre);
+    if(Nombre != null){
+      $("#textonombreregimenfiscalreceptor").html(Nombre.substring(0, 15));
+    }
+    mostrarformulario();
+  }
+}
+//obtener por clave
+function obtenerregimenfiscalreceptorporclave(){
+  var claveregimenfiscalreceptoranterior = $("#claveregimenfiscalreceptoranterior").val();
+  var claveregimenfiscalreceptor = $("#claveregimenfiscalreceptor").val();
+  if(claveregimenfiscalreceptoranterior != claveregimenfiscalreceptor){
+    if($("#claveregimenfiscalreceptor").parsley().isValid()){
+      $.get(notas_credito_clientes_obtener_regimenfiscalreceptor_por_clave, {claveregimenfiscalreceptor:claveregimenfiscalreceptor}, function(data){
+        $("#claveregimenfiscalreceptor").val(data.clave);
+        $("#claveregimenfiscalreceptoranterior").val(data.clave);
+        $("#regimenfiscalreceptor").val(data.nombre);
+        if(data.nombre != null){
+          $("#textonombreregimenfiscalreceptor").html(data.nombre.substring(0, 15));
+        }
+        mostrarformulario();
+      }) 
+    }
+  }
+}
+//regresar clave
+function regresarclaveregimenfiscalreceptor(){
+  var claveregimenfiscalreceptoranterior = $("#claveregimenfiscalreceptoranterior").val();
+  $("#claveregimenfiscalreceptor").val(claveregimenfiscalreceptoranterior);
 }
 //listar productos para tab consumos
 function listarproductos(){
@@ -1894,7 +2015,7 @@ function agregarfiladppp(){
       var index = $(this).index(".inputnextdet");          
       switch(code){
         case 13:
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+          //$(".inputnextdet").eq(index + 1).focus().select(); 
           break;
         case 39:
           $(".inputnextdet").eq(index + 1).focus().select(); 
@@ -1992,7 +2113,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
           var index = $(this).index(".inputnextdet");          
           switch(code){
             case 13:
-              $(".inputnextdet").eq(index + 1).focus().select(); 
+              //$(".inputnextdet").eq(index + 1).focus().select(); 
               break;
             case 39:
               $(".inputnextdet").eq(index + 1).focus().select(); 
@@ -2237,10 +2358,6 @@ function alta(){
                                         '</table>'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
-                                        '<label>Condiciones de Pago</label>'+
-                                        '<input type="text" class="form-control inputnextdet" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
-                                    '</div>'+
-                                    '<div class="col-md-3">'+
                                         '<label>Uso CFDI <span class="label label-danger" id="textonombreusocfdi"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
@@ -2274,7 +2391,28 @@ function alta(){
                                             '</tr>'+    
                                         '</table>'+
                                     '</div>'+
-                                    '<div class="col-md-3">'+
+                                    '<div class="col-md-2">'+
+                                        '<label>Régimen Fiscal <span class="label label-danger" id="textonombreregimenfiscalreceptor"></span></label>'+
+                                        '<table class="col-md-12">'+
+                                            '<tr>'+
+                                            '<td>'+
+                                                '<div class="btn bg-blue waves-effect" onclick="obtenerregimenesfiscalesreceptor()">Seleccionar</div>'+
+                                            '</td>'+
+                                            '<td>'+
+                                                '<div class="form-line">'+
+                                                '<input type="text" class="form-control inputnextdet" name="claveregimenfiscalreceptor" id="claveregimenfiscalreceptor"  required onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                                '<input type="hidden" class="form-control" name="claveregimenfiscalreceptoranterior" id="claveregimenfiscalreceptoranterior"  required onkeyup="tipoLetra(this)">'+
+                                                '<input type="hidden" class="form-control" name="regimenfiscalreceptor" id="regimenfiscalreceptor"  required readonly>'+
+                                                '</div>'+
+                                            '</td>'+
+                                            '</tr>'+    
+                                        '</table>'+
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
+                                        '<label>Condiciones de Pago</label>'+
+                                        '<input type="text" class="form-control inputnextdet" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
                                         '<label>Num Reg Id Trib</label>'+
                                         '<input type="text" class="form-control inputnextdet" name="numeroregidtrib" id="numeroregidtrib"  data-parsley-length="[1, 40]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                                     '</div>'+
@@ -2544,6 +2682,18 @@ function alta(){
   $('#claveresidenciafiscal').on('change', function(e) {
     regresarclaveresidenciafiscal();
   });
+  //activar busqueda para forma pago
+  $('#claveregimenfiscalreceptor').on('keypress', function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+      obtenerregimenfiscalreceptorporclave();
+      }
+  });
+  //regresar clave
+  $('#claveregimenfiscalreceptor').on('change', function(e) {
+      regresarclaveregimenfiscalreceptor();
+  });
   //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
   $(".inputnextdet").keyup(function (e) {
     //recomentable para mayor compatibilidad entre navegadores.
@@ -2551,7 +2701,7 @@ function alta(){
     var index = $(this).index(".inputnextdet");          
     switch(code){
       case 13:
-        $(".inputnextdet").eq(index + 1).focus().select(); 
+        //$(".inputnextdet").eq(index + 1).focus().select(); 
         break;
       case 39:
         $(".inputnextdet").eq(index + 1).focus().select(); 
@@ -3099,10 +3249,6 @@ function obtenerdatos(notamodificar){
                                         '</table>'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
-                                        '<label>Condiciones de Pago</label>'+
-                                        '<input type="text" class="form-control inputnextdet" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
-                                    '</div>'+
-                                    '<div class="col-md-3">'+
                                         '<label>Uso CFDI  <span class="label label-danger" id="textonombreusocfdi"></span></label>'+
                                         '<table class="col-md-12">'+
                                             '<tr>'+
@@ -3136,7 +3282,28 @@ function obtenerdatos(notamodificar){
                                             '</tr>'+    
                                         '</table>'+
                                     '</div>'+
-                                    '<div class="col-md-3">'+
+                                    '<div class="col-md-2">'+
+                                        '<label>Régimen Fiscal <span class="label label-danger" id="textonombreregimenfiscalreceptor"></span></label>'+
+                                        '<table class="col-md-12">'+
+                                            '<tr>'+
+                                            '<td>'+
+                                                '<div class="btn bg-blue waves-effect" onclick="obtenerregimenesfiscalesreceptor()">Seleccionar</div>'+
+                                            '</td>'+
+                                            '<td>'+
+                                                '<div class="form-line">'+
+                                                '<input type="text" class="form-control inputnextdet" name="claveregimenfiscalreceptor" id="claveregimenfiscalreceptor"  required onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                                '<input type="hidden" class="form-control" name="claveregimenfiscalreceptoranterior" id="claveregimenfiscalreceptoranterior"  required onkeyup="tipoLetra(this)">'+
+                                                '<input type="hidden" class="form-control" name="regimenfiscalreceptor" id="regimenfiscalreceptor"  required readonly>'+
+                                                '</div>'+
+                                            '</td>'+
+                                            '</tr>'+    
+                                        '</table>'+
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
+                                        '<label>Condiciones de Pago</label>'+
+                                        '<input type="text" class="form-control inputnextdet" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
                                         '<label>Num Reg Id Trib</label>'+
                                         '<input type="text" class="form-control inputnextdet" name="numeroregidtrib" id="numeroregidtrib" data-parsley-length="[1, 40]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                                     '</div>'+
@@ -3364,6 +3531,14 @@ function obtenerdatos(notamodificar){
     }
     $("#claveresidenciafiscal").val(data.residenciafiscal.Clave);
     $("#claveresidenciafiscalanterior").val(data.residenciafiscal.Clave);
+    if(data.regimenfiscalreceptor != null){
+        $("#regimenfiscalreceptor").val(data.regimenfiscalreceptor.Nombre);
+        if(data.regimenfiscalreceptor.Nombre != null){
+            $("#textonombreregimenfiscalreceptor").html(data.regimenfiscalreceptor.Nombre.substring(0, 15));
+        }
+        $("#claveregimenfiscalreceptor").val(data.regimenfiscalreceptor.Clave);
+        $("#claveregimenfiscalreceptoranterior").val(data.regimenfiscalreceptor.Clave);
+    }
     $("#numeroregidtrib").val(data.notacliente.NumRegIdTrib);
     //cargar todos los detalles
     $("#tabladetallesnotacliente tbody").html(data.filasdetallesnotacliente);
@@ -3495,6 +3670,18 @@ function obtenerdatos(notamodificar){
     $('#claveresidenciafiscal').on('change', function(e) {
       regresarclaveresidenciafiscal();
     });
+    //activar busqueda para forma pago
+    $('#claveregimenfiscalreceptor').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerregimenfiscalreceptorporclave();
+        }
+    });
+    //regresar clave
+    $('#claveregimenfiscalreceptor').on('change', function(e) {
+        regresarclaveregimenfiscalreceptor();
+    });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
     $(".inputnextdet").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
@@ -3502,7 +3689,7 @@ function obtenerdatos(notamodificar){
       var index = $(this).index(".inputnextdet");          
       switch(code){
         case 13:
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+          //$(".inputnextdet").eq(index + 1).focus().select(); 
           break;
         case 39:
           $(".inputnextdet").eq(index + 1).focus().select(); 
@@ -3981,9 +4168,6 @@ function configurar_tabla(){
   //formulario configuracion tablas se arma desde funcionesglobales.js
   var tabs = armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbusquedas);
   $("#tabsconfigurartabla").html(tabs);
-  if(rol_usuario_logueado == 1){
-    $("#divorderbystabla").show();
-  }
   $("#string_datos_ordenamiento_columnas").val(columnas_ordenadas);
   $("#string_datos_tabla_true").val(campos_activados);
   $("#string_datos_tabla_false").val(campos_desactivados);

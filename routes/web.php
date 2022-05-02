@@ -34,6 +34,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/pruebas_vocales', 'PruebaController@pruebas_vocales')->name('pruebas_vocales');
     Route::get('/prueba_diferencias_arrays', 'PruebaController@prueba_diferencias_arrays')->name('prueba_diferencias_arrays');
     Route::get('/importSATClaveProdServCP', 'PruebaController@importSATClaveProdServCP')->name('importSATClaveProdServCP');
+    Route::get('/actualizar_catalogos_sat_cfdi4', 'PruebaController@actualizar_catalogos_sat_cfdi4')->name('actualizar_catalogos_sat_cfdi4');
     Route::get('/obtener_datos_catalogo_productos_por_codigo', 'PruebaController@obtener_datos_catalogo_productos_por_codigo')->name('obtener_datos_catalogo_productos_por_codigo');
     Route::get('/migrar_productos_utilizados_base_nueva', 'PruebaController@migrar_productos_utilizados_base_nueva')->name('migrar_productos_utilizados_base_nueva');
     Route::get('/obtener_existencias_por_codigo_y_almacen_generar_excel_ajuste', 'PruebaController@obtener_existencias_por_codigo_y_almacen_generar_excel_ajuste')->name('obtener_existencias_por_codigo_y_almacen_generar_excel_ajuste');
@@ -459,6 +460,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/cuentas_por_cobrar_obtener_tipo_relacion_por_clave', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_tipo_relacion_por_clave')->name('cuentas_por_cobrar_obtener_tipo_relacion_por_clave')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
     Route::get('/cuentas_por_cobrar_obtener_formas_pago', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_formas_pago')->name('cuentas_por_cobrar_obtener_formas_pago')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
     Route::get('/cuentas_por_cobrar_obtener_forma_pago_por_clave', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_forma_pago_por_clave')->name('cuentas_por_cobrar_obtener_forma_pago_por_clave')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::get('/cuentas_por_cobrar_obtener_usos_cfdi', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_usos_cfdi')->name('cuentas_por_cobrar_obtener_usos_cfdi')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::get('/cuentas_por_cobrar_obtener_uso_cfdi_por_clave', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_uso_cfdi_por_clave')->name('cuentas_por_cobrar_obtener_uso_cfdi_por_clave')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::get('/cuentas_por_cobrar_obtener_exportaciones', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_exportaciones')->name('cuentas_por_cobrar_obtener_exportaciones')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::get('/cuentas_por_cobrar_obtener_exportacion_por_clave', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_exportacion_por_clave')->name('cuentas_por_cobrar_obtener_exportacion_por_clave')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::get('/cuentas_por_cobrar_obtener_regimenes_fiscales_receptor', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_regimenes_fiscales_receptor')->name('cuentas_por_cobrar_obtener_regimenes_fiscales_receptor')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
+    Route::get('/cuentas_por_cobrar_obtener_regimenfiscalreceptor_por_clave', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_regimenfiscalreceptor_por_clave')->name('cuentas_por_cobrar_obtener_regimenfiscalreceptor_por_clave')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
     Route::get('/cuentas_por_cobrar_obtener_facturas', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_facturas')->name('cuentas_por_cobrar_obtener_facturas')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
     Route::get('/cuentas_por_cobrar_obtener_factura', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_factura')->name('cuentas_por_cobrar_obtener_factura')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
     Route::get('/cuentas_por_cobrar_obtener_folios_fiscales', 'CuentasPorCobrarController@cuentas_por_cobrar_obtener_folios_fiscales')->name('cuentas_por_cobrar_obtener_folios_fiscales')->middleware('revisaraccesomenu:menuregistroscuentasxcobrar');
@@ -556,6 +563,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/notas_credito_clientes_obtener_uso_cfdi_por_clave', 'NotasCreditoClientesController@notas_credito_clientes_obtener_uso_cfdi_por_clave')->name('notas_credito_clientes_obtener_uso_cfdi_por_clave')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');    
     Route::get('/notas_credito_clientes_obtener_residencias_fiscales', 'NotasCreditoClientesController@notas_credito_clientes_obtener_residencias_fiscales')->name('notas_credito_clientes_obtener_residencias_fiscales')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
     Route::get('/notas_credito_clientes_obtener_residencia_fiscal_por_clave', 'NotasCreditoClientesController@notas_credito_clientes_obtener_residencia_fiscal_por_clave')->name('notas_credito_clientes_obtener_residencia_fiscal_por_clave')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::get('/notas_credito_clientes_obtener_regimenes_fiscales_receptor', 'NotasCreditoClientesController@notas_credito_clientes_obtener_regimenes_fiscales_receptor')->name('notas_credito_clientes_obtener_regimenes_fiscales_receptor')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
+    Route::get('/notas_credito_clientes_obtener_regimenfiscalreceptor_por_clave', 'NotasCreditoClientesController@notas_credito_clientes_obtener_regimenfiscalreceptor_por_clave')->name('notas_credito_clientes_obtener_regimenfiscalreceptor_por_clave')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');    
     Route::get('/notas_credito_cliente_comprobar_cantidad_nota_vs_cantidad_factura', 'NotasCreditoClientesController@notas_credito_cliente_comprobar_cantidad_nota_vs_cantidad_factura')->name('notas_credito_cliente_comprobar_cantidad_nota_vs_cantidad_factura')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
     Route::get('/notas_credito_clientes_obtener_facturas', 'NotasCreditoClientesController@notas_credito_clientes_obtener_facturas')->name('notas_credito_clientes_obtener_facturas')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
     Route::get('/notas_credito_clientes_obtener_factura', 'NotasCreditoClientesController@notas_credito_clientes_obtener_factura')->name('notas_credito_clientes_obtener_factura')->middleware('revisaraccesomenu:menuregistrosnotascreditoclientes');
@@ -873,6 +882,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/facturas_obtener_uso_cfdi_por_clave', 'FacturaController@facturas_obtener_uso_cfdi_por_clave')->name('facturas_obtener_uso_cfdi_por_clave')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_residencias_fiscales', 'FacturaController@facturas_obtener_residencias_fiscales')->name('facturas_obtener_residencias_fiscales')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_residencia_fiscal_por_clave', 'FacturaController@facturas_obtener_residencia_fiscal_por_clave')->name('facturas_obtener_residencia_fiscal_por_clave')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_regimenes_fiscales_receptor', 'FacturaController@facturas_obtener_regimenes_fiscales_receptor')->name('facturas_obtener_regimenes_fiscales_receptor')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_regimenfiscalreceptor_por_clave', 'FacturaController@facturas_obtener_regimenfiscalreceptor_por_clave')->name('facturas_obtener_regimenfiscalreceptor_por_clave')->middleware('revisaraccesomenu:menuregistrosfacturas');    
     Route::get('/facturas_obtener_folios_fiscales', 'FacturaController@facturas_obtener_folios_fiscales')->name('facturas_obtener_folios_fiscales')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_ultimo_folio_serie_seleccionada', 'FacturaController@facturas_obtener_ultimo_folio_serie_seleccionada')->name('facturas_obtener_ultimo_folio_serie_seleccionada')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_serie_interna', 'FacturaController@facturas_obtener_serie_interna')->name('facturas_obtener_serie_interna')->middleware('revisaraccesomenu:menuregistrosfacturas');
@@ -888,6 +899,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/facturas_obtener_producto_por_codigo', 'FacturaController@facturas_obtener_producto_por_codigo')->name('facturas_obtener_producto_por_codigo')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_productos_gastos', 'FacturaController@facturas_obtener_productos_gastos')->name('facturas_obtener_productos_gastos')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_producto_gasto_por_codigo', 'FacturaController@facturas_obtener_producto_gasto_por_codigo')->name('facturas_obtener_producto_gasto_por_codigo')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_servicios', 'FacturaController@facturas_obtener_servicios')->name('facturas_obtener_servicios')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/facturas_obtener_servicio_por_codigo', 'FacturaController@facturas_obtener_servicio_por_codigo')->name('facturas_obtener_servicio_por_codigo')->middleware('revisaraccesomenu:menuregistrosfacturas');    
     Route::get('/facturas_obtener_claves_productos', 'FacturaController@facturas_obtener_claves_productos')->name('facturas_obtener_claves_productos')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_claves_unidades', 'FacturaController@facturas_obtener_claves_unidades')->name('facturas_obtener_claves_unidades')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_facturas_relacionadas', 'FacturaController@facturas_obtener_facturas_relacionadas')->name('facturas_obtener_facturas_relacionadas')->middleware('revisaraccesomenu:menuregistrosfacturas');
@@ -910,6 +923,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/facturas_generar_pdfs_cliente_indiv/{documento}', 'FacturaController@facturas_generar_pdfs_cliente_indiv')->name('facturas_generar_pdfs_cliente_indiv')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_exportar_excel', 'FacturaController@facturas_exportar_excel')->name('facturas_exportar_excel')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::post('/facturas_guardar_configuracion_tabla', 'FacturaController@facturas_guardar_configuracion_tabla')->name('facturas_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    
+    //Rentenciones
+    Route::get('/retenciones_crearretencion', 'RetencionController@retenciones_crearretencion')->name('retenciones_crearretencion')->middleware('revisaraccesomenu:menuregistrosfacturas');
     //---///---///---///---///---/// INTEGRACION FACTURAPI ////----/////----/////----/////_----/////-----/////
     Route::get('/facturas_verificar_si_continua_timbrado', 'FacturaController@facturas_verificar_si_continua_timbrado')->name('facturas_verificar_si_continua_timbrado')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::post('/facturas_timbrar_factura', 'FacturaController@facturas_timbrar_factura')->name('facturas_timbrar_factura')->middleware('revisarpermisos:registros.facturas.timbrar');
@@ -931,7 +947,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/carta_porte_obtener_clavestransporte', 'CartaPorteController@carta_porte_obtener_clavestransporte')->name('carta_porte_obtener_clavestransporte')->middleware('revisaraccesomenu:menuregistroscartasporte');
     Route::get('/carta_porte_obtener_configuracionautotransporte_por_clave', 'CartaPorteController@carta_porte_obtener_configuracionautotransporte_por_clave')->name('carta_porte_obtener_configuracionautotransporte_por_clave')->middleware('revisaraccesomenu:menuregistroscartasporte');
     Route::get('/carta_porte_obtener_clavetransporte_por_clave', 'CartaPorteController@carta_porte_obtener_clavetransporte_por_clave')->name('carta_porte_obtener_clavetransporte_por_clave')->middleware('revisaraccesomenu:menuregistroscartasporte');
-    
+    Route::get('/carta_porte_obtener_vehiculos', 'CartaPorteController@carta_porte_obtener_vehiculos')->name('carta_porte_obtener_vehiculos')->middleware('revisaraccesomenu:menuregistroscartasporte');
+    Route::get('/carta_porte_obtener_vehiculo_por_numero', 'CartaPorteController@carta_porte_obtener_vehiculo_por_numero')->name('carta_porte_obtener_vehiculo_por_numero')->middleware('revisaraccesomenu:menuregistroscartasporte');
+    Route::get('/carta_porte_obtener_operadores', 'CartaPorteController@carta_porte_obtener_operadores')->name('carta_porte_obtener_operadores')->middleware('revisaraccesomenu:menuregistroscartasporte');
+    Route::get('/carta_porte_obtener_operador_por_numero', 'CartaPorteController@carta_porte_obtener_operador_por_numero')->name('carta_porte_obtener_operador_por_numero')->middleware('revisaraccesomenu:menuregistroscartasporte');    
     //Produccion
     Route::get('/produccion', 'ProduccionController@produccion')->name('produccion')->middleware('revisaraccesomenu:menuregistrosproduccion');
     Route::get('/produccion_obtener', 'ProduccionController@produccion_obtener')->name('produccion_obtener')->middleware('revisaraccesomenu:menuregistrosproduccion');
@@ -985,6 +1004,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/requisiciones_generar_pdfs_indiv/{documento}', 'RequisicionController@requisiciones_generar_pdfs_indiv')->name('requisiciones_generar_pdfs_indiv')->middleware('revisaraccesomenu:menuregistrosrequisiciones');
     Route::get('/requisiciones_exportar_excel', 'RequisicionController@requisiciones_exportar_excel')->name('requisiciones_exportar_excel')->middleware('revisaraccesomenu:menuregistrosrequisiciones');
     Route::post('/requisiciones_guardar_configuracion_tabla', 'RequisicionController@requisiciones_guardar_configuracion_tabla')->name('requisiciones_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrosrequisiciones');
+    //punto de venta
+    Route::get('/punto_de_venta', 'PuntoDeVentaController@punto_de_venta')->name('punto_de_venta')->middleware('revisaraccesomenu:menuregistrosrequisiciones');
+    Route::get('/punto_de_venta_obtener_producto_por_codigo', 'PuntoDeVentaController@punto_de_venta_obtener_producto_por_codigo')->name('punto_de_venta_obtener_producto_por_codigo')->middleware('revisaraccesomenu:menuregistrosrequisiciones');
+    Route::get('/punto_de_venta_obtener_datos_agregar_fila_producto', 'PuntoDeVentaController@punto_de_venta_obtener_datos_agregar_fila_producto')->name('punto_de_venta_obtener_datos_agregar_fila_producto')->middleware('revisaraccesomenu:menuregistrosrequisiciones');
+    Route::get('/punto_de_venta_obtener_nuevo_saldo_cliente', 'PuntoDeVentaController@punto_de_venta_obtener_nuevo_saldo_cliente')->name('punto_de_venta_obtener_nuevo_saldo_cliente')->middleware('revisaraccesomenu:menuregistrosrequisiciones');
+    Route::get('/punto_de_venta_obtener_cliente_por_numero', 'PuntoDeVentaController@punto_de_venta_obtener_cliente_por_numero')->name('punto_de_venta_obtener_cliente_por_numero')->middleware('revisaraccesomenu:menuregistrosrequisiciones');    
     /* -----------------------------------||||||||||||||||||||FIN REGISTROS||||||||||||||||||||||-------------------------------------*/
     /* -----------------------------------||||||||||||||||||||REPORTES||||||||||||||||||||||-------------------------------------*/
     /*##################################ORDENES DE COMPRA#######################################*/
@@ -1112,7 +1137,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/reporte_facturas_ventas_marca_obtener_linea_por_numero', 'ReporteFacturasVentasMarcaController@reporte_facturas_ventas_marca_obtener_linea_por_numero')->name('reporte_facturas_ventas_marca_obtener_linea_por_numero')->middleware('revisaraccesomenu:menureporterelacionfacturasventasmarcas');
     Route::get('/reporte_facturas_ventas_marca_obtener_productos', 'ReporteFacturasVentasMarcaController@reporte_facturas_ventas_marca_obtener_productos')->name('reporte_facturas_ventas_marca_obtener_productos')->middleware('revisaraccesomenu:menureporterelacionfacturasventasmarcas');
     Route::get('/reporte_facturas_ventas_marca_obtener_producto_por_codigo', 'ReporteFacturasVentasMarcaController@reporte_facturas_ventas_marca_obtener_producto_por_codigo')->name('reporte_facturas_ventas_marca_obtener_producto_por_codigo')->middleware('revisaraccesomenu:menureporterelacionfacturasventasmarcas');
-    Route::post('/reporte_facturas_ventas_marca_generar_reporte', 'ReporteFacturasVentasMarcaController@reporte_facturas_ventas_marca_generar_reporte')->name('reporte_facturas_ventas_marca_generar_reporte')->middleware('revisaraccesomenu:menureporterelacionfacturasventasclientes');
+    Route::get('/reporte_facturas_ventas_marca_obtener_tipos_ordenes_compra', 'ReporteFacturasVentasMarcaController@reporte_facturas_ventas_marca_obtener_tipos_ordenes_compra')->name('reporte_facturas_ventas_marca_obtener_tipos_ordenes_compra')->middleware('revisaraccesomenu:menureporterelacionfacturasventasmarcas');
+    Route::post('/reporte_facturas_ventas_marca_generar_reporte', 'ReporteFacturasVentasMarcaController@reporte_facturas_ventas_marca_generar_reporte')->name('reporte_facturas_ventas_marca_generar_reporte')->middleware('revisaraccesomenu:menureporterelacionfacturasventasmarcas');
+    Route::get('/reporte_facturas_ventas_marca_generar_formato_excel', 'ReporteFacturasVentasMarcaController@reporte_facturas_ventas_marca_generar_formato_excel')->name('reporte_facturas_ventas_marca_generar_formato_excel')->middleware('revisaraccesomenu:menureporterelacionfacturasventasmarcas');
     //reporte antiguedad saldos
     Route::get('/reporte_antiguedad_saldos', 'ReporteAntiguedadSaldosController@reporte_antiguedad_saldos')->name('reporte_antiguedad_saldos')->middleware('revisaraccesomenu:menureportefacturasantiguedadsaldos');
     Route::get('/reporte_antiguedad_saldos_generar_formato_excel', 'ReporteAntiguedadSaldosController@reporte_antiguedad_saldos_generar_formato_excel')->name('reporte_antiguedad_saldos_generar_formato_excel')->middleware('revisaraccesomenu:menureportefacturasantiguedadsaldos');
@@ -1215,6 +1242,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/modificar_valores_en_bd_para_actualizacion_rama20220214correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20220214correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20220214correciones');
     Route::get('/modificar_valores_en_bd_para_actualizacion_rama20220228correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20220228correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20220228correciones');
     Route::get('/modificar_valores_en_bd_para_actualizacion_rama20220404correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20220404correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20220404correciones');
+    Route::get('/modificar_valores_en_bd_para_actualizacion_rama20220413correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20220413correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20220413correciones');
     /* -----------------------------------||||||||||||||||||||FIN CONFIGURACIONES Y PRUEBAS||||||||||||||||||||||-------------------------------------*/
     /*---------------------------------------|||||||||||||||||||MANEJO DE ERRORES LOGS|||||||||||||||||||||------------------------------------------*/
     Route::get('errors_inaasys', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index')->name('errors_inaasys');

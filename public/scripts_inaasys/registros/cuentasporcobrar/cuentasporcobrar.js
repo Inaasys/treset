@@ -218,11 +218,11 @@ function obtenerclientes(){
     //seleccionar registro al dar doble click
     $('#tbllistadocliente tbody').on('dblclick', 'tr', function () {
         var data = tcli.row( this ).data();
-        seleccionarcliente(data.Numero, data.Nombre, data.Plazo, data.Rfc, data.ClaveFormaPago, data.NombreFormaPago, data.ClaveMetodoPago, data.NombreMetodoPago, data.ClaveUsoCfdi, data.NombreUsoCfdi, "", "");
+        seleccionarcliente(data.Numero, data.Nombre, data.Plazo, data.Rfc, data.ClaveFormaPago, data.NombreFormaPago, data.ClaveMetodoPago, data.NombreMetodoPago, data.ClaveUsoCfdi, data.NombreUsoCfdi, "", "", data.ClaveRegimenFiscal, data.RegimenFiscal);
     }); 
 } 
 //seleccionar cliente
-function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapago, clavemetodopago, metodopago, claveusocfdi, usocfdi, claveresidenciafiscal, residenciafiscal){
+function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapago, clavemetodopago, metodopago, claveusocfdi, usocfdi, claveresidenciafiscal, residenciafiscal, claveregimenfiscalreceptor, regimenfiscalreceptor){
     $('.page-loader-wrapper').css('display', 'block');
     var numeroclienteanterior = $("#numeroclienteanterior").val();
     var numerocliente = Numero;
@@ -243,11 +243,19 @@ function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapag
         if(formapago != null){
             $("#textonombreformapago").html(formapago.substring(0, 40));            
         }
+        //regimen fiscal
+        $("#claveregimenfiscalreceptor").val(claveregimenfiscalreceptor);
+        $("#claveregimenfiscalreceptoranterior").val(claveregimenfiscalreceptor);
+        $("#regimenfiscalreceptor").val(regimenfiscalreceptor);
+        if(regimenfiscalreceptor != null){
+            $("#textonombreregimenfiscalreceptor").html(regimenfiscalreceptor.substring(0, 40));            
+        }
         $("#btnlistarfacturas").show();
         var tipooperacion = $("#tipooperacion").val();
         var numerocliente = Numero;
         $.get(cuentas_por_cobrar_obtener_facturas_cliente, {numerocliente:numerocliente,tipooperacion:tipooperacion}, function(data){
             $("#tabladetallesfacturas tbody").html(data.filasfacturas);
+            $(".select2").select2();
             $('.page-loader-wrapper').css('display', 'none');
         });
         mostrarformulario();
@@ -845,9 +853,17 @@ function obtenerclientepornumero(){
                 if(data.formapago != null){
                     $("#textonombreformapago").html(data.formapago.substring(0, 40));
                 }
+                //regimen fiscal
+                $("#claveregimenfiscalreceptor").val(data.claveregimenfiscalreceptor);
+                $("#claveregimenfiscalreceptoranterior").val(data.claveregimenfiscalreceptor);
+                $("#regimenfiscalreceptor").val(data.regimenfiscalreceptor);
+                if(data.regimenfiscalreceptor != null){
+                    $("#textonombreregimenfiscalreceptor").html(data.regimenfiscalreceptor.substring(0, 40));            
+                }
                 $("#btnlistarfacturas").show();
                 $("#tabladetallesfacturas tbody").html(data.filasfacturas);
                 mostrarformulario(); 
+                $(".select2").select2();
                 $('.page-loader-wrapper').css('display', 'none');
             }) 
         }
@@ -972,6 +988,323 @@ function regresarclaveformapago(){
     var claveformapagoanterior = $("#claveformapagoanterior").val();
     $("#claveformapago").val(claveformapagoanterior);
 }
+//obtener usos cfdi
+function obtenerusoscfdi(){
+    ocultarformulario();
+    var tablausoscfdi='<div class="modal-header '+background_forms_and_modals+'">'+
+                                  '<h4 class="modal-title">Usos CFDI</h4>'+
+                                '</div>'+
+                                '<div class="modal-body">'+
+                                  '<div class="row">'+
+                                      '<div class="col-md-12">'+
+                                          '<div class="table-responsive">'+
+                                              '<table id="tbllistadousocfdi" class="tbllistadousocfdi table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                                  '<thead class="'+background_tables+'">'+
+                                                      '<tr>'+
+                                                          '<th>Operaciones</th>'+
+                                                          '<th>Clave</th>'+
+                                                          '<th>Nombre</th>'+
+                                                          '<th>Fisica</th>'+
+                                                          '<th>Moral</th>'+
+                                                      '</tr>'+
+                                                  '</thead>'+
+                                                  '<tbody></tbody>'+
+                                              '</table>'+
+                                          '</div>'+
+                                      '</div>'+   
+                                  '</div>'+
+                                '</div>'+
+                                '<div class="modal-footer">'+
+                                  '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                                '</div>';  
+    $("#contenidomodaltablas").html(tablausoscfdi);
+    var tusocfdi = $('#tbllistadousocfdi').DataTable({
+        keys: true,
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,  
+        processing: true,
+        'language': {
+          'loadingRecords': '&nbsp;',
+          'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+          url: cuentas_por_cobrar_obtener_usos_cfdi
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Clave', name: 'Clave' },
+            { data: 'Nombre', name: 'Nombre', orderable: false, searchable: false},
+            { data: 'Fisica', name: 'Fisica', orderable: false, searchable: false},
+            { data: 'Moral', name: 'Moral', orderable: false, searchable: false}
+        ],
+        "initComplete": function() {
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.focus();
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistadousocfdi').DataTable().search( this.value ).draw();
+              }
+          });
+        }, 
+    });
+    //seleccionar registro al dar doble click
+    $('#tbllistadousocfdi tbody').on('dblclick', 'tr', function () {
+        var data = tusocfdi.row( this ).data();
+        seleccionarusocfdi(data.Clave, data.Nombre);
+    }); 
+} 
+//seleccionar uso cfdi
+function seleccionarusocfdi(Clave, Nombre){
+    var claveusocfdianterior = $("#claveusocfdianterior").val();
+    var claveusocfdi = Clave;
+    if(claveusocfdianterior != claveusocfdi){
+      $("#claveusocfdi").val(Clave);
+      $("#claveusocfdianterior").val(Clave);
+      $("#usocfdi").val(Nombre);
+      if(Nombre != null){
+        $("#textonombreusocfdi").html(Nombre.substring(0, 40));
+      }
+      mostrarformulario();
+    }
+} 
+//obtener por clave
+function obtenerusocfdiporclave(){
+    var claveusocfdianterior = $("#claveusocfdianterior").val();
+    var claveusocfdi = $("#claveusocfdi").val();
+    if(claveusocfdianterior != claveusocfdi){
+      if($("#claveusocfdi").parsley().isValid()){
+        $.get(cuentas_por_cobrar_obtener_uso_cfdi_por_clave, {claveusocfdi:claveusocfdi}, function(data){
+          $("#claveusocfdi").val(data.clave);
+          $("#claveusocfdianterior").val(data.clave);
+          $("#usocfdi").val(data.nombre);
+          if(data.nombre != null){
+            $("#textonombreusocfdi").html(data.nombre.substring(0, 40));
+          }
+          mostrarformulario();
+        }) 
+      } 
+    }
+  }
+//regresar clave
+function regresarclaveusocfdi(){
+    var claveusocfdianterior = $("#claveusocfdianterior").val();
+    $("#claveusocfdi").val(claveusocfdianterior);
+}
+//obtener exportaciones
+function obtenerexportaciones(){
+    ocultarformulario();
+    var tablaexportaciones='<div class="modal-header '+background_forms_and_modals+'">'+
+                                  '<h4 class="modal-title">Exportaciones</h4>'+
+                                '</div>'+
+                                '<div class="modal-body">'+
+                                  '<div class="row">'+
+                                      '<div class="col-md-12">'+
+                                          '<div class="table-responsive">'+
+                                              '<table id="tbllistadoexportacion" class="tbllistadoexportacion table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                                  '<thead class="'+background_tables+'">'+
+                                                      '<tr>'+
+                                                          '<th>Operaciones</th>'+
+                                                          '<th>Clave</th>'+
+                                                          '<th>Descripción</th>'+
+                                                      '</tr>'+
+                                                  '</thead>'+
+                                                  '<tbody></tbody>'+
+                                              '</table>'+
+                                          '</div>'+
+                                      '</div>'+   
+                                  '</div>'+
+                                '</div>'+
+                                '<div class="modal-footer">'+
+                                  '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                                '</div>';  
+    $("#contenidomodaltablas").html(tablaexportaciones);
+    var texport = $('#tbllistadoexportacion').DataTable({
+        keys: true,
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,  
+        processing: true,
+        'language': {
+          'loadingRecords': '&nbsp;',
+          'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+          url: cuentas_por_cobrar_obtener_exportaciones
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Clave', name: 'Clave' },
+            { data: 'Descripción', name: 'Descripción', orderable: false, searchable: false},
+        ],
+        "initComplete": function() {
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.focus();
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistadoexportacion').DataTable().search( this.value ).draw();
+              }
+          });
+        }, 
+    });
+    //seleccionar registro al dar doble click
+    $('#tbllistadoexportacion tbody').on('dblclick', 'tr', function () {
+        var data = texport.row( this ).data();
+        seleccionarexportacion(data.Clave, data.Descripción);
+    }); 
+} 
+//seleccionar uso cfdi
+function seleccionarexportacion(Clave, Descripción){
+    var claveexportacionanterior = $("#claveexportacionanterior").val();
+    var claveexportacion = Clave;
+    if(claveexportacionanterior != claveexportacion){
+      $("#claveexportacion").val(Clave);
+      $("#claveexportacionanterior").val(Clave);
+      $("#exportacion").val(Descripción);
+      if(Descripción != null){
+        $("#textonombreexportacion").html(Descripción.substring(0, 40));
+      }
+      mostrarformulario();
+    }
+} 
+//obtener por clave
+function obtenerexportacionporclave(){
+    var claveexportacionanterior = $("#claveexportacionanterior").val();
+    var claveexportacion = $("#claveexportacion").val();
+    if(claveexportacionanterior != claveexportacion){
+      if($("#claveexportacion").parsley().isValid()){
+        $.get(cuentas_por_cobrar_obtener_exportacion_por_clave, {claveexportacion:claveexportacion}, function(data){
+          $("#claveexportacion").val(data.clave);
+          $("#claveexportacionanterior").val(data.clave);
+          $("#exportacion").val(data.descripcion);
+          if(data.descripcion != null){
+            $("#textonombreexportacion").html(data.descripcion.substring(0, 40));
+          }
+          mostrarformulario();
+        }) 
+      } 
+    }
+  }
+//regresar clave
+function regresarclaveexportacion(){
+    var claveexportacionanterior = $("#claveexportacionanterior").val();
+    $("#claveexportacion").val(claveexportacionanterior);
+}
+//obtener regimenes fiscales
+function obtenerregimenesfiscalesreceptor(){
+    ocultarformulario();
+    var tablaregimenesfiscales ='<div class="modal-header '+background_forms_and_modals+'">'+
+                                  '<h4 class="modal-title">Regimenes Fiscales</h4>'+
+                                '</div>'+
+                                '<div class="modal-body">'+
+                                  '<div class="row">'+
+                                      '<div class="col-md-12">'+
+                                          '<div class="table-responsive">'+
+                                              '<table id="tbllistadoregimenfiscalreceptor" class="tbllistadoregimenfiscalreceptor table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                                  '<thead class="'+background_tables+'">'+
+                                                      '<tr>'+
+                                                          '<th>Operaciones</th>'+
+                                                          '<th>Clave</th>'+
+                                                          '<th>Nombre</th>'+
+                                                          '<th>Física</th>'+
+                                                          '<th>Moral</th>'+
+                                                      '</tr>'+
+                                                  '</thead>'+
+                                                  '<tbody></tbody>'+
+                                              '</table>'+
+                                          '</div>'+
+                                      '</div>'+   
+                                  '</div>'+
+                                '</div>'+
+                                '<div class="modal-footer">'+
+                                  '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                                '</div>';  
+    $("#contenidomodaltablas").html(tablaregimenesfiscales);
+    var tregfis = $('#tbllistadoregimenfiscalreceptor').DataTable({
+        keys: true,
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,  
+        processing: true,
+        'language': {
+          'loadingRecords': '&nbsp;',
+          'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+          url: cuentas_por_cobrar_obtener_regimenes_fiscales_receptor
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Clave', name: 'Clave' },
+            { data: 'Nombre', name: 'Nombre', orderable: false, searchable: false},
+            { data: 'Fisica', name: 'Fisica', orderable: false, searchable: false},
+            { data: 'Moral', name: 'Moral', orderable: false, searchable: false}
+        ],
+        "initComplete": function() {
+          var $buscar = $('div.dataTables_filter input');
+          $buscar.focus();
+          $buscar.unbind();
+          $buscar.bind('keyup change', function(e) {
+              if(e.keyCode == 13 || this.value == "") {
+                $('#tbllistadoregimenfiscalreceptor').DataTable().search( this.value ).draw();
+              }
+          });
+        }, 
+    });
+    //seleccionar registro al dar doble click
+    $('#tbllistadoregimenfiscalreceptor tbody').on('dblclick', 'tr', function () {
+        var data = tregfis.row( this ).data();
+        seleccionarregimenfiscalreceptor(data.Clave, data.Nombre);
+    }); 
+  } 
+//seleccionar lugar expedicion
+function seleccionarregimenfiscalreceptor(Clave, Nombre){
+    var claveregimenfiscalreceptoranterior = $("#claveregimenfiscalreceptoranterior").val();
+    var claveregimenfiscalreceptor = Clave;
+    if(claveregimenfiscalreceptoranterior != claveregimenfiscalreceptor){
+      $("#claveregimenfiscalreceptor").val(Clave);
+      $("#claveregimenfiscalreceptoranterior").val(Clave);
+      $("#regimenfiscalreceptor").val(Nombre);
+      if(Nombre != null){
+        $("#textonombreregimenfiscalreceptor").html(Nombre.substring(0, 40));
+      }
+      mostrarformulario();
+    }
+}
+//obtener por clave
+function obtenerregimenfiscalreceptorporclave(){
+    var claveregimenfiscalreceptoranterior = $("#claveregimenfiscalreceptoranterior").val();
+    var claveregimenfiscalreceptor = $("#claveregimenfiscalreceptor").val();
+    if(claveregimenfiscalreceptoranterior != claveregimenfiscalreceptor){
+      if($("#claveregimenfiscalreceptor").parsley().isValid()){
+        $.get(cuentas_por_cobrar_obtener_regimenfiscalreceptor_por_clave, {claveregimenfiscalreceptor:claveregimenfiscalreceptor}, function(data){
+          $("#claveregimenfiscalreceptor").val(data.clave);
+          $("#claveregimenfiscalreceptoranterior").val(data.clave);
+          $("#regimenfiscalreceptor").val(data.nombre);
+          if(data.nombre != null){
+            $("#textonombreregimenfiscalreceptor").html(data.nombre.substring(0, 40));
+          }
+          mostrarformulario();
+        }) 
+      }
+    }
+}
+//regresar clave
+function regresarclaveregimenfiscalreceptor(){
+    var claveregimenfiscalreceptoranterior = $("#claveregimenfiscalreceptoranterior").val();
+    $("#claveregimenfiscalreceptor").val(claveregimenfiscalreceptoranterior);
+}
 //listar todas las facturas
 function listarfacturas (){
     ocultarformulario();
@@ -1070,6 +1403,7 @@ function seleccionarfactura(Folio, Factura){
         comprobarfilasfactura();
         //calcular totales compras nota proveedor
         calculartotal();
+        $(".select2").select2();//activar select2
         $('.page-loader-wrapper').css('display', 'none');
         contadorfilas++;
         contadorproductos++;
@@ -1354,6 +1688,59 @@ function alta(){
                                         '</tr>'+    
                                     '</table>'+
                                 '</div>'+
+                                '<div class="col-md-3">'+
+                                    '<label>Uso CFDI <span class="label label-danger" id="textonombreusocfdi"></span></label>'+
+                                    '<table class="col-md-12">'+
+                                        '<tr>'+
+                                            '<td>'+
+                                                '<div class="btn bg-blue waves-effect" onclick="obtenerusoscfdi()">Seleccionar</div>'+
+                                            '</td>'+
+                                            '<td>'+
+                                                '<div class="form-line">'+
+                                                '<input type="text" class="form-control inputnextdet" name="claveusocfdi" id="claveusocfdi" required onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                                '<input type="hidden" class="form-control" name="claveusocfdianterior" id="claveusocfdianterior" required readonly onkeyup="tipoLetra(this)">'+
+                                                '<input type="hidden" class="form-control" name="usocfdi" id="usocfdi" required readonly>'+
+                                                '</div>'+
+                                            '</td>'+
+                                        '</tr>'+    
+                                    '</table>'+
+                                '</div>'+
+                            '</div>'+
+                            '<div class="row">'+
+                                '<div class="col-md-3">'+
+                                    '<label>Régimen Fiscal <span class="label label-danger" id="textonombreregimenfiscalreceptor"></span></label>'+
+                                    '<table class="col-md-12">'+
+                                        '<tr>'+
+                                        '<td>'+
+                                            '<div class="btn bg-blue waves-effect" onclick="obtenerregimenesfiscalesreceptor()">Seleccionar</div>'+
+                                        '</td>'+
+                                        '<td>'+
+                                            '<div class="form-line">'+
+                                            '<input type="text" class="form-control inputnextdet" name="claveregimenfiscalreceptor" id="claveregimenfiscalreceptor"  required onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                            '<input type="hidden" class="form-control" name="claveregimenfiscalreceptoranterior" id="claveregimenfiscalreceptoranterior"  required onkeyup="tipoLetra(this)">'+
+                                            '<input type="hidden" class="form-control" name="regimenfiscalreceptor" id="regimenfiscalreceptor"  required readonly>'+
+                                            '</div>'+
+                                        '</td>'+
+                                        '</tr>'+    
+                                    '</table>'+
+                                '</div>'+
+                                '<div class="col-md-3">'+
+                                    '<label>Exportación <span class="label label-danger" id="textonombreexportacion"></span></label>'+
+                                    '<table class="col-md-12">'+
+                                        '<tr>'+
+                                            '<td>'+
+                                                '<div class="btn bg-blue waves-effect" onclick="obtenerexportaciones()">Seleccionar</div>'+
+                                            '</td>'+
+                                            '<td>'+
+                                                '<div class="form-line">'+
+                                                '<input type="text" class="form-control inputnextdet" name="claveexportacion" id="claveexportacion" required onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                                '<input type="hidden" class="form-control" name="claveexportacionanterior" id="claveexportacionanterior" required readonly onkeyup="tipoLetra(this)">'+
+                                                '<input type="hidden" class="form-control" name="exportacion" id="exportacion" required readonly>'+
+                                                '</div>'+
+                                            '</td>'+
+                                        '</tr>'+    
+                                    '</table>'+
+                                '</div>'+
                             '</div>'+
                         '</div>'+
                     '</div>'+
@@ -1386,6 +1773,8 @@ function alta(){
                                             '<th class="'+background_tables+'"><div class="divorinputmodxl">idDocumento</div></th>'+
                                             '<th class="'+background_tables+'">Serie</th>'+
                                             '<th class="'+background_tables+'">Folio</th>'+
+                                            '<th class="'+background_tables+'">Equivalencia</th>'+
+                                            '<th class="'+background_tables+'">Objeto Impuesto</th>'+
                                             '<th class="'+background_tables+'">MonedaDR</th>'+
                                             '<th class="'+background_tables+'">TipoCambioDR</th>'+
                                             '<th class="'+background_tables+'">MetodoDePagoDR</th>'+
@@ -1426,6 +1815,12 @@ function alta(){
     $("#btnobtenerclientes").show();
     obtenultimonumero();
     asignarfechaactual();
+    //asignar el uso cfdi
+    $("#claveusocfdi").val("CP01");
+    //asignar la exportaxion
+    $("#claveexportacion").val("01");
+    obtenerusocfdiporclave();
+    obtenerexportacionporclave();
     //asignar el tipo de operacion que se realizara
     $("#tipooperacion").val("alta");
     //activar los input select
@@ -1505,6 +1900,42 @@ function alta(){
     //regresar clave
     $('#claveformapago').on('change', function(e) {
         regresarclaveformapago();
+    });
+    //activar busqueda para forma pago
+    $('#claveusocfdi').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerusocfdiporclave();
+        }
+    });
+    //regresar clave
+    $('#claveusocfdi').on('change', function(e) {
+        regresarclaveusocfdi();
+    });
+    //activar busqueda para forma pago
+    $('#claveexportacion').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerexportacionporclave();
+        }
+    });
+    //regresar clave
+    $('#claveexportacion').on('change', function(e) {
+        regresarclaveexportacion();
+    });
+    //activar busqueda para forma pago
+    $('#claveregimenfiscalreceptor').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerregimenfiscalreceptorporclave();
+        }
+    });
+    //regresar clave
+    $('#claveregimenfiscalreceptor').on('change', function(e) {
+        regresarclaveregimenfiscalreceptor();
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
     $(".inputnext").keypress(function (e) {
@@ -1846,6 +2277,59 @@ function obtenerdatos(cxcmodificar){
                                             '</tr>'+    
                                         '</table>'+
                                     '</div>'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Uso CFDI <span class="label label-danger" id="textonombreusocfdi"></span></label>'+
+                                        '<table class="col-md-12">'+
+                                            '<tr>'+
+                                                '<td>'+
+                                                    '<div class="btn bg-blue waves-effect" onclick="obtenerusoscfdi()">Seleccionar</div>'+
+                                                '</td>'+
+                                                '<td>'+
+                                                    '<div class="form-line">'+
+                                                    '<input type="text" class="form-control inputnextdet" name="claveusocfdi" id="claveusocfdi" required onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                                    '<input type="hidden" class="form-control" name="claveusocfdianterior" id="claveusocfdianterior" required readonly onkeyup="tipoLetra(this)">'+
+                                                    '<input type="hidden" class="form-control" name="usocfdi" id="usocfdi" required readonly>'+
+                                                    '</div>'+
+                                                '</td>'+
+                                            '</tr>'+    
+                                        '</table>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Régimen Fiscal <span class="label label-danger" id="textonombreregimenfiscalreceptor"></span></label>'+
+                                        '<table class="col-md-12">'+
+                                            '<tr>'+
+                                            '<td>'+
+                                                '<div class="btn bg-blue waves-effect" onclick="obtenerregimenesfiscalesreceptor()">Seleccionar</div>'+
+                                            '</td>'+
+                                            '<td>'+
+                                                '<div class="form-line">'+
+                                                '<input type="text" class="form-control inputnextdet" name="claveregimenfiscalreceptor" id="claveregimenfiscalreceptor"  required onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                                '<input type="hidden" class="form-control" name="claveregimenfiscalreceptoranterior" id="claveregimenfiscalreceptoranterior"  required onkeyup="tipoLetra(this)">'+
+                                                '<input type="hidden" class="form-control" name="regimenfiscalreceptor" id="regimenfiscalreceptor"  required readonly>'+
+                                                '</div>'+
+                                            '</td>'+
+                                            '</tr>'+    
+                                        '</table>'+
+                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Exportación <span class="label label-danger" id="textonombreexportacion"></span></label>'+
+                                        '<table class="col-md-12">'+
+                                            '<tr>'+
+                                                '<td>'+
+                                                    '<div class="btn bg-blue waves-effect" onclick="obtenerexportaciones()">Seleccionar</div>'+
+                                                '</td>'+
+                                                '<td>'+
+                                                    '<div class="form-line">'+
+                                                    '<input type="text" class="form-control inputnextdet" name="claveexportacion" id="claveexportacion" required onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                                    '<input type="hidden" class="form-control" name="claveexportacionanterior" id="claveexportacionanterior" required readonly onkeyup="tipoLetra(this)">'+
+                                                    '<input type="hidden" class="form-control" name="exportacion" id="exportacion" required readonly>'+
+                                                    '</div>'+
+                                                '</td>'+
+                                            '</tr>'+    
+                                        '</table>'+
+                                    '</div>'+
                                 '</div>'+
                             '</div>'+
                         '</div>'+
@@ -1878,6 +2362,8 @@ function obtenerdatos(cxcmodificar){
                                                 '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'uuidfacturapartida\',\'IdDocumento\');"><div class="divorinputmodxl">idDocumento</div></th>'+
                                                 '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'seriefacturapartida\',\'Serie\');">Serie</th>'+
                                                 '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'foliofacturapartida\',\'Folio\');">Folio</th>'+
+                                                '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'equivalenciafacturapartida\',\'Equivalencia\');">Equivalencia</th>'+
+                                                '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'objimpuestofacturapartida\',\'ObjetoImp\');">Objeto Impuesto</th>'+
                                                 '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'monedadrfacturapartida\',\'MonedaDR\');">MonedaDR</th>'+
                                                 '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'tipocambiodrfacturapartida\',\'TipoCambioDR\');">TipoCambioDR</th>'+
                                                 '<th class="'+background_tables+'"  ondblclick="construirtabladinamicaporcolumna(\'metodopagodrfacturapartida\',\'MetodoDePagoDR\');">MetodoDePagoDR</th>'+
@@ -1974,6 +2460,26 @@ function obtenerdatos(cxcmodificar){
     }
     $("#claveformapago").val(data.formapago.Clave);
     $("#claveformapagoanterior").val(data.formapago.Clave);
+    $("#usocfdi").val(data.usocfdi.Nombre);
+    if(data.usocfdi.Nombre != null){
+        $("#textonombreusocfdi").html(data.usocfdi.Nombre.substring(0, 40));
+    }
+    $("#claveusocfdi").val(data.usocfdi.Clave);
+    $("#claveusocfdianterior").val(data.usocfdi.Clave);
+    $("#exportacion").val(data.exportacion.Descripcion);
+    if(data.exportacion.Descripcion != null){
+        $("#textonombreexportacion").html(data.exportacion.Descripcion.substring(0, 40));
+    }
+    $("#claveexportacion").val(data.exportacion.Clave);
+    $("#claveexportacionanterior").val(data.exportacion.Clave);
+    if(data.regimenfiscalreceptor != null){
+        $("#regimenfiscalreceptor").val(data.regimenfiscalreceptor.Nombre);
+        if(data.regimenfiscalreceptor.Nombre != null){
+            $("#textonombreregimenfiscalreceptor").html(data.regimenfiscalreceptor.Nombre.substring(0, 40));
+        }
+        $("#claveregimenfiscalreceptor").val(data.regimenfiscalreceptor.Clave);
+        $("#claveregimenfiscalreceptoranterior").val(data.regimenfiscalreceptor.Clave);
+    }
     $("#anotacion").val(data.cuentaxcobrar.Anotacion);
     //cargar todos los detalles
     $("#tabladetallesfacturas tbody").html(data.filasdetallecuentasporcobrar);
@@ -2050,6 +2556,42 @@ function obtenerdatos(cxcmodificar){
     $('#claveformapago').on('change', function(e) {
         regresarclaveformapago();
     });
+    //activar busqueda para forma pago
+    $('#claveusocfdi').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerusocfdiporclave();
+        }
+    });
+    //regresar clave
+    $('#claveusocfdi').on('change', function(e) {
+        regresarclaveusocfdi();
+    });
+    //activar busqueda para forma pago
+    $('#claveexportacion').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerexportacionporclave();
+        }
+    });
+    //regresar clave
+    $('#claveexportacion').on('change', function(e) {
+        regresarclaveexportacion();
+    });
+    //activar busqueda para forma pago
+    $('#claveregimenfiscalreceptor').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerregimenfiscalreceptorporclave();
+        }
+    });
+    //regresar clave
+    $('#claveregimenfiscalreceptor').on('change', function(e) {
+        regresarclaveregimenfiscalreceptor();
+    });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
     $(".inputnext").keypress(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
@@ -2077,8 +2619,6 @@ function obtenerdatos(cxcmodificar){
         $(".inputnexttabre").eq(index + 1).focus().select(); 
       }
     });
-
-
     //copiar detalles tabla modulo
     const btnCopyTable = document.querySelector('table.tabladinamicaacopiar');
     const elTable = document.querySelector('table.tabladinamicaacopiar');
@@ -2106,8 +2646,7 @@ function obtenerdatos(cxcmodificar){
     //btnCopyText.addEventListener('click', () => copyEl(elText));
     btnCopyTable.addEventListener('dblclick', () => copyEl(elTable));
     //fin copias tabla detalles modulo
-
-
+    $(".select2").select2();//activar select2
     setTimeout(function(){$("#folio").focus();},500);
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
     $('.page-loader-wrapper').css('display', 'none');
@@ -2498,9 +3037,6 @@ function configurar_tabla(){
     //formulario configuracion tablas se arma desde funcionesglobales.js
     var tabs = armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbusquedas);
     $("#tabsconfigurartabla").html(tabs);
-    if(rol_usuario_logueado == 1){
-      $("#divorderbystabla").show();
-    }
     $("#string_datos_ordenamiento_columnas").val(columnas_ordenadas);
     $("#string_datos_tabla_true").val(campos_activados);
     $("#string_datos_tabla_false").val(campos_desactivados);

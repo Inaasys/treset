@@ -47,6 +47,7 @@ use App\VistaObtenerExistenciaProducto;
 use App\FolioComprobanteFactura;
 use App\TipoOrdenCompra;
 use App\TipoUnidad;
+use App\CuentaXCobrar;
 use App\CuentaXCobrarDetalle;
 use App\NotaCliente;
 use App\NotaClienteDetalle;
@@ -398,13 +399,14 @@ class FacturaController extends ConfiguracionSistemaController{
             ->leftJoin('c_MetodoPago as mp', 'mp.Clave', '=', 'c.MetodoPago')
             ->leftJoin('c_UsoCFDI as uc', 'uc.Clave', '=', 'c.UsoCfdi')
             ->leftJoin('c_Pais as p', 'p.Clave', '=', 'c.Pais')
-            ->select('c.Numero', 'c.Nombre', 'c.Plazo', 'c.Rfc', 'c.Agente', 'c.Credito', 'c.Saldo', 'c.Status', 'c.Municipio', 'c.Tipo', 'fp.Clave AS ClaveFormaPago', 'fp.Nombre AS NombreFormaPago', 'mp.Clave AS ClaveMetodoPago', 'mp.Nombre AS NombreMetodoPago', 'uc.Clave AS ClaveUsoCfdi', 'uc.Nombre AS NombreUsoCfdi', 'p.Clave AS ClavePais', 'p.Nombre AS NombrePais')
+            ->leftJoin('c_RegimenFiscal as rf', 'rf.Clave', '=', 'c.RegimenFiscal')
+            ->select('c.Numero', 'c.Nombre', 'c.Plazo', 'c.Rfc', 'c.Agente', 'c.Credito', 'c.Saldo', 'c.Status', 'c.Municipio', 'c.Tipo', 'fp.Clave AS ClaveFormaPago', 'fp.Nombre AS NombreFormaPago', 'mp.Clave AS ClaveMetodoPago', 'mp.Nombre AS NombreMetodoPago', 'uc.Clave AS ClaveUsoCfdi', 'uc.Nombre AS NombreUsoCfdi', 'p.Clave AS ClavePais', 'p.Nombre AS NombrePais', 'rf.Clave as ClaveRegimenFiscal', 'rf.Nombre as RegimenFiscal')
             ->where('c.Status', 'ALTA')
             ->orderBy("Numero", "DESC")
             ->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarcliente('.$data->Numero.',\''.$data->Nombre .'\','.$data->Plazo.',\''.$data->Rfc.'\',\''.$data->ClaveFormaPago.'\',\''.$data->NombreFormaPago.'\',\''.$data->ClaveMetodoPago.'\',\''.$data->NombreMetodoPago.'\',\''.$data->ClaveUsoCfdi.'\',\''.$data->NombreUsoCfdi.'\',\''.$data->ClavePais.'\',\''.$data->NombrePais.'\','.$data->Agente.','.Helpers::convertirvalorcorrecto($data->Credito).','.Helpers::convertirvalorcorrecto($data->Saldo).')">Seleccionar</div>';
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarcliente('.$data->Numero.',\''.$data->Nombre .'\','.$data->Plazo.',\''.$data->Rfc.'\',\''.$data->ClaveFormaPago.'\',\''.$data->NombreFormaPago.'\',\''.$data->ClaveMetodoPago.'\',\''.$data->NombreMetodoPago.'\',\''.$data->ClaveUsoCfdi.'\',\''.$data->NombreUsoCfdi.'\',\''.$data->ClavePais.'\',\''.$data->NombrePais.'\','.$data->Agente.','.Helpers::convertirvalorcorrecto($data->Credito).','.Helpers::convertirvalorcorrecto($data->Saldo).',\''.$data->ClaveRegimenFiscal.'\',\''.$data->RegimenFiscal.'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->rawColumns(['operaciones'])
@@ -431,6 +433,8 @@ class FacturaController extends ConfiguracionSistemaController{
         $numeroagente = '';
         $nombreagente = '';
         $rfcagente = '';
+        $claveregimenfiscalreceptor = '';
+        $regimenfiscalreceptor = '';
         $existecliente = Cliente::where('Numero', $request->numerocliente)->where('Status', 'ALTA')->count();
         if($existecliente > 0){
             $cliente = Cliente::where('Numero', $request->numerocliente)->where('Status', 'ALTA')->first();
@@ -439,7 +443,8 @@ class FacturaController extends ConfiguracionSistemaController{
             ->leftJoin('c_MetodoPago as mp', 'mp.Clave', '=', 'c.MetodoPago')
             ->leftJoin('c_UsoCFDI as uc', 'uc.Clave', '=', 'c.UsoCfdi')
             ->leftJoin('c_Pais as p', 'p.Clave', '=', 'c.Pais')
-            ->select('c.Numero', 'c.Status', 'fp.Clave AS claveformapago', 'fp.Nombre AS formapago', 'mp.Clave AS clavemetodopago', 'mp.Nombre AS metodopago', 'uc.Clave AS claveusocfdi', 'uc.Nombre AS usocfdi', 'p.Clave AS claveresidenciafiscal', 'p.Nombre AS residenciafiscal')
+            ->leftJoin('c_RegimenFiscal as rf', 'rf.Clave', '=', 'c.RegimenFiscal')
+            ->select('c.Numero', 'c.Status', 'fp.Clave AS claveformapago', 'fp.Nombre AS formapago', 'mp.Clave AS clavemetodopago', 'mp.Nombre AS metodopago', 'uc.Clave AS claveusocfdi', 'uc.Nombre AS usocfdi', 'p.Clave AS claveresidenciafiscal', 'p.Nombre AS residenciafiscal', 'rf.Clave as ClaveRegimenFiscal', 'rf.Nombre as RegimenFiscal')
             ->where('c.Numero', $request->numerocliente)
             ->where('c.Status', 'ALTA')
             ->get();
@@ -451,6 +456,8 @@ class FacturaController extends ConfiguracionSistemaController{
             $usocfdi = $datos[0]->usocfdi;
             $claveresidenciafiscal = $datos[0]->claveresidenciafiscal;
             $residenciafiscal = $datos[0]->residenciafiscal;
+            $claveregimenfiscalreceptor = $datos[0]->ClaveRegimenFiscal;
+            $regimenfiscalreceptor = $datos[0]->RegimenFiscal;
             $agente = Agente::where('Numero', $cliente->Agente)->first();
             $numero = $cliente->Numero;
             $nombre = $cliente->Nombre;
@@ -477,6 +484,8 @@ class FacturaController extends ConfiguracionSistemaController{
             'usocfdi' => $usocfdi,
             'claveresidenciafiscal' => $claveresidenciafiscal,
             'residenciafiscal' => $residenciafiscal,
+            'claveregimenfiscalreceptor' => $claveregimenfiscalreceptor,
+            'regimenfiscalreceptor' => $regimenfiscalreceptor,
             'numeroagente' => $numeroagente,
             'nombreagente' => $nombreagente,
             'rfcagente' => $rfcagente
@@ -723,6 +732,37 @@ class FacturaController extends ConfiguracionSistemaController{
                     ->make(true);
         }
     }
+
+    //obtener 
+    public function facturas_obtener_regimenes_fiscales_receptor(Request $request){
+        if($request->ajax()){
+            $data = c_RegimenFiscal::query();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarregimenfiscalreceptor(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+
+    //obtener forma pago por clave
+    public function facturas_obtener_regimenfiscalreceptor_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existeregimenfiscal = c_RegimenFiscal::where('Clave', $request->claveregimenfiscalreceptor)->count();
+        if($existeregimenfiscal > 0){
+            $regimenfiscal = c_RegimenFiscal::where('Clave', $request->claveregimenfiscalreceptor)->first();
+            $clave = $regimenfiscal->Clave;
+            $nombre = $regimenfiscal->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data);  
+    }    
 
     //obtener forma pago por clave
     public function facturas_obtener_residencia_fiscal_por_clave(Request $request){
@@ -1004,6 +1044,7 @@ class FacturaController extends ConfiguracionSistemaController{
         //detalles remision
         $filasremisiones = '';
         $contadorfilas = $request->contadorfilas;
+        $contadorproductos = $request->contadorproductos;
         $partida = $request->partida;
         foreach(explode(",", $request->stringremisionesseleccionadas) as $r){
             $remision = Remision::where('Remision', $r)->first();
@@ -1087,6 +1128,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 '</tr>';
                 $contadorfilas++;
                 $partida++;
+                $contadorproductos++;
             }  
             /*
             $remision = Remision::where('Remision', $request->Remision)->first();
@@ -1179,6 +1221,7 @@ class FacturaController extends ConfiguracionSistemaController{
         $data = array(
             "filasremisiones" => $filasremisiones,
             "contadorfilas" => $contadorfilas,
+            "contadorproductos" => $contadorproductos,
             "partida" => $partida,
             "saldo" => Helpers::convertirvalorcorrecto($remision->Saldo),
             "cliente" => $cliente
@@ -1229,9 +1272,9 @@ class FacturaController extends ConfiguracionSistemaController{
     public function facturas_obtener_orden(Request $request){
         $filasordenes = '';
         $contadorfilas = $request->contadorfilas;
+        $contadorproductos = $request->contadorproductos;
         $partida = $request->partida;
         foreach(explode(",", $request->stringordenesseleccionadas) as $o){
-
             $orden = OrdenTrabajo::where('Orden', $o)->first();
             $cliente = $orden->Cliente;
             $porcentajeiva = Helpers::calcular_porcentaje_iva_aritmetico($orden->Iva, $orden->SubTotal);
@@ -1321,6 +1364,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 '</tr>';
                 $contadorfilas++;
                 $partida++;
+                $contadorproductos++;
             } 
             /*
             $orden = OrdenTrabajo::where('Orden', $request->Orden)->first();
@@ -1417,6 +1461,7 @@ class FacturaController extends ConfiguracionSistemaController{
         $data = array(
             "filasordenes" => $filasordenes,
             "contadorfilas" => $contadorfilas,
+            "contadorproductos" => $contadorproductos,
             "partida" => $partida,
             "cliente" => $cliente,
             "pedido" => $orden->Pedido
@@ -1552,6 +1597,66 @@ class FacturaController extends ConfiguracionSistemaController{
         return response()->json($data);
 
     }
+        
+    public function facturas_obtener_servicios(Request $request){
+        if($request->ajax()){
+            $codigoservicioabuscar = $request->codigoservicioabuscar;
+            $tipooperacion = $request->tipooperacion;
+            //$data = Servicio::where('Codigo', 'like', '%'.$codigoservicioabuscar.'%')->where('Status', 'ALTA');
+            $data = DB::table('Servicios as s')
+            ->leftjoin('c_ClaveProdServ as cps', 's.ClaveProducto', '=', 'cps.Clave')
+            ->leftjoin('c_ClaveUnidad as cu', 's.ClaveUnidad', '=', 'cu.Clave')
+            ->select('s.Codigo', 's.Servicio', 's.Unidad', 's.Costo', 's.Venta', "s.Cantidad", 's.ClaveProducto', 's.ClaveUnidad', 'cps.Nombre as NombreClaveProducto', 'cu.Nombre as NombreClaveUnidad')
+            ->where('Codigo', 'like', '%'.$codigoservicioabuscar.'%')
+            ->where('Status', 'ALTA');
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data) use ($tipooperacion){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Servicio, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Venta).'\',\''.Helpers::convertirvalorcorrecto(16).'\',\''.Helpers::convertirvalorcorrecto($data->Venta).'\',\''.$tipooperacion.'\',\'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$data->NombreClaveProducto.'\',\''.$data->NombreClaveUnidad.'\',\''.Helpers::convertirvalorcorrecto($data->Venta).'\',\''.Helpers::convertirvalorcorrecto($data->Cantidad).'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->addColumn('Venta', function($data){ 
+                        return Helpers::convertirvalorcorrecto($data->Venta);
+                    })
+                    ->addColumn('Cantidad', function($data){ 
+                        return Helpers::convertirvalorcorrecto($data->Cantidad);
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+
+    }
+    public function facturas_obtener_servicio_por_codigo(Request $request){
+        $codigoservicioabuscar = $request->codigoservicioabuscar;
+        $contarservicios = Servicio::where('Codigo', $codigoservicioabuscar)->where('Status', 'ALTA')->count();
+        if($contarservicios > 0){
+            $servicio = Servicio::where('Codigo', $codigoservicioabuscar)->where('Status', 'ALTA')->first();
+            $data = array(
+                'Codigo' => $servicio->Codigo,
+                'Servicio' => htmlspecialchars($servicio->Servicio, ENT_QUOTES),
+                'Unidad' => $servicio->Unidad,
+                'Costo' => Helpers::convertirvalorcorrecto($servicio->Costo),
+                'Venta' => Helpers::convertirvalorcorrecto($servicio->Venta),
+                'Cantidad' => Helpers::convertirvalorcorrecto($servicio->Cantidad),
+                'ClaveProducto' => $servicio->ClaveProducto,
+                'ClaveUnidad' => $servicio->ClaveUnidad,
+                'contarservicios' => $contarservicios
+            );
+        }else{
+            $data = array(
+                'Codigo' => '',
+                'Servicio' => '',
+                'Unidad' => '',
+                'Costo' => '',
+                'Venta' => '',
+                'Cantidad' => '',
+                'ClaveProducto' => '',
+                'ClaveUnidad' => '',
+                'contarservicios' => $contarservicios
+            );
+        }
+        return response()->json($data);
+    }
+
     //obtener claves productos
     public function facturas_obtener_claves_productos(Request $request){
         if($request->ajax()){
@@ -1688,6 +1793,7 @@ class FacturaController extends ConfiguracionSistemaController{
         $Factura->EmisorNombre=$request->emisornombre;
         $Factura->ReceptorRfc=$request->receptorrfc;
         $Factura->ReceptorNombre=$request->receptornombre;
+        $Factura->RegimenFiscalReceptor=$request->claveregimenfiscalreceptor;
         $Factura->Hora=Carbon::parse($request->fecha)->toDateTimeString();
         $Factura->Periodo=$this->periodohoy;
         $Factura->save();
@@ -1795,6 +1901,7 @@ class FacturaController extends ConfiguracionSistemaController{
         $metodopago = MetodoPago::where('Clave', $factura->MetodoPago)->first();
         $usocfdi = UsoCFDI::where('Clave', $factura->UsoCfdi)->first();
         $residenciafiscal = Pais::where('Clave', $factura->ResidenciaFiscal)->first();
+        $regimenfiscalreceptor = c_RegimenFiscal::where('Clave', $factura->RegimenFiscalReceptor)->first();
         $nombretiporelacion = "";
         $clavetiporelacion = "";
         $contartiporelacion = c_TipoRelacion::where('Clave', $factura->TipoRelacion)->count();
@@ -1802,6 +1909,20 @@ class FacturaController extends ConfiguracionSistemaController{
             $tiporelacion = c_TipoRelacion::where('Clave', $factura->TipoRelacion)->first();
             $nombretiporelacion = $tiporelacion->Nombre;
             $clavetiporelacion = $tiporelacion->Clave;
+        }
+        //ver si se puede modificar la factura siempre y cuando sea una factura libre y no tenga ningun documento ligado a ella
+        switch($factura->Serie){
+            case "LST":
+                $numerocuentasporcobrarligadas = CuentaXCobrarDetalle::where('Factura', $factura->Factura)->where('Abono', '>', 0)->count();
+                $numeronotascreditoligadas = NotaClienteDocumento::where('Factura', $factura->Factura)->where('Descuento', '>', 0)->count();
+                if($numerocuentasporcobrarligadas == 0 && $numeronotascreditoligadas == 0){
+                    $readonly = "";
+                }else{
+                    $readonly = "readonly";
+                }
+                break;
+            default:
+                $readonly = "readonly";
         }
         //detalles
         $consarrayremisiones = array();
@@ -1817,13 +1938,6 @@ class FacturaController extends ConfiguracionSistemaController{
             $partida = 1;
             $tipo="modificacion";
             foreach($detallesfactura as $df){
-                switch($factura->Serie){
-                    case "LST":
-                        $readonly = "";
-                        break;
-                    default:
-                        $readonly = "readonly";
-                }
                 $claveproductopartida = ClaveProdServ::where('Clave', $df->ClaveProducto)->first();
                 $claveunidadpartida = ClaveUnidad::where('Clave', $df->ClaveUnidad)->first();
                 $claveproducto = $claveproductopartida ? $claveproductopartida->Clave : '';
@@ -1834,7 +1948,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                     '<td class="tdmod"><div class="numeropartida">'.$partida.'</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$df->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$df->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$df->Codigo.'</b></td>'.
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($df->Descripcion, ENT_QUOTES).'" required '.$readonly.' data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></td>'.
+                    '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($df->Descripcion, ENT_QUOTES).'" required '.$readonly.' data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodxs unidadpartida" name="unidadpartida[]" value="'.$df->Unidad.'" required data-parsley-length="[1, 5]">'.$df->Unidad.'</td>'.
                     '<td class="tdmod">'.
                         '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($df->Cantidad).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" '.$readonly.'>'.
@@ -1969,6 +2083,7 @@ class FacturaController extends ConfiguracionSistemaController{
             "metodopago" => $metodopago,
             "usocfdi" => $usocfdi,
             "residenciafiscal" => $residenciafiscal,
+            "regimenfiscalreceptor" => $regimenfiscalreceptor,
             "filasdocumentosfactura" => $filasdocumentosfactura,
             "numerodocumentosfactura" => $numerodocumentosfactura,
             "fecha" => Helpers::formatoinputdatetime($factura->Fecha),
@@ -2041,8 +2156,34 @@ class FacturaController extends ConfiguracionSistemaController{
             'MetodoPago' => $request->clavemetodopago,
             'UsoCfdi' => $request->claveusocfdi,
             'ResidenciaFiscal' => $request->claveresidenciafiscal,
+            'RegimenFiscalReceptor' => $request->claveregimenfiscalreceptor,
             'NumRegIdTrib' => $request->numeroregidtrib
         ]);
+        //ver si se puede modificar la factura siempre y cuando sea una factura libre y no tenga ningun documento ligado a ella
+        switch($Factura->Serie){
+            case "LST":
+                //modificar saldo cliente
+                $cliente = Cliente::where('Numero', $Factura->Cliente)->first();
+                $NuevoSaldoCliente = $cliente->Saldo + $Factura->Total - $request->total;
+                Cliente::where('Numero', $Factura->Cliente)
+                ->update([
+                    'Saldo' => Helpers::convertirvalorcorrecto($NuevoSaldoCliente)
+                ]); 
+                //modificar detalle
+                Factura::where('Factura', $factura)
+                ->update([
+                    'Importe' => $request->importe,
+                    'Descuento' => $request->descuento,
+                    'SubTotal' => $request->subtotal,
+                    'Iva' => $request->iva,
+                    'Total' => $request->total,
+                    'Costo' => $request->costo,
+                    'Comision' => $request->comision,
+                    'Utilidad' => $request->utilidad,
+                    'Saldo' => $request->total
+                ]); 
+                break;
+        }
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
         $BitacoraDocumento->Documento = "FACTURAS";
@@ -2055,12 +2196,34 @@ class FacturaController extends ConfiguracionSistemaController{
         $BitacoraDocumento->save();
         //detalles
         foreach ($request->codigopartida as $key => $codigopartida){  
-            //modificar detalle
-            /*FacturaDetalle::where('Factura', $factura)
-                            ->where('Item', $request->itempartida [$key])
-                            ->update([
-                                'Descripcion' => $request->descripcionpartida [$key]
-                            ]);    */           
+            //ver si se puede modificar la factura siempre y cuando sea una factura libre y no tenga ningun documento ligado a ella
+            switch($Factura->Serie){
+                case "LST":
+                    //modificar detalle
+                    FacturaDetalle::where('Factura', $factura)
+                    ->where('Item', $request->itempartida [$key])
+                    ->update([
+                        'Descripcion' => $request->descripcionpartida [$key],
+                        'Cantidad' =>  $request->cantidadpartida  [$key],
+                        'Precio' =>  $request->preciopartida [$key],
+                        'Importe' => $request->importepartida [$key],
+                        'Dcto' => $request->descuentoporcentajepartida [$key],
+                        'Descuento' => $request->descuentopesospartida [$key],
+                        'ImporteDescuento' => $request->importedescuentopesospartida [$key],
+                        'SubTotal' => $request->subtotalpartida [$key],
+                        'Impuesto' => $request->ivaporcentajepartida [$key],
+                        'Iva' => $request->trasladoivapesospartida [$key],
+                        'Total' => $request->totalpesospartida [$key],
+                        'Costo' => $request->costopartida [$key],
+                        'CostoTotal' => $request->costototalpartida [$key],
+                        'Com' => $request->comisionporcentajepartida [$key],
+                        'Comision' => $request->comisionpesospartida [$key],
+                        'Utilidad' => $request->utilidadpartida [$key],
+                        'ClaveProducto' => $request->claveproductopartida [$key],
+                        'ClaveUnidad' => $request->claveunidadpartida [$key],
+                    ]); 
+                    break;
+            }
         }
         //detalles documentos
         if($request->numerofilasuuid > 0){
@@ -2131,12 +2294,12 @@ class FacturaController extends ConfiguracionSistemaController{
         $numeronotacliente = 0;
         //verificar si hay una cuenta por cobrar ligada
         if($numerocuentasporcobrar > 0){
-            $detallecuentaxcobrar = CuentaXCobrarDetalle::where('Factura', $request->facturadesactivar)->first();
+            $detallecuentaxcobrar = CuentaXCobrarDetalle::where('Factura', $request->facturadesactivar)->Where('Abono', '>', 0)->first();
             $numerocuentaxcobrar = $detallecuentaxcobrar->Pago;
         }
         //verificar si hay una nota de credito cliente ligada
         if($numeronotascliente > 0){
-            $detallenotacliente = NotaClienteDocumento::where('Factura', $request->facturadesactivar)->first();
+            $detallenotacliente = NotaClienteDocumento::where('Factura', $request->facturadesactivar)->where('Descuento', '>', 0)->first();
             $numeronotacliente = $detallenotacliente->Nota;
         }
         $resultadofechas = Helpers::compararanoymesfechas($Factura->Fecha);
@@ -2431,7 +2594,8 @@ class FacturaController extends ConfiguracionSistemaController{
             }else{
                 $est = $cliente->Estado;
             }
-            $regimenfiscalcliente = c_RegimenFiscal::where('Clave', $cliente->RegimenFiscal)->first();
+            //$regimenfiscalcliente = c_RegimenFiscal::where('Clave', $cliente->RegimenFiscal)->first();
+            $regimenfiscalcliente = c_RegimenFiscal::where('Clave', $f->RegimenFiscalReceptor)->first();
             $contaragente = Agente::where('Numero', $f->Agente)->count();
             $NombreAgente = "";
             if($contaragente > 0){
@@ -2679,7 +2843,8 @@ class FacturaController extends ConfiguracionSistemaController{
             }else{
                 $est = $cliente->Estado;
             }
-            $regimenfiscalcliente = c_RegimenFiscal::where('Clave', $cliente->RegimenFiscal)->first();
+            //$regimenfiscalcliente = c_RegimenFiscal::where('Clave', $cliente->RegimenFiscal)->first();
+            $regimenfiscalcliente = c_RegimenFiscal::where('Clave', $f->RegimenFiscalReceptor)->first();
             $contaragente = Agente::where('Numero', $f->Agente)->count();
             $NombreAgente = "";
             if($contaragente > 0){
@@ -2905,7 +3070,8 @@ class FacturaController extends ConfiguracionSistemaController{
             }else{
                 $est = $cliente->Estado;
             }
-            $regimenfiscalcliente = c_RegimenFiscal::where('Clave', $cliente->RegimenFiscal)->first();
+            //$regimenfiscalcliente = c_RegimenFiscal::where('Clave', $cliente->RegimenFiscal)->first();
+            $regimenfiscalcliente = c_RegimenFiscal::where('Clave', $f->RegimenFiscalReceptor)->first();
             $contaragente = Agente::where('Numero', $f->Agente)->count();
             $NombreAgente = "";
             if($contaragente > 0){
@@ -3282,7 +3448,8 @@ class FacturaController extends ConfiguracionSistemaController{
             }else{
                 $est = $cliente->Estado;
             }
-            $regimenfiscalcliente = c_RegimenFiscal::where('Clave', $cliente->RegimenFiscal)->first();
+            //$regimenfiscalcliente = c_RegimenFiscal::where('Clave', $cliente->RegimenFiscal)->first();
+            $regimenfiscalcliente = c_RegimenFiscal::where('Clave', $f->RegimenFiscalReceptor)->first();
             $contaragente = Agente::where('Numero', $f->Agente)->count();
             $NombreAgente = "";
             if($contaragente > 0){
@@ -3482,7 +3649,8 @@ class FacturaController extends ConfiguracionSistemaController{
             }else{
                 $est = $cliente->Estado;
             }
-            $regimenfiscalcliente = c_RegimenFiscal::where('Clave', $cliente->RegimenFiscal)->first();
+            //$regimenfiscalcliente = c_RegimenFiscal::where('Clave', $cliente->RegimenFiscal)->first();
+            $regimenfiscalcliente = c_RegimenFiscal::where('Clave', $f->RegimenFiscalReceptor)->first();
             $contaragente = Agente::where('Numero', $f->Agente)->count();
             $NombreAgente = "";
             if($contaragente > 0){
@@ -3845,7 +4013,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 "customer" => array(
                     "legal_name" => $cliente->Nombre,
                     "tax_id" => $cliente->Rfc,
-                    /*
+                    
                     //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
                     "tax_system" => $cliente->RegimenFiscal,
                     "address" => 
@@ -3853,12 +4021,12 @@ class FacturaController extends ConfiguracionSistemaController{
                             "zip" => $cliente->CodigoPostal,
                         )
                     //fin cfdi 4.0
-                    */
+                    
                 ),
                 "items" => $arraytest,
                 "payment_form" => $factura->FormaPago,
                 "payment_method" => $factura->MetodoPago,
-                /*
+                
                 //se debe cambiar la forma de relacion los documentos y en lugar de mandar arra products, se manda array items como en las facturas de ingreso con facturapi 2.0
                 "related_documents" => array(
                     array(
@@ -3866,11 +4034,11 @@ class FacturaController extends ConfiguracionSistemaController{
                         "documents" => $arraydoc
                     )
                 ),
-                */
+                /*
                 //datos para facturar en facturapi 1.0
                 "relation" => $factura->TipoRelacion,
                 "related" => $arraydoc,
-                //datos para facturar en facturapi 1.0
+                */
                 "folio_number" => $factura->Folio,
                 "series" => $factura->Serie,
                 "currency" => $factura->Moneda,
@@ -3884,7 +4052,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 "customer" => array(
                     "legal_name" => $cliente->Nombre,
                     "tax_id" => $cliente->Rfc,
-                    /*
+                    
                     //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
                     "tax_system" => $cliente->RegimenFiscal,
                     "address" => 
@@ -3892,7 +4060,7 @@ class FacturaController extends ConfiguracionSistemaController{
                             "zip" => $cliente->CodigoPostal,
                         )
                     //fin cfdi 4.0
-                    */
+                    
                 ),
                 "items" => $arraytest,
                 "payment_form" => $factura->FormaPago,
@@ -3938,9 +4106,9 @@ class FacturaController extends ConfiguracionSistemaController{
             $Comprobante->Comprobante = 'Factura';
             $Comprobante->Tipo = $new_invoice->type;
             //version 4.0
-            //$Comprobante->Version = '4.0';
+            $Comprobante->Version = '4.0';
             //version 3.3
-            $Comprobante->Version = '3.3';
+            //$Comprobante->Version = '3.3';
             $Comprobante->Serie = $new_invoice->series;
             $Comprobante->Folio = $new_invoice->folio_number;
             $Comprobante->UUID = $new_invoice->uuid;

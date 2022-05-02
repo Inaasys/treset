@@ -270,6 +270,8 @@
         var notas_credito_clientes_obtener_uso_cfdi_por_clave = '{!!URL::to('notas_credito_clientes_obtener_uso_cfdi_por_clave')!!}';
         var notas_credito_clientes_obtener_residencias_fiscales = '{!!URL::to('notas_credito_clientes_obtener_residencias_fiscales')!!}';
         var notas_credito_clientes_obtener_residencia_fiscal_por_clave = '{!!URL::to('notas_credito_clientes_obtener_residencia_fiscal_por_clave')!!}';
+        var notas_credito_clientes_obtener_regimenes_fiscales_receptor = '{!!URL::to('notas_credito_clientes_obtener_regimenes_fiscales_receptor')!!}';
+        var notas_credito_clientes_obtener_regimenfiscalreceptor_por_clave = '{!!URL::to('notas_credito_clientes_obtener_regimenfiscalreceptor_por_clave')!!}';
         var notas_credito_clientes_obtener_facturas = '{!!URL::to('notas_credito_clientes_obtener_facturas')!!}'; 
         var notas_credito_clientes_obtener_factura = '{!!URL::to('notas_credito_clientes_obtener_factura')!!}';
         var notas_credito_clientes_obtener_productos = '{!!URL::to('notas_credito_clientes_obtener_productos')!!}';

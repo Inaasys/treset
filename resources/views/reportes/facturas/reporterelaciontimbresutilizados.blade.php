@@ -44,7 +44,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="form-line">
-                                                        <input type="text" class="form-control" name="claveserie" id="claveserie" onkeyup="tipoLetra(this)" autocomplete="off">
+                                                        <input type="text" class="form-control inputnextdet" name="claveserie" id="claveserie" onkeyup="tipoLetra(this)" autocomplete="off">
                                                         <input type="hidden" class="form-control" name="claveserieanterior" id="claveserieanterior" onkeyup="tipoLetra(this)">
                                                         <input type="hidden" class="form-control" name="serie" id="serie" readonly onkeyup="tipoLetra(this)">
                                                     </div>

@@ -201,13 +201,14 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             ->leftJoin('c_MetodoPago as mp', 'mp.Clave', '=', 'c.MetodoPago')
             ->leftJoin('c_UsoCFDI as uc', 'uc.Clave', '=', 'c.UsoCfdi')
             ->leftJoin('c_Pais as p', 'p.Clave', '=', 'c.Pais')
-            ->select('c.Numero', 'c.Nombre', 'c.Plazo', 'c.Rfc', 'c.Agente', 'c.Credito', 'c.Saldo', 'c.Status', 'c.Municipio', 'c.Tipo', 'fp.Clave AS ClaveFormaPago', 'fp.Nombre AS NombreFormaPago', 'mp.Clave AS ClaveMetodoPago', 'mp.Nombre AS NombreMetodoPago', 'uc.Clave AS ClaveUsoCfdi', 'uc.Nombre AS NombreUsoCfdi', 'p.Clave AS ClavePais', 'p.Nombre AS NombrePais')
+            ->leftJoin('c_RegimenFiscal as rf', 'rf.Clave', '=', 'c.RegimenFiscal')
+            ->select('c.Numero', 'c.Nombre', 'c.Plazo', 'c.Rfc', 'c.Agente', 'c.Credito', 'c.Saldo', 'c.Status', 'c.Municipio', 'c.Tipo', 'fp.Clave AS ClaveFormaPago', 'fp.Nombre AS NombreFormaPago', 'mp.Clave AS ClaveMetodoPago', 'mp.Nombre AS NombreMetodoPago', 'uc.Clave AS ClaveUsoCfdi', 'uc.Nombre AS NombreUsoCfdi', 'p.Clave AS ClavePais', 'p.Nombre AS NombrePais', 'rf.Clave as ClaveRegimenFiscal', 'rf.Nombre as RegimenFiscal')
             ->where('c.Status', 'ALTA')
             ->orderBy("Numero", "DESC")
             ->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarcliente('.$data->Numero.',\''.$data->Nombre .'\','.$data->Plazo.',\''.$data->Rfc.'\',\''.$data->ClaveFormaPago.'\',\''.$data->NombreFormaPago.'\',\''.$data->ClaveMetodoPago.'\',\''.$data->NombreMetodoPago.'\',\''.$data->ClaveUsoCfdi.'\',\''.$data->NombreUsoCfdi.'\',\''.$data->ClavePais.'\',\''.$data->NombrePais.'\')">Seleccionar</div>';
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarcliente('.$data->Numero.',\''.$data->Nombre .'\','.$data->Plazo.',\''.$data->Rfc.'\',\''.$data->ClaveFormaPago.'\',\''.$data->NombreFormaPago.'\',\''.$data->ClaveMetodoPago.'\',\''.$data->NombreMetodoPago.'\',\''.$data->ClaveUsoCfdi.'\',\''.$data->NombreUsoCfdi.'\',\''.$data->ClavePais.'\',\''.$data->NombrePais.'\',\''.$data->ClaveRegimenFiscal.'\',\''.$data->RegimenFiscal.'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->rawColumns(['operaciones'])
@@ -231,6 +232,8 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
         $usocfdi = '';
         $claveresidenciafiscal = '';
         $residenciafiscal = '';
+        $claveregimenfiscalreceptor = '';
+        $regimenfiscalreceptor = '';
         $existecliente = Cliente::where('Numero', $request->numerocliente)->where('Status', 'ALTA')->count();
         if($existecliente > 0){
             $cliente = Cliente::where('Numero', $request->numerocliente)->where('Status', 'ALTA')->first();
@@ -239,7 +242,8 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             ->leftJoin('c_MetodoPago as mp', 'mp.Clave', '=', 'c.MetodoPago')
             ->leftJoin('c_UsoCFDI as uc', 'uc.Clave', '=', 'c.UsoCfdi')
             ->leftJoin('c_Pais as p', 'p.Clave', '=', 'c.Pais')
-            ->select('c.Numero', 'c.Status', 'fp.Clave AS claveformapago', 'fp.Nombre AS formapago', 'mp.Clave AS clavemetodopago', 'mp.Nombre AS metodopago', 'uc.Clave AS claveusocfdi', 'uc.Nombre AS usocfdi', 'p.Clave AS claveresidenciafiscal', 'p.Nombre AS residenciafiscal')
+            ->leftJoin('c_RegimenFiscal as rf', 'rf.Clave', '=', 'c.RegimenFiscal')
+            ->select('c.Numero', 'c.Status', 'fp.Clave AS claveformapago', 'fp.Nombre AS formapago', 'mp.Clave AS clavemetodopago', 'mp.Nombre AS metodopago', 'uc.Clave AS claveusocfdi', 'uc.Nombre AS usocfdi', 'p.Clave AS claveresidenciafiscal', 'p.Nombre AS residenciafiscal', 'rf.Clave as ClaveRegimenFiscal', 'rf.Nombre as RegimenFiscal')
             ->where('c.Numero', $request->numerocliente)
             ->where('c.Status', 'ALTA')
             ->get();
@@ -251,6 +255,8 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $usocfdi = $datos[0]->usocfdi;
             $claveresidenciafiscal = $datos[0]->claveresidenciafiscal;
             $residenciafiscal = $datos[0]->residenciafiscal;
+            $claveregimenfiscalreceptor = $datos[0]->ClaveRegimenFiscal;
+            $regimenfiscalreceptor = $datos[0]->RegimenFiscal;
             $numero = $cliente->Numero;
             $nombre = $cliente->Nombre;
             $rfc = $cliente->Rfc;
@@ -273,6 +279,8 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             'usocfdi' => $usocfdi,
             'claveresidenciafiscal' => $claveresidenciafiscal,
             'residenciafiscal' => $residenciafiscal,
+            'claveregimenfiscalreceptor' => $claveregimenfiscalreceptor,
+            'regimenfiscalreceptor' => $regimenfiscalreceptor,
         );
         return response()->json($data);
     }
@@ -559,6 +567,37 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
         );
         return response()->json($data); 
     }
+
+    //obtener 
+    public function notas_credito_clientes_obtener_regimenes_fiscales_receptor(Request $request){
+        if($request->ajax()){
+            $data = c_RegimenFiscal::query();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarregimenfiscalreceptor(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+
+    //obtener forma pago por clave
+    public function notas_credito_clientes_obtener_regimenfiscalreceptor_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existeregimenfiscal = c_RegimenFiscal::where('Clave', $request->claveregimenfiscalreceptor)->count();
+        if($existeregimenfiscal > 0){
+            $regimenfiscal = c_RegimenFiscal::where('Clave', $request->claveregimenfiscalreceptor)->first();
+            $clave = $regimenfiscal->Clave;
+            $nombre = $regimenfiscal->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data);  
+    }    
 
     //obtener facturas
     public function notas_credito_clientes_obtener_facturas(Request $request){
@@ -850,9 +889,17 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $NotaCliente->EmisorNombre=$request->emisornombre;
             $NotaCliente->ReceptorRfc=$request->receptorrfc;
             $NotaCliente->ReceptorNombre=$request->receptornombre;
+            $NotaCliente->RegimenFiscalReceptor=$request->claveregimenfiscalreceptor;
             $NotaCliente->Hora=Carbon::parse($request->fecha)->toDateTimeString();
             $NotaCliente->Periodo=$this->periodohoy;
             $NotaCliente->save();
+            //modificar saldo cliente
+            $SaldoCliente = Cliente::where('Numero', $request->numerocliente)->first();
+            $NuevoSaldoCliente = $SaldoCliente->Saldo - $request->total;
+            Cliente::where('Numero', $request->numerocliente)
+            ->update([
+                'Saldo' => Helpers::convertirvalorcorrecto($NuevoSaldoCliente)
+            ]); 
             //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO NOTAS PROVEEDOR
             $BitacoraDocumento = new BitacoraDocumento;
             $BitacoraDocumento->Documento = "NOTAS CLIENTE";
@@ -977,6 +1024,13 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
     //bajas
     public function notas_credito_clientes_alta_o_baja(Request $request){
         $NotaCliente = NotaCliente::where('Nota', $request->notadesactivar)->first();
+        //modificar saldo cliente
+        $SaldoCliente = Cliente::where('Numero', $NotaCliente->Cliente)->first();
+        $NuevoSaldoCliente = $SaldoCliente->Saldo + $NotaCliente->Total;
+        Cliente::where('Numero', $NotaCliente->Cliente)
+        ->update([
+            'Saldo' => Helpers::convertirvalorcorrecto($NuevoSaldoCliente)
+        ]); 
         //cambiar status y colocar valores en 0
         $MotivoBaja = $request->motivobaja.', '.Helpers::fecha_exacta_accion_datetimestring().', '.Auth::user()->user;
         NotaCliente::where('Nota', $request->notadesactivar)
@@ -1081,6 +1135,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
         $metodopago = MetodoPago::where('Clave', $notacliente->MetodoPago)->first();
         $usocfdi = UsoCFDI::where('Clave', $notacliente->UsoCfdi)->first();
         $residenciafiscal = Pais::where('Clave', $notacliente->ResidenciaFiscal)->first();
+        $regimenfiscalreceptor = c_RegimenFiscal::where('Clave', $notacliente->RegimenFiscalReceptor)->first();
         //detalles
         $detallesnotacliente = NotaClienteDetalle::where('Nota', $request->notamodificar)->orderBy('Item', 'ASC')->get();
         $numerodetallesnotacliente = NotaClienteDetalle::where('Nota', $request->notamodificar)->count();
@@ -1311,6 +1366,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             "metodopago" => $metodopago,
             "usocfdi" => $usocfdi,
             "residenciafiscal" => $residenciafiscal,
+            "regimenfiscalreceptor" => $regimenfiscalreceptor,
             "filasdocumentosnotacliente" => $filasdocumentosnotacliente,
             "numerodocumentosnotacliente" => $numerodocumentosnotacliente,
             "contadorfilasfacturas" => $contadorfilasfacturas,
@@ -1433,12 +1489,20 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                 'MetodoPago' => $request->clavemetodopago,
                 'UsoCfdi' => $request->claveusocfdi,
                 'ResidenciaFiscal' => $request->claveresidenciafiscal,
+                'RegimenFiscalReceptor' => $request->claveregimenfiscalreceptor,
                 'NumRegIdTrib' => $request->numeroregidtrib,
                 'EmisorRfc' => $request->emisorrfc,
                 'EmisorNombre' => $request->emisornombre,
                 'ReceptorRfc' => $request->receptorrfc,
                 'ReceptorNombre' => $request->receptornombre
             ]);
+            //modificar saldo cliente
+            $SaldoCliente = Cliente::where('Numero', $request->numerocliente)->first();
+            $NuevoSaldoCliente = $SaldoCliente->Saldo + $NotaCliente->Total - $request->total;
+            Cliente::where('Numero', $request->numerocliente)
+            ->update([
+                'Saldo' => Helpers::convertirvalorcorrecto($NuevoSaldoCliente)
+            ]); 
             //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
             $BitacoraDocumento = new BitacoraDocumento;
             $BitacoraDocumento->Documento = "NOTAS CLIENTE";
@@ -1711,12 +1775,14 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $comprobantetimbrado = Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->count();
             $comprobante = Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->first();
             $regimenfiscal = c_RegimenFiscal::where('Clave', $ncc->RegimenFiscal)->first();
+            $regimenfiscalcliente = c_RegimenFiscal::where('Clave', $ncc->RegimenFiscalReceptor)->first();
             $data[]=array(
                 "notacreditocliente"=>$ncc,
                 "notaclientedocumento"=>$notaclientedocumento,
                 "comprobante" => $comprobante,
                 "comprobantetimbrado" => $comprobantetimbrado,
                 "regimenfiscal"=> $regimenfiscal,
+                "regimenfiscalcliente" => $regimenfiscalcliente,
                 "subtotalnotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->SubTotal),
                 "ivanotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->Iva),
                 "totalnotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->Total),
@@ -1828,12 +1894,14 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $comprobantetimbrado = Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->count();
             $comprobante = Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->first();
             $regimenfiscal = c_RegimenFiscal::where('Clave', $ncc->RegimenFiscal)->first();
+            $regimenfiscalcliente = c_RegimenFiscal::where('Clave', $ncc->RegimenFiscalReceptor)->first();
             $data[]=array(
                 "notacreditocliente"=>$ncc,
                 "notaclientedocumento"=>$notaclientedocumento,
                 "comprobante" => $comprobante,
                 "comprobantetimbrado" => $comprobantetimbrado,
                 "regimenfiscal"=> $regimenfiscal,
+                "regimenfiscalcliente" => $regimenfiscalcliente,
                 "subtotalnotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->SubTotal),
                 "ivanotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->Iva),
                 "totalnotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->Total),
@@ -1922,12 +1990,14 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $comprobantetimbrado = Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->count();
             $comprobante = Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->first();
             $regimenfiscal = c_RegimenFiscal::where('Clave', $ncc->RegimenFiscal)->first();
+            $regimenfiscalcliente = c_RegimenFiscal::where('Clave', $ncc->RegimenFiscalReceptor)->first();
             $data[]=array(
                 "notacreditocliente"=>$ncc,
                 "notaclientedocumento"=>$notaclientedocumento,
                 "comprobante" => $comprobante,
                 "comprobantetimbrado" => $comprobantetimbrado,
                 "regimenfiscal"=> $regimenfiscal,
+                "regimenfiscalcliente" => $regimenfiscalcliente,
                 "subtotalnotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->SubTotal),
                 "ivanotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->Iva),
                 "totalnotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->Total),
@@ -2204,7 +2274,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
         $arraydet = array();
         foreach($detallesnota as $dn){
             if($dn->Impuesto == 0.000000){
-                /*
+                
                 //facturapi version 2.0
                 array_push($arraydet,  array(
                                             "quantity" => Helpers::convertirvalorcorrecto($dn->Cantidad),
@@ -2222,7 +2292,8 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                                                 )
                                         )
                 );
-                */
+                
+                /*
                 //facturapi version 1.0
                 array_push($arraydet,   array(
                                             "quantity" => Helpers::convertirvalorcorrecto($dn->Cantidad),
@@ -2237,8 +2308,9 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                                             "sku" => $dn->Codigo
                                         )                
                 );
+                */
             }else{
-                /*
+                
                 //facturapi version 2.0
                 array_push($arraydet,  array(
                                     "quantity" => Helpers::convertirvalorcorrecto($dn->Cantidad),
@@ -2254,7 +2326,8 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                                         )
                                 )
                 );
-                */
+                
+                /*
                 //facturapi version 1.0
                 array_push($arraydet,   array(
                                             "quantity" => Helpers::convertirvalorcorrecto($dn->Cantidad),
@@ -2267,6 +2340,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                                             "sku" => $dn->Codigo
                                         )                    
                 );
+                */
             }
         }  
         $arraydoc = array();
@@ -2279,7 +2353,7 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             "customer" => array(
                 "legal_name" => $cliente->Nombre,
                 "tax_id" => $cliente->Rfc,
-                /*
+                
                 //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
                 "tax_system" => $cliente->RegimenFiscal,
                 "address" => 
@@ -2287,11 +2361,11 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
                         "zip" => $cliente->CodigoPostal,
                     )
                 //fin cfdi 4.0
-                */
+                
             ),
             "payment_form" => $nota->FormaPago,
             "payment_method" => $nota->MetodoPago,
-            /*
+            
             //version facturapi 2.0
             //se debe cambiar la forma de relacion los documentos y en lugar de mandar arra products, se manda array items como en las facturas de ingreso con facturapi 2.0
             "related_documents" => array(
@@ -2302,11 +2376,13 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             
             ),
             "items" => $arraydet,
-            */
+            
+            /*
             //datos para facturar en facturapi 1.0
             "relation" => $nota->TipoRelacion,
             "related" => $arraydoc,
             "products" => $arraydet,
+            */
             "folio_number" => $nota->Folio,
             "series" => $nota->Serie,
             "currency" => $nota->Moneda,
@@ -2347,9 +2423,9 @@ class NotasCreditoClientesController extends ConfiguracionSistemaController{
             $Comprobante->Comprobante = 'Nota';
             $Comprobante->Tipo = $new_invoice->type;
             //version 4.0
-            //$Comprobante->Version = '4.0';
+            $Comprobante->Version = '4.0';
             //version 3.3
-            $Comprobante->Version = '3.3';
+            //$Comprobante->Version = '3.3';
             $Comprobante->Serie = $new_invoice->series;
             $Comprobante->Folio = $new_invoice->folio_number;
             $Comprobante->UUID = $new_invoice->uuid;

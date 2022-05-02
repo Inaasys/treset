@@ -58,6 +58,7 @@
                             <li style="font-size:10px; margin-left: 5px;"> Ciudad: {{$d['cliente']->Estado}} {{$d['cliente']->CodigoPostal}}</b></li>
                             <li style="font-size:10px; margin-left: 5px;"> EmisorRfc: {{$d['notacreditocliente']->EmisorRfc}}</li>
                             <li style="font-size:10px; margin-left: 5px;"> ReceptorRfc: {{$d['notacreditocliente']->ReceptorRfc}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> ReceptorRegimenFiscal: @if($d['regimenfiscalcliente'] != null) {{$d['regimenfiscalcliente']->Nombre}} ({{$d['regimenfiscalcliente']->Clave}}) @endif</li>
                         </ul>
                     </div>
                     <div style="width:1%; float:left;">
@@ -125,7 +126,7 @@
                             <tr><td style="font-size:9px;">{{$d['totalletras']}}</td></tr>
                             <tr><td style="font-size:9px;">La reproducción no autorizada de este comprobante constituye un delito en los términos de las disposiciones fiscales</td></tr>
                             <tr><td style="font-size:9px;">Tipo Relación ({{$d['notacreditocliente']->TipoRelacion}}) {{$d['notaclientedocumento']->UUID}} Factura: {{$d['notaclientedocumento']->Factura}}</td></tr>
-                            <tr><td style="font-size:9px;color:red;">Este documento es una representación impresa de un CFDI</td></tr>
+                            <tr><td style="font-size:9px;color:red;"> @if($d['comprobante'] != null) Este documento es una representación impresa de un CFDI Versión {{$d['comprobante']->Version}} @endif</td></tr>
                         </table>
                     </div>
                 </div>

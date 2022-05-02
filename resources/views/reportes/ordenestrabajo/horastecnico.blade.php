@@ -57,7 +57,7 @@
                                                 <td>
                                                     <div class="form-line">
                                                         <input type="hidden" class="form-control" name="numerotecnico" id="numerotecnico" onkeyup="tipoLetra(this)">
-                                                        <input type="text" class="form-control" name="tecnico" id="tecnico" onchange="colocarvalorstring();generar_reporte();">
+                                                        <input type="text" class="form-control inputnextdet" name="tecnico" id="tecnico" onchange="colocarvalorstring();generar_reporte();">
                                                     </div>
                                                 </td>
                                             </tr>    

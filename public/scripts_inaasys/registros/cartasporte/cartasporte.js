@@ -760,7 +760,7 @@ function seleccionarconfigautotransporte(Numero, Clave, Descripcion){
     $("#claveconfigautotransporteanterior").val(Clave);
     $("#configautotransporte").val(Descripcion);
     if(Descripcion != null){
-      $("#textonombreconfigautotransporte").html(Descripcion.substring(0, 40));
+      $("#textonombreconfigautotransporte").html(Descripcion.substring(0, 30));
     }
     mostrarformulario();
   }
@@ -1582,6 +1582,269 @@ function seleccionarfoliofiscal(Serie, Esquema){
       mostrarformulario();
     }) 
   }
+}
+//obtener vehiculos
+function obtenervehiculosempresa (){
+  ocultarformulario();
+  var tablavehiculos='<div class="modal-header '+background_forms_and_modals+'">'+
+                                '<h4 class="modal-title">Vehiculos</h4>'+
+                              '</div>'+
+                              '<div class="modal-body">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-12">'+
+                                        '<div class="table-responsive">'+
+                                            '<table id="tbllistadovehiculo" class="tbllistadovehiculo table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                                '<thead class="'+background_tables+'">'+
+                                                    '<tr>'+
+                                                        '<th>Operaciones</th>'+
+                                                        '<th>Numero</th>'+
+                                                        '<th>Placa</th>'+
+                                                        '<th>Año</th>'+
+                                                        '<th>Marca</th>'+
+                                                        '<th>Modelo</th>'+
+                                                    '</tr>'+
+                                                '</thead>'+
+                                                '<tbody></tbody>'+
+                                            '</table>'+
+                                        '</div>'+
+                                    '</div>'+   
+                                '</div>'+
+                              '</div>'+
+                              '<div class="modal-footer">'+
+                                '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                              '</div>';  
+  $("#contenidomodaltablas").html(tablavehiculos);
+  var tvehi = $('#tbllistadovehiculo').DataTable({
+      keys: true,
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
+      "sScrollX": "110%",
+      "sScrollY": "370px",
+      "bScrollCollapse": true,  
+      processing: true,
+      'language': {
+        'loadingRecords': '&nbsp;',
+        'processing': '<div class="spinner"></div>'
+      },
+      serverSide: true,
+      ajax: {
+        url: carta_porte_obtener_vehiculos
+      },
+      columns: [
+          { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+          { data: 'id', name: 'id' },
+          { data: 'Placa', name: 'Placa' },
+          { data: 'Año', name: 'Año', orderable: false, searchable: false},
+          { data: 'Marca', name: 'Marca', orderable: false, searchable: false},
+          { data: 'Modelo', name: 'Modelo', orderable: false, searchable: false},
+      ],
+      "initComplete": function() {
+        var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
+        $buscar.unbind();
+        $buscar.bind('keyup change', function(e) {
+            if(e.keyCode == 13 || this.value == "") {
+              $('#tbllistadovehiculo').DataTable().search( this.value ).draw();
+            }
+        });
+      },
+  });
+  //seleccionar registro al dar doble click
+  $('#tbllistadovehiculo tbody').on('dblclick', 'tr', function () {
+      var data = tvehi.row( this ).data();
+      seleccionarvehiculo(data.id, data.PermisoSCT, data.NumeroPermisoSCT, data.NombreAseguradora, data.NumeroPolizaSeguro, data.Placa, data.Año, data.SubTipoRemolque, data.PlacaSubTipoRemolque, data.Marca, data.Modelo);
+  }); 
+} 
+//seleccionar residencia fiscal
+function seleccionarvehiculo(id, PermisoSCT, NumeroPermisoSCT, NombreAseguradora, NumeroPolizaSeguro, Placa, Año, SubTipoRemolque, PlacaSubTipoRemolque, Marca, Modelo){
+  var numerovehiculoempresaanterior = $("#numerovehiculoempresaanterior").val();
+  var numerovehiculoempresa = id;
+  if(numerovehiculoempresaanterior != numerovehiculoempresa){
+    $("#numerovehiculoempresa").val(id);
+    $("#numerovehiculoempresaanterior").val(id);
+    $("#permisosct").val(PermisoSCT);
+    $("#numeropermisosct").val(NumeroPermisoSCT);
+    $("#nombreaseguradora").val(NombreAseguradora);
+    $("#numeropolizaseguro").val(NumeroPolizaSeguro);
+    $("#placavehiculo").val(Placa);
+    $("#anovehiculo").val(Año);
+    $("#subtiporemolque").val(SubTipoRemolque);
+    $("#placaremolque").val(PlacaSubTipoRemolque);
+    $("#vehiculoempresa").val(Modelo);
+    if(Modelo != null){
+      $("#textonombrevehiculoempresa").html(Marca +" - "+Modelo);
+    }
+    mostrarformulario();
+  }
+}
+//obtener por clave
+function obtenervehiculopornumero(){
+  var numerovehiculoempresaanterior = $("#numerovehiculoempresaanterior").val();
+  var numerovehiculoempresa  = $("#numerovehiculoempresa").val();
+  if(numerovehiculoempresaanterior != numerovehiculoempresa){
+    if($("#numerovehiculoempresa").parsley().isValid()){
+      $.get(carta_porte_obtener_vehiculo_por_numero, {numerovehiculoempresa:numerovehiculoempresa}, function(data){
+        $("#numerovehiculoempresa").val(data.id);
+        $("#numerovehiculoempresaanterior").val(data.id);
+        $("#permisosct").val(data.PermisoSCT);
+        $("#numeropermisosct").val(data.NumeroPermisoSCT);
+        $("#nombreaseguradora").val(data.NombreAseguradora);
+        $("#numeropolizaseguro").val(data.NumeroPolizaSeguro);
+        $("#placavehiculo").val(data.Placa);
+        $("#anovehiculo").val(data.Año);
+        $("#subtiporemolque").val(data.SubTipoRemolque);
+        $("#placaremolque").val(data.PlacaSubTipoRemolque);
+        $("#vehiculoempresa").val(data.Modelo);
+        if(data.Modelo != null){
+          $("#textonombrevehiculoempresa").html(data.Marca +" - "+data.Modelo);
+        }
+        mostrarformulario();
+      }) 
+    }
+  }
+}
+//regresar clave
+function regresarnumerovehiculo(){
+  var numerovehiculoempresaanterior = $("#numerovehiculoempresaanterior").val();
+  $("#numerovehiculoempresa").val(numerovehiculoempresaanterior);
+}
+
+
+
+
+
+
+
+//obtener operadores
+function obteneroperadoresempresa (){
+  ocultarformulario();
+  var tablaoperadores='<div class="modal-header '+background_forms_and_modals+'">'+
+                                '<h4 class="modal-title">Operadores</h4>'+
+                              '</div>'+
+                              '<div class="modal-body">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-12">'+
+                                        '<div class="table-responsive">'+
+                                            '<table id="tbllistadooperador" class="tbllistadooperador table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                                '<thead class="'+background_tables+'">'+
+                                                    '<tr>'+
+                                                        '<th>Operaciones</th>'+
+                                                        '<th>Numero</th>'+
+                                                        '<th>RFC</th>'+
+                                                        '<th>Nombre</th>'+
+                                                        '<th>Licencia</th>'+
+                                                    '</tr>'+
+                                                '</thead>'+
+                                                '<tbody></tbody>'+
+                                            '</table>'+
+                                        '</div>'+
+                                    '</div>'+   
+                                '</div>'+
+                              '</div>'+
+                              '<div class="modal-footer">'+
+                                '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                              '</div>';  
+  $("#contenidomodaltablas").html(tablaoperadores);
+  var toper = $('#tbllistadooperador').DataTable({
+      keys: true,
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
+      "sScrollX": "110%",
+      "sScrollY": "370px",
+      "bScrollCollapse": true,  
+      processing: true,
+      'language': {
+        'loadingRecords': '&nbsp;',
+        'processing': '<div class="spinner"></div>'
+      },
+      serverSide: true,
+      ajax: {
+        url: carta_porte_obtener_operadores
+      },
+      columns: [
+          { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+          { data: 'id', name: 'id' },
+          { data: 'Rfc', name: 'Rfc' },
+          { data: 'Nombre', name: 'Nombre', orderable: false, searchable: false},
+          { data: 'NumeroLicencia', name: 'NumeroLicencia', orderable: false, searchable: false},
+      ],
+      "initComplete": function() {
+        var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
+        $buscar.unbind();
+        $buscar.bind('keyup change', function(e) {
+            if(e.keyCode == 13 || this.value == "") {
+              $('#tbllistadooperador').DataTable().search( this.value ).draw();
+            }
+        });
+      },
+  });
+  //seleccionar registro al dar doble click
+  $('#tbllistadooperador tbody').on('dblclick', 'tr', function () {
+      var data = toper.row( this ).data();
+      seleccionaroperador(data.id, data.Rfc, data.Nombre, data.NumeroLicencia, data.Calle, data.NoExterior, data.NoInterior, data.Colonia, data.Localidad, data.Referencia, data.Municipio, data.Estado, data.Pais, data.CodigoPostal);
+  }); 
+} 
+//seleccionar residencia fiscal
+function seleccionaroperador(id, Rfc, Nombre, NumeroLicencia, Calle, NoExterior, NoInterior, Colonia, Localidad, Referencia, Municipio, Estado, Pais, CodigoPostal){
+  var numerooperadoranterior = $("#numerooperadoranterior").val();
+  var numerooperador = id;
+  if(numerooperadoranterior != numerooperador){
+    $("#numerooperador").val(id);
+    $("#numerooperadoranterior").val(id);
+    $("#rfcoperador").val(Rfc);
+    $("#nombreoperador").val(Nombre);
+    $("#numerolicenciaoperador").val(NumeroLicencia);
+    $("#calleoperador").val(Calle);
+    $("#numeroextoperador").val(NoExterior);
+    $("#numerointoperador").val(NoInterior);
+    $("#coloniaoperador").val(Colonia);
+    $("#localidadoperador").val(Localidad);
+    $("#referenciaoperador").val(Referencia);
+    $("#municipiooperador").val(Municipio);
+    $("#estadooperador").val(Estado);
+    $("#paisoperador").val(Pais);
+    $("#cpoperador").val(CodigoPostal);
+    if(Nombre != null){
+      $("#textonombreoperador").html(Nombre);
+    }
+    mostrarformulario();
+  }
+}
+//obtener por clave
+function obteneroperadorpornumero(){
+  var numerooperadoranterior = $("#numerooperadoranterior").val();
+  var numerooperador  = $("#numerooperador").val();
+  if(numerooperadoranterior != numerooperador){
+    if($("#numerooperador").parsley().isValid()){
+      $.get(carta_porte_obtener_operador_por_numero, {numerooperador:numerooperador}, function(data){
+        $("#numerooperador").val(data.id);
+        $("#numerooperadoranterior").val(data.id);
+        $("#rfcoperador").val(data.Rfc);
+        $("#nombreoperador").val(data.Nombre);
+        $("#numerolicenciaoperador").val(data.NumeroLicencia);
+        $("#calleoperador").val(data.Calle);
+        $("#numeroextoperador").val(data.NoExterior);
+        $("#numerointoperador").val(data.NoInterior);
+        $("#coloniaoperador").val(data.Colonia);
+        $("#localidadoperador").val(data.Localidad);
+        $("#referenciaoperador").val(data.Referencia);
+        $("#municipiooperador").val(data.Municipio);
+        $("#estadooperador").val(data.Estado);
+        $("#paisoperador").val(data.Pais);
+        $("#cpoperador").val(data.CodigoPostal);
+        if(data.Nombre != null){
+          $("#textonombreoperador").html(data.Nombre);
+        }
+        mostrarformulario();
+      }) 
+    }
+  }
+}
+//regresar clave
+function regresarnumerooperador(){
+  var numerooperadoranterior = $("#numerooperadoranterior").val();
+  $("#numerooperador").val(numerooperadoranterior);
 }
 //listar todas las facturas
 function listarfacturas (){
@@ -3409,6 +3672,30 @@ function alta(){
   $('#claveconfigautotransporte').on('change', function(e) {
     regresarclaveconfigautotransporte();
   });
+  //activar busqueda
+  $('#numerovehiculoempresa').on('keypress', function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      obtenervehiculopornumero();
+    }
+  });
+  //regresar
+  $('#numerovehiculoempresa').on('change', function(e) {
+    regresarnumerovehiculo();
+  });
+  //activar busqueda
+  $('#numerooperador').on('keypress', function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      obteneroperadorpornumero();
+    }
+  });
+  //regresar
+  $('#numerooperador').on('change', function(e) {
+    regresarnumerooperador();
+  });
   //activar busqueda para residencia fiscal
   $('#clavetransporte').on('keypress', function(e) {
     //recomentable para mayor compatibilidad entre navegadores.
@@ -4771,9 +5058,6 @@ function configurar_tabla(){
   //formulario configuracion tablas se arma desde funcionesglobales.js
   var tabs = armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbusquedas);
   $("#tabsconfigurartabla").html(tabs);
-  if(rol_usuario_logueado == 1){
-    $("#divorderbystabla").show();
-  }
   $("#string_datos_ordenamiento_columnas").val(columnas_ordenadas);
   $("#string_datos_tabla_true").val(campos_activados);
   $("#string_datos_tabla_false").val(campos_desactivados);

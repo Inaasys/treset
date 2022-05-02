@@ -262,6 +262,12 @@
         var cuentas_por_cobrar_obtener_formas_pago = '{!!URL::to('cuentas_por_cobrar_obtener_formas_pago')!!}';
         var cuentas_por_cobrar_obtener_forma_pago_por_clave = '{!!URL::to('cuentas_por_cobrar_obtener_forma_pago_por_clave')!!}';
         var cuentas_por_cobrar_obtener_metodos_pago = '{!!URL::to('cuentas_por_cobrar_obtener_metodos_pago')!!}';
+        var cuentas_por_cobrar_obtener_usos_cfdi = '{!!URL::to('cuentas_por_cobrar_obtener_usos_cfdi')!!}';
+        var cuentas_por_cobrar_obtener_uso_cfdi_por_clave = '{!!URL::to('cuentas_por_cobrar_obtener_uso_cfdi_por_clave')!!}';
+        var cuentas_por_cobrar_obtener_exportaciones = '{!!URL::to('cuentas_por_cobrar_obtener_exportaciones')!!}';
+        var cuentas_por_cobrar_obtener_exportacion_por_clave = '{!!URL::to('cuentas_por_cobrar_obtener_exportacion_por_clave')!!}';
+        var cuentas_por_cobrar_obtener_regimenes_fiscales_receptor = '{!!URL::to('cuentas_por_cobrar_obtener_regimenes_fiscales_receptor')!!}';
+        var cuentas_por_cobrar_obtener_regimenfiscalreceptor_por_clave = '{!!URL::to('cuentas_por_cobrar_obtener_regimenfiscalreceptor_por_clave')!!}';
         var cuentas_por_cobrar_obtener_facturas = '{!!URL::to('cuentas_por_cobrar_obtener_facturas')!!}';
         var cuentas_por_cobrar_obtener_factura = '{!!URL::to('cuentas_por_cobrar_obtener_factura')!!}';        
         var cuentas_por_cobrar_obtener_folios_fiscales = '{!!URL::to('cuentas_por_cobrar_obtener_folios_fiscales')!!}';

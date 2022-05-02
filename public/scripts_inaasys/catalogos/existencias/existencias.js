@@ -95,9 +95,6 @@ function configurar_tabla(){
     //formulario configuracion tablas se arma desde funcionesglobales.js
     var tabs = armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbusquedas);
         $("#tabsconfigurartabla").html(tabs);
-        if(rol_usuario_logueado == 1){
-          $("#divorderbystabla").show();
-        }
         $("#string_datos_ordenamiento_columnas").val(columnas_ordenadas);
         $("#string_datos_tabla_true").val(campos_activados);
         $("#string_datos_tabla_false").val(campos_desactivados);

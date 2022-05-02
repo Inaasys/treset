@@ -192,7 +192,7 @@ $("#btnenviarpartidasexcel").on('click', function(e){
         var index = $(this).index(".inputnextdet");          
         switch(code){
           case 13:
-            $(".inputnextdet").eq(index + 1).focus().select(); 
+            //$(".inputnextdet").eq(index + 1).focus().select(); 
             break;
           case 39:
             $(".inputnextdet").eq(index + 1).focus().select(); 
@@ -684,7 +684,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, tipooper
         var index = $(this).index(".inputnextdet");          
         switch(code){
           case 13:
-            $(".inputnextdet").eq(index + 1).focus().select(); 
+            //$(".inputnextdet").eq(index + 1).focus().select(); 
             break;
           case 39:
             $(".inputnextdet").eq(index + 1).focus().select(); 
@@ -949,7 +949,7 @@ function alta(){
     var index = $(this).index(".inputnextdet");          
     switch(code){
       case 13:
-        $(".inputnextdet").eq(index + 1).focus().select(); 
+        //$(".inputnextdet").eq(index + 1).focus().select(); 
         break;
       case 39:
         $(".inputnextdet").eq(index + 1).focus().select(); 
@@ -1225,7 +1225,7 @@ function obtenerdatos(ajustemodificar){
       var index = $(this).index(".inputnextdet");          
       switch(code){
         case 13:
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+          //$(".inputnextdet").eq(index + 1).focus().select(); 
           break;
         case 39:
           $(".inputnextdet").eq(index + 1).focus().select(); 
@@ -1439,9 +1439,6 @@ function configurar_tabla(){
   //formulario configuracion tablas se arma desde funcionesglobales.js
   var tabs = armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbusquedas);
     $("#tabsconfigurartabla").html(tabs);
-    if(rol_usuario_logueado == 1){
-      $("#divorderbystabla").show();
-    }
     $("#string_datos_ordenamiento_columnas").val(columnas_ordenadas);
     $("#string_datos_tabla_true").val(campos_activados);
     $("#string_datos_tabla_false").val(campos_desactivados);

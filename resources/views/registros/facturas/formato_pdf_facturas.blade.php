@@ -219,7 +219,7 @@
                             <tr><td style="font-size:9px;">{{$d['totalletras']}}</td></tr>
                             <tr><td style="font-size:9px;">La reproducción no autorizada de este comprobante constituye un delito en los términos de las disposiciones fiscales</td></tr>
                             @if($d['documentosrelacionados'] != null)<tr><td style="font-size:9px;">Tipo Relación ({{$d['factura']->TipoRelacion}}) {{$d['documentosrelacionados']->UUID}} Factura: {{$d['documentosrelacionados']->Factura}}</td></tr>@endif
-                            <tr><td style="font-size:9px;color:red;">Este documento es una representación impresa de un CFDI</td></tr>
+                            <tr><td style="font-size:9px;color:red;"> @if($d['comprobante'] != null) Este documento es una representación impresa de un CFDI Versión {{$d['comprobante']->Version}} @endif</td></tr>
                         </table>
                     </div>
                 </div>

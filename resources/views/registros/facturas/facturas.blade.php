@@ -406,6 +406,8 @@
         var facturas_obtener_uso_cfdi_por_clave = '{!!URL::to('facturas_obtener_uso_cfdi_por_clave')!!}';
         var facturas_obtener_residencias_fiscales = '{!!URL::to('facturas_obtener_residencias_fiscales')!!}';
         var facturas_obtener_residencia_fiscal_por_clave = '{!!URL::to('facturas_obtener_residencia_fiscal_por_clave')!!}';
+        var facturas_obtener_regimenes_fiscales_receptor = '{!!URL::to('facturas_obtener_regimenes_fiscales_receptor')!!}';
+        var facturas_obtener_regimenfiscalreceptor_por_clave = '{!!URL::to('facturas_obtener_regimenfiscalreceptor_por_clave')!!}';
         var facturas_obtener_folios_fiscales = '{!!URL::to('facturas_obtener_folios_fiscales')!!}';
         var facturas_obtener_ultimo_folio_serie_seleccionada  = '{!!URL::to('facturas_obtener_ultimo_folio_serie_seleccionada')!!}';
         var facturas_obtener_serie_interna  = '{!!URL::to('facturas_obtener_serie_interna')!!}';
@@ -421,6 +423,8 @@
         var facturas_obtener_producto_por_codigo = '{!!URL::to('facturas_obtener_producto_por_codigo')!!}';
         var facturas_obtener_productos_gastos = '{!!URL::to('facturas_obtener_productos_gastos')!!}';
         var facturas_obtener_producto_gasto_por_codigo = '{!!URL::to('facturas_obtener_producto_gasto_por_codigo')!!}';
+        var facturas_obtener_servicios = '{!!URL::to('facturas_obtener_servicios')!!}';
+        var facturas_obtener_servicio_por_codigo = '{!!URL::to('facturas_obtener_servicio_por_codigo')!!}';
         var facturas_obtener_claves_productos = '{!!URL::to('facturas_obtener_claves_productos')!!}';
         var facturas_obtener_claves_unidades = '{!!URL::to('facturas_obtener_claves_unidades')!!}';
         var facturas_obtener_facturas_relacionadas = '{!!URL::to('facturas_obtener_facturas_relacionadas')!!}';

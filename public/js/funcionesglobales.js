@@ -463,6 +463,16 @@ function msj_errorfechaigualafechafactura(){
         "extendedTImeout": "6000"
     });
 }
+
+//mensaje error noy hay existencias suficientes en algunas partidas
+function msj_errornohayexistenciassuficientes(){
+    toastr.info( "Aviso, no hay existencias suficientes en algunas partidas, para mas información posicionate sobre los que se pintaron de color ROJO", "Mensaje", {
+        "timeOut": "8000",
+        "progressBar": true,
+        "extendedTImeout": "6000"
+    });
+}
+
 //mensaje error el total de las pertidas no coincide con el total de factura del proveedor
 function msj_errortotalpartidasnocoincide(){
     toastr.error( "Aviso, el total de las partidas no coincide con el total de la factura del proveedor", "Mensaje", {
@@ -950,7 +960,7 @@ function armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbus
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
-                            '<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" id="divorderbystabla" hidden>'+
+                            '<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" id="divorderbystabla">'+
                                 '<div class="card">'+
                                     '<div class="header">'+
                                         '<h2>'+
@@ -1071,6 +1081,12 @@ $(document).bind('keydown', 'Shift+t', function(){
 //ajustesinventario
 $(document).bind('keydown', 'Ctrl+a', function(){
     var win = window.open(ajustesinventario, '_blank');
+    win.focus();
+});
+
+//punto de venta
+$(document).bind('keydown', 'Ctrl+v', function(){
+    var win = window.open(puntodeventa, '_blank');
     win.focus();
 });
 //ordenes_trabajo

@@ -58,6 +58,7 @@
                             <li style="font-size:10px; margin-left: 5px;"> Municipio: {{$d['cliente']->Municipio}} &nbsp;&nbsp; C.P. {{$d['cliente']->CodigoPostal}}</li>
                             <li style="font-size:10px; margin-left: 5px;"> EmisorRfc:{{$d['cuentaporcobrar']->EmisorRfc}}</li>
                             <li style="font-size:10px; margin-left: 5px;"> ReceptorRfc: {{$d['cuentaporcobrar']->ReceptorRfc}}</li>
+                            <li style="font-size:10px; margin-left: 5px;"> ReceptorRegimenFiscal: @if($d['regimenfiscalcliente'] != null) {{$d['regimenfiscalcliente']->Nombre}} ({{$d['regimenfiscalcliente']->Clave}}) @endif</li>
                         </ul>
                     </div>
                     <div style="width:1%; float:left;">
@@ -67,6 +68,9 @@
                             <li style="font-size:18px; margin-left: 5px;"><b>Pago:</b> <b style="color:red">{{$d['cuentaporcobrar']->Pago}}</b></li>
                             <li style="font-size:10px; margin-left: 5px;">Emitida: {{$d['cuentaporcobrar']->Hora}}</li>
                             <li style="font-size:10px; margin-left: 5px;">Fecha Depósito: {{$d['cuentaporcobrar']->FechaPago}}</li>
+
+                            <li style="font-size:10px; margin-left: 5px;">UsoCfdi: @if($d['usocfdi'] != null) {{$d['usocfdi']->Clave}} {{$d['usocfdi']->Nombre}} @endif</li>
+                            <li style="font-size:10px; margin-left: 5px;">Exportacion: @if($d['exportacion'] != null) {{$d['exportacion']->Clave}} {{$d['exportacion']->Descripcion}} @endif</li>
                         </ul>
                     </div>
                 </div>
@@ -99,9 +103,13 @@
                                     <td style="text-align: right;">{{ number_format($cxcd['impsaldoinsolutodetalle'], $d['numerodecimalesdocumento']) }}</td>
                                 </tr>
                                 <tr style="font-size:10px;">
-                                    <td></td> 
-                                    <td colspan="2"><b>{{ number_format($cxcd['tipocambiofacturadetalle'], $d['numerodecimalesdocumento']) }}</b></td> 
-                                    <td colspan="7"><b>Método de Pago: {{$cxcd['nombremetodopagodetalle']}} ({{$cxcd['clavemetodopagodetalle']}})</b></td>
+                                    <td colspan="1" style="text-align:right"><b>{{ number_format($cxcd['tipocambiofacturadetalle'], $d['numerodecimalesdocumento']) }}</b></td> 
+                                    <td colspan="6"><b>Método de Pago: {{$cxcd['nombremetodopagodetalle']}} ({{$cxcd['clavemetodopagodetalle']}})</b></td>
+                                    @if($cxcd['objetoimpdetalle'] == '02')
+                                        <td colspan="3" style="white-space:nowrap;text-align: center;"><b>Traslado:</b>Tasa002 Iva {{ number_format(16, $d['numerodecimalesdocumento']) }}% = {{ number_format($cxcd['totalfactura'] * 0.16, $d['numerodecimalesdocumento']) }} Base {{ number_format($cxcd['totalfactura'], $d['numerodecimalesdocumento']) }}</td>
+                                    @else
+                                        <td colspan="3" style="white-space:nowrap;text-align: center;"><b>Traslado:</b>Tasa002 Iva {{ number_format(0, $d['numerodecimalesdocumento']) }}% = {{ number_format($cxcd['totalfactura'] * 0, $d['numerodecimalesdocumento']) }} Base {{ number_format($cxcd['totalfactura'], $d['numerodecimalesdocumento']) }}</td>
+                                    @endif
                                 </tr>
                             @endforeach
                             <tr>
@@ -125,6 +133,7 @@
                             <tr><td style="font-size:9px;">{{ number_format($d['tipocambiocxc'], $d['numerodecimalesdocumento']) }} {{$d['cuentaporcobrar']->Moneda}}</td></tr>
                             <tr><td style="font-size:9px;">{{$d['totalletras']}}</td></tr>
                             <tr><td style="font-size:9px;">La reproducción no autorizada de este comprobante constituye un delito en los términos de las disposiciones fiscales</td></tr>
+                            <tr><td style="font-size:9px;color:red;"> @if($d['comprobante'] != null) Este documento es una representación impresa de un CFDI Versión {{$d['comprobante']->Version}} @endif</td></tr>
                             <tr><td style="font-size:9px;">Forma Pago: {{$d['formapago']->Nombre}} ({{$d['formapago']->Clave}})</td></tr>
                         </table>
                     </div>

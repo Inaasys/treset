@@ -219,7 +219,7 @@ $("#btnenviarpartidasexcel").on('click', function(e){
           var index = $(this).index(".inputnextdet");          
           switch(code){
             case 13:
-              $(".inputnextdet").eq(index + 1).focus().select(); 
+              //$(".inputnextdet").eq(index + 1).focus().select(); 
               break;
             case 39:
               $(".inputnextdet").eq(index + 1).focus().select(); 
@@ -244,14 +244,14 @@ $("#btnenviarpartidasexcel").on('click', function(e){
         }
         //colocar o no dataparsleyutilidad segun la configuracion de la empresa
         if(validarutilidadnegativa == 'S'){
-            $(".utilidadpartida").removeAttr('data-parsley-utilidad');
+            //$(".utilidadpartida").removeAttr('data-parsley-utilidad');
             $("#utilidad").removeAttr('data-parsley-decimalesconfigurados');
         }else{
-            $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
+            //$(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
             $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
         }
         //dar cambio en cantidad para colocar data parsley existencias de forma correcta
-        $(".cantidadpartida").change();
+        //$(".cantidadpartida").change();
         //ver si la opcion agregar iva al precio esta seleccionada
         if( $('#agregarivaalprecio').prop('checked') ) {
             //agregar al costo el iva
@@ -621,10 +621,12 @@ function seleccionaralmacen(Numero, Nombre){
         }
         mostrarformulario();
         mostrarbuscadorcodigoproducto();
+        /*
         //recargar existencias actuales del nuevo almacen seleccionado en data-parsley-existencias de las partidas
         $("tr.filasproductos").each(function () {
         $('.cantidadpartida', this).change();
         });
+        */
     }
 }
 //detectar cuando en el input de buscar por codigo de producto el usuario presione la tecla enter, si es asi se realizara la busqueda con el codigo escrito
@@ -727,10 +729,12 @@ function obteneralmacenpornumero(){
                 }
                 mostrarformulario();
                 mostrarbuscadorcodigoproducto();
+                /*
                 //recargar existencias actuales del nuevo almacen seleccionado en data-parsley-existencias de las partidas
                 $("tr.filasproductos").each(function () {
-                $('.cantidadpartida', this).change();
+                    $('.cantidadpartida', this).change();
                 });
+                */
             }) 
         }
     }
@@ -963,14 +967,14 @@ function seleccionarcotizacion(Folio, Cotizacion){
         }
         //colocar o no dataparsleyutilidad segun la configuracion de la empresa
         if(validarutilidadnegativa == 'S'){
-            $(".utilidadpartida").removeAttr('data-parsley-utilidad');
+            //$(".utilidadpartida").removeAttr('data-parsley-utilidad');
             $("#utilidad").removeAttr('data-parsley-decimalesconfigurados');
         }else{
-            $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
+            //$(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
             $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
         }
         //dar cambio en cantidad para colocar data parsley existencias de forma correcta
-        $(".cantidadpartida").change();
+        //$(".cantidadpartida").change();
         //ver si la opcion agregar iva al precio esta seleccionada
         if( $('#agregarivaalprecio').prop('checked') ) {
             //agregar al costo el iva
@@ -992,7 +996,7 @@ async function seleccionartipocotizacion(data){
       var index = $(this).index(".inputnextdet");          
       switch(code){
         case 13:
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+          //$(".inputnextdet").eq(index + 1).focus().select(); 
           break;
         case 39:
           $(".inputnextdet").eq(index + 1).focus().select(); 
@@ -1191,11 +1195,11 @@ function cambiodecantidadpartida(fila,tipo){
                 }else if(tipo == "modificacion"){
                     var dataparsleymax = new Decimal(existencias).plus($("#filaproducto"+fila+" .cantidadpartidadb").val());
                 }
-                $("#filaproducto"+fila+" .cantidadpartida").attr('data-parsley-existencias',dataparsleymax);
+                //$("#filaproducto"+fila+" .cantidadpartida").attr('data-parsley-existencias',dataparsleymax);
                 $('.cantidadpartida', this).parsley().validate();
                 $("#filaproducto"+fila+" .utilidadpartida").attr('data-parsley-utilidad', '0.'+numerocerosconfiguradosinputnumberstep);
             }else{
-                $("#filaproducto"+fila+" .cantidadpartida").removeAttr('data-parsley-existencias');
+                //$("#filaproducto"+fila+" .cantidadpartida").removeAttr('data-parsley-existencias');
                 $('.cantidadpartida', this).parsley().validate();
                 $("#filaproducto"+fila+" .utilidadpartida").removeAttr('data-parsley-utilidad');
             }
@@ -1338,7 +1342,7 @@ function agregarfilaproducto(data,Codigo){
           var index = $(this).index(".inputnextdet");          
           switch(code){
             case 13:
-              $(".inputnextdet").eq(index + 1).focus().select(); 
+              //$(".inputnextdet").eq(index + 1).focus().select(); 
               break;
             case 39:
               $(".inputnextdet").eq(index + 1).focus().select(); 
@@ -1363,14 +1367,14 @@ function agregarfilaproducto(data,Codigo){
         }
         //colocar o no dataparsleyutilidad segun la configuracion de la empresa
         if(validarutilidadnegativa == 'S'){
-            $(".utilidadpartida").removeAttr('data-parsley-utilidad');
+            //$(".utilidadpartida").removeAttr('data-parsley-utilidad');
             $("#utilidad").removeAttr('data-parsley-decimalesconfigurados');
         }else{
-            $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
+            //$(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
             $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
         }
         //dar cambio en cantidad para colocar data parsley existencias de forma correcta
-        $(".cantidadpartida").change();
+        //$(".cantidadpartida").change();
         $('.page-loader-wrapper').css('display', 'none');
     }else{
         msj_errorproductoyaagregado();
@@ -1945,7 +1949,7 @@ function alta(){
       var index = $(this).index(".inputnextdet");          
       switch(code){
         case 13:
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+          //$(".inputnextdet").eq(index + 1).focus().select(); 
           break;
         case 39:
           $(".inputnextdet").eq(index + 1).focus().select(); 
@@ -1980,13 +1984,42 @@ $("#btnGuardar").on('click', function (e) {
                     contentType: false,
                     processData: false,
                     success:function(data){
-                        if(data == 1){
-                            msj_errorremisionexistente();
+                        var results = JSON.parse(data);
+                        if(results.detallescodigossinexistencias > 0){
+                            //si alguna partida no tiene existencias mandara msj
+                            $.each(results.arraypartidassinexistencias,function(key, registro) {
+                                $("tr.filasproductos").each(function () {
+                                    var codigoproductopartida = $('.codigoproductopartida', this).val();
+                                    if(registro.Codigo == codigoproductopartida){
+                                        if(registro.ExistenciasNueva < 0){
+                                            $(".codigopartidatexto", this).addClass('font-bold col-red parpadea');
+                                            $(".codigopartidatexto", this).attr('data-toggle', 'tooltip');
+                                            $(".codigopartidatexto", this).attr('data-placement', 'top');
+                                            $(".codigopartidatexto", this).attr('data-original-title', 'Codigo:'+registro.Codigo+' ExistenciasActuales:'+registro.ExistenciasActualesMasExistenciasCaptura+' ExistenciasRequeridas:'+registro.ExistenciasARestarEnModificacion+' Diferencia:'+registro.ExistenciasNueva);
+                                        }else{
+                                            $(".codigopartidatexto", this).removeClass('font-bold col-red parpadea');
+                                            $(".codigopartidatexto", this).removeAttr('data-toggle');
+                                            $(".codigopartidatexto", this).removeAttr('data-placement');
+                                            $(".codigopartidatexto", this).removeAttr('data-original-title');
+                                        }
+                                    }
+                                });
+                            });
+                            //tooltip mensajes
+                            $('[data-toggle="tooltip"]').tooltip({
+                                container: 'body'
+                            });
+                            msj_errornohayexistenciassuficientes();
                         }else{
-                            msj_datosguardadoscorrectamente();
-                            limpiar();
-                            ocultarmodalformulario();
-                            limpiarmodales();
+
+                            if(data == 1){
+                                msj_errorremisionexistente();
+                            }else{
+                                msj_datosguardadoscorrectamente();
+                                limpiar();
+                                ocultarmodalformulario();
+                                limpiarmodales();
+                            }
                         }
                         $('.page-loader-wrapper').css('display', 'none');
                     },
@@ -2568,7 +2601,7 @@ function obtenerdatos(remisionmodificar){
       var index = $(this).index(".inputnextdet");          
       switch(code){
         case 13:
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+          //$(".inputnextdet").eq(index + 1).focus().select(); 
           break;
         case 39:
           $(".inputnextdet").eq(index + 1).focus().select(); 
@@ -2595,14 +2628,14 @@ function obtenerdatos(remisionmodificar){
     }
     //colocar o no dataparsleyutilidad segun la configuracion de la empresa
     if(validarutilidadnegativa == 'S'){
-        $(".utilidadpartida").removeAttr('data-parsley-utilidad');
+        //$(".utilidadpartida").removeAttr('data-parsley-utilidad');
         $("#utilidad").removeAttr('data-parsley-decimalesconfigurados');
     }else{
-        $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
+        //$(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
         $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
     }
     //dar cambio en cantidad para colocar data parsley existencias de forma correcta
-    $(".cantidadpartida").change();
+    //$(".cantidadpartida").change();
     //asignar el tipo de operacion que se realizara
     $("#tipooperacion").val("modificacion");
     seleccionartipocliente(data);
@@ -2643,10 +2676,38 @@ $("#btnGuardarModificacion").on('click', function (e) {
                     contentType: false,
                     processData: false,
                     success:function(data){
-                        msj_datosguardadoscorrectamente();
-                        limpiar();
-                        ocultarmodalformulario();
-                        limpiarmodales();
+                        var results = JSON.parse(data);
+                        if(results.detallescodigossinexistencias > 0){
+                            //si alguna partida no tiene existencias mandara msj
+                            $.each(results.arraypartidassinexistencias,function(key, registro) {
+                                $("tr.filasproductos").each(function () {
+                                    var codigoproductopartida = $('.codigoproductopartida', this).val();
+                                    if(registro.Codigo == codigoproductopartida){
+                                        if(registro.ExistenciasNueva < 0){
+                                            $(".codigopartidatexto", this).addClass('font-bold col-red parpadea');
+                                            $(".codigopartidatexto", this).attr('data-toggle', 'tooltip');
+                                            $(".codigopartidatexto", this).attr('data-placement', 'top');
+                                            $(".codigopartidatexto", this).attr('data-original-title', 'Codigo:'+registro.Codigo+' ExistenciasActuales:'+registro.ExistenciasActualesMasExistenciasCaptura+' ExistenciasRequeridas:'+registro.ExistenciasARestarEnModificacion+' Diferencia:'+registro.ExistenciasNueva);
+                                        }else{
+                                            $(".codigopartidatexto", this).removeClass('font-bold col-red parpadea');
+                                            $(".codigopartidatexto", this).removeAttr('data-toggle');
+                                            $(".codigopartidatexto", this).removeAttr('data-placement');
+                                            $(".codigopartidatexto", this).removeAttr('data-original-title');
+                                        }
+                                    }
+                                });
+                            });
+                            //tooltip mensajes
+                            $('[data-toggle="tooltip"]').tooltip({
+                                container: 'body'
+                            });
+                            msj_errornohayexistenciassuficientes();
+                        }else{
+                            msj_datosguardadoscorrectamente();
+                            limpiar();
+                            ocultarmodalformulario();
+                            limpiarmodales();
+                        }
                         $('.page-loader-wrapper').css('display', 'none');
                     },
                     error:function(data){
@@ -2749,7 +2810,7 @@ function modificardatosgeneralesdocumento(Remision){
         var index = $(this).index(".inputnextdet");          
         switch(code){
             case 13:
-                $(".inputnextdet").eq(index + 1).focus().select(); 
+                //$(".inputnextdet").eq(index + 1).focus().select(); 
                 break;
             case 39:
                 $(".inputnextdet").eq(index + 1).focus().select(); 
@@ -2920,9 +2981,6 @@ function configurar_tabla(){
     //formulario configuracion tablas se arma desde funcionesglobales.js
     var tabs = armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbusquedas);
     $("#tabsconfigurartabla").html(tabs);
-    if(rol_usuario_logueado == 1){
-      $("#divorderbystabla").show();
-    }
     $("#string_datos_ordenamiento_columnas").val(columnas_ordenadas);
     $("#string_datos_tabla_true").val(campos_activados);
     $("#string_datos_tabla_false").val(campos_desactivados);

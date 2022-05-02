@@ -44,7 +44,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="form-line">
-                                                        <input type="text" class="form-control" name="numerocliente" id="numerocliente" data-parsley-type="integer" autocomplete="off">
+                                                        <input type="text" class="form-control inputnextdet" name="numerocliente" id="numerocliente" data-parsley-type="integer" autocomplete="off">
                                                         <input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" data-parsley-type="integer">
                                                         <input type="hidden" class="form-control" name="cliente" id="cliente" readonly>
                                                     </div>

@@ -24,7 +24,7 @@ use App\Linea;
 use App\Producto;
 use App\TipoOrdenCompra;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\ReportesFacturasVentasClientesExport;
+use App\Exports\ReportesFacturasVentasMarcasExport;
 use DB;
 
 class ReporteFacturasVentasMarcaController  extends ConfiguracionSistemaController{
@@ -256,6 +256,209 @@ class ReporteFacturasVentasMarcaController  extends ConfiguracionSistemaControll
 
     //generar reporte
     public function reporte_facturas_ventas_marca_generar_reporte(Request $request){
-        
+        $fechainicio = date($request->fechainicialreporte);
+        $fechaterminacion = date($request->fechafinalreporte);
+        $numerocliente=$request->numerocliente;
+        $numeroagente=$request->numeroagente;
+        $numeromarca = $request->numeromarca;
+        $numerolinea = $request->numerolinea;
+        $claveserie = $request->claveserie;
+        $numeroalmacen = $request->numeroalmacen;
+        $codigo = $request->codigo;
+        $tipo=$request->tipo;
+        $departamento=$request->departamento;
+        $documentos=$request->documentos;
+        $status=$request->status;
+        $reporte = $request->reporte;
+        switch($reporte){
+            case "RELACIONUTILIDADES":
+                $data = DB::table('Facturas as f')
+                ->join('Facturas Detalles as fd', 'f.Factura', '=', 'fd.Factura')
+                ->join('Productos as p', 'p.Codigo', '=', 'fd.Codigo')
+                ->leftjoin('Marcas as m', 'm.Numero', '=', 'p.Marca')
+                ->join('Clientes as c', 'c.Numero', '=', 'f.Cliente')
+                ->leftjoin('Agentes as a', 'a.Numero', '=', 'f.Agente')
+                ->select("f.Factura", "f.Fecha", "fd.Remision", "fd.Orden", "p.Producto", "c.Nombre as NombreCliente", "f.Agente", "a.Nombre as NombreAgente", "fd.Almacen", "fd.Codigo", "p.Marca", "m.Nombre", "fd.Cantidad", "fd.Precio", "fd.Dcto", "fd.Descuento", "fd.SubTotal", "fd.Iva", "fd.Total", DB::raw("case when fd.moneda = 'USD' and round(fd.SubTotal-fd.CostoDeLista*fd.TipoDeCambio*fd.Cantidad,2) > 0 then round(fd.CostoDeLista*fd.TipoDeCambio,2) else fd.Costo end as Costo"),DB::raw("case when fd.moneda = 'USD' and round(fd.SubTotal-fd.CostoDeLista*fd.TipoDeCambio*fd.Cantidad,2) > 0 then round(fd.CostoDeLista*fd.TipoDeCambio*fd.Cantidad,2) else fd.CostoTotal end as CostoTotal"),DB::raw("case	when fd.moneda = 'USD' and round(fd.SubTotal-fd.CostoDeLista*fd.TipoDeCambio*fd.Cantidad,2) > 0 then fd.SubTotal-round(fd.CostoDeLista*fd.TipoDeCambio*fd.Cantidad,2) else fd.Utilidad end as Utilidad"),DB::raw("p.[Fecha Ultima Compra] as FechaUltimaCompra"),DB::raw("p.[Fecha Ultima Venta] as FechaUltimaVenta"),DB::raw("datediff(dd, p.[Fecha Ultima Compra], getdate()) as Dias"))
+                ->whereDate('f.Fecha', '>=', $fechainicio)->whereDate('f.Fecha', '<=', $fechaterminacion)
+                ->where(function($q) use ($numerocliente) {
+                    if($numerocliente != ""){
+                        $q->where('f.Cliente', $numerocliente);
+                    }
+                })
+                ->where(function($q) use ($numeroagente) {
+                    if($numeroagente != ""){
+                        $q->where('f.Agente', $numeroagente);
+                    }
+                })
+                ->where(function($q) use ($numeromarca) {
+                    if($numeromarca != ""){
+                        $q->whereIn('p.Marca', array($numeromarca));
+                    }
+                })
+                ->where(function($q) use ($numerolinea) {
+                    if($numerolinea != ""){
+                        $q->whereIn('p.Linea', array($numerolinea));
+                    }
+                })
+                ->where(function($q) use ($claveserie) {
+                    if($claveserie != ""){
+                        $q->whereIn('f.Serie', array($claveserie));
+                    }
+                })
+                ->where(function($q) use ($numeroalmacen) {
+                    if($numeroalmacen != ""){
+                        $q->whereIn('fd.Almacen', array($numeroalmacen));
+                    }
+                })
+                ->where(function($q) use ($codigo) {
+                    if($codigo != ""){
+                        $q->where('fd.Codigo', $codigo);
+                    }
+                })
+                ->where(function($q) use ($tipo) {
+                    if($tipo != 'TODOS'){
+                        $q->where('f.Tipo', $tipo);
+                    }
+                })
+                ->where(function($q) use ($departamento) {
+                    if($departamento != 'TODOS'){
+                        $q->where('f.Depto', $departamento);
+                    }
+                })
+                ->where(function($q) use ($status) {
+                    if($status != 'TODOS'){
+                        $q->where('f.Status', $status);
+                    }
+                })
+                ->where(function($q) use ($documentos) {
+                    if($documentos != 'TODOS'){
+                        if($documentos == 'FACTURAS'){
+                            $q->where('f.Esquema', '<>', 'INTERNA');
+                        }
+                        if($documentos == 'INTERNOS'){
+                            $q->where('f.Esquema', 'INTERNA');
+                        }
+                    }
+                })
+                ->orderby('f.Serie', 'ASC')
+                ->orderby('f.Folio', 'ASC')
+                ->orderby('fd.Item', 'ASC')
+                ->get();
+                return DataTables::of($data)
+                ->addColumn('NombreCliente', function($data){ return substr($data->NombreCliente, 0, 30); })
+                ->addColumn('NombreAgente', function($data){ return substr($data->NombreAgente, 0, 30); })
+                ->addColumn('Precio', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Precio), $this->numerodecimales); })
+                ->addColumn('Dcto', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Dcto), $this->numerodecimales); })
+                ->addColumn('Descuento', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Descuento), $this->numerodecimales); })
+                ->addColumn('SubTotal', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->SubTotal), $this->numerodecimales); })
+                ->addColumn('Iva', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Iva), $this->numerodecimales); })
+                ->addColumn('Total', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Total), $this->numerodecimales); })
+                ->addColumn('Costo', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Costo), $this->numerodecimales); })
+                ->addColumn('CostoTotal', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->CostoTotal), $this->numerodecimales); })
+                ->addColumn('Utilidad', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Utilidad), $this->numerodecimales); })
+                ->make(true);
+                break;
+            case "UTILIDADCAMBIARIA":
+                $data = DB::table('Facturas as f')
+                ->join('Facturas Detalles as fd', 'f.Factura', '=', 'fd.Factura')
+                ->join('Productos as p', 'p.Codigo', '=', 'fd.Codigo')
+                ->leftjoin('Marcas as m', 'm.Numero', '=', 'p.Marca')
+                ->join('Clientes as c', 'c.Numero', '=', 'f.Cliente')
+                ->leftjoin('Agentes as a', 'a.Numero', '=', 'f.Agente')
+                ->select("f.Factura", "f.Fecha", "fd.Remision", "fd.Orden", "p.Producto", "c.Nombre as NombreCliente", "f.Agente", "a.Nombre as NombreAgente", "fd.Almacen", "fd.Codigo", "p.Marca", "m.Nombre", "fd.Cantidad", "fd.Precio", "fd.Dcto", "fd.Descuento", "fd.SubTotal", "fd.Iva", "fd.Total","fd.Costo", "fd.CostoTotal", "fd.Utilidad", DB::raw("case when fd.subtotal>0 then (fd.Utilidad/fd.SubTotal)*100 else 0 end as PorcentajeUtilidad"),"fd.CostoDeLista", "fd.Moneda", "fd.TipoDeCambio", DB::raw("fd.CostoDeLista*fd.TipoDeCambio as CostoDeListaMXN"),DB::raw("round(fd.CostoDeLista*fd.TipoDeCambio*fd.Cantidad,2) as TotalCostoDeListaReal"),DB::raw("round(fd.SubTotal-fd.CostoDeLista*fd.TipoDeCambio*fd.Cantidad,2) as UtilidadPorCostoDeListaActualReal"),DB::raw("round(fd.Utilidad-(fd.SubTotal-fd.CostoDeLista*fd.TipoDeCambio*fd.Cantidad),2) as UtilidadPorTC"),DB::raw("case when fd.moneda = 'USD' and round(fd.SubTotal-fd.CostoDeLista*fd.TipoDeCambio*fd.Cantidad,2) > 0 then round(fd.CostoDeLista*fd.TipoDeCambio,2) else fd.Costo end as CostoParaComision"),DB::raw("case when fd.moneda = 'USD' and round(fd.SubTotal-fd.CostoDeLista*fd.TipoDeCambio*fd.Cantidad,2) > 0 then round(fd.CostoDeLista*fd.TipoDeCambio*fd.Cantidad,2) else fd.CostoTotal end as CostoTotalParaComision"),DB::raw("case when fd.moneda = 'USD' and round(fd.SubTotal-fd.CostoDeLista*fd.TipoDeCambio*fd.Cantidad,2) > 0 then fd.SubTotal-round(fd.CostoDeLista*fd.TipoDeCambio*fd.Cantidad,2) else fd.Utilidad end as UtilidadParaComision"))
+                ->whereDate('f.Fecha', '>=', $fechainicio)->whereDate('f.Fecha', '<=', $fechaterminacion)
+                ->where(function($q) use ($numerocliente) {
+                    if($numerocliente != ""){
+                        $q->where('f.Cliente', $numerocliente);
+                    }
+                })
+                ->where(function($q) use ($numeroagente) {
+                    if($numeroagente != ""){
+                        $q->where('f.Agente', $numeroagente);
+                    }
+                })
+                ->where(function($q) use ($numeromarca) {
+                    if($numeromarca != ""){
+                        $q->whereIn('p.Marca', array($numeromarca));
+                    }
+                })
+                ->where(function($q) use ($numerolinea) {
+                    if($numerolinea != ""){
+                        $q->whereIn('p.Linea', array($numerolinea));
+                    }
+                })
+                ->where(function($q) use ($claveserie) {
+                    if($claveserie != ""){
+                        $q->whereIn('f.Serie', array($claveserie));
+                    }
+                })
+                ->where(function($q) use ($numeroalmacen) {
+                    if($numeroalmacen != ""){
+                        $q->whereIn('fd.Almacen', array($numeroalmacen));
+                    }
+                })
+                ->where(function($q) use ($codigo) {
+                    if($codigo != ""){
+                        $q->where('fd.Codigo', $codigo);
+                    }
+                })
+                ->where(function($q) use ($tipo) {
+                    if($tipo != 'TODOS'){
+                        $q->where('f.Tipo', $tipo);
+                    }
+                })
+                ->where(function($q) use ($departamento) {
+                    if($departamento != 'TODOS'){
+                        $q->where('f.Depto', $departamento);
+                    }
+                })
+                ->where(function($q) use ($status) {
+                    if($status != 'TODOS'){
+                        $q->where('f.Status', $status);
+                    }
+                })
+                ->where(function($q) use ($documentos) {
+                    if($documentos != 'TODOS'){
+                        if($documentos == 'FACTURAS'){
+                            $q->where('f.Esquema', '<>', 'INTERNA');
+                        }
+                        if($documentos == 'INTERNOS'){
+                            $q->where('f.Esquema', 'INTERNA');
+                        }
+                    }
+                })
+                ->orderby('f.Serie', 'ASC')
+                ->orderby('f.Folio', 'ASC')
+                ->orderby('fd.Item', 'ASC')
+                ->get();
+                return DataTables::of($data)
+                ->addColumn('NombreCliente', function($data){ return substr($data->NombreCliente, 0, 30); })
+                ->addColumn('NombreAgente', function($data){ return substr($data->NombreAgente, 0, 30); })
+                ->addColumn('Precio', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Precio), $this->numerodecimales); })
+                ->addColumn('Dcto', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Dcto), $this->numerodecimales); })
+                ->addColumn('Descuento', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Descuento), $this->numerodecimales); })
+                ->addColumn('SubTotal', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->SubTotal), $this->numerodecimales); })
+                ->addColumn('Iva', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Iva), $this->numerodecimales); })
+                ->addColumn('Total', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Total), $this->numerodecimales); })
+                ->addColumn('Costo', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Costo), $this->numerodecimales); })
+                ->addColumn('CostoTotal', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->CostoTotal), $this->numerodecimales); })
+                ->addColumn('Utilidad', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->Utilidad), $this->numerodecimales); })
+                ->addColumn('PorcentajeUtilidad', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->PorcentajeUtilidad), $this->numerodecimales); })
+                ->addColumn('CostoDeLista', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->CostoDeLista), $this->numerodecimales); })
+                ->addColumn('TipoDeCambio', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->TipoDeCambio), $this->numerodecimales); })
+                ->addColumn('CostoDeListaMXN', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->CostoDeListaMXN), $this->numerodecimales); })
+                ->addColumn('TotalCostoDeListaReal', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->TotalCostoDeListaReal), $this->numerodecimales); })
+                ->addColumn('UtilidadPorCostoDeListaActualReal', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->UtilidadPorCostoDeListaActualReal), $this->numerodecimales); })
+                ->addColumn('UtilidadPorTC', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->UtilidadPorTC), $this->numerodecimales); })
+                ->addColumn('CostoParaComision', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->CostoParaComision), $this->numerodecimales); })
+                ->addColumn('CostoTotalParaComision', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->CostoTotalParaComision), $this->numerodecimales); })
+                ->addColumn('UtilidadParaComision', function($data){ return number_format(Helpers::convertirvalorcorrecto($data->UtilidadParaComision), $this->numerodecimales); })
+                ->make(true);
+                break;
+        }
+    }
+    //generar reporte en excel
+    public function reporte_facturas_ventas_marca_generar_formato_excel(Request $request){
+        return Excel::download(new ReportesFacturasVentasMarcasExport($request->fechainicialreporte, $request->fechafinalreporte, $request->numerocliente, $request->numeroagente, $request->numeromarca, $request->numerolinea, $request->numeroalmacen, $request->codigo, $request->claveserie, $request->tipo, $request->departamento, $request->documentos, $request->status, $request->reporte, $this->numerodecimales, $this->empresa), "formatofacturasventaspormarcas-".$request->reporte.".xlsx");    
     }
 }

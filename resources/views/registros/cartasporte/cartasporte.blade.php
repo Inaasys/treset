@@ -247,8 +247,14 @@
         var carta_porte_obtener_codigospostales = '{!!URL::to('carta_porte_obtener_codigospostales')!!}';
         var carta_porte_obtener_coonfiguracionesautotransporte = '{!!URL::to('carta_porte_obtener_coonfiguracionesautotransporte')!!}';
         var carta_porte_obtener_configuracionautotransporte_por_clave = '{!!URL::to('carta_porte_obtener_configuracionautotransporte_por_clave')!!}';
+        var  carta_porte_obtener_vehiculos = '{!!URL::to('carta_porte_obtener_vehiculos')!!}';
+        var carta_porte_obtener_vehiculo_por_numero = '{!!URL::to('carta_porte_obtener_vehiculo_por_numero')!!}';
+        var carta_porte_obtener_operadores = '{!!URL::to('carta_porte_obtener_operadores')!!}';
+        var carta_porte_obtener_operador_por_numero = '{!!URL::to('carta_porte_obtener_operador_por_numero')!!}';
         var carta_porte_obtener_clavestransporte = '{!!URL::to('carta_porte_obtener_clavestransporte')!!}';
         var carta_porte_obtener_clavetransporte_por_clave = '{!!URL::to('carta_porte_obtener_clavetransporte_por_clave')!!}';
+
+
         var notas_credito_clientes_obtener_almacenes = '{!!URL::to('notas_credito_clientes_obtener_almacenes')!!}';
         var notas_credito_clientes_obtener_almacen_por_numero = '{!!URL::to('notas_credito_clientes_obtener_almacen_por_numero')!!}';
         var notas_credito_clientes_obtener_codigos_postales = '{!!URL::to('notas_credito_clientes_obtener_codigos_postales')!!}';
@@ -285,6 +291,9 @@
         var notas_credito_clientes_timbrar_nota=  '{!!URL::to('notas_credito_clientes_timbrar_nota')!!}';
         var notas_credito_clientes_verificar_si_continua_baja_timbre=  '{!!URL::to('notas_credito_clientes_verificar_si_continua_baja_timbre')!!}';
         var notas_credito_clientes_baja_timbre=  '{!!URL::to('notas_credito_clientes_baja_timbre')!!}';
+
+
+        
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="scripts_inaasys/registros/cartasporte/cartasporte.js"></script>

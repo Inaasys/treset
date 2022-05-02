@@ -215,18 +215,24 @@ class RemisionController extends ConfiguracionSistemaController{
                         //utilidad de la partida
                         $utilidadpartida = $subtotalpartida-$costototalpartida-$comisionespesospartida;
                         $tipo = "alta";
+                        $dataparsleyutilidad = "";
+                        if($this->validarutilidadnegativa == 'N'){
+                            if($cantidad > 0){
+                                $dataparsleyutilidad = 'data-parsley-utilidad="0.'.$this->numerocerosconfiguradosinputnumberstep.'"';
+                            }
+                        }
                         $filasdetallesremision= $filasdetallesremision.
                         '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                             '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
                             '<td class="tdmod tdinsumospartidas"><input type="text" class="form-control inputnextdet divorinputmodsm insumopartida" name="insumopartida[]" value="'.$producto->Insumo.'"  data-parsley-length="[1, 20]"></td>'.
-                            '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$producto->Codigo.'</b></td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;" class="codigopartidatexto">'.$producto->Codigo.'</b></td>'.
                             '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet descripcionproductopartida" name="descripcionproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($producto->Producto, ENT_QUOTES).'</textarea></td>'.                    
                             '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$producto->Unidad.'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'.$producto->Unidad.'</td>'.
                             '<td class="tdmod">'.
                                 '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm pendientearemisionarpartida" name="pendientearemisionarpartida[]" value="'.Helpers::convertirvalorcorrecto($cantidad).'" onchange="formatocorrectoinputcantidades(this);">'.
                             '</td>'.
                             '<td class="tdmod">'.
-                                '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($cantidad).'"  data-parsley-existencias="'.$Existencias.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodecantidadpartida('.$contadorfilas.',\''.$tipo.'\');">'.
+                                '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodecantidadpartida('.$contadorfilas.',\''.$tipo.'\');">'.
                                 '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'.                         
                             '</td>'.
                             '<td class="tdmod"><input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartidaop" name="preciopartidaop[]" value="'.Helpers::convertirvalorcorrecto($preciopartida).'" ><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($preciopartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodepreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
@@ -241,7 +247,7 @@ class RemisionController extends ConfiguracionSistemaController{
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="'.Helpers::convertirvalorcorrecto($costototalpartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm comisionporcentajepartida" name="comisionporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($comisionporcentajepartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('.$contadorfilas.');" required></td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm comisionespesospartida" name="comisionespesospartida[]" value="'.Helpers::convertirvalorcorrecto($comisionespesospartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'.Helpers::convertirvalorcorrecto($utilidadpartida).'" data-parsley-utilidad="0.'.$this->numerocerosconfiguradosinputnumberstep.'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'.Helpers::convertirvalorcorrecto($utilidadpartida).'" '.$dataparsleyutilidad.' onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodsm monedapartida" name="monedapartida[]" value="MXN" readonly data-parsley-length="[1, 3]" autocomplete="off"></td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costolistapartida" name="costolistapartida[]" value="'.Helpers::convertirvalorcorrecto($producto->CostoDeLista).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm tipocambiopartida" name="tipocambiopartida[]" value="'.Helpers::convertirvalorcorrecto(1).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
@@ -507,22 +513,25 @@ class RemisionController extends ConfiguracionSistemaController{
                     }else{
                         $parsleymax = 0;
                     }
+                    $dataparsleyutilidad = "";
+                    if($this->validarutilidadnegativa == 'N'){
+                        if($dc->Cantidad > 0){
+                            $dataparsleyutilidad = 'data-parsley-utilidad="0.'.$this->numerocerosconfiguradosinputnumberstep.'"';
+                        }
+                    }
                     $filasdetallescotizacion= $filasdetallescotizacion.
                     '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                         '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipo.'" readonly></td>'.
                         '<td class="tdmod tdinsumospartidas"><input type="text" class="form-control inputnextdet divorinputmodsm insumopartida" name="insumopartida[]" value="'.$producto->Insumo.'" data-parsley-length="[1, 20]"></td>'.
-                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dc->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$dc->Codigo.'</b></td>'.
+                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dc->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;" class="codigopartidatexto">'.$dc->Codigo.'</b></td>'.
                         '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet descripcionproductopartida" name="descripcionproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($dc->Descripcion, ENT_QUOTES).'</textarea></td>'.                                        
                         '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$dc->Unidad.'" readonly data-parsley-length="[1, 5]">'.$dc->Unidad.'</td>'.
-                        
-                        
                         '<td class="tdmod">'.
                             '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm pendientearemisionarpartida" name="pendientearemisionarpartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Cantidad).'" onchange="formatocorrectoinputcantidades(this);">'.
                         '</td>'.
-                        
                         '<td class="tdmod">'.
                             '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="'.Helpers::convertirvalorcorrecto($dc->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
-                            '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Cantidad).'" data-parsley-existencias="'.$parsleymax.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodecantidadpartida('.$contadorfilas.',\''.$tipo.'\');">'.
+                            '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodecantidadpartida('.$contadorfilas.',\''.$tipo.'\');">'.
                             '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'.                           
                         '</td>'.
                         '<td class="tdmod"><input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartidaop" name="preciopartidaop[]" value="'.Helpers::convertirvalorcorrecto($dc->Precio).'" ><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Precio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodepreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
@@ -537,7 +546,7 @@ class RemisionController extends ConfiguracionSistemaController{
                         '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="'.Helpers::convertirvalorcorrecto($dc->CostoTotal).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
                         '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm comisionporcentajepartida" name="comisionporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Com).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('.$contadorfilas.');" required></td>'.
                         '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm comisionespesospartida" name="comisionespesospartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Comision).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'.
-                        '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Utilidad).'" data-parsley-utilidad="0.'.$this->numerocerosconfiguradosinputnumberstep.'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                        '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Utilidad).'" '.$dataparsleyutilidad.' onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
                         '<td class="tdmod"><input type="text" class="form-control divorinputmodsm monedapartida" name="monedapartida[]" value="'.$dc->Moneda.'" readonly data-parsley-length="[1, 3]"></td>'.
                         '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costolistapartida" name="costolistapartida[]" value="'.Helpers::convertirvalorcorrecto($dc->CostoDeLista).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'.
                         '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm tipocambiopartida" name="tipocambiopartida[]" value="'.Helpers::convertirvalorcorrecto($dc->TipoDeCambio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
@@ -701,11 +710,17 @@ class RemisionController extends ConfiguracionSistemaController{
             //utilidad de la partida
             $utilidadpartida = $subtotalpartida-$costototalpartida-$comisionespesospartida;
             $tipo = "alta";
+            $dataparsleyutilidad = "";
+            if($this->validarutilidadnegativa == 'N'){
+                if($cantidad > 0){
+                    $dataparsleyutilidad = 'data-parsley-utilidad="0.'.$this->numerocerosconfiguradosinputnumberstep.'"';
+                }
+            }
             $filasdetallesremision= $filasdetallesremision.
             '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                 '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
                 '<td class="tdmod tdinsumospartidas"><input type="text" class="form-control inputnextdet divorinputmodsm insumopartida" name="insumopartida[]" value="'.$producto->Insumo.'" data-parsley-length="[1, 20]"></td>'.
-                '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$producto->Codigo.'</b></td>'.
+                '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;" class="codigopartidatexto">'.$producto->Codigo.'</b></td>'.
                 '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet descripcionproductopartida" name="descripcionproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($producto->Producto, ENT_QUOTES).'</textarea></td>'.
                 '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$producto->Unidad.'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'.$producto->Unidad.'</td>'.
                 '<td class="tdmod">'.
@@ -727,7 +742,7 @@ class RemisionController extends ConfiguracionSistemaController{
                 '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="'.Helpers::convertirvalorcorrecto($costototalpartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
                 '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm comisionporcentajepartida" name="comisionporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($comisionporcentajepartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('.$contadorfilas.');" required></td>'.
                 '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm comisionespesospartida" name="comisionespesospartida[]" value="'.Helpers::convertirvalorcorrecto($comisionespesospartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'.
-                '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'.Helpers::convertirvalorcorrecto($utilidadpartida).'" data-parsley-utilidad="0.'.$this->numerocerosconfiguradosinputnumberstep.'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'.Helpers::convertirvalorcorrecto($utilidadpartida).'" '.$dataparsleyutilidad.' onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
                 '<td class="tdmod"><input type="text" class="form-control divorinputmodsm monedapartida" name="monedapartida[]" value="MXN" readonly data-parsley-length="[1, 3]" autocomplete="off"></td>'.
                 '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costolistapartida" name="costolistapartida[]" value="'.Helpers::convertirvalorcorrecto($producto->CostoDeLista).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'.
                 '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm tipocambiopartida" name="tipocambiopartida[]" value="'.Helpers::convertirvalorcorrecto(1).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
@@ -819,125 +834,160 @@ class RemisionController extends ConfiguracionSistemaController{
     //guardar
     public function remisiones_guardar(Request $request){
         ini_set('max_input_vars','20000' );
-        if($this->modificarconsecutivofolioenremisiones == 'S'){
-            $folio = $request->folio;
-        }else{
-            //obtener el ultimo folio de la tabla
-            $folio = Helpers::ultimofolioserietablamodulos('App\Remision',$request->serie);
-        }
-        //INGRESAR DATOS A TABLA ORDEN COMPRA
-        $remision = $folio.'-'.$request->serie;
-        $ExisteRemision = Remision::where('Remision', $remision)->first();
-	    if($ExisteRemision == true){
-	        $Remision = 1;
-	    }else{  
-            $Remision = new Remision;
-            $Remision->Remision=$remision;
-            $Remision->Serie=$request->serie;
-            $Remision->Folio=$folio;
-            $Remision->Cliente=$request->numerocliente;
-            $Remision->Agente=$request->numeroagente;
-            $Remision->Fecha=Carbon::parse($request->fecha)->toDateTimeString();
-            $Remision->Plazo=$request->plazo;
-            $Remision->Tipo=$request->tipo;
-            $Remision->Unidad=$request->unidad;
-            $Remision->Pedido=$request->pedido;
-            $Remision->Solicita=$request->solicitadopor;
-            $Remision->Referencia=$request->referencia;
-            $Remision->Destino=$request->destinodelpedido;
-            $Remision->Almacen=$request->numeroalmacen;
-            $Remision->Os=$request->ordenservicio;
-            $Remision->Eq=$request->equipo;
-            $Remision->Rq=$request->requisicion;
-            $Remision->SerieRq=$request->serierequisicion;
-            $Remision->Importe=$request->importe;
-            $Remision->Descuento=$request->descuento;
-            $Remision->SubTotal=$request->subtotal;
-            $Remision->Iva=$request->iva;
-            $Remision->Total=$request->total;
-            $Remision->Costo=$request->costo;
-            $Remision->Comision=$request->comision;
-            $Remision->Utilidad=$request->utilidad;
-            $Remision->Obs=$request->observaciones;
-            $Remision->Hora=Helpers::fecha_exacta_accion_datetimestring();
-            $Remision->Status="POR FACTURAR";
-            $Remision->Usuario=Auth::user()->user;
-            $Remision->Periodo=$this->periodohoy;
-            $Remision->save();
-            //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
-            $BitacoraDocumento = new BitacoraDocumento;
-            $BitacoraDocumento->Documento = "REMISIONES";
-            $BitacoraDocumento->Movimiento = $remision;
-            $BitacoraDocumento->Aplicacion = "ALTA";
-            $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
-            $BitacoraDocumento->Status = "POR FACTURAR";
-            $BitacoraDocumento->Usuario = Auth::user()->user;
-            $BitacoraDocumento->Periodo = $this->periodohoy;
-            $BitacoraDocumento->save();
-            //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
-            $item = 1;
-            foreach ($request->codigoproductopartida as $key => $codigoproductopartida){             
-                $RemisionDetalle=new RemisionDetalle;
-                $RemisionDetalle->Remision = $remision;
-                $RemisionDetalle->Cliente = $request->numerocliente;
-                $RemisionDetalle->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
-                $RemisionDetalle->Codigo = $codigoproductopartida;
-                $RemisionDetalle->Descripcion = $request->descripcionproductopartida [$key];
-                $RemisionDetalle->Unidad = $request->unidadproductopartida [$key];
-                $RemisionDetalle->Cantidad =  $request->cantidadpartida [$key];
-                $RemisionDetalle->Precio =  $request->preciopartida [$key];
-                $RemisionDetalle->Importe =  $request->importepartida [$key];
-                $RemisionDetalle->Dcto =  $request->descuentoporcentajepartida [$key];
-                $RemisionDetalle->Descuento =  $request->descuentopesospartida  [$key];
-                $RemisionDetalle->SubTotal =  $request->subtotalpartida [$key];
-                $RemisionDetalle->Impuesto =  $request->ivaporcentajepartida [$key];
-                $RemisionDetalle->Iva =  $request->ivapesospartida [$key];
-                $RemisionDetalle->Total =  $request->totalpesospartida [$key];
-                $RemisionDetalle->Costo =  $request->costopartida [$key];
-                $RemisionDetalle->CostoTotal =  $request->costototalpartida [$key];
-                $RemisionDetalle->Com =  $request->comisionporcentajepartida [$key];
-                $RemisionDetalle->Comision =  $request->comisionespesospartida [$key];
-                $RemisionDetalle->Utilidad =  $request->utilidadpartida [$key];
-                $RemisionDetalle->Moneda =  $request->monedapartida [$key];
-                $RemisionDetalle->CostoDeLista =  $request->costolistapartida [$key];
-                $RemisionDetalle->TipoDeCambio =  $request->tipocambiopartida [$key];
-                $RemisionDetalle->Cotizacion =  $request->cotizacionpartida [$key];
-                $RemisionDetalle->Insumo =  $request->insumopartida [$key];
-                $RemisionDetalle->InteresMeses =  $request->mesespartida [$key];
-                $RemisionDetalle->InteresTasa =  $request->tasainterespartida  [$key];
-                $RemisionDetalle->InteresMonto =  $request->montointerespartida  [$key];
-                $RemisionDetalle->PorRemisionar = $request->pendientearemisionarpartida [$key];
-                $RemisionDetalle->Item = $item;
-                $RemisionDetalle->save();
-                //modificar fechaultimaventa y ultimocosto
-                /*
-                $Producto = Producto::where('Codigo', $codigoproductopartida)->first();
-                $Producto->{'Fecha Ultima Venta'} = Carbon::parse($request->fecha)->toDateTimeString();
-                $Producto->{'Ultima Venta'} = $request->preciopartida [$key];
-                $Producto->save();
-                */
-                Producto::where('Codigo', $codigoproductopartida)
-                ->update([
-                    'Fecha Ultima Venta' => Carbon::parse($request->fecha)->toDateTimeString(),
-                    'Ultima Venta' => $request->preciopartida [$key]
-                ]);
-                if($request->cantidadpartida [$key] > 0){
-                    //restar existencias del almacen 
-                    $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
-                    if($ContarExistenciaAlmacen > 0){
-                        $ExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
-                        $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias - $request->cantidadpartida [$key];
-                        Existencia::where('Codigo', $codigoproductopartida)
-                                    ->where('Almacen', $request->numeroalmacen)
-                                    ->update([
-                                        'Existencias' => $ExistenciaNuevaAlmacen
-                                    ]);
-                    }
-                }
-                $item++;
+        //revisar si hay existencias suficientes para guardar la remision
+        $arraypartidassinexistencias = Array();
+        $detallescodigossinexistencias = 0;
+        foreach ($request->codigoproductopartida as $key => $codigoproductopartida){  
+            $numeroalmacen = $request->numeroalmacen;
+            $cantidadpartida = $request->cantidadpartida [$key];
+            //$cantidadpartidadb = $request->cantidadpartidadb [$key];
+            $ContarExistencias = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $numeroalmacen)->count();
+            if($ContarExistencias > 0){            
+                $Existencias = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $numeroalmacen)->first();
+                $ExistenciasTabla = $Existencias->Existencias;
+            }else{
+                $ExistenciasTabla = 0;
+            }
+            $ExistenciasActualesMasExistenciasCaptura = $ExistenciasTabla;
+            $ExistenciasNueva = $ExistenciasActualesMasExistenciasCaptura - $cantidadpartida; 
+            $data = array(
+                    "Codigo" => $codigoproductopartida,
+                    "ExistenciasActualesMasExistenciasCaptura" => Helpers::convertirvalorcorrecto($ExistenciasActualesMasExistenciasCaptura),
+                    "ExistenciasARestarEnModificacion" => Helpers::convertirvalorcorrecto($cantidadpartida),
+                    "ExistenciasNueva" => Helpers::convertirvalorcorrecto($ExistenciasNueva)
+            );
+            array_push($arraypartidassinexistencias, $data);
+            if($ExistenciasNueva < 0){
+                $detallescodigossinexistencias++;
             }
         }
-        return response()->json($Remision);
+        $dataexistencias = array(
+            "arraypartidassinexistencias" =>  $arraypartidassinexistencias,
+            "detallescodigossinexistencias" => $detallescodigossinexistencias
+        );
+        if($detallescodigossinexistencias != ""){
+            return response()->json($dataexistencias);
+        }else{
+            if($this->modificarconsecutivofolioenremisiones == 'S'){
+                $folio = $request->folio;
+            }else{
+                //obtener el ultimo folio de la tabla
+                $folio = Helpers::ultimofolioserietablamodulos('App\Remision',$request->serie);
+            }
+            //INGRESAR DATOS A TABLA ORDEN COMPRA
+            $remision = $folio.'-'.$request->serie;
+            $ExisteRemision = Remision::where('Remision', $remision)->first();
+            if($ExisteRemision == true){
+                $Remision = 1;
+            }else{  
+                $Remision = new Remision;
+                $Remision->Remision=$remision;
+                $Remision->Serie=$request->serie;
+                $Remision->Folio=$folio;
+                $Remision->Cliente=$request->numerocliente;
+                $Remision->Agente=$request->numeroagente;
+                $Remision->Fecha=Carbon::parse($request->fecha)->toDateTimeString();
+                $Remision->Plazo=$request->plazo;
+                $Remision->Tipo=$request->tipo;
+                $Remision->Unidad=$request->unidad;
+                $Remision->Pedido=$request->pedido;
+                $Remision->Solicita=$request->solicitadopor;
+                $Remision->Referencia=$request->referencia;
+                $Remision->Destino=$request->destinodelpedido;
+                $Remision->Almacen=$request->numeroalmacen;
+                $Remision->Os=$request->ordenservicio;
+                $Remision->Eq=$request->equipo;
+                $Remision->Rq=$request->requisicion;
+                $Remision->SerieRq=$request->serierequisicion;
+                $Remision->Importe=$request->importe;
+                $Remision->Descuento=$request->descuento;
+                $Remision->SubTotal=$request->subtotal;
+                $Remision->Iva=$request->iva;
+                $Remision->Total=$request->total;
+                $Remision->Costo=$request->costo;
+                $Remision->Comision=$request->comision;
+                $Remision->Utilidad=$request->utilidad;
+                $Remision->Obs=$request->observaciones;
+                $Remision->Hora=Helpers::fecha_exacta_accion_datetimestring();
+                $Remision->Status="POR FACTURAR";
+                $Remision->Usuario=Auth::user()->user;
+                $Remision->Periodo=$this->periodohoy;
+                $Remision->save();
+                //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
+                $BitacoraDocumento = new BitacoraDocumento;
+                $BitacoraDocumento->Documento = "REMISIONES";
+                $BitacoraDocumento->Movimiento = $remision;
+                $BitacoraDocumento->Aplicacion = "ALTA";
+                $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
+                $BitacoraDocumento->Status = "POR FACTURAR";
+                $BitacoraDocumento->Usuario = Auth::user()->user;
+                $BitacoraDocumento->Periodo = $this->periodohoy;
+                $BitacoraDocumento->save();
+                //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
+                $item = 1;
+                foreach ($request->codigoproductopartida as $key => $codigoproductopartida){             
+                    $RemisionDetalle=new RemisionDetalle;
+                    $RemisionDetalle->Remision = $remision;
+                    $RemisionDetalle->Cliente = $request->numerocliente;
+                    $RemisionDetalle->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
+                    $RemisionDetalle->Codigo = $codigoproductopartida;
+                    $RemisionDetalle->Descripcion = $request->descripcionproductopartida [$key];
+                    $RemisionDetalle->Unidad = $request->unidadproductopartida [$key];
+                    $RemisionDetalle->Cantidad =  $request->cantidadpartida [$key];
+                    $RemisionDetalle->Precio =  $request->preciopartida [$key];
+                    $RemisionDetalle->Importe =  $request->importepartida [$key];
+                    $RemisionDetalle->Dcto =  $request->descuentoporcentajepartida [$key];
+                    $RemisionDetalle->Descuento =  $request->descuentopesospartida  [$key];
+                    $RemisionDetalle->SubTotal =  $request->subtotalpartida [$key];
+                    $RemisionDetalle->Impuesto =  $request->ivaporcentajepartida [$key];
+                    $RemisionDetalle->Iva =  $request->ivapesospartida [$key];
+                    $RemisionDetalle->Total =  $request->totalpesospartida [$key];
+                    $RemisionDetalle->Costo =  $request->costopartida [$key];
+                    $RemisionDetalle->CostoTotal =  $request->costototalpartida [$key];
+                    $RemisionDetalle->Com =  $request->comisionporcentajepartida [$key];
+                    $RemisionDetalle->Comision =  $request->comisionespesospartida [$key];
+                    $RemisionDetalle->Utilidad =  $request->utilidadpartida [$key];
+                    $RemisionDetalle->Moneda =  $request->monedapartida [$key];
+                    $RemisionDetalle->CostoDeLista =  $request->costolistapartida [$key];
+                    $RemisionDetalle->TipoDeCambio =  $request->tipocambiopartida [$key];
+                    $RemisionDetalle->Cotizacion =  $request->cotizacionpartida [$key];
+                    $RemisionDetalle->Insumo =  $request->insumopartida [$key];
+                    $RemisionDetalle->InteresMeses =  $request->mesespartida [$key];
+                    $RemisionDetalle->InteresTasa =  $request->tasainterespartida  [$key];
+                    $RemisionDetalle->InteresMonto =  $request->montointerespartida  [$key];
+                    $RemisionDetalle->PorRemisionar = $request->pendientearemisionarpartida [$key];
+                    $RemisionDetalle->Item = $item;
+                    $RemisionDetalle->save();
+                    //modificar fechaultimaventa y ultimocosto
+                    /*
+                    $Producto = Producto::where('Codigo', $codigoproductopartida)->first();
+                    $Producto->{'Fecha Ultima Venta'} = Carbon::parse($request->fecha)->toDateTimeString();
+                    $Producto->{'Ultima Venta'} = $request->preciopartida [$key];
+                    $Producto->save();
+                    */
+                    Producto::where('Codigo', $codigoproductopartida)
+                    ->update([
+                        'Fecha Ultima Venta' => Carbon::parse($request->fecha)->toDateTimeString(),
+                        'Ultima Venta' => $request->preciopartida [$key]
+                    ]);
+                    if($request->cantidadpartida [$key] > 0){
+                        //restar existencias del almacen 
+                        $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
+                        if($ContarExistenciaAlmacen > 0){
+                            $ExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
+                            $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias - $request->cantidadpartida [$key];
+                            Existencia::where('Codigo', $codigoproductopartida)
+                                        ->where('Almacen', $request->numeroalmacen)
+                                        ->update([
+                                            'Existencias' => $ExistenciaNuevaAlmacen
+                                        ]);
+                        }
+                    }
+                    $item++;
+                }
+            }
+            return response()->json($Remision);
+        }
     }
 
     //verificar baja
@@ -1076,11 +1126,18 @@ class RemisionController extends ConfiguracionSistemaController{
                 }else{
                     $parsleymax = $dr->Cantidad;
                 }
+                $dataparsleyutilidad = "";
+                if($this->validarutilidadnegativa == 'N'){
+                    if($dr->Cantidad > 0){
+                        $dataparsleyutilidad = 'data-parsley-utilidad="0.'.$this->numerocerosconfiguradosinputnumberstep.'"';
+                    }
+                }
+                //dd($dataparsleyutilidad);
                 $filasdetallesremision= $filasdetallesremision.
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dr->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                     '<td class="tdmod tdinsumospartidas"><input type="text" class="form-control inputnextdet divorinputmodsm insumopartida" name="insumopartida[]" value="'.$dr->Insumo.'" data-parsley-length="[1, 20]"></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dr->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$dr->Codigo.'</b></td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dr->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;" class="codigopartidatexto">'.$dr->Codigo.'</b></td>'.
                     '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet descripcionproductopartida" name="descripcionproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($dr->Descripcion, ENT_QUOTES).'</textarea></td>'.                    
                     '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$dr->Unidad.'" readonly data-parsley-length="[1, 5]">'.$dr->Unidad.'</td>'.
                     
@@ -1090,7 +1147,7 @@ class RemisionController extends ConfiguracionSistemaController{
                     
                     '<td class="tdmod">'.
                         '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="'.Helpers::convertirvalorcorrecto($dr->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
-                        '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Cantidad).'" data-parsley-existencias="'.$parsleymax.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodecantidadpartida('.$contadorfilas.',\''.$tipo.'\');">'.
+                        '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodecantidadpartida('.$contadorfilas.',\''.$tipo.'\');">'.
                         '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'.                           
                     '</td>'.
                     '<td class="tdmod"><input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartidaop" name="preciopartidaop[]" value="'.Helpers::convertirvalorcorrecto($dr->Precio).'" ><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Precio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodepreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
@@ -1105,7 +1162,7 @@ class RemisionController extends ConfiguracionSistemaController{
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="'.Helpers::convertirvalorcorrecto($dr->CostoTotal).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm comisionporcentajepartida" name="comisionporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Com).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('.$contadorfilas.');" required></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm comisionespesospartida" name="comisionespesospartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Comision).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Utilidad).'" data-parsley-utilidad="0.'.$this->numerocerosconfiguradosinputnumberstep.'" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Utilidad).'" '.$dataparsleyutilidad.' onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm monedapartida" name="monedapartida[]" value="'.$dr->Moneda.'" readonly data-parsley-length="[1, 3]"></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costolistapartida" name="costolistapartida[]" value="'.Helpers::convertirvalorcorrecto($dr->CostoDeLista).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly required></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm tipocambiopartida" name="tipocambiopartida[]" value="'.Helpers::convertirvalorcorrecto($dr->TipoDeCambio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
@@ -1173,212 +1230,235 @@ class RemisionController extends ConfiguracionSistemaController{
     //cambios
     public function remisiones_guardar_modificacion(Request $request){
         ini_set('max_input_vars','20000' );
-        $remision = $request->folio.'-'.$request->serie;
-        $Remision = Remision::where('Remision', $remision)->first();
-        //validar si las partidas en las modiifcacion son las mismas que los detalles de los traspasos
-        // si no son las mismas comparar y eliminar las partidas que corresponden en la tabla detalles de OrdenesTrabajo y Traspasos
-        //array partidas antes de modificacion
-        $ArrayDetallesRemisionAnterior = Array();
-        $DetallesRemisionAnterior = RemisionDetalle::where('Remision', $remision)->get();
-        foreach($DetallesRemisionAnterior as $detalle){
-            //array_push($ArrayDetallesRemisionAnterior, $detalle->Codigo);
-            array_push($ArrayDetallesRemisionAnterior, $detalle->Remision.'#'.$detalle->Codigo.'#'.$detalle->Item);
-        }
-        //array partida despues de modificacion
-        $ArrayDetallesRemisionNuevo = Array();
-        foreach ($request->codigoproductopartida as $key => $nuevocodigo){
-            //array_push($ArrayDetallesRemisionNuevo, $nuevocodigo);
-            if($request->agregadoen [$key] == 'NA'){
-                array_push($ArrayDetallesRemisionNuevo, $remision.'#'.$nuevocodigo.'#'.$request->itempartida [$key]);
-            } 
-        }  
-        //diferencias entre arreglos
-        $diferencias_arreglos = array_diff($ArrayDetallesRemisionAnterior, $ArrayDetallesRemisionNuevo);
-        //iteramos las diferencias entre arreglos
-        if(count($diferencias_arreglos) > 0){
-            foreach($diferencias_arreglos as $eliminapartida){
-                $explode_d = explode("#",$eliminapartida);
-                $detalleremision = RemisionDetalle::where('Remision', $explode_d[0])->where('Codigo', $explode_d[1])->where('Item', $explode_d[2])->first();
-                //sumar existencias a almacen principal
-                $SumarExistenciaAlmacen = Existencia::where('Codigo', $explode_d[1])->where('Almacen', $request->numeroalmacen)->first();
-                $SumarExistenciaNuevaAlmacen = $SumarExistenciaAlmacen->Existencias + $detalleremision->Cantidad;
-                Existencia::where('Codigo', $explode_d[1])
-                            ->where('Almacen', $request->numeroalmacen)
-                            ->update([
-                                'Existencias' => $SumarExistenciaNuevaAlmacen
-                            ]);            
-                //eliminar detalle de la remision eliminado
-                $eliminardetalleremision = RemisionDetalle::where('Remision', $explode_d[0])->where('Codigo', $explode_d[1])->where('Item', $explode_d[2])->forceDelete();
+        //revisar si hay existencias suficientes para guardar la remision
+        $arraypartidassinexistencias = Array();
+        $detallescodigossinexistencias = 0;
+        foreach ($request->codigoproductopartida as $key => $codigoproductopartida){  
+            $numeroalmacen = $request->numeroalmacen;
+            $cantidadpartida = $request->cantidadpartida [$key];
+            $agregadoen = $request->agregadoen [$key];
+            if($agregadoen == "modificacion"){
+                $cantidadpartidadb = 0;
+            }else{
+                $cantidadpartidadb = $request->cantidadpartidadb [$key];
+            }
+            $ContarExistencias = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $numeroalmacen)->count();
+            if($ContarExistencias > 0){            
+                $Existencias = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $numeroalmacen)->first();
+                $ExistenciasTabla = $Existencias->Existencias;
+            }else{
+                $ExistenciasTabla = 0;
+            }
+            $Existencias = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $numeroalmacen)->first();
+            $ExistenciasActualesMasExistenciasCaptura = $ExistenciasTabla + $cantidadpartidadb;
+            $ExistenciasNueva = $ExistenciasActualesMasExistenciasCaptura - $cantidadpartida; 
+            $data = array(
+                    "Codigo" => $codigoproductopartida,
+                    "ExistenciasActualesMasExistenciasCaptura" => Helpers::convertirvalorcorrecto($ExistenciasActualesMasExistenciasCaptura),
+                    "ExistenciasARestarEnModificacion" => Helpers::convertirvalorcorrecto($cantidadpartida),
+                    "ExistenciasNueva" => Helpers::convertirvalorcorrecto($ExistenciasNueva)
+            );
+            array_push($arraypartidassinexistencias, $data);
+            if($ExistenciasNueva < 0){
+                $detallescodigossinexistencias++;
             }
         }
-        //modificar remision
-        Remision::where('Remision', $remision)
-        ->update([
-            'Cliente' => $request->numerocliente,
-            'Agente' => $request->numeroagente,
-            'Fecha' => Carbon::parse($request->fecha)->toDateTimeString(),
-            'Plazo' => $request->plazo,
-            'Tipo' => $request->tipo,
-            'Unidad' => $request->unidad,
-            'Pedido' => $request->pedido,
-            'Solicita' => $request->solicitadopor,
-            'Referencia' => $request->referencia,
-            'Destino' => $request->destinodelpedido,
-            'Os' => $request->ordenservicio,
-            'Eq' => $request->equipo,
-            'SerieRq' => $request->serierequisicion,
-            'Rq' => $request->requisicion,
-            'Obs' => $request->observaciones,
-            'Importe' => $request->importe,
-            'Descuento' => $request->descuento,
-            'SubTotal' => $request->subtotal,
-            'Iva' => $request->iva,
-            'Total' => $request->total,
-            'Costo' => $request->costo,
-            'Utilidad' => $request->utilidad,
-            'Comision' => $request->comision
-        ]);
-        //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
-        $BitacoraDocumento = new BitacoraDocumento;
-        $BitacoraDocumento->Documento = "REMISIONES";
-        $BitacoraDocumento->Movimiento = $remision;
-        $BitacoraDocumento->Aplicacion = "CAMBIO";
-        $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
-        $BitacoraDocumento->Status = $Remision->Status;
-        $BitacoraDocumento->Usuario = Auth::user()->user;
-        $BitacoraDocumento->Periodo = $this->periodohoy;
-        $BitacoraDocumento->save();
-        //INGRESAR DATOS A TABLA DETALLES
-        foreach ($request->codigoproductopartida as $key => $codigoproductopartida){    
-            //if la partida se agrego en la modificacion se agrega en los detalles de traspaso y de orden de trabajo si asi lo requiere
-            if($request->agregadoen [$key] == 'modificacion'){     
-                $contaritems = RemisionDetalle::select('Item')->where('Remision', $remision)->count();
-                if($contaritems > 0){
-                    $item = RemisionDetalle::select('Item')->where('Remision', $remision)->orderBy('Item', 'DESC')->take(1)->get();
-                    $ultimoitem = $item[0]->Item+1;
-                }else{
-                    $ultimoitem = 1;
-                }
-                $RemisionDetalle=new RemisionDetalle;
-                $RemisionDetalle->Remision = $remision;
-                $RemisionDetalle->Cliente = $request->numerocliente;
-                $RemisionDetalle->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
-                $RemisionDetalle->Codigo = $codigoproductopartida;
-                $RemisionDetalle->Descripcion = $request->descripcionproductopartida [$key];
-                $RemisionDetalle->Unidad = $request->unidadproductopartida [$key];
-                $RemisionDetalle->Cantidad =  $request->cantidadpartida [$key];
-                $RemisionDetalle->Precio =  $request->preciopartida [$key];
-                $RemisionDetalle->Importe =  $request->importepartida [$key];
-                $RemisionDetalle->Dcto =  $request->descuentoporcentajepartida [$key];
-                $RemisionDetalle->Descuento =  $request->descuentopesospartida  [$key];
-                $RemisionDetalle->SubTotal =  $request->subtotalpartida [$key];
-                $RemisionDetalle->Impuesto =  $request->ivaporcentajepartida [$key];
-                $RemisionDetalle->Iva =  $request->ivapesospartida [$key];
-                $RemisionDetalle->Total =  $request->totalpesospartida [$key];
-                $RemisionDetalle->Costo =  $request->costopartida [$key];
-                $RemisionDetalle->CostoTotal =  $request->costototalpartida [$key];
-                $RemisionDetalle->Com =  $request->comisionporcentajepartida [$key];
-                $RemisionDetalle->Comision =  $request->comisionespesospartida [$key];
-                $RemisionDetalle->Utilidad =  $request->utilidadpartida [$key];
-                $RemisionDetalle->Moneda =  $request->monedapartida [$key];
-                $RemisionDetalle->CostoDeLista =  $request->costolistapartida [$key];
-                $RemisionDetalle->Insumo =  $request->insumopartida [$key];
-                $RemisionDetalle->InteresMeses =  $request->mesespartida [$key];
-                $RemisionDetalle->InteresTasa =  $request->tasainterespartida  [$key];
-                $RemisionDetalle->InteresMonto =  $request->montointerespartida  [$key];
-                $RemisionDetalle->Item = $ultimoitem;
-                $RemisionDetalle->save();
-                //restar existencias del almacen 
-                $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
-                if($ContarExistenciaAlmacen > 0){
-                    $ExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
-                    $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias - $request->cantidadpartida [$key];
-                    Existencia::where('Codigo', $codigoproductopartida)
-                                ->where('Almacen', $request->numeroalmacen)
-                                ->update([
-                                    'Existencias' => $ExistenciaNuevaAlmacen
-                                ]);
-                }else{
-                    $Existencia = new Existencia;
-                    $Existencia->Codigo = $codigoproductopartida;
-                    $Existencia->Almacen = $request->numeroalmacen;
-                    $Existencia->Existencias = $ExistenciaNuevaAlmacen;
-                    $Existencia->save();
-                }
-                $ultimoitem++;
-            }else{
-                //si la partida no se agrego en la modificacion solo se modifican los datos
-                //modificar detalle
-                RemisionDetalle::where('Remision', $remision)
-                ->where('Item', $request->itempartida [$key])
-                ->update([
-                    'Cliente' => $request->numerocliente,
-                    'Fecha' => Carbon::parse($request->fecha)->toDateTimeString(),
-                    'Descripcion' => $request->descripcionproductopartida [$key],
-                    'Cantidad' =>  $request->cantidadpartida [$key],
-                    'Precio' =>  $request->preciopartida [$key],
-                    'Importe' =>  $request->importepartida [$key],
-                    'Dcto' =>  $request->descuentoporcentajepartida [$key],
-                    'Descuento' =>  $request->descuentopesospartida  [$key],
-                    'SubTotal' =>  $request->subtotalpartida [$key],
-                    'Impuesto' =>  $request->ivaporcentajepartida [$key],
-                    'Iva' =>  $request->ivapesospartida [$key],
-                    'Total' =>  $request->totalpesospartida [$key],
-                    'Costo' =>  $request->costopartida [$key],
-                    'CostoTotal' =>  $request->costototalpartida [$key],
-                    'Com' =>  $request->comisionporcentajepartida [$key],
-                    'Comision' =>  $request->comisionespesospartida [$key],
-                    'Utilidad' =>  $request->utilidadpartida [$key],
-                    'Moneda' =>  $request->monedapartida [$key],
-                    'InteresMeses' =>  $request->mesespartida [$key],
-                    'InteresTasa' =>  $request->tasainterespartida  [$key],
-                    'InteresMonto' =>  $request->montointerespartida  [$key]
-                ]);
-                //solo si el usuario esta autorizado en modificar el dato insumo
-                if (in_array(strtoupper(Auth::user()->user), explode(",",$this->usuariosamodificarinsumos))) {
-                    RemisionDetalle::where('Remision', $remision)
-                    ->where('Item', $request->itempartida [$key])
-                            ->update([
-                                'Insumo'=>$request->insumopartida [$key],
-                            ]);
-                }
-                $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
-                if($ContarExistenciaAlmacen > 0){
+        $dataexistencias = array(
+            "arraypartidassinexistencias" =>  $arraypartidassinexistencias,
+            "detallescodigossinexistencias" => $detallescodigossinexistencias
+        );
+        if($detallescodigossinexistencias != ""){
+            return response()->json($dataexistencias);
+        }else{
+            $remision = $request->folio.'-'.$request->serie;
+            $Remision = Remision::where('Remision', $remision)->first();
+            //validar si las partidas en las modiifcacion son las mismas que los detalles de los traspasos
+            // si no son las mismas comparar y eliminar las partidas que corresponden en la tabla detalles de OrdenesTrabajo y Traspasos
+            //array partidas antes de modificacion
+            $ArrayDetallesRemisionAnterior = Array();
+            $DetallesRemisionAnterior = RemisionDetalle::where('Remision', $remision)->get();
+            foreach($DetallesRemisionAnterior as $detalle){
+                //array_push($ArrayDetallesRemisionAnterior, $detalle->Codigo);
+                array_push($ArrayDetallesRemisionAnterior, $detalle->Remision.'#'.$detalle->Codigo.'#'.$detalle->Item);
+            }
+            //array partida despues de modificacion
+            $ArrayDetallesRemisionNuevo = Array();
+            foreach ($request->codigoproductopartida as $key => $nuevocodigo){
+                //array_push($ArrayDetallesRemisionNuevo, $nuevocodigo);
+                if($request->agregadoen [$key] == 'NA'){
+                    array_push($ArrayDetallesRemisionNuevo, $remision.'#'.$nuevocodigo.'#'.$request->itempartida [$key]);
+                } 
+            }  
+            //diferencias entre arreglos
+            $diferencias_arreglos = array_diff($ArrayDetallesRemisionAnterior, $ArrayDetallesRemisionNuevo);
+            //iteramos las diferencias entre arreglos
+            if(count($diferencias_arreglos) > 0){
+                foreach($diferencias_arreglos as $eliminapartida){
+                    $explode_d = explode("#",$eliminapartida);
+                    $detalleremision = RemisionDetalle::where('Remision', $explode_d[0])->where('Codigo', $explode_d[1])->where('Item', $explode_d[2])->first();
                     //sumar existencias a almacen principal
-                    $SumarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
-                    $SumarExistenciaNuevaAlmacen = $SumarExistenciaAlmacen->Existencias + $request->cantidadpartidadb [$key];
-                    Existencia::where('Codigo', $codigoproductopartida)
+                    $SumarExistenciaAlmacen = Existencia::where('Codigo', $explode_d[1])->where('Almacen', $request->numeroalmacen)->first();
+                    $SumarExistenciaNuevaAlmacen = $SumarExistenciaAlmacen->Existencias + $detalleremision->Cantidad;
+                    Existencia::where('Codigo', $explode_d[1])
                                 ->where('Almacen', $request->numeroalmacen)
                                 ->update([
                                     'Existencias' => $SumarExistenciaNuevaAlmacen
-                                ]);
-                }else{
-                    $Existencia = new Existencia;
-                    $Existencia->Codigo = $codigoproductopartida;
-                    $Existencia->Almacen = $request->numeroalmacen;
-                    $Existencia->Existencias = $SumarExistenciaNuevaAlmacen;
-                    $Existencia->save();
-                }
-                //restar existencias del almacen 
-                $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
-                if($ContarExistenciaAlmacen > 0){
-                    $ExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
-                    $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias - $request->cantidadpartida [$key];
-                    Existencia::where('Codigo', $codigoproductopartida)
-                                ->where('Almacen', $request->numeroalmacen)
-                                ->update([
-                                    'Existencias' => $ExistenciaNuevaAlmacen
-                                ]);
-                }else{
-                    $Existencia = new Existencia;
-                    $Existencia->Codigo = $codigoproductopartida;
-                    $Existencia->Almacen = $request->numeroalmacen;
-                    $Existencia->Existencias = $ExistenciaNuevaAlmacen;
-                    $Existencia->save();
+                                ]);            
+                    //eliminar detalle de la remision eliminado
+                    $eliminardetalleremision = RemisionDetalle::where('Remision', $explode_d[0])->where('Codigo', $explode_d[1])->where('Item', $explode_d[2])->forceDelete();
                 }
             }
+            //modificar remision
+            Remision::where('Remision', $remision)
+            ->update([
+                'Cliente' => $request->numerocliente,
+                'Agente' => $request->numeroagente,
+                'Fecha' => Carbon::parse($request->fecha)->toDateTimeString(),
+                'Plazo' => $request->plazo,
+                'Tipo' => $request->tipo,
+                'Unidad' => $request->unidad,
+                'Pedido' => $request->pedido,
+                'Solicita' => $request->solicitadopor,
+                'Referencia' => $request->referencia,
+                'Destino' => $request->destinodelpedido,
+                'Os' => $request->ordenservicio,
+                'Eq' => $request->equipo,
+                'SerieRq' => $request->serierequisicion,
+                'Rq' => $request->requisicion,
+                'Obs' => $request->observaciones,
+                'Importe' => $request->importe,
+                'Descuento' => $request->descuento,
+                'SubTotal' => $request->subtotal,
+                'Iva' => $request->iva,
+                'Total' => $request->total,
+                'Costo' => $request->costo,
+                'Utilidad' => $request->utilidad,
+                'Comision' => $request->comision
+            ]);
+            //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
+            $BitacoraDocumento = new BitacoraDocumento;
+            $BitacoraDocumento->Documento = "REMISIONES";
+            $BitacoraDocumento->Movimiento = $remision;
+            $BitacoraDocumento->Aplicacion = "CAMBIO";
+            $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
+            $BitacoraDocumento->Status = $Remision->Status;
+            $BitacoraDocumento->Usuario = Auth::user()->user;
+            $BitacoraDocumento->Periodo = $this->periodohoy;
+            $BitacoraDocumento->save();
+            //INGRESAR DATOS A TABLA DETALLES
+            foreach ($request->codigoproductopartida as $key => $codigoproductopartida){    
+                //if la partida se agrego en la modificacion se agrega en los detalles de traspaso y de orden de trabajo si asi lo requiere
+                if($request->agregadoen [$key] == 'modificacion'){     
+                    $contaritems = RemisionDetalle::select('Item')->where('Remision', $remision)->count();
+                    if($contaritems > 0){
+                        $item = RemisionDetalle::select('Item')->where('Remision', $remision)->orderBy('Item', 'DESC')->take(1)->get();
+                        $ultimoitem = $item[0]->Item+1;
+                    }else{
+                        $ultimoitem = 1;
+                    }
+                    $RemisionDetalle=new RemisionDetalle;
+                    $RemisionDetalle->Remision = $remision;
+                    $RemisionDetalle->Cliente = $request->numerocliente;
+                    $RemisionDetalle->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
+                    $RemisionDetalle->Codigo = $codigoproductopartida;
+                    $RemisionDetalle->Descripcion = $request->descripcionproductopartida [$key];
+                    $RemisionDetalle->Unidad = $request->unidadproductopartida [$key];
+                    $RemisionDetalle->Cantidad =  $request->cantidadpartida [$key];
+                    $RemisionDetalle->Precio =  $request->preciopartida [$key];
+                    $RemisionDetalle->Importe =  $request->importepartida [$key];
+                    $RemisionDetalle->Dcto =  $request->descuentoporcentajepartida [$key];
+                    $RemisionDetalle->Descuento =  $request->descuentopesospartida  [$key];
+                    $RemisionDetalle->SubTotal =  $request->subtotalpartida [$key];
+                    $RemisionDetalle->Impuesto =  $request->ivaporcentajepartida [$key];
+                    $RemisionDetalle->Iva =  $request->ivapesospartida [$key];
+                    $RemisionDetalle->Total =  $request->totalpesospartida [$key];
+                    $RemisionDetalle->Costo =  $request->costopartida [$key];
+                    $RemisionDetalle->CostoTotal =  $request->costototalpartida [$key];
+                    $RemisionDetalle->Com =  $request->comisionporcentajepartida [$key];
+                    $RemisionDetalle->Comision =  $request->comisionespesospartida [$key];
+                    $RemisionDetalle->Utilidad =  $request->utilidadpartida [$key];
+                    $RemisionDetalle->Moneda =  $request->monedapartida [$key];
+                    $RemisionDetalle->CostoDeLista =  $request->costolistapartida [$key];
+                    $RemisionDetalle->Insumo =  $request->insumopartida [$key];
+                    $RemisionDetalle->InteresMeses =  $request->mesespartida [$key];
+                    $RemisionDetalle->InteresTasa =  $request->tasainterespartida  [$key];
+                    $RemisionDetalle->InteresMonto =  $request->montointerespartida  [$key];
+                    $RemisionDetalle->Item = $ultimoitem;
+                    $RemisionDetalle->save();
+                    //restar existencias del almacen 
+                    $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
+                    if($ContarExistenciaAlmacen > 0){
+                        $ExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
+                        $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias - $request->cantidadpartida [$key];
+                        Existencia::where('Codigo', $codigoproductopartida)
+                                    ->where('Almacen', $request->numeroalmacen)
+                                    ->update([
+                                        'Existencias' => $ExistenciaNuevaAlmacen
+                                    ]);
+                    }
+                    $ultimoitem++;
+                }else{
+                    //si la partida no se agrego en la modificacion solo se modifican los datos
+                    //modificar detalle
+                    RemisionDetalle::where('Remision', $remision)
+                    ->where('Item', $request->itempartida [$key])
+                    ->update([
+                        'Cliente' => $request->numerocliente,
+                        'Fecha' => Carbon::parse($request->fecha)->toDateTimeString(),
+                        'Descripcion' => $request->descripcionproductopartida [$key],
+                        'Cantidad' =>  $request->cantidadpartida [$key],
+                        'Precio' =>  $request->preciopartida [$key],
+                        'Importe' =>  $request->importepartida [$key],
+                        'Dcto' =>  $request->descuentoporcentajepartida [$key],
+                        'Descuento' =>  $request->descuentopesospartida  [$key],
+                        'SubTotal' =>  $request->subtotalpartida [$key],
+                        'Impuesto' =>  $request->ivaporcentajepartida [$key],
+                        'Iva' =>  $request->ivapesospartida [$key],
+                        'Total' =>  $request->totalpesospartida [$key],
+                        'Costo' =>  $request->costopartida [$key],
+                        'CostoTotal' =>  $request->costototalpartida [$key],
+                        'Com' =>  $request->comisionporcentajepartida [$key],
+                        'Comision' =>  $request->comisionespesospartida [$key],
+                        'Utilidad' =>  $request->utilidadpartida [$key],
+                        'Moneda' =>  $request->monedapartida [$key],
+                        'InteresMeses' =>  $request->mesespartida [$key],
+                        'InteresTasa' =>  $request->tasainterespartida  [$key],
+                        'InteresMonto' =>  $request->montointerespartida  [$key]
+                    ]);
+                    //solo si el usuario esta autorizado en modificar el dato insumo
+                    if (in_array(strtoupper(Auth::user()->user), explode(",",$this->usuariosamodificarinsumos))) {
+                        RemisionDetalle::where('Remision', $remision)
+                        ->where('Item', $request->itempartida [$key])
+                                ->update([
+                                    'Insumo'=>$request->insumopartida [$key],
+                                ]);
+                    }
+                    $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
+                    if($ContarExistenciaAlmacen > 0){
+                        //sumar existencias a almacen principal
+                        $SumarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
+                        $SumarExistenciaNuevaAlmacen = $SumarExistenciaAlmacen->Existencias + $request->cantidadpartidadb [$key];
+                        Existencia::where('Codigo', $codigoproductopartida)
+                                    ->where('Almacen', $request->numeroalmacen)
+                                    ->update([
+                                        'Existencias' => $SumarExistenciaNuevaAlmacen
+                                    ]);
+                    }
+                    //restar existencias del almacen 
+                    $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
+                    if($ContarExistenciaAlmacen > 0){
+                        $ExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
+                        $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias - $request->cantidadpartida [$key];
+                        Existencia::where('Codigo', $codigoproductopartida)
+                                    ->where('Almacen', $request->numeroalmacen)
+                                    ->update([
+                                        'Existencias' => $ExistenciaNuevaAlmacen
+                                    ]);
+                    }
+                }
+            }
+            return response()->json($Remision);
         }
-        return response()->json($Remision);
     }
 
     //obtener datos generales

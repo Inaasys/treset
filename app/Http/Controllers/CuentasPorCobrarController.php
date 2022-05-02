@@ -37,6 +37,8 @@ use App\c_TipoRelacion;
 use App\FolioComprobantePago;
 use App\Comprobante;
 use App\User_Rel_Serie;
+use App\c_ObjetoImp;
+use App\c_Exportacion;
 use Config;
 use Mail;
 use Facturapi\Facturapi;
@@ -182,13 +184,14 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             ->leftJoin('c_MetodoPago as mp', 'mp.Clave', '=', 'c.MetodoPago')
             ->leftJoin('c_UsoCFDI as uc', 'uc.Clave', '=', 'c.UsoCfdi')
             ->leftJoin('c_Pais as p', 'p.Clave', '=', 'c.Pais')
-            ->select('c.Numero', 'c.Nombre', 'c.Plazo', 'c.Rfc', 'c.Agente', 'c.Credito', 'c.Saldo', 'c.Status', 'c.Municipio', 'c.Tipo', 'fp.Clave AS ClaveFormaPago', 'fp.Nombre AS NombreFormaPago', 'mp.Clave AS ClaveMetodoPago', 'mp.Nombre AS NombreMetodoPago', 'uc.Clave AS ClaveUsoCfdi', 'uc.Nombre AS NombreUsoCfdi', 'p.Clave AS ClavePais', 'p.Nombre AS NombrePais')
+            ->leftJoin('c_RegimenFiscal as rf', 'rf.Clave', '=', 'c.RegimenFiscal')
+            ->select('c.Numero', 'c.Nombre', 'c.Plazo', 'c.Rfc', 'c.Agente', 'c.Credito', 'c.Saldo', 'c.Status', 'c.Municipio', 'c.Tipo', 'fp.Clave AS ClaveFormaPago', 'fp.Nombre AS NombreFormaPago', 'mp.Clave AS ClaveMetodoPago', 'mp.Nombre AS NombreMetodoPago', 'uc.Clave AS ClaveUsoCfdi', 'uc.Nombre as NombreUsoCfdi', 'p.Clave as ClavePais', 'p.Nombre as NombrePais', 'rf.Clave as ClaveRegimenFiscal', 'rf.Nombre as RegimenFiscal')
             ->where('c.Status', 'ALTA')
             ->orderBy("Numero", "DESC")
             ->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarcliente('.$data->Numero.',\''.$data->Nombre .'\','.$data->Plazo.',\''.$data->Rfc.'\',\''.$data->ClaveFormaPago.'\',\''.$data->NombreFormaPago.'\',\''.$data->ClaveMetodoPago.'\',\''.$data->NombreMetodoPago.'\',\''.$data->ClaveUsoCfdi.'\',\''.$data->NombreUsoCfdi.'\',\''.$data->ClavePais.'\',\''.$data->NombrePais.'\')">Seleccionar</div>';
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarcliente('.$data->Numero.',\''.$data->Nombre .'\','.$data->Plazo.',\''.$data->Rfc.'\',\''.$data->ClaveFormaPago.'\',\''.$data->NombreFormaPago.'\',\''.$data->ClaveMetodoPago.'\',\''.$data->NombreMetodoPago.'\',\''.$data->ClaveUsoCfdi.'\',\''.$data->NombreUsoCfdi.'\',\''.$data->ClavePais.'\',\''.$data->NombrePais.'\',\''.$data->ClaveRegimenFiscal.'\',\''.$data->RegimenFiscal.'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->rawColumns(['operaciones'])
@@ -211,12 +214,15 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             ->leftJoin('c_MetodoPago as mp', 'mp.Clave', '=', 'c.MetodoPago')
             ->leftJoin('c_UsoCFDI as uc', 'uc.Clave', '=', 'c.UsoCfdi')
             ->leftJoin('c_Pais as p', 'p.Clave', '=', 'c.Pais')
-            ->select('c.Numero', 'c.Status', 'fp.Clave AS claveformapago', 'fp.Nombre AS formapago', 'mp.Clave AS clavemetodopago', 'mp.Nombre AS metodopago', 'uc.Clave AS claveusocfdi', 'uc.Nombre AS usocfdi', 'p.Clave AS claveresidenciafiscal', 'p.Nombre AS residenciafiscal')
+            ->leftJoin('c_RegimenFiscal as rf', 'rf.Clave', '=', 'c.RegimenFiscal')
+            ->select('c.Numero', 'c.Status', 'fp.Clave AS claveformapago', 'fp.Nombre AS formapago', 'mp.Clave AS clavemetodopago', 'mp.Nombre AS metodopago', 'uc.Clave AS claveusocfdi', 'uc.Nombre AS usocfdi', 'p.Clave AS claveresidenciafiscal', 'p.Nombre AS residenciafiscal', 'rf.Clave as ClaveRegimenFiscal', 'rf.Nombre as RegimenFiscal')
             ->where('c.Numero', $request->numerocliente)
             ->where('c.Status', 'ALTA')
             ->get();
             $claveformapago = $datos[0]->claveformapago;
             $formapago = $datos[0]->formapago;
+            $claveregimenfiscalreceptor = $datos[0]->ClaveRegimenFiscal;
+            $regimenfiscalreceptor = $datos[0]->RegimenFiscal;
             $numero = $cliente->Numero;
             $nombre = $cliente->Nombre;
             $rfc = $cliente->Rfc;
@@ -224,7 +230,16 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $numerofacturas = Factura::where('Cliente', $request->numerocliente)->where('Status', 'POR COBRAR')->count();
             $filasfacturas= '';
             $contadorfilas = 0;
-            if($numerofacturas > 0){
+            if($numerofacturas > 0){    
+                $objetosimp = c_ObjetoImp::all();
+                $selectobjetosimp = "<option selected disabled hidden>Selecciona</option>";
+                foreach($objetosimp as $oi){
+                    if($oi->Numero == 2){
+                        $selectobjetosimp = $selectobjetosimp.'<option value='.$oi->Clave.' selected>'.$oi->Descripcion.'</option>';
+                    }else{
+                        $selectobjetosimp = $selectobjetosimp.'<option value='.$oi->Clave.'>'.$oi->Descripcion.'</option>';
+                    }
+                }
                 foreach($facturas as $f){
                     $porcentajeiva = Helpers::calcular_porcentaje_iva_aritmetico($f->Iva, $f->SubTotal);
                     $tipooperacion = $request->tipooperacion;
@@ -250,6 +265,12 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                         '<td class="tdmod"><input type="hidden" class="form-control uuidfacturapartida" name="uuidfacturapartida[]" value="'.$f->UUID.'" readonly>'.$f->UUID.'</td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control seriefacturapartida" name="seriefacturapartida[]" value="'.$f->Serie.'" readonly>'.$f->Serie.'</td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control foliofacturapartida" name="foliofacturapartida[]" value="'.$f->Folio.'" readonly>'.$f->Folio.'</td>'.
+                        '<td class="tdmod"><input type="text" class="form-control equivalenciafacturapartida" name="equivalenciafacturapartida[]" value="'.Helpers::convertirvalorcorrecto(1).'" readonly></td>'.
+                        '<td class="tdmod">'.
+                            '<select name="objimpuestofacturapartida[]" class="form-control divorinputmodxl objimpuestofacturapartida select2" style="width:100% !important;height: 28px !important;" required>'.
+                                $selectobjetosimp.
+                            '</select>'.
+                        '</td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control monedadrfacturapartida" name="monedadrfacturapartida[]" value="'.$f->Moneda.'" readonly>'.$f->Moneda.'</td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control tipocambiodrfacturapartida" name="tipocambiodrfacturapartida[]" value="'.$f->TipoCambio.'" readonly>'.$f->TipoCambio.'</td>'.
                         '<td class="tdmod">'.
@@ -277,6 +298,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             'rfc' => $rfc,
             'claveformapago' => $claveformapago,
             'formapago' => $formapago,
+            'claveregimenfiscalreceptor' => $claveregimenfiscalreceptor,
+            'regimenfiscalreceptor' => $regimenfiscalreceptor,
             'filasfacturas' => $filasfacturas
         );
         return response()->json($data);
@@ -320,6 +343,15 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         $filasfacturas= '';
         $contadorfilas = 0;
         if($numerofacturas > 0){
+            $objetosimp = c_ObjetoImp::all();
+            $selectobjetosimp = "<option selected disabled hidden>Selecciona</option>";
+            foreach($objetosimp as $oi){
+                if($oi->Numero == 2){
+                    $selectobjetosimp = $selectobjetosimp.'<option value='.$oi->Clave.' selected>'.$oi->Descripcion.'</option>';
+                }else{
+                    $selectobjetosimp = $selectobjetosimp.'<option value='.$oi->Clave.'>'.$oi->Descripcion.'</option>';
+                }
+            }
             foreach($facturas as $f){
                 $porcentajeiva = Helpers::calcular_porcentaje_iva_aritmetico($f->Iva, $f->SubTotal);
                 $tipooperacion = $request->tipooperacion;
@@ -345,6 +377,12 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     '<td class="tdmod"><input type="hidden" class="form-control uuidfacturapartida" name="uuidfacturapartida[]" value="'.$f->UUID.'" readonly>'.$f->UUID.'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control seriefacturapartida" name="seriefacturapartida[]" value="'.$f->Serie.'" readonly>'.$f->Serie.'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control foliofacturapartida" name="foliofacturapartida[]" value="'.$f->Folio.'" readonly>'.$f->Folio.'</td>'.
+                    '<td class="tdmod"><input type="text" class="form-control equivalenciafacturapartida" name="equivalenciafacturapartida[]" value="'.Helpers::convertirvalorcorrecto(1).'" readonly></td>'.
+                    '<td class="tdmod">'.
+                        '<select name="objimpuestofacturapartida[]" class="form-control divorinputmodxl objimpuestofacturapartida select2" style="width:100% !important;height: 28px !important;" required>'.
+                            $selectobjetosimp.
+                        '</select>'.
+                    '</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control monedadrfacturapartida" name="monedadrfacturapartida[]" value="'.$f->Moneda.'" readonly>'.$f->Moneda.'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control tipocambiodrfacturapartida" name="tipocambiodrfacturapartida[]" value="'.$f->TipoCambio.'" readonly>'.$f->TipoCambio.'</td>'.
                     '<td class="tdmod">'.
@@ -494,6 +532,98 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         );
         return response()->json($data); 
     }
+    //obtener
+    public function cuentas_por_cobrar_obtener_usos_cfdi(Request $request){
+        if($request->ajax()){
+            $data = UsoCFDI::query();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarusocfdi(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+
+    //obtener por clave
+    public function cuentas_por_cobrar_obtener_uso_cfdi_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existereusocfdi = UsoCFDI::where('Clave', $request->claveusocfdi)->count();
+        if($existereusocfdi > 0){
+            $usocfdi = UsoCFDI::where('Clave', $request->claveusocfdi)->first();
+            $clave = $usocfdi->Clave;
+            $nombre = $usocfdi->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data); 
+    }
+
+    //obtener
+    public function cuentas_por_cobrar_obtener_exportaciones(Request $request){
+        if($request->ajax()){
+            $data = c_Exportacion::query();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarexportacion(\''.$data->Clave .'\',\''.$data->Descripcion .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+
+    //obtener por clave
+    public function cuentas_por_cobrar_obtener_exportacion_por_clave(Request $request){
+        $clave = '';
+        $descripcion = '';
+        $existeexportacion = c_Exportacion::where('Clave', $request->claveexportacion)->count();
+        if($existeexportacion > 0){
+            $exportacion = c_Exportacion::where('Clave', $request->claveexportacion)->first();
+            $clave = $exportacion->Clave;
+            $descripcion = $exportacion->Descripcion;
+        }
+        $data = array(
+            'clave' => $clave,
+            'descripcion' => $descripcion
+        );
+        return response()->json($data); 
+    }
+
+    //obtener 
+    public function cuentas_por_cobrar_obtener_regimenes_fiscales_receptor(Request $request){
+        if($request->ajax()){
+            $data = c_RegimenFiscal::query();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarregimenfiscalreceptor(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+
+    //obtener forma pago por clave
+    public function cuentas_por_cobrar_obtener_regimenfiscalreceptor_por_clave(Request $request){
+        $clave = '';
+        $nombre = '';
+        $existeregimenfiscal = c_RegimenFiscal::where('Clave', $request->claveregimenfiscalreceptor)->count();
+        if($existeregimenfiscal > 0){
+            $regimenfiscal = c_RegimenFiscal::where('Clave', $request->claveregimenfiscalreceptor)->first();
+            $clave = $regimenfiscal->Clave;
+            $nombre = $regimenfiscal->Nombre;
+        }
+        $data = array(
+            'clave' => $clave,
+            'nombre' => $nombre
+        );
+        return response()->json($data);  
+    }
 
     //obtener metodos pago
     public function cuentas_por_cobrar_obtener_metodos_pago(Request $request){
@@ -560,6 +690,15 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         if($numparcialidades > 0){
             $numeroparcialidades = $numeroparcialidades + $numparcialidades;
         }
+        $objetosimp = c_ObjetoImp::all();
+        $selectobjetosimp = "<option selected disabled hidden>Selecciona</option>";
+        foreach($objetosimp as $oi){
+            if($oi->Numero == 2){
+                $selectobjetosimp = $selectobjetosimp.'<option value='.$oi->Clave.' selected>'.$oi->Descripcion.'</option>';
+            }else{
+                $selectobjetosimp = $selectobjetosimp.'<option value='.$oi->Clave.'>'.$oi->Descripcion.'</option>';
+            }
+        }
         //detalles factura
         $filafactura = '';
         $filafactura= $filafactura.
@@ -578,6 +717,12 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             '<td class="tdmod"><input type="hidden" class="form-control uuidfacturapartida" name="uuidfacturapartida[]" value="'.$factura->UUID.'" readonly>'.$factura->UUID.'</td>'.
             '<td class="tdmod"><input type="hidden" class="form-control seriefacturapartida" name="seriefacturapartida[]" value="'.$factura->Serie.'" readonly>'.$factura->Serie.'</td>'.
             '<td class="tdmod"><input type="hidden" class="form-control foliofacturapartida" name="foliofacturapartida[]" value="'.$factura->Folio.'" readonly>'.$factura->Folio.'</td>'.
+            '<td class="tdmod"><input type="text" class="form-control equivalenciafacturapartida" name="equivalenciafacturapartida[]" value="'.Helpers::convertirvalorcorrecto(1).'" readonly></td>'.
+            '<td class="tdmod">'.
+                '<select name="objimpuestofacturapartida[]" class="form-control divorinputmodxl objimpuestofacturapartida select2" style="width:100% !important;height: 28px !important;" required>'.
+                    $selectobjetosimp.
+                '</select>'.
+            '</td>'.
             '<td class="tdmod"><input type="hidden" class="form-control monedadrfacturapartida" name="monedadrfacturapartida[]" value="'.$factura->Moneda.'" readonly>'.$factura->Moneda.'</td>'.
             '<td class="tdmod"><input type="hidden" class="form-control tipocambiodrfacturapartida" name="tipocambiodrfacturapartida[]" value="'.$factura->TipoCambio.'" readonly>'.$factura->TipoCambio.'</td>'.
             '<td class="tdmod">'.
@@ -661,11 +806,21 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         $CuentaXCobrar->ReceptorRfc=$request->receptorrfc;
         $CuentaXCobrar->ReceptorNombre=$request->receptornombre;
         $CuentaXCobrar->FormaPago=$request->claveformapago;
+        $CuentaXCobrar->UsoCfdi=$request->claveusocfdi;
+        $CuentaXCobrar->Exportacion=$request->claveexportacion;
+        $CuentaXCobrar->RegimenFiscalReceptor=$request->claveregimenfiscalreceptor;
         $CuentaXCobrar->Hora=Carbon::parse($request->fecha)->toDateTimeString();
         $CuentaXCobrar->Status="ALTA";
         $CuentaXCobrar->Usuario=Auth::user()->user;
         $CuentaXCobrar->Periodo=$this->periodohoy;
         $CuentaXCobrar->save();
+        //modificar saldo cliente
+        $SaldoCliente = Cliente::where('Numero', $request->numerocliente)->first();
+        $NuevoSaldoCliente = $SaldoCliente->Saldo - $request->total;
+        Cliente::where('Numero', $request->numerocliente)
+        ->update([
+            'Saldo' => Helpers::convertirvalorcorrecto($NuevoSaldoCliente)
+        ]); 
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
         $BitacoraDocumento->Documento = "CXC";
@@ -689,6 +844,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                 $CuentaXCobrarDetalle->idDocumento = $request->uuidfacturapartida [$key];
                 $CuentaXCobrarDetalle->Serie = $request->seriefacturapartida [$key];
                 $CuentaXCobrarDetalle->Folio = $request->foliofacturapartida [$key];
+                $CuentaXCobrarDetalle->Equivalencia = $request->equivalenciafacturapartida [$key];
+                $CuentaXCobrarDetalle->ObjetoImp = $request->objimpuestofacturapartida  [$key];
                 $CuentaXCobrarDetalle->MonedaDR = $request->monedadrfacturapartida [$key];
                 $CuentaXCobrarDetalle->TipoCambioDR = $request->tipocambiodrfacturapartida [$key];
                 $CuentaXCobrarDetalle->MetodoDePagoDR = $request->metodopagodrfacturapartida [$key];
@@ -714,7 +871,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     'Abonos' => Helpers::convertirvalorcorrecto($NuevoAbono),
                     'Saldo' => Helpers::convertirvalorcorrecto($NuevoSaldo),
                     'Status' => $Status
-                ]);
+                ]);                
             }
         }
     	return response()->json($CuentaXCobrar); 
@@ -734,6 +891,13 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
     //bajas
     public function cuentas_por_cobrar_baja(Request $request){
         $CuentaXCobrar = CuentaXCobrar::where('Pago', $request->cxcdesactivar)->first();
+        //modificar saldo cliente
+        $SaldoCliente = Cliente::where('Numero', $CuentaXCobrar->Cliente)->first();
+        $NuevoSaldoCliente = $SaldoCliente->Saldo + $CuentaXCobrar->Abono;
+        Cliente::where('Numero', $CuentaXCobrar->Cliente)
+        ->update([
+            'Saldo' => Helpers::convertirvalorcorrecto($NuevoSaldoCliente)
+        ]); 
         //cambiar status y colocar valores en 0
         $MotivoBaja = $request->motivobaja.', '.Helpers::fecha_exacta_accion_datetimestring().', '.Auth::user()->user;
         CuentaXCobrar::where('Pago', $request->cxcdesactivar)
@@ -783,6 +947,9 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         $regimenfiscal = c_RegimenFiscal::where('Clave', $cuentaxcobrar->RegimenFiscal)->first();
         $tiporelacion = c_TipoRelacion::where('Numero', 1)->first();
         $formapago = FormaPago::where('Clave', $cuentaxcobrar->FormaPago)->first();
+        $usocfdi = UsoCFDI::where('Clave', $cuentaxcobrar->UsoCfdi)->first();
+        $exportacion = c_Exportacion::where('Clave', $cuentaxcobrar->Exportacion)->first();
+        $regimenfiscalreceptor = c_RegimenFiscal::where('Clave', $cuentaxcobrar->RegimenFiscalReceptor)->first();
         $banco = Banco::where('Numero', $cuentaxcobrar->Banco)->first();
         $filasdetallecuentasporcobrar = '';
         $contadorfilas = 0;
@@ -791,6 +958,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         $arrayfacturas = array();
         if($numerocuentaxcobrardetalle > 0){
             foreach($cuentaxcobrardetalle as $cxcd){
+                $ObjetoImp = c_ObjetoImp::where('Clave', $cxcd->ObjetoImp)->first();
                 array_push($arrayfacturas, $cxcd->Factura);
                 $factura = Factura::where('Factura', $cxcd->Factura)->first();
                 $encabezadostablaacopiar = '#,Factura,Fecha,Plazo,Vence,Total $,Abonos $,Notas Crédito $,Abono,Saldo $,idDocumento,Serie,Folio,MonedaDR,TipoCambioDR,MetodoDePagoDR,NumParcialidad,ImpSaldoAnt,ImpPagado,ImpSaldoInsoluto';
@@ -811,6 +979,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     '<td class="tdmod"><input type="hidden" class="form-control uuidfacturapartida" name="uuidfacturapartida[]" value="'.$cxcd->idDocumento.'" readonly>'.$cxcd->idDocumento.'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control seriefacturapartida" name="seriefacturapartida[]" value="'.$cxcd->Serie.'" readonly>'.$cxcd->Serie.'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control foliofacturapartida" name="foliofacturapartida[]" value="'.$cxcd->Folio.'" readonly>'.$cxcd->Folio.'</td>'.
+                    '<td class="tdmod"><input type="hidden" class="form-control equivalenciafacturapartida" name="equivalenciafacturapartida[]" value="'.Helpers::convertirvalorcorrecto($cxcd->Equivalencia).'" readonly>'.Helpers::convertirvalorcorrecto($cxcd->Equivalencia).'</td>'.
+                    '<td class="tdmod">'.$cxcd->ObjetoImp.' - '.$ObjetoImp->Descripcion.'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control monedadrfacturapartida" name="monedadrfacturapartida[]" value="'.$cxcd->MonedaDR.'" readonly>'.$cxcd->MonedaDR.'</td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control tipocambiodrfacturapartida" name="tipocambiodrfacturapartida[]" value="'.$cxcd->TipoCambioDR.'" readonly>'.$cxcd->TipoCambioDR.'</td>'.
                     '<td class="tdmod">'.
@@ -875,6 +1045,9 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             'regimenfiscal' => $regimenfiscal,
             'tiporelacion' => $tiporelacion,
             'formapago' => $formapago,
+            'usocfdi' => $usocfdi,
+            'exportacion' => $exportacion,
+            'regimenfiscalreceptor' => $regimenfiscalreceptor,
             'banco' => $banco,
             'filasdetallecuentasporcobrar' => $filasdetallecuentasporcobrar,
             'arrayfacturas' => $arrayfacturas,
@@ -902,7 +1075,11 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             'TipoCambio' => $request->pesosmoneda,
             'LugarExpedicion' => $request->lugarexpedicion,
             'RegimenFiscal' => $request->claveregimenfiscal,
-            'FormaPago' => $request->claveformapago
+            'FormaPago' => $request->claveformapago,
+            'UsoCfdi' => $request->claveusocfdi,
+            'Exportacion' => $request->claveexportacion,
+            'RegimenFiscalReceptor' => $request->claveregimenfiscalreceptor
+
         ]);
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
@@ -979,6 +1156,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     "plazodetalle" => $facturadetalle->Plazo,
                     "vencedetalle" => Carbon::parse($facturadetalle->Fecha)->addDays($facturadetalle->Plazo)->toDateString(),
                     "totalfactura" => Helpers::convertirvalorcorrecto($facturadetalle->Total),
+                    "objetoimpdetalle" => $cxcd->ObjetoImp,
                     "numparcialidaddetalle" => $cxcd->NumParcialidad,
                     "impsaldoantdetalle" => Helpers::convertirvalorcorrecto($cxcd->ImpSaldoAnt),
                     "imppagadodetalle" => Helpers::convertirvalorcorrecto($cxcd->ImpPagado),
@@ -1003,12 +1181,15 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $estadocliente = Estado::where('Clave', $cliente->Estado)->first();
             $formapago = FormaPago::where('Clave', $cxc->FormaPago)->first();
             $regimenfiscal = c_RegimenFiscal::where('Clave', $cxc->RegimenFiscal)->first();
+            $usocfdi = UsoCFDI::where('Clave', $cxc->UsoCfdi)->first();
+            $exportacion = c_Exportacion::where('Clave', $cxc->Exportacion)->first();
             $comprobantetimbrado = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->count();
             $comprobante = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->first();
             $formatter = new NumeroALetras;
             $formatter->conector = 'PESOS';
             $totalletras = $formatter->toInvoice($cxc->Abono, 2, 'M.N.');
             $banco = Banco::where('Numero', $cxc->Banco)->first();
+            $regimenfiscalcliente = c_RegimenFiscal::where('Clave', $cxc->RegimenFiscalReceptor)->first();
             $data[]=array(
                         "cuentaporcobrar"=>$cxc,
                         "fechaespanolcuentaporcobrar"=>Helpers::fecha_espanol($cxc->Fecha),
@@ -1021,8 +1202,11 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                         "comprobantetimbrado" => $comprobantetimbrado,
                         "regimenfiscal"=> $regimenfiscal,
                         "cliente" => $cliente,
+                        "regimenfiscalcliente" => $regimenfiscalcliente,
                         "estadocliente" => $estadocliente,
                         "banco"=> $banco,
+                        "usocfdi" => $usocfdi,
+                        "exportacion" => $exportacion,
                         "datadetalle" => $datadetalle,
                         "tipocambiocxc"=>Helpers::convertirvalorcorrecto($cxc->TipoCambio),
                         "totalletras"=>$totalletras,
@@ -1040,7 +1224,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             }else{
                 $pdf = PDF::loadView('registros.cuentasporcobrar.formato_pdf_cuentasporcobrar', compact('data'))
                         ->setPaper('Letter')
-                        ->setOption('footer-left', 'Este pago es una representación impresa de un CFDi')
+                        //->setOption('footer-left', 'Este pago es una representación impresa de un CFDi')
                         ->setOption('footer-center', 'Página [page] de [toPage]')
                         //->setOption('footer-right', ''.$fechaformato.'')
                         ->setOption('footer-font-size', 7)
@@ -1126,6 +1310,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     "plazodetalle" => $facturadetalle->Plazo,
                     "vencedetalle" => Carbon::parse($facturadetalle->Fecha)->addDays($facturadetalle->Plazo)->toDateString(),
                     "totalfactura" => Helpers::convertirvalorcorrecto($facturadetalle->Total),
+                    "objetoimpdetalle" => $cxcd->ObjetoImp,
                     "numparcialidaddetalle" => $cxcd->NumParcialidad,
                     "impsaldoantdetalle" => Helpers::convertirvalorcorrecto($cxcd->ImpSaldoAnt),
                     "imppagadodetalle" => Helpers::convertirvalorcorrecto($cxcd->ImpPagado),
@@ -1139,12 +1324,15 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $estadocliente = Estado::where('Clave', $cliente->Estado)->first();
             $formapago = FormaPago::where('Clave', $cxc->FormaPago)->first();
             $regimenfiscal = c_RegimenFiscal::where('Clave', $cxc->RegimenFiscal)->first();
+            $usocfdi = UsoCFDI::where('Clave', $cxc->UsoCfdi)->first();
+            $exportacion = c_Exportacion::where('Clave', $cxc->Exportacion)->first();
             $comprobantetimbrado = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->count();
             $comprobante = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->first();
             $formatter = new NumeroALetras;
             $formatter->conector = 'PESOS';
             $totalletras = $formatter->toInvoice($cxc->Abono, 2, 'M.N.');
             $banco = Banco::where('Numero', $cxc->Banco)->first();
+            $regimenfiscalcliente = c_RegimenFiscal::where('Clave', $cxc->RegimenFiscalReceptor)->first();
             $data[]=array(
                         "cuentaporcobrar"=>$cxc,
                         "fechaespanolcuentaporcobrar"=>Helpers::fecha_espanol($cxc->Fecha),
@@ -1157,8 +1345,11 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                         "comprobantetimbrado" => $comprobantetimbrado,
                         "regimenfiscal"=> $regimenfiscal,
                         "cliente" => $cliente,
+                        "regimenfiscalcliente" => $regimenfiscalcliente,
                         "estadocliente" => $estadocliente,
                         "banco"=> $banco,
+                        "usocfdi" => $usocfdi,
+                        "exportacion" => $exportacion,
                         "datadetalle" => $datadetalle,
                         "tipocambiocxc"=>Helpers::convertirvalorcorrecto($cxc->TipoCambio),
                         "totalletras"=>$totalletras,
@@ -1177,7 +1368,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         }else{
             $pdf = PDF::loadView('registros.cuentasporcobrar.formato_pdf_cuentasporcobrar', compact('data'))
                     ->setPaper('Letter')
-                    ->setOption('footer-left', 'Este pago es una representación impresa de un CFDi')
+                    //->setOption('footer-left', 'Este pago es una representación impresa de un CFDi')
                     ->setOption('footer-center', 'Página [page] de [toPage]')
                     //->setOption('footer-right', ''.$fechaformato.'')
                     ->setOption('footer-font-size', 7)
@@ -1240,6 +1431,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     "plazodetalle" => $facturadetalle->Plazo,
                     "vencedetalle" => Carbon::parse($facturadetalle->Fecha)->addDays($facturadetalle->Plazo)->toDateString(),
                     "totalfactura" => Helpers::convertirvalorcorrecto($facturadetalle->Total),
+                    "objetoimpdetalle" => $cxcd->ObjetoImp,
                     "numparcialidaddetalle" => $cxcd->NumParcialidad,
                     "impsaldoantdetalle" => Helpers::convertirvalorcorrecto($cxcd->ImpSaldoAnt),
                     "imppagadodetalle" => Helpers::convertirvalorcorrecto($cxcd->ImpPagado),
@@ -1253,12 +1445,15 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $estadocliente = Estado::where('Clave', $cliente->Estado)->first();
             $formapago = FormaPago::where('Clave', $cxc->FormaPago)->first();
             $regimenfiscal = c_RegimenFiscal::where('Clave', $cxc->RegimenFiscal)->first();
+            $usocfdi = UsoCFDI::where('Clave', $cxc->UsoCfdi)->first();
+            $exportacion = c_Exportacion::where('Clave', $cxc->Exportacion)->first();
             $comprobantetimbrado = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->count();
             $comprobante = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->first();
             $formatter = new NumeroALetras;
             $formatter->conector = 'PESOS';
             $totalletras = $formatter->toInvoice($cxc->Abono, 2, 'M.N.');
             $banco = Banco::where('Numero', $cxc->Banco)->first();
+            $regimenfiscalcliente = c_RegimenFiscal::where('Clave', $cxc->RegimenFiscalReceptor)->first();
             $data[]=array(
                         "cuentaporcobrar"=>$cxc,
                         "fechaespanolcuentaporcobrar"=>Helpers::fecha_espanol($cxc->Fecha),
@@ -1271,8 +1466,11 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                         "comprobantetimbrado" => $comprobantetimbrado,
                         "regimenfiscal"=> $regimenfiscal,
                         "cliente" => $cliente,
+                        "regimenfiscalcliente" => $regimenfiscalcliente,
                         "estadocliente" => $estadocliente,
                         "banco"=> $banco,
+                        "usocfdi" => $usocfdi,
+                        "exportacion" => $exportacion,
                         "datadetalle" => $datadetalle,
                         "tipocambiocxc"=>Helpers::convertirvalorcorrecto($cxc->TipoCambio),
                         "totalletras"=>$totalletras,
@@ -1291,7 +1489,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         }else{
             $pdf = PDF::loadView('registros.cuentasporcobrar.formato_pdf_cuentasporcobrar', compact('data'))
                     ->setPaper('Letter')
-                    ->setOption('footer-left', 'Este pago es una representación impresa de un CFDi')
+                    //->setOption('footer-left', 'Este pago es una representación impresa de un CFDi')
                     ->setOption('footer-center', 'Página [page] de [toPage]')
                     //->setOption('footer-right', ''.$fechaformato.'')
                     ->setOption('footer-font-size', 7)
@@ -1440,6 +1638,18 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         $cliente = Cliente::where('Numero', $CXC->Cliente)->first();
         $arraydet = array();
         foreach($detallescxc as $dp){
+            //agregado para facturacion 4.0
+            if($dp->ObjetoImp == '02'){//con impuestos
+                $taxes = array(
+                    array(
+                        "base" => Helpers::convertirvalorcorrecto($dp->Abono), 
+                        "type" => "IVA",
+                        "rate" => 0.160000
+                    )
+                );
+            }else{//sin impuestos
+                $taxes = [];
+            }
             array_push($arraydet,   array(
                                         "uuid" => $dp->idDocumento, // UUID_de_factura_relacionada
                                         "installment" => Helpers::convertirvalorcorrecto($dp->NumParcialidad),
@@ -1448,13 +1658,15 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                                         "currency" => $dp->MonedaDR,
                                         "folio_number" => $dp->Folio,
                                         "series" => $dp->Serie,
+                                        //si taxability == 01 sin impuestos si es 02 con impuestos
+                                        "taxability" => $dp->ObjetoImp, //c_ObjetoImp
+                                        "taxes" => $taxes,
                                         /*
-                                        //version 2.0 facturapi cdfi 4.0
                                         "taxes" => array(
                                             array(
-                                                "base" => 0.000001, 
+                                                "base" => Helpers::convertirvalorcorrecto($dp->Abono), 
                                                 "type" => "IVA",
-                                                "rate" => 0.000000
+                                                "rate" => 0.160000
                                             )
                                         )
                                         */
@@ -1467,17 +1679,19 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             "customer" => array(
                 "legal_name" => $cliente->Nombre,
                 "tax_id" => $cliente->Rfc,
-                /*
+                
                 //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
-                "tax_system" => $cliente->RegimenFiscal,
+                //"tax_system" => $cliente->RegimenFiscal,
+                "tax_system" => $CXC->RegimenFiscalReceptor,
                 "address" => 
                     array(
                         "zip" => $cliente->CodigoPostal,
                     )
                 //fin cfdi 4.0
-                */
+                
             ),
-            //facturapi version 1.0
+            /*
+            //se debe agregar para facturapi version 1.0
             "payments" => array(
                 array(
                     "payment_form" => $CXC->FormaPago,
@@ -1487,8 +1701,9 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     "related" => $arraydet
                 )
             ),
-            /*
-            //facturapi version 2.0
+            */
+            
+            //se debe agregar para facturapi version 2.0
             "complements" => array(
                 //"type" => "P",
                 array(
@@ -1504,7 +1719,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     )
                 )
             ),
-            */
+            
             "date" => Helpers::formatoinputdatetime($CXC->Fecha),
             "folio_number" => $CXC->Folio,
             "series" => $CXC->Serie,
@@ -1543,9 +1758,9 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $Comprobante->Comprobante = 'Pago';
             $Comprobante->Tipo = $new_invoice->type;
             //version 4.0
-            //$Comprobante->Version = '4.0';
+            $Comprobante->Version = '4.0';
             //version 3.3
-            $Comprobante->Version = '3.3';
+            //$Comprobante->Version = '3.3';
             $Comprobante->Serie = $new_invoice->series;
             $Comprobante->Folio = $new_invoice->folio_number;
             $Comprobante->UUID = $new_invoice->uuid;

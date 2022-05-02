@@ -49,7 +49,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="form-line">
-                                                        <input type="text" class="form-control" name="numeroclientefacturara" id="numeroclientefacturara" data-parsley-type="integer" autocomplete="off">
+                                                        <input type="text" class="form-control inputnextdet" name="numeroclientefacturara" id="numeroclientefacturara" data-parsley-type="integer" autocomplete="off">
                                                         <input type="hidden" class="form-control" name="numeroclienteanteriorfacturara" id="numeroclienteanteriorfacturara" data-parsley-type="integer">
                                                         <input type="hidden" class="form-control" name="clientefacturara" id="clientefacturara" readonly onkeyup="tipoLetra(this)">
                                                     </div>
@@ -66,7 +66,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="form-line">
-                                                        <input type="text" class="form-control" name="numeroclientedelcliente" id="numeroclientedelcliente" data-parsley-type="integer" autocomplete="off">
+                                                        <input type="text" class="form-control inputnextdet" name="numeroclientedelcliente" id="numeroclientedelcliente" data-parsley-type="integer" autocomplete="off">
                                                         <input type="hidden" class="form-control" name="numeroclienteanteriordelcliente" id="numeroclienteanteriordelcliente" data-parsley-type="integer">
                                                         <input type="hidden" class="form-control" name="clientedelcliente" id="clientedelcliente" readonly onkeyup="tipoLetra(this)">
                                                     </div>
@@ -83,7 +83,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="form-line">
-                                                        <input type="text" class="form-control" name="numerovin" id="numerovin" autocomplete="off" onkeyup="tipoLetra(this)">
+                                                        <input type="text" class="form-control inputnextdet" name="numerovin" id="numerovin" autocomplete="off" onkeyup="tipoLetra(this)">
                                                         <input type="hidden" class="form-control" name="numerovinanterior" id="numerovinanterior">
                                                         <input type="hidden" class="form-control" name="vin" id="vin" readonly onkeyup="tipoLetra(this)">
                                                     </div>

@@ -44,7 +44,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="form-line">
-                                                        <input type="text" class="form-control" name="numerocliente" id="numerocliente" data-parsley-type="integer" autocomplete="off">
+                                                        <input type="text" class="form-control inputnextdet" name="numerocliente" id="numerocliente" data-parsley-type="integer" autocomplete="off">
                                                         <input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" data-parsley-type="integer">
                                                         <input type="hidden" class="form-control" name="cliente" id="cliente" readonly onkeyup="tipoLetra(this)">
                                                     </div>
@@ -61,7 +61,7 @@
                                                 </td>
                                                 <td> 
                                                     <div class="form-line">
-                                                        <input type="text" class="form-control" name="numeroagente" id="numeroagente" data-parsley-type="integer" autocomplete="off">
+                                                        <input type="text" class="form-control inputnextdet" name="numeroagente" id="numeroagente" data-parsley-type="integer" autocomplete="off">
                                                         <input type="hidden" class="form-control" name="numeroagenteanterior" id="numeroagenteanterior" data-parsley-type="integer">
                                                         <input type="hidden" class="form-control" name="agente" id="agente" readonly onkeyup="tipoLetra(this)">
                                                     </div>
@@ -78,7 +78,7 @@
                                                 </td>
                                                 <td> 
                                                     <div class="form-line">
-                                                        <input type="text" class="form-control" name="numeromarca" id="numeromarca" data-parsley-type="integer" autocomplete="off">
+                                                        <input type="text" class="form-control inputnextdet" name="numeromarca" id="numeromarca" data-parsley-type="integer" autocomplete="off">
                                                         <input type="hidden" class="form-control" name="numeromarcaanterior" id="numeromarcaanterior" data-parsley-type="integer">
                                                         <input type="hidden" class="form-control" name="marca" id="marca" readonly onkeyup="tipoLetra(this)">
                                                     </div>
@@ -95,7 +95,7 @@
                                                 </td>
                                                 <td> 
                                                     <div class="form-line">
-                                                        <input type="text" class="form-control" name="numerolinea" id="numerolinea" data-parsley-type="integer" autocomplete="off">
+                                                        <input type="text" class="form-control inputnextdet" name="numerolinea" id="numerolinea" data-parsley-type="integer" autocomplete="off">
                                                         <input type="hidden" class="form-control" name="numerolineaanterior" id="numerolineaanterior" data-parsley-type="integer">
                                                         <input type="hidden" class="form-control" name="linea" id="linea" readonly onkeyup="tipoLetra(this)">
                                                     </div>
@@ -112,7 +112,7 @@
                                                 </td>
                                                 <td> 
                                                     <div class="form-line">
-                                                        <input type="text" class="form-control" name="claveserie" id="claveserie" onkeyup="tipoLetra(this)" autocomplete="off">
+                                                        <input type="text" class="form-control inputnextdet" name="claveserie" id="claveserie" onkeyup="tipoLetra(this)" autocomplete="off">
                                                         <input type="hidden" class="form-control" name="claveserieanterior" id="claveserieanterior" onkeyup="tipoLetra(this)">
                                                         <input type="hidden" class="form-control" name="serie" id="serie" readonly onkeyup="tipoLetra(this)">
                                                     </div>
@@ -129,7 +129,7 @@
                                                 </td>
                                                 <td> 
                                                     <div class="form-line">
-                                                        <input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" data-parsley-type="integer" autocomplete="off">
+                                                        <input type="text" class="form-control inputnextdet" name="numeroalmacen" id="numeroalmacen" data-parsley-type="integer" autocomplete="off">
                                                         <input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" data-parsley-type="integer">
                                                         <input type="hidden" class="form-control" name="almacen" id="almacen" readonly onkeyup="tipoLetra(this)">
                                                     </div>
@@ -151,16 +151,13 @@
                                         <label>Producto <span class="label label-danger" id="textonombreproducto"></span></label>
                                         <table class="col-md-12">
                                             <tr>
+                                                <td>
+                                                    <div class="btn bg-blue waves-effect" id="btnobtenerproductos" onclick="obtenerproductos()">Seleccionar</div>
+                                                </td>
                                                 <td> 
                                                     <div class="form-line">
-                                                        <input type="text" class="form-control" name="producto" id="producto" onkeyup="tipoLetra(this)" autocomplete="off">
-                                                        <input type="hidden" class="form-control" name="productoanterior" id="productoanterior" onkeyup="tipoLetra(this)">
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="col-md-12 form-check">
-                                                        <input type="checkbox" name="productoigual" id="idproductoigual" class="filled-in" value="1" />
-                                                        <label for="idproductoigual">Igual</label>
+                                                        <input type="text" class="form-control inputnextdet" name="codigo" id="codigo" onkeyup="tipoLetra(this)" autocomplete="off">
+                                                        <input type="hidden" class="form-control" name="codigoanterior" id="codigoanterior" onkeyup="tipoLetra(this)">
                                                     </div>
                                                 </td>
                                             </tr>  
@@ -204,7 +201,6 @@
                                         <select class="form-control select2" name="reporte" id="reporte" onchange="generar_reporte()"  required>
                                             <option value="RELACIONUTILIDADES">RELACION UTILIDADES</option>
                                             <option value="UTILIDADCAMBIARIA">UTILIDAD CAMBIARIA</option>
-                                            <option value="COMPARARUTILIDADCOSTO">COMPARAR UTILIDAD COSTO</option>
                                         </select>
                                     </div>
                                 </div>
@@ -269,6 +265,7 @@
         var reporte_facturas_ventas_marca_obtener_productos = '{!!URL::to('reporte_facturas_ventas_marca_obtener_productos')!!}';
         var reporte_facturas_ventas_marca_obtener_producto_por_codigo = '{!!URL::to('reporte_facturas_ventas_marca_obtener_producto_por_codigo')!!}';
         var reporte_facturas_ventas_marca_generar_reporte = '{!!URL::to('reporte_facturas_ventas_marca_generar_reporte')!!}';
+        var reporte_facturas_ventas_marca_obtener_tipos_ordenes_compra = '{!!URL::to('reporte_facturas_ventas_marca_obtener_tipos_ordenes_compra')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="scripts_inaasys/reportes/facturas/reportefacturasventasmarca.js"></script>

@@ -238,7 +238,7 @@ $("#btnenviarpartidasexcel").on('click', function(e){
         var index = $(this).index(".inputnextdet");          
         switch(code){
           case 13:
-            $(".inputnextdet").eq(index + 1).focus().select(); 
+            //$(".inputnextdet").eq(index + 1).focus().select(); 
             break;
           case 39:
             $(".inputnextdet").eq(index + 1).focus().select(); 
@@ -327,11 +327,11 @@ function obtenerclientes(){
     //seleccionar registro al dar doble click
     $('#tbllistadocliente tbody').on('dblclick', 'tr', function () {
         var data = tcli.row( this ).data();
-        seleccionarcliente(data.Numero, data.Nombre, data.Plazo, data.Rfc, data.ClaveFormaPago, data.NombreFormaPago, data.ClaveMetodoPago, data.NombreMetodoPago, data.ClaveUsoCfdi, data.NombreUsoCfdi, "", "", data.Agente, data.Credito, data.Saldo);
+        seleccionarcliente(data.Numero, data.Nombre, data.Plazo, data.Rfc, data.ClaveFormaPago, data.NombreFormaPago, data.ClaveMetodoPago, data.NombreMetodoPago, data.ClaveUsoCfdi, data.NombreUsoCfdi, "", "", data.Agente, data.Credito, data.Saldo, data.ClaveRegimenFiscal, data.RegimenFiscal);
     }); 
 } 
 //seleccionar cliente
-function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapago, clavemetodopago, metodopago, claveusocfdi, usocfdi, claveresidenciafiscal, residenciafiscal,NumeroAgente,CreditoCliente,SaldoCliente){
+function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapago, clavemetodopago, metodopago, claveusocfdi, usocfdi, claveresidenciafiscal, residenciafiscal,NumeroAgente,CreditoCliente,SaldoCliente, claveregimenfiscalreceptor, regimenfiscalreceptor){
   var numeroclienteanterior = $("#numeroclienteanterior").val();
   var numerocliente = Numero;
   if(numeroclienteanterior != numerocliente){  
@@ -407,6 +407,13 @@ function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapag
         $("#residenciafiscal").val(residenciafiscal);
         if(residenciafiscal != null){
           $("#textonombreresidenciafiscal").html(residenciafiscal.substring(0, 40));
+        }
+        //regimen fiscal
+        $("#claveregimenfiscalreceptor").val(claveregimenfiscalreceptor);
+        $("#claveregimenfiscalreceptoranterior").val(claveregimenfiscalreceptor);
+        $("#regimenfiscalreceptor").val(regimenfiscalreceptor);
+        if(regimenfiscalreceptor != null){
+            $("#textonombreregimenfiscalreceptor").html(regimenfiscalreceptor.substring(0, 40));            
         }
         //datos agente
         $.get(facturas_obtener_datos_agente, {NumeroAgente:NumeroAgente}, function(Agente){
@@ -1207,18 +1214,21 @@ function comprobartiposerie(Depto){
         $("#divbuscarcodigosgastos").hide();
       }
       $("#divlistarservicios").hide();
+      $("#divbuscarcodigosservicios").hide();
       $("#divbuscarcodigos").hide();
       $("#divimportarpartidas").hide();
     }else if(Depto == 'SERVICIO'){
       $("#divlistarremisiones").hide();
       $("#divbuscarcodigosgastos").hide();
       $("#divlistarservicios").show();
+      $("#divbuscarcodigosservicios").show();
       $("#divbuscarcodigos").hide();
       $("#divimportarpartidas").hide();
     }else{
       $("#divlistarremisiones").hide();
       $("#divbuscarcodigosgastos").hide();
       $("#divlistarservicios").hide();
+      $("#divbuscarcodigosservicios").hide();
       $("#divbuscarcodigos").show();
       $("#divimportarpartidas").show();
     }
@@ -1326,6 +1336,7 @@ function seleccionarremisionesporpedido(){
   $("#tabladetallesfactura tbody").html("");
   partida=1;
   contadorfilas=0;
+  contadorproductos=0;
   var form = $("#formremisionesporpedido");
   if (form.parsley().isValid()){
     var numeropedidoremisiones = $("#numeropedidoremisiones").val();
@@ -1492,7 +1503,7 @@ function cargarremisionesseleccionadas(){
   $("#tabladetallesfactura tbody").html("");
   var tipooperacion = $("#tipooperacion").val();
   var stringremisionesseleccionadas = $("#stringremisionesseleccionadas").val();
-  $.get(facturas_obtener_remision, {stringremisionesseleccionadas:stringremisionesseleccionadas, contadorfilas:contadorfilas, partida:partida, tipooperacion:tipooperacion}, function(data){
+  $.get(facturas_obtener_remision, {stringremisionesseleccionadas:stringremisionesseleccionadas, contadorfilas:contadorfilas, partida:partida, tipooperacion:tipooperacion, contadorproductos:contadorproductos}, function(data){
     //cargar datos cliente
     $("#numerocliente").val(data.cliente);
     $("#numeroclienteanterior").val("");
@@ -1510,6 +1521,7 @@ async function seleccionarclienteremisionesseleccionadas(data){
   //calcular totales
   calculartotal();
   contadorfilas = data.contadorfilas;
+  contadorproductos = data.contadorproductos;
   partida = data.partida;
   remisionagregadacorrectamente();
   mostrarformulario();
@@ -1520,7 +1532,7 @@ async function seleccionarclienteremisionesseleccionadas(data){
     var index = $(this).index(".inputnextdet");          
     switch(code){
       case 13:
-        $(".inputnextdet").eq(index + 1).focus().select(); 
+        //$(".inputnextdet").eq(index + 1).focus().select(); 
         break;
       case 39:
         $(".inputnextdet").eq(index + 1).focus().select(); 
@@ -1677,10 +1689,11 @@ function seleccionarorden(Orden,Cliente){
 function cargarserviciosseleccionadas(){
   contadorfilas = 0;
   partida = 1;
+  contadorproductos = 0;
   $("#tabladetallesfactura tbody").html("");
   var tipooperacion = $("#tipooperacion").val();
   var stringordenesseleccionadas = $("#stringordenesseleccionadas").val();
-  $.get(facturas_obtener_orden, {stringordenesseleccionadas:stringordenesseleccionadas, contadorfilas:contadorfilas, partida:partida, tipooperacion:tipooperacion}, function(data){
+  $.get(facturas_obtener_orden, {stringordenesseleccionadas:stringordenesseleccionadas, contadorfilas:contadorfilas, partida:partida, contadorproductos:contadorproductos, tipooperacion:tipooperacion}, function(data){
     $("#tabladetallesfactura tbody").append(data.filasordenes);
     //colocar pedido
     $("#pedido").val(data.pedido);
@@ -1692,6 +1705,7 @@ function cargarserviciosseleccionadas(){
     calculartotal();
     contadorfilas = data.contadorfilas;
     partida = data.partida;
+    contadorproductos = data.contadorproductos;
     ordenagregadacorrectamente();
     mostrarformulario();
     //cargar datos cliente
@@ -1705,7 +1719,7 @@ function cargarserviciosseleccionadas(){
       var index = $(this).index(".inputnextdet");          
       switch(code){
         case 13:
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+          //$(".inputnextdet").eq(index + 1).focus().select(); 
           break;
         case 39:
           $(".inputnextdet").eq(index + 1).focus().select(); 
@@ -1723,6 +1737,9 @@ function cargarserviciosseleccionadas(){
         $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
         $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
     }
+    //ocultar input para agregar servicios
+    $("#btnobtenerservicios").hide();
+    $("#codigoservicioabuscar").hide();
   })
 }
 //detectar cuando en el input de buscar por codigo de producto el usuario presione la tecla enter, si es asi se realizara la busqueda con el codigo escrito
@@ -1740,7 +1757,14 @@ $(document).ready(function(){
     if(code==13){
       listarproductosgastos();
     }
-});
+  });
+  $("#codigoservicioabuscar").keypress(function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      listarservicios();
+    }
+  });
 });
 //obtener por numero
 function obtenerclientepornumero(){
@@ -1801,6 +1825,13 @@ function obtenerclientepornumero(){
             $("#residenciafiscal").val(data.residenciafiscal);
             if(data.residenciafiscal != null){
               $("#textonombreresidenciafiscal").html(data.residenciafiscal.substring(0, 40));
+            }
+            //regimen fiscal
+            $("#claveregimenfiscalreceptor").val(data.claveregimenfiscalreceptor);
+            $("#claveregimenfiscalreceptoranterior").val(data.claveregimenfiscalreceptor);
+            $("#regimenfiscalreceptor").val(data.regimenfiscalreceptor);
+            if(data.regimenfiscalreceptor != null){
+                $("#textonombreregimenfiscalreceptor").html(data.regimenfiscalreceptor.substring(0, 40));            
             }
             //datos agente
             $("#numeroagente").val(data.numeroagente);
@@ -2175,6 +2206,113 @@ function regresarclaveresidenciafiscal(){
   var claveresidenciafiscalanterior = $("#claveresidenciafiscalanterior").val();
   $("#claveresidenciafiscal").val(claveresidenciafiscalanterior);
 }
+//obtener regimenes fiscales
+function obtenerregimenesfiscalesreceptor(){
+  ocultarformulario();
+  var tablaregimenesfiscales ='<div class="modal-header '+background_forms_and_modals+'">'+
+                                '<h4 class="modal-title">Regimenes Fiscales</h4>'+
+                              '</div>'+
+                              '<div class="modal-body">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-12">'+
+                                        '<div class="table-responsive">'+
+                                            '<table id="tbllistadoregimenfiscalreceptor" class="tbllistadoregimenfiscalreceptor table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                                '<thead class="'+background_tables+'">'+
+                                                    '<tr>'+
+                                                        '<th>Operaciones</th>'+
+                                                        '<th>Clave</th>'+
+                                                        '<th>Nombre</th>'+
+                                                        '<th>Física</th>'+
+                                                        '<th>Moral</th>'+
+                                                    '</tr>'+
+                                                '</thead>'+
+                                                '<tbody></tbody>'+
+                                            '</table>'+
+                                        '</div>'+
+                                    '</div>'+   
+                                '</div>'+
+                              '</div>'+
+                              '<div class="modal-footer">'+
+                                '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                              '</div>';  
+  $("#contenidomodaltablas").html(tablaregimenesfiscales);
+  var tregfis = $('#tbllistadoregimenfiscalreceptor').DataTable({
+      keys: true,
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
+      "sScrollX": "110%",
+      "sScrollY": "370px",
+      "bScrollCollapse": true,  
+      processing: true,
+      'language': {
+        'loadingRecords': '&nbsp;',
+        'processing': '<div class="spinner"></div>'
+      },
+      serverSide: true,
+      ajax: {
+        url: facturas_obtener_regimenes_fiscales_receptor
+      },
+      columns: [
+          { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+          { data: 'Clave', name: 'Clave' },
+          { data: 'Nombre', name: 'Nombre', orderable: false, searchable: false},
+          { data: 'Fisica', name: 'Fisica', orderable: false, searchable: false},
+          { data: 'Moral', name: 'Moral', orderable: false, searchable: false}
+      ],
+      "initComplete": function() {
+        var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
+        $buscar.unbind();
+        $buscar.bind('keyup change', function(e) {
+            if(e.keyCode == 13 || this.value == "") {
+              $('#tbllistadoregimenfiscalreceptor').DataTable().search( this.value ).draw();
+            }
+        });
+      }, 
+  });
+  //seleccionar registro al dar doble click
+  $('#tbllistadoregimenfiscalreceptor tbody').on('dblclick', 'tr', function () {
+      var data = tregfis.row( this ).data();
+      seleccionarregimenfiscalreceptor(data.Clave, data.Nombre);
+  }); 
+} 
+//seleccionar lugar expedicion
+function seleccionarregimenfiscalreceptor(Clave, Nombre){
+  var claveregimenfiscalreceptoranterior = $("#claveregimenfiscalreceptoranterior").val();
+  var claveregimenfiscalreceptor = Clave;
+  if(claveregimenfiscalreceptoranterior != claveregimenfiscalreceptor){
+    $("#claveregimenfiscalreceptor").val(Clave);
+    $("#claveregimenfiscalreceptoranterior").val(Clave);
+    $("#regimenfiscalreceptor").val(Nombre);
+    if(Nombre != null){
+      $("#textonombreregimenfiscalreceptor").html(Nombre.substring(0, 15));
+    }
+    mostrarformulario();
+  }
+}
+//obtener por clave
+function obtenerregimenfiscalreceptorporclave(){
+  var claveregimenfiscalreceptoranterior = $("#claveregimenfiscalreceptoranterior").val();
+  var claveregimenfiscalreceptor = $("#claveregimenfiscalreceptor").val();
+  if(claveregimenfiscalreceptoranterior != claveregimenfiscalreceptor){
+    if($("#claveregimenfiscalreceptor").parsley().isValid()){
+      $.get(facturas_obtener_regimenfiscalreceptor_por_clave, {claveregimenfiscalreceptor:claveregimenfiscalreceptor}, function(data){
+        $("#claveregimenfiscalreceptor").val(data.clave);
+        $("#claveregimenfiscalreceptoranterior").val(data.clave);
+        $("#regimenfiscalreceptor").val(data.nombre);
+        if(data.nombre != null){
+          $("#textonombreregimenfiscalreceptor").html(data.nombre.substring(0, 15));
+        }
+        mostrarformulario();
+      }) 
+    }
+  }
+}
+//regresar clave
+function regresarclaveregimenfiscalreceptor(){
+  var claveregimenfiscalreceptoranterior = $("#claveregimenfiscalreceptoranterior").val();
+  $("#claveregimenfiscalreceptor").val(claveregimenfiscalreceptoranterior);
+}
 //listar productos para tab consumos
 function listarproductos(){
   ocultarformulario();
@@ -2358,6 +2496,95 @@ function obtenerproductogastoporcodigo(){
   $.get(facturas_obtener_producto_gasto_por_codigo,{codigogastoabuscar:codigogastoabuscar}, function(data){
     if(parseInt(data.contarproductos) > 0){
       agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, data.SubTotal, tipooperacion, data.Insumo, data.ClaveProducto, data.ClaveUnidad, data.NombreClaveProducto, data.NombreClaveUnidad, data.CostoDeLista);
+    }else{
+      msjnoseencontroningunproducto();
+    }
+  }) 
+}
+//listarserv
+function listarservicios(){
+  ocultarformulario();
+  var tablaservicios = '<div class="modal-header '+background_forms_and_modals+'">'+
+                          '<h4 class="modal-title">Servicios</h4>'+
+                        '</div>'+
+                        '<div class="modal-body">'+
+                          '<div class="row">'+
+                            '<div class="col-md-12">'+
+                              '<div class="table-responsive">'+
+                                '<table id="tbllistadoservicio" class="tbllistadoservicio table table-bordered table-striped table-hover" style="width:100% !important">'+
+                                  '<thead class="'+background_tables+'">'+
+                                    '<tr>'+
+                                      '<th>Operaciones</th>'+
+                                      '<th>Código</th>'+
+                                      '<th>Servicio</th>'+
+                                      '<th>Cantidad</th>'+
+                                      '<th>SubTotal</th>'+
+                                    '</tr>'+
+                                  '</thead>'+
+                                  '<tbody></tbody>'+
+                                '</table>'+
+                              '</div>'+
+                            '</div>'+  
+                          '</div>'+
+                        '</div>'+
+                        '<div class="modal-footer">'+
+                          '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                        '</div>';   
+  $("#contenidomodaltablas").html(tablaservicios);
+  var tserv = $('#tbllistadoservicio').DataTable({
+    keys: true,
+    "lengthMenu": [ 10, 50, 100, 250, 500 ],
+    "pageLength": 250,
+    "sScrollX": "110%",
+    "sScrollY": "370px",
+    "bScrollCollapse": true,
+    processing: true,
+      'language': {
+        'loadingRecords': '&nbsp;',
+        'processing': '<div class="spinner"></div>'
+      },
+    serverSide: true,
+    ajax: {
+      url: facturas_obtener_servicios,
+      data: function (d) {
+        d.codigoservicioabuscar = $("#codigoservicioabuscar").val();
+        d.tipooperacion = $("#tipooperacion").val();
+      }
+    },
+    columns: [
+      { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false  },
+      { data: 'Codigo', name: 'Codigo' },
+      { data: 'Servicio', name: 'Servicio'  },
+      { data: 'Cantidad', name: 'Cantidad', orderable: false, searchable: false  },
+      { data: 'Venta', name: 'Venta', orderable: false, searchable: false  }
+    ],
+    "initComplete": function() {
+      var $buscar = $('div.dataTables_filter input');
+      $buscar.focus();
+      $buscar.unbind();
+      $buscar.bind('keyup change', function(e) {
+        if(e.keyCode == 13 || this.value == "") {
+          $('#tbllistadoservicio').DataTable().search( this.value ).draw();
+        }
+      });
+    },
+  }); 
+  //seleccionar registro al dar doble click
+  $('#tbllistadoservicio tbody').on('dblclick', 'tr', function () {
+      var data = tserv.row( this ).data();
+      var tipooperacion = $("#tipooperacion").val();
+
+      agregarfilaproducto(data.Codigo, data.Servicio, data.Unidad, number_format(round(data.Venta, numerodecimales), numerodecimales, '.', ''), number_format(round(16, numerodecimales), numerodecimales, '.', ''), number_format(round(data.Venta, numerodecimales), numerodecimales, '.', ''), tipooperacion, "", data.ClaveProducto, data.ClaveUnidad, data.NombreClaveProducto, data.NombreClaveUnidad, number_format(round(data.Venta, numerodecimales), numerodecimales, '.', ''), number_format(round(data.Cantidad, numerodecimales), numerodecimales, '.', ''));
+
+      //agregarfilaservicio(data.Codigo, data.Servicio, data.Unidad, number_format(round(data.Costo, numerodecimales), numerodecimales, '.', ''), data.Venta, data.Cantidad, data.ClaveProducto, data.ClaveUnidad, tipooperacion);
+  });
+}
+function obtenerservicioporcodigo(){
+  var codigoservicioabuscar = $("#codigoservicioabuscar").val();
+  var tipooperacion = $("#tipooperacion").val();
+  $.get(facturas_obtener_servicio_por_codigo,{codigoservicioabuscar:codigoservicioabuscar}, function(data){
+    if(parseInt(data.contarproductos) > 0){
+      agregarfilaservicio(data.Codigo, data.Servicio, data.Unidad, data.Costo, data.Venta, data.Cantidad, data.ClaveProducto, data.ClaveUnidad, tipooperacion);
     }else{
       msjnoseencontroningunproducto();
     }
@@ -2631,7 +2858,7 @@ function evaluarproductoexistente(Codigo){
 var contadorproductos=0;
 var contadorfilas = 0;
 var partida = 1;
-function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal, tipooperacion, Insumo, ClaveProducto, ClaveUnidad, NombreClaveProducto, NombreClaveUnidad, CostoDeLista){
+function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal, tipooperacion, Insumo, ClaveProducto, ClaveUnidad, NombreClaveProducto, NombreClaveUnidad, CostoDeLista, Cantidad){
     $('.page-loader-wrapper').css('display', 'block');
     var result = evaluarproductoexistente(Codigo);
     if(result == false){
@@ -2640,18 +2867,26 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
         var total = new Decimal(SubTotal).plus(ivapesos);
         var preciopartida = SubTotal;
         var utilidad = new Decimal(SubTotal).minus(Costo);
+        var cantidad = '1.'+numerocerosconfigurados;
+        var tipopartida = '';
+        if(Cantidad != undefined){
+          cantidad = Cantidad;
+          var utilidad = preciopartida;
+          tipopartida = 'SERV';
+        }
         var tipo = "alta";
         var fila= '<tr class="filasproductos" id="filaproducto'+contadorfilas+'">'+
-                    '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('+contadorproductos+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
+                    '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfilas" onclick="eliminarfila('+contadorproductos+')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
                     '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'+Codigo+'</b></td>'+
                     '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'+Producto+'" data-parsley-length="[1, 255]" autocomplete="off"></td>'+
                     '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxs unidadpartida" name="unidadpartida[]" value="'+Unidad+'" data-parsley-length="[1, 5]" autocomplete="off"></td>'+
                     '<td class="tdmod">'+
-                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.'+numerocerosconfiguradosinputnumberstep+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');">'+
-                        '<input type="hidden" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="1.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly>'+
+                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'+cantidad+'" data-parsley-min="0.'+numerocerosconfiguradosinputnumberstep+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');">'+
+                        '<input type="hidden" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="'+cantidad+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly>'+
                         '<input type="hidden" class="form-control cantidadincorrecta" name="cantidadincorrecta[]" >'+
                         '<input type="hidden" class="form-control realizarbusquedaexistencias" name="realizarbusquedaexistencias[]" value="1" >'+
                         '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'+
+                        '<input type="hidden" class="form-control tipopartida" name="tipopartida[]" value="'+tipopartida+'">'+
                     '</td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'+preciopartida+'" data-parsley-min="0.'+numerocerosconfiguradosinputnumberstep+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');"></td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
@@ -2705,13 +2940,14 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
                     '</td>'+
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'+NombreClaveUnidad+'" readonly></td>'+
                   '</tr>';
-        contadorproductos++;
-        contadorfilas++;
-        partida++;
         $("#tabladetallesfactura").append(fila);
+        calculartotalesfilas(contadorfilas);
         mostrarformulario();      
         comprobarfilas();
         calculartotal();
+        contadorproductos++;
+        contadorfilas++;
+        partida++;
         //colocar o no dataparsleyutilidad segun la configuracion de la empresa
         if(validarutilidadnegativa == 'S'){
             $(".utilidadpartida").removeAttr('data-parsley-utilidad');
@@ -2729,7 +2965,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
           var index = $(this).index(".inputnextdet");          
           switch(code){
             case 13:
-              $(".inputnextdet").eq(index + 1).focus().select(); 
+              //$(".inputnextdet").eq(index + 1).focus().select(); 
               break;
             case 39:
               $(".inputnextdet").eq(index + 1).focus().select(); 
@@ -2884,6 +3120,21 @@ function alta(){
                                 '<label>Servicios</label>'+
                                 '<div class="btn btn-block bg-blue waves-effect" id="btnlistarservicios" onclick="listarordenes()">Agregar Servicios</div>'+
                               '</div>'+ 
+                              '<div class="col-md-3" id="divbuscarcodigosservicios" hidden>'+
+                                '<label>Escribe el código del servicio y presiona ENTER</label>'+
+                                '<table class="col-md-12">'+
+                                  '<tr>'+
+                                    '<td>'+
+                                      '<div class="btn bg-blue waves-effect" id="btnobtenerservicios" onclick="listarservicios()">Ver Servicios</div>'+
+                                    '</td>'+
+                                    '<td>'+ 
+                                      '<div class="form-line">'+
+                                        '<input type="text" class="form-control" name="codigoservicioabuscar" id="codigoservicioabuscar" placeholder="Escribe el código del servicio" autocomplete="off" onkeyup="tipoLetra(this);">'+
+                                      '</div>'+
+                                    '</td>'+
+                                  '</tr>'+    
+                                '</table>'+
+                              '</div>'+
                               '<div class="col-md-3" id="divbuscarcodigosgastos" hidden>'+
                                 '<label>Escribe el código gastos a buscar y presiona ENTER</label>'+
                                 '<table class="col-md-12">'+
@@ -3041,10 +3292,6 @@ function alta(){
                                 '</table>'+
                               '</div>'+
                               '<div class="col-md-3">'+
-                                '<label>Condiciones de Pago </label>'+
-                                '<input type="text" class="form-control inputnextdet" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
-                              '</div>'+
-                              '<div class="col-md-3">'+
                                 '<label>Uso CFDI <span class="label label-danger" id="textonombreusocfdi"></span></label>'+
                                 '<table class="col-md-12">'+
                                   '<tr>'+
@@ -3078,7 +3325,28 @@ function alta(){
                                   '</tr>'+    
                                 '</table>'+
                               '</div>'+
-                              '<div class="col-md-3">'+
+                              '<div class="col-md-2">'+
+                                  '<label>Régimen Fiscal <span class="label label-danger" id="textonombreregimenfiscalreceptor"></span></label>'+
+                                  '<table class="col-md-12">'+
+                                      '<tr>'+
+                                      '<td>'+
+                                          '<div class="btn bg-blue waves-effect" onclick="obtenerregimenesfiscalesreceptor()">Seleccionar</div>'+
+                                      '</td>'+
+                                      '<td>'+
+                                          '<div class="form-line">'+
+                                          '<input type="text" class="form-control inputnextdet" name="claveregimenfiscalreceptor" id="claveregimenfiscalreceptor"  required onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                          '<input type="hidden" class="form-control" name="claveregimenfiscalreceptoranterior" id="claveregimenfiscalreceptoranterior"  required onkeyup="tipoLetra(this)">'+
+                                          '<input type="hidden" class="form-control" name="regimenfiscalreceptor" id="regimenfiscalreceptor"  required readonly>'+
+                                          '</div>'+
+                                      '</td>'+
+                                      '</tr>'+    
+                                  '</table>'+
+                              '</div>'+
+                              '<div class="col-md-2">'+
+                                '<label>Condiciones de Pago </label>'+
+                                '<input type="text" class="form-control inputnextdet" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                              '</div>'+
+                              '<div class="col-md-2">'+
                                 '<label>Num Reg Id Trib</label>'+
                                 '<input type="text" class="form-control inputnextdet" name="numeroregidtrib" id="numeroregidtrib" data-parsley-length="[1, 40]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                               '</div>'+
@@ -3302,6 +3570,13 @@ function alta(){
       obtenerproductogastoporcodigo();
     }
   });
+  $("#codigoservicioabuscar").keypress(function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      obtenerservicioporcodigo();
+    }
+  });
   //activar busqueda para clientes
   $('#numerocliente').on('keypress', function(e) {
     //recomentable para mayor compatibilidad entre navegadores.
@@ -3410,6 +3685,18 @@ function alta(){
   $('#claveresidenciafiscal').on('change', function(e) {
     regresarclaveresidenciafiscal();
   });
+  //activar busqueda para forma pago
+  $('#claveregimenfiscalreceptor').on('keypress', function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+      obtenerregimenfiscalreceptorporclave();
+      }
+  });
+  //regresar clave
+  $('#claveregimenfiscalreceptor').on('change', function(e) {
+      regresarclaveregimenfiscalreceptor();
+  });
   //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
   $(".inputnextdet").keyup(function (e) {
     //recomentable para mayor compatibilidad entre navegadores.
@@ -3417,7 +3704,7 @@ function alta(){
     var index = $(this).index(".inputnextdet");          
     switch(code){
       case 13:
-        $(".inputnextdet").eq(index + 1).focus().select(); 
+        //$(".inputnextdet").eq(index + 1).focus().select(); 
         break;
       case 39:
         $(".inputnextdet").eq(index + 1).focus().select(); 
@@ -3534,6 +3821,7 @@ function calculartotalesfilas(fila){
       var costototalpartida = $(".costototalpartida ", this).val();
       var comisionporcentajepartida = $('.comisionporcentajepartida ', this).val();
       var comisionespesospartida = $('.comisionespesospartida ', this).val();
+      var tipopartida = $(".tipopartida", this).val();
       //importe de la partida
       importepartida =  new Decimal(cantidadpartida).times(preciopartida);
       $('.importepartida', this).val(number_format(round(importepartida, numerodecimales), numerodecimales, '.', ''));
@@ -3558,8 +3846,14 @@ function calculartotalesfilas(fila){
       comisionespesospartida = new Decimal(comisionporcentajepartida/100);
       $('.comisionespesospartida', this).val(number_format(round(comisionespesospartida, numerodecimales), numerodecimales, '.', ''));
       //utilidad de la partida
-      utilidadpartida = new Decimal(subtotalpartida).minus(costototalpartida).minus(comisionespesospartida);
-      $(".utilidadpartida", this).val(number_format(round(utilidadpartida, numerodecimales), numerodecimales, '.', ''));
+      if(tipopartida == 'SERV'){
+        utilidadpartida = subtotalpartida;
+        $(".utilidadpartida", this).val(number_format(round(utilidadpartida, numerodecimales), numerodecimales, '.', ''));
+
+      }else{
+        utilidadpartida = new Decimal(subtotalpartida).minus(costototalpartida).minus(comisionespesospartida);
+        $(".utilidadpartida", this).val(number_format(round(utilidadpartida, numerodecimales), numerodecimales, '.', ''));
+      }
       calculartotal();
     }  
     cuentaFilas++;
@@ -3667,11 +3961,11 @@ function eliminarfila(numerofila){
   var confirmacion = confirm("Esta seguro de eliminar la fila?"); 
   if (confirmacion == true) { 
     $("#filaproducto"+numerofila).remove();
-    //contadorfilas--;
-    //contadorproductos--;
-    //partida--;
+    contadorfilas--;
+    contadorproductos--;
+    partida--;
     comprobarfilas();
-    //renumerarfilas();//importante para todos los calculo en el modulo de orden de compra 
+    renumerarfilas();//importante para todos los calculo en el modulo
     calculartotal();  
   }
 }
@@ -3693,15 +3987,20 @@ function renumerarfilas(){
   for (var i = 0; i < lista.length; i++) {
     lista[i].setAttribute("id", "filaproducto"+i);
   }
+  //renumerar btn eliminar filas
+  lista = document.getElementsByClassName("btneliminarfilas");
+  for (var i = 0; i < lista.length; i++) {
+    lista[i].setAttribute("onclick", "eliminarfila("+i+")");
+  }
   //renumerar la cantidad de la partida
   lista = document.getElementsByClassName("cantidadpartida");
   for (var i = 0; i < lista.length; i++) {
-    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+');cambiodecantidadopreciopartida('+i+',\''+tipo +'\')');
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+')');
   }
   //renumerar el precio de la partida
   lista = document.getElementsByClassName("preciopartida");
   for (var i = 0; i < lista.length; i++) {
-    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+');cambiodecantidadopreciopartida('+i+',\''+tipo +'\')');
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+') ');
   }
   //renumerar descuento en pesos
   lista = document.getElementsByClassName("descuentoporcentajepartida");
@@ -4083,10 +4382,6 @@ function obtenerdatos(facturamodificar){
                           '</table>'+
                         '</div>'+
                         '<div class="col-md-3">'+
-                          '<label>Condiciones de Pago</label>'+
-                          '<input type="text" class="form-control inputnextdet" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
-                        '</div>'+
-                        '<div class="col-md-3">'+
                           '<label>Uso CFDI <span class="label label-danger" id="textonombreusocfdi"></span></label>'+
                           '<table class="col-md-12">'+
                             '<tr>'+
@@ -4120,7 +4415,28 @@ function obtenerdatos(facturamodificar){
                             '</tr>'+    
                           '</table>'+
                         '</div>'+
-                        '<div class="col-md-3">'+
+                        '<div class="col-md-2">'+
+                            '<label>Régimen Fiscal <span class="label label-danger" id="textonombreregimenfiscalreceptor"></span></label>'+
+                            '<table class="col-md-12">'+
+                                '<tr>'+
+                                '<td>'+
+                                    '<div class="btn bg-blue waves-effect" onclick="obtenerregimenesfiscalesreceptor()">Seleccionar</div>'+
+                                '</td>'+
+                                '<td>'+
+                                    '<div class="form-line">'+
+                                    '<input type="text" class="form-control inputnextdet" name="claveregimenfiscalreceptor" id="claveregimenfiscalreceptor"  required onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                    '<input type="hidden" class="form-control" name="claveregimenfiscalreceptoranterior" id="claveregimenfiscalreceptoranterior"  required onkeyup="tipoLetra(this)">'+
+                                    '<input type="hidden" class="form-control" name="regimenfiscalreceptor" id="regimenfiscalreceptor"  required readonly>'+
+                                    '</div>'+
+                                '</td>'+
+                                '</tr>'+    
+                            '</table>'+
+                        '</div>'+
+                        '<div class="col-md-2">'+
+                          '<label>Condiciones de Pago</label>'+
+                          '<input type="text" class="form-control inputnextdet" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                        '</div>'+
+                        '<div class="col-md-2">'+
                           '<label>Num Reg Id Trib</label>'+
                           '<input type="text" class="form-control inputnextdet" name="numeroregidtrib" id="numeroregidtrib"  data-parsley-length="[1, 40]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                         '</div>'+
@@ -4377,6 +4693,14 @@ function obtenerdatos(facturamodificar){
       $("#claveresidenciafiscal").val(data.residenciafiscal.Clave);
       $("#claveresidenciafiscalanterior").val(data.residenciafiscal.Clave);
     }
+    if(data.regimenfiscalreceptor != null){
+        $("#regimenfiscalreceptor").val(data.regimenfiscalreceptor.Nombre);
+        if(data.regimenfiscalreceptor.Nombre != null){
+            $("#textonombreregimenfiscalreceptor").html(data.regimenfiscalreceptor.Nombre.substring(0, 40));
+        }
+        $("#claveregimenfiscalreceptor").val(data.regimenfiscalreceptor.Clave);
+        $("#claveregimenfiscalreceptoranterior").val(data.regimenfiscalreceptor.Clave);
+    }
     $("#numeroregidtrib").val(data.factura.NumRegIdTrib);
     $("#descripcion").val(data.factura.Descripcion);
     //cargar todos los detalles
@@ -4517,6 +4841,18 @@ function obtenerdatos(facturamodificar){
     $('#claveresidenciafiscal').on('change', function(e) {
       regresarclaveresidenciafiscal();
     });
+    //activar busqueda para forma pago
+    $('#claveregimenfiscalreceptor').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+        obtenerregimenfiscalreceptorporclave();
+        }
+    });
+    //regresar clave
+    $('#claveregimenfiscalreceptor').on('change', function(e) {
+        regresarclaveregimenfiscalreceptor();
+    });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
     $(".inputnextdet").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
@@ -4524,7 +4860,7 @@ function obtenerdatos(facturamodificar){
       var index = $(this).index(".inputnextdet");          
       switch(code){
         case 13:
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+          //$(".inputnextdet").eq(index + 1).focus().select(); 
           break;
         case 39:
           $(".inputnextdet").eq(index + 1).focus().select(); 
@@ -4622,7 +4958,7 @@ function modificardatosgeneralesdocumento(Factura){
       var index = $(this).index(".inputnextdet");          
       switch(code){
         case 13:
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+          //$(".inputnextdet").eq(index + 1).focus().select(); 
           break;
         case 39:
           $(".inputnextdet").eq(index + 1).focus().select(); 
@@ -5122,9 +5458,6 @@ function configurar_tabla(){
   //formulario configuracion tablas se arma desde funcionesglobales.js
   var tabs = armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbusquedas);
   $("#tabsconfigurartabla").html(tabs);
-  if(rol_usuario_logueado == 1){
-    $("#divorderbystabla").show();
-  }
   $("#string_datos_ordenamiento_columnas").val(columnas_ordenadas);
   $("#string_datos_tabla_true").val(campos_activados);
   $("#string_datos_tabla_false").val(campos_desactivados);

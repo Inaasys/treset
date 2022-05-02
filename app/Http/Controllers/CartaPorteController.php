@@ -42,6 +42,8 @@ use App\FolioComprobanteTraslado;
 use App\Comprobante;
 use App\c_ConfiguracionAutoTransporte;
 use App\c_CveTransporte;
+use App\Operador;
+use App\Vehiculo;
 use Config;
 use Mail;
 use Facturapi\Facturapi;
@@ -882,7 +884,132 @@ class CartaPorteController extends ConfiguracionSistemaController{
                     ->make(true);
         }
     }
+
+    //obtener vehiculos
+    public function carta_porte_obtener_vehiculos(Request $request){
+        if($request->ajax()){
+            $data = Vehiculo::OrderBy('id', 'DESC')->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarvehiculo(\''.$data->id.'\',\''.$data->PermisoSCT.'\',\''.$data->NumeroPermisoSCT.'\',\''.$data->NombreAseguradora.'\',\''.$data->NumeroPolizaSeguro.'\',\''.$data->Placa.'\',\''.$data->Año.'\',\''.$data->SubTipoRemolque.'\',\''.$data->PlacaSubTipoRemolque.'\',\''.$data->Marca.'\',\''.$data->Modelo.'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
     
+    //obtener vehiculo por numero
+    public function carta_porte_obtener_vehiculo_por_numero(Request $request){
+        $id = '';
+        $PermisoSCT = '';
+        $NumeroPermisoSCT = '';
+        $NombreAseguradora = '';
+        $NumeroPolizaSeguro = '';
+        $Placa = '';
+        $Año = '';
+        $SubTipoRemolque = '';
+        $PlacaSubTipoRemolque = '';
+        $Modelo = '';
+        $Marca = '';
+        $existevehiculo = Vehiculo::where('id', $request->numerovehiculoempresa)->count();
+        if($existevehiculo > 0){
+            $vehiculo = Vehiculo::where('id', $request->numerovehiculoempresa)->first();
+            $id = $vehiculo->id;
+            $PermisoSCT = $vehiculo->PermisoSCT;
+            $NumeroPermisoSCT = $vehiculo->NumeroPermisoSCT;
+            $NombreAseguradora = $vehiculo->NombreAseguradora;
+            $NumeroPolizaSeguro = $vehiculo->NumeroPolizaSeguro;
+            $Placa = $vehiculo->Placa;
+            $Año = $vehiculo->Año;
+            $SubTipoRemolque = $vehiculo->SubTipoRemolque;
+            $PlacaSubTipoRemolque = $vehiculo->PlacaSubTipoRemolque;
+            $Modelo = $vehiculo->Modelo;
+            $Marca = $vehiculo->Marca;
+        }
+        $data = array(
+            'id' => $id,
+            'PermisoSCT' => $PermisoSCT,
+            'NumeroPermisoSCT' => $NumeroPermisoSCT,
+            'NombreAseguradora' => $NombreAseguradora,
+            'NumeroPolizaSeguro' => $NumeroPolizaSeguro,
+            'Placa' => $Placa,
+            'Año' => $Año,
+            'SubTipoRemolque' => $SubTipoRemolque,
+            'PlacaSubTipoRemolque' => $PlacaSubTipoRemolque,
+            'Marca' => $Marca,
+            'Modelo' => $Modelo,
+        );
+        return response()->json($data); 
+
+    }
+    //obtener operadores
+    public function carta_porte_obtener_operadores(Request $request){
+        if($request->ajax()){
+            $data = Operador::OrderBy('id', 'DESC')->get();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionaroperador(\''.$data->id.'\',\''.$data->Rfc.'\',\''.$data->Nombre.'\',\''.$data->NumeroLicencia.'\',\''.$data->Calle.'\',\''.$data->NoExterior.'\',\''.$data->NoInterior.'\',\''.$data->Colonia.'\',\''.$data->Localidad.'\',\''.$data->Referencia.'\',\''.$data->Municipio.'\',\''.$data->Estado.'\',\''.$data->Pais.'\',\''.$data->CodigoPostal.'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+    //obtener operador por numero
+    public function carta_porte_obtener_operador_por_numero(Request $request){
+        $id = '';
+        $Rfc = '';
+        $Nombre = '';
+        $NumeroLicencia = '';
+        $Calle = '';
+        $NoExterior = '';
+        $NoInterior = '';
+        $Colonia = '';
+        $Localidad = '';
+        $Referencia = '';
+        $Municipio = '';
+        $Estado = '';
+        $Pais = '';
+        $CodigoPostal = '';
+        $existeoperador = Operador::where('id', $request->numerooperador)->count();
+        if($existeoperador > 0){
+            $operador = Operador::where('id', $request->numerooperador)->first();
+            $id = $operador->id;
+            $Rfc = $operador->Rfc;
+            $Nombre = $operador->Nombre;
+            $NumeroLicencia = $operador->NumeroLicencia;
+            $Calle = $operador->Calle;
+            $NoExterior = $operador->NoExterior;
+            $NoInterior = $operador->NoInterior;
+            $Colonia = $operador->Colonia;
+            $Localidad = $operador->Localidad;
+            $Referencia = $operador->Referencia;
+            $Municipio = $operador->Municipio;
+            $Estado = $operador->Estado;
+            $Pais = $operador->Pais;
+            $CodigoPostal = $operador->CodigoPostal;
+        }
+        $data = array(
+            'id' => $id,
+            'Rfc' => $Rfc,
+            'Nombre' => $Nombre,
+            'NumeroLicencia' => $NumeroLicencia,
+            'Calle' => $Calle,
+            'NoExterior' => $NoExterior,
+            'NoInterior' => $NoInterior,
+            'Colonia' => $Colonia,
+            'Localidad' => $Localidad,
+            'Referencia' => $Referencia,
+            'Municipio' => $Municipio,
+            'Estado' => $Estado,
+            'Pais' => $Pais,
+            'CodigoPostal' => $CodigoPostal,
+        );
+        return response()->json($data); 
+
+    }
+
     //obtener datos folio seleccionado
     public function notas_credito_clientes_obtener_ultimo_folio_serie_seleccionada(Request $request){
         $folio = Helpers::ultimofolioserietablamodulos('App\NotaCliente', $request->Serie);

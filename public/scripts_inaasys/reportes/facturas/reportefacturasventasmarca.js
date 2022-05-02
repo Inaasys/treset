@@ -68,6 +68,42 @@ $(document).ready(function() {
             e.preventDefault();
         }
     });
+    //activar busqueda
+    $('#numeroalmacen').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obteneralmacenpornumero();
+            e.preventDefault();
+        }
+    });
+    //activar busqueda
+    $('#numeromarca').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obtenermarcapornumero();
+            e.preventDefault();
+        }
+    });
+    //activar busqueda
+    $('#numerolinea').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obtenerlineapornumero();
+            e.preventDefault();
+        }
+    });
+    //activar busqueda
+    $('#codigo').on('keypress', function(e) {
+        //recomentable para mayor compatibilidad entre navegadores.
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code==13){
+            obtenerproductoporcodigo();
+            e.preventDefault();
+        }
+    });
     //regresar numero
     $('#numerocliente').on('change', function(e) {
         regresarnumerocliente();
@@ -79,6 +115,22 @@ $(document).ready(function() {
     //regresar numero
     $('#claveserie').on('change', function(e) {
         regresarclaveserie();
+    });
+    //regresar numero
+    $('#numeroalmacen').on('change', function(e) {
+        regresarnumeroalmacen();
+    });
+    //regresar numero
+    $('#numeromarca').on('change', function(e) {
+        regresarnumeromarca();
+    });
+    //regresar numero
+    $('#numerolinea').on('change', function(e) {
+        regresarnumerolinea();
+    });
+    //regresar numero
+    $('#codigo').on('change', function(e) {
+        regresarcodigoproducto();
     });
     //cargar reporte al dar enter en las fechas
     //activar busqueda
@@ -99,10 +151,28 @@ $(document).ready(function() {
             e.preventDefault();
         }
     });
+    //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+    $(".inputnextdet").keyup(function (e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      var index = $(this).index(".inputnextdet");          
+      switch(code){
+        case 13:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 39:
+          $(".inputnextdet").eq(index + 1).focus().select(); 
+          break;
+        case 37:
+          $(".inputnextdet").eq(index - 1).focus().select(); 
+          break;
+      }
+    });
+    setTimeout(function(){$("#numerocliente").focus();},500);
 });
 //obtener tipos ordenes de compra
 function obtenertiposordenescompra(){
-    $.get(reporte_facturas_ventas_cliente_obtener_tipos_ordenes_compra, function(select_tipos_ordenes_compra){
+    $.get(reporte_facturas_ventas_marca_obtener_tipos_ordenes_compra, function(select_tipos_ordenes_compra){
       $("#tipo").html(select_tipos_ordenes_compra);
     })  
 }
@@ -136,7 +206,7 @@ function obtenerclientes(){
                               '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                           '</div>';
         $("#contenidomodaltablas").html(tablaclientes);
-        $('#tbllistadocliente').DataTable({
+        var tcli = $('#tbllistadocliente').DataTable({
             keys: true,
             "lengthMenu": [ 10, 50, 100, 250, 500 ],
             "pageLength": 250,
@@ -150,7 +220,7 @@ function obtenerclientes(){
             },
             serverSide: true,
             ajax: {
-                url: reporte_facturas_ventas_cliente_obtener_clientes
+                url: reporte_facturas_ventas_marca_obtener_clientes
             },
             columns: [
                 { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
@@ -169,6 +239,11 @@ function obtenerclientes(){
             },
             
         }); 
+        //seleccion al dar doble click
+        $('#tbllistadocliente tbody').on('dblclick', 'tr', function () {
+          var data = tcli.row( this ).data();
+          seleccionarcliente(data.Numero, data.Nombre);
+        });
 } 
 //obtener registros de agentes
 function obteneragentes(){ 
@@ -200,7 +275,7 @@ function obteneragentes(){
                             '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                         '</div>';
     $("#contenidomodaltablas").html(tablaagentes);
-    $('#tbllistadoagente').DataTable({
+    var tagen = $('#tbllistadoagente').DataTable({
         keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
@@ -214,7 +289,7 @@ function obteneragentes(){
         },
         serverSide: true,
         ajax: {
-            url: reporte_facturas_ventas_cliente_obtener_agentes,
+            url: reporte_facturas_ventas_marca_obtener_agentes,
         },
         columns: [
             { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
@@ -232,6 +307,11 @@ function obteneragentes(){
             });
         },    
     }); 
+    //seleccion al dar doble click
+    $('#tbllistadoagente tbody').on('dblclick', 'tr', function () {
+      var data = tagen.row( this ).data();
+      seleccionaragente(data.Numero, data.Nombre);
+    });
 } 
 //obtener registros de series
 function obtenerseries(){ 
@@ -262,7 +342,7 @@ function obtenerseries(){
                             '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                         '</div>';
     $("#contenidomodaltablas").html(tablaseries);
-    $('#tbllistadoserie').DataTable({
+    var tser = $('#tbllistadoserie').DataTable({
         keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
@@ -276,7 +356,7 @@ function obtenerseries(){
         },
         serverSide: true,
         ajax: {
-            url: reporte_facturas_ventas_cliente_obtener_series,
+            url: reporte_facturas_ventas_marca_obtener_series,
         },
         columns: [
             { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
@@ -293,6 +373,11 @@ function obtenerseries(){
             });
         },    
     }); 
+    //seleccion al dar doble click
+    $('#tbllistadoserie tbody').on('dblclick', 'tr', function () {
+      var data = tser.row( this ).data();
+      seleccionarserie(data.Serie);
+    });
 } 
 function seleccionarcliente(Numero, Nombre){
     var numeroclienteanterior = $("#numeroclienteanterior").val();
@@ -342,7 +427,7 @@ function obtenerclientepornumero(){
     var numerocliente = $("#numerocliente").val();
     if(numeroclienteanterior != numerocliente){
         if($("#numerocliente").parsley().isValid()){
-            $.get(reporte_facturas_ventas_cliente_obtener_cliente_por_numero, {numerocliente:numerocliente}, function(data){
+            $.get(reporte_facturas_ventas_marca_obtener_cliente_por_numero, {numerocliente:numerocliente}, function(data){
                 $("#numerocliente").val(data.numero);
                 $("#numeroclienteanterior").val(data.numero);
                 $("#cliente").val(data.nombre);
@@ -365,7 +450,7 @@ function obteneragentepornumero(){
     var numeroagente = $("#numeroagente").val();
     if(numeroagenteanterior != numeroagente){
         if($("#numeroagente").parsley().isValid()){
-            $.get(reporte_facturas_ventas_cliente_obtener_agente_por_numero, {numeroagente:numeroagente}, function(data){
+            $.get(reporte_facturas_ventas_marca_obtener_agente_por_numero, {numeroagente:numeroagente}, function(data){
                 $("#numeroagente").val(data.numero);
                 $("#numeroagenteanterior").val(data.numero);
                 $("#almacen").val(data.nombre);
@@ -388,7 +473,7 @@ function obtenerserieporclave(){
     var claveserie = $("#claveserie").val();
     if(claveserieanterior != claveserie){
         if($("#claveserie").parsley().isValid()){
-            $.get(reporte_facturas_ventas_cliente_obtener_serie_por_clave, {claveserie:claveserie}, function(data){
+            $.get(reporte_facturas_ventas_marca_obtener_serie_por_clave, {claveserie:claveserie}, function(data){
                 $("#claveserie").val(data.claveserie);
                 $("#claveserieanterior").val(data.claveserie);
                 $("#serie").val(data.claveserie);
@@ -404,6 +489,431 @@ function obtenerserieporclave(){
 function regresarclaveserie(){
     var claveserieanterior = $("#claveserieanterior").val();
     $("#claveserie").val(claveserieanterior);
+}
+//obtener registros de almacenes
+function obteneralmacenes(){ 
+    $("#ModalFormulario").modal('show');
+    $("#contenidomodaltablas").show();
+    $("#formulario").hide();
+    var tablaalmacenes ='<div class="modal-header '+background_forms_and_modals+'">'+
+                            '<h4 class="modal-title">Almacenes</h4>'+
+                        '</div>'+
+                        '<div class="modal-body">'+
+                            '<div class="row">'+
+                                '<div class="col-md-12">'+
+                                    '<div class="table-responsive ">'+
+                                        '<table id="tbllistadoalmacen" class="tbllistadoalmacen table table-bordered table-striped table-hover" style="width:100% !important">'+
+                                            '<thead class="'+background_tables+'">'+
+                                                '<tr>'+
+                                                    '<th>Operaciones</th>'+
+                                                    '<th>Numero</th>'+
+                                                    '<th>Almacén</th>'+
+                                                '</tr>'+
+                                            '</thead>'+
+                                            '<tbody></tbody>'+
+                                        '</table>'+
+                                    '</div>'+
+                                '</div>'+   
+                            '</div>'+
+                        '</div>'+
+                        '<div class="modal-footer">'+
+                            '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                        '</div>';
+    $("#contenidomodaltablas").html(tablaalmacenes);
+    var talm = $('#tbllistadoalmacen').DataTable({
+        keys: true,
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,
+        processing: true,
+        'language': {
+            'loadingRecords': '&nbsp;',
+            'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+            url: reporte_facturas_ventas_marca_obtener_almacenes,
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Numero', name: 'Numero' },
+            { data: 'Nombre', name: 'Nombre' }
+        ],
+        "initComplete": function() {
+            var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
+            $buscar.unbind();
+            $buscar.bind('keyup change', function(e) {
+                if(e.keyCode == 13 || this.value == "") {
+                    $('#tbllistadoalmacen').DataTable().search( this.value ).draw();
+                }
+            });
+        },    
+    }); 
+    //seleccion al dar doble click
+    $('#tbllistadoalmacen tbody').on('dblclick', 'tr', function () {
+      var data = talm.row( this ).data();
+      seleccionaralmacen(data.Numero, data.Nombre);
+    });
+} 
+function seleccionaralmacen(Numero, Nombre){
+    var numeroalmacenanterior = $("#numeroalmacenanterior").val();
+    var numeroalmacen = Numero;
+    if(numeroalmacenanterior != numeroalmacen){
+        $("#numeroalmacen").val(Numero);
+        $("#numeroalmacenanterior").val(Numero);
+        $("#almacen").val(Nombre);
+        if(Nombre != null){
+            $("#textonombrealmacen").attr('style', 'font-size:8px').html(Nombre.substring(0, 45));
+        }
+        generar_reporte();
+        $("#ModalFormulario").modal('hide');
+    }
+}
+//obtener por numero
+function obteneralmacenpornumero(){
+    var numeroalmacenanterior = $("#numeroalmacenanterior").val();
+    var numeroalmacen = $("#numeroalmacen").val();
+    if(numeroalmacenanterior != numeroalmacen){
+        if($("#numeroalmacen").parsley().isValid()){
+            $.get(reporte_facturas_ventas_marca_obtener_almacen_por_numero, {numeroalmacen:numeroalmacen}, function(data){
+                $("#numeroalmacen").val(data.numero);
+                $("#numeroalmacenanterior").val(data.numero);
+                $("#almacen").val(data.nombre);
+                if(data.nombre != null){
+                    $("#textonombrealmacen").attr('style', 'font-size:8px').html(data.nombre.substring(0, 45));
+                }
+                generar_reporte();
+            })  
+        }
+    }
+}
+//regresar numero
+function regresarnumeroalmacen(){
+    var numeroalmacenanterior = $("#numeroalmacenanterior").val();
+    $("#numeroalmacen").val(numeroalmacenanterior);
+}
+//obtener registros de marcas
+function obtenermarcas(){
+    $("#ModalFormulario").modal('show');
+    $("#contenidomodaltablas").show();
+    $("#formulario").hide();
+    var tablamarcas = '<div class="modal-header '+background_forms_and_modals+'">'+
+                                '<h4 class="modal-title">Marcas</h4>'+
+                            '</div>'+
+                            '<div class="modal-body">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-12">'+
+                                        '<div class="table-responsive">'+
+                                            '<table id="tbllistadomarca" class="tbllistadomarca table table-bordered table-striped table-hover" style="width:100% !important">'+
+                                                '<thead class="'+background_tables+'">'+
+                                                    '<tr>'+
+                                                        '<th>Operaciones</th>'+
+                                                        '<th>Numero</th>'+
+                                                        '<th>Nombre</th>'+
+                                                    '</tr>'+
+                                                '</thead>'+
+                                                '<tbody></tbody>'+
+                                            '</table>'+
+                                        '</div>'+
+                                    '</div>'+   
+                                '</div>'+
+                            '</div>'+
+                            '<div class="modal-footer">'+
+                                '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                            '</div>';
+    $("#contenidomodaltablas").html(tablamarcas);
+    var tmar = $('#tbllistadomarca').DataTable({
+        keys: true,
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,
+        processing: true,
+        'language': {
+            'loadingRecords': '&nbsp;',
+            'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+            url: reporte_facturas_ventas_marca_obtener_marcas,
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Numero', name: 'Numero' },
+            { data: 'Nombre', name: 'Nombre' },
+        ],
+        "initComplete": function() {
+            var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
+            $buscar.unbind();
+            $buscar.bind('keyup change', function(e) {
+                if(e.keyCode == 13 || this.value == "") {
+                  $('#tbllistadomarca').DataTable().search( this.value ).draw();
+                }
+            });
+        },  
+    }); 
+    //seleccion al dar doble click
+    $('#tbllistadomarca tbody').on('dblclick', 'tr', function () {
+      var data = tmar.row( this ).data();
+      seleccionarmarca(data.Numero, data.Nombre);
+    });
+} 
+//obtener registros de lineas
+function obtenerlineas(){ 
+    $("#ModalFormulario").modal('show');
+    $("#contenidomodaltablas").show();
+    $("#formulario").hide();
+    var tablalineas ='<div class="modal-header '+background_forms_and_modals+'">'+
+                            '<h4 class="modal-title">Lineas</h4>'+
+                        '</div>'+
+                        '<div class="modal-body">'+
+                            '<div class="row">'+
+                                '<div class="col-md-12">'+
+                                    '<div class="table-responsive ">'+
+                                        '<table id="tbllistadolinea" class="tbllistadolinea table table-bordered table-striped table-hover" style="width:100% !important">'+
+                                            '<thead class="'+background_tables+'">'+
+                                                '<tr>'+
+                                                    '<th>Operaciones</th>'+
+                                                    '<th>Numero</th>'+
+                                                    '<th>Nombre</th>'+
+                                                '</tr>'+
+                                            '</thead>'+
+                                            '<tbody></tbody>'+
+                                        '</table>'+
+                                    '</div>'+
+                                '</div>'+   
+                            '</div>'+
+                        '</div>'+
+                        '<div class="modal-footer">'+
+                            '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                        '</div>';
+    $("#contenidomodaltablas").html(tablalineas);
+    var tlin = $('#tbllistadolinea').DataTable({
+        keys: true,
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,
+        processing: true,
+        'language': {
+            'loadingRecords': '&nbsp;',
+            'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+            url: reporte_facturas_ventas_marca_obtener_lineas,
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Numero', name: 'Numero' },
+            { data: 'Nombre', name: 'Nombre' }
+        ],
+        "initComplete": function() {
+            var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
+            $buscar.unbind();
+            $buscar.bind('keyup change', function(e) {
+                if(e.keyCode == 13 || this.value == "") {
+                    $('#tbllistadolinea').DataTable().search( this.value ).draw();
+                }
+            });
+        },    
+    }); 
+    //seleccion al dar doble click
+    $('#tbllistadolinea tbody').on('dblclick', 'tr', function () {
+      var data = tlin.row( this ).data();
+      seleccionarlinea(data.Numero, data.Nombre);
+    });
+} 
+function seleccionarmarca(Numero, Nombre){
+    var numeromarcaanterior = $("#numeromarcaanterior").val();
+    var numeromarca = Numero;
+    if(numeromarcaanterior != numeromarca){
+        $("#numeromarca").val(Numero);
+        $("#numeromarcaanterior").val(Numero);
+        $("#marca").val(Nombre);
+        if(Nombre != null){
+            $("#textonombremarca").attr('style', 'font-size:8px').html(Nombre.substring(0, 45));
+        }
+        generar_reporte();
+        $("#ModalFormulario").modal('hide');
+    }
+}
+function seleccionarlinea(Numero, Nombre){
+    var numerolineaanterior = $("#numerolineaanterior").val();
+    var numerolinea = Numero;
+    if(numerolineaanterior != numerolinea){
+        $("#numerolinea").val(Numero);
+        $("#numerolineaanterior").val(Numero);
+        $("#linea").val(Nombre);
+        if(Nombre != null){
+            $("#textonombrelinea").attr('style', 'font-size:8px').html(Nombre.substring(0, 45));
+        }
+        generar_reporte();
+        $("#ModalFormulario").modal('hide');
+    }
+}
+//obtener por numero
+function obtenermarcapornumero(){
+    var numeromarcaanterior = $("#numeromarcaanterior").val();
+    var numeromarca = $("#numeromarca").val();
+    if(numeromarcaanterior != numeromarca){
+        if($("#numeromarca").parsley().isValid()){
+            $.get(reporte_facturas_ventas_marca_obtener_marca_por_numero, {numeromarca:numeromarca}, function(data){
+                $("#numeromarca").val(data.numero);
+                $("#numeromarcaanterior").val(data.numero);
+                $("#marca").val(data.nombre);
+                if(data.nombre != null){
+                    $("#textonombremarca").attr('style', 'font-size:8px').html(data.nombre.substring(0, 45));
+                }
+                generar_reporte();
+            }) 
+        }
+    }
+}
+//regresar numero
+function regresarnumeromarca(){
+    var numeromarcaanterior = $("#numeromarcaanterior").val();
+    $("#numeromarca").val(numeromarcaanterior);
+}
+//obtener por numero
+function obtenerlineapornumero(){
+    var numerolineaanterior = $("#numerolineaanterior").val();
+    var numerolinea = $("#numerolinea").val();
+    if(numerolineaanterior != numerolinea){
+        if($("#numerolinea").parsley().isValid()){
+            $.get(reporte_facturas_ventas_marca_obtener_linea_por_numero, {numerolinea:numerolinea}, function(data){
+                $("#numerolinea").val(data.numero);
+                $("#numerolineaanterior").val(data.numero);
+                $("#linea").val(data.nombre);
+                if(data.nombre != null){
+                    $("#textonombrelinea").attr('style', 'font-size:8px').html(data.nombre.substring(0, 45));
+                }
+                generar_reporte();
+            })  
+        }
+    }
+}
+//regresar numero
+function regresarnumerolinea(){
+    var numerolineaanterior = $("#numerolineaanterior").val();
+    $("#numerolinea").val(numerolineaanterior);
+}
+//obtener registros de lineas
+function obtenerproductos(){ 
+    $("#ModalFormulario").modal('show');
+    $("#contenidomodaltablas").show();
+    $("#formulario").hide();
+    var tablaproductos ='<div class="modal-header '+background_forms_and_modals+'">'+
+                            '<h4 class="modal-title">Productos</h4>'+
+                        '</div>'+
+                        '<div class="modal-body">'+
+                            '<div class="row">'+
+                                '<div class="col-md-12">'+
+                                    '<div class="table-responsive ">'+
+                                        '<table id="tbllistadoproducto" class="tbllistadoproducto table table-bordered table-striped table-hover" style="width:100% !important">'+
+                                            '<thead class="'+background_tables+'">'+
+                                                '<tr>'+
+                                                    '<th>Operaciones</th>'+
+                                                    '<th>Codigo</th>'+
+                                                    '<th>Producto</th>'+
+                                                    '<th>Marca</th>'+
+                                                    '<th>Ubicacion</th>'+
+                                                '</tr>'+
+                                            '</thead>'+
+                                            '<tbody></tbody>'+
+                                        '</table>'+
+                                    '</div>'+
+                                '</div>'+   
+                            '</div>'+
+                        '</div>'+
+                        '<div class="modal-footer">'+
+                            '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                        '</div>';
+    $("#contenidomodaltablas").html(tablaproductos);
+    var tproduc = $('#tbllistadoproducto').DataTable({
+        keys: true,
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,
+        processing: true,
+        'language': {
+            'loadingRecords': '&nbsp;',
+            'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+            url: reporte_facturas_ventas_marca_obtener_productos,
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Codigo', name: 'Codigo' },
+            { data: 'Producto', name: 'Producto' },
+            { data: 'Marca', name: 'Marca' },
+            { data: 'Ubicacion', name: 'Ubicacion' }
+        ],
+        "initComplete": function() {
+            var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
+            $buscar.unbind();
+            $buscar.bind('keyup change', function(e) {
+                if(e.keyCode == 13 || this.value == "") {
+                    $('#tbllistadoproducto').DataTable().search( this.value ).draw();
+                }
+            });
+        },    
+    }); 
+    //seleccion al dar doble click
+    $('#tbllistadoproducto tbody').on('dblclick', 'tr', function () {
+      var data = tproduc.row( this ).data();
+      seleccionarproducto(data.Codigo, data.Producto);
+    });
+} 
+function seleccionarproducto(Codigo, Producto){
+    var codigoanterior = $("#codigoanterior").val();
+    var codigo = Codigo;
+    if(codigoanterior != codigo){
+        $("#codigo").val(Codigo);
+        $("#codigoanterior").val(Codigo);
+        $("#producto").val(Producto);
+        if(Producto != null){
+            $("#textonombreproducto").attr('style', 'font-size:8px').html(Producto.substring(0, 30));
+        }
+        generar_reporte();
+        $("#ModalFormulario").modal('hide');
+    }
+}
+//obtener por numero
+function obtenerproductoporcodigo(){
+    var codigoanterior = $("#codigoanterior").val();
+    var codigo = $("#codigo").val();
+    if(codigoanterior != codigo){
+        if($("#codigo").parsley().isValid()){
+            $.get(reporte_facturas_ventas_marca_obtener_producto_por_codigo, {codigo:codigo}, function(data){
+                console.log(data);
+                $("#codigo").val(data.codigo);
+                $("#codigoanterior").val(data.codigo);
+                $("#producto").val(data.producto);
+                if(data.producto != null){
+                    $("#textonombreproducto").attr('style', 'font-size:8px').html(data.producto.substring(0, 30));
+                }
+                generar_reporte();
+            })  
+        }
+    }
+}
+//regresar numero
+function regresarcodigoproducto(){
+    var codigoanterior = $("#codigoanterior").val();
+    $("#codigo").val(codigoanterior);
 }
 //actualizar reporte
 function generar_reporte(){
@@ -435,12 +945,16 @@ function generar_formato_excel(){
         var numerocliente = $("#numerocliente").val();
         var numeroagente = $("#numeroagente").val();
         var claveserie = $("#claveserie").val();
+        var numeromarca = $("#numeromarca").val();
+        var numerolinea = $("#numerolinea").val();
+        var numeroalmacen = $("#numeroalmacen").val();
+        var codigo = $("#codigo").val();
         var tipo = $("#tipo").val();
         var departamento = $("#departamento").val();
         var documentos = $("#documentos").val();
         var status = $("#status").val();
         var reporte = $("#reporte").val();
-        $("#btnGenerarFormatoReporteExcel").attr("href", urlgenerarformatoexcel+'?fechainicialreporte='+fechainicialreporte+'&fechafinalreporte='+fechafinalreporte+'&numerocliente='+numerocliente+'&numeroagente='+numeroagente+'&claveserie='+claveserie+'&tipo='+tipo+'&departamento='+departamento+'&documentos='+documentos+'&status='+status+'&reporte='+reporte);
+        $("#btnGenerarFormatoReporteExcel").attr("href", urlgenerarformatoexcel+'?fechainicialreporte='+fechainicialreporte+'&fechafinalreporte='+fechafinalreporte+'&numerocliente='+numerocliente+'&numeroagente='+numeroagente+'&claveserie='+claveserie+'&numeromarca='+numeromarca+'&numerolinea='+numerolinea+'&numeroalmacen='+numeroalmacen+'&codigo='+codigo+'&tipo='+tipo+'&departamento='+departamento+'&documentos='+documentos+'&status='+status+'&reporte='+reporte);
         $("#btnGenerarFormatoReporteExcel").click();
     }else{
         form.parsley().validate();
@@ -450,63 +964,11 @@ function generar_formato_excel(){
 function listar(){
     var reporte = $("#reporte").val();
     switch(reporte){
-        case "UTILIDAD":
+        case "RELACIONUTILIDADES":
+            var columnas = new Array("Factura", "Fecha", "Remision", "Orden", "Producto", "NombreCliente", "Agente", "NombreAgente", "Almacen", "Codigo", "Marca", "Nombre", "Cantidad", "Precio", "Dcto", "Descuento", "SubTotal", "Iva", "Total", "Costo", "CostoTotal", "Utilidad", "FechaUltimaCompra", "FechaUltimaVenta", "Dias");
             break;
-        case "GENERAL":
-            var columnas = new Array("Factura", "UUID", "Serie", "Folio", "Depto", "Tipo", "Cliente", "NombreCliente", "Agente", "NombreAgente", "Fecha", "Plazo", "Pedido", "Importe", "Descuento", "SubTotal", "Iva", "Total", "Abonos", "Descuentos", "Saldo", "Costo", "Utilidad", "Moneda", "TipoCambio", "Obs", "Status", "MotivoBaja", "Usuario");
-            break;
-        case "PRODUCTOS":
-            var columnas = new Array("Factura", "Fecha", "Cliente", "NombreCliente", "Agente", "Tipo", "NombreAgente", "Plazo", "Codigo", "Descripcion", "Unidad", "Cantidad", "Precio", "Importe", "Dcto", "Descuento", "SubTotal", "Impuesto", "Iva", "Total", "Costo", "CostoTotal", "Utilidad", "Facturar", "Remision", "Orden", "Departamento", "Cargo", "Almacen", "Partida", "Item");
-            break;
-        case "VENTAS":
-            break;
-        case "PAGOS":
-            break;
-        case "FACTURAS":
-            break;
-        case "RESUMEN":
-            var columnas = new Array("Cliente", "Nombre", "Importe", "Descuento", 'SubTotal', 'Iva', 'Total', 'Costo', 'Utilidad', 'PorcentajeUtilidad');
-            break;
-        case "MENSUAL":
-            var columnas = new Array("Cliente", "NombreCliente", "SubTotal", "Utilidad");
-            break;
-        case "POTENCIALES":
-            var columnas = new Array("Numero", "Nombre", "Plazo", "Credito", "Bloquear", "Saldo", "TotalFacturas");
-            break;
-        case "COMPARATIVO MENSUAL":
-            var columnas = new Array("Cliente", "NombreCliente");
-            var todaslasfechas = new Array();
-            var fechaInicio = new Date($("#fechainicialreporte").val());
-            var fechaFin    = new Date($("#fechafinalreporte").val()); 
-            while(fechaFin.getTime() >= fechaInicio.getTime()){
-                fechaInicio.setDate(fechaInicio.getDate() + 1);
-                var fecha = fechaInicio.getFullYear() + '-' + ('0' + (fechaInicio.getMonth()+1)).slice(-2);
-                if(todaslasfechas.indexOf(fecha) == -1){
-                    todaslasfechas.push(fecha);
-                    columnas.push("SubTotal"+fecha);
-                    columnas.push("Utilidad"+fecha);
-                    columnas.push("PorcentajeUtilidad"+fecha);
-                }
-            }
-            break;
-        case "COMPARATIVO ANUAL":
-            var columnas = new Array("Cliente", "NombreCliente");
-            var todaslasfechas = new Array();
-            var fechaInicio = new Date($("#fechainicialreporte").val());
-            var fechaFin    = new Date($("#fechafinalreporte").val()); 
-            while(fechaFin.getTime() >= fechaInicio.getTime()){
-                fechaInicio.setDate(fechaInicio.getDate() + 1);
-                var fecha = fechaInicio.getFullYear();
-                if(todaslasfechas.indexOf(fecha) == -1){
-                    todaslasfechas.push(fecha);
-                    columnas.push("Facturado"+fecha);
-                }
-            }
-            break;
-        case "NOTAS DE CREDITO":
-            var columnas = new Array("Comprobante", "Documento", "Fecha", "SubTotal", "Iva", "Total");
-            break;
-        case "NO FACTURADOS":
+        case "UTILIDADCAMBIARIA":
+            var columnas = new Array("Factura", "Fecha", "Remision", "Orden", "Producto", "NombreCliente", "Agente", "NombreAgente", "Almacen", "Codigo", "Marca", "Nombre", "Cantidad", "Precio", "Dcto", "Descuento", "SubTotal", "Iva", "Total", "Costo", "CostoTotal", "Utilidad", "PorcentajeUtilidad", "CostoDeLista", "Moneda", "TipoDeCambio", "CostoDeListaMXN", "TotalCostoDeListaReal", "UtilidadPorCostoDeListaActualReal", "UtilidadPorTC", "CostoParaComision", "CostoTotalParaComision", "UtilidadParaComision");
             break;
     }
     var campos_tabla  = [];
@@ -523,18 +985,6 @@ function listar(){
     $("#cabecerastablareporte").html(cabecerastablareporte);
     tabla=$('#tbllistado').DataTable({
         keys: true,
-        /*
-        "columnDefs": [{
-            "targets": [2],
-            "render": function(data, type, row) {
-                return Number(data).toLocaleString('en-US', {
-                    maximumFractionDigits: numerodecimales,
-                    style: 'currency',
-                    currency: 'USD'
-                });
-            }
-        }],
-        */
         "lengthMenu": [ 500, 1000 ],
         "sScrollX": "110%",
         "sScrollY": "300px",
@@ -553,12 +1003,16 @@ function listar(){
         serverSide: true,
         ajax: {
             headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-            url: reporte_facturas_ventas_cliente_generar_reporte,
+            url: reporte_facturas_ventas_marca_generar_reporte,
             method: 'POST',
             data: function (d) {
                 d.numerocliente = $("#numerocliente").val();
                 d.numeroagente = $("#numeroagente").val();
+                d.numeromarca = $("#numeromarca").val();
+                d.numerolinea = $("#numerolinea").val();
                 d.claveserie = $("#claveserie").val();
+                d.numeroalmacen = $("#numeroalmacen").val();
+                d.codigo = $("#codigo").val();
                 d.fechainicialreporte = $("#fechainicialreporte").val();
                 d.fechafinalreporte = $("#fechafinalreporte").val();
                 d.tipo = $("#tipo").val();

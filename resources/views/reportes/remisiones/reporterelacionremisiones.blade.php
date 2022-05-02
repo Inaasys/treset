@@ -44,7 +44,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="form-line">
-                                                        <input type="text" class="form-control" name="numerocliente" id="numerocliente" data-parsley-type="integer" autocomplete="off">
+                                                        <input type="text" class="form-control inputnextdet" name="numerocliente" id="numerocliente" data-parsley-type="integer" autocomplete="off">
                                                         <input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" data-parsley-type="integer">
                                                         <input type="hidden" class="form-control" name="cliente" id="cliente" readonly onkeyup="tipoLetra(this)">
                                                     </div>
@@ -61,7 +61,7 @@
                                                 </td>
                                                 <td> 
                                                     <div class="form-line">
-                                                        <input type="text" class="form-control" name="numeroagente" id="numeroagente" data-parsley-type="integer" autocomplete="off">
+                                                        <input type="text" class="form-control inputnextdet" name="numeroagente" id="numeroagente" data-parsley-type="integer" autocomplete="off">
                                                         <input type="hidden" class="form-control" name="numeroagenteanterior" id="numeroagenteanterior" data-parsley-type="integer">
                                                         <input type="hidden" class="form-control" name="agente" id="agente" readonly onkeyup="tipoLetra(this)">
                                                     </div>
@@ -78,7 +78,7 @@
                                                 </td>
                                                 <td> 
                                                     <div class="form-line">
-                                                        <input type="text" class="form-control" name="claveserie" id="claveserie" onkeyup="tipoLetra(this)" autocomplete="off">
+                                                        <input type="text" class="form-control inputnextdet" name="claveserie" id="claveserie" onkeyup="tipoLetra(this)" autocomplete="off">
                                                         <input type="hidden" class="form-control" name="claveserieanterior" id="claveserieanterior" onkeyup="tipoLetra(this)">
                                                         <input type="hidden" class="form-control" name="serie" id="serie" readonly onkeyup="tipoLetra(this)">
                                                     </div>
@@ -95,7 +95,7 @@
                                                 </td>
                                                 <td> 
                                                     <div class="form-line">
-                                                        <input type="text" class="form-control" name="claveformapago" id="claveformapago" onkeyup="tipoLetra(this)" autocomplete="off">
+                                                        <input type="text" class="form-control inputnextdet" name="claveformapago" id="claveformapago" onkeyup="tipoLetra(this)" autocomplete="off">
                                                         <input type="hidden" class="form-control" name="claveformapagoanterior" id="claveformapagoanterior" onkeyup="tipoLetra(this)">
                                                         <input type="hidden" class="form-control" name="formapago" id="formapago" readonly onkeyup="tipoLetra(this)">
                                                     </div>

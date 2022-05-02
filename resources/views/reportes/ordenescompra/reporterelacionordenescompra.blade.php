@@ -44,7 +44,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="form-line">
-                                                        <input type="text" class="form-control" name="numeroproveedor" id="numeroproveedor" data-parsley-type="integer" autocomplete="off">
+                                                        <input type="text" class="form-control inputnextdet" name="numeroproveedor" id="numeroproveedor" data-parsley-type="integer" autocomplete="off">
                                                         <input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior" data-parsley-type="integer">
                                                         <input type="hidden" class="form-control" name="proveedor" id="proveedor" readonly onkeyup="tipoLetra(this)">
                                                     </div>
@@ -61,7 +61,7 @@
                                                 </td>
                                                 <td> 
                                                     <div class="form-line">
-                                                        <input type="text" class="form-control" name="numeroalmacen" id="numeroalmacen" data-parsley-type="integer" autocomplete="off">
+                                                        <input type="text" class="form-control inputnextdet" name="numeroalmacen" id="numeroalmacen" data-parsley-type="integer" autocomplete="off">
                                                         <input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" data-parsley-type="integer">
                                                         <input type="hidden" class="form-control" name="almacen" id="almacen" readonly onkeyup="tipoLetra(this)">
                                                     </div>

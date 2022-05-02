@@ -29,6 +29,18 @@ use App\OrdenTrabajo;
 use App\OrdenTrabajoDetalle;
 use App\Factura;
 use App\FacturaDetalle;
+use App\Operador;
+use App\Vehiculo;
+use App\c_Exportacion;
+use App\c_Meses;
+use App\c_Periodicidad;
+use App\c_ObjetoImp;
+use App\ClaveProdServ;
+use App\c_RegimenFiscal;
+use App\c_TasaOCuota;
+use App\UsoCFDI;
+use App\CuentaXCobrar;
+use App\CuentaXCobrarDetalle;
 use Mail;
 use App\Configuracion_Tabla;
 use App\Imports\CatalogoSATc_ClaveProdServCPImport;
@@ -36,11 +48,14 @@ use App\Imports\CatalogosSATImport;
 use App\Exports\ProductosActivosMigrarNuevaBaseExport;
 use App\Exports\ProductosActivosMigrarExistenciasNuevaBaseExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Facturapi\Facturapi;
 
 class PruebaController extends ConfiguracionSistemaController{
 
     public function __construct(){
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
+        //API FACTURAPI 
+        $this->facturapi = new Facturapi( config('app.keyfacturapi') ); //
     }
 
     public function migrarubicacionesproductos(Request $request){
@@ -275,6 +290,190 @@ class PruebaController extends ConfiguracionSistemaController{
         $sales = DB::connection('sqlsrv2')->select("Select * from Clientes");
         dd($sales);
 
+    }
+
+    public function actualizar_catalogos_sat_cfdi4(){
+        /*
+        //CATALOGO c_Exportacion
+        $arrayexcel =  Excel::toArray(new CatalogoSATc_ClaveProdServCPImport, storage_path('c_Exportacion.xls'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        $eliminarlistaprecios = c_Exportacion::truncate();
+        DB::unprepared('SET IDENTITY_INSERT c_Exportacion OFF');
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 4){
+                $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[2]))->toDateTimeString();
+                DB::table('c_Exportacion')->insert(
+                    [
+                        'Clave' => $partida[0], 
+                        'Descripcion' => $partida[1],
+                        'FechaDeInicioDeVigencia' => $fecha,
+                        'FechaDeFinDeVigencia' => $partida[3],
+                    ]
+                );
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        //DB::unprepared('SET IDENTITY_INSERT c_Exportacion ON');
+        //CATALOGO c_Meses
+        $arrayexcel =  Excel::toArray(new CatalogoSATc_ClaveProdServCPImport, storage_path('c_Meses.xls'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        $eliminarlistaprecios = c_Meses::truncate();
+        DB::unprepared('SET IDENTITY_INSERT c_Meses OFF');
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 4){
+                $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[2]))->toDateTimeString();
+                DB::table('c_Meses')->insert(
+                    [
+                        'Clave' => $partida[0], 
+                        'Descripcion' => $partida[1],
+                        'FechaDeInicioDeVigencia' => $fecha,
+                        'FechaDeFinDeVigencia' => $partida[3],
+                    ]
+                );
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        //DB::unprepared('SET IDENTITY_INSERT c_Meses ON');
+        //CATALOGO c_ObjetoImp
+        $arrayexcel =  Excel::toArray(new CatalogoSATc_ClaveProdServCPImport, storage_path('c_ObjetoImp.xls'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        $eliminarlistaprecios = c_ObjetoImp::truncate();
+        DB::unprepared('SET IDENTITY_INSERT c_ObjetoImp OFF');
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 4){
+                $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[2]))->toDateTimeString();
+                DB::table('c_ObjetoImp')->insert(
+                    [
+                        'Clave' => $partida[0], 
+                        'Descripcion' => $partida[1],
+                        'FechaDeInicioDeVigencia' => $fecha,
+                        'FechaDeFinDeVigencia' => $partida[3],
+                    ]
+                );
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        //DB::unprepared('SET IDENTITY_INSERT c_ObjetoImp ON');
+        //CATALOGO c_Periodicidad
+        $arrayexcel =  Excel::toArray(new CatalogoSATc_ClaveProdServCPImport, storage_path('c_Periodicidad.xls'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        $eliminarlistaprecios = c_Periodicidad::truncate();
+        DB::unprepared('SET IDENTITY_INSERT c_Periodicidad OFF');
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 4){
+                $fecha = Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($partida[2]))->toDateTimeString();
+                DB::table('c_Periodicidad')->insert(
+                    [
+                        'Clave' => $partida[0], 
+                        'Descripcion' => $partida[1],
+                        'FechaDeInicioDeVigencia' => $fecha,
+                        'FechaDeFinDeVigencia' => $partida[3],
+                    ]
+                );
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        //DB::unprepared('SET IDENTITY_INSERT c_Periodicidad ON');
+        */
+        /*
+        //CATALOGO c_ClaveProdServ
+        $arrayexcel =  Excel::toArray(new CatalogoSATc_ClaveProdServCPImport, storage_path('c_ClaveProdServ.xls'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        $eliminarlistaprecios = ClaveProdServ::truncate();
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 4){
+                DB::table('c_ClaveProdServ')->insert(
+                    [
+                        'Numero' => $numerofila,
+                        'Clave' => $partida[0], 
+                        'Nombre' => $partida[1],
+                    ]
+                );
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        //CATALOGO c_RegimenFiscal
+        $arrayexcel =  Excel::toArray(new CatalogoSATc_ClaveProdServCPImport, storage_path('c_RegimenFiscal.xls'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        $eliminarlistaprecios = c_RegimenFiscal::truncate();
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 0){
+                DB::table('c_RegimenFiscal')->insert(
+                    [
+                        'Numero' => $numerofila,
+                        'Clave' => $partida[0], 
+                        'Nombre' => $partida[1],
+                        'Fisica' => $partida[2],
+                        'Moral' => $partida[3]
+                    ]
+                );
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        //CATALOGO c_TasaOCuota
+        $arrayexcel =  Excel::toArray(new CatalogoSATc_ClaveProdServCPImport, storage_path('c_TasaOCuota.xls'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        $eliminarlistaprecios = c_TasaOCuota::truncate();
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 0){
+                DB::table('c_TasaOCuota')->insert(
+                    [
+                        'Numero' => $numerofila,
+                        'Tipo' => $partida[0], 
+                        'ValorMinimo' => $partida[1],
+                        'ValorMaximo' => $partida[2],
+                        'Impuesto' => $partida[3],
+                        'Factor' => $partida[4],
+                        'Traslado' => $partida[5],
+                        'Retencion' => $partida[6]
+                    ]
+                );
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        //CATALOGO c_UsoCFDI
+        $arrayexcel =  Excel::toArray(new CatalogoSATc_ClaveProdServCPImport, storage_path('c_UsoCFDI.xls'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        $eliminarlistaprecios = UsoCFDI::truncate();
+        foreach($partidasexcel as $partida){
+            if($rowexcel > 1){
+                DB::table('c_UsoCFDI')->insert(
+                    [
+                        'Numero' => $numerofila,
+                        'Clave' => $partida[0], 
+                        'Nombre' => $partida[1],
+                        'Fisica' => $partida[2],
+                        'Moral' => $partida[3]
+                    ]
+                );
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        */
     }
 
     public function importSATClaveProdServCP(){        
@@ -598,6 +797,66 @@ class PruebaController extends ConfiguracionSistemaController{
             $rowexcel++;
         }
         */
+        //CATALOGO  operadores 
+        $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('CatalogoOperadoresGeneral.xlsx'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        $eliminarregistros = Operador::truncate();
+        DB::unprepared('SET IDENTITY_INSERT operadores OFF');
+        foreach($partidasexcel as $partida){
+            if($rowexcel >= 1){
+                DB::table('operadores')->insert(
+                    [
+                        'Rfc' => $partida[0], 
+                        'Nombre' => $partida[1],
+                        'NumeroLicencia' => $partida[2],
+                        'Calle' => $partida[3],
+                        'NoExterior' => $partida[4],
+                        'NoInterior' => $partida[5],
+                        'Colonia' => $partida[6],
+                        'Localidad' => $partida[7],
+                        'Referencia' => $partida[8],
+                        'Municipio' => $partida[9],
+                        'Estado' => $partida[10],
+                        'Pais' => $partida[11],
+                        'CodigoPostal' => $partida[12],
+                    ]
+                );
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        DB::unprepared('SET IDENTITY_INSERT operadores ON');
+
+        //CATALOGO  vehiculos 
+        $arrayexcel =  Excel::toArray(new CatalogosSATImport, storage_path('CatalogoVehiculosGeneral.xlsx'));
+        $partidasexcel = $arrayexcel[0];
+        $rowexcel = 0;
+        $numerofila = 1;
+        $eliminarregistros = Vehiculo::truncate();
+        DB::unprepared('SET IDENTITY_INSERT vehiculos OFF');
+        foreach($partidasexcel as $partida){
+            if($rowexcel >= 1){
+                DB::table('vehiculos')->insert(
+                    [
+                        'PermisoSCT' => $partida[0], 
+                        'NumeroPermisoSCT' => $partida[1],
+                        'NombreAseguradora' => $partida[2],
+                        'NumeroPolizaSeguro' => $partida[3],
+                        'Placa' => $partida[4],
+                        'Año' => $partida[5],
+                        'SubTipoRemolque' => $partida[6],
+                        'PlacaSubTipoRemolque' => $partida[7],
+                        'Marca' => $partida[8],
+                        'Modelo' => $partida[9]
+                    ]
+                );
+                $numerofila++;
+            }
+            $rowexcel++;
+        }
+        DB::unprepared('SET IDENTITY_INSERT vehiculos ON');
 
         return response()->json($rowexcel); 
         
@@ -1165,4 +1424,16 @@ class PruebaController extends ConfiguracionSistemaController{
         ]);
     }
 
+    public function modificar_valores_en_bd_para_actualizacion_rama20220413correciones(){
+        CuentaXCobrarDetalle::where('Pago', '<>', '')
+        ->update([
+            'Equivalencia'=>1,
+            'ObjetoImp'=>'02'
+        ]);
+        CuentaXCobrar::where('Pago', '<>', '')
+        ->update([
+            'UsoCfdi'=>'CP01',
+            'Exportacion'=>'01'
+        ]);
+    }
 }
