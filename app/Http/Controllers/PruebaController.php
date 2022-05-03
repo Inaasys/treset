@@ -41,6 +41,7 @@ use App\c_TasaOCuota;
 use App\UsoCFDI;
 use App\CuentaXCobrar;
 use App\CuentaXCobrarDetalle;
+use App\Cliente;
 use Mail;
 use App\Configuracion_Tabla;
 use App\Imports\CatalogoSATc_ClaveProdServCPImport;

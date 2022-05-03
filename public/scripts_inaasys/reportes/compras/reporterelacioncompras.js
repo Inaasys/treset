@@ -344,7 +344,7 @@ function generar_formato_excel(){
 function listar(){
     var reporte = $("#reporte").val();
     if(reporte == 'GENERAL'){
-        var columnas = new Array('Compra', 'Proveedor', 'Nombre', 'Fecha', 'Plazo', 'Vence', 'Remision', 'Factura', 'Movimiento', 'Almacen', 'Tipo', 'Importe', 'Descuento', 'SubTotal', 'Iva', 'Total', 'Abonos', 'Descuentos', 'Saldo', 'Obs', 'Status', 'MotivoBaja', 'Usuario', 'Rfc', 'Calle', 'NoExterior', 'Colonia', 'Municipio', 'Estado', 'CodigoPostal', 'Contacto', 'Telefonos', 'Email1');
+        var columnas = new Array('Compra', 'Proveedor', 'Nombre', 'Fecha', 'FechaEmitida', 'Plazo', 'Vence', 'Remision', 'Factura', 'Movimiento', 'Almacen', 'Tipo', 'Importe', 'Descuento', 'SubTotal', 'Iva', 'Total', 'Abonos', 'Descuentos', 'Saldo', 'Obs', 'Status', 'MotivoBaja', 'Usuario', 'Rfc', 'Calle', 'NoExterior', 'Colonia', 'Municipio', 'Estado', 'CodigoPostal', 'Contacto', 'Telefonos', 'Email1');
     }else if(reporte == 'DETALLES'){
         var columnas = new Array('Compra', 'Proveedor', 'Nombre', 'Fecha', 'Plazo', 'Vence', 'Remision', 'Factura', 'Movimiento', 'Almacen', 'Tipo', 'Codigo', 'Descripcion', 'Unidad', 'Cantidad', 'Precio', 'Importe', 'Descuento', 'SubTotal', 'Iva', 'Total', 'ObsCompra', 'ObsDetalle', 'Status', 'MotivoBaja', 'Usuario', 'Rfc', 'Calle', 'NoExterior', 'Colonia', 'Municipio', 'Estado', 'CodigoPostal', 'Contacto', 'Telefonos', 'Email1');
     }else{

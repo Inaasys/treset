@@ -41,7 +41,7 @@ class ReportesRelacionCompraExport implements FromCollection,WithHeadings,WithTi
 
     public function __construct($fechainicialreporte, $fechafinalreporte, $numeroproveedor, $numeroalmacen, $tipo, $movimiento, $status, $reporte, $numerodecimales, $empresa){
         if($reporte == 'GENERAL'){
-            $this->campos_consulta = array('Compra', 'Proveedor', 'Nombre', 'Fecha', 'Plazo', 'Vence', 'Remision', 'Factura', 'Movimiento', 'Almacen', 'Tipo', 'Importe', 'Descuento', 'SubTotal', 'Iva', 'Total', 'Abonos', 'Descuentos', 'Saldo', 'Obs', 'Status', 'MotivoBaja', 'Usuario', 'Rfc', 'Calle', 'NoExterior', 'Colonia', 'Municipio', 'Estado', 'CodigoPostal', 'Contacto', 'Telefonos', 'Email1');
+            $this->campos_consulta = array('Compra', 'Proveedor', 'Nombre', 'Fecha', 'FechaEmitida', 'Plazo', 'Vence', 'Remision', 'Factura', 'Movimiento', 'Almacen', 'Tipo', 'Importe', 'Descuento', 'SubTotal', 'Iva', 'Total', 'Abonos', 'Descuentos', 'Saldo', 'Obs', 'Status', 'MotivoBaja', 'Usuario', 'Rfc', 'Calle', 'NoExterior', 'Colonia', 'Municipio', 'Estado', 'CodigoPostal', 'Contacto', 'Telefonos', 'Email1');
         }else if($reporte == 'DETALLES'){
             $this->campos_consulta = array('Compra', 'Proveedor', 'Nombre', 'Fecha', 'Plazo', 'Vence', 'Remision', 'Factura', 'Movimiento', 'Almacen', 'Tipo', 'Codigo', 'Descripcion', 'Unidad', 'Cantidad', 'Precio', 'Importe', 'Descuento', 'SubTotal', 'Iva', 'Total', 'ObsCompra', 'ObsDetalle', 'Status', 'MotivoBaja', 'Usuario', 'Rfc', 'Calle', 'NoExterior', 'Colonia', 'Municipio', 'Estado', 'CodigoPostal', 'Contacto', 'Telefonos', 'Email1');
         }else{
@@ -123,7 +123,7 @@ class ReportesRelacionCompraExport implements FromCollection,WithHeadings,WithTi
         if($reporte == "GENERAL"){
             $sql = DB::table('Compras as c')
             ->leftjoin('Proveedores as p', 'c.Proveedor', '=', 'p.Numero')
-            ->select('c.Compra', 'c.Proveedor', 'p.Nombre', DB::raw("FORMAT(c.Fecha, 'yyyy-MM-dd') as Fecha"), 'c.Plazo', DB::raw("FORMAT(c.Fecha+c.Plazo, 'yyyy-MM-dd') as Vence"), 'c.Remision', 'c.Factura', 'c.Movimiento', 'c.Almacen', 'c.Tipo', 'c.Importe', 'c.Descuento', 'c.SubTotal', 'c.Iva', 'c.Total', 'c.Abonos', 'c.Descuentos', 'c.Saldo', 'c.Obs', 'c.Status', 'c.MotivoBaja', 'c.Usuario', 'p.Rfc', 'p.Calle', 'p.NoExterior', 'p.Colonia', 'p.Municipio', 'p.Estado', 'p.CodigoPostal', 'p.Contacto', 'p.Telefonos', 'p.Email1')
+            ->select('c.Compra', 'c.Proveedor', 'p.Nombre', DB::raw("FORMAT(c.Fecha, 'yyyy-MM-dd') as Fecha"), DB::raw("FORMAT(c.FechaEmitida, 'yyyy-MM-dd') as FechaEmitida"), 'c.Plazo', DB::raw("FORMAT(c.Fecha+c.Plazo, 'yyyy-MM-dd') as Vence"), 'c.Remision', 'c.Factura', 'c.Movimiento', 'c.Almacen', 'c.Tipo', 'c.Importe', 'c.Descuento', 'c.SubTotal', 'c.Iva', 'c.Total', 'c.Abonos', 'c.Descuentos', 'c.Saldo', 'c.Obs', 'c.Status', 'c.MotivoBaja', 'c.Usuario', 'p.Rfc', 'p.Calle', 'p.NoExterior', 'p.Colonia', 'p.Municipio', 'p.Estado', 'p.CodigoPostal', 'p.Contacto', 'p.Telefonos', 'p.Email1')
             //->whereBetween('c.Fecha', [$fechainicio, $fechaterminacion])
             ->whereDate('c.Fecha', '>=', $fechainicio)->whereDate('c.Fecha', '<=', $fechaterminacion)
             ->where(function($q) use ($numeroproveedor) {
