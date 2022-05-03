@@ -53,6 +53,8 @@ use App\NotaCliente;
 use App\NotaClienteDetalle;
 use App\NotaClienteDocumento;
 use App\User_Rel_Serie;
+use App\c_Periodicidad;
+use App\c_Meses;
 use Config;
 use Mail;
 use Facturapi\Facturapi;
@@ -762,7 +764,71 @@ class FacturaController extends ConfiguracionSistemaController{
             'nombre' => $nombre
         );
         return response()->json($data);  
-    }    
+    }   
+    
+    //obtener periodicidades
+    public function facturas_obtener_periodicidades(Request $request){
+        if($request->ajax()){
+            $data = c_Periodicidad::query();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarperiodicidad(\''.$data->Clave .'\',\''.$data->Descripcion .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+
+    //obtener periodicidad por clave
+    public function facturas_obtener_periodicidad_por_clave(Request $request){
+        $clave = '';
+        $descripcion = '';
+        $existeperiodicidad = c_Periodicidad::where('Clave', $request->claveperiodicidad)->count();
+        if($existeperiodicidad > 0){
+            $periodicidad = c_Periodicidad::where('Clave', $request->claveperiodicidad)->first();
+            $clave = $periodicidad->Clave;
+            $descripcion = $periodicidad->Descripcion;
+        }
+        $data = array(
+            'clave' => $clave,
+            'descripcion' => $descripcion
+        );
+        return response()->json($data);  
+
+    }
+
+    //obtener meses
+    public function facturas_obtener_meses(Request $request){
+        if($request->ajax()){
+            $data = c_Meses::query();
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarmes(\''.$data->Clave .'\',\''.$data->Descripcion .'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+    }
+
+    //obtener mes por clave
+    public function facturas_obtener_mes_por_clave(Request $request){
+        $clave = '';
+        $descripcion = '';
+        $existemes = c_Meses::where('Clave', $request->clavemes)->count();
+        if($existemes > 0){
+            $mes = c_Meses::where('Clave', $request->clavemes)->first();
+            $clave = $mes->Clave;
+            $descripcion = $mes->Descripcion;
+        }
+        $data = array(
+            'clave' => $clave,
+            'descripcion' => $descripcion
+        );
+        return response()->json($data);  
+
+    }
 
     //obtener forma pago por clave
     public function facturas_obtener_residencia_fiscal_por_clave(Request $request){
@@ -780,6 +846,7 @@ class FacturaController extends ConfiguracionSistemaController{
         );
         return response()->json($data); 
     }
+    
 
     //obtener folios fiscales
     public function facturas_obtener_folios_fiscales(Request $request){
@@ -1796,6 +1863,8 @@ class FacturaController extends ConfiguracionSistemaController{
         $Factura->RegimenFiscalReceptor=$request->claveregimenfiscalreceptor;
         $Factura->Hora=Carbon::parse($request->fecha)->toDateTimeString();
         $Factura->Periodo=$this->periodohoy;
+        $Factura->Periodicidad=$request->claveperiodicidad;
+        $Factura->Meses=$request->clavemes;
         $Factura->save();
         //Modificar saldo cliente
         $cliente = Cliente::where('Numero', $request->numerocliente)->first();
@@ -1902,6 +1971,8 @@ class FacturaController extends ConfiguracionSistemaController{
         $usocfdi = UsoCFDI::where('Clave', $factura->UsoCfdi)->first();
         $residenciafiscal = Pais::where('Clave', $factura->ResidenciaFiscal)->first();
         $regimenfiscalreceptor = c_RegimenFiscal::where('Clave', $factura->RegimenFiscalReceptor)->first();
+        $periodicidad = c_Periodicidad::where('Clave', $factura->Periodicidad)->first();
+        $meses = c_Meses::where('Clave', $factura->Meses)->first();
         $nombretiporelacion = "";
         $clavetiporelacion = "";
         $contartiporelacion = c_TipoRelacion::where('Clave', $factura->TipoRelacion)->count();
@@ -2084,6 +2155,8 @@ class FacturaController extends ConfiguracionSistemaController{
             "usocfdi" => $usocfdi,
             "residenciafiscal" => $residenciafiscal,
             "regimenfiscalreceptor" => $regimenfiscalreceptor,
+            "periodicidad" => $periodicidad,
+            "meses" => $meses,
             "filasdocumentosfactura" => $filasdocumentosfactura,
             "numerodocumentosfactura" => $numerodocumentosfactura,
             "fecha" => Helpers::formatoinputdatetime($factura->Fecha),
@@ -2157,6 +2230,8 @@ class FacturaController extends ConfiguracionSistemaController{
             'UsoCfdi' => $request->claveusocfdi,
             'ResidenciaFiscal' => $request->claveresidenciafiscal,
             'RegimenFiscalReceptor' => $request->claveregimenfiscalreceptor,
+            'Periodicidad'=> $request->claveperiodicidad,
+            'Meses' => $request->clavemes,
             'NumRegIdTrib' => $request->numeroregidtrib
         ]);
         //ver si se puede modificar la factura siempre y cuando sea una factura libre y no tenga ningun documento ligado a ella
@@ -4002,75 +4077,175 @@ class FacturaController extends ConfiguracionSistemaController{
                 );
             }
         }
-        if($factura->TipoRelacion != ""){
-            $arraydoc = array();
-            foreach($detallesdocumentosfactura as $ddf){
-                array_push($arraydoc, $ddf->UUID);
-            } 
-            //FACTURA
-            // Crea una nueva factura
-            $invoice = array(
-                "customer" => array(
-                    "legal_name" => $cliente->Nombre,
-                    "tax_id" => $cliente->Rfc,
-                    
-                    //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
-                    "tax_system" => $cliente->RegimenFiscal,
-                    "address" => 
-                        array(
-                            "zip" => $cliente->CodigoPostal,
-                        )
-                    //fin cfdi 4.0
-                    
-                ),
-                "items" => $arraytest,
-                "payment_form" => $factura->FormaPago,
-                "payment_method" => $factura->MetodoPago,
-                
-                //se debe cambiar la forma de relacion los documentos y en lugar de mandar arra products, se manda array items como en las facturas de ingreso con facturapi 2.0
-                "related_documents" => array(
-                    array(
-                        "relationship" => $factura->TipoRelacion,
-                        "documents" => $arraydoc
-                    )
-                ),
-                /*
-                //datos para facturar en facturapi 1.0
-                "relation" => $factura->TipoRelacion,
-                "related" => $arraydoc,
-                */
-                "folio_number" => $factura->Folio,
-                "series" => $factura->Serie,
-                "currency" => $factura->Moneda,
-                "exchange" => Helpers::convertirvalorcorrecto($factura->TipoCambio),
-                "conditions" => $factura->CondicionesDePago
+        if($cliente->Rfc == 'XAXX010101000'){
+            //asignar periodicidad en ingles para facturas globales
+            switch($factura->Periodicidad){
+                case "01":
+                    $periodicidad = "day";
+                    break;
+                case "02":
+                    $periodicidad = "week";
+                    break;
+                case "03":
+                    $periodicidad = "fortnight";
+                    break;
+                case "04":
+                    $periodicidad = "month";
+                    break;
+                case "05":
+                    $periodicidad = "two_months";
+                    break;
+            }
+            //obtener el año actual
+            $fechaactual = Carbon::now();
+            $global = array(
+                "periodicity" => $periodicidad,
+                "months" => $factura->Meses,
+                "year" => $fechaactual->year
             );
+            if($factura->TipoRelacion != ""){
+                $arraydoc = array();
+                foreach($detallesdocumentosfactura as $ddf){
+                    array_push($arraydoc, $ddf->UUID);
+                } 
+                //FACTURA
+                // Crea una nueva factura
+                $invoice = array(
+                    "customer" => array(
+                        "legal_name" => $cliente->Nombre,
+                        "tax_id" => $cliente->Rfc,
+                        
+                        //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
+                        "tax_system" => $cliente->RegimenFiscal,
+                        "address" => 
+                            array(
+                                "zip" => $cliente->CodigoPostal,
+                            )
+                        //fin cfdi 4.0
+                        
+                    ),
+                    "items" => $arraytest,
+                    "payment_form" => $factura->FormaPago,
+                    "payment_method" => $factura->MetodoPago,
+                    
+                    //se debe cambiar la forma de relacion los documentos y en lugar de mandar arra products, se manda array items como en las facturas de ingreso con facturapi 2.0
+                    "related_documents" => array(
+                        array(
+                            "relationship" => $factura->TipoRelacion,
+                            "documents" => $arraydoc
+                        )
+                    ),
+                    /*
+                    //datos para facturar en facturapi 1.0
+                    "relation" => $factura->TipoRelacion,
+                    "related" => $arraydoc,
+                    */
+                    "global" => $global,
+                    "folio_number" => $factura->Folio,
+                    "series" => $factura->Serie,
+                    "currency" => $factura->Moneda,
+                    "exchange" => Helpers::convertirvalorcorrecto($factura->TipoCambio),
+                    "conditions" => $factura->CondicionesDePago
+                );
+            }else{
+                //FACTURA
+                // Crea una nueva factura
+                $invoice = array(
+                    "customer" => array(
+                        "legal_name" => $cliente->Nombre,
+                        "tax_id" => $cliente->Rfc,
+                        
+                        //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
+                        "tax_system" => $cliente->RegimenFiscal,
+                        "address" => 
+                            array(
+                                "zip" => $cliente->CodigoPostal,
+                            )
+                        //fin cfdi 4.0
+                        
+                    ),
+                    "items" => $arraytest,
+                    "payment_form" => $factura->FormaPago,
+                    "payment_method" => $factura->MetodoPago,
+                    "global" => $global,
+                    "folio_number" => $factura->Folio,
+                    "series" => $factura->Serie,
+                    "currency" => $factura->Moneda,
+                    "exchange" => Helpers::convertirvalorcorrecto($factura->TipoCambio),
+                    "conditions" => $factura->CondicionesDePago
+                );
+            }
         }else{
-            //FACTURA
-            // Crea una nueva factura
-            $invoice = array(
-                "customer" => array(
-                    "legal_name" => $cliente->Nombre,
-                    "tax_id" => $cliente->Rfc,
+            if($factura->TipoRelacion != ""){
+                $arraydoc = array();
+                foreach($detallesdocumentosfactura as $ddf){
+                    array_push($arraydoc, $ddf->UUID);
+                } 
+                //FACTURA
+                // Crea una nueva factura
+                $invoice = array(
+                    "customer" => array(
+                        "legal_name" => $cliente->Nombre,
+                        "tax_id" => $cliente->Rfc,
+                        
+                        //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
+                        "tax_system" => $cliente->RegimenFiscal,
+                        "address" => 
+                            array(
+                                "zip" => $cliente->CodigoPostal,
+                            )
+                        //fin cfdi 4.0
+                        
+                    ),
+                    "items" => $arraytest,
+                    "payment_form" => $factura->FormaPago,
+                    "payment_method" => $factura->MetodoPago,
                     
-                    //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
-                    "tax_system" => $cliente->RegimenFiscal,
-                    "address" => 
+                    //se debe cambiar la forma de relacion los documentos y en lugar de mandar arra products, se manda array items como en las facturas de ingreso con facturapi 2.0
+                    "related_documents" => array(
                         array(
-                            "zip" => $cliente->CodigoPostal,
+                            "relationship" => $factura->TipoRelacion,
+                            "documents" => $arraydoc
                         )
-                    //fin cfdi 4.0
-                    
-                ),
-                "items" => $arraytest,
-                "payment_form" => $factura->FormaPago,
-                "payment_method" => $factura->MetodoPago,
-                "folio_number" => $factura->Folio,
-                "series" => $factura->Serie,
-                "currency" => $factura->Moneda,
-                "exchange" => Helpers::convertirvalorcorrecto($factura->TipoCambio),
-                "conditions" => $factura->CondicionesDePago
-            );
+                    ),
+                    /*
+                    //datos para facturar en facturapi 1.0
+                    "relation" => $factura->TipoRelacion,
+                    "related" => $arraydoc,
+                    */
+                    "folio_number" => $factura->Folio,
+                    "series" => $factura->Serie,
+                    "currency" => $factura->Moneda,
+                    "exchange" => Helpers::convertirvalorcorrecto($factura->TipoCambio),
+                    "conditions" => $factura->CondicionesDePago
+                );
+            }else{
+                //FACTURA
+                // Crea una nueva factura
+                $invoice = array(
+                    "customer" => array(
+                        "legal_name" => $cliente->Nombre,
+                        "tax_id" => $cliente->Rfc,
+                        
+                        //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
+                        "tax_system" => $cliente->RegimenFiscal,
+                        "address" => 
+                            array(
+                                "zip" => $cliente->CodigoPostal,
+                            )
+                        //fin cfdi 4.0
+                        
+                    ),
+                    "items" => $arraytest,
+                    "payment_form" => $factura->FormaPago,
+                    "payment_method" => $factura->MetodoPago,    
+                    "folio_number" => $factura->Folio,
+                    "series" => $factura->Serie,
+                    "currency" => $factura->Moneda,
+                    "exchange" => Helpers::convertirvalorcorrecto($factura->TipoCambio),
+                    "conditions" => $factura->CondicionesDePago
+                );
+            }
         }
         $new_invoice = $this->facturapi->Invoices->create( $invoice );
         $result = json_encode($new_invoice);

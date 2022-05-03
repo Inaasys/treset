@@ -71,7 +71,9 @@ class Factura extends Model
         'FechaTimbrado',
         'UUID',
         'Hora',
-        'Periodo'
+        'Periodo',
+        'Periodicidad',
+        'Meses'
     ];
     //importe
     public function getImporteAttribute($value){

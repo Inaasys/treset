@@ -377,6 +377,25 @@ function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapag
           $("#textonombrecliente").html(Nombre.substring(0, 40));
         }
         $("#rfccliente").val(Rfc);
+        if(Rfc == 'XAXX010101000'){
+          $("#divperiodicidad").show();
+          $("#divmes").show();
+          $("#claveperiodicidad").attr('required', 'required');
+          $("#claveperiodicidadanterior").attr('required', 'required');
+          $("#periodicidad").attr('required', 'required');
+          $("#clavemes").attr('required', 'required');
+          $("#clavemesanterior").attr('required', 'required');
+          $("#mes").attr('required', 'required');
+        }else{
+          $("#divperiodicidad").hide();
+          $("#divmes").hide();
+          $("#claveperiodicidad").removeAttr('required');
+          $("#claveperiodicidadanterior").removeAttr('required');
+          $("#periodicidad").removeAttr('required');
+          $("#clavemes").removeAttr('required');
+          $("#clavemesanterior").removeAttr('required');
+          $("#mes").removeAttr('required');
+        }
         $("#plazo").val(Plazo);
         //credito y saldo
         $("#credito").val(number_format(round(CreditoCliente, numerodecimales), numerodecimales, '.', ''));
@@ -1795,6 +1814,25 @@ function obtenerclientepornumero(){
               $("#textonombrecliente").html(data.nombre.substring(0, 40));
             }
             $("#rfccliente").val(data.rfc);
+            if(data.rfc == 'XAXX010101000'){
+              $("#divperiodicidad").show();
+              $("#divmes").show();
+              $("#claveperiodicidad").attr('required', 'required');
+              $("#claveperiodicidadanterior").attr('required', 'required');
+              $("#periodicidad").attr('required', 'required');
+              $("#clavemes").attr('required', 'required');
+              $("#clavemesanterior").attr('required', 'required');
+              $("#mes").attr('required', 'required');
+            }else{
+              $("#divperiodicidad").hide();
+              $("#divmes").hide();
+              $("#claveperiodicidad").removeAttr('required');
+              $("#claveperiodicidadanterior").removeAttr('required');
+              $("#periodicidad").removeAttr('required');
+              $("#clavemes").removeAttr('required');
+              $("#clavemesanterior").removeAttr('required');
+              $("#mes").removeAttr('required');
+            }
             $("#plazo").val(data.plazo);
             //credito y saldo
             $("#credito").val(number_format(round(data.credito, numerodecimales), numerodecimales, '.', ''));
@@ -2313,6 +2351,223 @@ function regresarclaveregimenfiscalreceptor(){
   var claveregimenfiscalreceptoranterior = $("#claveregimenfiscalreceptoranterior").val();
   $("#claveregimenfiscalreceptor").val(claveregimenfiscalreceptoranterior);
 }
+//obtener peridicidades
+function obtenerperiodicidades(){
+  ocultarformulario();
+  var tablaperidicidades ='<div class="modal-header '+background_forms_and_modals+'">'+
+                                '<h4 class="modal-title">Periodicidades</h4>'+
+                              '</div>'+
+                              '<div class="modal-body">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-12">'+
+                                        '<div class="table-responsive">'+
+                                            '<table id="tbllistadoperiodicidad" class="tbllistadoperiodicidad table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                                '<thead class="'+background_tables+'">'+
+                                                    '<tr>'+
+                                                        '<th>Operaciones</th>'+
+                                                        '<th>Numero</th>'+
+                                                        '<th>Clave</th>'+
+                                                        '<th>Descripcion</th>'+
+                                                    '</tr>'+
+                                                '</thead>'+
+                                                '<tbody></tbody>'+
+                                            '</table>'+
+                                        '</div>'+
+                                    '</div>'+   
+                                '</div>'+
+                              '</div>'+
+                              '<div class="modal-footer">'+
+                                '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                              '</div>';  
+  $("#contenidomodaltablas").html(tablaperidicidades);
+  var listadotablaperiodicidades = $('#tbllistadoperiodicidad').DataTable({
+      keys: true,
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
+      "sScrollX": "110%",
+      "sScrollY": "370px",
+      "bScrollCollapse": true,  
+      processing: true,
+      'language': {
+        'loadingRecords': '&nbsp;',
+        'processing': '<div class="spinner"></div>'
+      },
+      serverSide: true,
+      ajax: {
+        url: facturas_obtener_periodicidades
+      },
+      columns: [
+          { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+          { data: 'Numero', name: 'Numero' },
+          { data: 'Clave', name: 'Clave', orderable: false, searchable: false},
+          { data: 'Descripcion', name: 'Descripcion', orderable: false, searchable: false}
+      ],
+      "initComplete": function() {
+        var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
+        $buscar.unbind();
+        $buscar.bind('keyup change', function(e) {
+            if(e.keyCode == 13 || this.value == "") {
+              $('#tbllistadoperiodicidad').DataTable().search( this.value ).draw();
+            }
+        });
+      }, 
+  });
+  //seleccionar registro al dar doble click
+  $('#tbllistadoperiodicidad tbody').on('dblclick', 'tr', function () {
+      var data = listadotablaperiodicidades.row( this ).data();
+      seleccionarperiodicidad(data.Clave, data.Descripcion);
+  }); 
+} 
+//seleccionar periodicidad
+function seleccionarperiodicidad(Clave, Descripcion){
+  var claveperiodicidadanterior = $("#claveperiodicidadanterior").val();
+  var claveperiodicidad = Clave;
+  if(claveperiodicidadanterior != claveperiodicidad){
+    $("#claveperiodicidad").val(Clave);
+    $("#claveperiodicidadanterior").val(Clave);
+    $("#periodicidad").val(Descripcion);
+    if(Descripcion != null){
+      $("#textonombreperiodicidad").html(Descripcion.substring(0, 15));
+    }
+    mostrarformulario();
+  }
+}
+//obtener por clave
+function obtenerperiodicidadporclave(){
+  var claveperiodicidadanterior = $("#claveperiodicidadanterior").val();
+  var claveperiodicidad = $("#claveperiodicidad").val();
+  if(claveperiodicidadanterior != claveperiodicidad){
+    if($("#claveperiodicidad").parsley().isValid()){
+      $.get(facturas_obtener_periodicidad_por_clave, {claveperiodicidad:claveperiodicidad}, function(data){
+        $("#claveperiodicidad").val(data.clave);
+        $("#claveperiodicidadanterior").val(data.clave);
+        $("#periodicidad").val(data.descripcion);
+        if(data.descripcion != null){
+          $("#textonombreperiodicidad").html(data.descripcion.substring(0, 15));
+        }
+        mostrarformulario();
+      }) 
+    }
+  }
+}
+//regresar clave
+function regresarclaveperiodicidad(){
+  var claveperiodicidadanterior = $("#claveperiodicidadanterior").val();
+  $("#claveperiodicidad").val(claveperiodicidadanterior);
+}
+
+
+
+//obtener meses
+function obtenermeses(){
+  ocultarformulario();
+  var tablameses ='<div class="modal-header '+background_forms_and_modals+'">'+
+                                '<h4 class="modal-title">Meses</h4>'+
+                              '</div>'+
+                              '<div class="modal-body">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-12">'+
+                                        '<div class="table-responsive">'+
+                                            '<table id="tbllistadomes" class="tbllistadomes table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                                '<thead class="'+background_tables+'">'+
+                                                    '<tr>'+
+                                                        '<th>Operaciones</th>'+
+                                                        '<th>Numero</th>'+
+                                                        '<th>Clave</th>'+
+                                                        '<th>Descripcion</th>'+
+                                                    '</tr>'+
+                                                '</thead>'+
+                                                '<tbody></tbody>'+
+                                            '</table>'+
+                                        '</div>'+
+                                    '</div>'+   
+                                '</div>'+
+                              '</div>'+
+                              '<div class="modal-footer">'+
+                                '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                              '</div>';  
+  $("#contenidomodaltablas").html(tablameses);
+  var listadotablameses = $('#tbllistadomes').DataTable({
+      keys: true,
+      "lengthMenu": [ 10, 50, 100, 250, 500 ],
+      "pageLength": 250,
+      "sScrollX": "110%",
+      "sScrollY": "370px",
+      "bScrollCollapse": true,  
+      processing: true,
+      'language': {
+        'loadingRecords': '&nbsp;',
+        'processing': '<div class="spinner"></div>'
+      },
+      serverSide: true,
+      ajax: {
+        url: facturas_obtener_meses
+      },
+      columns: [
+          { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+          { data: 'Numero', name: 'Numero' },
+          { data: 'Clave', name: 'Clave', orderable: false, searchable: false},
+          { data: 'Descripcion', name: 'Descripcion', orderable: false, searchable: false}
+      ],
+      "initComplete": function() {
+        var $buscar = $('div.dataTables_filter input');
+        $buscar.focus();
+        $buscar.unbind();
+        $buscar.bind('keyup change', function(e) {
+            if(e.keyCode == 13 || this.value == "") {
+              $('#tbllistadomes').DataTable().search( this.value ).draw();
+            }
+        });
+      }, 
+  });
+  //seleccionar registro al dar doble click
+  $('#tbllistadomes tbody').on('dblclick', 'tr', function () {
+      var data = listadotablameses.row( this ).data();
+      seleccionarmes(data.Clave, data.Descripcion);
+  }); 
+} 
+//seleccionar mes
+function seleccionarmes(Clave, Descripcion){
+  var clavemesanterior = $("#clavemesanterior").val();
+  var clavemes = Clave;
+  if(clavemesanterior != clavemes){
+    $("#clavemes").val(Clave);
+    $("#clavemesanterior").val(Clave);
+    $("#mes").val(Descripcion);
+    if(Descripcion != null){
+      $("#textonombremes").html(Descripcion.substring(0, 15));
+    }
+    mostrarformulario();
+  }
+}
+//obtener por clave
+function obtenermesporclave(){
+  var clavemesanterior = $("#clavemesanterior").val();
+  var clavemes = $("#clavemes").val();
+  if(clavemesanterior != clavemes){
+    if($("#clavemes").parsley().isValid()){
+      $.get(facturas_obtener_mes_por_clave, {clavemes:clavemes}, function(data){
+        $("#clavemes").val(data.clave);
+        $("#clavemesanterior").val(data.clave);
+        $("#mes").val(data.descripcion);
+        if(data.descripcion != null){
+          $("#textonombremes").html(data.descripcion.substring(0, 15));
+        }
+        mostrarformulario();
+      }) 
+    }
+  }
+}
+//regresar clave
+function regresarclavemes(){
+  var clavemesanterior = $("#clavemesanterior").val();
+  $("#clavemes").val(clavemesanterior);
+}
+
+
+
+
 //listar productos para tab consumos
 function listarproductos(){
   ocultarformulario();
@@ -3354,7 +3609,7 @@ function alta(){
                           '</div>'+ 
                           '<div role="tabpanel" class="tab-pane fade" id="otrostab">'+
                             '<div class="row">'+
-                              '<div class="col-md-4">'+
+                              '<div class="col-md-3">'+
                                 '<label>Tipo PA</label>'+
                                 '<table class="col-md-12">'+
                                   '<tr>'+
@@ -3370,9 +3625,43 @@ function alta(){
                                   '</tr>'+    
                                 '</table>'+
                               '</div>'+
-                              '<div class="col-md-4">'+
+                              '<div class="col-md-3">'+
                                 '<label>Refactura</label>'+
                                 '<input type="text" class="form-control inputnextdet" name="refactura" id="refactura"  readonly data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                              '</div>'+
+                              '<div class="col-md-3" id="divperiodicidad">'+
+                                    '<label>Periodicidad <span class="label label-danger" id="textonombreperiodicidad"></span></label>'+
+                                    '<table class="col-md-12">'+
+                                        '<tr>'+
+                                        '<td>'+
+                                            '<div class="btn bg-blue waves-effect" onclick="obtenerperiodicidades()">Seleccionar</div>'+
+                                        '</td>'+
+                                        '<td>'+
+                                            '<div class="form-line">'+
+                                            '<input type="text" class="form-control inputnextdet" name="claveperiodicidad" id="claveperiodicidad"  onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                            '<input type="hidden" class="form-control" name="claveperiodicidadanterior" id="claveperiodicidadanterior"  onkeyup="tipoLetra(this)">'+
+                                            '<input type="hidden" class="form-control" name="periodicidad" id="periodicidad" readonly>'+
+                                            '</div>'+
+                                        '</td>'+
+                                        '</tr>'+    
+                                    '</table>'+
+                              '</div>'+
+                              '<div class="col-md-3" id="divmes">'+
+                                    '<label>Meses <span class="label label-danger" id="textonombremes"></span></label>'+
+                                    '<table class="col-md-12">'+
+                                        '<tr>'+
+                                        '<td>'+
+                                            '<div class="btn bg-blue waves-effect" onclick="obtenermeses()">Seleccionar</div>'+
+                                        '</td>'+
+                                        '<td>'+
+                                            '<div class="form-line">'+
+                                            '<input type="text" class="form-control inputnextdet" name="clavemes" id="clavemes"   onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                            '<input type="hidden" class="form-control" name="clavemesanterior" id="clavemesanterior"   onkeyup="tipoLetra(this)">'+
+                                            '<input type="hidden" class="form-control" name="mes" id="mes"   readonly>'+
+                                            '</div>'+
+                                        '</td>'+
+                                        '</tr>'+    
+                                    '</table>'+
                               '</div>'+
                             '</div>'+
                           '</div>'+
@@ -3696,6 +3985,30 @@ function alta(){
   //regresar clave
   $('#claveregimenfiscalreceptor').on('change', function(e) {
       regresarclaveregimenfiscalreceptor();
+  });
+  //activar busqueda para periodicidad
+  $('#claveperiodicidad').on('keypress', function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      obtenerperiodicidadporclave();
+    }
+  });
+  //regresar clave
+  $('#claveperiodicidad').on('change', function(e) {
+      regresarclaveperiodicidad();
+  });
+  //activar busqueda para periodicidad
+  $('#clavemes').on('keypress', function(e) {
+    //recomentable para mayor compatibilidad entre navegadores.
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code==13){
+      obtenermesporclave();
+    }
+  });
+  //regresar clave
+  $('#clavemes').on('change', function(e) {
+      regresarclavemes();
   });
   //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
   $(".inputnextdet").keyup(function (e) {
@@ -4444,7 +4757,7 @@ function obtenerdatos(facturamodificar){
                     '</div>'+ 
                     '<div role="tabpanel" class="tab-pane fade" id="otrostab">'+
                       '<div class="row">'+
-                        '<div class="col-md-4">'+
+                        '<div class="col-md-3">'+
                           '<label>Tipo PA</label>'+
                           '<table class="col-md-12">'+
                             '<tr>'+
@@ -4460,9 +4773,43 @@ function obtenerdatos(facturamodificar){
                             '</tr>'+    
                           '</table>'+
                         '</div>'+
-                        '<div class="col-md-4">'+
+                        '<div class="col-md-3">'+
                           '<label>Refactura</label>'+
                           '<input type="text" class="form-control inputnextdet" name="refactura" id="refactura"  readonly data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                        '</div>'+
+                        '<div class="col-md-3" id="divperiodicidad">'+
+                              '<label>Periodicidad <span class="label label-danger" id="textonombreperiodicidad"></span></label>'+
+                              '<table class="col-md-12">'+
+                                  '<tr>'+
+                                  '<td>'+
+                                      '<div class="btn bg-blue waves-effect" onclick="obtenerperiodicidades()">Seleccionar</div>'+
+                                  '</td>'+
+                                  '<td>'+
+                                      '<div class="form-line">'+
+                                      '<input type="text" class="form-control inputnextdet" name="claveperiodicidad" id="claveperiodicidad"  onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                      '<input type="hidden" class="form-control" name="claveperiodicidadanterior" id="claveperiodicidadanterior"  onkeyup="tipoLetra(this)">'+
+                                      '<input type="hidden" class="form-control" name="periodicidad" id="periodicidad" readonly>'+
+                                      '</div>'+
+                                  '</td>'+
+                                  '</tr>'+    
+                              '</table>'+
+                        '</div>'+
+                        '<div class="col-md-3" id="divmes">'+
+                              '<label>Meses <span class="label label-danger" id="textonombremes"></span></label>'+
+                              '<table class="col-md-12">'+
+                                  '<tr>'+
+                                  '<td>'+
+                                      '<div class="btn bg-blue waves-effect" onclick="obtenermeses()">Seleccionar</div>'+
+                                  '</td>'+
+                                  '<td>'+
+                                      '<div class="form-line">'+
+                                      '<input type="text" class="form-control inputnextdet" name="clavemes" id="clavemes"   onkeyup="tipoLetra(this)" autocomplete="off">'+
+                                      '<input type="hidden" class="form-control" name="clavemesanterior" id="clavemesanterior"   onkeyup="tipoLetra(this)">'+
+                                      '<input type="hidden" class="form-control" name="mes" id="mes"   readonly>'+
+                                      '</div>'+
+                                  '</td>'+
+                                  '</tr>'+    
+                              '</table>'+
                         '</div>'+
                       '</div>'+
                     '</div>'+
@@ -4701,6 +5048,29 @@ function obtenerdatos(facturamodificar){
         $("#claveregimenfiscalreceptor").val(data.regimenfiscalreceptor.Clave);
         $("#claveregimenfiscalreceptoranterior").val(data.regimenfiscalreceptor.Clave);
     }
+    if(data.cliente.Rfc == "XAXX010101000"){
+      $("#divperiodicidad").show();
+      $("#divmes").show();
+      if(data.periodicidad != null){
+          $("#periodicidad").val(data.periodicidad.Descripcion);
+          if(data.periodicidad.Descripcion != null){
+              $("#textonombreperiodicidad").html(data.periodicidad.Descripcion.substring(0, 40));
+          }
+          $("#claveperiodicidad").val(data.periodicidad.Clave);
+          $("#claveperiodicidadanterior").val(data.periodicidad.Clave);
+      }
+      if(data.meses != null){
+          $("#mes").val(data.meses.Descripcion);
+          if(data.meses.Descripcion != null){
+              $("#textonombremes").html(data.meses.Descripcion.substring(0, 40));
+          }
+          $("#clavemes").val(data.meses.Clave);
+          $("#clavemesanterior").val(data.meses.Clave);
+      }
+    }else{
+      $("#divperiodicidad").hide();
+      $("#divmes").hide();
+    }
     $("#numeroregidtrib").val(data.factura.NumRegIdTrib);
     $("#descripcion").val(data.factura.Descripcion);
     //cargar todos los detalles
@@ -4852,6 +5222,29 @@ function obtenerdatos(facturamodificar){
     //regresar clave
     $('#claveregimenfiscalreceptor').on('change', function(e) {
         regresarclaveregimenfiscalreceptor();
+    });  //activar busqueda para periodicidad
+    $('#claveperiodicidad').on('keypress', function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        obtenerperiodicidadporclave();
+      }
+    });
+    //regresar clave
+    $('#claveperiodicidad').on('change', function(e) {
+        regresarclaveperiodicidad();
+    });
+    //activar busqueda para periodicidad
+    $('#clavemes').on('keypress', function(e) {
+      //recomentable para mayor compatibilidad entre navegadores.
+      var code = (e.keyCode ? e.keyCode : e.which);
+      if(code==13){
+        obtenermesporclave();
+      }
+    });
+    //regresar clave
+    $('#clavemes').on('change', function(e) {
+        regresarclavemes();
     });
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
     $(".inputnextdet").keyup(function (e) {

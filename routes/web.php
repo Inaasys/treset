@@ -884,6 +884,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/facturas_obtener_residencia_fiscal_por_clave', 'FacturaController@facturas_obtener_residencia_fiscal_por_clave')->name('facturas_obtener_residencia_fiscal_por_clave')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_regimenes_fiscales_receptor', 'FacturaController@facturas_obtener_regimenes_fiscales_receptor')->name('facturas_obtener_regimenes_fiscales_receptor')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_regimenfiscalreceptor_por_clave', 'FacturaController@facturas_obtener_regimenfiscalreceptor_por_clave')->name('facturas_obtener_regimenfiscalreceptor_por_clave')->middleware('revisaraccesomenu:menuregistrosfacturas');    
+    Route::get('/facturas_obtener_periodicidades', 'FacturaController@facturas_obtener_periodicidades')->name('facturas_obtener_periodicidades')->middleware('revisaraccesomenu:menuregistrosfacturas');    
+    Route::get('/facturas_obtener_periodicidad_por_clave', 'FacturaController@facturas_obtener_periodicidad_por_clave')->name('facturas_obtener_periodicidad_por_clave')->middleware('revisaraccesomenu:menuregistrosfacturas');    
+    Route::get('/facturas_obtener_meses', 'FacturaController@facturas_obtener_meses')->name('facturas_obtener_meses')->middleware('revisaraccesomenu:menuregistrosfacturas');    
+    Route::get('/facturas_obtener_mes_por_clave', 'FacturaController@facturas_obtener_mes_por_clave')->name('facturas_obtener_mes_por_clave')->middleware('revisaraccesomenu:menuregistrosfacturas');        
     Route::get('/facturas_obtener_folios_fiscales', 'FacturaController@facturas_obtener_folios_fiscales')->name('facturas_obtener_folios_fiscales')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_ultimo_folio_serie_seleccionada', 'FacturaController@facturas_obtener_ultimo_folio_serie_seleccionada')->name('facturas_obtener_ultimo_folio_serie_seleccionada')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener_serie_interna', 'FacturaController@facturas_obtener_serie_interna')->name('facturas_obtener_serie_interna')->middleware('revisaraccesomenu:menuregistrosfacturas');
@@ -1243,6 +1247,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/modificar_valores_en_bd_para_actualizacion_rama20220228correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20220228correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20220228correciones');
     Route::get('/modificar_valores_en_bd_para_actualizacion_rama20220404correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20220404correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20220404correciones');
     Route::get('/modificar_valores_en_bd_para_actualizacion_rama20220413correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20220413correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20220413correciones');
+    Route::get('/modificar_valores_en_bd_para_actualizacion_rama20220502correciones', 'PruebaController@modificar_valores_en_bd_para_actualizacion_rama20220502correciones')->name('modificar_valores_en_bd_para_actualizacion_rama20220502correciones');
     /* -----------------------------------||||||||||||||||||||FIN CONFIGURACIONES Y PRUEBAS||||||||||||||||||||||-------------------------------------*/
     /*---------------------------------------|||||||||||||||||||MANEJO DE ERRORES LOGS|||||||||||||||||||||------------------------------------------*/
     Route::get('errors_inaasys', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index')->name('errors_inaasys');

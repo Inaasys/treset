@@ -293,6 +293,8 @@ class PruebaController extends ConfiguracionSistemaController{
     }
 
     public function actualizar_catalogos_sat_cfdi4(){
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
         /*
         //CATALOGO c_Exportacion
         $arrayexcel =  Excel::toArray(new CatalogoSATc_ClaveProdServCPImport, storage_path('c_Exportacion.xls'));
@@ -1434,6 +1436,13 @@ class PruebaController extends ConfiguracionSistemaController{
         ->update([
             'UsoCfdi'=>'CP01',
             'Exportacion'=>'01'
+        ]);
+    }
+
+    public function modificar_valores_en_bd_para_actualizacion_rama20220502correciones(){
+        Cliente::where('Rfc', 'XAXX010101000')
+        ->update([
+            'MetodoPago'=> 'PUE'
         ]);
     }
 }

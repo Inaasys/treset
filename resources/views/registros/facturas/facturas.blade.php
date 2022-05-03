@@ -408,6 +408,10 @@
         var facturas_obtener_residencia_fiscal_por_clave = '{!!URL::to('facturas_obtener_residencia_fiscal_por_clave')!!}';
         var facturas_obtener_regimenes_fiscales_receptor = '{!!URL::to('facturas_obtener_regimenes_fiscales_receptor')!!}';
         var facturas_obtener_regimenfiscalreceptor_por_clave = '{!!URL::to('facturas_obtener_regimenfiscalreceptor_por_clave')!!}';
+        var facturas_obtener_periodicidades = '{!!URL::to('facturas_obtener_periodicidades')!!}';
+        var facturas_obtener_periodicidad_por_clave = '{!!URL::to('facturas_obtener_periodicidad_por_clave')!!}';
+        var facturas_obtener_meses = '{!!URL::to('facturas_obtener_meses')!!}';
+        var facturas_obtener_mes_por_clave = '{!!URL::to('facturas_obtener_mes_por_clave')!!}';
         var facturas_obtener_folios_fiscales = '{!!URL::to('facturas_obtener_folios_fiscales')!!}';
         var facturas_obtener_ultimo_folio_serie_seleccionada  = '{!!URL::to('facturas_obtener_ultimo_folio_serie_seleccionada')!!}';
         var facturas_obtener_serie_interna  = '{!!URL::to('facturas_obtener_serie_interna')!!}';
