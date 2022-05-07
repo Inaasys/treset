@@ -1642,7 +1642,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             if($dp->ObjetoImp == '02'){//con impuestos
                 $taxes = array(
                     array(
-                        "base" => Helpers::convertirvalorcorrecto($dp->Abono), 
+                        //"base" => Helpers::convertirvalorcorrecto($dp->Abono), 
+                        "base" => number_format(round($dp->Abono, 2), 2, '.', ''),
                         "type" => "IVA",
                         "rate" => 0.160000
                     )
@@ -1652,9 +1653,12 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             }
             array_push($arraydet,   array(
                                         "uuid" => $dp->idDocumento, // UUID_de_factura_relacionada
-                                        "installment" => Helpers::convertirvalorcorrecto($dp->NumParcialidad),
-                                        "last_balance" => Helpers::convertirvalorcorrecto($dp->ImpSaldoAnt),
-                                        "amount" => Helpers::convertirvalorcorrecto($dp->Abono),
+                                        //"installment" => Helpers::convertirvalorcorrecto($dp->NumParcialidad),
+                                        "installment" => number_format(round($dp->NumParcialidad, 2), 2, '.', ''),
+                                        //"last_balance" => Helpers::convertirvalorcorrecto($dp->ImpSaldoAnt),
+                                        "last_balance" => number_format(round($dp->ImpSaldoAnt, 2), 2, '.', ''),
+                                        //"amount" => Helpers::convertirvalorcorrecto($dp->Abono),
+                                        "amount" => number_format(round($dp->Abono, 2), 2, '.', ''),
                                         "currency" => $dp->MonedaDR,
                                         "folio_number" => $dp->Folio,
                                         "series" => $dp->Serie,
@@ -1712,7 +1716,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                         array(
                             "payment_form" => $CXC->FormaPago,
                             "currency" => $CXC->Moneda,
-                            "exchange" => Helpers::convertirvalorcorrecto($CXC->TipoCambio),
+                            //"exchange" => Helpers::convertirvalorcorrecto($CXC->TipoCambio),
+                            "exchange" => number_format(round($CXC->TipoCambio, 2), 2, '.', ''),
                             "date" => Helpers::formatoinputdatetime($CXC->FechaPago),
                             "related_documents" =>  $arraydet
                         )
