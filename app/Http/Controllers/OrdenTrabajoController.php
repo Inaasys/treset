@@ -32,7 +32,7 @@ use Config;
 use Mail;
 use App\Serie;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
-use Storage; 
+use Storage;
 use ZipArchive;
 use File;
 
@@ -136,11 +136,11 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     //->addColumn('KmProximoServicio', function($data){ return $data->KmProximoServicio; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        } 
+        }
     }
     //descargar plantilla
     public function ordenes_trabajo_generar_plantilla(){
-        return Excel::download(new PlantillasOrdenesTrabajoExport(), "plantillaordenestrabajo.xlsx"); 
+        return Excel::download(new PlantillasOrdenesTrabajoExport(), "plantillaordenestrabajo.xlsx");
     }
     //cargar partidas excel
     public function ordenes_trabajo_cargar_partidas_excel(Request $request){
@@ -157,7 +157,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         foreach($partidasexcel as $partida){
             if($rowexcel > 0){
                 //if (in_array(strtoupper($partida[0]), $arraycodigosyaagregados)) {
-                    
+
                 //}else{
                     $codigoabuscar = $partida[0];
                     $cantidadpartida = $partida[1];
@@ -175,7 +175,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                         $importepartidaservicio =  $cantidad*$preciopartidaservicio;
                         //subtotal de la partida
                         $subtotalpartidaservicio =  $importepartidaservicio-0;
-                        //iva porcentaje partida 
+                        //iva porcentaje partida
                         $ivaporcentajepartidaservicio = Helpers::convertirvalorcorrecto(16);
                         //iva en pesos de la partida
                         $multiplicacionivapesospartida = $subtotalpartidaservicio*$ivaporcentajepartidaservicio;
@@ -253,7 +253,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             "contadorfilas" => $contadorfilas,
             "item" => $item
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
     //obtener series documento
     public function ordenes_trabajo_obtener_series_documento(Request $request){
@@ -358,7 +358,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        }  
+        }
     }
 
     //obtener cliente del lciente por numero
@@ -409,7 +409,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             'numero' => $numero,
             'nombre' => $nombre,
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener vines
@@ -461,10 +461,10 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             'año' => $año,
             'color' => $color
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
-    //obtener cotizaciones 
+    //obtener cotizaciones
     public function ordenes_trabajo_obtener_cotizaciones(Request $request){
         if($request->ajax()){
             $mesactual = date("m");
@@ -553,7 +553,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             }
         }else{
             $filasdetallescotizacion = '';
-        }        
+        }
         $data = array(
             "cotizacion" => $cotizacion,
             "filasdetallescotizacion" => $filasdetallescotizacion,
@@ -582,10 +582,10 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaservicio(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Servicio, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Venta).'\',\''.Helpers::convertirvalorcorrecto($data->Cantidad).'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$tipooperacion.'\')">Seleccionar</div>';
                         return $boton;
                     })
-                    ->addColumn('Venta', function($data){ 
+                    ->addColumn('Venta', function($data){
                         return Helpers::convertirvalorcorrecto($data->Venta);
                     })
-                    ->addColumn('Cantidad', function($data){ 
+                    ->addColumn('Cantidad', function($data){
                         return Helpers::convertirvalorcorrecto($data->Cantidad);
                     })
                     ->rawColumns(['operaciones'])
@@ -644,10 +644,21 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         //$folio = Helpers::ultimofolioserietablamodulos('App\OrdenTrabajo', $request->serie);
         $folio = $request->folio;
         $orden = $folio.'-'.$request->serie;
+        $importeAux = 0;
+        $descuentoAux = 0;
+        $subtotalAux = 0;
+        $ivaAux = 0;
+        $totalAux = 0;
+        $importeTotal = 0;
+        $descuentoTotal = 0;
+        $ivaTotal = 0;
+        $subtotalTotal = 0;
+        $totalTotal = 0;
+        $idOrden  = '';
         $ExisteOrden = OrdenTrabajo::where('Orden', $orden)->first();
 	    if($ExisteOrden == true){
 	        $OrdenTrabajo = 1;
-	    }else{  
+	    }else{
             //INGRESAR DATOS A TABLA ORDEN DE TRABAJO
             $OrdenTrabajo = new OrdenTrabajo;
             $OrdenTrabajo->Orden=$orden;
@@ -695,6 +706,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             $OrdenTrabajo->Usuario=Auth::user()->user;
             $OrdenTrabajo->Periodo=$this->periodohoy;
             $OrdenTrabajo->save();
+            $idOrden = $OrdenTrabajo->Orden;
             //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
             $BitacoraDocumento = new BitacoraDocumento;
             $BitacoraDocumento->Documento = "ORDENES DE TRABAJO";
@@ -707,7 +719,24 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             $BitacoraDocumento->save();
             if($request->numerofilastablaservicios > 0){
                 //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
-                foreach ($request->codigopartida as $key => $codigopartida){             
+                foreach ($request->codigopartida as $key => $codigopartida){
+                    //Coloca las variables en 0 para hacer la validación de los montos
+                    $importeAux = 0;
+                    $descuentoAux = 0;
+                    $subtotalAux = 0;
+                    $ivaAux = 0;
+                    $totalAux = 0;
+
+                    $importeAux = number_format($request->preciopartida[$key], 4, '.', '') * number_format($request->cantidadpartida[$key], 4, '.', '');
+                    $descuentoAux = number_format($importeAux, 4, '.', '') * (number_format($request->descuentoporcentajepartida[$key], 4, '.', '')/100);
+                    $subtotalAux = number_format($importeAux, 4, '.','') - number_format($descuentoAux, 4, '.','');
+
+                    $ivaAux = number_format($subtotalAux, 4, '.','') * (number_format($request->ivaporcentajepartida[$key], 4, '.','') / 100);
+                    $totalAux = number_format($subtotalAux,4, '.','') + number_format($ivaAux, 4, '.','');
+
+                    $importeTotal += number_format($importeAux, 4, '.', '');
+                    $descuentoTotal += number_format($descuentoAux, 4, '.', '');
+
                     $OrdenTrabajoDetalle=new OrdenTrabajoDetalle;
                     $OrdenTrabajoDetalle->Orden = $orden;
                     $OrdenTrabajoDetalle->Cliente = $request->numeroclientefacturaa;
@@ -719,18 +748,18 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     $OrdenTrabajoDetalle->Unidad = $request->unidadpartidad [$key];
                     $OrdenTrabajoDetalle->Cantidad =  $request->cantidadpartida  [$key];
                     $OrdenTrabajoDetalle->Precio =  $request->preciopartida [$key];
-                    $OrdenTrabajoDetalle->Importe = $request->importepartida [$key];
+                    $OrdenTrabajoDetalle->Importe = number_format($importeAux, 4, '.', '');
                     $OrdenTrabajoDetalle->Dcto = $request->descuentoporcentajepartida [$key];
-                    $OrdenTrabajoDetalle->Descuento = $request->descuentopesospartida [$key];
-                    $OrdenTrabajoDetalle->SubTotal = $request->subtotalpartida [$key];
+                    $OrdenTrabajoDetalle->Descuento = number_format($descuentoAux, 4, '.', '');
+                    $OrdenTrabajoDetalle->SubTotal = number_format($subtotalAux,4, '.','');
                     $OrdenTrabajoDetalle->Impuesto = $request->ivaporcentajepartida [$key];
-                    $OrdenTrabajoDetalle->Iva = $request->ivapesospartida [$key];
-                    $OrdenTrabajoDetalle->Total = $request->totalpesospartida [$key];
+                    $OrdenTrabajoDetalle->Iva = number_format($ivaAux, 4, '.','');
+                    $OrdenTrabajoDetalle->Total = number_format($totalAux,4, '.','');
                     $OrdenTrabajoDetalle->Costo = $request->costopartida [$key];
                     $OrdenTrabajoDetalle->CostoTotal = $request->costototalpartida [$key];
                     $OrdenTrabajoDetalle->Com = $request->comisionporcentajepartida [$key];
                     $OrdenTrabajoDetalle->Comision = $request->comisionpesospartida [$key];
-                    $OrdenTrabajoDetalle->Utilidad = $request->utilidadpartida [$key];
+                    $OrdenTrabajoDetalle->Utilidad = number_format($subtotalAux, 4, '.','');
                     $OrdenTrabajoDetalle->Departamento = $request->departamentopartida [$key];
                     $OrdenTrabajoDetalle->Cargo = $request->cargopartida [$key];
                     $OrdenTrabajoDetalle->Traspaso = $request->traspasopartida [$key];
@@ -752,9 +781,29 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     $OrdenTrabajoDetalle->Partida = $request->partidapartida [$key];
                     $OrdenTrabajoDetalle->save();
                 }
-            } 
+            }
+            $subtotalTotal = number_format($importeTotal,4, '.','') - number_format($descuentoTotal,4, '.','');
+            $ivaTotal = number_format($subtotalTotal,4, '.','') * 0.16;
+            $totalTotal = number_format($subtotalTotal,4, '.','') + number_format($ivaTotal, 4,'.','');
+
+            $OrdenTrabajo->Importe= number_format($importeTotal,4, '.','');
+            $OrdenTrabajo->Descuento = number_format($descuentoTotal,4, '.','');
+            $OrdenTrabajo->SubTotal = number_format($subtotalTotal,4, '.','');
+            $OrdenTrabajo->Iva= number_format($ivaTotal,4, '.','');
+            $OrdenTrabajo->Total= number_format($totalTotal,4, '.','');
+            $OrdenTrabajo->save();
+            $OrdenTrabajo->update();
+
+            OrdenTrabajo::where('Orden', $idOrden)
+            ->update([
+                'Importe' => number_format($importeTotal,4, '.',''),
+                'Descuento' => number_format($descuentoTotal,4, '.',''),
+                'SubTotal' => number_format($subtotalTotal,4, '.',''),
+                'Iva' => number_format($ivaTotal,4, '.',''),
+                'Total' =>  number_format($totalTotal,4, '.','')
+            ]);
         }
-    	return response()->json($OrdenTrabajo); 
+    	return response()->json($OrdenTrabajo);
     }
     //obtener orden de trabajo
     public function ordenes_trabajo_obtener_orden_trabajo(Request $request){
@@ -770,7 +819,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                 $selecttipoordentrabajo = $selecttipoordentrabajo.'<option selected value='.$tot->Nombre.'>'.$tot->Nombre.'</option>';
             }else{
                 $selecttipoordentrabajo = $selecttipoordentrabajo.'<option value='.$tot->Nombre.'>'.$tot->Nombre.'</option>';
-            }    
+            }
         }
         //tipo unidad seleccionada
         $tipos_unidades= TipoUnidad::where('STATUS', 'ALTA')->get();
@@ -780,11 +829,11 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                 $selecttipounidad = $selecttipounidad.'<option selected value='.$tu->Nombre.'>'.$tu->Nombre.'</option>';
             }else{
                 $selecttipounidad = $selecttipounidad.'<option value='.$tu->Nombre.'>'.$tu->Nombre.'</option>';
-            }    
+            }
         }
         //modificacion permitida
         if($ordentrabajo->Status == 'ABIERTA'){
-            //$readonly = ''; 
+            //$readonly = '';
         }else{
             //$readonly = 'readonly="readonly"';
         }
@@ -798,14 +847,14 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         if(sizeof($ultimapartida) == 0 || sizeof($ultimapartida) == "" || sizeof($ultimapartida) == null){
             $partida = 1;
         }else{
-            $partida = $ultimapartida[0]->Partida+1;   
+            $partida = $ultimapartida[0]->Partida+1;
         }
         //item
         $ultimoitem = OrdenTrabajoDetalle::select("Item")->where('Orden', $request->ordenmodificar)->where('Traspaso', NULL)->where('Compra', NULL)->orderBy("Item", "DESC")->take(1)->get();
         if(sizeof($ultimoitem) == 0 || sizeof($ultimoitem) == "" || sizeof($ultimoitem) == null){
             $item = 1;
         }else{
-            $item = $ultimoitem[0]->Item+1;   
+            $item = $ultimoitem[0]->Item+1;
         }
         $tipo = "modificacion";
         //detalles orden trabajo
@@ -863,7 +912,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     $readonly = 'readonly="readonly"';
                     $solicitartecnico = '';
                 }
-                $filasdetallesordentrabajo=$filasdetallesordentrabajo. 
+                $filasdetallesordentrabajo=$filasdetallesordentrabajo.
                 '<tr class="filasservicios" id="filaservicio'.$contadorservicios.'">'.
                     '<td class="tdmod"><div class="divorinputmodmd">'.
                     $botoneliminarfila.
@@ -917,7 +966,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             }
         }else{
             $filasdetallesordentrabajo = '';
-        }  
+        }
         //permitir o no modificar registro
         if(Auth::user()->role_id == 1){
             if($ordentrabajo->Status != 'ABIERTA'){
@@ -932,7 +981,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             }else{
                 $modificacionpermitida = 1;
             }
-        } 
+        }
         $data = array(
             "ordentrabajo" => $ordentrabajo,
             "filasdetallesordentrabajo" => $filasdetallesordentrabajo,
@@ -1032,10 +1081,10 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                 array_push($array_detalles_antes_de_modificar, $dotadm->Orden.'#'.$dotadm->Codigo.'#'.$dotadm->Partida);
             }
             $array_detalles_despues_de_modificar = [];
-            foreach ($request->codigopartida as $key => $codigopartida){   
+            foreach ($request->codigopartida as $key => $codigopartida){
                 if($request->tipofila [$key] == 'consultado'){
                     array_push($array_detalles_despues_de_modificar, $orden.'#'.$codigopartida.'#'.$request->partidapartida [$key]);
-                }  
+                }
             }
             $diferencias = array_diff($array_detalles_antes_de_modificar, $array_detalles_despues_de_modificar);
             foreach($diferencias as $d){
@@ -1044,7 +1093,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                 $EliminaDetalle = OrdenTrabajoDetalle::where('Orden', $explode_d[0])->where('Codigo', $explode_d[1])->where('Partida', $explode_d[2])->forceDelete();
             }
             //modificar partidas que no se eliminaron
-            foreach ($request->codigopartida as $key => $codigopartida){   
+            foreach ($request->codigopartida as $key => $codigopartida){
                 if($request->tipofila [$key] == 'consultado'){
                     OrdenTrabajoDetalle::where('Orden', $orden)
                     ->where('Partida', $request->partidapartida [$key])
@@ -1135,11 +1184,11 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     $OrdenTrabajoDetalle->Almacen = $request->almacenpartida [$key];
                     $OrdenTrabajoDetalle->Cotizacion = $request->cotizacionpartida [$key];
                     $OrdenTrabajoDetalle->Partida = $request->partidapartida [$key];
-                    $OrdenTrabajoDetalle->save();                    
-                }          
+                    $OrdenTrabajoDetalle->save();
+                }
             }
         }
-    	return response()->json($OrdenTrabajo);         
+    	return response()->json($OrdenTrabajo);
     }
 
     //obtener datos generales orden
@@ -1222,7 +1271,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             'cliente' => $cliente,
             "fecha" => Helpers::formatoinputdatetime($ordentrabajo->Fecha)
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //terminar orden de trabajo
@@ -1246,13 +1295,13 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         $BitacoraDocumento->Usuario = Auth::user()->user;
         $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
-        return response()->json($OrdenTrabajo);  
+        return response()->json($OrdenTrabajo);
     }
 
     //verificar status del registro
     public function ordenes_trabajo_verificar_abrir_nuevamente_orden(Request $request){
         $ordentrabajo = OrdenTrabajo::where('Orden', $request->ordenabrir)->first();
-        return response()->json($ordentrabajo); 
+        return response()->json($ordentrabajo);
     }
 
     //abrir nuevamente orden de trabajo
@@ -1272,7 +1321,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         $BitacoraDocumento->Usuario = Auth::user()->user;
         $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
-        return response()->json($OrdenTrabajo);  
+        return response()->json($OrdenTrabajo);
     }
 
     //buscar folio on key up
@@ -1286,7 +1335,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     return $total;
                 })
                 ->make(true);
-        } 
+        }
     }
     //generacion de formato en PDF
     public function ordenes_trabajo_generar_pdfs(Request $request){
@@ -1295,11 +1344,11 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         //primero eliminar todos los archivos zip
         Helpers::eliminararchivoszipgenerados();
         if($request->imprimirdirectamente == 1){
-            $ordenestrabajo = OrdenTrabajo::where('Orden', $request->arraypdf)->get(); 
+            $ordenestrabajo = OrdenTrabajo::where('Orden', $request->arraypdf)->get();
         }else{
             $tipogeneracionpdf = $request->tipogeneracionpdf;
             if($tipogeneracionpdf == 0){
-                $ordenestrabajo = OrdenTrabajo::whereIn('Orden', $request->arraypdf)->orderBy('Folio', 'ASC')->take(500)->get(); 
+                $ordenestrabajo = OrdenTrabajo::whereIn('Orden', $request->arraypdf)->orderBy('Folio', 'ASC')->take(500)->get();
             }else{
                 $fechainiciopdf = date($request->fechainiciopdf);
                 $fechaterminacionpdf = date($request->fechaterminacionpdf);
@@ -1328,7 +1377,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($otd->SubTotal),
                     "totaldetalle" => Helpers::convertirvalorcorrecto($otd->Total)
                 );
-            } 
+            }
             $cliente = Cliente::where('Numero', $ot->Cliente)->first();
             $data[]=array(
                     "ordentrabajo"=>$ot,
@@ -1385,8 +1434,8 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     // Agregar archivos que se comprimiran
                     foreach($arrayfilespdf as $afp) {
                         $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
-                    }     
-                    //terminar proceso   
+                    }
+                    //terminar proceso
                     $zip->close();
                 }
                 // Set Encabezados para descargar
@@ -1404,7 +1453,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
 
     //generacion de formato en PDF
     public function ordenes_trabajo_generar_pdfs_indiv($documento){
-        $ordenestrabajo = OrdenTrabajo::where('Orden', $documento)->get(); 
+        $ordenestrabajo = OrdenTrabajo::where('Orden', $documento)->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($ordenestrabajo as $ot){
@@ -1422,7 +1471,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($otd->SubTotal),
                     "totaldetalle" => Helpers::convertirvalorcorrecto($otd->Total)
                 );
-            } 
+            }
             $cliente = Cliente::where('Numero', $ot->Cliente)->first();
             $data[]=array(
                     "ordentrabajo"=>$ot,
@@ -1477,7 +1526,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
 
     //enviar pdf por emial
     public function ordenes_trabajo_enviar_pdfs_email(Request $request){
-        $ordenestrabajo = OrdenTrabajo::where('Orden', $request->emaildocumento)->get(); 
+        $ordenestrabajo = OrdenTrabajo::where('Orden', $request->emaildocumento)->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($ordenestrabajo as $ot){
@@ -1495,7 +1544,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($otd->SubTotal),
                     "totaldetalle" => Helpers::convertirvalorcorrecto($otd->Total)
                 );
-            } 
+            }
             $cliente = Cliente::where('Numero', $ot->Cliente)->first();
             $data[]=array(
                     "ordentrabajo"=>$ot,
@@ -1522,7 +1571,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         ->setOption('margin-bottom', 10);
         try{
             $datosdocumento = OrdenTrabajo::where('Orden', $request->emaildocumento)->first();
-            //enviar correo electrónico	
+            //enviar correo electrónico
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
             $arraycc = array();
@@ -1570,9 +1619,9 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('OrdenesDeTrabajo', Auth::user()->id);
-        return Excel::download(new OrdenesDeTrabajoExport($configuraciones_tabla['campos_consulta'],$request->periodo), "ordenesdetrabajo-".$request->periodo.".xlsx");   
-    }  
-    //configuracion tabla  
+        return Excel::download(new OrdenesDeTrabajoExport($configuraciones_tabla['campos_consulta'],$request->periodo), "ordenesdetrabajo-".$request->periodo.".xlsx");
+    }
+    //configuracion tabla
     public function ordenes_trabajo_guardar_configuracion_tabla(Request $request){
         if($request->string_datos_tabla_false == null){
             $string_datos_tabla_false = "todos los campos fueron seleccionados";
