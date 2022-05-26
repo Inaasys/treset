@@ -1813,7 +1813,6 @@ class FacturaController extends ConfiguracionSistemaController{
 
     //alta
     public function facturas_guardar(Request $request){
-        dd($request->all());
         ini_set('max_input_vars','20000' );
         //obtener el ultimo id de la tabla
         $folio = Helpers::ultimofolioserietablamodulos('App\Factura', $request->serie);
