@@ -17,14 +17,14 @@ function retrasoremisionesseleccionadas(){
 function asignarfechaactual(){
   $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechas){
     $("#fecha").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
-  }) 
+  })
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
   var serie = $("#serie").val();
   $.get(facturas_obtener_ultimo_folio, {serie:serie}, function(folio){
     $("#folio").val(folio);
-  })  
+  })
 }
 //obtener tipos ordenes de compra
 function obtenertiposordenescompra(defaultvalue){
@@ -34,13 +34,13 @@ function obtenertiposordenescompra(defaultvalue){
       $("#tipo").val(defaultvalue).change();
       $("#tipo").select2();
     }
-  })  
+  })
 }
 //obtener tipos de unidades
 function obtenertiposunidades(){
   $.get(facturas_obtener_tipos_unidades, function(select_tipos_unidades){
     $("#tipounidad").html(select_tipos_unidades);
-  }) 
+  })
 }
 //cerrar modales
 function limpiarmodales(){
@@ -69,7 +69,7 @@ function mostrarmodalformulario(tipo, modificacionpermitida){
           $("#btnGuardar").hide();
           $("#btnGuardarModificacion").show();
         }
-    }   
+    }
 }
 //ocultar modal formulario
 function ocultarmodalformulario(){
@@ -112,7 +112,7 @@ function listar(){
   //agregar inputs de busqueda por columna
   $('#tbllistado tfoot th').each( function () {
     var titulocolumnatfoot = $(this).text();
-    var valor_encontrado_en_array = campos_busqueda.indexOf(titulocolumnatfoot); 
+    var valor_encontrado_en_array = campos_busqueda.indexOf(titulocolumnatfoot);
     if(valor_encontrado_en_array >= 0){
       $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
     }
@@ -124,7 +124,7 @@ function listar(){
     "lengthMenu": [ 100, 250, 500, 1000 ],
     "pageLength": 100,
     "sScrollX": "110%",
-    "sScrollY": "350px", 
+    "sScrollY": "350px",
     processing: true,
     'language': {
         'loadingRecords': '&nbsp;',
@@ -150,10 +150,10 @@ function listar(){
         $("#sumatotalfiltrado").html(number_format(round(data.json.sumatotal, numerodecimales), numerodecimales, '.', ''));
         $("#sumaabonosfiltrado").html(number_format(round(data.json.sumaabonos, numerodecimales), numerodecimales, '.', ''));
         $("#sumadescuentosfiltrado").html(number_format(round(data.json.sumadescuentos, numerodecimales), numerodecimales, '.', ''));
-        $("#sumasaldofiltrado").html(number_format(round(data.json.sumasaldo, numerodecimales), numerodecimales, '.', '')); 
+        $("#sumasaldofiltrado").html(number_format(round(data.json.sumasaldo, numerodecimales), numerodecimales, '.', ''));
         $("#sumacostofiltrado").html(number_format(round(data.json.sumacosto, numerodecimales), numerodecimales, '.', ''));
         $("#sumacomisionfiltrado").html(number_format(round(data.json.sumacomision, numerodecimales), numerodecimales, '.', ''));
-        $("#sumautilidadfiltrado").html(number_format(round(data.json.sumautilidad, numerodecimales), numerodecimales, '.', '')); 
+        $("#sumautilidadfiltrado").html(number_format(round(data.json.sumautilidad, numerodecimales), numerodecimales, '.', ''));
     },
     initComplete: function () {
       // Aplicar busquedas por columna
@@ -171,7 +171,7 @@ function listar(){
       $buscar.bind('keyup change', function(e) {
           if(e.keyCode == 13 || this.value == "") {
             $('#tbllistado').DataTable().search( this.value ).draw();
-            $(".inputbusquedageneral").val(""); 
+            $(".inputbusquedageneral").val("");
           }
       });
       //tooltip mensajes
@@ -209,7 +209,7 @@ $("#btnenviarpartidasexcel").on('click', function(e){
   var partidasexcel = $('#partidasexcel')[0].files[0];
   var numeroalmacen = 1;
   var form_data = new FormData();
-  form_data.append('partidasexcel', partidasexcel);  
+  form_data.append('partidasexcel', partidasexcel);
   form_data.append('numeroalmacen', numeroalmacen);
   form_data.append('contadorproductos', contadorproductos);
   form_data.append('contadorfilas', contadorfilas);
@@ -235,16 +235,16 @@ $("#btnenviarpartidasexcel").on('click', function(e){
       $(".inputnextdet").keyup(function (e) {
         //recomentable para mayor compatibilidad entre navegadores.
         var code = (e.keyCode ? e.keyCode : e.which);
-        var index = $(this).index(".inputnextdet");          
+        var index = $(this).index(".inputnextdet");
         switch(code){
           case 13:
-            //$(".inputnextdet").eq(index + 1).focus().select(); 
+            //$(".inputnextdet").eq(index + 1).focus().select();
             break;
           case 39:
-            $(".inputnextdet").eq(index + 1).focus().select(); 
+            $(".inputnextdet").eq(index + 1).focus().select();
             break;
           case 37:
-            $(".inputnextdet").eq(index - 1).focus().select(); 
+            $(".inputnextdet").eq(index - 1).focus().select();
             break;
         }
       });
@@ -252,7 +252,7 @@ $("#btnenviarpartidasexcel").on('click', function(e){
     error: function (data) {
       console.log(data);
     }
-  });                      
+  });
 });
 //obtener registros de proveedores
 function obtenerclientes(){
@@ -280,7 +280,7 @@ function obtenerclientes(){
                                       '<tbody></tbody>'+
                                   '</table>'+
                               '</div>'+
-                          '</div>'+   
+                          '</div>'+
                       '</div>'+
                     '</div>'+
                     '<div class="modal-footer">'+
@@ -293,7 +293,7 @@ function obtenerclientes(){
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
-        "bScrollCollapse": true,  
+        "bScrollCollapse": true,
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -323,29 +323,29 @@ function obtenerclientes(){
                 }
             });
         },
-    }); 
+    });
     //seleccionar registro al dar doble click
     $('#tbllistadocliente tbody').on('dblclick', 'tr', function () {
         var data = tcli.row( this ).data();
         seleccionarcliente(data.Numero, data.Nombre, data.Plazo, data.Rfc, data.ClaveFormaPago, data.NombreFormaPago, data.ClaveMetodoPago, data.NombreMetodoPago, data.ClaveUsoCfdi, data.NombreUsoCfdi, "", "", data.Agente, data.Credito, data.Saldo, data.ClaveRegimenFiscal, data.RegimenFiscal);
-    }); 
-} 
+    });
+}
 //seleccionar cliente
 function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapago, clavemetodopago, metodopago, claveusocfdi, usocfdi, claveresidenciafiscal, residenciafiscal,NumeroAgente,CreditoCliente,SaldoCliente, claveregimenfiscalreceptor, regimenfiscalreceptor){
   var numeroclienteanterior = $("#numeroclienteanterior").val();
   var numerocliente = Numero;
-  if(numeroclienteanterior != numerocliente){  
+  if(numeroclienteanterior != numerocliente){
     var numerofilas = $("#numerofilas").val()
     if(parseInt(numerofilas) > 0){
-      var confirmacion = confirm("Esta seguro de cambiar el cliente, esto eliminara las partidas agregadas (Remisiones ó Servicios)?"); 
+      var confirmacion = confirm("Esta seguro de cambiar el cliente, esto eliminara las partidas agregadas (Remisiones ó Servicios)?");
     }else{
       var confirmacion = true;
     }
-    if (confirmacion == true) { 
-      //validar si el RFC del cliente es igual al de la empresa si es asi la seria de la factura debe ser con el depto INTERNA 
+    if (confirmacion == true) {
+      //validar si el RFC del cliente es igual al de la empresa si es asi la seria de la factura debe ser con el depto INTERNA
       var emisorrfc = $("#emisorrfc").val();
       if(emisorrfc == Rfc){
-        var confirmacionrfcigual = confirm("El cliente seleccionado tiene el mismo RFC que el emisor de la FACTURA por lo tanto la serie debe ser INTERNA esta seguro de seguir con los cambios?"); 
+        var confirmacionrfcigual = confirm("El cliente seleccionado tiene el mismo RFC que el emisor de la FACTURA por lo tanto la serie debe ser INTERNA esta seguro de seguir con los cambios?");
       }
       if(confirmacionrfcigual == true){
           $.get(facturas_obtener_serie_interna, function(datos){
@@ -367,7 +367,7 @@ function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapag
             contadorproductos = 0;
             contadorfilas = 0;
             partida = 1;
-          }) 
+          })
       }
         $("#tabladetallesfactura tbody").html("");
         $("#numerocliente").val(Numero);
@@ -432,7 +432,7 @@ function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapag
         $("#claveregimenfiscalreceptoranterior").val(claveregimenfiscalreceptor);
         $("#regimenfiscalreceptor").val(regimenfiscalreceptor);
         if(regimenfiscalreceptor != null){
-            $("#textonombreregimenfiscalreceptor").html(regimenfiscalreceptor.substring(0, 40));            
+            $("#textonombreregimenfiscalreceptor").html(regimenfiscalreceptor.substring(0, 40));
         }
         //datos agente
         $.get(facturas_obtener_datos_agente, {NumeroAgente:NumeroAgente}, function(Agente){
@@ -443,7 +443,7 @@ function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapag
           if(Agente.Nombre != null){
             $("#textonombreagente").html(Agente.Nombre.substring(0, 40));
           }
-        }) 
+        })
         //comprobar si mostrar botones
         var Depto = $("#depto").val();
         comprobartiposerie(Depto);
@@ -483,7 +483,7 @@ function obteneragentes(){
                                             '<tbody></tbody>'+
                                         '</table>'+
                                     '</div>'+
-                                '</div>'+   
+                                '</div>'+
                             '</div>'+
                         '</div>'+
                         '<div class="modal-footer">'+
@@ -496,7 +496,7 @@ function obteneragentes(){
           "pageLength": 250,
           "sScrollX": "110%",
           "sScrollY": "370px",
-          "bScrollCollapse": true,  
+          "bScrollCollapse": true,
           processing: true,
           'language': {
               'loadingRecords': '&nbsp;',
@@ -522,13 +522,13 @@ function obteneragentes(){
                   }
               });
           },
-      });  
+      });
       //seleccionar registro al dar doble click
       $('#tbllistadoagente tbody').on('dblclick', 'tr', function () {
           var data = tagen.row( this ).data();
           seleccionaragente(data.Numero, data.Nombre, data.Rfc);
-      }); 
-} 
+      });
+}
 //seleccionar almacen
 function seleccionaragente(Numero, Nombre, Rfc){
   var numeroagenteanterior = $("#numeroagenteanterior").val();
@@ -566,12 +566,12 @@ function obtenerlugaresexpedicion(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                              '</div>';  
+                              '</div>';
   $("#contenidomodaltablas").html(tablacodigospostales);
   var tcodpost = $('#tbllistadocodigopostal').DataTable({
       keys: true,
@@ -579,7 +579,7 @@ function obtenerlugaresexpedicion(){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -607,14 +607,14 @@ function obtenerlugaresexpedicion(){
               $('#tbllistadocodigopostal').DataTable().search( this.value ).draw();
             }
         });
-      }, 
-  }); 
+      },
+  });
   //seleccionar registro al dar doble click
   $('#tbllistadocodigopostal tbody').on('dblclick', 'tr', function () {
       var data = tcodpost.row( this ).data();
       seleccionarlugarexpedicion(data.Clave, data.Estado);
-  }); 
-} 
+  });
+}
 //seleccionar lugar expedicion
 function seleccionarlugarexpedicion(Clave, Estado){
   var lugarexpedicionanterior = $("#lugarexpedicionanterior").val();
@@ -649,12 +649,12 @@ function obtenerregimenesfiscales(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                              '</div>';  
+                              '</div>';
   $("#contenidomodaltablas").html(tablaregimenesfiscales);
   var tregfis = $('#tbllistadoregimenfiscal').DataTable({
       keys: true,
@@ -662,7 +662,7 @@ function obtenerregimenesfiscales(){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -688,14 +688,14 @@ function obtenerregimenesfiscales(){
               $('#tbllistadoregimenfiscal').DataTable().search( this.value ).draw();
             }
         });
-      }, 
+      },
   });
   //seleccionar registro al dar doble click
   $('#tbllistadoregimenfiscal tbody').on('dblclick', 'tr', function () {
       var data = tregfis.row( this ).data();
       seleccionarregimenfiscal(data.Clave, data.Nombre);
-  }); 
-} 
+  });
+}
 //seleccionar lugar expedicion
 function seleccionarregimenfiscal(Clave, Nombre){
   var claveregimenfiscalanterior = $("#claveregimenfiscalanterior").val();
@@ -731,12 +731,12 @@ function obtenertiposrelaciones(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                              '</div>';  
+                              '</div>';
   $("#contenidomodaltablas").html(tablatiposrelaciones);
   var ttiprel = $('#tbllistadotiporelacion').DataTable({
       keys: true,
@@ -744,7 +744,7 @@ function obtenertiposrelaciones(){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -774,15 +774,15 @@ function obtenertiposrelaciones(){
   $('#tbllistadotiporelacion tbody').on('dblclick', 'tr', function () {
       var data = ttiprel.row( this ).data();
       seleccionartiporelacion(data.Clave, data.Nombre);
-  }); 
-} 
+  });
+}
 //seleccionar lugar expedicion
 function seleccionartiporelacion(Clave, Nombre){
   var clavetiporelacionanterior = $("#clavetiporelacionanterior").val();
   var clavetiporelacion = Clave;
   if(clavetiporelacionanterior != clavetiporelacion){
     $("#clavetiporelacion").val(Clave);
-    $("#clavetiporelacionanterior").val(Clave);  
+    $("#clavetiporelacionanterior").val(Clave);
     $("#tiporelacion").val(Nombre);
     if(Nombre != null){
       $("#textonombretiporelacion").html(Nombre.substring(0, 40));
@@ -812,12 +812,12 @@ function obtenerformaspago(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                              '</div>';  
+                              '</div>';
   $("#contenidomodaltablas").html(tablaformaspago);
   var tforpag = $('#tbllistadoformapago').DataTable({
       keys: true,
@@ -825,7 +825,7 @@ function obtenerformaspago(){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -850,14 +850,14 @@ function obtenerformaspago(){
               $('#tbllistadoformapago').DataTable().search( this.value ).draw();
             }
         });
-      }, 
+      },
   });
   //seleccionar registro al dar doble click
   $('#tbllistadoformapago tbody').on('dblclick', 'tr', function () {
       var data = tforpag.row( this ).data();
       seleccionarformapago(data.Clave, data.Nombre);
-  }); 
-} 
+  });
+}
 //seleccionar forma pago
 function seleccionarformapago(Clave, Nombre){
   var claveformapagoanterior = $("#claveformapagoanterior").val();
@@ -868,7 +868,7 @@ function seleccionarformapago(Clave, Nombre){
     $("#formapago").val(Nombre);
     if(Nombre != null){
       $("#textonombreformapago").html(Nombre.substring(0, 40));
-    }    
+    }
     if(Clave == '99'){
       seleccionarmetodopago('PPD','Pago en parcialidades o diferido');
     }else{
@@ -898,12 +898,12 @@ function obtenermetodospago(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                              '</div>';  
+                              '</div>';
   $("#contenidomodaltablas").html(tablametodospago);
   var tmetpag = $('#tbllistadometodopago').DataTable({
       keys: true,
@@ -911,7 +911,7 @@ function obtenermetodospago(){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -935,14 +935,14 @@ function obtenermetodospago(){
               $('#tbllistadometodopago').DataTable().search( this.value ).draw();
             }
         });
-      }, 
+      },
   });
   //seleccionar registro al dar doble click
   $('#tbllistadometodopago tbody').on('dblclick', 'tr', function () {
       var data = tmetpag.row( this ).data();
       seleccionarmetodopago(data.Clave, data.Nombre);
-  }); 
-} 
+  });
+}
 //seleccionar metodo pago
 function seleccionarmetodopago(Clave, Nombre){
   var clavemetodopagoanterior = $("#clavemetodopagoanterior").val();
@@ -980,12 +980,12 @@ function obtenerusoscfdi(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                              '</div>';  
+                              '</div>';
   $("#contenidomodaltablas").html(tablausoscfdi);
   var tusocfdi = $('#tbllistadousocfdi').DataTable({
       keys: true,
@@ -993,7 +993,7 @@ function obtenerusoscfdi(){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -1019,14 +1019,14 @@ function obtenerusoscfdi(){
               $('#tbllistadousocfdi').DataTable().search( this.value ).draw();
             }
         });
-      }, 
+      },
   });
   //seleccionar registro al dar doble click
   $('#tbllistadousocfdi tbody').on('dblclick', 'tr', function () {
       var data = tusocfdi.row( this ).data();
       seleccionarusocfdi(data.Clave, data.Nombre);
-  }); 
-} 
+  });
+}
 //seleccionar uso cfdi
 function seleccionarusocfdi(Clave, Nombre){
   var claveusocfdianterior = $("#claveusocfdianterior").val();
@@ -1062,12 +1062,12 @@ function obtenerresidenciasfiscales(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                              '</div>';  
+                              '</div>';
   $("#contenidomodaltablas").html(tablaresidenciasfiscales);
   var tresfis = $('#tbllistadoresidencialfiscal').DataTable({
       keys: true,
@@ -1075,7 +1075,7 @@ function obtenerresidenciasfiscales(){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -1105,8 +1105,8 @@ function obtenerresidenciasfiscales(){
   $('#tbllistadoresidencialfiscal tbody').on('dblclick', 'tr', function () {
       var data = tresfis.row( this ).data();
       seleccionarresidenciafiscal(data.Clave, data.Nombre);
-  }); 
-} 
+  });
+}
 //seleccionar residencia fiscal
 function seleccionarresidenciafiscal(Clave, Nombre){
   var claveresidenciafiscalanterior = $("#claveresidenciafiscalanterior").val();
@@ -1143,12 +1143,12 @@ function obtenerfoliosfacturas(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                              '</div>';  
+                              '</div>';
   $("#contenidomodaltablas").html(tablafoliosfiscales);
   var tfolfis = $('#tbllistadofoliofiscal').DataTable({
       keys: true,
@@ -1156,7 +1156,7 @@ function obtenerfoliosfacturas(){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -1182,21 +1182,21 @@ function obtenerfoliosfacturas(){
             }
         });
       },
-  }); 
+  });
   //seleccionar registro al dar doble click
   $('#tbllistadofoliofiscal tbody').on('dblclick', 'tr', function () {
       var data = tfolfis.row( this ).data();
       seleccionarfoliofiscal(data.Serie, data.Esquema, data.Depto);
-  });  
+  });
 }
 function seleccionarfoliofiscal(Serie, Esquema, Depto){
   var numerofilas = $("#numerofilas").val()
   if(parseInt(numerofilas) > 0){
-    var confirmacion = confirm("Esta seguro de cambiar el folio fiscal, esto eliminara las partidas agregadas (Remisiones ó Servicios)?"); 
+    var confirmacion = confirm("Esta seguro de cambiar el folio fiscal, esto eliminara las partidas agregadas (Remisiones ó Servicios)?");
   }else{
     var confirmacion = true;
   }
-  if (confirmacion == true) { 
+  if (confirmacion == true) {
     $.get(facturas_obtener_ultimo_folio_serie_seleccionada, {Serie:Serie,Esquema:Esquema,Depto:Depto}, function(folio){
       $("#tabladetallesfactura tbody").html("");
       $("#folio").val(folio);
@@ -1217,7 +1217,7 @@ function seleccionarfoliofiscal(Serie, Esquema, Depto){
       contadorfilas = 0;
       partida = 1;
       mostrarformulario();
-    }) 
+    })
   }
 }
 //comprobar el tipo de serie para la factura
@@ -1279,15 +1279,15 @@ function listarremisiones(){
                                 '<tbody></tbody>'+
                               '</table>'+
                             '</div>'+
-                          '</div>'+   
+                          '</div>'+
                         '</div>'+
                         '<div class="row">'+
                           '<div class="col-md-6 col-md-offset-4">'+
-                          '</div>'+ 
+                          '</div>'+
                           '<div class="col-md-2">'+
                             '<label>Total $</label>'+
                             '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="totalafacturar" id="totalafacturar" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
-                          '</div>'+   
+                          '</div>'+
                         '</div>'+
                       '</div>'+
                       '<div class="modal-footer">'+
@@ -1304,7 +1304,7 @@ function listarremisiones(){
         //"paging":   false,
         "sScrollX": "110%",
         "sScrollY": "370px",
-        "bScrollCollapse": true,  
+        "bScrollCollapse": true,
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -1341,7 +1341,7 @@ function listarremisiones(){
         "iDisplayLength": 1000,
         "order": [[ 0, "desc" ]]
     });
-} 
+}
 //mostrar modal remisiones por numero de pedido
 function mostrarmodalnumeropedido(){
   $("#modalremisionesporpedido").modal('show');
@@ -1384,20 +1384,20 @@ function seleccionarremisionesporpedido(){
                                     '<tbody></tbody>'+
                                   '</table>'+
                                 '</div>'+
-                              '</div>'+   
+                              '</div>'+
                             '</div>'+
                             '<div class="row">'+
                               '<div class="col-md-6 col-md-offset-4">'+
-                              '</div>'+ 
+                              '</div>'+
                               '<div class="col-md-2">'+
                                 '<label>Total $</label>'+
                                 '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="totalafacturar" id="totalafacturar" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
-                              '</div>'+   
+                              '</div>'+
                             '</div>'+
                           '</div>'+
                           '<div class="modal-footer">'+
                             '<div type="button" class="btn btn-info btn-sm" onclick="mostrarmodalnumeropedido();">Seleccionar remisiones por número de pedido</div>'+
-                            '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+                        
+                            '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                             '<button type="button" class="btn btn-success btn-sm" onclick="cargarremisionesseleccionadas();">Cargar remisiones</button>'+
                           '</div>';
                           $("#contenidomodaltablas").html(tablaremisiones);
@@ -1407,7 +1407,7 @@ function seleccionarremisionesporpedido(){
                             //"paging":   false,
                             "sScrollX": "110%",
                             "sScrollY": "370px",
-                            "bScrollCollapse": true,  
+                            "bScrollCollapse": true,
                             processing: true,
                             'language': {
                               'loadingRecords': '&nbsp;',
@@ -1548,16 +1548,16 @@ async function seleccionarclienteremisionesseleccionadas(data){
   $(".inputnextdet").keyup(function (e) {
     //recomentable para mayor compatibilidad entre navegadores.
     var code = (e.keyCode ? e.keyCode : e.which);
-    var index = $(this).index(".inputnextdet");          
+    var index = $(this).index(".inputnextdet");
     switch(code){
       case 13:
-        //$(".inputnextdet").eq(index + 1).focus().select(); 
+        //$(".inputnextdet").eq(index + 1).focus().select();
         break;
       case 39:
-        $(".inputnextdet").eq(index + 1).focus().select(); 
+        $(".inputnextdet").eq(index + 1).focus().select();
         break;
       case 37:
-        $(".inputnextdet").eq(index - 1).focus().select(); 
+        $(".inputnextdet").eq(index - 1).focus().select();
         break;
     }
   });
@@ -1570,7 +1570,7 @@ async function seleccionarclienteremisionesseleccionadas(data){
       $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
   }
   $('.page-loader-wrapper').css('display', 'none');
-} 
+}
 //listar todas las facturas
 function listarordenes(){
   ocultarformulario();
@@ -1597,19 +1597,19 @@ function listarordenes(){
                                 '<tbody></tbody>'+
                               '</table>'+
                             '</div>'+
-                          '</div>'+   
+                          '</div>'+
                         '</div>'+
                         '<div class="row">'+
                           '<div class="col-md-6 col-md-offset-4">'+
-                          '</div>'+ 
+                          '</div>'+
                           '<div class="col-md-2">'+
                             '<label>Total $</label>'+
                             '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="totalafacturar" id="totalafacturar" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
-                          '</div>'+   
+                          '</div>'+
                         '</div>'+
                       '</div>'+
                       '<div class="modal-footer">'+
-                        '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+                       
+                        '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
                         '<button type="button" class="btn btn-success btn-sm" onclick="cargarserviciosseleccionadas();">Cargar servicios</button>'+
                       '</div>';
     $("#contenidomodaltablas").html(tablaordenes);
@@ -1619,7 +1619,7 @@ function listarordenes(){
         //"paging":   false,
         "sScrollX": "110%",
         "sScrollY": "370px",
-        "bScrollCollapse": true,  
+        "bScrollCollapse": true,
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -1656,7 +1656,7 @@ function listarordenes(){
         "iDisplayLength": 1000,
         "order": [[ 0, "desc" ]]
     });
-} 
+}
 //construir array ordenes seleccionadas
 var arrayordenesseleccionadas = new Array();
 function construirarrayordenesseleccionadas(Orden){
@@ -1735,16 +1735,16 @@ function cargarserviciosseleccionadas(){
     $(".inputnextdet").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      var index = $(this).index(".inputnextdet");          
+      var index = $(this).index(".inputnextdet");
       switch(code){
         case 13:
-          //$(".inputnextdet").eq(index + 1).focus().select(); 
+          //$(".inputnextdet").eq(index + 1).focus().select();
           break;
         case 39:
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+          $(".inputnextdet").eq(index + 1).focus().select();
           break;
         case 37:
-          $(".inputnextdet").eq(index - 1).focus().select(); 
+          $(".inputnextdet").eq(index - 1).focus().select();
           break;
       }
     });
@@ -1793,8 +1793,8 @@ function obtenerclientepornumero(){
     if($("#numerocliente").parsley().isValid()){
       $.get(facturas_obtener_cliente_por_numero, {numerocliente:numerocliente}, function(data){
           var confirmacion = true;
-          if (confirmacion == true) { 
-              //validar si el RFC del cliente es igual al de la empresa si es asi la seria de la factura debe ser con el depto INTERNA 
+          if (confirmacion == true) {
+              //validar si el RFC del cliente es igual al de la empresa si es asi la seria de la factura debe ser con el depto INTERNA
               var emisorrfc = $("#emisorrfc").val();
               if(emisorrfc == data.rfc){
                   $.get(facturas_obtener_serie_interna, function(datos){
@@ -1804,7 +1804,7 @@ function obtenerclientepornumero(){
                     $("#depto").val(datos.Depto);
                     $("#serietexto").html("Serie: "+datos.Serie);
                     $("#esquematexto").html("Esquema: "+datos.Esquema);
-                  }) 
+                  })
               }
             $("#tabladetallesfactura tbody").html("");
             $("#numerocliente").val(data.numero);
@@ -1869,7 +1869,7 @@ function obtenerclientepornumero(){
             $("#claveregimenfiscalreceptoranterior").val(data.claveregimenfiscalreceptor);
             $("#regimenfiscalreceptor").val(data.regimenfiscalreceptor);
             if(data.regimenfiscalreceptor != null){
-                $("#textonombreregimenfiscalreceptor").html(data.regimenfiscalreceptor.substring(0, 40));            
+                $("#textonombreregimenfiscalreceptor").html(data.regimenfiscalreceptor.substring(0, 40));
             }
             //datos agente
             $("#numeroagente").val(data.numeroagente);
@@ -1894,7 +1894,7 @@ function obtenerclientepornumero(){
             partida = 1;
             mostrarformulario();
           }
-      }) 
+      })
     }
   }
 }
@@ -1906,18 +1906,11 @@ function obtenerclienteremisionesseleccionadas(){
     if($("#numerocliente").parsley().isValid()){
       $.get(facturas_obtener_cliente_por_numero, {numerocliente:numerocliente}, function(data){
           var confirmacion = true;
-          if (confirmacion == true) { 
-              //validar si el RFC del cliente es igual al de la empresa si es asi la seria de la factura debe ser con el depto INTERNA 
+          if (confirmacion == true) {
+              //validar si el RFC del cliente es igual al de la empresa si es asi la seria de la factura debe ser con el depto INTERNA
               var emisorrfc = $("#emisorrfc").val();
               if(emisorrfc == data.rfc){
-                  $.get(facturas_obtener_serie_interna, function(datos){
-                    $("#folio").val(datos.Folio);
-                    $("#serie").val(datos.Serie);
-                    $("#esquema").val(datos.Esquema);
-                    $("#depto").val(datos.Depto);
-                    $("#serietexto").html("Serie: "+datos.Serie);
-                    $("#esquematexto").html("Esquema: "+datos.Esquema);
-                  }) 
+
               }
             $("#numerocliente").val(data.numero);
             $("#numeroclienteanterior").val(data.numero);
@@ -1970,7 +1963,7 @@ function obtenerclienteremisionesseleccionadas(){
             comprobartiposerie(Depto);
             mostrarformulario();
           }
-      }) 
+      })
     }
   }
 }
@@ -1982,8 +1975,8 @@ function obtenerclienteserviciosseleccionados(){
     if($("#numerocliente").parsley().isValid()){
       $.get(facturas_obtener_cliente_por_numero, {numerocliente:numerocliente}, function(data){
           var confirmacion = true;
-          if (confirmacion == true) { 
-              //validar si el RFC del cliente es igual al de la empresa si es asi la seria de la factura debe ser con el depto INTERNA 
+          if (confirmacion == true) {
+              //validar si el RFC del cliente es igual al de la empresa si es asi la seria de la factura debe ser con el depto INTERNA
               var emisorrfc = $("#emisorrfc").val();
               if(emisorrfc == data.rfc){
                   $.get(facturas_obtener_serie_interna, function(datos){
@@ -1993,7 +1986,7 @@ function obtenerclienteserviciosseleccionados(){
                     $("#depto").val(datos.Depto);
                     $("#serietexto").html("Serie: "+datos.Serie);
                     $("#esquematexto").html("Esquema: "+datos.Esquema);
-                  }) 
+                  })
               }
             $("#numerocliente").val(data.numero);
             $("#numeroclienteanterior").val(data.numero);
@@ -2046,7 +2039,7 @@ function obtenerclienteserviciosseleccionados(){
             comprobartiposerie(Depto);
             mostrarformulario();
           }
-      }) 
+      })
     }
   }
 }
@@ -2070,7 +2063,7 @@ function obteneragentepornumero(){
             $("#textonombreagente").html(data.nombre.substring(0, 40));
           }
           mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -2092,7 +2085,7 @@ function obtenerlugarexpedicionporclave(){
           $("#textonombrelugarexpedicion").html(data.estado.substring(0, 40));
         }
         mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -2115,7 +2108,7 @@ function obtenerregimenfiscalporclave(){
           $("#textonombreregimenfiscal").html(data.nombre.substring(0, 40));
         }
         mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -2132,13 +2125,13 @@ function obtenertiporelacionporclave(){
     if($("#clavetiporelacion").parsley().isValid()){
       $.get(facturas_obtener_tipo_relacion_por_clave, {clavetiporelacion:clavetiporelacion}, function(data){
         $("#clavetiporelacion").val(data.clave);
-        $("#clavetiporelacionanterior").val(data.clave);  
+        $("#clavetiporelacionanterior").val(data.clave);
         $("#tiporelacion").val(data.nombre);
         if(data.nombre != null){
           $("#textonombretiporelacion").html(data.nombre.substring(0, 40));
         }
         mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -2166,7 +2159,7 @@ function obtenerformapagoporclave(){
           seleccionarmetodopago('PUE','Pago en una sola exhibición');
         }
         mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -2189,7 +2182,7 @@ function obtenermetodopagoporclave(){
           $("#textonombremetodopago").html(data.nombre.substring(0, 40));
         }
         mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -2212,8 +2205,8 @@ function obtenerusocfdiporclave(){
           $("#textonombreusocfdi").html(data.nombre.substring(0, 40));
         }
         mostrarformulario();
-      }) 
-    } 
+      })
+    }
   }
 }
 //regresar clave
@@ -2235,7 +2228,7 @@ function obtenerresidenciafiscalporclave(){
           $("#textonombreresidenciafiscal").html(data.nombre.substring(0, 40));
         }
         mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -2267,12 +2260,12 @@ function obtenerregimenesfiscalesreceptor(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                              '</div>';  
+                              '</div>';
   $("#contenidomodaltablas").html(tablaregimenesfiscales);
   var tregfis = $('#tbllistadoregimenfiscalreceptor').DataTable({
       keys: true,
@@ -2280,7 +2273,7 @@ function obtenerregimenesfiscalesreceptor(){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -2306,14 +2299,14 @@ function obtenerregimenesfiscalesreceptor(){
               $('#tbllistadoregimenfiscalreceptor').DataTable().search( this.value ).draw();
             }
         });
-      }, 
+      },
   });
   //seleccionar registro al dar doble click
   $('#tbllistadoregimenfiscalreceptor tbody').on('dblclick', 'tr', function () {
       var data = tregfis.row( this ).data();
       seleccionarregimenfiscalreceptor(data.Clave, data.Nombre);
-  }); 
-} 
+  });
+}
 //seleccionar lugar expedicion
 function seleccionarregimenfiscalreceptor(Clave, Nombre){
   var claveregimenfiscalreceptoranterior = $("#claveregimenfiscalreceptoranterior").val();
@@ -2342,7 +2335,7 @@ function obtenerregimenfiscalreceptorporclave(){
           $("#textonombreregimenfiscalreceptor").html(data.nombre.substring(0, 15));
         }
         mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -2373,12 +2366,12 @@ function obtenerperiodicidades(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                              '</div>';  
+                              '</div>';
   $("#contenidomodaltablas").html(tablaperidicidades);
   var listadotablaperiodicidades = $('#tbllistadoperiodicidad').DataTable({
       keys: true,
@@ -2386,7 +2379,7 @@ function obtenerperiodicidades(){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -2411,14 +2404,14 @@ function obtenerperiodicidades(){
               $('#tbllistadoperiodicidad').DataTable().search( this.value ).draw();
             }
         });
-      }, 
+      },
   });
   //seleccionar registro al dar doble click
   $('#tbllistadoperiodicidad tbody').on('dblclick', 'tr', function () {
       var data = listadotablaperiodicidades.row( this ).data();
       seleccionarperiodicidad(data.Clave, data.Descripcion);
-  }); 
-} 
+  });
+}
 //seleccionar periodicidad
 function seleccionarperiodicidad(Clave, Descripcion){
   var claveperiodicidadanterior = $("#claveperiodicidadanterior").val();
@@ -2447,7 +2440,7 @@ function obtenerperiodicidadporclave(){
           $("#textonombreperiodicidad").html(data.descripcion.substring(0, 15));
         }
         mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -2481,12 +2474,12 @@ function obtenermeses(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                              '</div>';  
+                              '</div>';
   $("#contenidomodaltablas").html(tablameses);
   var listadotablameses = $('#tbllistadomes').DataTable({
       keys: true,
@@ -2494,7 +2487,7 @@ function obtenermeses(){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -2519,14 +2512,14 @@ function obtenermeses(){
               $('#tbllistadomes').DataTable().search( this.value ).draw();
             }
         });
-      }, 
+      },
   });
   //seleccionar registro al dar doble click
   $('#tbllistadomes tbody').on('dblclick', 'tr', function () {
       var data = listadotablameses.row( this ).data();
       seleccionarmes(data.Clave, data.Descripcion);
-  }); 
-} 
+  });
+}
 //seleccionar mes
 function seleccionarmes(Clave, Descripcion){
   var clavemesanterior = $("#clavemesanterior").val();
@@ -2555,7 +2548,7 @@ function obtenermesporclave(){
           $("#textonombremes").html(data.descripcion.substring(0, 15));
         }
         mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -2595,12 +2588,12 @@ function listarproductos(){
                                 '<tbody></tbody>'+
                               '</table>'+
                             '</div>'+
-                          '</div>'+  
+                          '</div>'+
                         '</div>'+
                       '</div>'+
                       '<div class="modal-footer">'+
                         '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                      '</div>';   
+                      '</div>';
   $("#contenidomodaltablas").html(tablaproductos);
   var tprod = $('#tbllistadoproducto').DataTable({
     keys: true,
@@ -2631,7 +2624,7 @@ function listarproductos(){
       { data: 'Existencias', name: 'Existencias', orderable: false, searchable: false  },
       { data: 'Almacen', name: 'Almacen', orderable: false, searchable: false  },
       { data: 'Costo', name: 'Costo', orderable: false, searchable: false  },
-      { data: 'SubTotal', name: 'SubTotal', orderable: false, searchable: false  } 
+      { data: 'SubTotal', name: 'SubTotal', orderable: false, searchable: false  }
     ],
     "initComplete": function() {
       var $buscar = $('div.dataTables_filter input');
@@ -2660,7 +2653,7 @@ function obtenerproductoporcodigo(){
     }else{
       msjnoseencontroningunproducto();
     }
-  }) 
+  })
 }
 //listar productos para tab consumos
 function listarproductosgastos(){
@@ -2689,12 +2682,12 @@ function listarproductosgastos(){
                                 '<tbody></tbody>'+
                               '</table>'+
                             '</div>'+
-                          '</div>'+  
+                          '</div>'+
                         '</div>'+
                       '</div>'+
                       '<div class="modal-footer">'+
                         '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                      '</div>';   
+                      '</div>';
   $("#contenidomodaltablas").html(tablaproductosgastos);
   var tprodgast = $('#tbllistadoproductogasto').DataTable({
     keys: true,
@@ -2725,7 +2718,7 @@ function listarproductosgastos(){
       { data: 'Existencias', name: 'Existencias', orderable: false, searchable: false  },
       { data: 'Almacen', name: 'Almacen', orderable: false, searchable: false  },
       { data: 'Costo', name: 'Costo', orderable: false, searchable: false  },
-      { data: 'SubTotal', name: 'SubTotal', orderable: false, searchable: false  } 
+      { data: 'SubTotal', name: 'SubTotal', orderable: false, searchable: false  }
     ],
     "initComplete": function() {
       var $buscar = $('div.dataTables_filter input');
@@ -2754,7 +2747,7 @@ function obtenerproductogastoporcodigo(){
     }else{
       msjnoseencontroningunproducto();
     }
-  }) 
+  })
 }
 //listarserv
 function listarservicios(){
@@ -2779,12 +2772,12 @@ function listarservicios(){
                                   '<tbody></tbody>'+
                                 '</table>'+
                               '</div>'+
-                            '</div>'+  
+                            '</div>'+
                           '</div>'+
                         '</div>'+
                         '<div class="modal-footer">'+
                           '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                        '</div>';   
+                        '</div>';
   $("#contenidomodaltablas").html(tablaservicios);
   var tserv = $('#tbllistadoservicio').DataTable({
     keys: true,
@@ -2823,7 +2816,7 @@ function listarservicios(){
         }
       });
     },
-  }); 
+  });
   //seleccionar registro al dar doble click
   $('#tbllistadoservicio tbody').on('dblclick', 'tr', function () {
       var data = tserv.row( this ).data();
@@ -2843,7 +2836,7 @@ function obtenerservicioporcodigo(){
     }else{
       msjnoseencontroningunproducto();
     }
-  }) 
+  })
 }
 //listar claves productos
 function listarclavesproductos(fila){
@@ -2866,12 +2859,12 @@ function listarclavesproductos(fila){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+  
+                                    '</div>'+
                                 '</div>'+
                             '</div>'+
                             '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                            '</div>';   
+                            '</div>';
   $("#contenidomodaltablas").html(tablaclavesproducto);
   var tclavprod = $('#tbllistadoclaveproducto').DataTable({
       keys: true,
@@ -2879,7 +2872,7 @@ function listarclavesproductos(fila){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
           'loadingRecords': '&nbsp;',
@@ -2941,12 +2934,12 @@ function listarclavesunidades(fila){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+  
+                                    '</div>'+
                                 '</div>'+
                             '</div>'+
                             '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                            '</div>';   
+                            '</div>';
   $("#contenidomodaltablas").html(tablaclavesunidades);
   var tclavuni = $('#tbllistadoclaveunidad').DataTable({
       keys: true,
@@ -2954,7 +2947,7 @@ function listarclavesunidades(fila){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
           'loadingRecords': '&nbsp;',
@@ -3022,12 +3015,12 @@ function listaruuidrelacionados(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+  
+                                    '</div>'+
                                 '</div>'+
                             '</div>'+
                             '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                            '</div>';   
+                            '</div>';
   $("#contenidomodaltablas").html(tablafacturasrel);
   var tfacrel = $('#tbllistadofacturarel').DataTable({
       keys: true,
@@ -3035,7 +3028,7 @@ function listaruuidrelacionados(){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
           'loadingRecords': '&nbsp;',
@@ -3081,7 +3074,7 @@ function seleccionarfacturarel(UUID, Factura){
                                     '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminaruuid" onclick="eliminarfilauuid(0)">X</div><input type="hidden" class="form-control uuidagregadoen" name="uuidagregadoen[]" value="'+tipooperacion+'" readonly></td>'+
                                     '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm uuidrelacionado" name="uuidrelacionado[]" value="'+UUID+'" readonly>'+UUID+'</td>'+
                                 '</tr>';
-  $("#tablauuidrelacionados tbody").append(uuidrelacionado);  
+  $("#tablauuidrelacionados tbody").append(uuidrelacionado);
   renumerarfilasuuid();
   comprobarfilasuuid();
   mostrarformulario();
@@ -3108,7 +3101,7 @@ function evaluarproductoexistente(Codigo){
       var result = false;
   }
   return result;
-} 
+}
 //agregar una fila en la tabla de precios productos codigo ó dppp
 var contadorproductos=0;
 var contadorfilas = 0;
@@ -3117,7 +3110,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
     $('.page-loader-wrapper').css('display', 'block');
     var result = evaluarproductoexistente(Codigo);
     if(result == false){
-        var multiplicacioncostoimpuesto =  new Decimal(SubTotal).times(Impuesto);      
+        var multiplicacioncostoimpuesto =  new Decimal(SubTotal).times(Impuesto);
         var ivapesos = new Decimal(multiplicacioncostoimpuesto/100);
         var total = new Decimal(SubTotal).plus(ivapesos);
         var preciopartida = SubTotal;
@@ -3177,7 +3170,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
                         '<div class="col-xs-2 col-sm-2 col-md-2">'+
                           '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('+contadorfilas+');" ><i class="material-icons">remove_red_eye</i></div>'+
                         '</div>'+
-                        '<div class="col-xs-10 col-sm-10 col-md-10">'+    
+                        '<div class="col-xs-10 col-sm-10 col-md-10">'+
                           '<input type="text" class="form-control inputnextdet divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'+ClaveProducto+'" readonly required data-parsley-length="[1, 20]">'+
                         '</div>'+
                       '</div>'+
@@ -3188,7 +3181,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
                         '<div class="col-xs-2 col-sm-2 col-md-2">'+
                           '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('+contadorfilas+');" ><i class="material-icons">remove_red_eye</i></div>'+
                         '</div>'+
-                        '<div class="col-xs-10 col-sm-10 col-md-10">'+    
+                        '<div class="col-xs-10 col-sm-10 col-md-10">'+
                           '<input type="text" class="form-control inputnextdet divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'+ClaveUnidad+'" readonly required data-parsley-length="[1, 5]">'+
                         '</div>'+
                       '</div>'+
@@ -3197,7 +3190,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
                   '</tr>';
         $("#tabladetallesfactura").append(fila);
         calculartotalesfilas(contadorfilas);
-        mostrarformulario();      
+        mostrarformulario();
         comprobarfilas();
         calculartotal();
         contadorproductos++;
@@ -3217,16 +3210,16 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
         $(".inputnextdet").keyup(function (e) {
           //recomentable para mayor compatibilidad entre navegadores.
           var code = (e.keyCode ? e.keyCode : e.which);
-          var index = $(this).index(".inputnextdet");          
+          var index = $(this).index(".inputnextdet");
           switch(code){
             case 13:
-              //$(".inputnextdet").eq(index + 1).focus().select(); 
+              //$(".inputnextdet").eq(index + 1).focus().select();
               break;
             case 39:
-              $(".inputnextdet").eq(index + 1).focus().select(); 
+              $(".inputnextdet").eq(index + 1).focus().select();
               break;
             case 37:
-              $(".inputnextdet").eq(index - 1).focus().select(); 
+              $(".inputnextdet").eq(index - 1).focus().select();
               break;
           }
         });
@@ -3271,7 +3264,7 @@ function alta(){
                                 '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
                                 '<input type="hidden" class="form-control" name="esquema" id="esquema" value="'+esquema+'" readonly data-parsley-length="[1, 10]">'+
                                 '<input type="hidden" class="form-control" name="depto" id="depto" value="'+depto+'" readonly data-parsley-length="[1, 20]">'+
-                              '</div>'+  
+                              '</div>'+
                               '<div class="col-md-3">'+
                                 '<label>Cliente <span class="label label-danger" id="textonombrecliente"></span></label>'+
                                 '<table class="col-md-12">'+
@@ -3286,10 +3279,10 @@ function alta(){
                                         '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
                                         '<input type="hidden" class="form-control" name="rfccliente" id="rfccliente" required readonly>'+
                                       '</div>'+
-                                    '</td>'+    
-                                  '</tr>'+    
+                                    '</td>'+
+                                  '</tr>'+
                                 '</table>'+
-                              '</div>'+ 
+                              '</div>'+
                               '<div class="col-md-3">'+
                                 '<label>Agente <span class="label label-danger" id="textonombreagente"></span></label>'+
                                 '<table class="col-md-12">'+
@@ -3305,19 +3298,19 @@ function alta(){
                                         '<input type="hidden" class="form-control" name="agente" id="agente" required readonly>'+
                                       '</div>'+
                                     '</td>'+
-                                  '</tr>'+    
+                                  '</tr>'+
                                 '</table>'+
                               '</div>'+
                               '<div class="col-md-1">'+
                                 '<label>Plazo días</label>'+
                                 '<input type="text" class="form-control inputnextdet" name="plazo" id="plazo" value="5" required  autocomplete="off">'+
-                              '</div>'+  
+                              '</div>'+
                               '<div class="col-md-2">'+
                                 '<label>Fecha</label>'+
                                 '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required  data-parsley-excluded="true" onkeydown="return false">'+
                                 '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                 '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
-                              '</div>'+   
+                              '</div>'+
                             '</div>'+
                             '<div class="row">'+
                               '<div class="col-md-2">'+
@@ -3337,21 +3330,21 @@ function alta(){
                                     '</td>'+
                                   '</tr>'+
                                 '</table>'+
-                              '</div>'+ 
+                              '</div>'+
                               '<div class="col-md-2">'+
                                 '<label>Pedido</label>'+
                                 '<input type="text" class="form-control inputnextdet" name="pedido" id="pedido" data-parsley-length="[1, 50]" autocomplete="off">'+
-                              '</div>'+  
+                              '</div>'+
                               '<div class="col-md-1">'+
                                 '<label>Tipo</label>'+
                                 '<select id="tipo" name="tipo" class="form-control select2" style="width:100%">'+
                                 '</select>'+
-                              '</div>'+  
+                              '</div>'+
                               '<div class="col-md-1">'+
                                 '<label>Unidad</label>'+
                                 '<select id="tipounidad" name="tipounidad" class="form-control select2" style="width:100%">'+
                                 '</select>'+
-                              '</div>'+   
+                              '</div>'+
                               '<div class="col-md-3" id="divbuscarcodigos" hidden>'+
                                 '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
                                 '<table class="col-md-12">'+
@@ -3359,22 +3352,22 @@ function alta(){
                                     '<td>'+
                                       '<div class="btn bg-blue waves-effect" id="btnobtenerproductos" onclick="listarproductos()">Ver Productos</div>'+
                                     '</td>'+
-                                    '<td>'+ 
+                                    '<td>'+
                                       '<div class="form-line">'+
                                         '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off" onkeyup="tipoLetra(this);">'+
                                       '</div>'+
                                     '</td>'+
-                                  '</tr>'+    
+                                  '</tr>'+
                                 '</table>'+
                               '</div>'+
                               '<div class="col-md-3" id="divlistarremisiones"  style="display:none">'+
                                 '<label>Remisiones</label>'+
                                 '<div class="btn btn-block bg-blue waves-effect" id="btnlistarremisiones" onclick="listarremisiones()">Agregar Remisiones</div>'+
-                              '</div>'+ 
+                              '</div>'+
                               '<div class="col-md-3" id="divlistarservicios"  style="display:none">'+
                                 '<label>Servicios</label>'+
                                 '<div class="btn btn-block bg-blue waves-effect" id="btnlistarservicios" onclick="listarordenes()">Agregar Servicios</div>'+
-                              '</div>'+ 
+                              '</div>'+
                               '<div class="col-md-3" id="divbuscarcodigosservicios" hidden>'+
                                 '<label>Escribe el código del servicio y presiona ENTER</label>'+
                                 '<table class="col-md-12">'+
@@ -3382,12 +3375,12 @@ function alta(){
                                     '<td>'+
                                       '<div class="btn bg-blue waves-effect" id="btnobtenerservicios" onclick="listarservicios()">Ver Servicios</div>'+
                                     '</td>'+
-                                    '<td>'+ 
+                                    '<td>'+
                                       '<div class="form-line">'+
                                         '<input type="text" class="form-control" name="codigoservicioabuscar" id="codigoservicioabuscar" placeholder="Escribe el código del servicio" autocomplete="off" onkeyup="tipoLetra(this);">'+
                                       '</div>'+
                                     '</td>'+
-                                  '</tr>'+    
+                                  '</tr>'+
                                 '</table>'+
                               '</div>'+
                               '<div class="col-md-3" id="divbuscarcodigosgastos" hidden>'+
@@ -3397,16 +3390,16 @@ function alta(){
                                     '<td>'+
                                       '<div class="btn bg-blue waves-effect" id="btnobtenerproductosgastos" onclick="listarproductosgastos()">Ver Gastos</div>'+
                                     '</td>'+
-                                    '<td>'+ 
+                                    '<td>'+
                                       '<div class="form-line">'+
                                         '<input type="text" class="form-control" name="codigogastoabuscar" id="codigogastoabuscar" placeholder="Escribe el código gasto" autocomplete="off" onkeyup="tipoLetra(this);">'+
                                       '</div>'+
                                     '</td>'+
-                                  '</tr>'+    
+                                  '</tr>'+
                                 '</table>'+
                               '</div>'+
                             '</div>'+
-                          '</div>'+   
+                          '</div>'+
                           '<div role="tabpanel" class="tab-pane fade" id="emisortab">'+
                             '<div class="row">'+
                               '<div class="col-md-4">'+
@@ -3436,7 +3429,7 @@ function alta(){
                                         '<input type="hidden" class="form-control" name="lugarexpedicionanterior" id="lugarexpedicionanterior" value="'+lugarexpedicion+'" required>'+
                                       '</div>'+
                                     '</td>'+
-                                  '</tr>'+    
+                                  '</tr>'+
                                 '</table>'+
                               '</div>'+
                               '<div class="col-md-4">'+
@@ -3453,7 +3446,7 @@ function alta(){
                                         '<input type="hidden" class="form-control" name="regimenfiscal" id="regimenfiscal" value="'+regimenfiscal+'" required readonly>'+
                                       '</div>'+
                                     '</td>'+
-                                  '</tr>'+    
+                                  '</tr>'+
                                 '</table>'+
                               '</div>'+
                               '<div class="col-md-4">'+
@@ -3470,7 +3463,7 @@ function alta(){
                                         '<input type="hidden" class="form-control" name="tiporelacion" id="tiporelacion"   readonly>'+
                                       '</div>'+
                                     '</td>'+
-                                  '</tr>'+    
+                                  '</tr>'+
                                 '</table>'+
                               '</div>'+
                             '</div>'+
@@ -3487,21 +3480,21 @@ function alta(){
                                               '<div class="col-md-6">'+
                                                 '<label for="xml" class="btn btn-success">Selecciona el xml relacionado</label>'+
                                                 '<input type="file" class="form-control" name="xml" id="xml" onchange="cambiodexml(this)" style="visibility:hidden;display:none;" onclick="this.value=null;" form="formxml">'+
-                                              '</div>'+  
+                                              '</div>'+
                                               '<div class="col-md-6">'+
                                                 '<label class="btn btn-success" onclick="listaruuidrelacionados();">Selecciona factura relacionada</label>'+
                                               '</div>'+
                                           '</th>'+
                                         '</tr>'+
                                       '</thead>'+
-                                      '<tbody>'+           
+                                      '<tbody>'+
                                       '</tbody>'+
                                     '</table>'+
                                   '</div>'+
                                 '</div>'+
                               '</div>'+
                             '</div>'+
-                          '</div>'+ 
+                          '</div>'+
                           '<div role="tabpanel" class="tab-pane fade" id="receptortab">'+
                             '<div class="row">'+
                               '<div class="col-md-3">'+
@@ -3526,7 +3519,7 @@ function alta(){
                                         '<input type="hidden" class="form-control" name="formapago" id="formapago" required readonly>'+
                                       '</div>'+
                                     '</td>'+
-                                  '</tr>'+    
+                                  '</tr>'+
                                 '</table>'+
                               '</div>'+
                               '<div class="col-md-3">'+
@@ -3543,7 +3536,7 @@ function alta(){
                                         '<input type="hidden" class="form-control" name="metodopago" id="metodopago" required readonly>'+
                                       '</div>'+
                                     '</td>'+
-                                  '</tr>'+    
+                                  '</tr>'+
                                 '</table>'+
                               '</div>'+
                               '<div class="col-md-3">'+
@@ -3560,7 +3553,7 @@ function alta(){
                                         '<input type="hidden" class="form-control" name="usocfdi" id="usocfdi" required readonly>'+
                                       '</div>'+
                                     '</td>'+
-                                  '</tr>'+    
+                                  '</tr>'+
                                 '</table>'+
                               '</div>'+
                               '<div class="col-md-3">'+
@@ -3577,7 +3570,7 @@ function alta(){
                                         '<input type="hidden" class="form-control" name="residenciafiscal" id="residenciafiscal" required readonly>'+
                                       '</div>'+
                                     '</td>'+
-                                  '</tr>'+    
+                                  '</tr>'+
                                 '</table>'+
                               '</div>'+
                               '<div class="col-md-2">'+
@@ -3594,7 +3587,7 @@ function alta(){
                                           '<input type="hidden" class="form-control" name="regimenfiscalreceptor" id="regimenfiscalreceptor"  required readonly>'+
                                           '</div>'+
                                       '</td>'+
-                                      '</tr>'+    
+                                      '</tr>'+
                                   '</table>'+
                               '</div>'+
                               '<div class="col-md-2">'+
@@ -3606,7 +3599,7 @@ function alta(){
                                 '<input type="text" class="form-control inputnextdet" name="numeroregidtrib" id="numeroregidtrib" data-parsley-length="[1, 40]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                               '</div>'+
                             '</div>'+
-                          '</div>'+ 
+                          '</div>'+
                           '<div role="tabpanel" class="tab-pane fade" id="otrostab">'+
                             '<div class="row">'+
                               '<div class="col-md-3">'+
@@ -3622,7 +3615,7 @@ function alta(){
                                         '<input type="text" class="form-control inputnextdet" name="tipopa" id="tipopa"  readonly>'+
                                       '</div>'+
                                     '</td>'+
-                                  '</tr>'+    
+                                  '</tr>'+
                                 '</table>'+
                               '</div>'+
                               '<div class="col-md-3">'+
@@ -3643,7 +3636,7 @@ function alta(){
                                             '<input type="hidden" class="form-control" name="periodicidad" id="periodicidad" readonly>'+
                                             '</div>'+
                                         '</td>'+
-                                        '</tr>'+    
+                                        '</tr>'+
                                     '</table>'+
                               '</div>'+
                               '<div class="col-md-3" id="divmes">'+
@@ -3660,7 +3653,7 @@ function alta(){
                                             '<input type="hidden" class="form-control" name="mes" id="mes"   readonly>'+
                                             '</div>'+
                                         '</td>'+
-                                        '</tr>'+    
+                                        '</tr>'+
                                     '</table>'+
                               '</div>'+
                             '</div>'+
@@ -3730,28 +3723,28 @@ function alta(){
                                       '<th class="'+background_tables+'" hidden>Monto Interes</th>'+
                                     '</tr>'+
                                   '</thead>'+
-                                  '<tbody>'+           
+                                  '<tbody>'+
                                   '</tbody>'+
                                 '</table>'+
                               '</div>'+
-                            '</div>'+ 
-                          '</div>'+ 
+                            '</div>'+
+                          '</div>'+
                         '</div>'+
                         '<div class="row" id="divimportarpartidas">'+
-                          '<div class="col-md-12">'+   
+                          '<div class="col-md-12">'+
                             '<table>'+
                               '<tr>'+
                                 '<td><div type="button" class="btn btn-success btn-sm" onclick="seleccionarpartidasexcel()">Importar partidas en excel</div></td>'+
                                 '<td data-toggle="tooltip" data-placement="top" title data-original-title="Bajar plantilla"><a class="material-icons" onclick="descargar_plantilla()" id="btnGenerarPlantilla" target="_blank">get_app</a></td>'+
                               '</tr>'+
                             '</table>'+
-                          '</div>'+ 
+                          '</div>'+
                         '</div>'+
                         '<div class="row">'+
-                          '<div class="col-md-3">'+   
+                          '<div class="col-md-3">'+
                             '<label>Observaciones</label>'+
                             '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]"></textarea>'+
-                          '</div>'+ 
+                          '</div>'+
                           '<div class="col-md-3">'+
                             '<label>Comentarios</label>'+
                             '<textarea class="form-control inputnextdet" name="descripcion" id="descripcion" rows="5" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]"></textarea>'+
@@ -3806,8 +3799,8 @@ function alta(){
                           '</div>'+
                         '</div>'+
                         '<div class="row">'+
-                          '<div class="col-md-12">'+   
-                            '<h4 class="font-bold col-red" id="mensajecreditoexcedido"></h4>'+  
+                          '<div class="col-md-12">'+
+                            '<h4 class="font-bold col-red" id="mensajecreditoexcedido"></h4>'+
                           '</div>'+
                         '</div>'+
                       '</div>'+
@@ -4014,16 +4007,16 @@ function alta(){
   $(".inputnextdet").keyup(function (e) {
     //recomentable para mayor compatibilidad entre navegadores.
     var code = (e.keyCode ? e.keyCode : e.which);
-    var index = $(this).index(".inputnextdet");          
+    var index = $(this).index(".inputnextdet");
     switch(code){
       case 13:
-        //$(".inputnextdet").eq(index + 1).focus().select(); 
+        //$(".inputnextdet").eq(index + 1).focus().select();
         break;
       case 39:
-        $(".inputnextdet").eq(index + 1).focus().select(); 
+        $(".inputnextdet").eq(index + 1).focus().select();
         break;
       case 37:
-        $(".inputnextdet").eq(index - 1).focus().select(); 
+        $(".inputnextdet").eq(index - 1).focus().select();
         break;
     }
   });
@@ -4037,12 +4030,12 @@ function alta(){
   $("#ModalAlta").modal('show');
 }
 //Cada que se elija un archivo
-function cambiodexml(e) {  
+function cambiodexml(e) {
   var tipooperacion = $("#tipooperacion").val();
   var xml = $('#xml')[0].files[0];
   var form_data = new FormData();
-  form_data.append('xml', xml);  
-  form_data.append('tipooperacion', tipooperacion);  
+  form_data.append('xml', xml);
+  form_data.append('tipooperacion', tipooperacion);
   $.ajax({
     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
     url:facturas_cargar_xml_uuid_relacionado,
@@ -4053,7 +4046,7 @@ function cambiodexml(e) {
     success: function (data) {
       var result = evaluaruuidexistente(data.uuid[0]);
       if(result == false){
-        $("#tablauuidrelacionados tbody").append(data.uuidrelacionado);  
+        $("#tablauuidrelacionados tbody").append(data.uuidrelacionado);
         renumerarfilasuuid();
         comprobarfilasuuid();
       }
@@ -4061,7 +4054,7 @@ function cambiodexml(e) {
     error: function (data) {
       console.log(data);
     }
-  });  
+  });
 }
 //comprobar numero filas de la tabla
 function comprobarfilasuuid(){
@@ -4070,8 +4063,8 @@ function comprobarfilasuuid(){
 }
 //eliminar una fila en la tabla
 function eliminarfilauuid(fila){
-  var confirmacion = confirm("Esta seguro de eliminar la fila?"); 
-  if (confirmacion == true) { 
+  var confirmacion = confirm("Esta seguro de eliminar la fila?");
+  if (confirmacion == true) {
     $("#filauuid"+fila).remove();
     renumerarfilasuuid();
     comprobarfilasuuid();
@@ -4090,7 +4083,7 @@ function renumerarfilasuuid(){
   for (var i = 0; i < lista.length; i++) {
     lista[i].setAttribute("onclick", "eliminarfilauuid("+i+')');
   }
-} 
+}
 function evaluaruuidexistente(uuid){
   var sumaiguales=0;
   var sumadiferentes=0;
@@ -4112,12 +4105,12 @@ function evaluaruuidexistente(uuid){
       var result = false;
   }
   return result;
-} 
+}
 //calcular total de la orden de compra
 function calculartotalesfilas(fila){
   // for each por cada fila:
   var cuentaFilas = 0;
-  $("tr.filasproductos").each(function () { 
+  $("tr.filasproductos").each(function () {
     if(fila === cuentaFilas){
       // obtener los datos de la fila:
       var cantidadpartida = $(".cantidadpartida", this).val();
@@ -4128,7 +4121,7 @@ function calculartotalesfilas(fila){
       var subtotalpartida = $('.subtotalpartida', this).val();
       var ivaporcentajepartida = $('.ivaporcentajepartida', this).val();
       var trasladoivapesospartida = $('.trasladoivapesospartida', this).val();
-      var totalpesospartida = $('.totalpesospartida', this).val(); 
+      var totalpesospartida = $('.totalpesospartida', this).val();
       var utilidadpartida = $(".utilidadpartida", this).val();
       var costopartida = $(".costopartida", this).val();
       var costototalpartida = $(".costototalpartida ", this).val();
@@ -4168,7 +4161,7 @@ function calculartotalesfilas(fila){
         $(".utilidadpartida", this).val(number_format(round(utilidadpartida, numerodecimales), numerodecimales, '.', ''));
       }
       calculartotal();
-    }  
+    }
     cuentaFilas++;
   });
 }
@@ -4176,35 +4169,35 @@ function calculartotalesfilas(fila){
 function cambiodecantidadopreciopartida(fila){
   var cuentaFilas = 0;
   $("tr.filasproductos").each(function () {
-    if(fila === cuentaFilas){  
+    if(fila === cuentaFilas){
       calculardescuentoporcentajepartida(fila);
       calculartotalesfilas(fila);
       calculartotal();
-    }  
+    }
     cuentaFilas++;
-  });  
+  });
 }
 //calcular el porcentaje de descuento cuando el descuento en pesos se modifique
 function calculardescuentoporcentajepartida(fila){
   var cuentaFilas = 0;
   $("tr.filasproductos").each(function () {
-    if(fila === cuentaFilas){  
+    if(fila === cuentaFilas){
       //descuento en porcentaje de la partida
-      var importepartida = $('.importepartida', this).val(); 
-      var descuentopesospartida = $('.descuentopesospartida', this).val(); 
+      var importepartida = $('.importepartida', this).val();
+      var descuentopesospartida = $('.descuentopesospartida', this).val();
       var multiplicaciondescuentoporcentajepartida  =  new Decimal(descuentopesospartida).times(100);
       var descuentoporcentajepartida = new Decimal(multiplicaciondescuentoporcentajepartida/importepartida);
       $('.descuentoporcentajepartida', this).val(number_format(round(descuentoporcentajepartida, numerodecimales), numerodecimales, '.', ''));
       calculartotalesfilas(fila);
-    }  
+    }
     cuentaFilas++;
-  });    
+  });
 }
 //calcular el descuento en pesos cuando hay cambios en el porcentaje de descuento
 function calculardescuentopesospartida(fila){
   var cuentaFilas = 0;
   $("tr.filasproductos").each(function () {
-    if(fila === cuentaFilas){   
+    if(fila === cuentaFilas){
       //descuento en pesos de la partida
       var importepartida = $('.importepartida', this).val();
       var descuentoporcentajepartida = $('.descuentoporcentajepartida', this).val();
@@ -4212,10 +4205,10 @@ function calculardescuentopesospartida(fila){
       var descuentopesospartida = new Decimal(multiplicaciondescuentopesospartida/100);
       $('.descuentopesospartida', this).val(number_format(round(descuentopesospartida, numerodecimales), numerodecimales, '.', ''));
       calculartotalesfilas(fila);
-    }  
+    }
     cuentaFilas++;
-  }); 
-}      
+  });
+}
 //calcular totales de orden de compra
 function calculartotal(){
   var importe = 0;
@@ -4235,7 +4228,7 @@ function calculartotal(){
     utilidad = new Decimal(utilidad).plus($(".utilidadpartida", this).val());
     costo = new Decimal(costo).plus($(".costototalpartida", this).val());
     comision = new Decimal(comision).plus($(".comisionpesospartida", this).val());
-  }); 
+  });
   $("#importe").val(number_format(round(importe, numerodecimales), numerodecimales, '.', ''));
   $("#descuento").val(number_format(round(descuento, numerodecimales), numerodecimales, '.', ''));
   $("#subtotal").val(number_format(round(subtotal, numerodecimales), numerodecimales, '.', ''));
@@ -4256,9 +4249,9 @@ function calculartotal(){
         if(parseFloat(saldo) > parseFloat(credito)){
             $("#mensajecreditoexcedido").html("CRÉDITO DEL CLIENTE EXCEDIDO");
         }else{
-            $("#mensajecreditoexcedido").html("");           
+            $("#mensajecreditoexcedido").html("");
         }
-    }) 
+    })
   }
 }
 //calcular total a facturar
@@ -4267,19 +4260,19 @@ function calculartotalafacturar(tipo){
   var stringordenesseleccionadas = $("#stringordenesseleccionadas").val();
   $.get(facturas_obtener_total_a_facturar,{stringremisionesseleccionadas:stringremisionesseleccionadas,stringordenesseleccionadas:stringordenesseleccionadas,tipo:tipo}, function(totalafacturar){
     $("#totalafacturar").val(totalafacturar);
-  }) 
+  })
 }
 //eliminar una fila en la tabla de precios clientes
 function eliminarfila(numerofila){
-  var confirmacion = confirm("Esta seguro de eliminar la fila?"); 
-  if (confirmacion == true) { 
+  var confirmacion = confirm("Esta seguro de eliminar la fila?");
+  if (confirmacion == true) {
     $("#filaproducto"+numerofila).remove();
     contadorfilas--;
     contadorproductos--;
     partida--;
     comprobarfilas();
     renumerarfilas();//importante para todos los calculo en el modulo
-    calculartotal();  
+    calculartotal();
   }
 }
 //comprobar numero filas de la tabla precios clientes
@@ -4345,7 +4338,7 @@ function renumerarfilas(){
   for (var i = 0; i < lista.length; i++){
     lista[i].setAttribute("onclick", "listarclavesunidades("+i+')');
   }
-}  
+}
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
   e.preventDefault();
@@ -4437,7 +4430,7 @@ function obtenerdatos(facturamodificar){
                           '<input type="hidden" class="form-control" name="esquema" id="esquema" value="'+esquema+'" readonly data-parsley-length="[1, 10]">'+
                           '<input type="hidden" class="form-control" name="depto" id="depto" value="'+depto+'" readonly >'+
                           '<input type="hidden" class="form-control" name="facturabd" id="facturabd" value="'+facturamodificar+'" readonly data-parsley-length="[1, 20]">'+
-                        '</div>'+  
+                        '</div>'+
                         '<div class="col-md-3">'+
                           '<label>Cliente <span class="label label-danger" id="textonombrecliente"></span></label>'+
                           '<table class="col-md-12">'+
@@ -4452,10 +4445,10 @@ function obtenerdatos(facturamodificar){
                                   '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
                                   '<input type="hidden" class="form-control" name="rfccliente" id="rfccliente" required readonly>'+
                                 '</div>'+
-                              '</td>'+    
-                            '</tr>'+    
+                              '</td>'+
+                            '</tr>'+
                           '</table>'+
-                        '</div>'+ 
+                        '</div>'+
                         '<div class="col-md-3">'+
                           '<label>Agente <span class="label label-danger" id="textonombreagente"></span></label>'+
                           '<table class="col-md-12">'+
@@ -4471,19 +4464,19 @@ function obtenerdatos(facturamodificar){
                                   '<input type="hidden" class="form-control" name="agente" id="agente" required readonly>'+
                                 '</div>'+
                               '</td>'+
-                            '</tr>'+    
+                            '</tr>'+
                           '</table>'+
                         '</div>'+
                         '<div class="col-md-1">'+
                           '<label>Plazo días</label>'+
                           '<input type="text" class="form-control inputnextdet" name="plazo" id="plazo" value="5" required autocomplete="off" >'+
-                        '</div>'+  
+                        '</div>'+
                         '<div class="col-md-2">'+
                           '<label>Fecha</label>'+
                           '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required data-parsley-excluded="true" onkeydown="return false">'+
                           '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                           '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
-                        '</div>'+   
+                        '</div>'+
                       '</div>'+
                       '<div class="row">'+
                         '<div class="col-md-2">'+
@@ -4503,21 +4496,21 @@ function obtenerdatos(facturamodificar){
                               '</td>'+
                             '</tr>'+
                           '</table>'+
-                        '</div>'+ 
+                        '</div>'+
                         '<div class="col-md-2">'+
                           '<label>Pedido</label>'+
                           '<input type="text" class="form-control inputnextdet" name="pedido" id="pedido" data-parsley-length="[1, 50]" autocomplete="off">'+
-                        '</div>'+  
+                        '</div>'+
                         '<div class="col-md-1">'+
                           '<label>Tipo</label>'+
                           '<select id="tipo" name="tipo" class="form-control select2" style="width:100%">'+
                           '</select>'+
-                        '</div>'+  
+                        '</div>'+
                         '<div class="col-md-1">'+
                           '<label>Unidad</label>'+
                           '<select id="tipounidad" name="tipounidad" class="form-control select2" style="width:100%">'+
                           '</select>'+
-                        '</div>'+   
+                        '</div>'+
                         '<div class="col-md-3" id="divbuscarcodigos" hidden>'+
                           '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
                           '<table class="col-md-12">'+
@@ -4525,22 +4518,22 @@ function obtenerdatos(facturamodificar){
                               '<td>'+
                                 '<div class="btn bg-blue waves-effect" id="btnobtenerproductos" onclick="listarproductos()">Ver Productos</div>'+
                               '</td>'+
-                              '<td>'+ 
+                              '<td>'+
                                 '<div class="form-line">'+
                                   '<input type="text" class="form-control" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off"  onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                               '</td>'+
-                            '</tr>'+    
+                            '</tr>'+
                           '</table>'+
-                        '</div>'+ 
+                        '</div>'+
                         '<div class="col-md-3" id="divlistarremisiones"  style="display:none">'+
                           '<label>Remisiones</label>'+
                           '<div class="btn btn-block bg-blue waves-effect" id="btnlistarremisiones" onclick="listarremisiones()">Agregar Remisiones</div>'+
-                        '</div>'+ 
+                        '</div>'+
                         '<div class="col-md-3" id="divlistarservicios"  style="display:none">'+
                           '<label>Servicios</label>'+
                           '<div class="btn btn-block bg-blue waves-effect" id="btnlistarservicios" onclick="listarordenes()">Agregar Servicios</div>'+
-                        '</div>'+ 
+                        '</div>'+
                         '<div class="col-md-3" id="divbuscarcodigosgastos" hidden>'+
                           '<label>Escribe el código gastos a buscar y presiona ENTER</label>'+
                           '<table class="col-md-12">'+
@@ -4548,16 +4541,16 @@ function obtenerdatos(facturamodificar){
                               '<td>'+
                                 '<div class="btn bg-blue waves-effect" id="btnobtenerproductosgastos" onclick="listarproductosgastos()">Ver Gastos</div>'+
                               '</td>'+
-                              '<td>'+ 
+                              '<td>'+
                                 '<div class="form-line">'+
                                   '<input type="text" class="form-control" name="codigogastoabuscar" id="codigogastoabuscar" placeholder="Escribe el código gasto" autocomplete="off" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                               '</td>'+
-                            '</tr>'+    
+                            '</tr>'+
                           '</table>'+
                         '</div>'+
                       '</div>'+
-                    '</div>'+   
+                    '</div>'+
                     '<div role="tabpanel" class="tab-pane fade" id="emisortab">'+
                       '<div class="row">'+
                         '<div class="col-md-4">'+
@@ -4587,7 +4580,7 @@ function obtenerdatos(facturamodificar){
                                   '<input type="hidden" class="form-control" name="lugarexpedicionanterior" id="lugarexpedicionanterior" value="'+lugarexpedicion+'" required>'+
                                 '</div>'+
                               '</td>'+
-                            '</tr>'+    
+                            '</tr>'+
                           '</table>'+
                         '</div>'+
                         '<div class="col-md-4">'+
@@ -4604,7 +4597,7 @@ function obtenerdatos(facturamodificar){
                                   '<input type="hidden" class="form-control" name="regimenfiscal" id="regimenfiscal" value="'+regimenfiscal+'" required readonly>'+
                                 '</div>'+
                               '</td>'+
-                            '</tr>'+    
+                            '</tr>'+
                           '</table>'+
                         '</div>'+
                         '<div class="col-md-4">'+
@@ -4621,7 +4614,7 @@ function obtenerdatos(facturamodificar){
                                   '<input type="hidden" class="form-control" name="tiporelacion" id="tiporelacion" readonly>'+
                                 '</div>'+
                               '</td>'+
-                            '</tr>'+    
+                            '</tr>'+
                           '</table>'+
                         '</div>'+
                       '</div>'+
@@ -4642,14 +4635,14 @@ function obtenerdatos(facturamodificar){
                                     '</th>'+
                                   '</tr>'+
                                 '</thead>'+
-                                '<tbody>'+           
+                                '<tbody>'+
                                 '</tbody>'+
                               '</table>'+
                             '</div>'+
                           '</div>'+
                         '</div>'+
                       '</div>'+
-                    '</div>'+ 
+                    '</div>'+
                     '<div role="tabpanel" class="tab-pane fade" id="receptortab">'+
                       '<div class="row">'+
                         '<div class="col-md-3">'+
@@ -4674,7 +4667,7 @@ function obtenerdatos(facturamodificar){
                                   '<input type="hidden" class="form-control" name="formapago" id="formapago" required readonly>'+
                                 '</div>'+
                               '</td>'+
-                            '</tr>'+    
+                            '</tr>'+
                           '</table>'+
                         '</div>'+
                         '<div class="col-md-3">'+
@@ -4691,7 +4684,7 @@ function obtenerdatos(facturamodificar){
                                   '<input type="hidden" class="form-control" name="metodopago" id="metodopago" required readonly>'+
                                 '</div>'+
                               '</td>'+
-                            '</tr>'+    
+                            '</tr>'+
                           '</table>'+
                         '</div>'+
                         '<div class="col-md-3">'+
@@ -4708,7 +4701,7 @@ function obtenerdatos(facturamodificar){
                                   '<input type="hidden" class="form-control" name="usocfdi" id="usocfdi" required readonly>'+
                                 '</div>'+
                               '</td>'+
-                            '</tr>'+    
+                            '</tr>'+
                           '</table>'+
                         '</div>'+
                         '<div class="col-md-3">'+
@@ -4725,7 +4718,7 @@ function obtenerdatos(facturamodificar){
                                   '<input type="hidden" class="form-control" name="residenciafiscal" id="residenciafiscal" required readonly>'+
                                 '</div>'+
                               '</td>'+
-                            '</tr>'+    
+                            '</tr>'+
                           '</table>'+
                         '</div>'+
                         '<div class="col-md-2">'+
@@ -4742,7 +4735,7 @@ function obtenerdatos(facturamodificar){
                                     '<input type="hidden" class="form-control" name="regimenfiscalreceptor" id="regimenfiscalreceptor"  required readonly>'+
                                     '</div>'+
                                 '</td>'+
-                                '</tr>'+    
+                                '</tr>'+
                             '</table>'+
                         '</div>'+
                         '<div class="col-md-2">'+
@@ -4754,7 +4747,7 @@ function obtenerdatos(facturamodificar){
                           '<input type="text" class="form-control inputnextdet" name="numeroregidtrib" id="numeroregidtrib"  data-parsley-length="[1, 40]" onkeyup="tipoLetra(this);" autocomplete="off">'+
                         '</div>'+
                       '</div>'+
-                    '</div>'+ 
+                    '</div>'+
                     '<div role="tabpanel" class="tab-pane fade" id="otrostab">'+
                       '<div class="row">'+
                         '<div class="col-md-3">'+
@@ -4770,7 +4763,7 @@ function obtenerdatos(facturamodificar){
                                   '<input type="text" class="form-control inputnextdet" name="tipopa" id="tipopa"  readonly>'+
                                 '</div>'+
                               '</td>'+
-                            '</tr>'+    
+                            '</tr>'+
                           '</table>'+
                         '</div>'+
                         '<div class="col-md-3">'+
@@ -4791,7 +4784,7 @@ function obtenerdatos(facturamodificar){
                                       '<input type="hidden" class="form-control" name="periodicidad" id="periodicidad" readonly>'+
                                       '</div>'+
                                   '</td>'+
-                                  '</tr>'+    
+                                  '</tr>'+
                               '</table>'+
                         '</div>'+
                         '<div class="col-md-3" id="divmes">'+
@@ -4808,7 +4801,7 @@ function obtenerdatos(facturamodificar){
                                       '<input type="hidden" class="form-control" name="mes" id="mes"   readonly>'+
                                       '</div>'+
                                   '</td>'+
-                                  '</tr>'+    
+                                  '</tr>'+
                               '</table>'+
                         '</div>'+
                       '</div>'+
@@ -4878,18 +4871,18 @@ function obtenerdatos(facturamodificar){
                                 '<th class="'+background_tables+'" hidden>Monto Interes</th>'+
                               '</tr>'+
                             '</thead>'+
-                            '<tbody>'+           
+                            '<tbody>'+
                             '</tbody>'+
                           '</table>'+
                         '</div>'+
-                      '</div>'+ 
-                    '</div>'+ 
+                      '</div>'+
+                    '</div>'+
                   '</div>'+
                   '<div class="row">'+
-                    '<div class="col-md-3">'+   
+                    '<div class="col-md-3">'+
                       '<label>Observaciones</label>'+
                       '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]"></textarea>'+
-                    '</div>'+ 
+                    '</div>'+
                     '<div class="col-md-3">'+
                       '<label>Comentarios</label>'+
                       '<textarea class="form-control inputnextdet" name="descripcion" id="descripcion" rows="5" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
@@ -4944,8 +4937,8 @@ function obtenerdatos(facturamodificar){
                     '</div>'+
                   '</div>'+
                   '<div class="row">'+
-                    '<div class="col-md-12">'+   
-                      '<h4 class="font-bold col-red" id="mensajecreditoexcedido"></h4>'+  
+                    '<div class="col-md-12">'+
+                      '<h4 class="font-bold col-red" id="mensajecreditoexcedido"></h4>'+
                     '</div>'+
                   '</div>'+
                 '</div>'+
@@ -5080,7 +5073,7 @@ function obtenerdatos(facturamodificar){
     $("#descuento").val(data.descuento);
     $("#subtotal").val(data.subtotal);
     $("#iva").val(data.iva);
-    $("#total").val(data.total);  
+    $("#total").val(data.total);
     //cargar nota proveedor documentos
     $("#tablauuidrelacionados tbody").html(data.filasdocumentosfactura);
     //totales
@@ -5250,16 +5243,16 @@ function obtenerdatos(facturamodificar){
     $(".inputnextdet").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      var index = $(this).index(".inputnextdet");          
+      var index = $(this).index(".inputnextdet");
       switch(code){
         case 13:
-          //$(".inputnextdet").eq(index + 1).focus().select(); 
+          //$(".inputnextdet").eq(index + 1).focus().select();
           break;
         case 39:
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+          $(".inputnextdet").eq(index + 1).focus().select();
           break;
         case 37:
-          $(".inputnextdet").eq(index - 1).focus().select(); 
+          $(".inputnextdet").eq(index - 1).focus().select();
           break;
       }
     });
@@ -5314,7 +5307,7 @@ $("#btnGuardarModificacion").on('click', function (e) {
             limpiar();
             ocultarmodalformulario();
             limpiarmodales();
-            $('.page-loader-wrapper').css('display', 'none'); 
+            $('.page-loader-wrapper').css('display', 'none');
           },
           error:function(data){
             if(data.status == 403){
@@ -5348,16 +5341,16 @@ function modificardatosgeneralesdocumento(Factura){
     $(".inputnextdet").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      var index = $(this).index(".inputnextdet");          
+      var index = $(this).index(".inputnextdet");
       switch(code){
         case 13:
-          //$(".inputnextdet").eq(index + 1).focus().select(); 
+          //$(".inputnextdet").eq(index + 1).focus().select();
           break;
         case 39:
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+          $(".inputnextdet").eq(index + 1).focus().select();
           break;
         case 37:
-          $(".inputnextdet").eq(index - 1).focus().select(); 
+          $(".inputnextdet").eq(index - 1).focus().select();
           break;
       }
     });
@@ -5435,7 +5428,7 @@ function desactivar(facturadesactivar){
       $("#divmotivobaja").hide();
       $("#btnbaja").hide();
       $('#estatusregistro').modal('show');
-    }else{ 
+    }else{
       if(data.resultadofechas != ''){
         $("#facturadesactivar").val(0);
         $("#textomodaldesactivar").html('Error solo se pueden dar de baja las facturas del mes actual, fecha de la factura: ' + data.resultadofechas);
@@ -5465,7 +5458,7 @@ function desactivar(facturadesactivar){
         }
       }
     }
-  }) 
+  })
 }
 //bajas
 $("#btnbaja").on('click', function(e){
@@ -5537,7 +5530,7 @@ function enviardocumentoemail(documento, tipo){
         width: '78.00em',
         tokenSeparators: [',', ' ']
     })
-  })   
+  })
 }
 //enviar documento pdf por email
 $("#btnenviarpdfemail").on('click', function (e) {
@@ -5594,7 +5587,7 @@ function timbrarfactura(factura){
       $("#textomodaltimbrado").html('Aviso, esta Factura se encuentra dada de baja');
       $('#modaltimbrado').modal('show');
       $("#btntimbrarfactura").hide();
-    }else{ 
+    }else{
       if(data.UUID != ""){
         $("#facturatimbrado").val(0);
         $("#textomodaltimbrado").html('Aviso, esta Factura ya se timbro');
@@ -5607,7 +5600,7 @@ function timbrarfactura(factura){
         $("#btntimbrarfactura").show();
       }
     }
-  }) 
+  })
 }
 $("#btntimbrarfactura").on('click', function(e){
   e.preventDefault();
@@ -5647,7 +5640,7 @@ $("#btntimbrarfactura").on('click', function(e){
 // fin timbrar factura
 //cancelar timbre
 function cancelartimbre(facturabajatimbre){
-  $.get(facturas_verificar_si_continua_baja_timbre,{facturabajatimbre:facturabajatimbre}, function(data){   
+  $.get(facturas_verificar_si_continua_baja_timbre,{facturabajatimbre:facturabajatimbre}, function(data){
     if(data.comprobante != ''){
       if(data.comprobante.IdFacturapi != null){
         if(data.obtener_factura.status == "canceled"){
@@ -5683,7 +5676,7 @@ function cancelartimbre(facturabajatimbre){
         $("#btnbajatimbre").hide();
         $('#modalbajatimbre').modal('show');
       }
-    }else{ 
+    }else{
       $("#facturabajatimbre").val(0);
       $("#iddocumentofacturapi").val(0);
       $("#textomodalbajatimbre").html('Aviso, la factura No.'+ facturabajatimbre +' no esta timbrada');
@@ -5691,7 +5684,7 @@ function cancelartimbre(facturabajatimbre){
       $("#btnbajatimbre").hide();
       $('#modalbajatimbre').modal('show');
     }
-  })   
+  })
 }
 $("#btnbajatimbre").on('click', function(e){
   e.preventDefault();
@@ -5798,7 +5791,7 @@ function generardocumentoeniframe(Factura){
   var folios = [Factura];
   arraypdf.push(folios);
   var form_data = new FormData();
-  form_data.append('arraypdf', arraypdf); 
+  form_data.append('arraypdf', arraypdf);
   form_data.append('tipogeneracionpdf', 0);
   form_data.append('numerodecimalesdocumento', 2);
   form_data.append('imprimirdirectamente', 1);
@@ -5811,7 +5804,7 @@ function generardocumentoeniframe(Factura){
     processData: false,
     success: function (data) {
       $('#pdfiframe').attr("src", urlpdfsimpresionesrapidas+data);
-      setTimeout(function(){imprimirdirecto();},500);    
+      setTimeout(function(){imprimirdirecto();},500);
     },
     error: function (data) {
       console.log(data);
@@ -5884,3 +5877,4 @@ function configurar_tabla(){
   }
 }
 init();
+

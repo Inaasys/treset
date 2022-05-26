@@ -67,11 +67,11 @@ class FacturaController extends ConfiguracionSistemaController{
 
     public function __construct(){
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
-        //API FACTURAPI 
+        //API FACTURAPI
         $this->facturapi = new Facturapi( config('app.keyfacturapi') ); //
 
     }
-    
+
     public function facturas(){
         $contarseriesasignadasausuario = User_Rel_Serie::where('user_id', Auth::user()->id)->where('documento_serie', 'FACTURAS')->count();
         if($contarseriesasignadasausuario > 0){
@@ -130,7 +130,7 @@ class FacturaController extends ConfiguracionSistemaController{
         if($this->regimenfiscal != ''){
             $c_RegimenFiscal = c_RegimenFiscal::where('Clave', $this->regimenfiscal)->first();
             $claveregimenfiscal = $c_RegimenFiscal->Clave;
-            $regimenfiscal = $c_RegimenFiscal->Nombre;            
+            $regimenfiscal = $c_RegimenFiscal->Nombre;
         }
         $urlgenerarplantilla = route('facturas_generar_plantilla');
         return view('registros.facturas.facturas', compact('serieusuario','esquema','depto','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','rutacreardocumento','lugarexpedicion','claveregimenfiscal','regimenfiscal','urlgenerarplantilla'));
@@ -230,11 +230,11 @@ class FacturaController extends ConfiguracionSistemaController{
                     //->addColumn('Utilidad', function($data){ return $data->Utilidad; })
                     ->rawColumns(['operaciones'])
                     ->make();
-        } 
+        }
     }
     //descargar plantilla
     public function facturas_generar_plantilla(){
-        return Excel::download(new PlantillasFacturasExport(), "plantillafacturas.xlsx"); 
+        return Excel::download(new PlantillasFacturasExport(), "plantillafacturas.xlsx");
     }
     //cargar partidas excel
     public function facturas_cargar_partidas_excel(Request $request){
@@ -250,7 +250,7 @@ class FacturaController extends ConfiguracionSistemaController{
         foreach($partidasexcel as $partida){
             if($rowexcel > 0){
                 if (in_array(strtoupper($partida[0]), $arraycodigosyaagregados)) {
-                    
+
                 }else{
                     $codigoabuscar = $partida[0];
                     $cantidadpartida = $partida[1];
@@ -330,7 +330,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                     '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                         '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                     '</div>'.
-                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.    
+                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.
                                         '<input type="text" class="form-control inputnextdet divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$producto->ClaveProducto.'" readonly required data-parsley-length="[1, 20]">'.
                                     '</div>'.
                                 '</div>'.
@@ -341,7 +341,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                     '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                     '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                     '</div>'.
-                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.    
+                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.
                                     '<input type="text" class="form-control inputnextdet divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$producto->ClaveUnidad.'" readonly required data-parsley-length="[1, 5]">'.
                                     '</div>'.
                                 '</div>'.
@@ -363,7 +363,7 @@ class FacturaController extends ConfiguracionSistemaController{
             "contadorfilas" => $contadorfilas,
             "numeropartida" => $numeropartida
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener ultimo folio
@@ -515,7 +515,7 @@ class FacturaController extends ConfiguracionSistemaController{
         }
     }
 
-    //obtener agente por numero 
+    //obtener agente por numero
     public function facturas_obtener_agente_por_numero(Request $request){
         $numero = '';
         $nombre = '';
@@ -532,7 +532,7 @@ class FacturaController extends ConfiguracionSistemaController{
             'nombre' => $nombre,
             'rfc' => $rfc
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener codigo postal
@@ -563,7 +563,7 @@ class FacturaController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'estado' => $estado
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener regimen fiscal
@@ -594,7 +594,7 @@ class FacturaController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'nombre' => $nombre
         );
-        return response()->json($data);   
+        return response()->json($data);
     }
 
     //obtener tipo relacion
@@ -625,7 +625,7 @@ class FacturaController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'nombre' => $nombre
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener formas pago
@@ -656,7 +656,7 @@ class FacturaController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'nombre' => $nombre
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener metodos pago
@@ -687,7 +687,7 @@ class FacturaController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'nombre' => $nombre
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener usos cfdi
@@ -718,7 +718,7 @@ class FacturaController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'nombre' => $nombre
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener residencias fiscales
@@ -735,7 +735,7 @@ class FacturaController extends ConfiguracionSistemaController{
         }
     }
 
-    //obtener 
+    //obtener
     public function facturas_obtener_regimenes_fiscales_receptor(Request $request){
         if($request->ajax()){
             $data = c_RegimenFiscal::query();
@@ -763,9 +763,9 @@ class FacturaController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'nombre' => $nombre
         );
-        return response()->json($data);  
-    }   
-    
+        return response()->json($data);
+    }
+
     //obtener periodicidades
     public function facturas_obtener_periodicidades(Request $request){
         if($request->ajax()){
@@ -794,7 +794,7 @@ class FacturaController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'descripcion' => $descripcion
         );
-        return response()->json($data);  
+        return response()->json($data);
 
     }
 
@@ -826,7 +826,7 @@ class FacturaController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'descripcion' => $descripcion
         );
-        return response()->json($data);  
+        return response()->json($data);
 
     }
 
@@ -844,9 +844,9 @@ class FacturaController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'nombre' => $nombre
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
-    
+
 
     //obtener folios fiscales
     public function facturas_obtener_folios_fiscales(Request $request){
@@ -887,7 +887,7 @@ class FacturaController extends ConfiguracionSistemaController{
         if(sizeof($serieesquemainterno) == 0 || sizeof($serieesquemainterno) == "" || sizeof($serieesquemainterno) == null){
             $folio = 1;
         }else{
-            $folio = $serieesquemainterno[0]->Folio+1;   
+            $folio = $serieesquemainterno[0]->Folio+1;
         }
         $data = array(
             'Folio' => $folio,
@@ -1064,7 +1064,7 @@ class FacturaController extends ConfiguracionSistemaController{
                             '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                 '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
-                            '<div class="col-xs-10 col-sm-10 col-md-10">'.   
+                            '<div class="col-xs-10 col-sm-10 col-md-10">'.
                                 '<input type="text" class="form-control inputnextdet divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly required data-parsley-length="[1, 5]">'.
                             '</div>'.
                         '</div>'.
@@ -1073,14 +1073,14 @@ class FacturaController extends ConfiguracionSistemaController{
                 '</tr>';
                 $contadorfilas++;
                 $partida++;
-            }           
+            }
         }
         $data = array(
             "filasremisiones" => $filasremisiones,
             "contadorfilas" => $contadorfilas,
             "partida" => $partida,
             "saldo" => Helpers::convertirvalorcorrecto($remision->Saldo)
-        ); 
+        );
         return response()->json($data);
     }
 
@@ -1186,7 +1186,7 @@ class FacturaController extends ConfiguracionSistemaController{
                             '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                 '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
-                            '<div class="col-xs-10 col-sm-10 col-md-10">'.   
+                            '<div class="col-xs-10 col-sm-10 col-md-10">'.
                                 '<input type="text" class="form-control inputnextdet divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly required data-parsley-length="[1, 5]">'.
                             '</div>'.
                         '</div>'.
@@ -1196,7 +1196,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 $contadorfilas++;
                 $partida++;
                 $contadorproductos++;
-            }  
+            }
             /*
             $remision = Remision::where('Remision', $request->Remision)->first();
             $porcentajeiva = Helpers::calcular_porcentaje_iva_aritmetico($remision->Iva, $remision->SubTotal);
@@ -1273,7 +1273,7 @@ class FacturaController extends ConfiguracionSistemaController{
                             '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                 '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
-                            '<div class="col-xs-10 col-sm-10 col-md-10">'.   
+                            '<div class="col-xs-10 col-sm-10 col-md-10">'.
                                 '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly required data-parsley-length="[1, 5]">'.
                             '</div>'.
                         '</div>'.
@@ -1293,7 +1293,7 @@ class FacturaController extends ConfiguracionSistemaController{
             "saldo" => Helpers::convertirvalorcorrecto($remision->Saldo),
             "cliente" => $cliente
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener servicios
@@ -1422,7 +1422,7 @@ class FacturaController extends ConfiguracionSistemaController{
                             '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                 '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
-                            '<div class="col-xs-10 col-sm-10 col-md-10">'.   
+                            '<div class="col-xs-10 col-sm-10 col-md-10">'.
                                 '<input type="text" class="form-control inputnextdet divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly required data-parsley-length="[1, 5]">'.
                             '</div>'.
                         '</div>'.
@@ -1432,7 +1432,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 $contadorfilas++;
                 $partida++;
                 $contadorproductos++;
-            } 
+            }
             /*
             $orden = OrdenTrabajo::where('Orden', $request->Orden)->first();
             $porcentajeiva = Helpers::calcular_porcentaje_iva_aritmetico($orden->Iva, $orden->SubTotal);
@@ -1513,7 +1513,7 @@ class FacturaController extends ConfiguracionSistemaController{
                             '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                 '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
-                            '<div class="col-xs-10 col-sm-10 col-md-10">'.   
+                            '<div class="col-xs-10 col-sm-10 col-md-10">'.
                                 '<input type="text" class="form-control divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly required data-parsley-length="[1, 5]">'.
                             '</div>'.
                         '</div>'.
@@ -1533,7 +1533,7 @@ class FacturaController extends ConfiguracionSistemaController{
             "cliente" => $cliente,
             "pedido" => $orden->Pedido
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
     //obtener productos
     public function facturas_obtener_productos(Request $request){
@@ -1546,18 +1546,18 @@ class FacturaController extends ConfiguracionSistemaController{
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.$tipooperacion.'\',\''.$data->Insumo.'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$data->NombreClaveProducto.'\',\''.$data->NombreClaveUnidad.'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\')">Seleccionar</div>';
                         return $boton;
                     })
-                    ->addColumn('Existencias', function($data){ 
+                    ->addColumn('Existencias', function($data){
                         return Helpers::convertirvalorcorrecto($data->Existencias);
                     })
-                    ->addColumn('Costo', function($data){ 
+                    ->addColumn('Costo', function($data){
                         return Helpers::convertirvalorcorrecto($data->Costo);
                     })
-                    ->addColumn('SubTotal', function($data){ 
+                    ->addColumn('SubTotal', function($data){
                         return Helpers::convertirvalorcorrecto($data->SubTotal);
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        } 
+        }
     }
     //obtener producto por codigo
     public function facturas_obtener_producto_por_codigo(Request $request){
@@ -1610,18 +1610,18 @@ class FacturaController extends ConfiguracionSistemaController{
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.$tipooperacion.'\',\''.$data->Insumo.'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$data->NombreClaveProducto.'\',\''.$data->NombreClaveUnidad.'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\')">Seleccionar</div>';
                         return $boton;
                     })
-                    ->addColumn('Existencias', function($data){ 
+                    ->addColumn('Existencias', function($data){
                         return Helpers::convertirvalorcorrecto($data->Existencias);
                     })
-                    ->addColumn('Costo', function($data){ 
+                    ->addColumn('Costo', function($data){
                         return Helpers::convertirvalorcorrecto($data->Costo);
                     })
-                    ->addColumn('SubTotal', function($data){ 
+                    ->addColumn('SubTotal', function($data){
                         return Helpers::convertirvalorcorrecto($data->SubTotal);
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        } 
+        }
     }
     //producto gasto por codigo
     public function facturas_obtener_producto_gasto_por_codigo(Request $request){
@@ -1664,7 +1664,7 @@ class FacturaController extends ConfiguracionSistemaController{
         return response()->json($data);
 
     }
-        
+
     public function facturas_obtener_servicios(Request $request){
         if($request->ajax()){
             $codigoservicioabuscar = $request->codigoservicioabuscar;
@@ -1681,10 +1681,10 @@ class FacturaController extends ConfiguracionSistemaController{
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Servicio, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Venta).'\',\''.Helpers::convertirvalorcorrecto(16).'\',\''.Helpers::convertirvalorcorrecto($data->Venta).'\',\''.$tipooperacion.'\',\'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$data->NombreClaveProducto.'\',\''.$data->NombreClaveUnidad.'\',\''.Helpers::convertirvalorcorrecto($data->Venta).'\',\''.Helpers::convertirvalorcorrecto($data->Cantidad).'\')">Seleccionar</div>';
                         return $boton;
                     })
-                    ->addColumn('Venta', function($data){ 
+                    ->addColumn('Venta', function($data){
                         return Helpers::convertirvalorcorrecto($data->Venta);
                     })
-                    ->addColumn('Cantidad', function($data){ 
+                    ->addColumn('Cantidad', function($data){
                         return Helpers::convertirvalorcorrecto($data->Cantidad);
                     })
                     ->rawColumns(['operaciones'])
@@ -1736,7 +1736,7 @@ class FacturaController extends ConfiguracionSistemaController{
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        }          
+        }
     }
     //obtener claves unidades
     public function facturas_obtener_claves_unidades(Request $request){
@@ -1750,7 +1750,7 @@ class FacturaController extends ConfiguracionSistemaController{
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        }         
+        }
     }
     //obtener facturas relaciinadas
     public function facturas_obtener_facturas_relacionadas(Request $request){
@@ -1761,12 +1761,12 @@ class FacturaController extends ConfiguracionSistemaController{
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarfacturarel(\''.$data->UUID .'\',\''.$data->Factura.'\')">Seleccionar</div>';
                         return $boton;
                     })
-                    ->addColumn('Total', function($data){ 
+                    ->addColumn('Total', function($data){
                         return Helpers::convertirvalorcorrecto($data->Total);
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        } 
+        }
 
     }
 
@@ -1780,7 +1780,7 @@ class FacturaController extends ConfiguracionSistemaController{
         $xml->move($mover_a_carpeta,$nombre_original);
         if (file_exists('xml_cargados/'.$nombre_original)) {
             //cargar xml
-            $xml = simplexml_load_file('xml_cargados/'.$nombre_original); 
+            $xml = simplexml_load_file('xml_cargados/'.$nombre_original);
             $activar_namespaces = $xml->getNameSpaces(true);
             $namespaces = $xml->children($activar_namespaces['cfdi']);
             //obtener UUID del xml timbrado digital
@@ -1813,6 +1813,7 @@ class FacturaController extends ConfiguracionSistemaController{
 
     //alta
     public function facturas_guardar(Request $request){
+        dd($request->all());
         ini_set('max_input_vars','20000' );
         //obtener el ultimo id de la tabla
         $folio = Helpers::ultimofolioserietablamodulos('App\Factura', $request->serie);
@@ -1824,7 +1825,7 @@ class FacturaController extends ConfiguracionSistemaController{
         $Factura->Folio=$folio;
         $Factura->Esquema=$request->esquema;
         $Factura->Cliente=$request->numerocliente;
-        $Factura->Agente=$request->numeroagente; 
+        $Factura->Agente=$request->numeroagente;
         $Factura->Fecha=Carbon::parse($request->fecha)->toDateTimeString();
         $Factura->Plazo=$request->plazo;
         $Factura->Depto=$request->depto;
@@ -1885,7 +1886,7 @@ class FacturaController extends ConfiguracionSistemaController{
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA  DETALLES
         $item = 1;
-        foreach ($request->codigopartida as $key => $codigopartida){             
+        foreach ($request->codigopartida as $key => $codigopartida){
             $FacturaDetalle=new FacturaDetalle;
             $FacturaDetalle->Factura = $factura;
             $FacturaDetalle->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
@@ -1950,14 +1951,14 @@ class FacturaController extends ConfiguracionSistemaController{
         }
         //INGRESAR DATOS A TABLA  DOCUMENTOS
         if($request->numerofilasuuid > 0){
-            foreach ($request->uuidrelacionado as $key => $uuidrelacionado){             
+            foreach ($request->uuidrelacionado as $key => $uuidrelacionado){
                 $FacturaDocumento=new FacturaDocumento;
                 $FacturaDocumento->Factura = $factura;
                 $FacturaDocumento->UUID = $uuidrelacionado;
                 $FacturaDocumento->save();
             }
         }
-        return response()->json($Factura);  
+        return response()->json($Factura);
     }
 
     //obtener registro
@@ -2073,7 +2074,7 @@ class FacturaController extends ConfiguracionSistemaController{
                             '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                 '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
-                            '<div class="col-xs-10 col-sm-10 col-md-10">'.   
+                            '<div class="col-xs-10 col-sm-10 col-md-10">'.
                                 '<input type="text" class="form-control inputnextdet divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly required data-parsley-length="[1, 5]">'.
                             '</div>'.
                         '</div>'.
@@ -2089,7 +2090,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 $contadorproductos++;
                 $contadorfilas++;
             }
-        }     
+        }
         //factura documentos
         $documentosfactura = FacturaDocumento::where('Factura', $request->facturamodificar)->get();
         $numerodocumentosfactura = FacturaDocumento::where('Factura', $request->facturamodificar)->count();
@@ -2102,7 +2103,7 @@ class FacturaController extends ConfiguracionSistemaController{
                         '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm uuidrelacionadobd" name="uuidrelacionadobd[]" value="'.$docf->UUID.'" readonly><input type="hidden" class="form-control divorinputmodsm uuidrelacionado" name="uuidrelacionado[]" value="'.$docf->UUID.'" readonly>'.$docf->UUID.'</td>'.
                     '</tr>';
             }
-        } 
+        }
         //array remisiones o ordenes
         if(sizeof($consarrayremisiones) > 0){
             $arrayrem = array_unique($consarrayremisiones);
@@ -2135,7 +2136,7 @@ class FacturaController extends ConfiguracionSistemaController{
                     $modificacionpermitida = 1;
                 }
             }
-        } 
+        }
         $data = array(
             "factura" => $factura,
             "filasdetallesfactura" => $filasdetallesfactura,
@@ -2193,15 +2194,15 @@ class FacturaController extends ConfiguracionSistemaController{
             foreach ($request->uuidrelacionado as $key => $nuevodocumento){
                 if($request->uuidagregadoen [$key] == 'NA'){
                     array_push($ArrayDetallesDocumentosFacturaNuevo, $factura.'#'.$nuevodocumento);
-                } 
-            }  
+                }
+            }
         }
         //diferencias entre arreglos
         $diferencias_arreglos = array_diff($ArrayDetallesDocumentosFacturaAnterior, $ArrayDetallesDocumentosFacturaNuevo);
         //iteramos las diferencias entre arreglos
         if(count($diferencias_arreglos) > 0){
             foreach($diferencias_arreglos as $eliminapartida){
-                $explode_d = explode("#",$eliminapartida);                
+                $explode_d = explode("#",$eliminapartida);
                 //eliminar detalle
                 $eliminardetalledocumento= FacturaDocumento::where('Factura', $explode_d[0])->where('UUID', $explode_d[1])->forceDelete();
             }
@@ -2209,7 +2210,7 @@ class FacturaController extends ConfiguracionSistemaController{
         //modificar
         Factura::where('Factura', $factura)
         ->update([
-            'Agente' => $request->numeroagente, 
+            'Agente' => $request->numeroagente,
             'Fecha' => Carbon::parse($request->fecha)->toDateTimeString(),
             'Hora' => Carbon::parse($request->fecha)->toDateTimeString(),
             'Plazo' => $request->plazo,
@@ -2243,7 +2244,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 Cliente::where('Numero', $Factura->Cliente)
                 ->update([
                     'Saldo' => Helpers::convertirvalorcorrecto($NuevoSaldoCliente)
-                ]); 
+                ]);
                 //modificar detalle
                 Factura::where('Factura', $factura)
                 ->update([
@@ -2256,7 +2257,7 @@ class FacturaController extends ConfiguracionSistemaController{
                     'Comision' => $request->comision,
                     'Utilidad' => $request->utilidad,
                     'Saldo' => $request->total
-                ]); 
+                ]);
                 break;
         }
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
@@ -2270,7 +2271,7 @@ class FacturaController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
         //detalles
-        foreach ($request->codigopartida as $key => $codigopartida){  
+        foreach ($request->codigopartida as $key => $codigopartida){
             //ver si se puede modificar la factura siempre y cuando sea una factura libre y no tenga ningun documento ligado a ella
             switch($Factura->Serie){
                 case "LST":
@@ -2296,23 +2297,23 @@ class FacturaController extends ConfiguracionSistemaController{
                         'Utilidad' => $request->utilidadpartida [$key],
                         'ClaveProducto' => $request->claveproductopartida [$key],
                         'ClaveUnidad' => $request->claveunidadpartida [$key],
-                    ]); 
+                    ]);
                     break;
             }
         }
         //detalles documentos
         if($request->numerofilasuuid > 0){
-            foreach ($request->uuidrelacionado as $key => $uuidrelacionado){     
+            foreach ($request->uuidrelacionado as $key => $uuidrelacionado){
                 //if la partida se agrego en la modificacion se realiza un insert
-                if($request->uuidagregadoen [$key] != 'NA'){ 
+                if($request->uuidagregadoen [$key] != 'NA'){
                     $FacturaDocumento=new FacturaDocumento;
                     $FacturaDocumento->Factura = $factura;
                     $FacturaDocumento->UUID = $uuidrelacionado;
                     $FacturaDocumento->save();
                 }
-            }  
+            }
         }
-        return response()->json($Factura);        
+        return response()->json($Factura);
     }
 
     //obtener datos generales
@@ -2330,7 +2331,7 @@ class FacturaController extends ConfiguracionSistemaController{
         ]);
         return response()->json($Factura);
     }
-        
+
     //obtener movimientos factura
     public function facturas_obtener_kardex(Request $request){
         $kardex = DB::select('exec ObtenerKardexFactura ?', array($request->factura));
@@ -2362,7 +2363,7 @@ class FacturaController extends ConfiguracionSistemaController{
     //verificar si continua baja
     public function facturas_verificar_si_continua_baja(Request $request){
         $errores = '';
-        $Factura = Factura::where('Factura', $request->facturadesactivar)->first(); 
+        $Factura = Factura::where('Factura', $request->facturadesactivar)->first();
         $numerocuentasporcobrar = CuentaXCobrarDetalle::where('Factura', $request->facturadesactivar)->Where('Abono', '>', 0)->count();
         $numeronotascliente = NotaClienteDocumento::where('Factura', $request->facturadesactivar)->where('Descuento', '>', 0)->count();
         $numerocuentaxcobrar = 0;
@@ -2395,7 +2396,7 @@ class FacturaController extends ConfiguracionSistemaController{
         $Factura = Factura::where('Factura', $request->facturadesactivar)->first();
         //Modificar saldo cliente
         $cliente = Cliente::where('Numero', $Factura->Cliente)->first();
-        //regresar saldo restar 
+        //regresar saldo restar
         $saldoanterior = $cliente->Saldo - $Factura->Total;
         Cliente::where('Numero', $Factura->Cliente)
                             ->update([
@@ -2473,10 +2474,10 @@ class FacturaController extends ConfiguracionSistemaController{
                                 'Departamento' => '',
                                 'Cargo' => '',
                                 'Almacen' => '0'
-                            ]);                                    
+                            ]);
         }
         //eliminar detalles documentos
-        $detallesdocumentos = FacturaDocumento::where('Factura', $request->facturadesactivar)->forceDelete(); 
+        $detallesdocumentos = FacturaDocumento::where('Factura', $request->facturadesactivar)->forceDelete();
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
         $BitacoraDocumento->Documento = "FACTURAS";
@@ -2501,7 +2502,7 @@ class FacturaController extends ConfiguracionSistemaController{
                     return $total;
                 })
                 ->make(true);
-        } 
+        }
     }
 
     //generacion de formato en PDF
@@ -2513,11 +2514,11 @@ class FacturaController extends ConfiguracionSistemaController{
         //primero eliminar todos los archivos zip
         Helpers::eliminararchivoszipgenerados();
         if($request->imprimirdirectamente == 1){
-            $facturas = Factura::where('Factura', $request->arraypdf)->get(); 
+            $facturas = Factura::where('Factura', $request->arraypdf)->get();
         }else{
             $tipogeneracionpdf = $request->tipogeneracionpdf;
             if($tipogeneracionpdf == 0){
-                $facturas = Factura::whereIn('Factura', $request->arraypdf)->orderBy('Folio', 'ASC')->take(250)->get(); 
+                $facturas = Factura::whereIn('Factura', $request->arraypdf)->orderBy('Folio', 'ASC')->take(250)->get();
             }else{
                 $fechainiciopdf = date($request->fechainiciopdf);
                 $fechaterminacionpdf = date($request->fechaterminacionpdf);
@@ -2545,7 +2546,7 @@ class FacturaController extends ConfiguracionSistemaController{
                     $tipodetalles = 'ordenes';
                 }else if($fd->Facturar == 'LIBRE'){
                     $tipodetalles = 'libre';
-                } 
+                }
             }
             //if la factura es para remisiones o ordenes
             if(sizeof($arraytipofactura) > 0){
@@ -2586,7 +2587,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                     "claveproducto" => $claveproducto,
                                     "claveunidad" => $claveunidad
                                 );
-                            } 
+                            }
                             break;
                         case 'ordenes':
                             $datosgenerales = OrdenTrabajo::where('Orden', $sorf)->first();
@@ -2654,7 +2655,7 @@ class FacturaController extends ConfiguracionSistemaController{
                         "claveproducto" => $claveproducto,
                         "claveunidad" => $claveunidad
                     );
-                }  
+                }
                 $datageneral[]=array(
                     "datadetalle" => $datadetalle,
                     "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles),
@@ -2738,7 +2739,7 @@ class FacturaController extends ConfiguracionSistemaController{
             ->setOption('margin-bottom', 10);
             //return $pdf->stream();
             $ArchivoPDF = "PDF".$f->Factura.".pdf";
-            $pdf->save(storage_path('archivos_pdf_documentos_generados/'.$ArchivoPDF));            
+            $pdf->save(storage_path('archivos_pdf_documentos_generados/'.$ArchivoPDF));
         }
         $pdfMerger = PDFMerger::init(); //Initialize the merger
         //unir pdfs
@@ -2768,11 +2769,11 @@ class FacturaController extends ConfiguracionSistemaController{
                     // Agregar archivos que se comprimiran
                     foreach($arrayfiles as $af) {
                         $zip->addFile(Storage::disk('local2')->getAdapter()->applyPathPrefix($af),$af);
-                    }  
+                    }
                     foreach($arrayfilespdf as $afp) {
                         $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
-                    }     
-                    //terminar proceso   
+                    }
+                    //terminar proceso
                     $zip->close();
                 }
                 // Set Encabezados para descargar
@@ -2789,7 +2790,7 @@ class FacturaController extends ConfiguracionSistemaController{
     }
     //generacion de formato en PDF INTERNO
     public function facturas_generar_pdfs_indiv($documento){
-        $facturas = Factura::where('Factura', $documento)->get(); 
+        $facturas = Factura::where('Factura', $documento)->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($facturas as $f){
@@ -2805,7 +2806,7 @@ class FacturaController extends ConfiguracionSistemaController{
                     $tipodetalles = 'ordenes';
                 }else if($fd->Facturar == 'LIBRE'){
                     $tipodetalles = 'libre';
-                } 
+                }
             }
             //if la factura es para remisiones o ordenes
             if(sizeof($arraytipofactura) > 0){
@@ -2846,7 +2847,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                     "claveproducto" => $claveproducto,
                                     "claveunidad" => $claveunidad
                                 );
-                            } 
+                            }
                             break;
                         case 'ordenes':
                             $datosgenerales = OrdenTrabajo::where('Orden', $sorf)->first();
@@ -2903,7 +2904,7 @@ class FacturaController extends ConfiguracionSistemaController{
                         "claveproducto" => $claveproducto,
                         "claveunidad" => $claveunidad
                     );
-                }  
+                }
                 $datageneral[]=array(
                     "datadetalle" => $datadetalle,
                     "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles),
@@ -3016,7 +3017,7 @@ class FacturaController extends ConfiguracionSistemaController{
 
     //enviar pdf por emial
     public function facturas_enviar_pdfs_email(Request $request){
-        $facturas = Factura::where('Factura', $request->emaildocumento)->get(); 
+        $facturas = Factura::where('Factura', $request->emaildocumento)->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($facturas as $f){
@@ -3032,7 +3033,7 @@ class FacturaController extends ConfiguracionSistemaController{
                     $tipodetalles = 'ordenes';
                 }else if($fd->Facturar == 'LIBRE'){
                     $tipodetalles = 'libre';
-                } 
+                }
             }
             //if la factura es para remisiones o ordenes
             if(sizeof($arraytipofactura) > 0){
@@ -3073,7 +3074,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                     "claveproducto" => $claveproducto,
                                     "claveunidad" => $claveunidad
                                 );
-                            } 
+                            }
                             break;
                         case 'ordenes':
                             $datosgenerales = OrdenTrabajo::where('Orden', $sorf)->first();
@@ -3130,7 +3131,7 @@ class FacturaController extends ConfiguracionSistemaController{
                         "claveproducto" => $claveproducto,
                         "claveunidad" => $claveunidad
                     );
-                }  
+                }
                 $datageneral[]=array(
                     "datadetalle" => $datadetalle,
                     "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles),
@@ -3225,7 +3226,7 @@ class FacturaController extends ConfiguracionSistemaController{
             $url_xml = "";
         }
         try{
-            //enviar correo electrónico	
+            //enviar correo electrónico
             $datosfactura = Factura::where('Factura', $request->emaildocumento)->first();
             $datoscliente = Cliente::where('Numero', $datosfactura->Cliente)->first();
             $nombre = 'Receptor envio de correos';
@@ -3327,7 +3328,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                 ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf")
                                 ->attach($url_xml);
                     });
-                } 
+                }
                 //eliminar xml de storage/xml_cargados
                 unlink($url_xml);
             }else{
@@ -3379,7 +3380,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                 ->subject($asunto)
                                 ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf");
                     });
-                } 
+                }
             }
         } catch(\Exception $e) {
             $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
@@ -3394,7 +3395,7 @@ class FacturaController extends ConfiguracionSistemaController{
     }
     //generacion de formato en PDF INTERNO
     public function facturas_generar_pdfs_cliente_indiv($documento){
-        $facturas = Factura::where('Factura', $documento)->get(); 
+        $facturas = Factura::where('Factura', $documento)->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($facturas as $f){
@@ -3410,7 +3411,7 @@ class FacturaController extends ConfiguracionSistemaController{
                     $tipodetalles = 'ordenes';
                 }else if($fd->Facturar == 'LIBRE'){
                     $tipodetalles = 'libre';
-                } 
+                }
             }
             //if la factura es para remisiones o ordenes
             if(sizeof($arraytipofactura) > 0){
@@ -3451,7 +3452,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                     "claveproducto" => $claveproducto,
                                     "claveunidad" => $claveunidad
                                 );
-                            } 
+                            }
                             break;
                         case 'ordenes':
                             $datosgenerales = OrdenTrabajo::where('Orden', $sorf)->first();
@@ -3508,7 +3509,7 @@ class FacturaController extends ConfiguracionSistemaController{
                         "claveproducto" => $claveproducto,
                         "claveunidad" => $claveunidad
                     );
-                }  
+                }
                 $datageneral[]=array(
                     "datadetalle" => $datadetalle,
                     "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles),
@@ -3595,7 +3596,7 @@ class FacturaController extends ConfiguracionSistemaController{
     }
     //enviar pdf por emial
     public function facturas_enviar_pdfs_clientes_email(Request $request){
-        $facturas = Factura::where('Factura', $request->emaildocumento)->get(); 
+        $facturas = Factura::where('Factura', $request->emaildocumento)->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($facturas as $f){
@@ -3611,7 +3612,7 @@ class FacturaController extends ConfiguracionSistemaController{
                     $tipodetalles = 'ordenes';
                 }else if($fd->Facturar == 'LIBRE'){
                     $tipodetalles = 'libre';
-                } 
+                }
             }
             //if la factura es para remisiones o ordenes
             if(sizeof($arraytipofactura) > 0){
@@ -3652,7 +3653,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                     "claveproducto" => $claveproducto,
                                     "claveunidad" => $claveunidad
                                 );
-                            } 
+                            }
                             break;
                         case 'ordenes':
                             $datosgenerales = OrdenTrabajo::where('Orden', $sorf)->first();
@@ -3709,7 +3710,7 @@ class FacturaController extends ConfiguracionSistemaController{
                         "claveproducto" => $claveproducto,
                         "claveunidad" => $claveunidad
                     );
-                }  
+                }
                 $datageneral[]=array(
                     "datadetalle" => $datadetalle,
                     "sumatotaldetalles" => Helpers::convertirvalorcorrecto($sumatotaldetalles),
@@ -3804,7 +3805,7 @@ class FacturaController extends ConfiguracionSistemaController{
             $url_xml = "";
         }
         try{
-            //enviar correo electrónico	
+            //enviar correo electrónico
             $datosfactura = Factura::where('Factura', $request->emaildocumento)->first();
             $datoscliente = Cliente::where('Numero', $datosfactura->Cliente)->first();
             $nombre = 'Receptor envio de correos';
@@ -3906,7 +3907,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                 ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf")
                                 ->attach($url_xml);
                     });
-                } 
+                }
                 //eliminar xml de storage/xml_cargados
                 unlink($url_xml);
             }else{
@@ -3958,7 +3959,7 @@ class FacturaController extends ConfiguracionSistemaController{
                                 ->subject($asunto)
                                 ->attachData($pdf->output(), "FacturaNo".$emaildocumento.".pdf");
                     });
-                } 
+                }
             }
         } catch(\Exception $e) {
             $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
@@ -3976,7 +3977,7 @@ class FacturaController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Facturas', Auth::user()->id);
-        return Excel::download(new FacturasExport($configuraciones_tabla['campos_consulta'],$request->periodo), "facturas-".$request->periodo.".xlsx");   
+        return Excel::download(new FacturasExport($configuraciones_tabla['campos_consulta'],$request->periodo), "facturas-".$request->periodo.".xlsx");
     }
     //configuracion tabla
     public function facturas_guardar_configuracion_tabla(Request $request){
@@ -4047,7 +4048,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 array_push($arraytest,  array(
                                             "quantity" => Helpers::convertirvalorcorrecto($df->Cantidad),
                                             "discount" => Helpers::convertirvalorcorrecto($df->Descuento),
-                                            "product" => 
+                                            "product" =>
                                                 array(
                                                     "description" => $df->Descripcion,
                                                     "product_key" => $df->ClaveProducto,
@@ -4064,7 +4065,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 array_push($arraytest,  array(
                                             "quantity" => Helpers::convertirvalorcorrecto($df->Cantidad),
                                             "discount" => Helpers::convertirvalorcorrecto($df->Descuento),
-                                            "product" => 
+                                            "product" =>
                                                 array(
                                                     "description" => $df->Descripcion,
                                                     "product_key" => $df->ClaveProducto,
@@ -4107,27 +4108,27 @@ class FacturaController extends ConfiguracionSistemaController{
                 $arraydoc = array();
                 foreach($detallesdocumentosfactura as $ddf){
                     array_push($arraydoc, $ddf->UUID);
-                } 
+                }
                 //FACTURA
                 // Crea una nueva factura
                 $invoice = array(
                     "customer" => array(
                         "legal_name" => $cliente->Nombre,
                         "tax_id" => $cliente->Rfc,
-                        
+
                         //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
                         "tax_system" => $cliente->RegimenFiscal,
-                        "address" => 
+                        "address" =>
                             array(
                                 "zip" => $cliente->CodigoPostal,
                             )
                         //fin cfdi 4.0
-                        
+
                     ),
                     "items" => $arraytest,
                     "payment_form" => $factura->FormaPago,
                     "payment_method" => $factura->MetodoPago,
-                    
+
                     //se debe cambiar la forma de relacion los documentos y en lugar de mandar arra products, se manda array items como en las facturas de ingreso con facturapi 2.0
                     "related_documents" => array(
                         array(
@@ -4154,15 +4155,15 @@ class FacturaController extends ConfiguracionSistemaController{
                     "customer" => array(
                         "legal_name" => $cliente->Nombre,
                         "tax_id" => $cliente->Rfc,
-                        
+
                         //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
                         "tax_system" => $cliente->RegimenFiscal,
-                        "address" => 
+                        "address" =>
                             array(
                                 "zip" => $cliente->CodigoPostal,
                             )
                         //fin cfdi 4.0
-                        
+
                     ),
                     "items" => $arraytest,
                     "payment_form" => $factura->FormaPago,
@@ -4180,27 +4181,27 @@ class FacturaController extends ConfiguracionSistemaController{
                 $arraydoc = array();
                 foreach($detallesdocumentosfactura as $ddf){
                     array_push($arraydoc, $ddf->UUID);
-                } 
+                }
                 //FACTURA
                 // Crea una nueva factura
                 $invoice = array(
                     "customer" => array(
                         "legal_name" => $cliente->Nombre,
                         "tax_id" => $cliente->Rfc,
-                        
+
                         //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
                         "tax_system" => $cliente->RegimenFiscal,
-                        "address" => 
+                        "address" =>
                             array(
                                 "zip" => $cliente->CodigoPostal,
                             )
                         //fin cfdi 4.0
-                        
+
                     ),
                     "items" => $arraytest,
                     "payment_form" => $factura->FormaPago,
                     "payment_method" => $factura->MetodoPago,
-                    
+
                     //se debe cambiar la forma de relacion los documentos y en lugar de mandar arra products, se manda array items como en las facturas de ingreso con facturapi 2.0
                     "related_documents" => array(
                         array(
@@ -4226,19 +4227,19 @@ class FacturaController extends ConfiguracionSistemaController{
                     "customer" => array(
                         "legal_name" => $cliente->Nombre,
                         "tax_id" => $cliente->Rfc,
-                        
+
                         //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
                         "tax_system" => $cliente->RegimenFiscal,
-                        "address" => 
+                        "address" =>
                             array(
                                 "zip" => $cliente->CodigoPostal,
                             )
                         //fin cfdi 4.0
-                        
+
                     ),
                     "items" => $arraytest,
                     "payment_form" => $factura->FormaPago,
-                    "payment_method" => $factura->MetodoPago,    
+                    "payment_method" => $factura->MetodoPago,
                     "folio_number" => $factura->Folio,
                     "series" => $factura->Serie,
                     "currency" => $factura->Moneda,
@@ -4255,14 +4256,14 @@ class FacturaController extends ConfiguracionSistemaController{
             $tipomensaje = "error";
             $data = array(
                         'mensaje' => "Error, ".$mensaje,
-                        'tipomensaje' => $tipomensaje 
+                        'tipomensaje' => $tipomensaje
                     );
             return response()->json($data);
         }else{
             //obtener datos del xml del documento timbrado para guardarlo en la tabla comprobantes
             $descargar_xml = $this->facturapi->Invoices->download_xml($new_invoice->id); // stream containing the XML file or
-            $xml = simplexml_load_string($descargar_xml);  
-            $comprobante = $xml->attributes(); 
+            $xml = simplexml_load_string($descargar_xml);
+            $comprobante = $xml->attributes();
             $CertificadoCFD = $comprobante['NoCertificado'];
             //obtener datos generales del xml nodo Emisor
             $activar_namespaces = $xml->getNameSpaces(true);
@@ -4314,7 +4315,7 @@ class FacturaController extends ConfiguracionSistemaController{
                             ->update([
                                 'FechaTimbrado' => $fechatimbrado,
                                 'UUID' => $new_invoice->uuid
-                            ]);  
+                            ]);
             // Enviar a más de un correo (máx 10)
             $this->facturapi->Invoices->send_by_email(
                 $new_invoice->id,
@@ -4327,7 +4328,7 @@ class FacturaController extends ConfiguracionSistemaController{
             $tipomensaje = "success";
             $data = array(
                         'mensaje' => $mensaje,
-                        'tipomensaje' => $tipomensaje 
+                        'tipomensaje' => $tipomensaje
                     );
             return response()->json($data);
         }
@@ -4368,7 +4369,7 @@ class FacturaController extends ConfiguracionSistemaController{
             $tipomensaje = "error";
             $data = array(
                         'mensaje' => "Error, ".$mensaje,
-                        'tipomensaje' => $tipomensaje 
+                        'tipomensaje' => $tipomensaje
                     );
             return response()->json($data);
         }else{
@@ -4382,7 +4383,7 @@ class FacturaController extends ConfiguracionSistemaController{
             $tipomensaje = "success";
             $data = array(
                         'mensaje' => $mensaje,
-                        'tipomensaje' => $tipomensaje 
+                        'tipomensaje' => $tipomensaje
                     );
             return response()->json($data);
         }
