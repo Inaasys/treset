@@ -71,7 +71,7 @@
                                         <thead class="{{$empresa->background_tables}}">
                                             <tr>
                                                 <th><div style="width:100px !important;">Operaciones</div></th>
-                                                @foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                                                @foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co)
                                                     <th id="th{{$co}}">{{$co}}</th>
                                                 @endforeach
                                             </tr>
@@ -80,7 +80,7 @@
                                         <tfoot>
                                             <tr>
                                                 <th><div style="width:100px !important;">Operaciones</div></th>
-                                                @foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                                                @foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co)
                                                     <th id="th{{$co}}">{{$co}}</th>
                                                 @endforeach
                                             </tr>
@@ -101,10 +101,10 @@
                                                     <th>Sum Costo: <b id="sumacostofiltrado"></b></th>
                                                     <th>Sum Comisión: <b id="sumacomisionfiltrado"></b></th>
                                                     <th>Sum Utilidad: <b id="sumautilidadfiltrado"></b></th>
-                                                </tr>  
+                                                </tr>
                                             </table>
                                         </div>
-                                    @endif  
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -136,26 +136,26 @@
                                             </div>
                                         </td>
                                     </tr>
-                                </table>   
+                                </table>
                             </div>
                         </form>
                         <form id="formparsley" action="#">
                             <div class="col-md-12" id="tabsform">
                                 <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
                             </div>
-                        </form> 
+                        </form>
                     </div>
                     <div class="modal-footer">
                         <div class="col-md-12">
                             <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
                             <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
                             <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
-                        </div> 
+                        </div>
                     </div>
                 </div>
                 <div id="contenidomodaltablas">
                     <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
-                </div> 
+                </div>
             </div>
         </div>
     </div>
@@ -174,7 +174,7 @@
                             <label>Motivo Baja</label>
                             <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required data-parsley-length="[1, 200]"></textarea>
                         </div>
-                    </form>	
+                    </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
@@ -194,7 +194,7 @@
                     <form id="formtimbrado" action="#">
                         <h5 id="textomodaltimbrado"> </h5>
                         <input type="hidden" class="form-control" id="facturatimbrado" name="facturatimbrado" readonly>
-                    </form>	
+                    </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
@@ -221,7 +221,7 @@
                                 <select name="motivobajatimbre" id="motivobajatimbre" class="form-control select2" style="width:100%;" required></select>
                             </div>
                         </div>
-                    </form>	
+                    </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
@@ -293,16 +293,16 @@
                                         </tr>
                                     </thead>
                                     <tbody id="filasmovimientos"></tbody>
-                                </table> 
+                                </table>
                             </div>
                         </div>
-                    </div>    	
+                    </div>
                 </div>
                 <div class="modal-footer">
                 </div>
             </div>
         </div>
-    </div> 
+    </div>
     <!-- Modal modificar datos generales-->
     <div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalmodificardatosgeneralesdocumento" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -324,8 +324,8 @@
                                     <label>Pedido</label>
                                     <input type="text" class="form-control inputnextdet" id="pedidodatosgenerales" name="pedidodatosgenerales" onkeyup="tipoLetra(this)">
                             </div>
-                        </div>                    
-                    </form>	
+                        </div>
+                    </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
@@ -333,7 +333,7 @@
                 </div>
             </div>
         </div>
-    </div> 
+    </div>
     <!-- modal para crear documento en PDF-->
     @include('secciones.modalcreardocumento')
     <!-- fin modal para crear documento en PDF-->
@@ -375,7 +375,7 @@
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';
-        var urlgenerarplantilla = '{{$urlgenerarplantilla}}';       
+        var urlgenerarplantilla = '{{$urlgenerarplantilla}}';
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var urlpdfsimpresionesrapidas = '{{asset("xml_descargados/")}}/';
         var urliconossistema = '{{asset("images/")}}/';
@@ -418,8 +418,8 @@
         var facturas_obtener_datos_agente  = '{!!URL::to('facturas_obtener_datos_agente')!!}';
         var facturas_obtener_remisiones = '{!!URL::to('facturas_obtener_remisiones')!!}';
         var facturas_obtener_remisiones_por_pedido  = '{!!URL::to('facturas_obtener_remisiones_por_pedido')!!}';
-        var facturas_obtener_remisiones_pedido  = '{!!URL::to('facturas_obtener_remisiones_pedido')!!}'; 
-        var facturas_obtener_total_a_facturar  = '{!!URL::to('facturas_obtener_total_a_facturar')!!}'; 
+        var facturas_obtener_remisiones_pedido  = '{!!URL::to('facturas_obtener_remisiones_pedido')!!}';
+        var facturas_obtener_total_a_facturar  = '{!!URL::to('facturas_obtener_total_a_facturar')!!}';
         var facturas_obtener_remision = '{!!URL::to('facturas_obtener_remision')!!}';
         var facturas_obtener_ordenes = '{!!URL::to('facturas_obtener_ordenes')!!}';
         var facturas_obtener_orden = '{!!URL::to('facturas_obtener_orden')!!}';
@@ -441,18 +441,17 @@
         var facturas_guardar_modificacion_datos_generales = '{!!URL::to('facturas_guardar_modificacion_datos_generales')!!}';
         var facturas_obtener_kardex = '{!!URL::to('facturas_obtener_kardex')!!}';
         var facturas_verificar_si_continua_baja = '{!!URL::to('facturas_verificar_si_continua_baja')!!}';
-        var facturas_alta_o_baja = '{!!URL::to('facturas_alta_o_baja')!!}'; 
+        var facturas_alta_o_baja = '{!!URL::to('facturas_alta_o_baja')!!}';
         var facturas_obtener_datos_envio_email = '{!!URL::to('facturas_obtener_datos_envio_email')!!}';
         var facturas_enviar_pdfs_email = '{!!URL::to('facturas_enviar_pdfs_email')!!}';
         var facturas_enviar_pdfs_clientes_email = '{!!URL::to('facturas_enviar_pdfs_clientes_email')!!}';
         var facturas_generar_pdfs = '{!!URL::to('facturas_generar_pdfs')!!}';
-        var facturas_buscar_folio_string_like = '{!!URL::to('facturas_buscar_folio_string_like')!!}'; 
-        var facturas_verificar_si_continua_timbrado = '{!!URL::to('facturas_verificar_si_continua_timbrado')!!}'; 
-        var facturas_timbrar_factura = '{!!URL::to('facturas_timbrar_factura')!!}'; 
-        var facturas_verificar_si_continua_baja_timbre = '{!!URL::to('facturas_verificar_si_continua_baja_timbre')!!}'; 
-        var facturas_baja_timbre = '{!!URL::to('facturas_baja_timbre')!!}'; 
+        var facturas_buscar_folio_string_like = '{!!URL::to('facturas_buscar_folio_string_like')!!}';
+        var facturas_verificar_si_continua_timbrado = '{!!URL::to('facturas_verificar_si_continua_timbrado')!!}';
+        var facturas_timbrar_factura = '{!!URL::to('facturas_timbrar_factura')!!}';
+        var facturas_verificar_si_continua_baja_timbre = '{!!URL::to('facturas_verificar_si_continua_baja_timbre')!!}';
+        var facturas_baja_timbre = '{!!URL::to('facturas_baja_timbre')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
-    <script src="scripts_inaasys/registros/facturas/facturas.js"></script>
-    
+    <script src="{{ asset('scripts_inaasys/registros/facturas/facturas.js') }}"></script>
 @endsection
