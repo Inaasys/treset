@@ -136,6 +136,13 @@
 <!-- fin modal para configuraciones de tablas-->
 @endsection
 @section('additionals_js')
+<script>
+    $(document).ready(function(){
+        $('body').on('click', '#idsolicitarxmlencompras', function() {
+            return false;
+        });
+    })
+</script>
     <script>
         /*urls y variables renderizadas con blade*/
         var mayusculas_sistema = '{{$mayusculas_sistema}}';
