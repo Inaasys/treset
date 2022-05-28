@@ -10,7 +10,7 @@ function init(){
 function obtenultimonumero(){
   $.get(proveedores_obtener_ultimo_numero, function(numero){
     $("#numero").val(numero);
-  })  
+  })
 }
 //cerrar modales
 function limpiarmodales(){
@@ -34,7 +34,7 @@ function mostrarmodalformulario(tipo){
   }else if(tipo == 'MODIFICACION'){
       $("#btnGuardar").hide();
       $("#btnGuardarModificacion").show();
-  }   
+  }
 }
 //ocultar modal formulario
 function ocultarmodalformulario(){
@@ -58,7 +58,7 @@ function listar(){
   //agregar inputs de busqueda por columna
   $('#tbllistado tfoot th').each( function () {
     var titulocolumnatfoot = $(this).text();
-    var valor_encontrado_en_array = campos_busqueda.indexOf(titulocolumnatfoot); 
+    var valor_encontrado_en_array = campos_busqueda.indexOf(titulocolumnatfoot);
     if(valor_encontrado_en_array >= 0){
       $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
     }
@@ -70,7 +70,7 @@ function listar(){
       "lengthMenu": [ 100, 250, 500, 1000 ],
       "pageLength": 1000,
         "sScrollX": "110%",
-        "sScrollY": "350px", 
+        "sScrollY": "350px",
         processing: true,
         'language': {
           'loadingRecords': '&nbsp;',
@@ -95,7 +95,7 @@ function listar(){
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {
                 $('#tbllistado').DataTable().search( this.value ).draw();
-                $(".inputbusquedageneral").val(""); 
+                $(".inputbusquedageneral").val("");
               }
           });
         }
@@ -104,7 +104,7 @@ function listar(){
     $('#tbllistado tbody').on('dblclick', 'tr', function () {
       var data = tabla.row( this ).data();
       obtenerdatos(data.Numero);
-    }); 
+    });
 }
 function listarcodigospostales(){
   ocultarformulario();
@@ -127,7 +127,7 @@ function listarcodigospostales(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
@@ -139,7 +139,7 @@ function listarcodigospostales(){
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "300px",
-        "bScrollCollapse": true,  
+        "bScrollCollapse": true,
         processing: true,
         'language': {
           'loadingRecords': '&nbsp;',
@@ -169,7 +169,7 @@ function listarcodigospostales(){
     $('#tbllistadocodigopostal tbody').on('dblclick', 'tr', function () {
         var data = tcp.row( this ).data();
         seleccionarcodigopostal(data.Clave);
-    }); 
+    });
 }
 function seleccionarcodigopostal(Clave){
     $("#codigopostal").val(Clave);
@@ -209,12 +209,12 @@ function alta(){
                                     '<span class="input-group-btn">'+
                                         '<div id="buscarcodigospostales" class="btn bg-blue waves-effect" onclick="listarcodigospostales()">Seleccionar</div>'+
                                     '</span>'+
-                                '</div>'+  
-                                '<div class="col-md-8">'+  
+                                '</div>'+
+                                '<div class="col-md-8">'+
                                     '<div class="form-line">'+
                                         '<input type="text" class="form-control inputnext" name="codigopostal" id="codigopostal" required data-parsley-codigopostal="^[0-9]{5}$">'+
                                     '</div>'+
-                                '</div>'+     
+                                '</div>'+
                             '</div>'+
                         '</div>'+
                         '<div class="col-md-4">'+
@@ -239,13 +239,13 @@ function alta(){
                         '</div>'+
                         '<div class="col-md-4">'+
                           '<label class="col-red">Solicitar xml´s en compras</label>'+
-                          '<div class="col-md-12 form-check">'+ 
+                          '<div class="col-md-12 form-check">'+
                               '<input type="hidden" name="solicitarxmlencompras" value="0" />'+
-                              '<input type="checkbox" name="solicitarxmlencompras" id="idsolicitarxmlencompras" class="filled-in" value="1" checked/>'+
+                              '<input type="checkbox" onclick="return false;" name="solicitarxmlencompras" id="idsolicitarxmlencompras" class="filled-in" value="1" checked/>'+
                               '<label for="idsolicitarxmlencompras">Marcar</label>'+
                           '</div>'+
                         '</div>'+
-                    '</div>'+   
+                    '</div>'+
                 '</div>'+
               '</div>';
   $("#tabsform").html(tabs);
@@ -258,16 +258,16 @@ function alta(){
   $(".inputnext").keyup(function (e) {
     //recomentable para mayor compatibilidad entre navegadores.
     var code = (e.keyCode ? e.keyCode : e.which);
-    var index = $(this).index(".inputnext");          
+    var index = $(this).index(".inputnext");
     switch(code){
       case 13:
-        $(".inputnext").eq(index + 1).focus().select(); 
+        $(".inputnext").eq(index + 1).focus().select();
         break;
       case 39:
-        $(".inputnext").eq(index + 1).focus().select(); 
+        $(".inputnext").eq(index + 1).focus().select();
         break;
       case 37:
-        $(".inputnext").eq(index - 1).focus().select(); 
+        $(".inputnext").eq(index - 1).focus().select();
         break;
     }
   });
@@ -375,12 +375,12 @@ function obtenerdatos(numeroproveedor){
                                         '<span class="input-group-btn">'+
                                             '<div id="buscarcodigospostales" class="btn bg-blue waves-effect" onclick="listarcodigospostales()">Seleccionar</div>'+
                                         '</span>'+
-                                    '</div>'+  
-                                    '<div class="col-md-8">'+  
+                                    '</div>'+
+                                    '<div class="col-md-8">'+
                                         '<div class="form-line">'+
                                             '<input type="text" class="form-control inputnext" name="codigopostal" id="codigopostal" required data-parsley-codigopostal="^[0-9]{5}$">'+
                                         '</div>'+
-                                    '</div>'+     
+                                    '</div>'+
                                 '</div>'+
                             '</div>'+
                             '<div class="col-md-4">'+
@@ -405,19 +405,19 @@ function obtenerdatos(numeroproveedor){
                             '</div>'+
                             '<div class="col-md-4">'+
                               '<label class="col-red">Solicitar xml´s en compras</label>'+
-                              '<div class="col-md-12 form-check">'+ 
+                              '<div class="col-md-12 form-check">'+
                                   '<input type="hidden" name="solicitarxmlencompras" value="0" />'+
                                   '<input type="checkbox" name="solicitarxmlencompras" id="idsolicitarxmlencompras" class="filled-in" value="1"/>'+
                                   '<label for="idsolicitarxmlencompras">Marcar</label>'+
                               '</div>'+
                             '</div>'+
-                        '</div>'+   
+                        '</div>'+
                     '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
     //colocar autocomplette off  todo el formulario
     $(".form-control").attr('autocomplete','off');
-    //boton formulario 
+    //boton formulario
     $("#numero").val(numeroproveedor);
     $("#nombre").val(data.proveedor.Nombre);
     $("#rfc").val(data.proveedor.Rfc);
@@ -437,16 +437,16 @@ function obtenerdatos(numeroproveedor){
     $(".inputnext").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      var index = $(this).index(".inputnext");          
+      var index = $(this).index(".inputnext");
       switch(code){
         case 13:
-          $(".inputnext").eq(index + 1).focus().select(); 
+          $(".inputnext").eq(index + 1).focus().select();
           break;
         case 39:
-          $(".inputnext").eq(index + 1).focus().select(); 
+          $(".inputnext").eq(index + 1).focus().select();
           break;
         case 37:
-          $(".inputnext").eq(index - 1).focus().select(); 
+          $(".inputnext").eq(index - 1).focus().select();
           break;
       }
     });
