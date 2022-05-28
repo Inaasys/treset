@@ -49,7 +49,7 @@
                                     <thead class="{{$empresa->background_tables}}">
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
-                                            @foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                                            @foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co)
                                                 <th id="th{{$co}}">{{$co}}</th>
                                             @endforeach
                                         </tr>
@@ -58,7 +58,7 @@
                                     <tfoot>
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
-                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co)
                                                 <th id="th{{$co}}">{{$co}}</th>
                                             @endforeach
                                         </tr>
@@ -86,7 +86,7 @@
                             <div class="col-md-3">
                                 <label>Número</label>
                                 <input type="text" class="form-control inputnext" name="numero" id="numero" required readonly onkeyup="tipoLetra(this);">
-                            </div>   
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-md-12">
@@ -103,11 +103,11 @@
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
                     </div>
-                </form> 
+                </form>
             </div>
             <div id="contenidomodaltablas">
                 <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
-            </div> 
+            </div>
         </div>
     </div>
 </div>
@@ -122,7 +122,7 @@
 		      	<form id="formdesactivar" action="#">
                     <h5>Esta seguro de dar de baja este registro?</h5>
 		        	<input type="hidden" id="numeroproveedor" name="numeroproveedor">
-		        </form>	
+		        </form>
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
@@ -154,18 +154,18 @@
         var campos_busquedas = '{{$configuracion_tabla->campos_busquedas}}';
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
-        var background_tables = '{{$empresa->background_tables}}';       
+        var background_tables = '{{$empresa->background_tables}}';
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var proveedores_obtener = '{!!URL::to('proveedores_obtener')!!}';
         var proveedores_buscar_rfc_en_tabla = '{!!URL::to('proveedores_buscar_rfc_en_tabla')!!}';
         var proveedores_obtener_ultimo_numero = '{!!URL::to('proveedores_obtener_ultimo_numero')!!}';
         var proveedores_obtener_codigos_postales = '{!!URL::to('proveedores_obtener_codigos_postales')!!}';
         var proveedores_guardar = '{!!URL::to('proveedores_guardar')!!}';
-        var proveedores_alta_o_baja = '{!!URL::to('proveedores_alta_o_baja')!!}'; 
-        var proveedores_obtener_proveedor = '{!!URL::to('proveedores_obtener_proveedor')!!}'; 
+        var proveedores_alta_o_baja = '{!!URL::to('proveedores_alta_o_baja')!!}';
+        var proveedores_obtener_proveedor = '{!!URL::to('proveedores_obtener_proveedor')!!}';
         var proveedores_guardar_modificacion = '{!!URL::to('proveedores_guardar_modificacion')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
-    <script src="scripts_inaasys/catalogos/proveedores/proveedores.js"></script>
+    <script src="{{ asset('scripts_inaasys/catalogos/proveedores/proveedores.js') }}"></script>
 
 @endsection
