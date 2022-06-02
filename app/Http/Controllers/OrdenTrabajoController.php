@@ -28,6 +28,7 @@ use App\Servicio;
 use App\Configuracion_Tabla;
 use App\VistaOrdenTrabajo;
 use App\BitacoraDocumento;
+use App\RegistrosAcciones;
 use Config;
 use Mail;
 use App\Serie;
@@ -803,6 +804,19 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                 'Total' =>  number_format($totalTotal,4, '.','')
             ]);
         }
+        //Obtiene orden con relaciones
+        $registroOrden = OrdenTrabajo::where('Orden', $orden)
+        ->with(['detalles'])
+        ->first();
+        $descripcion = array_merge($registroOrden->toArray(), $request->all());
+        $registro = new RegistrosAcciones;
+        $registro->user_id = Auth::user()->id;
+        $registro->accion = "Guardar orden de Trabajo";
+        $registro->controlador = 'OrdenTrabajoController';
+        $registro->metodo = 'ordenes_trabajo_guardar';
+        $registro->descripcion = json_encode($descripcion);
+        $registro->save();
+
     	return response()->json($OrdenTrabajo);
     }
     //obtener orden de trabajo
@@ -1014,8 +1028,21 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
     //modificacion
     public function ordenes_trabajo_guardar_modificacion(Request $request){
         ini_set('max_input_vars','20000' );
+        $importeAux = 0;
+        $descuentoAux = 0;
+        $subtotalAux = 0;
+        $ivaAux = 0;
+        $totalAux = 0;
+        $importeTotal = 0;
+        $descuentoTotal = 0;
+        $ivaTotal = 0;
+        $subtotalTotal = 0;
+        $totalTotal = 0;
         $orden = $request->folio.'-'.$request->serie;
-        $OrdenTrabajo = OrdenTrabajo::where('Orden', $orden)->first();
+        $OrdenTrabajo = OrdenTrabajo::where('Orden', $orden)
+        ->with(['detalles'])
+        ->first();
+        $original = $OrdenTrabajo->toArray();
         //modificar orden
         OrdenTrabajo::where('Orden', $orden)
         ->update([
@@ -1095,7 +1122,24 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             //modificar partidas que no se eliminaron
             foreach ($request->codigopartida as $key => $codigopartida){
                 if($request->tipofila [$key] == 'consultado'){
-                    OrdenTrabajoDetalle::where('Orden', $orden)
+                    //Coloca las variables en 0 para hacer la validación de los montos
+                    $importeAux = 0;
+                    $descuentoAux = 0;
+                    $subtotalAux = 0;
+                    $ivaAux = 0;
+                    $totalAux = 0;
+
+                    $importeAux = number_format($request->preciopartida[$key], 4, '.', '') * number_format($request->cantidadpartida[$key], 4, '.', '');
+                    $descuentoAux = number_format($importeAux, 4, '.', '') * (number_format($request->descuentoporcentajepartida[$key], 4, '.', '')/100);
+                    $subtotalAux = number_format($importeAux, 4, '.','') - number_format($descuentoAux, 4, '.','');
+
+                    $ivaAux = number_format($subtotalAux, 4, '.','') * (number_format($request->ivaporcentajepartida[$key], 4, '.','') / 100);
+                    $totalAux = number_format($subtotalAux,4, '.','') + number_format($ivaAux, 4, '.','');
+
+                    $importeTotal += number_format($importeAux, 4, '.', '');
+                    $descuentoTotal += number_format($descuentoAux, 4, '.', '');
+
+                    $ordenT = OrdenTrabajoDetalle::where('Orden', $orden)
                     ->where('Partida', $request->partidapartida [$key])
                     ->update([
                         'Orden' => $orden,
@@ -1108,13 +1152,13 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                         'Unidad' => $request->unidadpartidad [$key],
                         'Cantidad' =>  $request->cantidadpartida  [$key],
                         'Precio' =>  $request->preciopartida [$key],
-                        'Importe' => $request->importepartida [$key],
+                        'Importe' => number_format($importeAux, 4, '.', ''),
                         'Dcto' => $request->descuentoporcentajepartida [$key],
-                        'Descuento' => $request->descuentopesospartida [$key],
-                        'SubTotal' => $request->subtotalpartida [$key],
+                        'Descuento' => number_format($descuentoAux, 4, '.', ''),
+                        'SubTotal' => number_format($subtotalAux, 4, '.', ''),
                         'Impuesto' => $request->ivaporcentajepartida [$key],
-                        'Iva' => $request->ivapesospartida [$key],
-                        'Total' => $request->totalpesospartida [$key],
+                        'Iva' => number_format($ivaAux, 4, '.', ''),
+                        'Total' => number_format($totalAux, 4, '.', ''),
                         'Costo' => $request->costopartida [$key],
                         'CostoTotal' => $request->costototalpartida [$key],
                         'Com' => $request->comisionporcentajepartida [$key],
@@ -1141,6 +1185,24 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                         //'Partida' => $request->partidapartida [$key]
                     ]);
                 }elseif($request->tipofila [$key] == 'agregado'){
+
+                    //Calculos por partida
+                    $importeAux = 0;
+                    $descuentoAux = 0;
+                    $subtotalAux = 0;
+                    $ivaAux = 0;
+                    $totalAux = 0;
+
+                    $importeAux = number_format($request->preciopartida[$key], 4, '.', '') * number_format($request->cantidadpartida[$key], 4, '.', '');
+                    $descuentoAux = number_format($importeAux, 4, '.', '') * (number_format($request->descuentoporcentajepartida[$key], 4, '.', '')/100);
+                    $subtotalAux = number_format($importeAux, 4, '.','') - number_format($descuentoAux, 4, '.','');
+
+                    $ivaAux = number_format($subtotalAux, 4, '.','') * (number_format($request->ivaporcentajepartida[$key], 4, '.','') / 100);
+                    $totalAux = number_format($subtotalAux,4, '.','') + number_format($ivaAux, 4, '.','');
+
+                    $importeTotal += number_format($importeAux, 4, '.', '');
+                    $descuentoTotal += number_format($descuentoAux, 4, '.', '');
+
                     //agregar todas las partidas agregadas en la modificación
                     $OrdenTrabajoDetalle=new OrdenTrabajoDetalle;
                     $OrdenTrabajoDetalle->Orden = $orden;
@@ -1153,13 +1215,13 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     $OrdenTrabajoDetalle->Unidad = $request->unidadpartidad [$key];
                     $OrdenTrabajoDetalle->Cantidad =  $request->cantidadpartida  [$key];
                     $OrdenTrabajoDetalle->Precio =  $request->preciopartida [$key];
-                    $OrdenTrabajoDetalle->Importe = $request->importepartida [$key];
+                    $OrdenTrabajoDetalle->Importe = number_format($importeAux, 4, '.','');
                     $OrdenTrabajoDetalle->Dcto = $request->descuentoporcentajepartida [$key];
-                    $OrdenTrabajoDetalle->Descuento = $request->descuentopesospartida [$key];
-                    $OrdenTrabajoDetalle->SubTotal = $request->subtotalpartida [$key];
+                    $OrdenTrabajoDetalle->Descuento = number_format($descuentoAux, 4, '.','');
+                    $OrdenTrabajoDetalle->SubTotal = number_format($subtotalAux, 4, '.','');
                     $OrdenTrabajoDetalle->Impuesto = $request->ivaporcentajepartida [$key];
-                    $OrdenTrabajoDetalle->Iva = $request->ivapesospartida [$key];
-                    $OrdenTrabajoDetalle->Total = $request->totalpesospartida [$key];
+                    $OrdenTrabajoDetalle->Iva = number_format($ivaAux, 4, '.','');
+                    $OrdenTrabajoDetalle->Total = number_format($totalAux, 4, '.','');
                     $OrdenTrabajoDetalle->Costo = $request->costopartida [$key];
                     $OrdenTrabajoDetalle->CostoTotal = $request->costototalpartida [$key];
                     $OrdenTrabajoDetalle->Com = $request->comisionporcentajepartida [$key];
@@ -1187,7 +1249,29 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     $OrdenTrabajoDetalle->save();
                 }
             }
+            $subtotalTotal = number_format($importeTotal,4, '.','') - number_format($descuentoTotal,4, '.','');
+            $ivaTotal = number_format($subtotalTotal,4, '.','') * 0.16;
+            $totalTotal = number_format($subtotalTotal,4, '.','') + number_format($ivaTotal, 4,'.','');
+            OrdenTrabajo::where('Orden', $orden)
+            ->update([
+                'Importe' => number_format($importeTotal,4, '.',''),
+                'Descuento' => number_format($descuentoTotal,4, '.',''),
+                'SubTotal' => number_format($subtotalTotal,4, '.',''),
+                'Iva' => number_format($ivaTotal,4, '.',''),
+                'Total' =>  number_format($totalTotal,4, '.','')
+            ]);
         }
+        $registroOrden = OrdenTrabajo::where('Orden', $orden)
+        ->with(['detalles'])
+        ->first();
+        $descripcion = ["original"=>$original,"camvios"=>$registroOrden->toArray(), "request"=>$request->all()];
+        $registro = new RegistrosAcciones;
+        $registro->user_id = Auth::user()->id;
+        $registro->accion = "Modificar orden de trabajo";
+        $registro->controlador = 'OrdenTrabajoController';
+        $registro->metodo = 'ordenes_trabajo_guardar_modificacion';
+        $registro->descripcion = json_encode($descripcion);
+        $registro->save();
     	return response()->json($OrdenTrabajo);
     }
 

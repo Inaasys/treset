@@ -10,7 +10,7 @@ class OrdenTrabajo extends Model
     protected $table = 'Ordenes de Trabajo';
     protected $primaryKey = 'Folio';
     protected $fillable = [
-        'Orden', 
+        'Orden',
         'Serie',
         'Folio',
         'Caso',
@@ -79,4 +79,14 @@ class OrdenTrabajo extends Model
         'Refactura',
         'Periodo'
     ];
+
+    /**
+     * Obtiene todos los detalle de la orden de trabajo
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function detalles()
+    {
+        return $this->hasMany(OrdenTrabajoDetalle::class, 'Orden', 'Orden');
+    }
 }
