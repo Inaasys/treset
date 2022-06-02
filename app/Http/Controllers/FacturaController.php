@@ -1814,6 +1814,18 @@ class FacturaController extends ConfiguracionSistemaController{
     //alta
     public function facturas_guardar(Request $request){
         ini_set('max_input_vars','20000' );
+
+        $importeAux = 0;
+        $descuentoAux = 0;
+        $subtotalAux = 0;
+        $ivaAux = 0;
+        $totalAux = 0;
+        $importeTotal = 0;
+        $descuentoTotal = 0;
+        $ivaTotal = 0;
+        $subtotalTotal = 0;
+        $totalTotal = 0;
+
         //obtener el ultimo id de la tabla
         $folio = Helpers::ultimofolioserietablamodulos('App\Factura', $request->serie);
         //INGRESAR DATOS A TABLA
@@ -1886,6 +1898,7 @@ class FacturaController extends ConfiguracionSistemaController{
         //INGRESAR DATOS A TABLA  DETALLES
         $item = 1;
         foreach ($request->codigopartida as $key => $codigopartida){
+
             $FacturaDetalle=new FacturaDetalle;
             $FacturaDetalle->Factura = $factura;
             $FacturaDetalle->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
@@ -4042,7 +4055,35 @@ class FacturaController extends ConfiguracionSistemaController{
         $detallesdocumentosfactura = FacturaDocumento::where('Factura', $request->facturatimbrado)->get();
         $cliente = Cliente::where('Numero', $factura->Cliente)->first();
         $arraytest = array();
+
+        $importeAux = 0;
+        $descuentoAux = 0;
+        $subtotalAux = 0;
+        $ivaAux = 0;
+        $totalAux = 0;
+        $importeTotal = 0;
+        $descuentoTotal = 0;
+        $ivaTotal = 0;
+        $subtotalTotal = 0;
+        $totalTotal = 0;
+
         foreach($detallesfactura as $df){
+            //Coloca las variables en 0 para hacer la validación de los montos
+            $importeAux = 0;
+            $descuentoAux = 0;
+            $subtotalAux = 0;
+            $ivaAux = 0;
+            $totalAux = 0;
+
+            $importeAux = number_format($df->Precio, 4, '.', '') * number_format($df->Cantidad, 4, '.', '');
+            $descuentoAux = number_format($importeAux, 4, '.', '') * (number_format($df->Dcto, 4, '.', '')/100);
+            $subtotalAux = number_format($importeAux, 4, '.','') - number_format($descuentoAux, 4, '.','');
+
+            $ivaAux = number_format($subtotalAux, 4, '.','') * (number_format($df->Impuesto, 4, '.','') / 100);
+            $totalAux = number_format($subtotalAux,4, '.','') + number_format($ivaAux, 4, '.','');
+
+            $importeTotal += number_format($importeAux, 4, '.', '');
+            $descuentoTotal += number_format($descuentoAux, 4, '.', '');
             if($df->Impuesto == 0.000000){
                 array_push($arraytest,  array(
                                             "quantity" => Helpers::convertirvalorcorrecto($df->Cantidad),
@@ -4076,6 +4117,20 @@ class FacturaController extends ConfiguracionSistemaController{
                                         )
                 );
             }
+        }
+        $subtotalTotal = number_format($importeTotal,4, '.','') - number_format($descuentoTotal,4, '.','');
+        $ivaTotal = number_format($subtotalTotal,4, '.','') * 0.16;
+        $totalTotal = number_format($subtotalTotal,4, '.','') + number_format($ivaTotal, 4,'.','');
+
+        if(number_format($factura->Total,4, '.','') != number_format($totalTotal,4, '.','')){
+            $mensaje = "La suma de las partidas no corresponde al total de la factura";
+            $tipomensaje = "error";
+            $data = array(
+                        'mensaje' => "Error, ".$mensaje,
+                        'tipomensaje' => $tipomensaje
+                    );
+            return response()->json($data);
+
         }
         if($cliente->Rfc == 'XAXX010101000'){
             //asignar periodicidad en ingles para facturas globales
