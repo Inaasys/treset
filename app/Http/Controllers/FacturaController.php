@@ -4122,7 +4122,7 @@ class FacturaController extends ConfiguracionSistemaController{
         $ivaTotal = number_format($subtotalTotal,4, '.','') * 0.16;
         $totalTotal = number_format($subtotalTotal,4, '.','') + number_format($ivaTotal, 4,'.','');
 
-        if(number_format($factura->Total,4, '.','') != number_format($totalTotal,4, '.','')){
+        if(number_format($factura->Total,2, '.','') != number_format($totalTotal,2, '.','')){
             $mensaje = "La suma de las partidas no corresponde al total de la factura";
             $tipomensaje = "error";
             $data = array(

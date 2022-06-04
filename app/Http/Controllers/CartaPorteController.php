@@ -54,16 +54,17 @@ class CartaPorteController extends ConfiguracionSistemaController{
 
     public function __construct(){
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
-        //API FACTURAPI 
+        //API FACTURAPI
         $this->facturapi = new Facturapi( config('app.keyfacturapi') ); //
     }
-    
+
     public function carta_porte(){
         $contarserieusuario = FolioComprobanteTraslado::where('Predeterminar', '+')->count();
         if($contarserieusuario == 0){
             $FolioComprobanteTraslado = FolioComprobanteTraslado::orderBy('Numero','DESC')->take(1)->get();
-            $serieusuario = $FolioComprobanteTraslado[0]->Serie;
-            $esquema = $FolioComprobanteTraslado[0]->Esquema;
+
+            $serieusuario = (isset($FolioComprobanteTraslado[0]) ? $FolioComprobanteTraslado[0]->Serie : 'CP');
+            $esquema = (isset($FolioComprobanteTraslado[0]) ? $FolioComprobanteTraslado[0]->Esquema : 'CP');
         }else{
             $FolioComprobanteTraslado = FolioComprobanteTraslado::where('Predeterminar', '+')->first();
             $serieusuario = $FolioComprobanteTraslado->Serie;
@@ -80,7 +81,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
         if($this->regimenfiscal != ''){
             $c_RegimenFiscal = c_RegimenFiscal::where('Clave', $this->regimenfiscal)->first();
             $claveregimenfiscal = $c_RegimenFiscal->Clave;
-            $regimenfiscal = $c_RegimenFiscal->Nombre;            
+            $regimenfiscal = $c_RegimenFiscal->Nombre;
         }
         return view('registros.cartasporte.cartasporte', compact('serieusuario','esquema','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','rutacreardocumento','lugarexpedicion','claveregimenfiscal','regimenfiscal'));
     }
@@ -142,7 +143,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                     //->addColumn('TotalDistanciaRecorrida', function($data){ return $data->TotalDistanciaRecorrida; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        } 
+        }
     }
 
     //obtener ultimo folio
@@ -164,7 +165,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                     ->make(true);
         }
     }
-    
+
     //obtener datos folio seleccionado
     public function carta_porte_obtener_ultimo_folio_serie_seleccionada(Request $request){
         $folio = Helpers::ultimofolioserietablamodulos('App\CartaPorte', $request->Serie);
@@ -372,7 +373,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'descripcion' => $descripcion
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener claves transportes
@@ -405,7 +406,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'descripcion' => $descripcion
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener almacenes
@@ -436,7 +437,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             'numero' => $numero,
             'nombre' => $nombre,
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener codifos postales
@@ -452,7 +453,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                     ->make(true);
         }
     }
-    
+
     //obtener lugar expedicion por clave
     public function notas_credito_clientes_obtener_lugar_expedicion_por_clave(Request $request){
         $clave = '';
@@ -467,7 +468,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'estado' => $estado
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener regimenes fiscales
@@ -498,7 +499,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'nombre' => $nombre
         );
-        return response()->json($data);  
+        return response()->json($data);
     }
 
     //obtener tipos relacion
@@ -529,7 +530,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'nombre' => $nombre
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener formas pago
@@ -560,7 +561,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'nombre' => $nombre
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener metodos pago
@@ -591,7 +592,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'nombre' => $nombre
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener usos cfdi
@@ -622,7 +623,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'nombre' => $nombre
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener residencias fiscales
@@ -653,7 +654,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'nombre' => $nombre
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener facturas
@@ -719,7 +720,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             "factura" => $factura,
             "filafactura" => $filafactura,
         );
-        return response()->json($data);   
+        return response()->json($data);
     }
 
     //obtener datos almacen
@@ -758,18 +759,18 @@ class CartaPorteController extends ConfiguracionSistemaController{
                         }
                         return $boton;
                     })
-                    ->addColumn('Existencias', function($data){ 
+                    ->addColumn('Existencias', function($data){
                         return Helpers::convertirvalorcorrecto($data->Existencias);
                     })
-                    ->addColumn('Costo', function($data){ 
+                    ->addColumn('Costo', function($data){
                         return Helpers::convertirvalorcorrecto($data->Costo);
                     })
-                    ->addColumn('SubTotal', function($data){ 
+                    ->addColumn('SubTotal', function($data){
                         return Helpers::convertirvalorcorrecto($data->SubTotal);
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        } 
+        }
     }
     //obtener producto por codigo
     public function notas_credito_clientes_obtener_producto_por_codigo(Request $request){
@@ -818,7 +819,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                 'contarproductos' => $contarproductos
             );
         }
-        return response()->json($data);  
+        return response()->json($data);
     }
 
     //obtener claves productos
@@ -833,7 +834,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        }          
+        }
     }
     //obtener claves unidades
     public function notas_credito_clientes_obtener_claves_unidades(Request $request){
@@ -847,7 +848,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        }         
+        }
     }
 
     //comprobar cantidad nota vs cantidad factura
@@ -864,7 +865,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                 if($existedetallenota > 0){
                     $detallenota = NotaClienteDetalle::where('Nota', $dnu->Nota)->where('Codigo', $request->codigopartida)->first();
                     $cantidadesenotrasnotas = $cantidadesenotrasnotas + $detallenota->Cantidad;
-                } 
+                }
             }
         }
         $cantidadmaximapermitida = $cantidadfactura + $cantidadesenotrasnotas;
@@ -898,7 +899,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                     ->make(true);
         }
     }
-    
+
     //obtener vehiculo por numero
     public function carta_porte_obtener_vehiculo_por_numero(Request $request){
         $id = '';
@@ -940,7 +941,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             'Marca' => $Marca,
             'Modelo' => $Modelo,
         );
-        return response()->json($data); 
+        return response()->json($data);
 
     }
     //obtener operadores
@@ -1006,7 +1007,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             'Pais' => $Pais,
             'CodigoPostal' => $CodigoPostal,
         );
-        return response()->json($data); 
+        return response()->json($data);
 
     }
 
@@ -1017,7 +1018,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
     }
 
     //alta
-    public function notas_credito_clientes_guardar(Request $request){ 
+    public function notas_credito_clientes_guardar(Request $request){
         ini_set('max_input_vars','20000' );
             //obtener el ultimo id de la tabla
             $folio = Helpers::ultimofolioserietablamodulos('App\NotaCliente', $request->serie);
@@ -1030,10 +1031,10 @@ class CartaPorteController extends ConfiguracionSistemaController{
             $NotaCliente->Esquema=$request->esquema;
             $NotaCliente->Cliente=$request->numerocliente;
             $NotaCliente->Fecha=Carbon::parse($request->fecha)->toDateTimeString();
-            $NotaCliente->Almacen=$request->numeroalmacen; 
+            $NotaCliente->Almacen=$request->numeroalmacen;
             $NotaCliente->Importe=$request->importe;
             $NotaCliente->Descuento=$request->descuento;
-            $NotaCliente->Ieps=$request->ieps;  
+            $NotaCliente->Ieps=$request->ieps;
             $NotaCliente->SubTotal=$request->subtotal;
             $NotaCliente->Iva=$request->iva;
             $NotaCliente->IvaRetencion=$request->retencioniva;
@@ -1084,7 +1085,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             $BitacoraDocumento->save();
             //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
             $item = 1;
-            foreach ($request->codigopartida as $key => $codigopartida){             
+            foreach ($request->codigopartida as $key => $codigopartida){
                 $NotaClienteDetalle=new NotaClienteDetalle;
                 $NotaClienteDetalle->Nota = $notacliente;
                 $NotaClienteDetalle->Cliente = $request->numerocliente;
@@ -1113,7 +1114,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                 $NotaClienteDetalle->Item = $item;
                 $NotaClienteDetalle->save();
                 if($codigopartida != 'DPPP'){
-                    //sumar existencias del almacen 
+                    //sumar existencias del almacen
                     $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigopartida)->where('Almacen', $request->numeroalmacen)->count();
                     if($ContarExistenciaAlmacen > 0){
                         $ExistenciaAlmacen = Existencia::where('Codigo', $codigopartida)->where('Almacen', $request->numeroalmacen)->first();
@@ -1135,7 +1136,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             }
             //INGRESAR DATOS A TABLA NOTA CLIENTES DOCUMENTOS
             $itemdocumento = 1;
-            foreach ($request->facturaaplicarpartida as $key => $facturapartida){             
+            foreach ($request->facturaaplicarpartida as $key => $facturapartida){
                 $NotaClienteDocumento=new NotaClienteDocumento;
                 $NotaClienteDocumento->Nota = $notacliente;
                 $NotaClienteDocumento->Factura = $facturapartida;
@@ -1158,7 +1159,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                 }
                 $itemdocumento++;
             }
-            return response()->json($NotaCliente);  
+            return response()->json($NotaCliente);
     }
 
     //verificar si se puede dar de bajar nota cliente
@@ -1173,7 +1174,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                     $errores = $errores.'Error la nota de cliente no se puede dar de baja porque no hay existencias suficientes en el almacen: '.$NotaCliente->Almacen.' para el código: '.$detalle->Codigo.'<br>';
                 }
             }
-        }  
+        }
         $resultadofechas = Helpers::compararanoymesfechas($NotaCliente->Fecha);
         $data = array(
             'resultadofechas' => $resultadofechas,
@@ -1233,10 +1234,10 @@ class CartaPorteController extends ConfiguracionSistemaController{
                                 'IsrRetencion' => '0.000000',
                                 'IepsRetencion' => '0.000000',
                                 'Total' => '0.000000'
-                            ]);                                    
+                            ]);
         }
         //nota cliente documentos
-        $detallesdocumentos = NotaClienteDocumento::where('Nota', $request->notadesactivar)->get(); 
+        $detallesdocumentos = NotaClienteDocumento::where('Nota', $request->notadesactivar)->get();
         foreach($detallesdocumentos as $detalledocumento){
             $notaclientedocumento = NotaClienteDocumento::where('Nota', $request->notadesactivar)->where('Factura', $detalledocumento->Factura)->first();
             $facturadocumento = Factura::where('Factura', $detalledocumento->Factura)->first();
@@ -1261,7 +1262,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                                     ->update([
                                         'Descuento' => '0.000000',
                                         'Total' => '0.000000'
-                                    ]);  
+                                    ]);
         }
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
@@ -1332,7 +1333,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                         $filasdetallesnotacliente= $filasdetallesnotacliente.
                         '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                             '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfila" onclick="eliminarfila('.$contadorfilas.')" >X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dnc->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
-                            '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dnc->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$dnc->Codigo.'</b></td>'.         
+                            '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dnc->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$dnc->Codigo.'</b></td>'.
                             '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($dnc->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                             '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxs unidadpartida" name="unidadpartida[]" value="'.$dnc->Unidad.'" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)"></td>'.
                             '<td class="tdmod">'.
@@ -1373,7 +1374,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                                     '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                         '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                     '</div>'.
-                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.   
+                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.
                                         '<input type="text" class="form-control inputnextdet divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
                                     '</div>'.
                                 '</div>'.
@@ -1430,7 +1431,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                                     '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                         '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                     '</div>'.
-                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.   
+                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.
                                         '<input type="text" class="form-control inputnextdet divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
                                     '</div>'.
                                 '</div>'.
@@ -1442,7 +1443,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                     $contadorproductos++;
                     $contadorfilas++;
             }
-        }     
+        }
         //nota proveedor documentos
         $documentosnotacliente = NotaClienteDocumento::where('Nota', $request->notamodificar)->orderBy('Item', 'ASC')->get();
         $numerodocumentosnotacliente = NotaClienteDocumento::where('Nota', $request->notamodificar)->count();
@@ -1472,10 +1473,10 @@ class CartaPorteController extends ConfiguracionSistemaController{
                         '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd notascreditofacturapartida" name="notascreditofacturapartida[]" value="'.Helpers::convertirvalorcorrecto($descuentofac).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                         '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdetfac divorinputmodmd descuentopesosfacturapartida" name="descuentopesosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto($docnc->Descuento).'" data-parsley-max="'.Helpers::convertirvalorcorrecto($saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilastablafacturas('.$contadorfilasfacturas.');" ></td>'.
                         '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd saldofacturapartida" name="saldofacturapartida[]" value="'.Helpers::convertirvalorcorrecto($factura->Saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '</tr>'; 
+                    '</tr>';
                     $descuentofacturas = $descuentofacturas+$docnc->Descuento;
             }
-        } 
+        }
         $diferencia = $notacliente->Total - $descuentofacturas;
         //permitir o no modificar registro
         if(Auth::user()->role_id == 1){
@@ -1550,8 +1551,8 @@ class CartaPorteController extends ConfiguracionSistemaController{
             foreach ($request->codigopartida as $key => $nuevocodigo){
                 if($request->agregadoen [$key] == 'NA'){
                     array_push($ArrayDetallesNotaNuevo, $notacliente.'#'.$nuevocodigo.'#'.$request->itempartida [$key]);
-                } 
-            }  
+                }
+            }
             //diferencias entre arreglos
             $diferencias_arreglos = array_diff($ArrayDetallesNotaAnterior, $ArrayDetallesNotaNuevo);
             //iteramos las diferencias entre arreglos
@@ -1582,8 +1583,8 @@ class CartaPorteController extends ConfiguracionSistemaController{
             foreach ($request->facturaaplicarpartida as $key => $nuevafactura){
                 if($request->facturaagregadoen [$key] == 'NA'){
                     array_push($ArrayDetallesDocumentosNotaNuevo, $notacliente.'#'.$nuevafactura.'#'.$request->itemfacturapartida [$key]);
-                } 
-            }  
+                }
+            }
             //diferencias entre arreglos
             $diferencias_arreglos = array_diff($ArrayDetallesDocumentosNotaAnterior, $ArrayDetallesDocumentosNotaNuevo);
             //iteramos las diferencias entre arreglos
@@ -1610,10 +1611,10 @@ class CartaPorteController extends ConfiguracionSistemaController{
             ->update([
                 'Cliente' => $request->numerocliente,
                 'Fecha' => Carbon::parse($request->fecha)->toDateTimeString(),
-                'Almacen' => $request->numeroalmacen, 
+                'Almacen' => $request->numeroalmacen,
                 'Importe' => $request->importe,
                 'Descuento' => $request->descuento,
-                'Ieps' => $request->ieps,  
+                'Ieps' => $request->ieps,
                 'SubTotal' => $request->subtotal,
                 'Iva' => $request->iva,
                 'IvaRetencion' => $request->retencioniva,
@@ -1649,9 +1650,9 @@ class CartaPorteController extends ConfiguracionSistemaController{
             $BitacoraDocumento->Periodo = $this->periodohoy;
             $BitacoraDocumento->save();
             //detalles
-            foreach ($request->codigopartida as $key => $codigopartida){  
+            foreach ($request->codigopartida as $key => $codigopartida){
                 //if la partida se agrego en la modificacion se realiza un insert
-                if($request->agregadoen [$key] == 'modificacion'){        
+                if($request->agregadoen [$key] == 'modificacion'){
                     $contaritems = NotaClienteDetalle::select('Item')->where('Nota', $notacliente)->count();
                     if($contaritems > 0){
                         $item = NotaClienteDetalle::select('Item')->where('Nota', $notacliente)->orderBy('Item', 'DESC')->take(1)->get();
@@ -1687,7 +1688,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                     $NotaClienteDetalle->Item = $ultimoitem;
                     $NotaClienteDetalle->save();
                     if($codigopartida != 'DPPP'){
-                        //sumar existencias del almacen 
+                        //sumar existencias del almacen
                         $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigopartida)->where('Almacen', $request->numeroalmacen)->count();
                         if($ContarExistenciaAlmacen > 0){
                             $ExistenciaAlmacen = Existencia::where('Codigo', $codigopartida)->where('Almacen', $request->numeroalmacen)->first();
@@ -1744,7 +1745,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                                     ->update([
                                         'Existencias' => Helpers::convertirvalorcorrecto($ExistenciaNuevaAlmacen)
                                     ]);
-                        //sumar existencias del almacen 
+                        //sumar existencias del almacen
                         $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigopartida)->where('Almacen', $request->numeroalmacen)->count();
                         if($ContarExistenciaAlmacen > 0){
                             $ExistenciaAlmacen = Existencia::where('Codigo', $codigopartida)->where('Almacen', $request->numeroalmacen)->first();
@@ -1762,12 +1763,12 @@ class CartaPorteController extends ConfiguracionSistemaController{
                             $ExistenciaAlmacen->save();
                         }
                     }
-                }    
+                }
             }
             //detalles documentos
-            foreach ($request->facturaaplicarpartida as $key => $facturapartida){     
+            foreach ($request->facturaaplicarpartida as $key => $facturapartida){
                 //if la partida se agrego en la modificacion se realiza un insert
-                if($request->facturaagregadoen [$key] == 'modificacion'){ 
+                if($request->facturaagregadoen [$key] == 'modificacion'){
                     $itemdocumento = NotaClienteDocumento::select('Item')->where('Nota', $notacliente)->orderBy('Item', 'DESC')->take(1)->get();
                     $ultimoitemdocumento = $itemdocumento[0]->Item+1;
                     $NotaClienteDocumento=new NotaClienteDocumento;
@@ -1821,8 +1822,8 @@ class CartaPorteController extends ConfiguracionSistemaController{
                                     'Status' => "LIQUIDADO"
                                 ]);
                     }
-                } 
-            }  
+                }
+            }
             return response()->json($NotaCliente);
     }
 
@@ -1842,7 +1843,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                 })
                 ->rawColumns(['operaciones','Total'])
                 ->make(true);
-        } 
+        }
     }
     //generacion de formato en PDF
     public function notas_credito_clientes_generar_pdfs(Request $request){
@@ -1850,9 +1851,9 @@ class CartaPorteController extends ConfiguracionSistemaController{
         Helpers::eliminararchivospdfsgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
-            $notascreditocliente = NotaCliente::whereIn('Nota', $request->arraypdf)->orderBy('Folio', 'ASC')->take(250)->get(); 
+            $notascreditocliente = NotaCliente::whereIn('Nota', $request->arraypdf)->orderBy('Folio', 'ASC')->take(250)->get();
         }else{
-            //$contrarecibos = ContraRecibo::where('Fecha', $request->anopdf)->get(); 
+            //$contrarecibos = ContraRecibo::where('Fecha', $request->anopdf)->get();
             $fechainiciopdf = date($request->fechainiciopdf);
             $fechaterminacionpdf = date($request->fechaterminacionpdf);
             if ($request->has("seriesdisponiblesdocumento")){
@@ -1882,7 +1883,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                     "claveproducto" => $claveproducto,
                     "claveunidad" => $claveunidad
                 );
-            } 
+            }
             $cliente = Cliente::where('Numero', $ncc->Cliente)->first();
             $formapago = FormaPago::where('Clave', $ncc->FormaPago)->first();
             $metodopago = MetodoPago::where('Clave', $ncc->MetodoPago)->first();
@@ -1939,7 +1940,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
 
     //generacion de formato en PDF
     public function notas_credito_clientes_generar_pdfs_indiv($documento){
-        $notascreditocliente = NotaCliente::where('Nota', $documento)->get(); 
+        $notascreditocliente = NotaCliente::where('Nota', $documento)->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($notascreditocliente as $ncc){
@@ -1961,7 +1962,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                     "claveproducto" => $claveproducto,
                     "claveunidad" => $claveunidad
                 );
-            } 
+            }
             $cliente = Cliente::where('Numero', $ncc->Cliente)->first();
             $formapago = FormaPago::where('Clave', $ncc->FormaPago)->first();
             $metodopago = MetodoPago::where('Clave', $ncc->MetodoPago)->first();
@@ -2022,7 +2023,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
 
     //enviar pdf por emial
     public function notas_credito_clientes_enviar_pdfs_email(Request $request){
-        $notascreditocliente = NotaCliente::where('Nota', $request->emaildocumento)->get(); 
+        $notascreditocliente = NotaCliente::where('Nota', $request->emaildocumento)->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($notascreditocliente as $ncc){
@@ -2044,7 +2045,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                     "claveproducto" => $claveproducto,
                     "claveunidad" => $claveunidad
                 );
-            } 
+            }
             $cliente = Cliente::where('Numero', $ncc->Cliente)->first();
             $formapago = FormaPago::where('Clave', $ncc->FormaPago)->first();
             $metodopago = MetodoPago::where('Clave', $ncc->MetodoPago)->first();
@@ -2087,7 +2088,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
         ->setOption('margin-bottom', 10);
         //obtener XML
         if($request->incluir_xml == 1){
-            $nota = NotaCliente::where('Nota', $request->emaildocumento)->first(); 
+            $nota = NotaCliente::where('Nota', $request->emaildocumento)->first();
             $comprobante = Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $nota->Folio . '')->where('Serie', '' . $nota->Serie . '')->first();
             $descargar_xml = $this->facturapi->Invoices->download_xml($comprobante->IdFacturapi); // stream containing the XML file or
             $nombre_xml = "NotaCreditoClienteNo".$nota->Nota.'##'.$nota->UUID.'.xml';
@@ -2097,7 +2098,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             $url_xml = "";
         }
         try{
-            //enviar correo electrónico	
+            //enviar correo electrónico
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
             $arraycc = array();
@@ -2196,7 +2197,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                                 ->attachData($pdf->output(), "NotaCreditoClienteNo".$emaildocumento.".pdf")
                                 ->attach($url_xml);
                     });
-                } 
+                }
                 //eliminar xml de storage/xml_cargados
                 unlink($url_xml);
             }else{
@@ -2248,7 +2249,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                                 ->subject($asunto)
                                 ->attachData($pdf->output(), "NotaCreditoClienteNo".$emaildocumento.".pdf");
                     });
-                } 
+                }
             }
         } catch(\Exception $e) {
             $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
@@ -2266,7 +2267,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
     public function notas_credito_clientes_exportar_excel(Request $request){
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
-        return Excel::download(new NotasCreditoClientesExport($this->campos_consulta,$request->periodo), "notascreditoclientes-".$request->periodo.".xlsx");   
+        return Excel::download(new NotasCreditoClientesExport($this->campos_consulta,$request->periodo), "notascreditoclientes-".$request->periodo.".xlsx");
     }
     //configuracion tabla
     public function notas_credito_clientes_guardar_configuracion_tabla(Request $request){
@@ -2319,13 +2320,13 @@ class CartaPorteController extends ConfiguracionSistemaController{
                                         "price" => Helpers::convertirvalorcorrecto($dn->Precio),
                                         "tax_included" => false,
                                         "sku" => $dn->Codigo
-                                    )                    
+                                    )
             );
-        }  
+        }
         $arraydoc = array();
         foreach($detallesdocumentosnota as $ddn){
             array_push($arraydoc, $ddn->UUID);
-        }  
+        }
         //NOTAS DE CREDITO PROVEEDOR
         $invoice = array(
             "type" => \Facturapi\InvoiceType::EGRESO,
@@ -2352,14 +2353,14 @@ class CartaPorteController extends ConfiguracionSistemaController{
             $tipomensaje = "error";
             $data = array(
                         'mensaje' => "Error, ".$mensaje,
-                        'tipomensaje' => $tipomensaje 
+                        'tipomensaje' => $tipomensaje
                     );
             return response()->json($data);
         }else{
             //obtener datos del xml del documento timbrado para guardarlo en la tabla comprobantes
             $descargar_xml = $this->facturapi->Invoices->download_xml($new_invoice->id); // stream containing the XML file or
-            $xml = simplexml_load_string($descargar_xml);  
-            $comprobante = $xml->attributes(); 
+            $xml = simplexml_load_string($descargar_xml);
+            $comprobante = $xml->attributes();
             $CertificadoCFD = $comprobante['NoCertificado'];
             //obtener datos generales del xml nodo Emisor
             $activar_namespaces = $xml->getNameSpaces(true);
@@ -2408,7 +2409,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                             ->update([
                                 'FechaTimbrado' => $fechatimbrado,
                                 'UUID' => $new_invoice->uuid
-                            ]);  
+                            ]);
             // Enviar a más de un correo (máx 10)
             $this->facturapi->Invoices->send_by_email(
                 $new_invoice->id,
@@ -2421,7 +2422,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             $tipomensaje = "success";
             $data = array(
                         'mensaje' => $mensaje,
-                        'tipomensaje' => $tipomensaje 
+                        'tipomensaje' => $tipomensaje
                     );
             return response()->json($data);
         }
