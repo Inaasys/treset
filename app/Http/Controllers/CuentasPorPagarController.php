@@ -30,7 +30,7 @@ use Config;
 use Mail;
 use App\Serie;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
-use Storage; 
+use Storage;
 use ZipArchive;
 use File;
 
@@ -92,7 +92,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                     ->addColumn('Facturas', function($data){ return substr($data->Facturas, 0, 70); })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        } 
+        }
     }
     //obtener series documento
     public function cuentas_por_pagar_obtener_series_documento(Request $request){
@@ -147,9 +147,9 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
             'nombre' => $nombre,
             'plazo' => $plazo
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
-    
+
     //obtener bancos
     public function cuentas_por_pagar_obtener_bancos(Request $request){
         if($request->ajax()){
@@ -162,7 +162,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                             $transferencia = $ultimatransferencia[0]->Transferencia;
                         }else{
                             $transferencia = 0;
-                        }                        
+                        }
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarbanco('.$data->Numero.',\''.$data->Nombre .'\','.$transferencia.')">Seleccionar</div>';
                         return $boton;
                     })
@@ -185,14 +185,14 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
         $existebanco = Banco::where('Numero', $request->numerobanco)->where('Status', 'ALTA')->count();
         if($existebanco > 0){
             $banco = Banco::where('Numero', $request->numerobanco)->where('Status', 'ALTA')->first();
-            
+
             $contarultimatransferencia = VistaCuentaPorPagar::select("Transferencia")->where('Banco', $request->numerobanco)->orderBy("Transferencia", "DESC")->take(1)->count();
             if($contarultimatransferencia > 0){
                 $ultimatransferencia = VistaCuentaPorPagar::select("Transferencia")->where('Banco', $request->numerobanco)->orderBy("Transferencia", "DESC")->take(1)->get();
                 $transferencia = $ultimatransferencia[0]->Transferencia;
             }else{
                 $transferencia = 0;
-            }      
+            }
             $numero = $banco->Numero;
             $nombre = $banco->Nombre;
         }
@@ -201,7 +201,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
             'nombre' => $nombre,
             'transferencia' => $transferencia
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener compras por proveedor
@@ -248,7 +248,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
             }
         }else{
             $numerocontrarecibos = 0;
-        }       
+        }
         $data = array(
             "filascompras" => $filascompras,
             "numerocontrarecibos" => $numerocontrarecibos
@@ -273,7 +273,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
 		$CuentaXPagar->Transferencia=$request->transferencia;
         $CuentaXPagar->Beneficiario=$request->beneficiario;
         $CuentaXPagar->Abono=$request->total;
-        $CuentaXPagar->CuentaDeposito=$request->cuentadeposito;  
+        $CuentaXPagar->CuentaDeposito=$request->cuentadeposito;
         $CuentaXPagar->Anotacion=$request->anotacion;
         $CuentaXPagar->Status="ALTA";
         $CuentaXPagar->Usuario=Auth::user()->user;
@@ -291,8 +291,8 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
         $item = 1;
-        foreach ($request->compra as $key => $c){     
-            if($request->abonocompra [$key] > Helpers::convertirvalorcorrecto(0)){        
+        foreach ($request->compra as $key => $c){
+            if($request->abonocompra [$key] > Helpers::convertirvalorcorrecto(0)){
                 $CuentaXPagarDetalle=new CuentaXPagarDetalle;
                 $CuentaXPagarDetalle->Pago = $pago;
                 $CuentaXPagarDetalle->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
@@ -309,7 +309,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                 if($request->saldocompra [$key] == 0){
                     $Status = "LIQUIDADA";
                 }else{
-                    $Status = "POR PAGAR"; 
+                    $Status = "POR PAGAR";
                 }
                 Compra::where('Compra', $c)
                             ->update([
@@ -319,7 +319,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                             ]);
             }
         }
-    	return response()->json($CuentaXPagar); 
+    	return response()->json($CuentaXPagar);
     }
 
     //comprobar baja de documento
@@ -464,7 +464,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
             'Cheque' => $request->cheque,
             'Transferencia' => $request->transferencia,
             'Beneficiario' => $request->beneficiario,
-            'CuentaDeposito' => $request->cuentadeposito,  
+            'CuentaDeposito' => $request->cuentadeposito,
             'Anotacion' => $request->anotacion
         ]);
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
@@ -490,7 +490,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                     return $abono;
                 })
                 ->make(true);
-        } 
+        }
     }
     //generacion de formato en PDF
     public function cuentas_por_pagar_generar_pdfs(Request $request){
@@ -499,20 +499,23 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
         //primero eliminar todos los archivos zip
         Helpers::eliminararchivoszipgenerados();
         if($request->imprimirdirectamente == 1){
-            $cuentasporpagar = CuentaXPagar::where('Pago', $request->arraypdf)->get(); 
+            $cuentasporpagar = CuentaXPagar::where('Pago', $request->arraypdf)->get();
         }else{
             $tipogeneracionpdf = $request->tipogeneracionpdf;
             if($tipogeneracionpdf == 0){
-                $cuentasporpagar = CuentaXPagar::whereIn('Pago', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
+                $cuentasporpagar = CuentaXPagar::whereIn('Pago', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get();
             }else{
-                $fechainiciopdf = date($request->fechainiciopdf);
-                $fechaterminacionpdf = date($request->fechaterminacionpdf);
+                $fechainiciopdf = date($request->fechainiciopdf)." 00:00:00.000";
+                $fechaterminacionpdf = date($request->fechaterminacionpdf)." 11:59:59.000";;
                 if ($request->has("seriesdisponiblesdocumento")){
                     $cuentasporpagar = CuentaXPagar::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->whereIn('Serie', $request->seriesdisponiblesdocumento)->orderBy('Folio', 'ASC')->take(1500)->get();
                 }else{
                     $cuentasporpagar = CuentaXPagar::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
                 }
             }
+        }
+        if($cuentasporpagar->count() < 1){
+            echo "<script languaje='javascript' type='text/javascript'>window.close();</script>";
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $arrayfilespdf = array();
@@ -539,7 +542,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                     "facturadetalle"=>$facturadetalle,
                     "abonodetalle" => Helpers::convertirvalorcorrecto($cxpd->Abono)
                 );
-            } 
+            }
             $banco = Banco::where('Numero', $cxp->Banco)->first();
             $proveedor = Proveedor::where('Numero', $cxp->Proveedor)->first();
             $data[]=array(
@@ -596,8 +599,8 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                     // Agregar archivos que se comprimiran
                     foreach($arrayfilespdf as $afp) {
                         $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
-                    }     
-                    //terminar proceso   
+                    }
+                    //terminar proceso
                     $zip->close();
                 }
                 // Set Encabezados para descargar
@@ -615,7 +618,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
 
     //generacion de formato en PDF
     public function cuentas_por_pagar_generar_pdfs_indiv($documento){
-        $cuentasporpagar = CuentaXPagar::where('Pago', $documento)->get(); 
+        $cuentasporpagar = CuentaXPagar::where('Pago', $documento)->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($cuentasporpagar as $cxp){
@@ -640,7 +643,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                     "facturadetalle"=>$facturadetalle,
                     "abonodetalle" => Helpers::convertirvalorcorrecto($cxpd->Abono)
                 );
-            } 
+            }
             $banco = Banco::where('Numero', $cxp->Banco)->first();
             $proveedor = Proveedor::where('Numero', $cxp->Proveedor)->first();
             $data[]=array(
@@ -695,7 +698,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
 
     //enviar pdf por emial
     public function cuentas_por_pagar_enviar_pdfs_email(Request $request){
-        $cuentasporpagar = CuentaXPagar::where('Pago', $request->emaildocumento)->get(); 
+        $cuentasporpagar = CuentaXPagar::where('Pago', $request->emaildocumento)->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($cuentasporpagar as $cxp){
@@ -720,7 +723,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                     "facturadetalle"=>$facturadetalle,
                     "abonodetalle" => Helpers::convertirvalorcorrecto($cxpd->Abono)
                 );
-            } 
+            }
             $banco = Banco::where('Numero', $cxp->Banco)->first();
             $proveedor = Proveedor::where('Numero', $cxp->Proveedor)->first();
             $data[]=array(
@@ -747,7 +750,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
         ->setOption('margin-bottom', 10);
         try{
             $datosdocumento = CuentaXPagar::where('Pago', $request->emaildocumento)->first();
-            //enviar correo electrónico	
+            //enviar correo electrónico
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
             $arraycc = array();
@@ -795,8 +798,8 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('CuentasPorPagar', Auth::user()->id);
-        return Excel::download(new CuentasPorPagarExport($configuraciones_tabla['campos_consulta'],$request->periodo), "cuentasporpagar-".$request->periodo.".xlsx");   
-    
+        return Excel::download(new CuentasPorPagarExport($configuraciones_tabla['campos_consulta'],$request->periodo), "cuentasporpagar-".$request->periodo.".xlsx");
+
     }
     //configuracion de la tabla
     public function cuentas_por_pagar_guardar_configuracion_tabla(Request $request){
