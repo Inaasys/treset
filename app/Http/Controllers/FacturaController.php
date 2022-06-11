@@ -4084,6 +4084,7 @@ class FacturaController extends ConfiguracionSistemaController{
 
             $importeTotal += number_format($importeAux, 4, '.', '');
             $descuentoTotal += number_format($descuentoAux, 4, '.', '');
+            $ivaTotal =+ $ivaAux;
             if($df->Impuesto == 0.000000){
                 array_push($arraytest,  array(
                                             "quantity" => Helpers::convertirvalorcorrecto($df->Cantidad),
@@ -4119,7 +4120,6 @@ class FacturaController extends ConfiguracionSistemaController{
             }
         }
         $subtotalTotal = number_format($importeTotal,4, '.','') - number_format($descuentoTotal,4, '.','');
-        $ivaTotal = number_format($subtotalTotal,4, '.','') * 0.16;
         $totalTotal = number_format($subtotalTotal,4, '.','') + number_format($ivaTotal, 4,'.','');
 
         if(number_format($factura->Total,2, '.','') != number_format($totalTotal,2, '.','')){
