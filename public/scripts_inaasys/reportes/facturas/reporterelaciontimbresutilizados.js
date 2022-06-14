@@ -249,9 +249,11 @@ function listar(){
             }
         },
         "createdRow": function( row, data, dataIndex){
-            if( (data.TotalSistema <  data.TotalCFDI) || (data.TotalSistema >  data.TotalCFDI) ){
-                if ( data.Status != "BAJA" ) {
-                    $(row).addClass('bg-red');
+            if (data.Tipo == "I") {
+                if( (data.TotalSistema <  data.TotalCFDI) || (data.TotalSistema >  data.TotalCFDI) ){
+                    if ( data.Status != "BAJA" ) {
+                        $(row).addClass('bg-red');
+                    }
                 }
             }
             comprobantesArray.push(data)
