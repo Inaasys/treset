@@ -70,7 +70,10 @@ class ReporteTimbresUtilizadosController extends ConfiguracionSistemaController{
         switch($reporte){
             case "GENERAL":
                 $data = DB::table('Comprobantes as c')
-                    ->join('Facturas as f','f.Factura',DB::raw("(c.Folio+'-'+c.Serie)"))
+                    ->leftjoin('Facturas as f','f.Factura',DB::raw("(c.Folio+'-'+c.Serie)"))
+                    ->leftjoin('CxC as cx','cx.Pago',DB::raw("(c.Folio+'-'+c.Serie)"))
+                    ->leftjoin('Notas Cliente as nc','nc.Nota',DB::raw("(c.Folio+'-'+c.Serie)"))
+                    ->leftjoin('Notas Proveedor as np','np.Nota',DB::raw("(c.Folio+'-'+c.Serie)"))
                     ->select('c.Comprobante', 'c.Tipo', 'c.Serie', 'c.Folio', 'f.Total as TotalSistema','f.Status','c.Total as TotalCFDI','c.UUID', 'c.EmisorRfc', 'c.ReceptorRfc', 'c.FormaPago', 'c.MetodoPago', 'c.UsoCfdi')
                     ->whereDate('c.Fecha', '>=', $fechainicio)->whereDate('c.Fecha', '<=', $fechaterminacion)
                     ->where(function($q) use ($claveserie) {
