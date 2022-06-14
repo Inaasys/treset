@@ -27,7 +27,7 @@
                                     <td>
                                         <div class="">
                                             <a class="btn bg-blue btn-xs waves-effect" id="btnGenerarFormatoReporteExcel" onclick="generar_formato_excel()">Generar Reporte en Excel</a>
-                                        </div>  
+                                        </div>
                                     </td>
                         		</tr>
                         	</table>
@@ -60,15 +60,15 @@
                                             <option value="PAGO">PAGO</option>
                                             <option value="NOTA">NOTA</option>
                                         </select>
-                                    </div> 
+                                    </div>
                                     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
                                         <label>Fecha Inicial</label>
                                         <input type="date" class="form-control" name="fechainicialreporte" id="fechainicialreporte" required>
-                                    </div>  
+                                    </div>
                                     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
                                         <label>Fecha Final</label>
                                         <input type="date" class="form-control" name="fechafinalreporte" id="fechafinalreporte" required>
-                                    </div> 
+                                    </div>
                                     <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
                                         <label>Reporte</label>
                                         <select class="form-control select2" name="reporte" id="reporte" onchange="generar_reporte()"  required>
@@ -101,11 +101,11 @@
                 <div id="formulario">
                     <div class="modal-header bg-red">
                         <h4 class="modal-title" id="titulomodal"></h4>
-                    </div> 
+                    </div>
                 </div>
                 <div id="contenidomodaltablas">
                     <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
-                </div> 
+                </div>
             </div>
         </div>
     </div>
@@ -127,5 +127,5 @@
         var reporte_relacion_timbres_utilizados_generar_reporte = '{!!URL::to('reporte_relacion_timbres_utilizados_generar_reporte')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
-    <script src="scripts_inaasys/reportes/facturas/reporterelaciontimbresutilizados.js"></script>
+    <script src="{{ asset('scripts_inaasys/reportes/facturas/reporterelaciontimbresutilizados.js') }}"></script>
 @endsection
