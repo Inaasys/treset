@@ -57,9 +57,9 @@ class ReporteTimbresUtilizadosController extends ConfiguracionSistemaController{
 
     //generar reporte en excel
     public function reporte_relacion_timbres_utilizados_generar_formato_excel(Request $request){
-        return Excel::download(new ReporteRelacionTimbresUtilizadosExport($request->fechainicialreporte, $request->fechafinalreporte, $request->claveserie, $request->tipocomprobante, $request->reporte, $this->numerodecimales, $this->empresa), "formatorelaciontimbresutilizados-".$request->reporte.".xlsx"); 
+        return Excel::download(new ReporteRelacionTimbresUtilizadosExport($request->fechainicialreporte, $request->fechafinalreporte, $request->claveserie, $request->tipocomprobante, $request->reporte, $this->numerodecimales, $this->empresa), "formatorelaciontimbresutilizados-".$request->reporte.".xlsx");
     }
-     
+
     //generar reporte
     public function reporte_relacion_timbres_utilizados_generar_reporte(Request $request){
         $fechainicio = date($request->fechainicialreporte);
@@ -69,21 +69,22 @@ class ReporteTimbresUtilizadosController extends ConfiguracionSistemaController{
         $tipocomprobante=$request->tipocomprobante;
         switch($reporte){
             case "GENERAL":
-                $data = DB::table('Comprobantes')
-                    ->select('Comprobante', 'Tipo', 'Serie', 'Folio', 'UUID', 'EmisorRfc', 'ReceptorRfc', 'FormaPago', 'MetodoPago', 'UsoCfdi')
-                    ->whereDate('Fecha', '>=', $fechainicio)->whereDate('Fecha', '<=', $fechaterminacion)
+                $data = DB::table('Comprobantes as c')
+                    ->join('Facturas as f','f.Factura',DB::raw("(c.Folio+'-'+c.Serie)"))
+                    ->select('c.Comprobante', 'c.Tipo', 'c.Serie', 'c.Folio', 'f.Total as TotalSistema','f.Status','c.Total as TotalCFDI','c.UUID', 'c.EmisorRfc', 'c.ReceptorRfc', 'c.FormaPago', 'c.MetodoPago', 'c.UsoCfdi')
+                    ->whereDate('c.Fecha', '>=', $fechainicio)->whereDate('c.Fecha', '<=', $fechaterminacion)
                     ->where(function($q) use ($claveserie) {
                         if($claveserie != null){
-                            $q->where('Serie', $claveserie);
+                            $q->where('c.Serie', $claveserie);
                         }
                     })
                     ->where(function($q) use ($tipocomprobante) {
                         if($tipocomprobante != 'TODOS'){
-                            $q->where('Comprobante', $tipocomprobante);
+                            $q->where('c.Comprobante', $tipocomprobante);
                         }
                     })
-                    ->orderby('Folio')
-                    ->orderby('Comprobante')
+                    ->orderby('c.Folio')
+                    ->orderby('c.Comprobante')
                     ->get();
                 return DataTables::of($data)
                 ->make(true);

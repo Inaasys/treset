@@ -3,7 +3,7 @@ var tabla;
 var form;
 //funcion que se ejecuta al inicio
 function init(){
-  asignarfechaactual(); 
+  asignarfechaactual();
   listar();
 }
 //mostrar formulario
@@ -59,23 +59,23 @@ $(document).ready(function() {
     $(".inputnextdet").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      var index = $(this).index(".inputnextdet");          
+      var index = $(this).index(".inputnextdet");
       switch(code){
         case 13:
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+          $(".inputnextdet").eq(index + 1).focus().select();
           break;
         case 39:
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+          $(".inputnextdet").eq(index + 1).focus().select();
           break;
         case 37:
-          $(".inputnextdet").eq(index - 1).focus().select(); 
+          $(".inputnextdet").eq(index - 1).focus().select();
           break;
       }
     });
     setTimeout(function(){$("#claveserie").focus();},500);
 });
 //obtener registros de almacenes
-function obtenerseries(){ 
+function obtenerseries(){
     $("#ModalFormulario").modal('show');
     $("#contenidomodaltablas").show();
     $("#formulario").hide();
@@ -96,7 +96,7 @@ function obtenerseries(){
                                             '<tbody></tbody>'+
                                         '</table>'+
                                     '</div>'+
-                                '</div>'+   
+                                '</div>'+
                             '</div>'+
                         '</div>'+
                         '<div class="modal-footer">'+
@@ -132,9 +132,9 @@ function obtenerseries(){
                     $('#tbllistadoserie').DataTable().search( this.value ).draw();
                 }
             });
-        },    
-    }); 
-} 
+        },
+    });
+}
 function seleccionarserie(Serie){
     var claveserieanterior = $("#claveserieanterior").val();
     var claveserie = Serie;
@@ -163,7 +163,7 @@ function obtenerserieporclave(){
                     $("#textonombreserie").attr('style', 'font-size:8px').html(data.claveserie.substring(0, 45));
                 }
                 generar_reporte();
-            })  
+            })
         }
     }
 }
@@ -199,16 +199,17 @@ function generar_formato_excel(){
 }
 //listar tabla reporte
 function listar(){
+    let comprobantesArray = []
     var reporte = $("#reporte").val();
     if(reporte == 'GENERAL'){
-        var columnas = new Array("Comprobante", "Tipo", "Serie", "Folio", "UUID", "EmisorRfc", "ReceptorRfc", "FormaPago", "MetodoPago", "UsoCfdi");
+        var columnas = new Array("Comprobante", "Tipo", "Serie", "Folio", 'TotalSistema', 'TotalCFDI' ,"UUID", "EmisorRfc", "ReceptorRfc", "FormaPago", "MetodoPago", "UsoCfdi");
     }else{
         var columnas = new Array("Total");
     }
     var campos_tabla  = [];
     var cabecerastablareporte = "";
     for (var i = 0; i < columnas.length; i++) {
-        campos_tabla.push({ 
+        campos_tabla.push({
             'data'    : columnas[i],
             'name'  : columnas[i],
             'orderable': false,
@@ -222,7 +223,7 @@ function listar(){
         "lengthMenu": [ 500, 1000 ],
         "sScrollX": "110%",
         "sScrollY": "300px",
-        "bScrollCollapse": true,  
+        "bScrollCollapse": true,
         "lengthChange": false,
         "paging":   true,
         "ordering": false,
@@ -247,6 +248,14 @@ function listar(){
                 d.reporte = $("#reporte").val();
             }
         },
+        "createdRow": function( row, data, dataIndex){
+            if( (data.TotalSistema <  data.TotalCFDI) || (data.TotalSistema >  data.TotalCFDI) ){
+                if ( data.Status != "BAJA" ) {
+                    $(row).addClass('bg-red');
+                }
+            }
+            comprobantesArray.push(data)
+        },
         columns: campos_tabla,
         "initComplete": function() {
             var $buscar = $('div.dataTables_filter input');
@@ -257,7 +266,21 @@ function listar(){
                     $('#tbllistado').DataTable().search( this.value ).draw();
                 }
             });
+            for (let i = 0; i < comprobantesArray.length; i++) {
+                if(i < comprobantesArray.length -1){
+                    if((comprobantesArray[i].Serie == comprobantesArray[i+1].Serie) && comprobantesArray[i].Folio == comprobantesArray[i+1].Folio){
+                        toastr.error( "Aviso, El siguiente serie y folio se encuentra duplicado "
+                        + comprobantesArray[i+1].Folio+'-'+comprobantesArray[i+1].Serie, "Mensaje", {
+                            "timeOut": "6000",
+                            "progressBar": true,
+                            "extendedTImeout": "6000"
+                        });
+                    }
+                }
+            }
         }
     });
+
 }
+
 init();
