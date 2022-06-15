@@ -18,12 +18,12 @@
 	        font-family: 'Roboto', Arial, Tahoma, sans-serif;
         }
         .wrap,
-        .wrap2{ 
+        .wrap2{
             width:750px;
-            white-space: pre-wrap;      /* CSS3 */   
-            white-space: -moz-pre-wrap; /* Firefox */    
-            white-space: -pre-wrap;     /* Opera <7 */   
-            white-space: -o-pre-wrap;   /* Opera 7 */    
+            white-space: pre-wrap;      /* CSS3 */
+            white-space: -moz-pre-wrap; /* Firefox */
+            white-space: -pre-wrap;     /* Opera <7 */
+            white-space: -o-pre-wrap;   /* Opera 7 */
             word-wrap: break-word;      /* IE */
         }
     </style>
@@ -50,7 +50,7 @@
                     <hr></hr>
                 </div>
                 <div id ="contenedor" style="margin-top:10px;">
-                    <div style="width:53%; height:135px;float:left;text-align:left;border-style:groove;">    
+                    <div style="width:53%; height:135px;float:left;text-align:left;border-style:groove;">
                         <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
                             <li style="font-size:10px; margin-left: 5px;"> Nombre: {{$d['cliente']->Nombre}} ({{$d['cliente']->Numero}})</li>
                             <li style="font-size:10px; margin-left: 5px;"> Dirección: {{$d['cliente']->Calle}} {{$d['cliente']->noExterior}} {{$d['cliente']->noInterior}}</b></li>
@@ -188,19 +188,24 @@
                                 @endforeach
                             @endif
                             <tr>
+                                @php
+                                    $redondeoSub = round($d['subtotalfactura'],2);
+                                    $redondeoIva = round(($redondeoSub * 0.16),2);
+                                    $redondeoTotal = round(($redondeoSub + $redondeoIva),2)
+                                @endphp
                                 <td colspan="3" style="font-size:10px"></td>
                                 <td style="font-size:11px;text-align: right;">SubTotal $ : </td>
-                                <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"><b>{{ number_format($d['subtotalfactura'], $d['numerodecimalesdocumento']) }}</b></td>
+                                <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"><b>{{ number_format($redondeoSub, $d['numerodecimalesdocumento']) }}</b></td>
                             </tr>
                             <tr>
                                 <td colspan="3" style="font-size:10px"></td>
                                 <td style="font-size:11px;text-align: right;">IVA $ : </td>
-                                <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"><b>{{ number_format($d['ivafactura'], $d['numerodecimalesdocumento']) }}</b></td>
+                                <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"><b>{{ number_format($redondeoIva, $d['numerodecimalesdocumento']) }}</b></td>
                             </tr>
                             <tr>
                                 <td colspan="3" style="font-size:10px"></td>
                                 <td style="font-size:11px;text-align: right;">Total $ : </td>
-                                <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"><b>{{ number_format($d['totalfactura'], $d['numerodecimalesdocumento']) }}</b></td>
+                                <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"><b>{{ number_format($redondeoTotal, $d['numerodecimalesdocumento']) }}</b></td>
                             </tr>
                         </tbody>
                     </table>
