@@ -54,7 +54,7 @@
                                     <thead class="{{$empresa->background_tables}}">
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
-                                            @foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                                            @foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co)
                                                 <th id="th{{$co}}">{{$co}}</th>
                                             @endforeach
                                         </tr>
@@ -63,7 +63,7 @@
                                     <tfoot>
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
-                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co)
                                                 <th id="th{{$co}}">{{$co}}</th>
                                             @endforeach
                                         </tr>
@@ -78,10 +78,10 @@
                                                     <th> Sum Ultima Venta: <b id="sumaultimaventafiltrado"></b></th>
                                                     <th> Sum Precio: <b id="sumapreciofiltrado"></b></th>
                                                     <th> Sum Existencias: <b id="sumaexistenciasfiltrado"></b></th>
-                                                </tr>   
+                                                </tr>
                                             </table>
                                         </div>
-                                @endif 
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -104,11 +104,11 @@
                                 <div class="col-md-4">
                                     <label>Código<b style="color:#F44336 !important;">*</b></label>
                                     <div class="row">
-                                        <div class="col-md-12"> 
+                                        <div class="col-md-12">
                                             <div class="form-line">
                                                 <input type="text" class="form-control inputnext" name="codigo" id="codigo" required data-parsley-length="[1, 20]" onchange="buscarcodigoencatalogo();" onkeyup="tipoLetra(this);">
                                             </div>
-                                        </div>  
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -118,13 +118,13 @@
                                             <span class="input-group-btn">
                                                 <div id="buscarclavesproductos" class="btn bg-blue waves-effect" onclick="listarclavesproductos()">Seleccionar</div>
                                             </span>
-                                        </div>  
-                                        <div class="col-md-8"> 
+                                        </div>
+                                        <div class="col-md-8">
                                             <div class="form-line">
                                                 <input type="text" class="form-control inputnext" name="claveproducto" id="claveproducto" required data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">
                                                 <input type="hidden" class="form-control" name="claveproductoanterior" id="claveproductoanterior" required readonly data-parsley-length="[1, 20]">
                                             </div>
-                                        </div>    
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -134,13 +134,13 @@
                                             <span class="input-group-btn">
                                                 <div id="buscarclavesunidades" class="btn bg-blue waves-effect" onclick="listarclavesunidades()">Seleccionar</div>
                                             </span>
-                                        </div>  
-                                        <div class="col-md-8"> 
+                                        </div>
+                                        <div class="col-md-8">
                                             <div class="form-line">
                                                 <input type="text" class="form-control inputnext" name="claveunidad" id="claveunidad" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this);">
                                                 <input type="hidden" class="form-control" name="claveunidadanterior" id="claveunidadanterior" required readonly data-parsley-length="[1, 5]">
                                             </div>
-                                        </div>    
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -155,7 +155,7 @@
                                 </div>
                             </div>
                             <div class="col-md-12" id="tabsform">
-                                
+
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -163,11 +163,11 @@
                             <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
                             <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
                         </div>
-                    </form> 
+                    </form>
                 </div>
                 <div id="contenidomodaltablas">
                     <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
-                </div>     
+                </div>
             </div>
         </div>
     </div>
@@ -182,7 +182,7 @@
                     <form id="formdesactivar" action="#">
                         <h5>Esta seguro de dar de baja este registro?</h5>
                         <input type="hidden" id="codigoproducto" name="codigoproducto">
-                    </form>	
+                    </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
@@ -190,7 +190,7 @@
                 </div>
             </div>
         </div>
-    </div> 
+    </div>
     <!-- Modal Movimientos-->
     <div class="modal fade" data-keyboard="false" id="modalmovimientos" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -241,17 +241,17 @@
                                         </tr>
                                     </thead>
                                     <tbody id="filasmovimientos"></tbody>
-                                </table> 
+                                </table>
                             </div>
                         </div>
-                    </div>    	
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <h5 id="infomovimientos"></h5>
                 </div>
             </div>
         </div>
-    </div> 
+    </div>
     <!-- Modal Códigos Barras-->
     <div class="modal fade" data-backdrop="static" data-keyboard="false" id="ModalCodigosBarras" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
@@ -270,7 +270,7 @@
                         </h4>
                     </div>
                     <div class="modal-body">
-                        <div class="row">                        
+                        <div class="row">
                             <div class="col-md-12">
                                 <ul class="nav nav-tabs tab-col-blue-grey" role="tablist">
                                     <li role="presentation" class="active">
@@ -299,7 +299,7 @@
                                                 </div>
                                             </div><br>
                                             <div class="row">
-                                                <div class="col-md-12 text-right" >                                            
+                                                <div class="col-md-12 text-right" >
                                                     <button type="submit" class="btn btn-success btn-sm">Imprimir Códigos de Barras</button>
                                                 </div>
                                             </div>
@@ -313,7 +313,7 @@
                                                 <div class="col-md-2">
                                                     <label >Tipo</label>
                                                     <select class="form-control select2" id="tipoprodcodigosbarras" name="tipoprodcodigosbarras" style="width:100%" required>
-                                                        <option value="TODOS" selected>TODOS</option>    
+                                                        <option value="TODOS" selected>TODOS</option>
                                                         <option value="REFACCION">REFACCION</option>
                                                         <option value="GASTOS">GASTOS</option>
                                                         <option value="TOT">TOT</option>
@@ -322,7 +322,7 @@
                                                 <div class="col-md-2">
                                                     <label >Status</label>
                                                     <select class="form-control select2" id="statuscodigosbarras" name="statuscodigosbarras" style="width:100%" required>
-                                                        <option value="TODOS" selected>TODOS</option> 
+                                                        <option value="TODOS" selected>TODOS</option>
                                                         <option value="ALTA">ALTA</option>
                                                         <option value="BAJA">BAJA</option>
                                                     </select>
@@ -347,12 +347,12 @@
                                                             <input name="generarcodigosdebarrasporexistencias" type="hidden" value="0"/>
                                                             <input type="checkbox" name="generarcodigosdebarrasporexistencias" id="idgenerarcodigosdebarrasporexistencias" class="filled-in submenu accesoreportes" value="1" />
                                                             <label for="idgenerarcodigosdebarrasporexistencias"></label>
-                                                        </div>                           
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div><br>
                                             <div class="row">
-                                                <div class="col-md-12 text-right" >                                            
+                                                <div class="col-md-12 text-right" >
                                                     <button type="submit" class="btn btn-success btn-sm">Imprimir Códigos de Barras</button>
                                                 </div>
                                             </div>
@@ -383,14 +383,14 @@
                             <div class="col-md-12" id="tabsform1">
                                 <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
                             </div>
-                        </form> 
+                        </form>
                     </div>
                     <div class="modal-footer" id="modal-footer">
                     </div>
                 </div>
                 <div id="contenidomodaltablas1">
                     <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
-                </div> 
+                </div>
             </div>
         </div>
     </div>
@@ -427,7 +427,7 @@
         var campos_busquedas = '{{$configuracion_tabla->campos_busquedas}}';
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
-        var background_tables = '{{$empresa->background_tables}}';       
+        var background_tables = '{{$empresa->background_tables}}';
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var tipodeutilidad = '{{$tipodeutilidad}}';
         var urlimagenesproductos = '{{asset("imagenes_productos/")}}/';
@@ -455,11 +455,11 @@
         var productos_obtener_tipos_prod = '{!!URL::to('productos_obtener_tipos_prod')!!}';
         var productos_obtener_kardex = '{!!URL::to('productos_obtener_kardex')!!}';
         var productos_guardar = '{!!URL::to('productos_guardar')!!}';
-        var productos_alta_o_baja = '{!!URL::to('productos_alta_o_baja')!!}'; 
-        var productos_obtener_producto = '{!!URL::to('productos_obtener_producto')!!}'; 
-        var productos_validar_si_existe_codigo = '{!!URL::to('productos_validar_si_existe_codigo')!!}'; 
-        var productos_generar_codigos_barras_catalogo = '{!!URL::to('productos_generar_codigos_barras_catalogo')!!}'; 
-        var productos_generar_pdf_codigo_barras = '{!!URL::to('productos_generar_pdf_codigo_barras')!!}'; 
+        var productos_alta_o_baja = '{!!URL::to('productos_alta_o_baja')!!}';
+        var productos_obtener_producto = '{!!URL::to('productos_obtener_producto')!!}';
+        var productos_validar_si_existe_codigo = '{!!URL::to('productos_validar_si_existe_codigo')!!}';
+        var productos_generar_codigos_barras_catalogo = '{!!URL::to('productos_generar_codigos_barras_catalogo')!!}';
+        var productos_generar_pdf_codigo_barras = '{!!URL::to('productos_generar_pdf_codigo_barras')!!}';
         var productos_guardar_modificacion = '{!!URL::to('productos_guardar_modificacion')!!}';
         //compras
         var compras_obtener_tipos_ordenes_compra = '{!!URL::to('compras_obtener_tipos_ordenes_compra')!!}';
@@ -471,10 +471,10 @@
         var compras_obtener_producto_por_codigo = '{!!URL::to('compras_obtener_producto_por_codigo')!!}';
         var compras_obtener_proveedor_por_numero = '{!!URL::to('compras_obtener_proveedor_por_numero')!!}';
         var compras_obtener_ordenes_compra = '{!!URL::to('compras_obtener_ordenes_compra')!!}';
-        var compras_obtener_orden_compra = '{!!URL::to('compras_obtener_orden_compra')!!}'; 
-        var compras_obtener_departamentos = '{!!URL::to('compras_obtener_departamentos')!!}'; 
-        var compras_obtener_claves_productos = '{!!URL::to('compras_obtener_claves_productos')!!}'; 
-        var compras_obtener_claves_unidades = '{!!URL::to('compras_obtener_claves_unidades')!!}'; 
+        var compras_obtener_orden_compra = '{!!URL::to('compras_obtener_orden_compra')!!}';
+        var compras_obtener_departamentos = '{!!URL::to('compras_obtener_departamentos')!!}';
+        var compras_obtener_claves_productos = '{!!URL::to('compras_obtener_claves_productos')!!}';
+        var compras_obtener_claves_unidades = '{!!URL::to('compras_obtener_claves_unidades')!!}';
         var compras_obtener_compra = '{!!URL::to('compras_obtener_compra')!!}';
         var compras_obtener_existencias_partida = '{!!URL::to('compras_obtener_existencias_partida')!!}';
         var compras_obtener_existencias_almacen = '{!!URL::to('compras_obtener_existencias_almacen')!!}';
@@ -482,6 +482,6 @@
         var compras_guardar_modificacion = '{!!URL::to('compras_guardar_modificacion')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
-    <script src="scripts_inaasys/catalogos/productos/productos.js"></script>
+    <script src="{{ asset('scripts_inaasys/catalogos/productos/productos.js') }}"></script>
     <!--<script src="scripts_inaasys/catalogos/productos/infodocumentos.js"></script>-->
 @endsection
