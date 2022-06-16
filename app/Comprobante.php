@@ -41,4 +41,14 @@ class Comprobante extends Model
         'IdFacturapi',
         'UrlVerificarCfdi'
     ];
+
+    /**
+    * Relaciona el comprobante con la Factura
+    */
+
+    public function factura(){
+        $factura = Factura::where('Factura',$this->Folio.'-'.$this->Serie)->first();
+        return $factura;
+    }
+
 }

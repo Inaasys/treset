@@ -13,6 +13,7 @@ use PDF;
 use Luecano\NumeroALetras\NumeroALetras;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\PlantillasFacturasExport;
+use App\Exports\DiferenciasExport;
 use App\Imports\FacturasImport;
 use App\Exports\FacturasExport;
 use App\Remision;
@@ -4084,7 +4085,7 @@ class FacturaController extends ConfiguracionSistemaController{
 
             $importeTotal += number_format($importeAux, 4, '.', '');
             $descuentoTotal += number_format($descuentoAux, 4, '.', '');
-            $ivaTotal =+ $ivaAux;
+            $ivaTotal += $ivaAux;
             if($df->Impuesto == 0.000000){
                 array_push($arraytest,  array(
                                             "quantity" => Helpers::convertirvalorcorrecto($df->Cantidad),
@@ -4303,6 +4304,7 @@ class FacturaController extends ConfiguracionSistemaController{
             }
         }
         $new_invoice = $this->facturapi->Invoices->create( $invoice );
+
         $result = json_encode($new_invoice);
         $result2 = json_decode($result, true);
         if(array_key_exists('ok', $result2) == true){
@@ -4345,7 +4347,7 @@ class FacturaController extends ConfiguracionSistemaController{
             $Comprobante->Fecha = Helpers::fecha_exacta_accion_datetimestring();
             $Comprobante->SubTotal = $factura->SubTotal;
             $Comprobante->Descuento = $factura->Descuento;
-            $Comprobante->Total = $factura->Total;
+            $Comprobante->Total = Helpers::convertirvalorcorrecto($new_invoice->total);
             $Comprobante->EmisorRfc = $factura->EmisorRfc;
             $Comprobante->ReceptorRfc = $factura->ReceptorRfc;
             $Comprobante->FormaPago = $new_invoice->payment_form;
@@ -4441,5 +4443,15 @@ class FacturaController extends ConfiguracionSistemaController{
                     );
             return response()->json($data);
         }
+    }
+
+    /**
+     * @author Jose Alonso Espinares
+     * Genera excel con las diferencias encontradas en sistema
+     */
+
+    public function diferencias(){
+
+        return Excel::download(new DiferenciasExport($this->numerodecimales), 'diferencias.xlsx');
     }
 }
