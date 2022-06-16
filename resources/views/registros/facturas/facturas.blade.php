@@ -37,6 +37,11 @@
                                                             Excel
                                                         </a>
                                                     </td>
+                                                    <td >
+                                                        <a class="btn bg-blue btn-xs waves-effect" id="btnGenerarFormatoExcel" href="{{route('facturas_generar_diferencias')}}" target="_blank">
+                                                            Validar Diferencias
+                                                        </a>
+                                                    </td>
                                                     <td>
                                                         <div class="btn bg-blue btn-xs waves-effect" onclick="configurar_tabla()">
                                                             Configurar Tabla
