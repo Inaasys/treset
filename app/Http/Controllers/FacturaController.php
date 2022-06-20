@@ -1088,6 +1088,10 @@ class FacturaController extends ConfiguracionSistemaController{
     //obtener factura
     public function facturas_obtener_total_a_facturar(Request $request){
         $totalafacturar = 0;
+        $subtotalafacturar = 0;
+        $ivaafacturar = 0;
+        $decimalesConf = (int) config('app.numerodedecimales');
+        $decimalesDoc = (int) config('app.numerodecimalesendocumentos');
         if($request->tipo == "REMISIONES"){
             foreach(explode(",", $request->stringremisionesseleccionadas) as $r){
                 $detallesremision = RemisionDetalle::where('Remision', $r)->OrderBy('Item', 'ASC')->get();
@@ -1099,8 +1103,10 @@ class FacturaController extends ConfiguracionSistemaController{
             foreach(explode(",", $request->stringordenesseleccionadas) as $o){
                 $detallesorden = OrdenTrabajoDetalle::where('Orden', $o)->OrderBy('Item', 'ASC')->get();
                 foreach($detallesorden as $detalle){
-                    $totalafacturar = $totalafacturar + $detalle->Total;
+                    $subtotalafacturar += $detalle->SubTotal;
+                    $ivaafacturar += $detalle->Iva;
                 }
+                $totalafacturar = number_format(round($subtotalafacturar, $decimalesDoc), $decimalesConf, '.', '') + number_format(round($ivaafacturar, $decimalesDoc), $decimalesConf, '.', '');
             }
         }
 
@@ -1827,8 +1833,18 @@ class FacturaController extends ConfiguracionSistemaController{
         $subtotalTotal = 0;
         $totalTotal = 0;
 
+        $decimalesConf = (int)config('app.numerodedecimales');
+        $decimalesDoc = (int)config('app.numerodecimalesendocumentos');
         //obtener el ultimo id de la tabla
         $folio = Helpers::ultimofolioserietablamodulos('App\Factura', $request->serie);
+
+        //Realiza erl redondeo de los montos finales para que coincidan con el sat
+
+        $subtotalAux = number_format(round($request->importe, $decimalesDoc), $decimalesConf, '.', '') - number_format(round($request->descuento, $decimalesDoc), $decimalesConf, '.', '');
+        $ivaAux = number_format(round($subtotalAux, $decimalesDoc), $decimalesConf, '.', '') * 0.16;
+
+        $totalTotal = number_format(round($subtotalAux, $decimalesDoc), $decimalesConf, '.', '') + number_format(round($ivaAux, $decimalesDoc), $decimalesConf, '.', '');
+
         //INGRESAR DATOS A TABLA
         $factura = $folio.'-'.$request->serie;
         $Factura = new Factura;
@@ -1844,11 +1860,11 @@ class FacturaController extends ConfiguracionSistemaController{
         $Factura->Pedido=$request->pedido;
         $Factura->Tipo=$request->tipo;
         $Factura->Unidad=$request->tipounidad;
-        $Factura->Importe=$request->importe;
-        $Factura->Descuento=$request->descuento;
-        $Factura->SubTotal=$request->subtotal;
-        $Factura->Iva=$request->iva;
-        $Factura->Total=$request->total;
+        $Factura->Importe=number_format(round($request->importe, $decimalesDoc), $decimalesConf, '.', '');
+        $Factura->Descuento=number_format(round($request->descuento, $decimalesDoc), $decimalesConf, '.', '');
+        $Factura->SubTotal=number_format(round($subtotalAux, $decimalesDoc), $decimalesConf, '.', '');
+        $Factura->Iva=number_format(round($ivaAux, $decimalesDoc), $decimalesConf, '.', '');
+        $Factura->Total = number_format(round($totalTotal, $decimalesDoc), $decimalesConf, '.', '');
         $Factura->Costo=$request->costo;
         $Factura->Comision=$request->comision;
         $Factura->Utilidad=$request->utilidad;
@@ -1881,7 +1897,7 @@ class FacturaController extends ConfiguracionSistemaController{
         $Factura->save();
         //Modificar saldo cliente
         $cliente = Cliente::where('Numero', $request->numerocliente)->first();
-        $nuevosaldo = $cliente->Saldo + $request->total;
+        $nuevosaldo = $cliente->Saldo + number_format(round($totalTotal, $decimalesDoc), $decimalesConf, '.', '');
         Cliente::where('Numero', $request->numerocliente)
                             ->update([
                                 'Saldo' => Helpers::convertirvalorcorrecto($nuevosaldo)
@@ -4056,7 +4072,6 @@ class FacturaController extends ConfiguracionSistemaController{
         $detallesdocumentosfactura = FacturaDocumento::where('Factura', $request->facturatimbrado)->get();
         $cliente = Cliente::where('Numero', $factura->Cliente)->first();
         $arraytest = array();
-
         $importeAux = 0;
         $descuentoAux = 0;
         $subtotalAux = 0;
@@ -4067,7 +4082,9 @@ class FacturaController extends ConfiguracionSistemaController{
         $ivaTotal = 0;
         $subtotalTotal = 0;
         $totalTotal = 0;
-
+        $decimalesConf = (int) config('app.numerodedecimales');
+        $decimalesDoc = (int) config('app.numerodecimalesendocumentos');
+        $fechaTimbrado = date('Y-m-d H:i:s');
         foreach($detallesfactura as $df){
             //Coloca las variables en 0 para hacer la validación de los montos
             $importeAux = 0;
@@ -4076,15 +4093,15 @@ class FacturaController extends ConfiguracionSistemaController{
             $ivaAux = 0;
             $totalAux = 0;
 
-            $importeAux = number_format($df->Precio, 4, '.', '') * number_format($df->Cantidad, 4, '.', '');
-            $descuentoAux = number_format($importeAux, 4, '.', '') * (number_format($df->Dcto, 4, '.', '')/100);
-            $subtotalAux = number_format($importeAux, 4, '.','') - number_format($descuentoAux, 4, '.','');
+            $importeAux = number_format($df->Precio, $decimalesConf, '.', '') * number_format($df->Cantidad, $decimalesConf, '.', '');
+            $descuentoAux = number_format($importeAux, $decimalesConf, '.', '') * (number_format($df->Dcto, $decimalesConf, '.', '')/100);
+            $subtotalAux = number_format($importeAux, $decimalesConf, '.','') - number_format($descuentoAux, $decimalesConf, '.','');
 
-            $ivaAux = number_format($subtotalAux, 4, '.','') * (number_format($df->Impuesto, 4, '.','') / 100);
-            $totalAux = number_format($subtotalAux,4, '.','') + number_format($ivaAux, 4, '.','');
+            $ivaAux = number_format($subtotalAux, $decimalesConf, '.','') * (number_format($df->Impuesto, $decimalesConf, '.','') / 100);
+            $totalAux = number_format($subtotalAux,$decimalesConf, '.','') + number_format($ivaAux, $decimalesConf, '.','');
 
-            $importeTotal += number_format($importeAux, 4, '.', '');
-            $descuentoTotal += number_format($descuentoAux, 4, '.', '');
+            $importeTotal += number_format($importeAux, $decimalesConf, '.', '');
+            $descuentoTotal += number_format($descuentoAux, $decimalesConf, '.', '');
             $ivaTotal += $ivaAux;
             if($df->Impuesto == 0.000000){
                 array_push($arraytest,  array(
@@ -4120,19 +4137,22 @@ class FacturaController extends ConfiguracionSistemaController{
                 );
             }
         }
-        $subtotalTotal = number_format($importeTotal,4, '.','') - number_format($descuentoTotal,4, '.','');
-        $totalTotal = number_format($subtotalTotal,4, '.','') + number_format($ivaTotal, 4,'.','');
+        $subtotalTotal = number_format(round($importeTotal, $decimalesDoc), $decimalesConf, '.', '') - number_format(round($descuentoTotal, $decimalesDoc), $decimalesConf, '.', '');
+        $totalTotal = number_format(round($subtotalTotal, $decimalesDoc), $decimalesConf, '.', '') + number_format(round($ivaTotal, $decimalesDoc), $decimalesConf, '.', '');
 
-        if(number_format($factura->Total,2, '.','') != number_format($totalTotal,2, '.','')){
-            $mensaje = "La suma de las partidas no corresponde al total de la factura";
-            $tipomensaje = "error";
-            $data = array(
-                        'mensaje' => "Error, ".$mensaje,
-                        'tipomensaje' => $tipomensaje
-                    );
-            return response()->json($data);
+        if($factura->Depto == "SERVICIO"){
+            if(number_format($factura->Total,2, '.','') != number_format($totalTotal,2, '.','')){
+                $mensaje = "La suma de las partidas no corresponde al total de la factura";
+                $tipomensaje = "error";
+                $data = array(
+                            'mensaje' => "Error, ".$mensaje,
+                            'tipomensaje' => $tipomensaje
+                        );
+                return response()->json($data);
 
+            }
         }
+
         if($cliente->Rfc == 'XAXX010101000'){
             //asignar periodicidad en ingles para facturas globales
             switch($factura->Periodicidad){
@@ -4303,6 +4323,23 @@ class FacturaController extends ConfiguracionSistemaController{
                 );
             }
         }
+
+        $comprobante = DB::table('Comprobantes')
+        ->select(DB::raw("CONVERT(varchar, FechaTimbrado, 20) as FechaTimbrado"))
+        ->where('Folio',$factura->Folio)->orderBy('FechaTimbrado','Desc')->take(1)->get();
+
+        /*if($comprobante->count() > 0){
+            $timbradoComprobante = date_create($comprobante[0]->FechaTimbrado);
+            $fechaTimbradoAux = date_create($fechaTimbrado);
+            if($timbradoComprobante->format('Y-m-d') == $fechaTimbradoAux->format('Y-m-d')){
+                $diferencia = $timbradoComprobante->diff($fechaTimbradoAux);
+
+                dump($diferencia);
+                dd('exit');
+            }
+        }*/
+
+
         $new_invoice = $this->facturapi->Invoices->create( $invoice );
 
         $result = json_encode($new_invoice);

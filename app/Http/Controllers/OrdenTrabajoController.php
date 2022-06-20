@@ -656,6 +656,8 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         $subtotalTotal = 0;
         $totalTotal = 0;
         $idOrden  = '';
+        $decimalesConf = (int)config('app.numerodedecimales');
+        $decimalesDoc = (int)config('app.numerodecimalesendocumentos');
         $ExisteOrden = OrdenTrabajo::where('Orden', $orden)->first();
 	    if($ExisteOrden == true){
 	        $OrdenTrabajo = 1;
@@ -728,15 +730,15 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     $ivaAux = 0;
                     $totalAux = 0;
 
-                    $importeAux = number_format($request->preciopartida[$key], 4, '.', '') * number_format($request->cantidadpartida[$key], 4, '.', '');
-                    $descuentoAux = number_format($importeAux, 4, '.', '') * (number_format($request->descuentoporcentajepartida[$key], 4, '.', '')/100);
-                    $subtotalAux = number_format($importeAux, 4, '.','') - number_format($descuentoAux, 4, '.','');
+                    $importeAux = number_format($request->preciopartida[$key], $decimalesConf, '.', '') * number_format($request->cantidadpartida[$key], $decimalesConf, '.', '');
+                    $descuentoAux = number_format($importeAux, $decimalesConf, '.', '') * (number_format($request->descuentoporcentajepartida[$key], $decimalesConf, '.', '')/100);
+                    $subtotalAux = number_format($importeAux, $decimalesConf, '.','') - number_format($descuentoAux, $decimalesConf, '.','');
 
-                    $ivaAux = number_format($subtotalAux, 4, '.','') * (number_format($request->ivaporcentajepartida[$key], 4, '.','') / 100);
-                    $totalAux = number_format($subtotalAux,4, '.','') + number_format($ivaAux, 4, '.','');
+                    $ivaAux = number_format($subtotalAux, $decimalesConf, '.','') * (number_format($request->ivaporcentajepartida[$key], $decimalesConf, '.','') / 100);
+                    $totalAux = number_format($subtotalAux,$decimalesConf, '.','') + number_format($ivaAux, $decimalesConf, '.','');
 
-                    $importeTotal += number_format($importeAux, 4, '.', '');
-                    $descuentoTotal += number_format($descuentoAux, 4, '.', '');
+                    $importeTotal += number_format($importeAux, $decimalesConf, '.', '');
+                    $descuentoTotal += number_format($descuentoAux, $decimalesConf, '.', '');
 
                     $OrdenTrabajoDetalle=new OrdenTrabajoDetalle;
                     $OrdenTrabajoDetalle->Orden = $orden;
@@ -749,18 +751,18 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     $OrdenTrabajoDetalle->Unidad = $request->unidadpartidad [$key];
                     $OrdenTrabajoDetalle->Cantidad =  $request->cantidadpartida  [$key];
                     $OrdenTrabajoDetalle->Precio =  $request->preciopartida [$key];
-                    $OrdenTrabajoDetalle->Importe = number_format($importeAux, 4, '.', '');
+                    $OrdenTrabajoDetalle->Importe = number_format($importeAux, $decimalesConf, '.', '');
                     $OrdenTrabajoDetalle->Dcto = $request->descuentoporcentajepartida [$key];
-                    $OrdenTrabajoDetalle->Descuento = number_format($descuentoAux, 4, '.', '');
-                    $OrdenTrabajoDetalle->SubTotal = number_format($subtotalAux,4, '.','');
+                    $OrdenTrabajoDetalle->Descuento = number_format($descuentoAux, $decimalesConf, '.', '');
+                    $OrdenTrabajoDetalle->SubTotal = number_format($subtotalAux,$decimalesConf, '.','');
                     $OrdenTrabajoDetalle->Impuesto = $request->ivaporcentajepartida [$key];
-                    $OrdenTrabajoDetalle->Iva = number_format($ivaAux, 4, '.','');
-                    $OrdenTrabajoDetalle->Total = number_format($totalAux,4, '.','');
+                    $OrdenTrabajoDetalle->Iva = number_format($ivaAux, $decimalesConf, '.','');
+                    $OrdenTrabajoDetalle->Total = number_format($totalAux,$decimalesConf, '.','');
                     $OrdenTrabajoDetalle->Costo = $request->costopartida [$key];
                     $OrdenTrabajoDetalle->CostoTotal = $request->costototalpartida [$key];
                     $OrdenTrabajoDetalle->Com = $request->comisionporcentajepartida [$key];
                     $OrdenTrabajoDetalle->Comision = $request->comisionpesospartida [$key];
-                    $OrdenTrabajoDetalle->Utilidad = number_format($subtotalAux, 4, '.','');
+                    $OrdenTrabajoDetalle->Utilidad = number_format($subtotalAux, $decimalesConf, '.','');
                     $OrdenTrabajoDetalle->Departamento = $request->departamentopartida [$key];
                     $OrdenTrabajoDetalle->Cargo = $request->cargopartida [$key];
                     $OrdenTrabajoDetalle->Traspaso = $request->traspasopartida [$key];
@@ -783,25 +785,24 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     $OrdenTrabajoDetalle->save();
                 }
             }
-            $subtotalTotal = number_format($importeTotal,4, '.','') - number_format($descuentoTotal,4, '.','');
-            $ivaTotal = number_format($subtotalTotal,4, '.','') * 0.16;
-            $totalTotal = number_format($subtotalTotal,4, '.','') + number_format($ivaTotal, 4,'.','');
-
-            $OrdenTrabajo->Importe= number_format($importeTotal,4, '.','');
-            $OrdenTrabajo->Descuento = number_format($descuentoTotal,4, '.','');
-            $OrdenTrabajo->SubTotal = number_format($subtotalTotal,4, '.','');
-            $OrdenTrabajo->Iva= number_format($ivaTotal,4, '.','');
-            $OrdenTrabajo->Total= number_format($totalTotal,4, '.','');
+            $subtotalTotal = number_format(round($importeTotal, $decimalesDoc), $decimalesConf, '.', '') - number_format(round($descuentoTotal, $decimalesDoc), $decimalesConf, '.', '');
+            $ivaTotal = number_format(round($subtotalTotal, $decimalesDoc), $decimalesConf, '.', '') * 0.16;
+            $totalTotal = number_format(round($subtotalTotal, $decimalesDoc), $decimalesConf, '.', '') + number_format(round($ivaTotal, $decimalesDoc), $decimalesConf, '.', '');
+            $OrdenTrabajo->Importe= number_format(round($importeTotal, $decimalesDoc), $decimalesConf, '.', '');
+            $OrdenTrabajo->Descuento = number_format(round($descuentoTotal, $decimalesDoc), $decimalesConf, '.', '');
+            $OrdenTrabajo->SubTotal = number_format(round($subtotalTotal, $decimalesDoc), $decimalesConf, '.', '');
+            $OrdenTrabajo->Iva = number_format(round($ivaTotal, $decimalesDoc), $decimalesConf, '.', '');
+            $OrdenTrabajo->Total = number_format(round($totalTotal, $decimalesDoc), $decimalesConf, '.', '');
             $OrdenTrabajo->save();
             $OrdenTrabajo->update();
 
             OrdenTrabajo::where('Orden', $idOrden)
             ->update([
-                'Importe' => number_format($importeTotal,4, '.',''),
-                'Descuento' => number_format($descuentoTotal,4, '.',''),
-                'SubTotal' => number_format($subtotalTotal,4, '.',''),
-                'Iva' => number_format($ivaTotal,4, '.',''),
-                'Total' =>  number_format($totalTotal,4, '.','')
+                'Importe' => number_format(round($importeTotal, $decimalesDoc), $decimalesConf, '.', ''),
+                'Descuento' => number_format(round($descuentoTotal, $decimalesDoc), $decimalesConf, '.', ''),
+                'SubTotal' => number_format(round($subtotalTotal, $decimalesDoc), $decimalesConf, '.', ''),
+                'Iva' => number_format(round($ivaTotal, $decimalesDoc), $decimalesConf, '.', ''),
+                'Total' =>  number_format(round($totalTotal, $decimalesDoc), $decimalesConf, '.', ''),
             ]);
         }
         //Obtiene orden con relaciones
@@ -1038,6 +1039,8 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         $ivaTotal = 0;
         $subtotalTotal = 0;
         $totalTotal = 0;
+        $decimalesConf = (int) config('app.numerodedecimales');
+        $decimalesDoc = (int) config('app.numerodecimalesendocumentos');
         $orden = $request->folio.'-'.$request->serie;
         $OrdenTrabajo = OrdenTrabajo::where('Orden', $orden)
         ->with(['detalles'])
@@ -1129,15 +1132,15 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     $ivaAux = 0;
                     $totalAux = 0;
 
-                    $importeAux = number_format($request->preciopartida[$key], 4, '.', '') * number_format($request->cantidadpartida[$key], 4, '.', '');
-                    $descuentoAux = number_format($importeAux, 4, '.', '') * (number_format($request->descuentoporcentajepartida[$key], 4, '.', '')/100);
-                    $subtotalAux = number_format($importeAux, 4, '.','') - number_format($descuentoAux, 4, '.','');
+                    $importeAux = number_format($request->preciopartida[$key], $decimalesConf, '.', '') * number_format($request->cantidadpartida[$key], $decimalesConf, '.', '');
+                    $descuentoAux = number_format($importeAux, $decimalesConf, '.', '') * (number_format($request->descuentoporcentajepartida[$key], $decimalesConf, '.', '')/100);
+                    $subtotalAux = number_format($importeAux, $decimalesConf, '.','') - number_format($descuentoAux, $decimalesConf, '.','');
 
-                    $ivaAux = number_format($subtotalAux, 4, '.','') * (number_format($request->ivaporcentajepartida[$key], 4, '.','') / 100);
-                    $totalAux = number_format($subtotalAux,4, '.','') + number_format($ivaAux, 4, '.','');
+                    $ivaAux = number_format($subtotalAux, $decimalesConf, '.','') * (number_format($request->ivaporcentajepartida[$key], $decimalesConf, '.','') / 100);
+                    $totalAux = number_format($subtotalAux,$decimalesConf, '.','') + number_format($ivaAux, $decimalesConf, '.','');
 
-                    $importeTotal += number_format($importeAux, 4, '.', '');
-                    $descuentoTotal += number_format($descuentoAux, 4, '.', '');
+                    $importeTotal += number_format($importeAux, $decimalesConf, '.', '');
+                    $descuentoTotal += number_format($descuentoAux, $decimalesConf, '.', '');
 
                     $ordenT = OrdenTrabajoDetalle::where('Orden', $orden)
                     ->where('Partida', $request->partidapartida [$key])
@@ -1152,13 +1155,13 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                         'Unidad' => $request->unidadpartidad [$key],
                         'Cantidad' =>  $request->cantidadpartida  [$key],
                         'Precio' =>  $request->preciopartida [$key],
-                        'Importe' => number_format($importeAux, 4, '.', ''),
+                        'Importe' => number_format($importeAux, $decimalesConf, '.', ''),
                         'Dcto' => $request->descuentoporcentajepartida [$key],
-                        'Descuento' => number_format($descuentoAux, 4, '.', ''),
-                        'SubTotal' => number_format($subtotalAux, 4, '.', ''),
+                        'Descuento' => number_format($descuentoAux, $decimalesConf, '.', ''),
+                        'SubTotal' => number_format($subtotalAux, $decimalesConf, '.', ''),
                         'Impuesto' => $request->ivaporcentajepartida [$key],
-                        'Iva' => number_format($ivaAux, 4, '.', ''),
-                        'Total' => number_format($totalAux, 4, '.', ''),
+                        'Iva' => number_format($ivaAux, $decimalesConf, '.', ''),
+                        'Total' => number_format($totalAux, $decimalesConf, '.', ''),
                         'Costo' => $request->costopartida [$key],
                         'CostoTotal' => $request->costototalpartida [$key],
                         'Com' => $request->comisionporcentajepartida [$key],
@@ -1193,15 +1196,15 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     $ivaAux = 0;
                     $totalAux = 0;
 
-                    $importeAux = number_format($request->preciopartida[$key], 4, '.', '') * number_format($request->cantidadpartida[$key], 4, '.', '');
-                    $descuentoAux = number_format($importeAux, 4, '.', '') * (number_format($request->descuentoporcentajepartida[$key], 4, '.', '')/100);
-                    $subtotalAux = number_format($importeAux, 4, '.','') - number_format($descuentoAux, 4, '.','');
+                    $importeAux = number_format($request->preciopartida[$key], $decimalesConf, '.', '') * number_format($request->cantidadpartida[$key], $decimalesConf, '.', '');
+                    $descuentoAux = number_format($importeAux, $decimalesConf, '.', '') * (number_format($request->descuentoporcentajepartida[$key], $decimalesConf, '.', '')/100);
+                    $subtotalAux = number_format($importeAux, $decimalesConf, '.','') - number_format($descuentoAux, $decimalesConf, '.','');
 
-                    $ivaAux = number_format($subtotalAux, 4, '.','') * (number_format($request->ivaporcentajepartida[$key], 4, '.','') / 100);
-                    $totalAux = number_format($subtotalAux,4, '.','') + number_format($ivaAux, 4, '.','');
+                    $ivaAux = number_format($subtotalAux, $decimalesConf, '.','') * (number_format($request->ivaporcentajepartida[$key], $decimalesConf, '.','') / 100);
+                    $totalAux = number_format($subtotalAux,$decimalesConf, '.','') + number_format($ivaAux, $decimalesConf, '.','');
 
-                    $importeTotal += number_format($importeAux, 4, '.', '');
-                    $descuentoTotal += number_format($descuentoAux, 4, '.', '');
+                    $importeTotal += number_format($importeAux, $decimalesConf, '.', '');
+                    $descuentoTotal += number_format($descuentoAux, $decimalesConf, '.', '');
 
                     //agregar todas las partidas agregadas en la modificación
                     $OrdenTrabajoDetalle=new OrdenTrabajoDetalle;
@@ -1215,13 +1218,13 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     $OrdenTrabajoDetalle->Unidad = $request->unidadpartidad [$key];
                     $OrdenTrabajoDetalle->Cantidad =  $request->cantidadpartida  [$key];
                     $OrdenTrabajoDetalle->Precio =  $request->preciopartida [$key];
-                    $OrdenTrabajoDetalle->Importe = number_format($importeAux, 4, '.','');
+                    $OrdenTrabajoDetalle->Importe = number_format($importeAux, $decimalesConf, '.','');
                     $OrdenTrabajoDetalle->Dcto = $request->descuentoporcentajepartida [$key];
-                    $OrdenTrabajoDetalle->Descuento = number_format($descuentoAux, 4, '.','');
-                    $OrdenTrabajoDetalle->SubTotal = number_format($subtotalAux, 4, '.','');
+                    $OrdenTrabajoDetalle->Descuento = number_format($descuentoAux, $decimalesConf, '.','');
+                    $OrdenTrabajoDetalle->SubTotal = number_format($subtotalAux, $decimalesConf, '.','');
                     $OrdenTrabajoDetalle->Impuesto = $request->ivaporcentajepartida [$key];
-                    $OrdenTrabajoDetalle->Iva = number_format($ivaAux, 4, '.','');
-                    $OrdenTrabajoDetalle->Total = number_format($totalAux, 4, '.','');
+                    $OrdenTrabajoDetalle->Iva = number_format($ivaAux, $decimalesConf, '.','');
+                    $OrdenTrabajoDetalle->Total = number_format($totalAux, $decimalesConf, '.','');
                     $OrdenTrabajoDetalle->Costo = $request->costopartida [$key];
                     $OrdenTrabajoDetalle->CostoTotal = $request->costototalpartida [$key];
                     $OrdenTrabajoDetalle->Com = $request->comisionporcentajepartida [$key];
@@ -1249,16 +1252,19 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                     $OrdenTrabajoDetalle->save();
                 }
             }
-            $subtotalTotal = number_format($importeTotal,4, '.','') - number_format($descuentoTotal,4, '.','');
-            $ivaTotal = number_format($subtotalTotal,4, '.','') * 0.16;
-            $totalTotal = number_format($subtotalTotal,4, '.','') + number_format($ivaTotal, 4,'.','');
-            OrdenTrabajo::where('Orden', $orden)
+
+            $subtotalTotal = number_format(round($importeTotal, $decimalesDoc), $decimalesConf, '.', '') - number_format(round($descuentoTotal, $decimalesDoc), $decimalesConf, '.', '');
+            $ivaTotal = number_format(round($subtotalTotal, $decimalesDoc), $decimalesConf, '.', '') * 0.16;
+            $totalTotal = number_format(round($subtotalTotal, $decimalesDoc), $decimalesConf, '.', '') + number_format(round($ivaTotal, $decimalesDoc), $decimalesConf, '.', '');
+
+
+            OrdenTrabajo::where('Orden', $idOrden)
             ->update([
-                'Importe' => number_format($importeTotal,4, '.',''),
-                'Descuento' => number_format($descuentoTotal,4, '.',''),
-                'SubTotal' => number_format($subtotalTotal,4, '.',''),
-                'Iva' => number_format($ivaTotal,4, '.',''),
-                'Total' =>  number_format($totalTotal,4, '.','')
+                'Importe' => number_format(round($importeTotal, $decimalesDoc), $decimalesConf, '.', ''),
+                'Descuento' => number_format(round($descuentoTotal, $decimalesDoc), $decimalesConf, '.', ''),
+                'SubTotal' => number_format(round($subtotalTotal, $decimalesDoc), $decimalesConf, '.', ''),
+                'Iva' => number_format(round($ivaTotal, $decimalesDoc), $decimalesConf, '.', ''),
+                'Total' =>  number_format(round($totalTotal, $decimalesDoc), $decimalesConf, '.', ''),
             ]);
         }
         $registroOrden = OrdenTrabajo::where('Orden', $orden)
