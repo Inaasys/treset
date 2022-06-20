@@ -4229,13 +4229,14 @@ function calculartotal(){
     costo = new Decimal(costo).plus($(".costototalpartida", this).val());
     comision = new Decimal(comision).plus($(".comisionpesospartida", this).val());
   });
-  $("#importe").val(number_format(round(importe, numerodecimales), numerodecimales, '.', ''));
-  $("#descuento").val(number_format(round(descuento, numerodecimales), numerodecimales, '.', ''));
-  $("#subtotal").val(number_format(round(subtotal, numerodecimales), numerodecimales, '.', ''));
-  $("#iva").val(number_format(round(iva, numerodecimales), numerodecimales, '.', ''));
-  $("#total").val(number_format(round(total, numerodecimales), numerodecimales, '.', ''));
-  $("#totalafacturar").val(number_format(round(total, numerodecimales), numerodecimales, '.', ''));
-  $("#utilidad").val(number_format(round(utilidad, numerodecimales), numerodecimales, '.', ''));
+  let totalRound = parseFloat(subtotal.toFixed(2)) + parseFloat(iva.toFixed(2))
+  $("#importe").val(number_format(round(importe, 2), numerodecimales, '.', ''));
+  $("#descuento").val(number_format(round(descuento, 2), numerodecimales, '.', ''));
+  $("#subtotal").val(number_format(round(subtotal, 2), numerodecimales, '.', ''));
+  $("#iva").val(number_format(round(iva, 2), numerodecimales, '.', ''));
+  $("#total").val(number_format(round(totalRound, 2), numerodecimales, '.', ''));
+  $("#totalafacturar").val(number_format(round(totalRound, 2), numerodecimales, '.', ''));
+  $("#utilidad").val(number_format(round(utilidad, 2), numerodecimales, '.', ''));
   $("#costo").val(number_format(round(costo, numerodecimales), numerodecimales, '.', ''));
   $("#comision").val(number_format(round(comision, numerodecimales), numerodecimales, '.', ''));
   //nuevo saldo
