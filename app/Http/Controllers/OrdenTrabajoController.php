@@ -1258,7 +1258,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             $totalTotal = number_format(round($subtotalTotal, $decimalesDoc), $decimalesConf, '.', '') + number_format(round($ivaTotal, $decimalesDoc), $decimalesConf, '.', '');
 
 
-            OrdenTrabajo::where('Orden', $idOrden)
+            OrdenTrabajo::where('Orden', $orden)
             ->update([
                 'Importe' => number_format(round($importeTotal, $decimalesDoc), $decimalesConf, '.', ''),
                 'Descuento' => number_format(round($descuentoTotal, $decimalesDoc), $decimalesConf, '.', ''),
@@ -1270,7 +1270,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         $registroOrden = OrdenTrabajo::where('Orden', $orden)
         ->with(['detalles'])
         ->first();
-        $descripcion = ["original"=>$original,"camvios"=>$registroOrden->toArray(), "request"=>$request->all()];
+        $descripcion = ["original"=>$original,"cambios"=>$registroOrden->toArray(), "request"=>$request->all()];
         $registro = new RegistrosAcciones;
         $registro->user_id = Auth::user()->id;
         $registro->accion = "Modificar orden de trabajo";
