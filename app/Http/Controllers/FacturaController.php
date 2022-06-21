@@ -1845,6 +1845,12 @@ class FacturaController extends ConfiguracionSistemaController{
 
         $totalTotal = number_format(round($subtotalAux, $decimalesDoc), $decimalesConf, '.', '') + number_format(round($ivaAux, $decimalesDoc), $decimalesConf, '.', '');
 
+        if($request->numerofilasuuid > 0){
+            if(!isset($request->clavetiporelacion)){
+                //Retorna error si no se selecciono tipo de relación
+                return response()->json(['error' => 'Error msg'], 404); // Status code here// Status code here
+            }
+        }
         //INGRESAR DATOS A TABLA
         $factura = $folio.'-'.$request->serie;
         $Factura = new Factura;
@@ -2213,6 +2219,12 @@ class FacturaController extends ConfiguracionSistemaController{
         $Factura = Factura::where('Factura', $factura)->first();
         //array detalles documentos antes de modificacion
         $ArrayDetallesDocumentosFacturaAnterior = Array();
+        if($request->numerofilasuuid > 0){
+            if(!isset($request->clavetiporelacion)){
+                //Retorna error si no se selecciono tipo de relación
+                return response()->json(['error' => 'Error msg'], 404); // Status code here// Status code here
+            }
+        }
         $DetallesDocumentosFacturaAnterior = FacturaDocumento::where('Factura', $factura)->get();
         foreach($DetallesDocumentosFacturaAnterior as $detalledocumento){
             array_push($ArrayDetallesDocumentosFacturaAnterior, $detalledocumento->Factura.'#'.$detalledocumento->UUID);
@@ -4084,7 +4096,7 @@ class FacturaController extends ConfiguracionSistemaController{
         $totalTotal = 0;
         $decimalesConf = (int) config('app.numerodedecimales');
         $decimalesDoc = (int) config('app.numerodecimalesendocumentos');
-        $fechaTimbrado = date('Y-m-d H:i:s');
+
         foreach($detallesfactura as $df){
             //Coloca las variables en 0 para hacer la validación de los montos
             $importeAux = 0;
@@ -4324,106 +4336,289 @@ class FacturaController extends ConfiguracionSistemaController{
             }
         }
 
+        //Obtiene el ultimo Comprobante de la factura
         $comprobante = DB::table('Comprobantes')
         ->select(DB::raw("CONVERT(varchar, FechaTimbrado, 20) as FechaTimbrado"))
+        ->where('Serie',$factura->Serie)
         ->where('Folio',$factura->Folio)->orderBy('FechaTimbrado','Desc')->take(1)->get();
 
-        /*if($comprobante->count() > 0){
+        //Valida si existe un comprobante anterior asociado, si no existe continua con el flujo
+        if($comprobante->count() > 0){
+            $fechaTimbrado = date('Y-m-d H:i:s');
             $timbradoComprobante = date_create($comprobante[0]->FechaTimbrado);
             $fechaTimbradoAux = date_create($fechaTimbrado);
+            //Valida si el comprobante es del día de hoy
             if($timbradoComprobante->format('Y-m-d') == $fechaTimbradoAux->format('Y-m-d')){
                 $diferencia = $timbradoComprobante->diff($fechaTimbradoAux);
+                //Valida si la diferencia en minutos es mayor a 5, si es verdadero guarda el registro
+                if($diferencia->i >= 5){
+                    $new_invoice = $this->facturapi->Invoices->create( $invoice );
 
-                dump($diferencia);
-                dd('exit');
+                    $result = json_encode($new_invoice);
+                    $result2 = json_decode($result, true);
+                    if(array_key_exists('ok', $result2) == true){
+                        $mensaje = $new_invoice->message;
+                        $tipomensaje = "error";
+                        $data = array(
+                                    'mensaje' => "Error, ".$mensaje,
+                                    'tipomensaje' => $tipomensaje
+                                );
+                        return response()->json($data);
+                    }else{
+                        //obtener datos del xml del documento timbrado para guardarlo en la tabla comprobantes
+                        $descargar_xml = $this->facturapi->Invoices->download_xml($new_invoice->id); // stream containing the XML file or
+                        $xml = simplexml_load_string($descargar_xml);
+                        $comprobante = $xml->attributes();
+                        $CertificadoCFD = $comprobante['NoCertificado'];
+                        //obtener datos generales del xml nodo Emisor
+                        $activar_namespaces = $xml->getNameSpaces(true);
+                        $namespaces = $xml->children($activar_namespaces['cfdi']);
+                        //obtener UUID del xml timbrado digital
+                        $activar_namespaces = $namespaces->Complemento->getNameSpaces(true);
+                        $namespaces_uuid = $namespaces->Complemento->children($activar_namespaces['tfd']);
+                        $atributos_complemento = $namespaces_uuid->TimbreFiscalDigital->attributes();
+                        $NoCertificadoSAT = $atributos_complemento['NoCertificadoSAT'];
+                        $SelloCFD = $atributos_complemento['SelloCFD'];
+                        $SelloSAT = $atributos_complemento['SelloSAT'];
+                        $fechatimbrado = $atributos_complemento['FechaTimbrado'];
+                        $cadenaoriginal = "||".$atributos_complemento['Version']."|".$new_invoice->uuid."|".$atributos_complemento['FechaTimbrado']."|".$atributos_complemento['SelloCFD']."|".$atributos_complemento['NoCertificadoSAT']."||";
+                        //guardar en tabla comprobante
+                        $Comprobante = new Comprobante;
+                        $Comprobante->Comprobante = 'Factura';
+                        $Comprobante->Tipo = $new_invoice->type;
+                        //version 4.0
+                        $Comprobante->Version = '4.0';
+                        //version 3.3
+                        //$Comprobante->Version = '3.3';
+                        $Comprobante->Serie = $new_invoice->series;
+                        $Comprobante->Folio = $new_invoice->folio_number;
+                        $Comprobante->UUID = $new_invoice->uuid;
+                        $Comprobante->Fecha = Helpers::fecha_exacta_accion_datetimestring();
+                        $Comprobante->SubTotal = $factura->SubTotal;
+                        $Comprobante->Descuento = $factura->Descuento;
+                        $Comprobante->Total = Helpers::convertirvalorcorrecto($new_invoice->total);
+                        $Comprobante->EmisorRfc = $factura->EmisorRfc;
+                        $Comprobante->ReceptorRfc = $factura->ReceptorRfc;
+                        $Comprobante->FormaPago = $new_invoice->payment_form;
+                        $Comprobante->MetodoPago = $new_invoice->payment_method;
+                        $Comprobante->UsoCfdi = $new_invoice->use;
+                        $Comprobante->Moneda = $new_invoice->currency;
+                        $Comprobante->TipoCambio = Helpers::convertirvalorcorrecto($new_invoice->exchange);
+                        $Comprobante->CertificadoSAT = $NoCertificadoSAT;
+                        $Comprobante->CertificadoCFD = $CertificadoCFD;
+                        $Comprobante->FechaTimbrado = $fechatimbrado;
+                        $Comprobante->CadenaOriginal = $cadenaoriginal;
+                        $Comprobante->selloSAT = $SelloSAT;
+                        $Comprobante->selloCFD = $SelloCFD;
+                        //$Comprobante->CfdiTimbrado = $new_invoice->type;
+                        $Comprobante->Periodo = $this->periodohoy;
+                        $Comprobante->IdFacturapi = $new_invoice->id;
+                        $Comprobante->UrlVerificarCfdi = $new_invoice->verification_url;
+                        $Comprobante->save();
+                        //Colocar UUID en factura
+                        Factura::where('Factura', $request->facturatimbrado)
+                                        ->update([
+                                            'FechaTimbrado' => $fechatimbrado,
+                                            'UUID' => $new_invoice->uuid
+                                        ]);
+                        // Enviar a más de un correo (máx 10)
+                        $this->facturapi->Invoices->send_by_email(
+                            $new_invoice->id,
+                            array(
+                                "osbaldo.anzaldo@utpcamiones.com.mx",
+                                //"marco.baltazar@utpcamiones.com.mx",
+                            )
+                        );
+                        $mensaje = "Correcto, el documento se timbro correctamente";
+                        $tipomensaje = "success";
+                        $data = array(
+                                    'mensaje' => $mensaje,
+                                    'tipomensaje' => $tipomensaje
+                                );
+                        return response()->json($data);
+                    }
+                }else{
+                    $mensaje = "Es posible que el folio se haya duplicado";
+                    $tipomensaje = "error";
+                    $data = array(
+                                'mensaje' => "Error, ".$mensaje,
+                                'tipomensaje' => $tipomensaje
+                            );
+                    return response()->json($data);
+                }
+            }else{
+                $new_invoice = $this->facturapi->Invoices->create( $invoice );
+
+                $result = json_encode($new_invoice);
+                $result2 = json_decode($result, true);
+                if(array_key_exists('ok', $result2) == true){
+                    $mensaje = $new_invoice->message;
+                    $tipomensaje = "error";
+                    $data = array(
+                                'mensaje' => "Error, ".$mensaje,
+                                'tipomensaje' => $tipomensaje
+                            );
+                    return response()->json($data);
+                }else{
+                    //obtener datos del xml del documento timbrado para guardarlo en la tabla comprobantes
+                    $descargar_xml = $this->facturapi->Invoices->download_xml($new_invoice->id); // stream containing the XML file or
+                    $xml = simplexml_load_string($descargar_xml);
+                    $comprobante = $xml->attributes();
+                    $CertificadoCFD = $comprobante['NoCertificado'];
+                    //obtener datos generales del xml nodo Emisor
+                    $activar_namespaces = $xml->getNameSpaces(true);
+                    $namespaces = $xml->children($activar_namespaces['cfdi']);
+                    //obtener UUID del xml timbrado digital
+                    $activar_namespaces = $namespaces->Complemento->getNameSpaces(true);
+                    $namespaces_uuid = $namespaces->Complemento->children($activar_namespaces['tfd']);
+                    $atributos_complemento = $namespaces_uuid->TimbreFiscalDigital->attributes();
+                    $NoCertificadoSAT = $atributos_complemento['NoCertificadoSAT'];
+                    $SelloCFD = $atributos_complemento['SelloCFD'];
+                    $SelloSAT = $atributos_complemento['SelloSAT'];
+                    $fechatimbrado = $atributos_complemento['FechaTimbrado'];
+                    $cadenaoriginal = "||".$atributos_complemento['Version']."|".$new_invoice->uuid."|".$atributos_complemento['FechaTimbrado']."|".$atributos_complemento['SelloCFD']."|".$atributos_complemento['NoCertificadoSAT']."||";
+                    //guardar en tabla comprobante
+                    $Comprobante = new Comprobante;
+                    $Comprobante->Comprobante = 'Factura';
+                    $Comprobante->Tipo = $new_invoice->type;
+                    //version 4.0
+                    $Comprobante->Version = '4.0';
+                    //version 3.3
+                    //$Comprobante->Version = '3.3';
+                    $Comprobante->Serie = $new_invoice->series;
+                    $Comprobante->Folio = $new_invoice->folio_number;
+                    $Comprobante->UUID = $new_invoice->uuid;
+                    $Comprobante->Fecha = Helpers::fecha_exacta_accion_datetimestring();
+                    $Comprobante->SubTotal = $factura->SubTotal;
+                    $Comprobante->Descuento = $factura->Descuento;
+                    $Comprobante->Total = Helpers::convertirvalorcorrecto($new_invoice->total);
+                    $Comprobante->EmisorRfc = $factura->EmisorRfc;
+                    $Comprobante->ReceptorRfc = $factura->ReceptorRfc;
+                    $Comprobante->FormaPago = $new_invoice->payment_form;
+                    $Comprobante->MetodoPago = $new_invoice->payment_method;
+                    $Comprobante->UsoCfdi = $new_invoice->use;
+                    $Comprobante->Moneda = $new_invoice->currency;
+                    $Comprobante->TipoCambio = Helpers::convertirvalorcorrecto($new_invoice->exchange);
+                    $Comprobante->CertificadoSAT = $NoCertificadoSAT;
+                    $Comprobante->CertificadoCFD = $CertificadoCFD;
+                    $Comprobante->FechaTimbrado = $fechatimbrado;
+                    $Comprobante->CadenaOriginal = $cadenaoriginal;
+                    $Comprobante->selloSAT = $SelloSAT;
+                    $Comprobante->selloCFD = $SelloCFD;
+                    //$Comprobante->CfdiTimbrado = $new_invoice->type;
+                    $Comprobante->Periodo = $this->periodohoy;
+                    $Comprobante->IdFacturapi = $new_invoice->id;
+                    $Comprobante->UrlVerificarCfdi = $new_invoice->verification_url;
+                    $Comprobante->save();
+                    //Colocar UUID en factura
+                    Factura::where('Factura', $request->facturatimbrado)
+                                    ->update([
+                                        'FechaTimbrado' => $fechatimbrado,
+                                        'UUID' => $new_invoice->uuid
+                                    ]);
+                    // Enviar a más de un correo (máx 10)
+                    $this->facturapi->Invoices->send_by_email(
+                        $new_invoice->id,
+                        array(
+                            "osbaldo.anzaldo@utpcamiones.com.mx",
+                            //"marco.baltazar@utpcamiones.com.mx",
+                        )
+                    );
+                    $mensaje = "Correcto, el documento se timbro correctamente";
+                    $tipomensaje = "success";
+                    $data = array(
+                                'mensaje' => $mensaje,
+                                'tipomensaje' => $tipomensaje
+                            );
+                    return response()->json($data);
+                }
             }
-        }*/
-
-
-        $new_invoice = $this->facturapi->Invoices->create( $invoice );
-
-        $result = json_encode($new_invoice);
-        $result2 = json_decode($result, true);
-        if(array_key_exists('ok', $result2) == true){
-            $mensaje = $new_invoice->message;
-            $tipomensaje = "error";
-            $data = array(
-                        'mensaje' => "Error, ".$mensaje,
-                        'tipomensaje' => $tipomensaje
-                    );
-            return response()->json($data);
         }else{
-            //obtener datos del xml del documento timbrado para guardarlo en la tabla comprobantes
-            $descargar_xml = $this->facturapi->Invoices->download_xml($new_invoice->id); // stream containing the XML file or
-            $xml = simplexml_load_string($descargar_xml);
-            $comprobante = $xml->attributes();
-            $CertificadoCFD = $comprobante['NoCertificado'];
-            //obtener datos generales del xml nodo Emisor
-            $activar_namespaces = $xml->getNameSpaces(true);
-            $namespaces = $xml->children($activar_namespaces['cfdi']);
-            //obtener UUID del xml timbrado digital
-            $activar_namespaces = $namespaces->Complemento->getNameSpaces(true);
-            $namespaces_uuid = $namespaces->Complemento->children($activar_namespaces['tfd']);
-            $atributos_complemento = $namespaces_uuid->TimbreFiscalDigital->attributes();
-            $NoCertificadoSAT = $atributos_complemento['NoCertificadoSAT'];
-            $SelloCFD = $atributos_complemento['SelloCFD'];
-            $SelloSAT = $atributos_complemento['SelloSAT'];
-            $fechatimbrado = $atributos_complemento['FechaTimbrado'];
-            $cadenaoriginal = "||".$atributos_complemento['Version']."|".$new_invoice->uuid."|".$atributos_complemento['FechaTimbrado']."|".$atributos_complemento['SelloCFD']."|".$atributos_complemento['NoCertificadoSAT']."||";
-            //guardar en tabla comprobante
-            $Comprobante = new Comprobante;
-            $Comprobante->Comprobante = 'Factura';
-            $Comprobante->Tipo = $new_invoice->type;
-            //version 4.0
-            $Comprobante->Version = '4.0';
-            //version 3.3
-            //$Comprobante->Version = '3.3';
-            $Comprobante->Serie = $new_invoice->series;
-            $Comprobante->Folio = $new_invoice->folio_number;
-            $Comprobante->UUID = $new_invoice->uuid;
-            $Comprobante->Fecha = Helpers::fecha_exacta_accion_datetimestring();
-            $Comprobante->SubTotal = $factura->SubTotal;
-            $Comprobante->Descuento = $factura->Descuento;
-            $Comprobante->Total = Helpers::convertirvalorcorrecto($new_invoice->total);
-            $Comprobante->EmisorRfc = $factura->EmisorRfc;
-            $Comprobante->ReceptorRfc = $factura->ReceptorRfc;
-            $Comprobante->FormaPago = $new_invoice->payment_form;
-            $Comprobante->MetodoPago = $new_invoice->payment_method;
-            $Comprobante->UsoCfdi = $new_invoice->use;
-            $Comprobante->Moneda = $new_invoice->currency;
-            $Comprobante->TipoCambio = Helpers::convertirvalorcorrecto($new_invoice->exchange);
-            $Comprobante->CertificadoSAT = $NoCertificadoSAT;
-            $Comprobante->CertificadoCFD = $CertificadoCFD;
-            $Comprobante->FechaTimbrado = $fechatimbrado;
-            $Comprobante->CadenaOriginal = $cadenaoriginal;
-            $Comprobante->selloSAT = $SelloSAT;
-            $Comprobante->selloCFD = $SelloCFD;
-            //$Comprobante->CfdiTimbrado = $new_invoice->type;
-            $Comprobante->Periodo = $this->periodohoy;
-            $Comprobante->IdFacturapi = $new_invoice->id;
-            $Comprobante->UrlVerificarCfdi = $new_invoice->verification_url;
-            $Comprobante->save();
-            //Colocar UUID en factura
-            Factura::where('Factura', $request->facturatimbrado)
-                            ->update([
-                                'FechaTimbrado' => $fechatimbrado,
-                                'UUID' => $new_invoice->uuid
-                            ]);
-            // Enviar a más de un correo (máx 10)
-            $this->facturapi->Invoices->send_by_email(
-                $new_invoice->id,
-                array(
-                    "osbaldo.anzaldo@utpcamiones.com.mx",
-                    //"marco.baltazar@utpcamiones.com.mx",
-                )
-            );
-            $mensaje = "Correcto, el documento se timbro correctamente";
-            $tipomensaje = "success";
-            $data = array(
-                        'mensaje' => $mensaje,
-                        'tipomensaje' => $tipomensaje
-                    );
-            return response()->json($data);
+            $new_invoice = $this->facturapi->Invoices->create( $invoice );
+
+            $result = json_encode($new_invoice);
+            $result2 = json_decode($result, true);
+            if(array_key_exists('ok', $result2) == true){
+                $mensaje = $new_invoice->message;
+                $tipomensaje = "error";
+                $data = array(
+                            'mensaje' => "Error, ".$mensaje,
+                            'tipomensaje' => $tipomensaje
+                        );
+                return response()->json($data);
+            }else{
+                //obtener datos del xml del documento timbrado para guardarlo en la tabla comprobantes
+                $descargar_xml = $this->facturapi->Invoices->download_xml($new_invoice->id); // stream containing the XML file or
+                $xml = simplexml_load_string($descargar_xml);
+                $comprobante = $xml->attributes();
+                $CertificadoCFD = $comprobante['NoCertificado'];
+                //obtener datos generales del xml nodo Emisor
+                $activar_namespaces = $xml->getNameSpaces(true);
+                $namespaces = $xml->children($activar_namespaces['cfdi']);
+                //obtener UUID del xml timbrado digital
+                $activar_namespaces = $namespaces->Complemento->getNameSpaces(true);
+                $namespaces_uuid = $namespaces->Complemento->children($activar_namespaces['tfd']);
+                $atributos_complemento = $namespaces_uuid->TimbreFiscalDigital->attributes();
+                $NoCertificadoSAT = $atributos_complemento['NoCertificadoSAT'];
+                $SelloCFD = $atributos_complemento['SelloCFD'];
+                $SelloSAT = $atributos_complemento['SelloSAT'];
+                $fechatimbrado = $atributos_complemento['FechaTimbrado'];
+                $cadenaoriginal = "||".$atributos_complemento['Version']."|".$new_invoice->uuid."|".$atributos_complemento['FechaTimbrado']."|".$atributos_complemento['SelloCFD']."|".$atributos_complemento['NoCertificadoSAT']."||";
+                //guardar en tabla comprobante
+                $Comprobante = new Comprobante;
+                $Comprobante->Comprobante = 'Factura';
+                $Comprobante->Tipo = $new_invoice->type;
+                //version 4.0
+                $Comprobante->Version = '4.0';
+                //version 3.3
+                //$Comprobante->Version = '3.3';
+                $Comprobante->Serie = $new_invoice->series;
+                $Comprobante->Folio = $new_invoice->folio_number;
+                $Comprobante->UUID = $new_invoice->uuid;
+                $Comprobante->Fecha = Helpers::fecha_exacta_accion_datetimestring();
+                $Comprobante->SubTotal = $factura->SubTotal;
+                $Comprobante->Descuento = $factura->Descuento;
+                $Comprobante->Total = Helpers::convertirvalorcorrecto($new_invoice->total);
+                $Comprobante->EmisorRfc = $factura->EmisorRfc;
+                $Comprobante->ReceptorRfc = $factura->ReceptorRfc;
+                $Comprobante->FormaPago = $new_invoice->payment_form;
+                $Comprobante->MetodoPago = $new_invoice->payment_method;
+                $Comprobante->UsoCfdi = $new_invoice->use;
+                $Comprobante->Moneda = $new_invoice->currency;
+                $Comprobante->TipoCambio = Helpers::convertirvalorcorrecto($new_invoice->exchange);
+                $Comprobante->CertificadoSAT = $NoCertificadoSAT;
+                $Comprobante->CertificadoCFD = $CertificadoCFD;
+                $Comprobante->FechaTimbrado = $fechatimbrado;
+                $Comprobante->CadenaOriginal = $cadenaoriginal;
+                $Comprobante->selloSAT = $SelloSAT;
+                $Comprobante->selloCFD = $SelloCFD;
+                //$Comprobante->CfdiTimbrado = $new_invoice->type;
+                $Comprobante->Periodo = $this->periodohoy;
+                $Comprobante->IdFacturapi = $new_invoice->id;
+                $Comprobante->UrlVerificarCfdi = $new_invoice->verification_url;
+                $Comprobante->save();
+                //Colocar UUID en factura
+                Factura::where('Factura', $request->facturatimbrado)
+                                ->update([
+                                    'FechaTimbrado' => $fechatimbrado,
+                                    'UUID' => $new_invoice->uuid
+                                ]);
+                // Enviar a más de un correo (máx 10)
+                $this->facturapi->Invoices->send_by_email(
+                    $new_invoice->id,
+                    array(
+                        "osbaldo.anzaldo@utpcamiones.com.mx",
+                        //"marco.baltazar@utpcamiones.com.mx",
+                    )
+                );
+                $mensaje = "Correcto, el documento se timbro correctamente";
+                $tipomensaje = "success";
+                $data = array(
+                            'mensaje' => $mensaje,
+                            'tipomensaje' => $tipomensaje
+                        );
+                return response()->json($data);
+            }
         }
     }
     //verificar cancelacion timbre

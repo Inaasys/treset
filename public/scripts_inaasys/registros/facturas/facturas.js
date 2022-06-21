@@ -4377,6 +4377,8 @@ $("#btnGuardar").on('click', function (e) {
             error:function(data){
               if(data.status == 403){
                 msj_errorenpermisos();
+              }else if(data.status == 404){
+                msj_errorenfacturarelacion()
               }else{
                 msj_errorajax();
               }
@@ -5312,10 +5314,12 @@ $("#btnGuardarModificacion").on('click', function (e) {
           },
           error:function(data){
             if(data.status == 403){
-              msj_errorenpermisos();
-            }else{
-              msj_errorajax();
-            }
+                msj_errorenpermisos();
+              }else if(data.status == 404){
+                msj_errorenfacturarelacion()
+              }else{
+                msj_errorajax();
+              }
             $('.page-loader-wrapper').css('display', 'none');
           }
         })

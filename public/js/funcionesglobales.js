@@ -23,7 +23,7 @@ function truncar(num,n) {
     //var num = (arguments[0] != null) ? arguments[0] : 0;
     //var n = (arguments[1] != null) ? arguments[1] : 2;
     num = (arguments[0] !== null) ? arguments[0] : 0;
-    n = (arguments[1] !== null) ? arguments[1] : 2;  
+    n = (arguments[1] !== null) ? arguments[1] : 2;
     if(num > 0){
         num = String(num);
         if(num.indexOf('.') !== -1) {
@@ -150,7 +150,7 @@ function mostrarmodalgenerarpdf(seleccionformato,descargarxmls,documento){
         $("#fechainiciopdf").val(data.fechahoyinputdate);
         $("#fechaterminacionpdf").val(data.fechahoyinputdate);
         $("#seriesdisponiblesdocumento").html(data.select_series_disponibles)
-    }) 
+    })
     if(seleccionformato == 1){
         $("#divseleccionartipoformatocxc").show();
     }
@@ -212,19 +212,19 @@ function validarrangofechascreaciondocumentos(){
         toastr.error( "Error, la fecha de terminación debe ser mayor a la fecha de inicio", "Mensaje", {
             "timeOut": "5000",
             "progressBar": true,
-            "extendedTImeout": "5000" 
+            "extendedTImeout": "5000"
         });
         $("#btngenerardocumentospdf").hide();
     }else{
         var fechadesde = new Date(fechainiciopdf);
-        var fechahasta = new Date(fechaterminacionpdf);    
+        var fechahasta = new Date(fechaterminacionpdf);
         var milisegundostranscurridos = fechahasta - fechadesde;// diferencia en milisegundos
         var diastranscurridos = milisegundostranscurridos / (1000 * 60 * 60 * 24) // diferencia en dias
         if(parseInt(diastranscurridos) > 60){
             toastr.error( "Error, el rango entre ambas fechas no debe ser mayor a 60 días", "Mensaje", {
                 "timeOut": "5000",
                 "progressBar": true,
-                "extendedTImeout": "5000" 
+                "extendedTImeout": "5000"
             });
             $("#btngenerardocumentospdf").hide();
         }else{
@@ -234,11 +234,11 @@ function validarrangofechascreaciondocumentos(){
 }
 //FIN FUNCIONES EXPORTACION DE PDF EN MODULOS
 //FINCOPIADO DE TABLAS CON DOBLE CLICK
-function copiarfilatabla(objeto){   
+function copiarfilatabla(objeto){
     //copiar detalles tabla modulo
     const btnCopyRowTable = document.querySelector(objeto);
     const elRowTable = document.querySelector(objeto);
-    const copyElRow = (elRowToBeCopied) => {  
+    const copyElRow = (elRowToBeCopied) => {
         let rangerow, selrow;
         // Ensure that range and selection are supported by the browsers
         if (document.createRange && window.getSelection) {
@@ -256,7 +256,7 @@ function copiarfilatabla(objeto){
             document.execCommand('copy');
         }
         selrow.removeAllRanges();
-        msj_tablacopiadacorrectamente(); 
+        msj_tablacopiadacorrectamente();
     };
     btnCopyRowTable.addEventListener('dblclick', () => copyElRow(elRowTable));
     //fin copias tabla detalles modulo
@@ -269,7 +269,7 @@ function construirtabladinamicaporcolumna(Columna, ColumnaEncabezado){
     for (var i = 0; i < lista.length; i++) {
       datoscolumna = datoscolumna + '<tr><td>'+lista[i].value+'</td></tr>';
     }
-    $("#tbodytabladinamicaacopiar").html(datoscolumna);    
+    $("#tbodytabladinamicaacopiar").html(datoscolumna);
     document.getElementsByClassName('tabladinamicaacopiar')[0].dispatchEvent(new MouseEvent('dblclick', {'bubbles': true}));
     $(".tabladinamicaacopiar").hide();
 }
@@ -277,24 +277,24 @@ function construirtabladinamicaporfila(fila, claseeach, encabezadostablaacopiar,
     $(".tabladinamicaacopiar").show();
     var encabezados = '';
     var arrayencabezados = encabezadostablaacopiar.split(",");
-    for (var i = 0; i < arrayencabezados.length; i++) {   
+    for (var i = 0; i < arrayencabezados.length; i++) {
         encabezados = encabezados+'<td>'+arrayencabezados[i]+'</td>';
     }
     $("#theadtabladinamicaacopiar").html('<tr>'+encabezados+'</tr>');
     var datosfila = '';
     var cuentaFilas = 0;
     $(claseeach).each(function () {
-        if(fila === cuentaFilas){   
+        if(fila === cuentaFilas){
             var arrayvalorescolumnas = clasecolumnaobtenervalor.split(",");
-            for (var i = 0; i < arrayvalorescolumnas.length; i++) {   
+            for (var i = 0; i < arrayvalorescolumnas.length; i++) {
                 datosfila = datosfila+'<td>'+$(arrayvalorescolumnas[i], this).val()+'</td>';
             }
-        }  
+        }
         cuentaFilas++;
-    }); 
-    $("#tbodytabladinamicaacopiar").html('<tr>'+datosfila+'</tr>');  
-    document.getElementsByClassName('tabladinamicaacopiar')[0].dispatchEvent(new MouseEvent('dblclick', {'bubbles': true}));  
-    $(".tabladinamicaacopiar").hide();  
+    });
+    $("#tbodytabladinamicaacopiar").html('<tr>'+datosfila+'</tr>');
+    document.getElementsByClassName('tabladinamicaacopiar')[0].dispatchEvent(new MouseEvent('dblclick', {'bubbles': true}));
+    $(".tabladinamicaacopiar").hide();
 }
 //FINCOPIADO DE TABLAS CON DOBLE CLICK
 ////////////////////////////////////////MENSAJES TOASTR.JS INAASYS//////////////////////////////////////////
@@ -303,7 +303,7 @@ function msj_errorenpermisos(){
     toastr.error( "No tiene permisos para realizar esta acción, contacta al administrador del sistema", "Mensaje", {
         "timeOut": "6000",
         "progressBar": true,
-        "extendedTImeout": "6000" 
+        "extendedTImeout": "6000"
     });
 }
 //error en peticion ajax
@@ -445,7 +445,7 @@ function msj_errorcomprayaagregada(){
         "timeOut": "6000",
         "progressBar": true,
         "extendedTImeout": "6000"
-    }); 
+    });
 }
 //mensaje error la fecha debe ser del año y mes en curso
 function msj_errorfechaanoymesactual(){
@@ -583,7 +583,7 @@ function msjfaltandatosporcapturar(){
         "timeOut": "6000",
         "progressBar": true,
         "extendedTImeout": "6000"
-    });   
+    });
 }
 //msj tecnico ya agregado OT
 function msj_errortecnicoyaagregado(){
@@ -591,7 +591,7 @@ function msj_errortecnicoyaagregado(){
         "timeOut": "6000",
         "progressBar": true,
         "extendedTImeout": "6000"
-    }); 
+    });
 }
 //msj solo se puedne agregar 4 tecnicos OT
 function msjsolo4tecnicospermitidos(){
@@ -599,7 +599,7 @@ function msjsolo4tecnicospermitidos(){
         "timeOut": "6000",
         "progressBar": true,
         "extendedTImeout": "6000"
-    }); 
+    });
 }
 //msj El total de horas trabajadas por los técnicos es distinto al total de horas facturadas OT
 function msjtotalhorasnocorresponden(){
@@ -607,7 +607,7 @@ function msjtotalhorasnocorresponden(){
         "timeOut": "6000",
         "progressBar": true,
         "extendedTImeout": "6000"
-    });     
+    });
 }
 //msj para quitar refaccion cancela su traspaso
 function msjerrorcancelartraspaso(){
@@ -615,7 +615,7 @@ function msjerrorcancelartraspaso(){
         "timeOut": "6000",
         "progressBar": true,
         "extendedTImeout": "6000"
-    });   
+    });
 }
 //msj orden terminada correctamente
 function msj_ordenterminada(){
@@ -633,7 +633,7 @@ function msjremisionyautilizada(){
         "timeOut": "6000",
         "progressBar": true,
         "extendedTImeout": "6000"
-    });       
+    });
 }
 //mensaje error se require al menos una entrada de una partida
 function msj_erroralmenosunaentrada(){
@@ -665,7 +665,7 @@ function msj_errorendiferenciatotalnotatotaldescuentos(){
         "timeOut": "6000",
         "progressBar": true,
         "extendedTImeout": "6000"
-    }); 
+    });
 }
 //mensaje solo se admite 1 factura
 function msj_errorsolo1factura(){
@@ -699,7 +699,7 @@ function remisionagregadacorrectamente(){
         "progressBar": true,
         "extendedTImeout": "6000"
     });
-} 
+}
 //mensaje remision eliminada correctamente
 function remisioneliminadacorrectamente(){
     toastr.success( "Aviso, la remisión se elimino correctamente de las partidas", "Mensaje", {
@@ -708,7 +708,7 @@ function remisioneliminadacorrectamente(){
         "progressBar": true,
         "extendedTImeout": "6000"
     });
-} 
+}
 //mensaje orden agregada correctamente
 function ordenagregadacorrectamente(){
     toastr.success( "Aviso, la orden se agrego correctamente a las partidas", "Mensaje", {
@@ -717,7 +717,7 @@ function ordenagregadacorrectamente(){
         "progressBar": true,
         "extendedTImeout": "6000"
     });
-} 
+}
 //mensaje orden eliminada correctamente
 function ordeneliminadacorrectamente(){
     toastr.success( "Correcto, la orden se elimino correctamente de las partidas", "Mensaje", {
@@ -726,14 +726,14 @@ function ordeneliminadacorrectamente(){
         "progressBar": true,
         "extendedTImeout": "6000"
     });
-} 
+}
 //mensaje documento enviado correctamente
 function msj_documentoenviadoporemailcorrectamente(){
     toastr.success( "Correcto, el documento se envió", "Mensaje", {
         "timeOut": "6000",
         "progressBar": true,
         "extendedTImeout": "6000"
-    });  
+    });
 }
 //mensaje este usuario ya cuenta con una serie igual para el documento seleccionado, cambia la serie
 function msj_errorserieexistenteendocumento(){
@@ -741,7 +741,7 @@ function msj_errorserieexistenteendocumento(){
         "timeOut": "6000",
         "progressBar": true,
         "extendedTImeout": "6000"
-    });  
+    });
 }
 //mensaje no se encontro ningun producto con el codigo especificado
 function msjnoseencontroningunproducto(){
@@ -749,7 +749,7 @@ function msjnoseencontroningunproducto(){
         "timeOut": "6000",
         "progressBar": true,
         "extendedTImeout": "6000"
-    });  
+    });
 }
 //mensaje credito de cliente excedido
 function msj_creditoexcedido(){
@@ -757,7 +757,7 @@ function msj_creditoexcedido(){
         "timeOut": "6000",
         "progressBar": true,
         "extendedTImeout": "6000"
-    });   
+    });
 }
 //mensaje error la serie ya existe
 function msj_errorserieexistente(){
@@ -793,13 +793,13 @@ function msj_documentotimbradocorrectamente(mensaje, tipomensaje){
             "timeOut": "6000",
             "progressBar": true,
             "extendedTImeout": "6000"
-        });  
+        });
     }else{
         toastr.success( mensaje, "Mensaje", {
             "timeOut": "6000",
             "progressBar": true,
             "extendedTImeout": "6000"
-        });  
+        });
         var tabla = $('.tbllistado').DataTable();
         tabla.ajax.reload();
     }
@@ -811,13 +811,13 @@ function msj_timbrecanceladocorrectamente(mensaje, tipomensaje){
             "timeOut": "6000",
             "progressBar": true,
             "extendedTImeout": "6000"
-        });  
+        });
     }else{
         toastr.success( mensaje, "Mensaje", {
             "timeOut": "6000",
             "progressBar": true,
             "extendedTImeout": "6000"
-        });  
+        });
         var tabla = $('.tbllistado').DataTable();
         tabla.ajax.reload();
     }
@@ -828,8 +828,18 @@ function msj_tablacopiadacorrectamente(){
         "timeOut": "3000",
         "progressBar": true,
         "extendedTImeout": "3000"
-    });  
+    });
 }
+
+//error al guardar factura relacionada
+function msj_errorenfacturarelacion(){
+    toastr.error( "El tipo de relación es obligatorio", "Mensaje", {
+        "timeOut": "6000",
+        "progressBar": true,
+        "extendedTImeout": "6000"
+    });
+}
+
 //|||||FIN MENSAJES API FACTURAPI |||||||
 ///////////////////////////////////FIN MENSAJES TOASTR.JS INAASYS///////////////////////////////////////
 //////////////////////////////FUNCIONES PARA CONFIGURACION DE COLUMNAS DE TABLAS/////////////////////////////////////////
@@ -879,11 +889,11 @@ function armar_columas_datatable(campos,campos_busqueda){
     campos_tabla.push({ 'data':'operaciones', 'name':'operaciones', 'orderable':false, 'searchable':false});
     for (var i = 0; i < campos.length; i++) {
         var searchable = false;
-        var valor_encontrado_en_array = campos_busqueda.indexOf(campos[i]); 
+        var valor_encontrado_en_array = campos_busqueda.indexOf(campos[i]);
         if(valor_encontrado_en_array >= 0){
             searchable = true;
         }
-        campos_tabla.push({ 
+        campos_tabla.push({
             'data'    : campos[i],
             'name'  : campos[i],
             'orderable': false,
@@ -917,7 +927,7 @@ function armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbus
                                 '<input type="hidden" class="form-control" name="string_datos_tabla_false" id="string_datos_tabla_false" required>'+
                             '</div>'+
                         '</div>'+
-                    '</div>'+ 
+                    '</div>'+
                     '<div role="tabpanel" class="tab-pane fade" id="tabordenarcolumnas">'+
                         '<div class="row">'+
                             '<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">'+
@@ -939,7 +949,7 @@ function armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbus
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
-                        '</div>'+      
+                        '</div>'+
                     '</div>'+
                     '<div role="tabpanel" class="tab-pane fade" id="tabbusquedayordenamiento">'+
                         '<div class="row">'+
@@ -1018,7 +1028,7 @@ function armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbus
                                             '</div>'+
                                         '</div>'+
                                     '</div>'+
-                                '</div>'+      
+                                '</div>'+
                             '</div>'+
                         '</div>'+
                     '</div>'+
@@ -1027,8 +1037,8 @@ function armar_formulario_configuracion_tabla(checkboxscolumnas,optionsselectbus
 }
 //BLOQUEAR MENU DE OPCIONES EN EL NAVEGADRO CLICK DERECHO PARA EVITAR QUE USUARIOS ABRAN LA CONSOLA
 if(rol_de_usuario_logueado_en_sistema == 2){
-    window.addEventListener('contextmenu', function (e) { 
-        e.preventDefault(); 
+    window.addEventListener('contextmenu', function (e) {
+        e.preventDefault();
     }, false);
 }
 //////////////////////////////FIN FUNCIONES PARA CONFIGURACION DE COLUMNAS DE TABLAS/////////////////////////////////////////
