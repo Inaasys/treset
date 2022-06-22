@@ -81,7 +81,7 @@
                                     <thead class="{{$empresa->background_tables}}">
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
-                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co)
                                                 <th id="th{{$co}}">{{$co}}</th>
                                             @endforeach
                                         </tr>
@@ -90,7 +90,7 @@
                                     <tfoot>
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
-                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co)
                                                 <th id="th{{$co}}">{{$co}}</th>
                                             @endforeach
                                         </tr>
@@ -108,10 +108,10 @@
                                                     <th>Sum Abonos: <b id="sumaabonosfiltrado"></b></th>
                                                     <th>Sum Descuentos: <b id="sumadescuentosfiltrado"></b></th>
                                                     <th>Sum Saldo: <b id="sumasaldofiltrado"></b></th>
-                                                </tr>   
+                                                </tr>
                                             </table>
                                         </div>
-                                @endif 
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -145,14 +145,14 @@
                                         </div>
                                     </td>
                                 </tr>
-                            </table>   
+                            </table>
                         </div>
                     </form>
                     <form id="formparsley" action="#">
                         <div class="col-md-12" id="tabsform">
                             <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
                         </div>
-                    </form> 
+                    </form>
                 </div>
                 <div class="modal-footer">
                     <div class="col-md-4">
@@ -165,12 +165,12 @@
                         <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
-                    </div> 
+                    </div>
                 </div>
             </div>
             <div id="contenidomodaltablas">
                 <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
-            </div> 
+            </div>
         </div>
     </div>
 </div>
@@ -189,7 +189,7 @@
                         <label>Motivo Baja</label>
                         <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required data-parsley-length="[1, 200]"></textarea>
                     </div>
-		        </form>	
+		        </form>
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
@@ -197,7 +197,7 @@
 	      	</div>
     	</div>
   	</div>
-</div> 
+</div>
 <!-- Modal Movimientos-->
 <div class="modal fade" data-keyboard="false" id="modalmovimientoscompra" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   	<div class="modal-dialog" role="document">
@@ -219,13 +219,13 @@
                                 </tr>
                             </thead>
                             <tbody id="filasmovimientos"></tbody>
-                        </table> 
+                        </table>
                     </div>
-                </div>    	
+                </div>
       		</div>
     	</div>
   	</div>
-</div> 
+</div>
 <!-- modal para crear documento en PDF-->
 @include('secciones.modalcreardocumento')
 <!-- fin modal para crear documento en PDF-->
@@ -262,7 +262,7 @@
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
-        var background_tables = '{{$empresa->background_tables}}';       
+        var background_tables = '{{$empresa->background_tables}}';
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var urlpdfsimpresionesrapidas = '{{asset("xml_descargados/")}}/';
         var compras_obtener = '{!!URL::to('compras_obtener')!!}';
@@ -279,10 +279,10 @@
         var compras_obtener_producto_por_codigo = '{!!URL::to('compras_obtener_producto_por_codigo')!!}';
         var compras_obtener_proveedor_por_numero = '{!!URL::to('compras_obtener_proveedor_por_numero')!!}';
         var compras_obtener_ordenes_compra = '{!!URL::to('compras_obtener_ordenes_compra')!!}';
-        var compras_obtener_orden_compra = '{!!URL::to('compras_obtener_orden_compra')!!}'; 
-        var compras_obtener_departamentos = '{!!URL::to('compras_obtener_departamentos')!!}'; 
-        var compras_obtener_claves_productos = '{!!URL::to('compras_obtener_claves_productos')!!}'; 
-        var compras_obtener_claves_unidades = '{!!URL::to('compras_obtener_claves_unidades')!!}'; 
+        var compras_obtener_orden_compra = '{!!URL::to('compras_obtener_orden_compra')!!}';
+        var compras_obtener_departamentos = '{!!URL::to('compras_obtener_departamentos')!!}';
+        var compras_obtener_claves_productos = '{!!URL::to('compras_obtener_claves_productos')!!}';
+        var compras_obtener_claves_unidades = '{!!URL::to('compras_obtener_claves_unidades')!!}';
         var compras_guardar = '{!!URL::to('compras_guardar')!!}';
         var compras_obtener_movimientos_compra = '{!!URL::to('compras_obtener_movimientos_compra')!!}';
         var compras_obtener_compra = '{!!URL::to('compras_obtener_compra')!!}';
@@ -291,12 +291,12 @@
         var compras_obtener_valor_modificacionpermitida = '{!!URL::to('compras_obtener_valor_modificacionpermitida')!!}';
         var compras_guardar_modificacion = '{!!URL::to('compras_guardar_modificacion')!!}';
         var compras_verificar_uso_en_modulos =  '{!!URL::to('compras_verificar_uso_en_modulos')!!}';
-        var compras_alta_o_baja = '{!!URL::to('compras_alta_o_baja')!!}'; 
+        var compras_alta_o_baja = '{!!URL::to('compras_alta_o_baja')!!}';
         var compras_obtener_datos_envio_email = '{!!URL::to('compras_obtener_datos_envio_email')!!}';
-        var compras_enviar_pdfs_email = '{!!URL::to('compras_enviar_pdfs_email')!!}';        
+        var compras_enviar_pdfs_email = '{!!URL::to('compras_enviar_pdfs_email')!!}';
         var compras_generar_pdfs = '{!!URL::to('compras_generar_pdfs')!!}';
-        var compras_buscar_folio_string_like = '{!!URL::to('compras_buscar_folio_string_like')!!}'; 
+        var compras_buscar_folio_string_like = '{!!URL::to('compras_buscar_folio_string_like')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
-    <script src="scripts_inaasys/registros/compras/compras.js"></script>
+    <script src="{{ asset('scripts_inaasys/registros/compras/compras.js') }}"></script>
 @endsection
