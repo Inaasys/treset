@@ -190,8 +190,8 @@
                             <tr>
                                 @php
                                     $redondeoSub = round($d['subtotalfactura'],2);
-                                    $redondeoIva = round(($redondeoSub * 0.16),2);
-                                    $redondeoTotal = round(($redondeoSub + $redondeoIva),2)
+                                    $redondeoIva = round(($d['ivafactura']),2);
+                                    $redondeoTotal = round(($d['totalfactura']),2)
                                 @endphp
                                 <td colspan="3" style="font-size:10px"></td>
                                 <td style="font-size:11px;text-align: right;">SubTotal $ : </td>
