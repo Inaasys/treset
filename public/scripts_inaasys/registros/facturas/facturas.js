@@ -1567,7 +1567,7 @@ async function seleccionarclienteremisionesseleccionadas(data){
       $("#utilidad").removeAttr('data-parsley-decimalesconfigurados');
   }else{
       $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
-      $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
+      $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/');
   }
   $('.page-loader-wrapper').css('display', 'none');
 }
@@ -1754,7 +1754,7 @@ function cargarserviciosseleccionadas(){
         $("#utilidad").removeAttr('data-parsley-decimalesconfigurados');
     }else{
         $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
-        $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
+        $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/');
     }
     //ocultar input para agregar servicios
     $("#btnobtenerservicios").hide();
@@ -3202,7 +3202,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
             $("#utilidad").removeAttr('data-parsley-decimalesconfigurados');
         }else{
             $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
-            $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
+            $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/');
         }
         $("#codigoabuscar").val("");
         $("#codigogastoabuscar").val("");
@@ -5265,7 +5265,7 @@ function obtenerdatos(facturamodificar){
         $("#utilidad").removeAttr('data-parsley-decimalesconfigurados');
     }else{
         $(".utilidadpartida").attr('data-parsley-utilidad', "0."+numerocerosconfiguradosinputnumberstep );
-        $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{4}$/');
+        $("#utilidad").attr('data-parsley-decimalesconfigurados', '/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/');
     }
     renumerarfilasuuid();
     seleccionartipocliente(data);

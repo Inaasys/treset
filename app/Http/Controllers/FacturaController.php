@@ -1841,9 +1841,14 @@ class FacturaController extends ConfiguracionSistemaController{
         //Realiza erl redondeo de los montos finales para que coincidan con el sat
 
         $subtotalAux = number_format(round($request->importe, $decimalesDoc), $decimalesConf, '.', '') - number_format(round($request->descuento, $decimalesDoc), $decimalesConf, '.', '');
-        $ivaAux = number_format(round($subtotalAux, $decimalesDoc), $decimalesConf, '.', '') * 0.16;
 
-        $totalTotal = number_format(round($subtotalAux, $decimalesDoc), $decimalesConf, '.', '') + number_format(round($ivaAux, $decimalesDoc), $decimalesConf, '.', '');
+        if($request->esquema == "INTERNA"){
+            $totalTotal = number_format(round($subtotalAux, $decimalesDoc), $decimalesConf, '.', '');
+        }else{
+            $ivaAux = number_format(round($subtotalAux, $decimalesDoc), $decimalesConf, '.', '') * 0.16;
+            $totalTotal = number_format(round($subtotalAux, $decimalesDoc), $decimalesConf, '.', '') + number_format(round($ivaAux, $decimalesDoc), $decimalesConf, '.', '');
+        }
+
 
         if($request->numerofilasuuid > 0){
             if(!isset($request->clavetiporelacion)){
