@@ -12,6 +12,10 @@ use Helpers;
 use DataTables;
 use App\Configuracion_Tabla;
 use App\Comprobante;
+use App\FolioComprobanteFactura;
+use App\FolioComprobanteNota;
+use App\FolioComprobantePago;
+use App\FolioComprobanteTraslado;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ReporteRelacionTimbresUtilizadosExport;
 use DB;
@@ -62,6 +66,13 @@ class ReporteTimbresUtilizadosController extends ConfiguracionSistemaController{
 
     //generar reporte
     public function reporte_relacion_timbres_utilizados_generar_reporte(Request $request){
+        $foliosF = FolioComprobanteFactura::select('Serie');
+        $foliosN = FolioComprobanteNota::select('Serie');
+        $foliosP = FolioComprobantePago::select('Serie');
+        $foliosT = FolioComprobanteTraslado::select('Serie')
+        ->union($foliosF)
+        ->union($foliosN)
+        ->union($foliosP)->get();
         $fechainicio = date($request->fechainicialreporte);
         $fechaterminacion = date($request->fechafinalreporte);
         $claveserie=$request->claveserie;
@@ -76,6 +87,7 @@ class ReporteTimbresUtilizadosController extends ConfiguracionSistemaController{
                     ->leftjoin('Notas Proveedor as np','np.Nota',DB::raw("(c.Folio+'-'+c.Serie)"))
                     ->select('c.Comprobante', 'c.Tipo', 'c.Serie', 'c.Folio', 'f.Total as TotalSistema','f.Status','c.Total as TotalCFDI','c.UUID', 'c.EmisorRfc', 'c.ReceptorRfc', 'c.FormaPago', 'c.MetodoPago', 'c.UsoCfdi')
                     ->whereDate('c.Fecha', '>=', $fechainicio)->whereDate('c.Fecha', '<=', $fechaterminacion)
+                    ->whereIn('c.Serie',$foliosT)
                     ->where(function($q) use ($claveserie) {
                         if($claveserie != null){
                             $q->where('c.Serie', $claveserie);
