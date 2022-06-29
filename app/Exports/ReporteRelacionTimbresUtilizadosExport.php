@@ -15,6 +15,10 @@ use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Jenssegers\Date\Date;
 use Helpers;
+use App\FolioComprobanteFactura;
+use App\FolioComprobanteNota;
+use App\FolioComprobantePago;
+use App\FolioComprobanteTraslado;
 use App\Comprobante;
 use DB;
 
@@ -79,7 +83,7 @@ class ReporteRelacionTimbresUtilizadosExport implements FromCollection,WithHeadi
             'W' => 15,
             'X' => 15,
             'Y' => 15,
-            'Z' => 15,       
+            'Z' => 15,
         ];
     }
 
@@ -98,11 +102,19 @@ class ReporteRelacionTimbresUtilizadosExport implements FromCollection,WithHeadi
         $claveserie=$this->claveserie;
         $reporte = $this->reporte;
         $tipocomprobante=$this->tipocomprobante;
+        $foliosF = FolioComprobanteFactura::select('Serie');
+        $foliosN = FolioComprobanteNota::select('Serie');
+        $foliosP = FolioComprobantePago::select('Serie');
+        $foliosT = FolioComprobanteTraslado::select('Serie')
+        ->union($foliosF)
+        ->union($foliosN)
+        ->union($foliosP)->get();
         switch($reporte){
             case "GENERAL":
                 $data = DB::table('Comprobantes')
                     ->select('Comprobante', 'Tipo', 'Serie', 'Folio', 'UUID', 'EmisorRfc', 'ReceptorRfc', 'FormaPago', 'MetodoPago', 'UsoCfdi')
                     ->whereDate('Fecha', '>=', $fechainicio)->whereDate('Fecha', '<=', $fechaterminacion)
+                    ->whereIn('Serie', $foliosT)
                     ->where(function($q) use ($claveserie) {
                         if($claveserie != null){
                             $q->where('Serie', $claveserie);
