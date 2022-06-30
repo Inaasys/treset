@@ -37,7 +37,7 @@ use Config;
 use Mail;
 use Schema;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
-use Storage; 
+use Storage;
 use ZipArchive;
 use File;
 
@@ -136,11 +136,11 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     //->addColumn('Descuento', function($data){ return $data->Descuento; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        } 
-    } 
+        }
+    }
     //descargar plantilla
     public function ordenes_compra_generar_plantilla(){
-        return Excel::download(new PlantillasOrdenesCompraExport(), "plantillaordenescompra.xlsx"); 
+        return Excel::download(new PlantillasOrdenesCompraExport(), "plantillaordenescompra.xlsx");
     }
     //cargar partidas excel
     public function ordenes_compra_cargar_partidas_excel(Request $request){
@@ -155,7 +155,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         foreach($partidasexcel as $partida){
             if($rowexcel > 0){
                 if (in_array(strtoupper($partida[0]), $arraycodigosyaagregados)) {
-                    
+
                 }else{
                     $codigoabuscar = $partida[0];
                     $cantidadpartida = $partida[1];
@@ -174,7 +174,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                                         ->where('TipoProd', 'REFACCION')
                                         ->orWhereNull('TipoProd');
                             })->count();
-                    } 
+                    }
                     if($contarproductos > 0){
                         switch ($request->tipoalta) {
                             case "GASTOS":
@@ -191,7 +191,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                                             ->where('TipoProd', 'REFACCION')
                                             ->orWhereNull('TipoProd');
                                 })->first();
-                        } 
+                        }
                         if(Helpers::convertirvalorcorrecto($cantidadpartida) == 0){
                             $cantidad = 1;
                         }else{
@@ -212,7 +212,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                         '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                             '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" id="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$producto->Codigo.'</b></td>'.
-                            '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet nombreproductopartida" name="nombreproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($producto->Producto, ENT_QUOTES).'</textarea></td>'.                    
+                            '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet nombreproductopartida" name="nombreproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($producto->Producto, ENT_QUOTES).'</textarea></td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" id="unidadproductopartida[]" value="'.$producto->Unidad.'" readonly data-parsley-length="[1, 5]">'.$producto->Unidad.'</td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm porsurtirpartida" name="porsurtirpartida[]" id="porsurtirpartida[]" value="'.Helpers::convertirvalorcorrecto($cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" id="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($cantidad).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilasordencompra('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
@@ -238,7 +238,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             "contadorproductos" => $contadorproductos,
             "contadorfilas" => $contadorfilas,
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
     //obtener series documento
     public function ordenes_compra_obtener_series_documento(Request $request){
@@ -354,7 +354,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             default:
                 $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->where('Nombre', '<>', 'GASTOS')->Where('Nombre', '<>', 'TOT')->get();
 
-        } 
+        }
         $select_tipos_ordenes_compra = "<option disabled hidden>Selecciona...</option>";
         foreach($tipos_ordenes_compra as $tipo){
             $select_tipos_ordenes_compra = $select_tipos_ordenes_compra."<option value='".$tipo->Nombre."'>".$tipo->Nombre."</option>";
@@ -437,7 +437,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         $data = array(
             'orden' => $orden
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
     //obtener productos
     public function ordenes_compra_obtener_productos(Request $request){
@@ -461,24 +461,24 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                                 ->orWhereNull('TipoProd');
                     });
                     //->where('TipoProd', '<>', 'GASTOS')->Where('TipoProd', '<>', 'TOT');
-            } 
+            }
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($tipooperacion, $numeroalmacen){
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.$tipooperacion.'\')">Seleccionar</div>';
                         return $boton;
                     })
-                    ->addColumn('Existencias', function($data){ 
+                    ->addColumn('Existencias', function($data){
                         return Helpers::convertirvalorcorrecto($data->Existencias);
                     })
-                    ->addColumn('Costo', function($data){ 
+                    ->addColumn('Costo', function($data){
                         return Helpers::convertirvalorcorrecto($data->Costo);
                     })
-                    ->addColumn('SubTotal', function($data){ 
+                    ->addColumn('SubTotal', function($data){
                         return Helpers::convertirvalorcorrecto($data->SubTotal);
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        } 
+        }
     }
     //obtener producto por codigo
     public function ordenes_compra_obtener_producto_por_codigo(Request $request){
@@ -498,7 +498,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                             ->where('TipoProd', 'REFACCION')
                             ->orWhereNull('TipoProd');
                 })->count();
-        } 
+        }
         if($contarproductos > 0){
             switch ($request->tipoalta) {
                 case "GASTOS":
@@ -515,7 +515,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                                 ->where('TipoProd', 'REFACCION')
                                 ->orWhereNull('TipoProd');
                     })->first();
-            } 
+            }
 
             $data = array(
                 'Codigo' => $producto->Codigo,
@@ -594,7 +594,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             'numero' => $numero,
             'nombre' => $nombre,
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
     //guardar en el módulo
     public function ordenes_compra_guardar(Request $request){
@@ -614,7 +614,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
 		$OrdenCompra->Referencia=$request->referencia;
         $OrdenCompra->Tipo=$request->tipo;
         $OrdenCompra->Importe=$request->importe;
-        $OrdenCompra->Descuento=$request->descuento;  
+        $OrdenCompra->Descuento=$request->descuento;
         $OrdenCompra->SubTotal=$request->subtotal;
         $OrdenCompra->Iva=$request->iva;
         $OrdenCompra->Total=$request->total;
@@ -636,7 +636,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
         $item = 1;
-        foreach ($request->codigoproductopartida as $key => $codigoproductopartida){             
+        foreach ($request->codigoproductopartida as $key => $codigoproductopartida){
             $OrdenCompraDetalle=new OrdenCompraDetalle;
             $OrdenCompraDetalle->Orden = $orden;
             $OrdenCompraDetalle->Proveedor = $request->numeroproveedor;
@@ -660,7 +660,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             $OrdenCompraDetalle->save();
             $item++;
         }
-    	return response()->json($OrdenCompra); 
+    	return response()->json($OrdenCompra);
     }
     //verificar autorizacion
     public function ordenes_compra_verificar_autorizacion(Request $request){
@@ -688,7 +688,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                 'AutorizadoFecha' => Helpers::fecha_exacta_accion_datetimestring()
             ]);
         /*
-        $OrdenCompra->AutorizadoPor = Auth::user()->user; 
+        $OrdenCompra->AutorizadoPor = Auth::user()->user;
         $OrdenCompra->AutorizadoFecha = Helpers::fecha_exacta_accion_datetimestring();
         $OrdenCompra->save();
         */
@@ -821,7 +821,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                 '<tr class="filasproductos filaproducto'.$contadorproductos.'" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfilapreciosproductos('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$doc->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                     '<td class="tdmod" ondblclick="construirtabladinamicaporfila('.$contadorfilas.',\'tr.filasproductos\',\''.$encabezadostablaacopiar.'\',\''.$clasecolumnaobtenervalor.'\')"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$doc->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$doc->Codigo.'</b></td>'.
-                    '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet nombreproductopartida" name="nombreproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($doc->Descripcion, ENT_QUOTES).'</textarea></td>'.                    
+                    '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet nombreproductopartida" name="nombreproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($doc->Descripcion, ENT_QUOTES).'</textarea></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$doc->Unidad.'" readonly data-parsley-length="[1, 5]">'.$doc->Unidad.'</td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm porsurtirpartida"  name="porsurtirpartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Surtir).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida"  name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Cantidad).'" data-parsley-min="'.Helpers::convertirvalorcorrecto($cantidadyasurtidapartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="calculartotalesfilasordencompra('.$contadorfilas.');cambiodecantidadopreciopartida('.$contadorfilas.',\''.$tipo .'\');formatocorrectoinputcantidades(this);" ></td>'.
@@ -840,7 +840,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             }
         }else{
             $filasdetallesordencompra = '';
-        }    
+        }
         //permitir o no modificar registro
         if(Auth::user()->role_id == 1){
             if($ordencompra->Status == 'SURTIDO' || $ordencompra->Status == 'BAJA'){
@@ -864,7 +864,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     }
                 //}
             }
-        }     
+        }
         $data = array(
             "ordencompra" => $ordencompra,
             "filasdetallesordencompra" => $filasdetallesordencompra,
@@ -908,8 +908,8 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             //array_push($ArrayDetallesOrdenCompraNuevo, $nuevocodigo);
             if($request->agregadoen [$key] == 'NA'){
                 array_push($ArrayDetallesOrdenCompraNuevo, $orden.'#'.$nuevocodigo.'#'.$request->itempartida [$key]);
-            } 
-        }  
+            }
+        }
         //diferencias entre arreglos
         $diferencias_arreglos = array_diff($ArrayDetallesOrdenCompraAnterior, $ArrayDetallesOrdenCompraNuevo);
         //iteramos las diferencias entre arreglos
@@ -930,7 +930,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             'Referencia'=>$request->referencia,
             'Tipo'=>$request->tipo,
             'Importe'=>$request->importe,
-            'Descuento'=>$request->descuento,  
+            'Descuento'=>$request->descuento,
             'SubTotal'=>$request->subtotal,
             'Iva'=>$request->iva,
             'Total'=>$request->total,
@@ -949,9 +949,9 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
         $detallesporsurtir = 0;
-        foreach ($request->codigoproductopartida as $key => $codigoproductopartida){    
+        foreach ($request->codigoproductopartida as $key => $codigoproductopartida){
             //if la partida se agrego en la modificacion se agrega en los detalles
-            if($request->agregadoen [$key] == 'modificacion'){      
+            if($request->agregadoen [$key] == 'modificacion'){
                 $contaritems = OrdenCompraDetalle::select('Item')->where('Orden', $orden)->count();
                 if($contaritems > 0){
                     $item = OrdenCompraDetalle::select('Item')->where('Orden', $orden)->orderBy('Item', 'DESC')->take(1)->get();
@@ -979,7 +979,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                 $OrdenCompraDetalle->Registro = 0;
                 $OrdenCompraDetalle->Item = $ultimoitem;
                 $OrdenCompraDetalle->save();
-                $ultimoitem++;   
+                $ultimoitem++;
             }else{
                 //si la partida no se agrego en la modificacion solo se modifican los datos
                 //modificar detalle
@@ -1020,7 +1020,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             $OrdenCompra->save();
             */
         }
-    	return response()->json($OrdenCompra);     
+    	return response()->json($OrdenCompra);
     }
     //buscar folio on key up
     public function ordenes_compra_buscar_folio_string_like(Request $request){
@@ -1033,7 +1033,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     return $total;
                 })
                 ->make(true);
-        } 
+        }
     }
     //generacion de formato en PDF
     public function ordenes_compra_generar_pdfs(Request $request){
@@ -1042,11 +1042,11 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         //primero eliminar todos los archivos zip
         Helpers::eliminararchivoszipgenerados();
         if($request->imprimirdirectamente == 1){
-            $ordenescompra = OrdenCompra::where('Orden', $request->arraypdf)->get(); 
+            $ordenescompra = OrdenCompra::where('Orden', $request->arraypdf)->get();
         }else{
             $tipogeneracionpdf = $request->tipogeneracionpdf;
             if($tipogeneracionpdf == 0){
-                $ordenescompra = OrdenCompra::whereIn('Orden', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
+                $ordenescompra = OrdenCompra::whereIn('Orden', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get();
             }else{
                 $fechainiciopdf = date($request->fechainiciopdf);
                 $fechaterminacionpdf = date($request->fechaterminacionpdf);
@@ -1056,6 +1056,9 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     $ordenescompra = OrdenCompra::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(1500)->get();
                 }
             }
+        }
+        if($ordenescompra->count() < 1){
+            echo "<script languaje='javascript' type='text/javascript'>window.close();</script>";
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $arrayfilespdf = array();
@@ -1076,7 +1079,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     "descuentodetalle" => Helpers::convertirvalorcorrecto($ocd->Dcto),
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($ocd->SubTotal)
                 );
-            } 
+            }
             $proveedor = Proveedor::where('Numero', $oc->Proveedor)->first();
             //obtener firmas
             $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'OrdenesDeCompra')->where('Documento', $oc->Orden)->where('Status', 'ALTA')->count();
@@ -1114,7 +1117,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             ->setOption('margin-bottom', 10);
             //return $pdf->stream();
             $ArchivoPDF = "PDF".$oc->Orden.".pdf";
-            $pdf->save(storage_path('archivos_pdf_documentos_generados/'.$ArchivoPDF)); 
+            $pdf->save(storage_path('archivos_pdf_documentos_generados/'.$ArchivoPDF));
         }
         $pdfMerger = PDFMerger::init(); //Initialize the merger
         //unir pdfs
@@ -1144,8 +1147,8 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     // Agregar archivos que se comprimiran
                     foreach($arrayfilespdf as $afp) {
                         $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
-                    }     
-                    //terminar proceso   
+                    }
+                    //terminar proceso
                     $zip->close();
                 }
                 // Set Encabezados para descargar
@@ -1163,7 +1166,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
 
     //generacion de formato en PDF
     public function ordenes_compra_generar_pdfs_indiv($documento){
-        $ordenescompra = OrdenCompra::where('Orden', $documento)->orderBy('Folio', 'ASC')->get(); 
+        $ordenescompra = OrdenCompra::where('Orden', $documento)->orderBy('Folio', 'ASC')->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($ordenescompra as $oc){
@@ -1182,7 +1185,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     "descuentodetalle" => Helpers::convertirvalorcorrecto($ocd->Dcto),
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($ocd->SubTotal)
                 );
-            } 
+            }
             $proveedor = Proveedor::where('Numero', $oc->Proveedor)->first();
             //obtener firmas
             $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'OrdenesDeCompra')->where('Documento', $oc->Orden)->where('Status', 'ALTA')->count();
@@ -1249,7 +1252,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
 
     //enviar pdf por emial
     public function ordenes_compra_enviar_pdfs_email(Request $request){
-        $ordenescompra = OrdenCompra::where('Orden', $request->emaildocumento)->orderBy('Folio', 'ASC')->get(); 
+        $ordenescompra = OrdenCompra::where('Orden', $request->emaildocumento)->orderBy('Folio', 'ASC')->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($ordenescompra as $oc){
@@ -1268,7 +1271,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     "descuentodetalle" => Helpers::convertirvalorcorrecto($ocd->Dcto),
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($ocd->SubTotal)
                 );
-            } 
+            }
             $proveedor = Proveedor::where('Numero', $oc->Proveedor)->first();
             //obtener firmas
             $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'OrdenesDeCompra')->where('Documento', $oc->Orden)->where('Status', 'ALTA')->count();
@@ -1305,7 +1308,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
         try{
-            //enviar correo electrónico	
+            //enviar correo electrónico
             $datosdocumento = OrdenCompra::where('Orden', $request->emaildocumento)->first();
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
@@ -1419,7 +1422,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('OrdenesDeCompra', Auth::user()->id);
-        return Excel::download(new OrdenesDeCompraExport($configuraciones_tabla['campos_consulta'],$request->periodo), "ordenesdecompra-".$request->periodo.".xlsx");   
+        return Excel::download(new OrdenesDeCompraExport($configuraciones_tabla['campos_consulta'],$request->periodo), "ordenesdecompra-".$request->periodo.".xlsx");
     }
 
     //configurar tabla
@@ -1481,7 +1484,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        }        
+        }
     }
     //obtener claves unidades
     public function ordenes_compra_obtener_claves_unidades(Request $request){
@@ -1494,8 +1497,8 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        }        
-    } 
+        }
+    }
     //obtener marcas
     public function ordenes_compra_obtener_marcas(Request $request){
         if($request->ajax()){
@@ -1527,8 +1530,8 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     })
                     ->rawColumns(['operaciones','Utilidad1','Utilidad2','Utilidad3','Utilidad4','Utilidad5'])
                     ->make(true);
-        }        
-    }    
+        }
+    }
     //obtener lineas
     public function ordenes_compra_obtener_lineas(Request $request){
         if($request->ajax()){
@@ -1540,15 +1543,15 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        }        
-    } 
+        }
+    }
     //guardar en catalogo
     public function ordenes_compra_guardar_producto(Request $request){
         $codigo=$request->codigo;
 	    $ExisteProducto = Producto::where('Codigo', $codigo )->first();
 	    if($ExisteProducto == true){
 	        $Producto = 1;
-	    }else{        
+	    }else{
             $marca = Marca::where('Numero', $request->marca)->first();
             $utilidadrestante = Helpers::convertirvalorcorrecto(100) - $marca->Utilidad1;
             $subtotalpesos = $request->costo / ($utilidadrestante/100);
@@ -1579,8 +1582,8 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             $Producto->Precio1=$request->precio;
             Log::channel('producto')->info('Se registro un nuevo producto: '.$Producto.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
             $Producto->save();
-        }    
-        return response()->json($Producto); 
-    } 
-    
+        }
+        return response()->json($Producto);
+    }
+
 }

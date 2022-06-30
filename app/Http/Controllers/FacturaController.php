@@ -2566,14 +2566,17 @@ class FacturaController extends ConfiguracionSistemaController{
             if($tipogeneracionpdf == 0){
                 $facturas = Factura::whereIn('Factura', $request->arraypdf)->orderBy('Folio', 'ASC')->take(250)->get();
             }else{
-                $fechainiciopdf = date($request->fechainiciopdf);
-                $fechaterminacionpdf = date($request->fechaterminacionpdf);
+                $fechainiciopdf = date($request->fechainiciopdf)." 00:00:00.000";
+                $fechaterminacionpdf = date($request->fechaterminacionpdf)." 11:59:59.000";
                 if ($request->has("seriesdisponiblesdocumento")){
                     $facturas = Factura::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->whereIn('Serie', $request->seriesdisponiblesdocumento)->orderBy('Folio', 'ASC')->take(250)->get();
                 }else{
                     $facturas = Factura::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(250)->get();
                 }
             }
+        }
+        if($facturas->count() < 1){
+            echo "<script languaje='javascript' type='text/javascript'>window.close();</script>";
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $arrayfiles = array();
