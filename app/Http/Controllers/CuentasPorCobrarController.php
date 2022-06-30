@@ -51,7 +51,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
 
     public function __construct(){
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
-        //API FACTURAPI 
+        //API FACTURAPI
         $this->facturapi = new Facturapi( config('app.keyfacturapi') ); //
     }
 
@@ -109,7 +109,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         if($this->regimenfiscal != ''){
             $c_RegimenFiscal = c_RegimenFiscal::where('Clave', $this->regimenfiscal)->first();
             $claveregimenfiscal = $c_RegimenFiscal->Clave;
-            $regimenfiscal = $c_RegimenFiscal->Nombre;            
+            $regimenfiscal = $c_RegimenFiscal->Nombre;
         }
         return view('registros.cuentasporcobrar.cuentasporcobrar', compact('serieusuario','esquema','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','rutacreardocumento','lugarexpedicion','claveregimenfiscal','regimenfiscal'));
     }
@@ -161,7 +161,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                 ->addColumn('Facturas', function($data){ return substr($data->Facturas, 0, 70); })
                 ->rawColumns(['operaciones'])
                 ->make(true);
-        } 
+        }
     }
 
     //obtener ultimo folio
@@ -170,7 +170,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         return response()->json($folio);
     }
 
-    //obtener datetime local 
+    //obtener datetime local
     public function cuentas_por_cobrar_obtener_fecha_datetime(){
         $fecha = Helpers::fecha_exacta_accion_datetimelocal();
         return response()->json($fecha);
@@ -230,7 +230,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $numerofacturas = Factura::where('Cliente', $request->numerocliente)->where('Status', 'POR COBRAR')->count();
             $filasfacturas= '';
             $contadorfilas = 0;
-            if($numerofacturas > 0){    
+            if($numerofacturas > 0){
                 $objetosimp = c_ObjetoImp::all();
                 $selectobjetosimp = "<option selected disabled hidden>Selecciona</option>";
                 foreach($objetosimp as $oi){
@@ -278,8 +278,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                                 '<div class="col-md-2">'.
                                     '<div class="btn bg-blue btn-xs waves-effect" data-toggle="tooltip" title="Cambiar Método de Pago" onclick="listarmetodospago('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                 '</div>'.
-                                '<div class="col-md-10">'.    
-                                    '<input type="text" class="form-control divorinputmodsm metodopagodrfacturapartida" name="metodopagodrfacturapartida[]" value="'.$f->MetodoPago.'" readonly>'.                 
+                                '<div class="col-md-10">'.
+                                    '<input type="text" class="form-control divorinputmodsm metodopagodrfacturapartida" name="metodopagodrfacturapartida[]" value="'.$f->MetodoPago.'" readonly>'.
                                 '</div>'.
                             '</div>'.
                         '</td>'.
@@ -290,7 +290,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     '</tr>';
                     $contadorfilas++;
                 }
-            }  
+            }
         }
         $data = array(
             'numero' => $numero,
@@ -318,7 +318,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     ->make(true);
         }
     }
-    
+
     //obtener banco por numero
     public function cuentas_por_cobrar_obtener_banco_por_numero(Request $request){
         $numero = '';
@@ -333,9 +333,9 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             'numero' => $numero,
             'nombre' => $nombre,
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
-    
+
     //obtener facturs clientes
     public function cuentas_por_cobrar_obtener_facturas_cliente(Request $request){
         $facturas = Factura::where('Cliente', $request->numerocliente)->where('Status', 'POR COBRAR')->orderBy('Folio', 'DESC')->get();
@@ -390,8 +390,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                             '<div class="col-md-2">'.
                                 '<div class="btn bg-blue btn-xs waves-effect" data-toggle="tooltip" title="Cambiar Método de Pago" onclick="listarmetodospago('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
-                            '<div class="col-md-10">'.    
-                                '<input type="text" class="form-control divorinputmodsm metodopagodrfacturapartida" name="metodopagodrfacturapartida[]" value="'.$f->MetodoPago.'" readonly>'.                 
+                            '<div class="col-md-10">'.
+                                '<input type="text" class="form-control divorinputmodsm metodopagodrfacturapartida" name="metodopagodrfacturapartida[]" value="'.$f->MetodoPago.'" readonly>'.
                             '</div>'.
                         '</div>'.
                     '</td>'.
@@ -402,7 +402,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                 '</tr>';
                 $contadorfilas++;
             }
-        }     
+        }
         $data = array(
             "filasfacturas" => $filasfacturas,
         );
@@ -437,7 +437,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'estado' => $estado
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener regimenes fiscales
@@ -468,7 +468,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'nombre' => $nombre
         );
-        return response()->json($data);  
+        return response()->json($data);
     }
 
     //obtener tipos relacion
@@ -499,7 +499,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'nombre' => $nombre
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener formas pago
@@ -530,7 +530,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'nombre' => $nombre
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
     //obtener
     public function cuentas_por_cobrar_obtener_usos_cfdi(Request $request){
@@ -560,7 +560,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'nombre' => $nombre
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener
@@ -591,10 +591,10 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'descripcion' => $descripcion
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
-    //obtener 
+    //obtener
     public function cuentas_por_cobrar_obtener_regimenes_fiscales_receptor(Request $request){
         if($request->ajax()){
             $data = c_RegimenFiscal::query();
@@ -622,7 +622,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'nombre' => $nombre
         );
-        return response()->json($data);  
+        return response()->json($data);
     }
 
     //obtener metodos pago
@@ -640,7 +640,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         }
     }
 
-    //obtener facturas 
+    //obtener facturas
     public function cuentas_por_cobrar_obtener_facturas(Request $request){
         if($request->ajax()){
             $arrayfacturasseleccionadas = Array();
@@ -730,8 +730,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     '<div class="col-md-2">'.
                         '<div class="btn bg-blue btn-xs waves-effect" data-toggle="tooltip" title="Cambiar Método de Pago" onclick="listarmetodospago('.$request->contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                     '</div>'.
-                    '<div class="col-md-10">'.    
-                        '<input type="text" class="form-control divorinputmodsm metodopagodrfacturapartida" name="metodopagodrfacturapartida[]" value="'.$factura->MetodoPago.'" readonly>'.                 
+                    '<div class="col-md-10">'.
+                        '<input type="text" class="form-control divorinputmodsm metodopagodrfacturapartida" name="metodopagodrfacturapartida[]" value="'.$factura->MetodoPago.'" readonly>'.
                     '</div>'.
                 '</div>'.
             '</td>'.
@@ -744,7 +744,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             "factura" => $factura,
             "filafactura" => $filafactura,
         );
-        return response()->json($data);  
+        return response()->json($data);
     }
 
     //obtener folios notas
@@ -772,7 +772,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     ->make(true);
         }
     }
-    
+
     //obtener datos folio seleccionado
     public function cuentas_por_cobrar_obtener_ultimo_folio_serie_seleccionada(Request $request){
         $folio = Helpers::ultimofolioserietablamodulos('App\CuentaXCobrar', $request->Serie);
@@ -820,7 +820,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         Cliente::where('Numero', $request->numerocliente)
         ->update([
             'Saldo' => Helpers::convertirvalorcorrecto($NuevoSaldoCliente)
-        ]); 
+        ]);
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
         $BitacoraDocumento->Documento = "CXC";
@@ -833,8 +833,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA DETALLES
         $item = 1;
-        foreach ($request->facturaaplicarpartida as $key => $factura){    
-            if($request->abonopesosfacturapartida [$key] > Helpers::convertirvalorcorrecto(0)){     
+        foreach ($request->facturaaplicarpartida as $key => $factura){
+            if($request->abonopesosfacturapartida [$key] > Helpers::convertirvalorcorrecto(0)){
                 $CuentaXCobrarDetalle=new CuentaXCobrarDetalle;
                 $CuentaXCobrarDetalle->Pago = $pago;
                 $CuentaXCobrarDetalle->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
@@ -863,7 +863,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                 if($request->saldofacturapartida [$key] == Helpers::convertirvalorcorrecto(0)){
                     $Status = "LIQUIDADO";
                 }else{
-                    $Status = "POR COBRAR"; 
+                    $Status = "POR COBRAR";
                 }
                 //Modificar Factura
                 Factura::where('Factura', $factura)
@@ -871,10 +871,10 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     'Abonos' => Helpers::convertirvalorcorrecto($NuevoAbono),
                     'Saldo' => Helpers::convertirvalorcorrecto($NuevoSaldo),
                     'Status' => $Status
-                ]);                
+                ]);
             }
         }
-    	return response()->json($CuentaXCobrar); 
+    	return response()->json($CuentaXCobrar);
     }
 
     //comprobar baja de documento
@@ -897,7 +897,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         Cliente::where('Numero', $CuentaXCobrar->Cliente)
         ->update([
             'Saldo' => Helpers::convertirvalorcorrecto($NuevoSaldoCliente)
-        ]); 
+        ]);
         //cambiar status y colocar valores en 0
         $MotivoBaja = $request->motivobaja.', '.Helpers::fecha_exacta_accion_datetimestring().', '.Auth::user()->user;
         CuentaXCobrar::where('Pago', $request->cxcdesactivar)
@@ -988,8 +988,8 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                             '<div class="col-md-2">'.
                                 '<div class="btn bg-blue btn-xs waves-effect" data-toggle="tooltip" title="Cambiar Método de Pago" onclick="listarmetodospago('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
-                            '<div class="col-md-10">'.    
-                                '<input type="text" class="form-control divorinputmodsm metodopagodrfacturapartida" name="metodopagodrfacturapartida[]" value="'.$cxcd->MetodoDePagoDR.'" readonly>'.                 
+                            '<div class="col-md-10">'.
+                                '<input type="text" class="form-control divorinputmodsm metodopagodrfacturapartida" name="metodopagodrfacturapartida[]" value="'.$cxcd->MetodoDePagoDR.'" readonly>'.
                             '</div>'.
                         '</div>'.
                         $cxcd->MetodoDePagoDR.
@@ -1103,7 +1103,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     return Helpers::convertirvalorcorrecto($data->Abono);
                 })
                 ->make(true);
-        } 
+        }
     }
 
     //generar documento PDF
@@ -1115,11 +1115,11 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         //primero eliminar todos los archivos zip
         Helpers::eliminararchivoszipgenerados();
         if($request->imprimirdirectamente == 1){
-            $cuentasporcobrar = CuentaXCobrar::where('Pago', $request->arraypdf)->get(); 
+            $cuentasporcobrar = CuentaXCobrar::where('Pago', $request->arraypdf)->get();
         }else{
             $tipogeneracionpdf = $request->tipogeneracionpdf;
             if($tipogeneracionpdf == 0){
-                $cuentasporcobrar = CuentaXCobrar::whereIn('Pago', $request->arraypdf)->orderBy('Folio', 'ASC')->take(150)->get(); 
+                $cuentasporcobrar = CuentaXCobrar::whereIn('Pago', $request->arraypdf)->orderBy('Folio', 'ASC')->take(150)->get();
             }else{
                 $fechainiciopdf = date($request->fechainiciopdf);
                 $fechaterminacionpdf = date($request->fechaterminacionpdf);
@@ -1129,6 +1129,9 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     $cuentasporcobrar = CuentaXCobrar::whereBetween('Fecha', [$fechainiciopdf, $fechaterminacionpdf])->orderBy('Folio', 'ASC')->take(150)->get();
                 }
             }
+        }
+        if($cuentasporcobrar->count() < 1){
+            echo "<script languaje='javascript' type='text/javascript'>window.close();</script>";
         }
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $arrayfiles = array();
@@ -1165,7 +1168,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     "clavemetodopagodetalle" => $metodopagofacturadetalle->Clave,
                     "nombremetodopagodetalle" => $metodopagofacturadetalle->Nombre
                 );
-            } 
+            }
             //obtener XML
             if($request->descargar_xml == 1){
                 $factura = CuentaXCobrar::where('Pago', $cxc->Pago)->first();
@@ -1211,7 +1214,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                         "tipocambiocxc"=>Helpers::convertirvalorcorrecto($cxc->TipoCambio),
                         "totalletras"=>$totalletras,
                         "numerodecimalesdocumento"=> $request->numerodecimalesdocumento
-            );        
+            );
             ini_set('max_execution_time', 300); // 5 minutos
             ini_set('memory_limit', '-1');
             if($request->tipoformatocxc == 1){
@@ -1263,11 +1266,11 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     // Agregar archivos que se comprimiran
                     foreach($arrayfiles as $af) {
                         $zip->addFile(Storage::disk('local2')->getAdapter()->applyPathPrefix($af),$af);
-                    }  
+                    }
                     foreach($arrayfilespdf as $afp) {
                         $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
-                    }     
-                    //terminar proceso   
+                    }
+                    //terminar proceso
                     $zip->close();
                 }
                 // Set Encabezados para descargar
@@ -1285,7 +1288,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
 
     //generacion de formato en PDF
     public function cuentas_por_cobrar_generar_pdfs_indiv($documento,$tipodocumento){
-        $cuentasporcobrar = CuentaXCobrar::where('Pago', $documento)->get(); 
+        $cuentasporcobrar = CuentaXCobrar::where('Pago', $documento)->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($cuentasporcobrar as $cxc){
@@ -1319,7 +1322,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     "clavemetodopagodetalle" => $metodopagofacturadetalle->Clave,
                     "nombremetodopagodetalle" => $metodopagofacturadetalle->Nombre
                 );
-            } 
+            }
             $cliente = Cliente::where('Numero', $cxc->Cliente)->first();
             $estadocliente = Estado::where('Clave', $cliente->Estado)->first();
             $formapago = FormaPago::where('Clave', $cxc->FormaPago)->first();
@@ -1406,7 +1409,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
 
     //enviar pdf por emial
     public function cuentas_por_cobrar_enviar_pdfs_email(Request $request){
-        $cuentasporcobrar = CuentaXCobrar::where('Pago', $request->emaildocumento)->get(); 
+        $cuentasporcobrar = CuentaXCobrar::where('Pago', $request->emaildocumento)->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($cuentasporcobrar as $cxc){
@@ -1440,7 +1443,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     "clavemetodopagodetalle" => $metodopagofacturadetalle->Clave,
                     "nombremetodopagodetalle" => $metodopagofacturadetalle->Nombre
                 );
-            } 
+            }
             $cliente = Cliente::where('Numero', $cxc->Cliente)->first();
             $estadocliente = Estado::where('Clave', $cliente->Estado)->first();
             $formapago = FormaPago::where('Clave', $cxc->FormaPago)->first();
@@ -1499,7 +1502,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         }
         //obtener XML
         if($request->incluir_xml == 1){
-            $cxc = CuentaXCobrar::where('Pago', $request->emaildocumento)->first(); 
+            $cxc = CuentaXCobrar::where('Pago', $request->emaildocumento)->first();
             $comprobante = Comprobante::where('Comprobante', 'Pago')->where('Folio', '' . $cxc->Folio . '')->where('Serie', '' . $cxc->Serie . '')->first();
             $descargar_xml = $this->facturapi->Invoices->download_xml($comprobante->IdFacturapi); // stream containing the XML file or
             $nombre_xml = "CuentaPorCobrarNo".$cxc->Pago.'##'.$cxc->UUID.'.xml';
@@ -1510,7 +1513,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         }
         try{
             $datosdocumento = CuentaXCobrar::where('Pago', $request->emaildocumento)->first();
-            //enviar correo electrónico	
+            //enviar correo electrónico
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
             $arraycc = array();
@@ -1570,7 +1573,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('CuentasPorCobrar', Auth::user()->id);
-        return Excel::download(new CuentasPorCobrarExport($configuraciones_tabla['campos_consulta'],$request->periodo), "cuentasporcobrar-".$request->periodo.".xlsx");   
+        return Excel::download(new CuentasPorCobrarExport($configuraciones_tabla['campos_consulta'],$request->periodo), "cuentasporcobrar-".$request->periodo.".xlsx");
     }
 
     //guardar configuracion tabla
@@ -1642,7 +1645,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             if($dp->ObjetoImp == '02'){//con impuestos
                 $taxes = array(
                     array(
-                        //"base" => Helpers::convertirvalorcorrecto($dp->Abono), 
+                        //"base" => Helpers::convertirvalorcorrecto($dp->Abono),
                         "base" => number_format(round($dp->Abono, 2), 2, '.', ''),
                         "type" => "IVA",
                         "rate" => 0.160000
@@ -1668,7 +1671,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                                         /*
                                         "taxes" => array(
                                             array(
-                                                "base" => Helpers::convertirvalorcorrecto($dp->Abono), 
+                                                "base" => Helpers::convertirvalorcorrecto($dp->Abono),
                                                 "type" => "IVA",
                                                 "rate" => 0.160000
                                             )
@@ -1676,23 +1679,23 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                                         */
                                     )
             );
-        }        
+        }
         //CUENTA POR COBRAR
         $invoice = array(
             "type" => \Facturapi\InvoiceType::PAGO,
             "customer" => array(
                 "legal_name" => $cliente->Nombre,
                 "tax_id" => $cliente->Rfc,
-                
+
                 //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
                 //"tax_system" => $cliente->RegimenFiscal,
                 "tax_system" => $CXC->RegimenFiscalReceptor,
-                "address" => 
+                "address" =>
                     array(
                         "zip" => $cliente->CodigoPostal,
                     )
                 //fin cfdi 4.0
-                
+
             ),
             /*
             //se debe agregar para facturapi version 1.0
@@ -1706,7 +1709,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                 )
             ),
             */
-            
+
             //se debe agregar para facturapi version 2.0
             "complements" => array(
                 //"type" => "P",
@@ -1724,7 +1727,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     )
                 )
             ),
-            
+
             "date" => Helpers::formatoinputdatetime($CXC->Fecha),
             "folio_number" => $CXC->Folio,
             "series" => $CXC->Serie,
@@ -1737,14 +1740,14 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $tipomensaje = "error";
             $data = array(
                         'mensaje' => "Error, ".$mensaje,
-                        'tipomensaje' => $tipomensaje 
+                        'tipomensaje' => $tipomensaje
                     );
             return response()->json($data);
         }else{
             //obtener datos del xml del documento timbrado para guardarlo en la tabla comprobantes
             $descargar_xml = $this->facturapi->Invoices->download_xml($new_invoice->id); // stream containing the XML file or
-            $xml = simplexml_load_string($descargar_xml);  
-            $comprobante = $xml->attributes(); 
+            $xml = simplexml_load_string($descargar_xml);
+            $comprobante = $xml->attributes();
             $CertificadoCFD = $comprobante['NoCertificado'];
             //obtener datos generales del xml nodo Emisor
             $activar_namespaces = $xml->getNameSpaces(true);
@@ -1793,7 +1796,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             CuentaXCobrar::where('Pago', $request->pagotimbrado)
                             ->update([
                                 'UUID' => $new_invoice->uuid
-                            ]);  
+                            ]);
             // Enviar a más de un correo (máx 10)
             $this->facturapi->Invoices->send_by_email(
                 $new_invoice->id,
@@ -1806,7 +1809,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $tipomensaje = "success";
             $data = array(
                         'mensaje' => $mensaje,
-                        'tipomensaje' => $tipomensaje 
+                        'tipomensaje' => $tipomensaje
                     );
             return response()->json($data);
         }
@@ -1847,7 +1850,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $tipomensaje = "error";
             $data = array(
                         'mensaje' => "Error, ".$mensaje,
-                        'tipomensaje' => $tipomensaje 
+                        'tipomensaje' => $tipomensaje
                     );
             return response()->json($data);
         }else{
@@ -1861,7 +1864,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
             $tipomensaje = "success";
             $data = array(
                         'mensaje' => $mensaje,
-                        'tipomensaje' => $tipomensaje 
+                        'tipomensaje' => $tipomensaje
                     );
             return response()->json($data);
         }
