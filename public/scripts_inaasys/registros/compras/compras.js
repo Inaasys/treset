@@ -780,18 +780,18 @@ function seleccionarordencompra(Folio, Orden, tipoalta){
     $("#observaciones").val(data.ordencompra.Obs);
     $("#plazo").val(data.ordencompra.Plazo);
     $("#tablaproductoscompras tbody").html(data.filasdetallesordencompra);
-    $("#importe").val(data.importe);
-    $("#descuento").val(data.descuento);
-    $("#subtotal").val(data.subtotal);
-    $("#iva").val(data.iva);
-    $("#total").val(data.total);
+    $("#importe").val(data.ordencompra.Importe);
+    $("#descuento").val(data.ordencompra.Descuento);
+    $("#subtotal").val(data.ordencompra.Subtotal);
+    $("#iva").val(data.ordencompra.Iva);
+    $("#total").val(data.ordencompra.Total);
     var solicitarxml = $("#solicitarxml").val();
     if(solicitarxml == 0){
-      $("#importexml").val(data.importe);
-      $("#descuentoxml").val(data.descuento);
-      $("#subtotalxml").val(data.subtotal);
-      $("#ivaxml").val(data.iva);
-      $("#totalxml").val(data.total);
+      $("#importexml").val(data.ordencompra.Importe);
+      $("#descuentoxml").val(data.ordencompra.Descuento);
+      $("#subtotalxml").val(data.ordencompra.Subtotal);
+      $("#ivaxml").val(data.ordencompra.Iva);
+      $("#totalxml").val(data.ordencompra.Total);
       $("#fechaemitida").val(data.fecha);
     }
     //detalles
@@ -884,8 +884,8 @@ $("#btnenviarxml").on('click', function(e){
       $("#importexml").val(number_format(round(importexml, numerodecimales), numerodecimales, '.', ''));
       $("#descuentoxml").val(number_format(round(descuentoxml, numerodecimales), numerodecimales, '.', ''));
       $("#subtotalxml").val(number_format(round(subtotalxml, numerodecimales), numerodecimales, '.', ''));
-      $("#ivaxml").val(number_format(round(ivaxml, numerodecimales), numerodecimales, '.', ''));
-      $("#totalxml").val(number_format(round(totalxml, numerodecimales), numerodecimales, '.', ''));
+      $("#ivaxml").val(number_format(round(ivaxml, 2), numerodecimales, '.', ''));
+      $("#totalxml").val(number_format(round(totalxml, 2), numerodecimales, '.', ''));
       $("#fechaemitida").val(data.array_comprobante.Fecha[0]);
       //mostrar el total de la factura del proveedor
       //$("#totalfacturaproveedor").html("Total factura proveedor : "+ truncar(totalxml.toFixed(parseInt(numerodecimales)), numerodecimales));
@@ -1269,11 +1269,14 @@ function calculartotal(){
     retencionisr = new Decimal(retencionisr).plus($(".retencionisrpesospartida", this).val());
     retencionieps = new Decimal(retencionieps).plus($(".retencioniepspesospartida", this).val());
   });
+  //IVA Y TOTAL
+  let ivaAux = subtotal * 0.16;
+  let totalRound = parseFloat(subtotal.toFixed(2)) + ivaAux
   $("#importe").val(number_format(round(importe, numerodecimales), numerodecimales, '.', ''));
   $("#descuento").val(number_format(round(descuento, numerodecimales), numerodecimales, '.', ''));
   $("#subtotal").val(number_format(round(subtotal, numerodecimales), numerodecimales, '.', ''));
-  $("#iva").val(number_format(round(iva, numerodecimales), numerodecimales, '.', ''));
-  $("#total").val(number_format(round(total, numerodecimales), numerodecimales, '.', ''));
+  $("#iva").val(number_format(round(ivaAux, 2), numerodecimales, '.', ''));
+  $("#total").val(number_format(round(totalRound, 2), numerodecimales, '.', ''));
   $("#ieps").val(number_format(round(ieps, numerodecimales), numerodecimales, '.', ''));
   $("#retencioniva").val(number_format(round(retencioniva, numerodecimales), numerodecimales, '.', ''));
   $("#retencionisr").val(number_format(round(retencionisr, numerodecimales), numerodecimales, '.', ''));
@@ -2368,25 +2371,25 @@ function obtenerdatos(compramodificar){
     $("#receptorrfcxml").val(data.compra.ReceptorRfc);
     $("#receptornombrexml").val(data.compra.ReceptorNombre);
     //totales compra
-    $("#importe").val(data.importe);
-    $("#descuento").val(data.descuento);
+    $("#importe").val(data.ordencompra.Importe);
+    $("#descuento").val(data.ordencompra.Descuento);
     $("#ieps").val(data.ieps);
-    $("#subtotal").val(data.subtotal);
-    $("#iva").val(data.iva);
+    $("#subtotal").val(data.ordencompra.SubTotal);
+    $("#iva").val(data.ordencompra.Iva);
     $("#retencioniva").val(data.ivaretencion);
     $("#retencionisr").val(data.isrretencion);
     $("#retencionieps").val(data.iepsretencion);
-    $("#total").val(data.total);
+    $("#total").val(data.ordencompra.Total);
     //totales xml
-    $("#importexml").val(data.importe);
-    $("#descuentoxml").val(data.descuento);
+    $("#importexml").val(data.ordencompra.importe);
+    $("#descuentoxml").val(data.ordencompra.Descuento);
     $("#iepsxml").val(data.ieps);
-    $("#subtotalxml").val(data.subtotal);
-    $("#ivaxml").val(data.iva);
+    $("#subtotalxml").val(data.ordencompra.SubTotal);
+    $("#ivaxml").val(data.ordencompra.Iva);
     $("#retencionivaxml").val(data.ivaretencion);
     $("#retencionisrxml").val(data.isrretencion);
     $("#retencioniepsxml").val(data.iepsretencion);
-    $("#totalxml").val(data.total);
+    $("#totalxml").val(data.ordencompra.Total);
     //detalles
     $("#tablaproductoscompras tbody").html(data.filasdetallescompra);
     $("#numerofilas").val(data.numerodetallescompra);
