@@ -1096,8 +1096,10 @@ class FacturaController extends ConfiguracionSistemaController{
             foreach(explode(",", $request->stringremisionesseleccionadas) as $r){
                 $detallesremision = RemisionDetalle::where('Remision', $r)->OrderBy('Item', 'ASC')->get();
                 foreach($detallesremision as $detalle){
-                    $totalafacturar = $totalafacturar + $detalle->Total;
+                    $subtotalafacturar += $detalle->SubTotal;
                 }
+                $ivaafacturar = $subtotalafacturar * 0.16;
+                $totalafacturar = number_format(round($subtotalafacturar, $decimalesDoc), $decimalesConf, '.', '') + $ivaafacturar;
             }
         }else{
             foreach(explode(",", $request->stringordenesseleccionadas) as $o){
