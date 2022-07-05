@@ -4229,11 +4229,13 @@ function calculartotal(){
     costo = new Decimal(costo).plus($(".costototalpartida", this).val());
     comision = new Decimal(comision).plus($(".comisionpesospartida", this).val());
   });
-  let totalRound = parseFloat(subtotal.toFixed(2)) + parseFloat(iva.toFixed(2))
+  let ivaAux = subtotal * 0.16;
+  let totalRound = parseFloat(subtotal.toFixed(2)) + ivaAux
+
   $("#importe").val(number_format(round(importe, 2), numerodecimales, '.', ''));
   $("#descuento").val(number_format(round(descuento, 2), numerodecimales, '.', ''));
   $("#subtotal").val(number_format(round(subtotal, 2), numerodecimales, '.', ''));
-  $("#iva").val(number_format(round(iva, 2), numerodecimales, '.', ''));
+  $("#iva").val(number_format(round(ivaAux, 2), numerodecimales, '.', ''));
   $("#total").val(number_format(round(totalRound, 2), numerodecimales, '.', ''));
   $("#totalafacturar").val(number_format(round(totalRound, 2), numerodecimales, '.', ''));
   $("#utilidad").val(number_format(round(utilidad, 2), numerodecimales, '.', ''));
