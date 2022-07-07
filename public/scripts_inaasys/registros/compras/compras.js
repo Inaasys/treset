@@ -2371,25 +2371,25 @@ function obtenerdatos(compramodificar){
     $("#receptorrfcxml").val(data.compra.ReceptorRfc);
     $("#receptornombrexml").val(data.compra.ReceptorNombre);
     //totales compra
-    $("#importe").val(data.ordencompra.Importe);
-    $("#descuento").val(data.ordencompra.Descuento);
+    $("#importe").val(data.compra.Importe);
+    $("#descuento").val(data.compra.Descuento);
     $("#ieps").val(data.ieps);
-    $("#subtotal").val(data.ordencompra.SubTotal);
-    $("#iva").val(data.ordencompra.Iva);
+    $("#subtotal").val(data.compra.SubTotal);
+    $("#iva").val(data.compra.Iva);
     $("#retencioniva").val(data.ivaretencion);
     $("#retencionisr").val(data.isrretencion);
     $("#retencionieps").val(data.iepsretencion);
-    $("#total").val(data.ordencompra.Total);
+    $("#total").val(data.compra.Total);
     //totales xml
-    $("#importexml").val(data.ordencompra.importe);
-    $("#descuentoxml").val(data.ordencompra.Descuento);
+    $("#importexml").val(data.compra.importe);
+    $("#descuentoxml").val(data.compra.Descuento);
     $("#iepsxml").val(data.ieps);
-    $("#subtotalxml").val(data.ordencompra.SubTotal);
-    $("#ivaxml").val(data.ordencompra.Iva);
+    $("#subtotalxml").val(data.compra.SubTotal);
+    $("#ivaxml").val(data.compra.Iva);
     $("#retencionivaxml").val(data.ivaretencion);
     $("#retencionisrxml").val(data.isrretencion);
     $("#retencioniepsxml").val(data.iepsretencion);
-    $("#totalxml").val(data.ordencompra.Total);
+    $("#totalxml").val(data.compra.Total);
     //detalles
     $("#tablaproductoscompras tbody").html(data.filasdetallescompra);
     $("#numerofilas").val(data.numerodetallescompra);
