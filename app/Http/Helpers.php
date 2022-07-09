@@ -11,7 +11,7 @@ use Symfony\Component\HttpClient\HttpClient;
 
 
 class Helpers{
-    
+
     //saber si el sistema esta configurado para utilizar mayusculas
     public static function mayusculas_sistema(){
         $configuraciones_empresa = Empresa::all();
@@ -19,7 +19,7 @@ class Helpers{
         $encontrarpalabra = 'Utilizar_Mayusculas=S';
         $mayusculas_sistema = strpos($ini, $encontrarpalabra);
         return $mayusculas_sistema;
-    } 
+    }
 
     //convertir el string en mayusculas o minusculas segun sea el caso de la configuracion de la empresa
     public static function convertir_string_mayuscula_o_minuscula($string){
@@ -40,7 +40,7 @@ class Helpers{
         return $select_series_disponibles;
     }
 
-    //se obtiene la fecha de mexico en español correcta 
+    //se obtiene la fecha de mexico en español correcta
     public static function fecha_exacta_accion(){
         /*Carbon::setLocale(config('app.locale'));
         Carbon::setUTF8(true);
@@ -213,7 +213,7 @@ class Helpers{
         if(sizeof($ultimoFolioTabla) == 0 || sizeof($ultimoFolioTabla) == "" || sizeof($ultimoFolioTabla) == null){
             $folio = 1;
         }else{
-            $folio = $ultimoFolioTabla[0]->Folio+1;   
+            $folio = $ultimoFolioTabla[0]->Folio+1;
         }
         return $folio;
     }
@@ -224,7 +224,7 @@ class Helpers{
         if(sizeof($ultimoFolioTabla) == 0 || sizeof($ultimoFolioTabla) == "" || sizeof($ultimoFolioTabla) == null){
             $folio = 1;
         }else{
-            $folio = $ultimoFolioTabla[0]->Folio+1;   
+            $folio = $ultimoFolioTabla[0]->Folio+1;
         }
         return $folio;
     }
@@ -235,7 +235,7 @@ class Helpers{
         if(sizeof($ultimoNumeroTabla) == 0 || sizeof($ultimoNumeroTabla) == "" || sizeof($ultimoNumeroTabla) == null){
             $id = 1;
         }else{
-            $id = $ultimoNumeroTabla[0]->Numero+1;   
+            $id = $ultimoNumeroTabla[0]->Numero+1;
         }
         return $id;
     }
@@ -246,7 +246,7 @@ class Helpers{
         if(sizeof($ultimoidregistrotabla) == 0 || sizeof($ultimoidregistrotabla) == "" || sizeof($ultimoidregistrotabla) == null){
             $id = 1;
         }else{
-            $id = $ultimoidregistrotabla[0]->id+1;   
+            $id = $ultimoidregistrotabla[0]->id+1;
         }
         return $id;
     }
@@ -257,7 +257,7 @@ class Helpers{
         if(sizeof($ultimofolioregistrotabla) == 0 || sizeof($ultimofolioregistrotabla) == "" || sizeof($ultimofolioregistrotabla) == null){
             $folio = 1;
         }else{
-            $folio = $ultimofolioregistrotabla[0]->folio+1;   
+            $folio = $ultimofolioregistrotabla[0]->folio+1;
         }
         return $folio;
     }
@@ -270,7 +270,7 @@ class Helpers{
             $cuentacontable = '100-002-000001';
         }else{
             $id = $ultimoNumeroTabla[0]->Numero+1;
-            $cuentacontable = '100-002-00000'.$id;   
+            $cuentacontable = '100-002-00000'.$id;
         }
         $data = array(
             'id' => $id,
@@ -332,7 +332,7 @@ class Helpers{
             $numerocerosconfigurados = $numerocerosconfigurados.'0';
         }
         return $numerocerosconfigurados.'1';
-    }    
+    }
 
     //obtener serie del modulo que se require del usuario logueado si es que la ocupa
     public static function obtenerserieusuario($usuario, $documento){
@@ -357,7 +357,7 @@ class Helpers{
         $mes = $fecha_explode[1];
         $dia = $fecha_explode[2];
         $precio_dolar = 0;
-        $client = new Client(HttpClient::create(['verify_peer' => false, 'verify_host' => false])); 
+        $client = new Client(HttpClient::create(['verify_peer' => false, 'verify_host' => false]));
         try{
             $resultado_scraping = $client->request('GET', 'https://www.dof.gob.mx/indicadores_detalle.php?cod_tipo_indicador=158&dfecha='.$dia.'%2F'.$mes.'%2F'.$ano.'&hfecha='.$dia.'%2F'.$mes.'%2F'.$ano);
             $precio_dolar = $resultado_scraping->filter('.Celda .txt')->last()->text();
@@ -378,7 +378,7 @@ class Helpers{
     }
 
     public static function comprobar_conexion_internet(){
-        $conexion = @fsockopen("www.google.com", 80); 
+        $conexion = @fsockopen("www.google.com", 80);
         if ($conexion){
             $estado_conexion_internet = true; //action when connected
             fclose($conexion);
@@ -420,7 +420,7 @@ class Helpers{
             unlink($z); //elimino el fichero
         }
         return $zips;
-        
+
     }
 
     //obtener configuracion de tablas en modulos
@@ -433,7 +433,7 @@ class Helpers{
                                                         ->where(function($q){
                                                             $q->where('IdUsuario', NULL)
                                                             ->orWhere('IdUsuario',0);
-                                                        })->first();       
+                                                        })->first();
         }
         //consultas ordenadas
         $campos_consulta = [];
@@ -456,7 +456,7 @@ class Helpers{
         );
         return $configuraciones_tabla;
     }
-    
+
     //quitar acentos
     public static function quitaracentos($string){
         $string = trim($string);
@@ -484,8 +484,29 @@ class Helpers{
             array('ú', 'ù', 'ü', 'û', 'Ú', 'Ù', 'Û', 'Ü'),
             array('u', 'u', 'u', 'u', 'U', 'U', 'U', 'U'),
             $string
-        );   
-        return $string;        
+        );
+        return $string;
+    }
+
+    /**
+     * @author Jose Alonso Espinares Romero
+     * Evalua que la fecha de alta de una remision este dentro del periodo de 2 meses
+     */
+    public static function diasModificacionRemisiones(){
+        Date::setLocale(config('app.locale'));
+        Date::setUTF8(true);
+        setlocale(LC_TIME, 'es_Es');
+        $fecha = "";
+        $fechaalta = Date::parse($fechadocumento);
+        $fechaactual = Date::now();
+        //$fechaactual = Date::parse('2000-01-31');
+        if( Auth::user()->role_id != 1){
+            if( ($fechaalta->year != $fechaactual->year) || ($fechaalta->month != $fechaactual->month)){
+                $fecha = Date::parse($fechadocumento)->format('l j F Y');
+            }
+        }
+        $diferenciaTiempo = date_diff($fechaalta, $fechaactual);
+        return $diferenciaTiempo;
     }
 }
 ?>
