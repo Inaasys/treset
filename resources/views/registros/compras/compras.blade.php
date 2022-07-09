@@ -135,6 +135,7 @@
                                 <tr>
                                     <td>
                                         <div class="col-md-6">
+                                            <input type="text" hidden name="altamodificacion" id="altamodificacion">
                                             <label>Selecciona el xml</label>
                                             <input type="file" class="form-control" name="xml" id="xml" onchange="cambiodexml(this)" onclick="this.value=null;">
                                             <button type="button" class="btn btn-success btn-sm" id="btnenviarxml" style="display:none">Enviar XML</button>
@@ -166,6 +167,7 @@
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
                     </div>
+
                 </div>
             </div>
             <div id="contenidomodaltablas">

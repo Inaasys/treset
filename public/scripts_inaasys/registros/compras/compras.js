@@ -1270,13 +1270,17 @@ function calculartotal(){
     retencionieps = new Decimal(retencionieps).plus($(".retencioniepspesospartida", this).val());
   });
   //IVA Y TOTAL
-  let ivaAux = subtotal * 0.16;
-  let totalRound = parseFloat(subtotal.toFixed(2)) + ivaAux
+  let ivaAux = 0
+  let totalRound = 0
+  if (iva > 0) {
+    ivaAux = subtotal * 0.16;
+  }
+  totalRound = parseFloat(subtotal.toFixed(parseInt(numerodecimales))) + ivaAux
   $("#importe").val(number_format(round(importe, numerodecimales), numerodecimales, '.', ''));
   $("#descuento").val(number_format(round(descuento, numerodecimales), numerodecimales, '.', ''));
   $("#subtotal").val(number_format(round(subtotal, numerodecimales), numerodecimales, '.', ''));
-  $("#iva").val(number_format(round(ivaAux, 2), numerodecimales, '.', ''));
-  $("#total").val(number_format(round(totalRound, 2), numerodecimales, '.', ''));
+  $("#iva").val(number_format(round(ivaAux, numerodecimales), numerodecimales, '.', ''));
+  $("#total").val(number_format(round(totalRound, numerodecimales), numerodecimales, '.', ''));
   $("#ieps").val(number_format(round(ieps, numerodecimales), numerodecimales, '.', ''));
   $("#retencioniva").val(number_format(round(retencioniva, numerodecimales), numerodecimales, '.', ''));
   $("#retencionisr").val(number_format(round(retencionisr, numerodecimales), numerodecimales, '.', ''));
@@ -1947,41 +1951,74 @@ $("#btnGuardar").on('click', function (e) {
             var receptorrfc = $("#receptorrfc").val();
             var receptorrfcxml = $("#receptorrfcxml").val();
             if(receptorrfc == receptorrfcxml  || solicitarxml == 1){
-            $("#tipo").prop("disabled", false);
+                $("#tipo").prop("disabled", false);
                 $('.page-loader-wrapper').css('display', 'block');
                 $.ajax({
-                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                url:compras_guardar,
-                type: "post",
-                dataType: "html",
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                success:function(data){
-                    if(data == 1){
-                    msj_erroruuidexistente();
-                    $('.page-loader-wrapper').css('display', 'none');
-                    }else{
-                    msj_datosguardadoscorrectamente();
-                    limpiar();
-                    ocultarmodalformulario();
-                    limpiarmodales();
-                    $('.page-loader-wrapper').css('display', 'none');
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    url:compras_guardar,
+                    type: "post",
+                    dataType: "html",
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success:function(data){
+                        if(data == 1){
+                        msj_erroruuidexistente();
+                        $('.page-loader-wrapper').css('display', 'none');
+                        }else{
+                        msj_datosguardadoscorrectamente();
+                        limpiar();
+                        ocultarmodalformulario();
+                        limpiarmodales();
+                        $('.page-loader-wrapper').css('display', 'none');
+                        }
+                    },
+                    error:function(data){
+                        if(data.status == 403){
+                        msj_errorenpermisos();
+                        }else{
+                        msj_errorajax();
+                        }
+                        $('.page-loader-wrapper').css('display', 'none');
                     }
-                },
-                error:function(data){
-                    if(data.status == 403){
-                    msj_errorenpermisos();
-                    }else{
-                    msj_errorajax();
-                    }
-                    $('.page-loader-wrapper').css('display', 'none');
-                }
                 })
             }else{
             msj_errorrfcreceptordistinto();
             }
+        }else{
+            $("#tipo").prop("disabled", false);
+                $('.page-loader-wrapper').css('display', 'block');
+                $.ajax({
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    url:compras_guardar,
+                    type: "post",
+                    dataType: "html",
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success:function(data){
+                        if(data == 1){
+                        msj_erroruuidexistente();
+                        $('.page-loader-wrapper').css('display', 'none');
+                        }else{
+                        msj_datosguardadoscorrectamente();
+                        limpiar();
+                        ocultarmodalformulario();
+                        limpiarmodales();
+                        $('.page-loader-wrapper').css('display', 'none');
+                        }
+                    },
+                    error:function(data){
+                        if(data.status == 403){
+                        msj_errorenpermisos();
+                        }else{
+                        msj_errorajax();
+                        }
+                        $('.page-loader-wrapper').css('display', 'none');
+                    }
+                })
         }
       }
     }else{

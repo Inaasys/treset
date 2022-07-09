@@ -1481,13 +1481,18 @@ function calculartotalordencompra(){
     total = new Decimal(total).plus($(".totalpesospartida", this).val());
   });
   //IVA Y TOTAL
-  let ivaAux = subtotal * 0.16;
-  let totalRound = parseFloat(subtotal.toFixed(2)) + ivaAux
+  let ivaAux = 0
+  let totalRound = 0
+  if(iva > 0){
+    ivaAux = subtotal * 0.16;
+  }
+  totalRound = parseFloat(subtotal.toFixed(parseInt(numerodecimales))) + ivaAux
+
   $("#importe").val(number_format(round(importe, numerodecimales), numerodecimales, '.', ''));
   $("#descuento").val(number_format(round(descuento, numerodecimales), numerodecimales, '.', ''));
   $("#subtotal").val(number_format(round(subtotal, numerodecimales), numerodecimales, '.', ''));
-  $("#iva").val(number_format(round(ivaAux, 2), numerodecimales, '.', ''));
-  $("#total").val(number_format(round(totalRound, 2), numerodecimales, '.', ''));
+  $("#iva").val(number_format(round(ivaAux, numerodecimales), numerodecimales, '.', ''));
+  $("#total").val(number_format(round(totalRound, numerodecimales), numerodecimales, '.', ''));
   //if el status de la orden es backorder se debe comparar el total de la orden de compra con el total de la(s) compras en las que se ha utilizado la orden de compra
   if($("#statusordencompra").val() == "BACKORDER"){
     if($("#sumatotalcompras").val() != number_format(round(total, numerodecimales), numerodecimales, '.', '')){
