@@ -44,7 +44,7 @@ use App\User_Rel_Almacen;
 use Config;
 use Mail;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
-use Storage; 
+use Storage;
 use ZipArchive;
 use File;
 
@@ -119,7 +119,7 @@ class RemisionController extends ConfiguracionSistemaController{
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Remision .'\')">Enviar Documento por Correo</a></li>'.
                                                 '<li class="operaciongenerarformatoreqtyt" hidden><a class="paddingmenuopciones" href="'.route('remisiones_generar_pdfs_indiv_requisicion_tyt',$data->Remision).'" target="_blank">Generar Formato Requisición TYT</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="modificardatosgeneralesdocumento(\''.$data->Remision .'\')">Modificar Datos Generales</a></li>'.
-                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="generardocumentoeniframe(\''.$data->Remision .'\')">Imprimir Documento PDF</a></li>'.                                                
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="generardocumentoeniframe(\''.$data->Remision .'\')">Imprimir Documento PDF</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;
@@ -141,11 +141,11 @@ class RemisionController extends ConfiguracionSistemaController{
                     //->addColumn('encheque', function($data){ return $data->EnCheque; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        } 
+        }
     }
     //descargar plantilla
     public function remisiones_generar_plantilla(){
-        return Excel::download(new PlantillasRemisionesExport(), "plantillaremisiones.xlsx"); 
+        return Excel::download(new PlantillasRemisionesExport(), "plantillaremisiones.xlsx");
     }
     //cargar partidas excel
     public function remisiones_cargar_partidas_excel(Request $request){
@@ -161,7 +161,7 @@ class RemisionController extends ConfiguracionSistemaController{
         foreach($partidasexcel as $partida){
             if($rowexcel > 0){
                 if (in_array(strtoupper($partida[0]), $arraycodigosyaagregados)) {
-                    
+
                 }else{
                     $codigoabuscar = $partida[0];
                     $cantidadpartida = $partida[1];
@@ -226,14 +226,14 @@ class RemisionController extends ConfiguracionSistemaController{
                             '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
                             '<td class="tdmod tdinsumospartidas"><input type="text" class="form-control inputnextdet divorinputmodsm insumopartida" name="insumopartida[]" value="'.$producto->Insumo.'"  data-parsley-length="[1, 20]"></td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$producto->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;" class="codigopartidatexto">'.$producto->Codigo.'</b></td>'.
-                            '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet descripcionproductopartida" name="descripcionproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($producto->Producto, ENT_QUOTES).'</textarea></td>'.                    
+                            '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet descripcionproductopartida" name="descripcionproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($producto->Producto, ENT_QUOTES).'</textarea></td>'.
                             '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$producto->Unidad.'" readonly data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)">'.$producto->Unidad.'</td>'.
                             '<td class="tdmod">'.
                                 '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm pendientearemisionarpartida" name="pendientearemisionarpartida[]" value="'.Helpers::convertirvalorcorrecto($cantidad).'" onchange="formatocorrectoinputcantidades(this);">'.
                             '</td>'.
                             '<td class="tdmod">'.
                                 '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodecantidadpartida('.$contadorfilas.',\''.$tipo.'\');">'.
-                                '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'.                         
+                                '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'.
                             '</td>'.
                             '<td class="tdmod"><input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartidaop" name="preciopartidaop[]" value="'.Helpers::convertirvalorcorrecto($preciopartida).'" ><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($preciopartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodepreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.Helpers::convertirvalorcorrecto($importepartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
@@ -271,7 +271,7 @@ class RemisionController extends ConfiguracionSistemaController{
             "contadorproductos" => $contadorproductos,
             "contadorfilas" => $contadorfilas,
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
     //obtener series documento
     public function remisiones_obtener_series_documento(Request $request){
@@ -360,7 +360,7 @@ class RemisionController extends ConfiguracionSistemaController{
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        } 
+        }
     }
 
     //obtener agente por numero
@@ -377,7 +377,7 @@ class RemisionController extends ConfiguracionSistemaController{
             'numero' => $numero,
             'nombre' => $nombre
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener almacenes
@@ -443,7 +443,7 @@ class RemisionController extends ConfiguracionSistemaController{
             'numero' => $numero,
             'nombre' => $nombre,
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener tipos cliente
@@ -463,10 +463,10 @@ class RemisionController extends ConfiguracionSistemaController{
         foreach($tipos_unidad as $tipo){
             $select_tipos_unidad = $select_tipos_unidad."<option value='".$tipo->Nombre."'>".$tipo->Nombre."</option>";
         }
-        return response()->json($select_tipos_unidad); 
+        return response()->json($select_tipos_unidad);
     }
 
-    //obtener cotizaciones 
+    //obtener cotizaciones
     public function remisiones_obtener_cotizaciones(Request $request){
         if($request->ajax()){
             $mesactual = date("m");
@@ -524,7 +524,7 @@ class RemisionController extends ConfiguracionSistemaController{
                         '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipo.'" readonly></td>'.
                         '<td class="tdmod tdinsumospartidas"><input type="text" class="form-control inputnextdet divorinputmodsm insumopartida" name="insumopartida[]" value="'.$producto->Insumo.'" data-parsley-length="[1, 20]"></td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dc->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;" class="codigopartidatexto">'.$dc->Codigo.'</b></td>'.
-                        '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet descripcionproductopartida" name="descripcionproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($dc->Descripcion, ENT_QUOTES).'</textarea></td>'.                                        
+                        '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet descripcionproductopartida" name="descripcionproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($dc->Descripcion, ENT_QUOTES).'</textarea></td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$dc->Unidad.'" readonly data-parsley-length="[1, 5]">'.$dc->Unidad.'</td>'.
                         '<td class="tdmod">'.
                             '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm pendientearemisionarpartida" name="pendientearemisionarpartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Cantidad).'" onchange="formatocorrectoinputcantidades(this);">'.
@@ -532,7 +532,7 @@ class RemisionController extends ConfiguracionSistemaController{
                         '<td class="tdmod">'.
                             '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="'.Helpers::convertirvalorcorrecto($dc->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
                             '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodecantidadpartida('.$contadorfilas.',\''.$tipo.'\');">'.
-                            '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'.                           
+                            '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'.
                         '</td>'.
                         '<td class="tdmod"><input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartidaop" name="preciopartidaop[]" value="'.Helpers::convertirvalorcorrecto($dc->Precio).'" ><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Precio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodepreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
                         '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Importe).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
@@ -563,7 +563,7 @@ class RemisionController extends ConfiguracionSistemaController{
             }
         }else{
             $filasdetallescotizacion = '';
-        }        
+        }
         $data = array(
             "cotizacion" => $cotizacion,
             "filasdetallescotizacion" => $filasdetallescotizacion,
@@ -609,15 +609,15 @@ class RemisionController extends ConfiguracionSistemaController{
                     ->addColumn('Existencias', function($data){
                         return Helpers::convertirvalorcorrecto($data->Existencias);
                     })
-                    ->addColumn('Costo', function($data){ 
+                    ->addColumn('Costo', function($data){
                         return Helpers::convertirvalorcorrecto($data->Costo);
                     })
-                    ->addColumn('SubTotal', function($data){ 
+                    ->addColumn('SubTotal', function($data){
                         return Helpers::convertirvalorcorrecto($data->SubTotal);
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        } 
+        }
     }
     //obtener producto por codigo
     public function remisiones_obtener_producto_por_codigo(Request $request){
@@ -728,7 +728,7 @@ class RemisionController extends ConfiguracionSistemaController{
                 '</td>'.
                 '<td class="tdmod">'.
                     '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($cantidad).'"   data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodecantidadpartida('.$contadorfilas.',\''.$tipo.'\');">'.
-                    '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'.                         
+                    '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'.
                 '</td>'.
                 '<td class="tdmod"><input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartidaop" name="preciopartidaop[]" value="'.Helpers::convertirvalorcorrecto($preciopartida).'" ><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($preciopartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodepreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
                 '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.Helpers::convertirvalorcorrecto($importepartida).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
@@ -761,7 +761,7 @@ class RemisionController extends ConfiguracionSistemaController{
             "contadorproductos" => $contadorproductos,
             "contadorfilas" => $contadorfilas,
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener existencias
@@ -805,7 +805,7 @@ class RemisionController extends ConfiguracionSistemaController{
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        }         
+        }
     }
 
     //obtener ultimo numero de serie de requisicon seleccionada
@@ -814,7 +814,7 @@ class RemisionController extends ConfiguracionSistemaController{
         if(sizeof($ultimonumero) == 0 || sizeof($ultimonumero) == "" || sizeof($ultimonumero) == null){
             $numerorequisicion = 1;
         }else{
-            $numerorequisicion = $ultimonumero[0]->Rq+1;   
+            $numerorequisicion = $ultimonumero[0]->Rq+1;
         }
         return response()->json($numerorequisicion);
     }
@@ -825,10 +825,10 @@ class RemisionController extends ConfiguracionSistemaController{
         if(sizeof($ultimonumero) == 0 || sizeof($ultimonumero) == "" || sizeof($ultimonumero) == null){
             $numerorequisicion = 1;
         }else{
-            $numerorequisicion = $ultimonumero[0]->Rq+1;   
+            $numerorequisicion = $ultimonumero[0]->Rq+1;
         }
         return response()->json($numerorequisicion);
-   
+
     }
 
     //guardar
@@ -837,19 +837,19 @@ class RemisionController extends ConfiguracionSistemaController{
         //revisar si hay existencias suficientes para guardar la remision
         $arraypartidassinexistencias = Array();
         $detallescodigossinexistencias = 0;
-        foreach ($request->codigoproductopartida as $key => $codigoproductopartida){  
+        foreach ($request->codigoproductopartida as $key => $codigoproductopartida){
             $numeroalmacen = $request->numeroalmacen;
             $cantidadpartida = $request->cantidadpartida [$key];
             //$cantidadpartidadb = $request->cantidadpartidadb [$key];
             $ContarExistencias = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $numeroalmacen)->count();
-            if($ContarExistencias > 0){            
+            if($ContarExistencias > 0){
                 $Existencias = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $numeroalmacen)->first();
                 $ExistenciasTabla = $Existencias->Existencias;
             }else{
                 $ExistenciasTabla = 0;
             }
             $ExistenciasActualesMasExistenciasCaptura = $ExistenciasTabla;
-            $ExistenciasNueva = $ExistenciasActualesMasExistenciasCaptura - $cantidadpartida; 
+            $ExistenciasNueva = $ExistenciasActualesMasExistenciasCaptura - $cantidadpartida;
             $data = array(
                     "Codigo" => $codigoproductopartida,
                     "ExistenciasActualesMasExistenciasCaptura" => Helpers::convertirvalorcorrecto($ExistenciasActualesMasExistenciasCaptura),
@@ -879,7 +879,7 @@ class RemisionController extends ConfiguracionSistemaController{
             $ExisteRemision = Remision::where('Remision', $remision)->first();
             if($ExisteRemision == true){
                 $Remision = 1;
-            }else{  
+            }else{
                 $Remision = new Remision;
                 $Remision->Remision=$remision;
                 $Remision->Serie=$request->serie;
@@ -925,7 +925,7 @@ class RemisionController extends ConfiguracionSistemaController{
                 $BitacoraDocumento->save();
                 //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
                 $item = 1;
-                foreach ($request->codigoproductopartida as $key => $codigoproductopartida){             
+                foreach ($request->codigoproductopartida as $key => $codigoproductopartida){
                     $RemisionDetalle=new RemisionDetalle;
                     $RemisionDetalle->Remision = $remision;
                     $RemisionDetalle->Cliente = $request->numerocliente;
@@ -971,7 +971,7 @@ class RemisionController extends ConfiguracionSistemaController{
                         'Ultima Venta' => $request->preciopartida [$key]
                     ]);
                     if($request->cantidadpartida [$key] > 0){
-                        //restar existencias del almacen 
+                        //restar existencias del almacen
                         $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
                         if($ContarExistenciaAlmacen > 0){
                             $ExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
@@ -999,7 +999,7 @@ class RemisionController extends ConfiguracionSistemaController{
             $DetallesRemisionFacturados = FacturaDetalle::where('Remision', $request->remisiondesactivar)->get();
             foreach($DetallesRemisionFacturados as $detalle){
                 $errores = $errores.'Error la remisión no se puede cancelar, porque existen registros de remisiones en la factura No:'.$detalle->Factura.'<br>';
-            }  
+            }
         }
         $errorescotizacion = '';
         $ContarRemisionCotizados = CotizacionDetalle::where('num_remision', $request->remisiondesactivar)->count();
@@ -1007,7 +1007,7 @@ class RemisionController extends ConfiguracionSistemaController{
             $RemisionCotizados = CotizacionDetalle::where('num_remision', $request->remisiondesactivar)->get();
             foreach($RemisionCotizados as $cot){
                 $errorescotizacion = $errorescotizacion.'Error la remisión no se puede cancelar, porque existen registros de remisiones en la cotización No:'.$cot->cotizacion.'<br>';
-            }  
+            }
         }
         $resultadofechas = Helpers::compararanoymesfechas($Remision->Fecha);
         $data = array(
@@ -1138,17 +1138,17 @@ class RemisionController extends ConfiguracionSistemaController{
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dr->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                     '<td class="tdmod tdinsumospartidas"><input type="text" class="form-control inputnextdet divorinputmodsm insumopartida" name="insumopartida[]" value="'.$dr->Insumo.'" data-parsley-length="[1, 20]"></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dr->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;" class="codigopartidatexto">'.$dr->Codigo.'</b></td>'.
-                    '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet descripcionproductopartida" name="descripcionproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($dr->Descripcion, ENT_QUOTES).'</textarea></td>'.                    
+                    '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet descripcionproductopartida" name="descripcionproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($dr->Descripcion, ENT_QUOTES).'</textarea></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$dr->Unidad.'" readonly data-parsley-length="[1, 5]">'.$dr->Unidad.'</td>'.
-                    
+
                     '<td class="tdmod">'.
                         '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm pendientearemisionarpartida" name="pendientearemisionarpartida[]" value="'.Helpers::convertirvalorcorrecto($dr->PorRemisionar).'" onchange="formatocorrectoinputcantidades(this);" readonly>'.
                     '</td>'.
-                    
+
                     '<td class="tdmod">'.
                         '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="'.Helpers::convertirvalorcorrecto($dr->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
                         '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodecantidadpartida('.$contadorfilas.',\''.$tipo.'\');">'.
-                        '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'.                           
+                        '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'.
                     '</td>'.
                     '<td class="tdmod"><input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm preciopartidaop" name="preciopartidaop[]" value="'.Helpers::convertirvalorcorrecto($dr->Precio).'" ><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Precio).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');cambiodepreciopartida('.$contadorfilas.',\''.$tipo.'\');"></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.Helpers::convertirvalorcorrecto($dr->Importe).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
@@ -1178,7 +1178,7 @@ class RemisionController extends ConfiguracionSistemaController{
             }
         }else{
             $filasdetallesremision = '';
-        }      
+        }
         //permitir o no modificar registro
         if(Auth::user()->role_id == 1){
             if($remision->Status != 'POR FACTURAR'){
@@ -1197,8 +1197,16 @@ class RemisionController extends ConfiguracionSistemaController{
                 }else{
                     $modificacionpermitida = 1;
                 }
+
+                //Valida que la remision no tenga mas de dos meses que fue levantada
+                // $resultadofechas = Helpers::diasModificacionRemisiones($remision->Fecha);
+                // if(((int)$resultadofechas->y == 0) && ((int)$resultadofechas->m <= 1) && ((int)$resultadofechas->d <=30 )){
+                //     $modificacionpermitida = 1;
+                // }else{
+                //     $modificacionpermitida = 0;
+                // }
             }
-        }  
+        }
         $data = array(
             "remision" => $remision,
             "cliente" => $cliente,
@@ -1233,7 +1241,7 @@ class RemisionController extends ConfiguracionSistemaController{
         //revisar si hay existencias suficientes para guardar la remision
         $arraypartidassinexistencias = Array();
         $detallescodigossinexistencias = 0;
-        foreach ($request->codigoproductopartida as $key => $codigoproductopartida){  
+        foreach ($request->codigoproductopartida as $key => $codigoproductopartida){
             $numeroalmacen = $request->numeroalmacen;
             $cantidadpartida = $request->cantidadpartida [$key];
             $agregadoen = $request->agregadoen [$key];
@@ -1243,7 +1251,7 @@ class RemisionController extends ConfiguracionSistemaController{
                 $cantidadpartidadb = $request->cantidadpartidadb [$key];
             }
             $ContarExistencias = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $numeroalmacen)->count();
-            if($ContarExistencias > 0){            
+            if($ContarExistencias > 0){
                 $Existencias = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $numeroalmacen)->first();
                 $ExistenciasTabla = $Existencias->Existencias;
             }else{
@@ -1251,7 +1259,7 @@ class RemisionController extends ConfiguracionSistemaController{
             }
             $Existencias = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $numeroalmacen)->first();
             $ExistenciasActualesMasExistenciasCaptura = $ExistenciasTabla + $cantidadpartidadb;
-            $ExistenciasNueva = $ExistenciasActualesMasExistenciasCaptura - $cantidadpartida; 
+            $ExistenciasNueva = $ExistenciasActualesMasExistenciasCaptura - $cantidadpartida;
             $data = array(
                     "Codigo" => $codigoproductopartida,
                     "ExistenciasActualesMasExistenciasCaptura" => Helpers::convertirvalorcorrecto($ExistenciasActualesMasExistenciasCaptura),
@@ -1287,8 +1295,8 @@ class RemisionController extends ConfiguracionSistemaController{
                 //array_push($ArrayDetallesRemisionNuevo, $nuevocodigo);
                 if($request->agregadoen [$key] == 'NA'){
                     array_push($ArrayDetallesRemisionNuevo, $remision.'#'.$nuevocodigo.'#'.$request->itempartida [$key]);
-                } 
-            }  
+                }
+            }
             //diferencias entre arreglos
             $diferencias_arreglos = array_diff($ArrayDetallesRemisionAnterior, $ArrayDetallesRemisionNuevo);
             //iteramos las diferencias entre arreglos
@@ -1303,7 +1311,7 @@ class RemisionController extends ConfiguracionSistemaController{
                                 ->where('Almacen', $request->numeroalmacen)
                                 ->update([
                                     'Existencias' => $SumarExistenciaNuevaAlmacen
-                                ]);            
+                                ]);
                     //eliminar detalle de la remision eliminado
                     $eliminardetalleremision = RemisionDetalle::where('Remision', $explode_d[0])->where('Codigo', $explode_d[1])->where('Item', $explode_d[2])->forceDelete();
                 }
@@ -1346,9 +1354,9 @@ class RemisionController extends ConfiguracionSistemaController{
             $BitacoraDocumento->Periodo = $this->periodohoy;
             $BitacoraDocumento->save();
             //INGRESAR DATOS A TABLA DETALLES
-            foreach ($request->codigoproductopartida as $key => $codigoproductopartida){    
+            foreach ($request->codigoproductopartida as $key => $codigoproductopartida){
                 //if la partida se agrego en la modificacion se agrega en los detalles de traspaso y de orden de trabajo si asi lo requiere
-                if($request->agregadoen [$key] == 'modificacion'){     
+                if($request->agregadoen [$key] == 'modificacion'){
                     $contaritems = RemisionDetalle::select('Item')->where('Remision', $remision)->count();
                     if($contaritems > 0){
                         $item = RemisionDetalle::select('Item')->where('Remision', $remision)->orderBy('Item', 'DESC')->take(1)->get();
@@ -1385,7 +1393,7 @@ class RemisionController extends ConfiguracionSistemaController{
                     $RemisionDetalle->InteresMonto =  $request->montointerespartida  [$key];
                     $RemisionDetalle->Item = $ultimoitem;
                     $RemisionDetalle->save();
-                    //restar existencias del almacen 
+                    //restar existencias del almacen
                     $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
                     if($ContarExistenciaAlmacen > 0){
                         $ExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
@@ -1444,7 +1452,7 @@ class RemisionController extends ConfiguracionSistemaController{
                                         'Existencias' => $SumarExistenciaNuevaAlmacen
                                     ]);
                     }
-                    //restar existencias del almacen 
+                    //restar existencias del almacen
                     $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
                     if($ContarExistenciaAlmacen > 0){
                         $ExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
@@ -1489,7 +1497,7 @@ class RemisionController extends ConfiguracionSistemaController{
                     return $total;
                 })
                 ->make(true);
-        } 
+        }
     }
 
     //generar documento pdf
@@ -1499,11 +1507,11 @@ class RemisionController extends ConfiguracionSistemaController{
         //primero eliminar todos los archivos zip
         Helpers::eliminararchivoszipgenerados();
         if($request->imprimirdirectamente == 1){
-            $remisiones = Remision::where('Remision', $request->arraypdf)->get(); 
+            $remisiones = Remision::where('Remision', $request->arraypdf)->get();
         }else{
             $tipogeneracionpdf = $request->tipogeneracionpdf;
             if($tipogeneracionpdf == 0){
-                $remisiones = Remision::whereIn('Remision', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
+                $remisiones = Remision::whereIn('Remision', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get();
             }else{
                 $fechainiciopdf = date($request->fechainiciopdf);
                 $fechaterminacionpdf = date($request->fechaterminacionpdf);
@@ -1533,7 +1541,7 @@ class RemisionController extends ConfiguracionSistemaController{
                     "descuentodetalle" => Helpers::convertirvalorcorrecto($rd->Dcto),
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($rd->SubTotal)
                 );
-            } 
+            }
             $cliente = Cliente::where('Numero', $r->Cliente)->first();
             $agente = Agente::where('Numero', $r->Agente)->first();
             //obtener firmas
@@ -1603,8 +1611,8 @@ class RemisionController extends ConfiguracionSistemaController{
                     // Agregar archivos que se comprimiran
                     foreach($arrayfilespdf as $afp) {
                         $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
-                    }     
-                    //terminar proceso   
+                    }
+                    //terminar proceso
                     $zip->close();
                 }
                 // Set Encabezados para descargar
@@ -1622,7 +1630,7 @@ class RemisionController extends ConfiguracionSistemaController{
 
     //generacion de formato en PDF
     public function remisiones_generar_pdfs_indiv($documento){
-        $remisiones = Remision::where('Remision', $documento)->get(); 
+        $remisiones = Remision::where('Remision', $documento)->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($remisiones as $r){
@@ -1641,7 +1649,7 @@ class RemisionController extends ConfiguracionSistemaController{
                     "descuentodetalle" => Helpers::convertirvalorcorrecto($rd->Dcto),
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($rd->SubTotal)
                 );
-            } 
+            }
             $cliente = Cliente::where('Numero', $r->Cliente)->first();
             $agente = Agente::where('Numero', $r->Agente)->first();
             //obtener firmas
@@ -1684,7 +1692,7 @@ class RemisionController extends ConfiguracionSistemaController{
 
     //generar formato pdf requisicion TYT
     public function remisiones_generar_pdfs_indiv_requisicion_tyt($documento){
-        $remisiones = Remision::where('Remision', $documento)->get(); 
+        $remisiones = Remision::where('Remision', $documento)->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($remisiones as $r){
@@ -1699,7 +1707,7 @@ class RemisionController extends ConfiguracionSistemaController{
                     "insumodetalle"=>$producto->Insumo,
                     "descripciondetalle"=>$rd->Descripcion
                 );
-            } 
+            }
             $data[]=array(
                       "remision"=>$r,
                       "fechaformato"=> $fechaformato,
@@ -1724,7 +1732,7 @@ class RemisionController extends ConfiguracionSistemaController{
     public function remisiones_generar_formato_req_tyt_en_modificacion_remision(Request $request){
         //primero eliminar todos los archivos de la carpeta
         Helpers::eliminararchivospdfsgenerados();
-        $remisiones = $request->arraycodigosformatoreqtyt; 
+        $remisiones = $request->arraycodigosformatoreqtyt;
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
             $remisiondetalle = $request->arraycodigosformatoreqtyt;
@@ -1736,7 +1744,7 @@ class RemisionController extends ConfiguracionSistemaController{
                     "insumodetalle"=>$rd[0],
                     "descripciondetalle"=>$rd[2]
                 );
-            } 
+            }
             $fecha = Carbon::parse($request->fecha)->toDateTimeString();
             $data[]=array(
                       "referencia"=>$request->referencia,
@@ -1791,7 +1799,7 @@ class RemisionController extends ConfiguracionSistemaController{
 
     //enviar pdf por emial
     public function remisiones_enviar_pdfs_email(Request $request){
-        $remisiones = Remision::where('Remision', $request->emaildocumento)->get(); 
+        $remisiones = Remision::where('Remision', $request->emaildocumento)->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($remisiones as $r){
@@ -1810,7 +1818,7 @@ class RemisionController extends ConfiguracionSistemaController{
                     "descuentodetalle" => Helpers::convertirvalorcorrecto($rd->Dcto),
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($rd->SubTotal)
                 );
-            } 
+            }
             $cliente = Cliente::where('Numero', $r->Cliente)->first();
             $agente = Agente::where('Numero', $r->Agente)->first();
             //obtener firmas
@@ -1850,7 +1858,7 @@ class RemisionController extends ConfiguracionSistemaController{
         ->setOption('margin-bottom', 10);
         try{
             $datosdocumento = Remision::where('Remision', $request->emaildocumento)->first();
-            //enviar correo electrónico	
+            //enviar correo electrónico
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
             $arraycc = array();
@@ -1898,7 +1906,7 @@ class RemisionController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Remisiones', Auth::user()->id);
-        return Excel::download(new RemisionesExport($configuraciones_tabla['campos_consulta'],$request->periodo), "remisiones-".$request->periodo.".xlsx");   
+        return Excel::download(new RemisionesExport($configuraciones_tabla['campos_consulta'],$request->periodo), "remisiones-".$request->periodo.".xlsx");
     }
 
     //guardar configuracion tabla
@@ -1948,5 +1956,5 @@ class RemisionController extends ConfiguracionSistemaController{
         }
         return redirect()->route('remisiones');
     }
-    
+
 }
