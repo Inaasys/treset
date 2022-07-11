@@ -1529,6 +1529,29 @@ function alta(tipoalta){
   $("#titulomodal").html('Alta Compra ' + tipoalta);
   mostrarmodalformulario('ALTA', 1);
   mostrarformulario();
+
+  //Variables filas xml
+  let solicitarxml = $('#solicitarxml').val()
+  let importexml = ''
+  let descuentoxml = ''
+  let subtotalxml = ''
+  let ivaxml = ''
+  let totalxml = ''
+
+  if(solicitarxml){
+    importexml = '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="importexml" id="importexml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'
+    descuentoxml = '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="descuentoxml" id="descuentoxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'
+    subtotalxml = '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="subtotalxml" id="subtotalxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'
+    ivaxml = '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="ivaxml" id="ivaxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'
+    totalxml = '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="totalxml" id="totalxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'
+  }else{
+    importexml = '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="importexml" id="importexml" value="0.'+numerocerosconfigurados+'" required readonly></td>'
+    descuentoxml = '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="descuentoxml" id="descuentoxml" value="0.'+numerocerosconfigurados+'" required readonly></td>'
+    subtotalxml = '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="subtotalxml" id="subtotalxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'
+    ivaxml = '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="ivaxml" id="ivaxml" value="0.'+numerocerosconfigurados+'" required readonly></td>'
+    totalxml = '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="totalxml" id="totalxml" value="0.'+numerocerosconfigurados+'" required readonly></td>'
+  }
+
   //formulario alta
   var tabs =    '<div class="row">'+
                     '<div class="col-md-12">'+
@@ -1765,12 +1788,12 @@ function alta(tipoalta){
                                             '<tr>'+
                                                 '<td class="tdmod">Importe</td>'+
                                                 '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="importe" id="importe" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                                '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="importexml" id="importexml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                                importexml+
                                             '</tr>'+
                                             '<tr>'+
                                                 '<td class="tdmod">Descuento</td>'+
                                                 '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="descuento" id="descuento" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                                '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="descuentoxml" id="descuentoxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                                descuentoxml+
                                             '</tr>'+
                                             '<tr id="trieps" hidden>'+
                                               '<td class="tdmod">Ieps</td>'+
@@ -1780,12 +1803,12 @@ function alta(tipoalta){
                                             '<tr>'+
                                                 '<td class="tdmod">SubTotal</td>'+
                                                 '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="subtotal" id="subtotal" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                                '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="subtotalxml" id="subtotalxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                                subtotalxml+
                                             '</tr>'+
                                             '<tr>'+
                                                 '<td class="tdmod">Iva</td>'+
                                                 '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="iva" id="iva" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                                '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="ivaxml" id="ivaxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                                ivaxml+
                                             '</tr>'+
                                             '<tr id="trretencioniva" hidden>'+
                                               '<td class="tdmod">Retención Iva</td>'+
@@ -1805,7 +1828,7 @@ function alta(tipoalta){
                                             '<tr>'+
                                                 '<td class="tdmod">Total</td>'+
                                                 '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                                '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="totalxml" id="totalxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                                totalxml+
                                             '</tr>'+
                                         '</table>'+
                                   '</div>'+
@@ -2408,25 +2431,25 @@ function obtenerdatos(compramodificar){
     $("#receptorrfcxml").val(data.compra.ReceptorRfc);
     $("#receptornombrexml").val(data.compra.ReceptorNombre);
     //totales compra
-    $("#importe").val(data.compra.Importe);
-    $("#descuento").val(data.compra.Descuento);
+    $("#importe").val(number_format(data.compra.Importe, numerodecimales, '.', ''));
+    $("#descuento").val(number_format(data.compra.Descuento, numerodecimales, '.', ''));
     $("#ieps").val(data.ieps);
-    $("#subtotal").val(data.compra.SubTotal);
-    $("#iva").val(data.compra.Iva);
+    $("#subtotal").val(number_format(data.compra.SubTotal, numerodecimales, '.', ''));
+    $("#iva").val(number_format(data.compra.Iva, numerodecimales, '.', ''));
     $("#retencioniva").val(data.ivaretencion);
     $("#retencionisr").val(data.isrretencion);
     $("#retencionieps").val(data.iepsretencion);
-    $("#total").val(data.compra.Total);
+    $("#total").val(number_format(data.compra.Total, numerodecimales, '.', ''));
     //totales xml
-    $("#importexml").val(data.compra.importe);
-    $("#descuentoxml").val(data.compra.Descuento);
+    $("#importexml").val(number_format(data.compra.Importe, numerodecimales, '.', ''));
+    $("#descuentoxml").val(number_format(data.compra.Descuento, numerodecimales, '.', ''));
     $("#iepsxml").val(data.ieps);
-    $("#subtotalxml").val(data.compra.SubTotal);
-    $("#ivaxml").val(data.compra.Iva);
+    $("#subtotalxml").val(number_format(data.compra.SubTotal, numerodecimales, '.', ''));
+    $("#ivaxml").val(number_format(data.compra.Iva, numerodecimales, '.', ''));
     $("#retencionivaxml").val(data.ivaretencion);
     $("#retencionisrxml").val(data.isrretencion);
     $("#retencioniepsxml").val(data.iepsretencion);
-    $("#totalxml").val(data.compra.Total);
+    $("#totalxml").val(number_format(data.compra.Total, numerodecimales, '.', ''));
     //detalles
     $("#tablaproductoscompras tbody").html(data.filasdetallescompra);
     $("#numerofilas").val(data.numerodetallescompra);
