@@ -17,9 +17,12 @@ use App\TipoOrdenTrabajo;
 use App\Tecnico;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ReportesOrdenesTrabajoHorasTecnico;
+use App\Exports\ComparativaOrdenesTrabajoExport;
+use Illuminate\Support\Facades\Validator;
 use DB;
 use Illuminate\Support\Collection;
 use PDF;
+use \stdClass;
 
 class ReportesOrdenesTrabajoController extends ConfiguracionSistemaController{
     public function __construct(){
@@ -40,7 +43,7 @@ class ReportesOrdenesTrabajoController extends ConfiguracionSistemaController{
         $tipos_ordenes_trabajo = TipoOrdenTrabajo::where('Status', 'ALTA')->get();
         $urlgenerarformatopdf = route('reporte_horas_tecnico_generar_formato_pdf');
         return view('reportes.ordenestrabajo.horastecnico', compact('configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel', 'urlgenerarformatopdf', 'tipos_ordenes_trabajo'));
-        
+
     }
 
     //obtener tecnicos
@@ -64,7 +67,7 @@ class ReportesOrdenesTrabajoController extends ConfiguracionSistemaController{
             })
             ->rawColumns(['operaciones'])
             ->make(true);
-        } 
+        }
     }
 
     //generar reporte
@@ -75,7 +78,7 @@ class ReportesOrdenesTrabajoController extends ConfiguracionSistemaController{
         $reporte = $request->statusorden;
         $tipoorden = $request->tipoorden;
         $statusorden = $request->statusorden;
-        $string_tecnicos_seleccionados = $request->string_tecnicos_seleccionados; 
+        $string_tecnicos_seleccionados = $request->string_tecnicos_seleccionados;
         if($string_tecnicos_seleccionados > 0){
             $todoslostecnicos = 0;
         }else{
@@ -102,14 +105,14 @@ class ReportesOrdenesTrabajoController extends ConfiguracionSistemaController{
                 })
                 ->where(function($q) use ($tipoorden) {
                     if($tipoorden != 'TODOS'){
-                        $q->where('ot.Tipo', $tipoorden);  
+                        $q->where('ot.Tipo', $tipoorden);
                     }
                 })
                 ->orderby('f.Fecha')
                 ->get();
                 $cont = 0;
                 $arreglo = new Collection;
-                if($todoslostecnicos == 1){       
+                if($todoslostecnicos == 1){
                     foreach($data as $d){
                         if($d->Tecnico1 > 0){
                             $tecnico = Tecnico::where('Numero', $d->Tecnico1)->first();
@@ -253,7 +256,7 @@ class ReportesOrdenesTrabajoController extends ConfiguracionSistemaController{
                         }
                     }
                 }
-                return Datatables::of($arreglo)->make(true);                          
+                return Datatables::of($arreglo)->make(true);
                 break;
             case "Porsucursal":
                 break;
@@ -264,7 +267,7 @@ class ReportesOrdenesTrabajoController extends ConfiguracionSistemaController{
 
     //generar formato en excel
     public function reporte_horas_tecnico_generar_formato_excel(Request $request){
-        return Excel::download(new ReportesOrdenesTrabajoHorasTecnico($request->fechainicialreporte, $request->fechafinalreporte, $request->tiporeporte, $request->tipoorden, $request->statusorden, $request->string_tecnicos_seleccionados, $this->numerodecimales, $this->empresa), "formatohorastecnico.xlsx"); 
+        return Excel::download(new ReportesOrdenesTrabajoHorasTecnico($request->fechainicialreporte, $request->fechafinalreporte, $request->tiporeporte, $request->tipoorden, $request->statusorden, $request->string_tecnicos_seleccionados, $this->numerodecimales, $this->empresa), "formatohorastecnico.xlsx");
     }
 
     //generar formato pdf
@@ -275,7 +278,7 @@ class ReportesOrdenesTrabajoController extends ConfiguracionSistemaController{
         $reporte = $request->statusorden;
         $tipoorden = $request->tipoorden;
         $statusorden = $request->statusorden;
-        $string_tecnicos_seleccionados = $request->string_tecnicos_seleccionados; 
+        $string_tecnicos_seleccionados = $request->string_tecnicos_seleccionados;
         if($string_tecnicos_seleccionados > 0){
             $todoslostecnicos = 0;
         }else{
@@ -302,14 +305,14 @@ class ReportesOrdenesTrabajoController extends ConfiguracionSistemaController{
                 })
                 ->where(function($q) use ($tipoorden) {
                     if($tipoorden != 'TODOS'){
-                        $q->where('ot.Tipo', $tipoorden);  
+                        $q->where('ot.Tipo', $tipoorden);
                     }
                 })
                 ->orderby('f.Fecha')
                 ->get();
                 $cont = 0;
                 $consultarep = new Collection;
-                if($todoslostecnicos == 1){       
+                if($todoslostecnicos == 1){
                     foreach($data as $d){
                         if($d->Tecnico1 > 0){
                             $tecnico = Tecnico::where('Numero', $d->Tecnico1)->first();
@@ -452,14 +455,14 @@ class ReportesOrdenesTrabajoController extends ConfiguracionSistemaController{
                             }
                         }
                     }
-                }                        
+                }
                 break;
             case "Porsucursal":
                 break;
             case "Portecnico":
                 break;
         }
-        if($todoslostecnicos == 1){ 
+        if($todoslostecnicos == 1){
             $data = array(
                 'fechainicio' => $fechainicio,
                 'fechaterminacion' => $fechaterminacion,
@@ -468,7 +471,7 @@ class ReportesOrdenesTrabajoController extends ConfiguracionSistemaController{
                 'statusorden' => $statusorden,
                 'string_tecnicos_seleccionados' => $string_tecnicos_seleccionados,
                 'todoslostecnicos' => $todoslostecnicos,
-                'numerodecimales' => $this->numerodecimales, 
+                'numerodecimales' => $this->numerodecimales,
                 'empresa' => $this->empresa,
                 'consultarep' => $consultarep
             );
@@ -481,7 +484,7 @@ class ReportesOrdenesTrabajoController extends ConfiguracionSistemaController{
                 'statusorden' => $statusorden,
                 'string_tecnicos_seleccionados' => $string_tecnicos_seleccionados,
                 'todoslostecnicos' => $todoslostecnicos,
-                'numerodecimales' => $this->numerodecimales, 
+                'numerodecimales' => $this->numerodecimales,
                 'empresa' => $this->empresa,
                 'consultarep' => $consultarep,
                 'arraytecnicosseleccionados' => $arraytecnicosseleccionados
@@ -500,5 +503,39 @@ class ReportesOrdenesTrabajoController extends ConfiguracionSistemaController{
         ->setOption('margin-right', 2)
         ->setOption('margin-bottom', 10);
         return $pdf->stream();
+    }
+
+    /**
+     * @author Jose Alonso Espinares
+     * Vista para importar Excel
+     * @return ordenestrabajoreporteview
+     */
+    public function vistaOrdenesTrabajoReporte(){
+        return view('reportes.ordenestrabajo.ordenestrabajoreporteview');
+    }
+    /**
+     * @author Jose Alonso Espinares
+     * Genera el archivo Excel de las ordenes de trabajo
+     * @return ComparativaOrdenesTrabajoExport
+     */
+     public function reporte_ordenes_de_trabajo_comparativa(Request $request){
+        $validator = Validator::make($request->all(), [
+            "listado" => 'required|mimes:xlsx,xls,csv',
+        ]);
+        if ($validator->fails()) {
+            return redirect()
+            ->route('vistaOrdenesTrabajoReporte')
+            ->withErrors($validator);
+        }
+        $archivo = $request->file('listado');
+        $datosEntrada = Excel::toArray(new stdClass(), $archivo);
+        $listadoOT = array();
+        $date = date('dmY');
+        foreach ($datosEntrada[0] as $orden) {
+            array_push($listadoOT, $orden[0]);
+        }
+        $ordenesTrabajo = OrdenTrabajo::whereIn('Folio',$listadoOT)->with(['detalles'])->orderBy('Folio','ASC')->get();
+        $decimalesSistema = (int)config('app.numerodedecimales');
+        return Excel::download(new ComparativaOrdenesTrabajoExport($decimalesSistema, $ordenesTrabajo), 'comparativaOT'.$date.'.xlsx');
     }
 }
