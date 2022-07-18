@@ -14,7 +14,7 @@
           <ul class="dropdown-menu">
             <li><a href="{{ route('ordenes_compra') }}" id="menuregistrosordenescompra">Ordenes de Compra <b>--> SHIFT+O</b></a></li>
             <li><a href="{{ route('compras') }}" id="menuregistroscompras">Compras <b>--> CTRL+S</b></a></li>
-            <li><a href="{{ route('contrarecibos') }}"  id="menuregistroscontrarecibos">ContraRecibos</a></li> 
+            <li><a href="{{ route('contrarecibos') }}"  id="menuregistroscontrarecibos">ContraRecibos</a></li>
             <li class="dropdown-submenu">
               <a class="test" href="#">Cotizador TYT <span class="caret"></span></a>
               <ul class="dropdown-menu">
@@ -23,29 +23,29 @@
                 <li><a  href="{{ route('lista_precios_cummins') }}" id="menuregistroslistaprecioscummins">Lista Precio Cummins</a></li>
                 <li><a  href="{{ route('lista_precios_fleetguard') }}" id="menuregistroslistapreciosfleetguard">Lista Precio Fleetguard</a></li>
               </ul>
-            </li>  
+            </li>
             <li class="dropdown-submenu">
               <a class="test" href="#">Cotizaciones <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a  href="{{ route('cotizaciones_productos') }}" id="menuregistroscotizacionesproductos">Cotizaciones Productos</a></li>
                 <li><a  href="{{ route('cotizaciones_servicios') }}" id="menuregistroscotizacionesservicios">Cotizaciones Servicios</a></li>
               </ul>
-            </li>  
+            </li>
             <!--<li><a href="#" id="menuregistrospedidos">Pedidos</a></li>-->
             <li><a href="{{ route('remisiones') }}" id="menuregistrosremisiones">Remisiones <b>--> CTRL+R</b></a></li>
-            <li><a href="{{ route('facturas') }}" id="menuregistrosfacturas">Facturas <b>--> CTRL+F</b></a></li>         
-            
+            <li><a href="{{ route('facturas') }}" id="menuregistrosfacturas">Facturas <b>--> CTRL+F</b></a></li>
+
             <li class="dropdown-submenu">
               <a class="test" href="#">Producción<span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a  href="{{ route('produccion') }}" id="menuregistrosproduccion">Producción <b>--> SHIFT+P</b></a></li>
               </ul>
-            </li> 
-            <li><a href="{{ route('requisiciones') }}" id="menuregistrosrequisiciones">Requisiciones <b>--> SHIFT+R</b></a></li> 
-            <li><a href="{{ route('traspasos') }}" id="menuregistrostraspasos">Traspasos <b>--> SHIFT+T</b></a></li>                    
+            </li>
+            <li><a href="{{ route('requisiciones') }}" id="menuregistrosrequisiciones">Requisiciones <b>--> SHIFT+R</b></a></li>
+            <li><a href="{{ route('traspasos') }}" id="menuregistrostraspasos">Traspasos <b>--> SHIFT+T</b></a></li>
             <li><a href="{{ route('ordenes_trabajo') }}" id="menuregistrosordenestrabajo">Ordenes de Trabajo <b>--> ALT+O</b></a></li>
             <li><a href="{{ route('cuentas_por_pagar') }}" id="menuregistroscuentasxpagar">Cuentas por Pagar</a></li>
-            <li><a href="{{ route('cuentas_por_cobrar') }}" id="menuregistroscuentasxcobrar">Cuentas por Cobrar</a></li>            
+            <li><a href="{{ route('cuentas_por_cobrar') }}" id="menuregistroscuentasxcobrar">Cuentas por Cobrar</a></li>
             <li><a href="{{ route('notas_credito_clientes') }}" id="menuregistrosnotascreditoclientes">Notas de Crédito Clientes</a></li>
             <li><a href="{{ route('notas_credito_proveedores') }}" id="menuregistrosnotascreditoproveedores">Notas de Crédito Proveedores</a></li>
             <li><a href="{{ route('carta_porte') }}" id="menuregistroscartasporte">Cartas Porte</a></li>
@@ -62,11 +62,11 @@
           <ul class="dropdown-menu">
             <li><a href="{{ route('clientes') }}" id="menucatalogoclientes">Clientes <b>--> ALT+C</b></a></li>
             <li><a href="{{ route('agentes') }}" id="menucatalogoagentes">Agentes</a></li>
-            <li><a href="{{ route('proveedores') }}" id="menucatalogoproveedores">Proveedores <b>--> ALT+P</b></a></li>                  
-            <li><a href="{{ route('almacenes') }}" id="menucatalogoalmacenes">Almacenes</a></li>                   
+            <li><a href="{{ route('proveedores') }}" id="menucatalogoproveedores">Proveedores <b>--> ALT+P</b></a></li>
+            <li><a href="{{ route('almacenes') }}" id="menucatalogoalmacenes">Almacenes</a></li>
             <li><a href="{{ route('marcas') }}" id="menucatalogomarcas">Marcas</a></li>
             <li><a href="{{ route('lineas') }}" id="menucatalogolineas">Lineas</a></li>
-            <li><a href="{{ route('productos') }}" id="menucatalogoproductos">Productos <b>--> CTRL+P</b></a></li>                           
+            <li><a href="{{ route('productos') }}" id="menucatalogoproductos">Productos <b>--> CTRL+P</b></a></li>
             <li class="dropdown-submenu">
               <a class="test" href="#">Existencias<span class="caret"></span></a>
               <ul class="dropdown-menu">
@@ -74,10 +74,10 @@
                 <li><a href="{{ route('existencias_suc1') }}" id="menucatalogoexistencias">Existencias Por Sucursales</a></li>
               </ul>
             </li>
-            <li><a href="{{ route('bancos') }}" id="menucatalogobancos">Bancos</a></li>              
+            <li><a href="{{ route('bancos') }}" id="menucatalogobancos">Bancos</a></li>
             <li><a href="{{ route('tecnicos') }}" id="menucatalogotecnicos">Técnicos</a></li>
             <li><a href="{{ route('servicios') }}" id="menucatalogoservicios">Servicios</a></li>
-            <li><a href="{{ route('vines') }}" id="menucatalogovines">Vines</a></li>           
+            <li><a href="{{ route('vines') }}" id="menucatalogovines">Vines</a></li>
             <li class="dropdown-submenu">
               <a class="test" href="#">Folios Fiscales<span class="caret"></span></a>
               <ul class="dropdown-menu">
@@ -97,11 +97,11 @@
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Liberar <span class="caret"></span></a>
           <ul class="dropdown-menu">
             <li><a href="#">Liberar Utilidad por Cliente y Marca</a></li>
-            <li><a href="#">Liberar Utilidad por Producto</a></li>          
+            <li><a href="#">Liberar Utilidad por Producto</a></li>
             <li><a href="#">Garantías</a></li>
             <li><a href="#">Garantías Detalles</a></li>
-            <li><a href="#">Garantías Series</a></li>                
-            <li><a href="#">Lista de Precios</a></li>                 
+            <li><a href="#">Garantías Series</a></li>
+            <li><a href="#">Lista de Precios</a></li>
             <li><a href="#">Bitacora Seguimiento</a></li>
           </ul>
         </li>-->
@@ -132,7 +132,7 @@
                 <li><a  href="#">14. Tipo de Comprobante</a></li>
                 <li><a  href="#">15. Tipo Factor</a></li>
                 <li><a  href="#">16. Tipo Relación</a></li>
-                <li><a  href="#">17. Uso de CFDi</a></li>                         
+                <li><a  href="#">17. Uso de CFDi</a></li>
                 <li class="dropdown-submenu">
                   <a class="test" href="#">Comercio Exterior <span class="caret"></span></a>
                   <ul class="dropdown-menu " style="margin-top: -237px !important;">
@@ -164,10 +164,10 @@
             <li class="dropdown-submenu">
               <a class="test"  href="#">Compras <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a  href="{{route('reporte_relacion_compras')}}" id="menureporterelacioncompras">Relación de Compras por Proveedor</a></li>                        
-                <li><a  href="{{route('reporte_caja_chica')}}" id="menureportescomprascajachica">Caja Chica</a></li>   
+                <li><a  href="{{route('reporte_relacion_compras')}}" id="menureporterelacioncompras">Relación de Compras por Proveedor</a></li>
+                <li><a  href="{{route('reporte_caja_chica')}}" id="menureportescomprascajachica">Caja Chica</a></li>
                 <!--<li><a  href="#">Proyección de Pagos a Proveedores</a></li>
-                <li><a  href="#">Cartera Vencida a Proveedores</a></li>   -->                   
+                <li><a  href="#">Cartera Vencida a Proveedores</a></li>   -->
                 <li><a  href="{{route('reporte_productos_mas_comprados')}}" id="menureporteproductosmascomprados">Productos + Comprados</a></li>
               </ul>
             </li>
@@ -176,7 +176,7 @@
               <ul class="dropdown-menu">
                 <li><a  href="{{route('reporte_relacion_contrarecibos')}}" id="menureporterelacioncontrarecibos">Relación de ContraRecibos</a></li>
               </ul>
-            </li>                 
+            </li>
             <li class="dropdown-submenu">
               <a class="test"  href="#">Cotizaciones <span class="caret"></span></a>
               <ul class="dropdown-menu">
@@ -194,26 +194,26 @@
               <ul class="dropdown-menu">
                 <li><a  href="{{route('reporte_diario_ventas')}}" id="menureportesfacturasventasdiarias">Ventas Diarias</a></li>
                 <li><a  href="{{route('reporte_facturas_ventas_cliente')}}" id="menureporterelacionfacturasventasclientes">Relación de Ventas por Clientes</a></li>
-                <!--<li><a  href="#" id="menureporterelacionfacturasventasagentes">Relación de Ventas por Agentes</a></li>--> 
-                <li><a  href="{{route('reporte_facturas_ventas_marca')}}" id="menureporterelacionfacturasventasmarcas">Relación de Ventas por Marcas</a></li>                                      
-                <li><a  href="{{route('reporte_antiguedad_saldos')}}" id="menureportefacturasantiguedadsaldos">Antiguedad de Saldos</a></li>                     
+                <!--<li><a  href="#" id="menureporterelacionfacturasventasagentes">Relación de Ventas por Agentes</a></li>-->
+                <li><a  href="{{route('reporte_facturas_ventas_marca')}}" id="menureporterelacionfacturasventasmarcas">Relación de Ventas por Marcas</a></li>
+                <li><a  href="{{route('reporte_antiguedad_saldos')}}" id="menureportefacturasantiguedadsaldos">Antiguedad de Saldos</a></li>
                 <li><a  href="{{route('reporte_relacion_timbres_utilizados')}}" id="menureporterelaciontimbresutilizados">Relación Timbres Utilizados</a></li>
                 <li><a  href="{{route('reporte_facturas_vencidas')}}" id="menureportefacturasvencidas">Facturas Vencidas</a></li>
                 <li><a  href="{{route('reporte_productos_mas_vendidos')}}" id="menureporteproductosmasvendidos">Productos + Vendidos</a></li>
               </ul>
-            </li>            
+            </li>
             <li class="dropdown-submenu">
               <a class="test"  href="#">Producción <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <!--<li><a  href="#" id="menureporterelacionproduccion">Relación de Producción</a></li>-->
               </ul>
-            </li>            
+            </li>
             <!--<li class="dropdown-submenu">
               <a class="test"  href="#">Comprobantes <span class="caret"></span></a>
               <ul class="dropdown-menu">
                  <li><a  href="#" id="menureporterelacioncomprobantes">Relación de Comprobantes</a></li>
               </ul>
-            </li>  -->  
+            </li>  -->
             <li class="dropdown-submenu">
               <a class="test"  href="#">Requisiciones <span class="caret"></span></a>
               <ul class="dropdown-menu">
@@ -226,12 +226,13 @@
                 <!--<li><a  href="#">Avance Unidades en Reparación</a></li>-->
                 <li><a  href="{{route('reporte_ordenes_trabajo_horas_tecnico')}}" id="menureportesordenestrabajohorastecnico">Horas Técnico</a></li>
                 <li><a  href="{{route('reporte_unidades_servicio')}}" id="menureporteunidadesservicio">Unidades Servicio</a></li>
+                <li><a  href="{{route('vistaOrdenesTrabajoReporte')}}" id="menureporteunidadesservicio">Comparativa</a></li>
               </ul>
-            </li>             
+            </li>
             <li class="dropdown-submenu">
               <a class="test"  href="#">Cuentas x Cobrar <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a  href="{{route('reporte_relacion_cuentasporcobrar')}}" id="menureporterelacioncxc">Relación de Cobranza a Clientes</a></li>                       
+                <li><a  href="{{route('reporte_relacion_cuentasporcobrar')}}" id="menureporterelacioncxc">Relación de Cobranza a Clientes</a></li>
                 <!--<li><a  href="#">Entrega de Facturas a Cobrar</a></li>-->
               </ul>
             </li>
@@ -240,7 +241,7 @@
               <ul class="dropdown-menu">
                 <li><a  href="{{route('reporte_relacion_cuentasporpagar')}}" id="menureporterelacioncxp">Relación de Pagos a Proveedores</a></li>
               </ul>
-            </li>                  
+            </li>
             <li class="dropdown-submenu">
               <a class="test"  href="#">Notas de Crédito Clientes <span class="caret"></span></a>
               <ul class="dropdown-menu">
@@ -270,7 +271,7 @@
               <ul class="dropdown-menu">
                 <!--<li><a href="#" id="menureportebitacorasdocumentosyclientes">Documentos y Clientes  </a></li>-->
               </ul>
-            </li>             
+            </li>
             <li class="dropdown-submenu">
               <a class="test" href="#">Usuarios <span class="caret"></span></a>
               <ul class="dropdown-menu">
@@ -292,11 +293,11 @@
               <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                 <b>CERRAR SESIÓN</b>
               </a>
-            </li>  
+            </li>
           </ul>
-        </li>      
+        </li>
       </ul>
-      <ul class="nav navbar-nav navbar-right infousuario">  
+      <ul class="nav navbar-nav navbar-right infousuario">
         <!-- Valores Dolar -->
         <li class="dropdown">
           <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button">
@@ -335,7 +336,7 @@
               </ul>
             </li>
           </ul>
-        </li> 
+        </li>
         <!-- Notificaciones -->
         <li class="dropdown">
           <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button">
@@ -404,7 +405,7 @@
               </ul>
             </li>
           </ul>
-        </li>   
+        </li>
         <li class="text-center">
           <div class="name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ Auth::user()->name }}</div>
           <div class="btn-group user-helper-dropdown">
@@ -420,8 +421,8 @@
                 </form>
               </li>
             </ul>
-          </div>                    
-        </li>        
+          </div>
+        </li>
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->

@@ -957,6 +957,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/carta_porte_obtener_vehiculo_por_numero', 'CartaPorteController@carta_porte_obtener_vehiculo_por_numero')->name('carta_porte_obtener_vehiculo_por_numero')->middleware('revisaraccesomenu:menuregistroscartasporte');
     Route::get('/carta_porte_obtener_operadores', 'CartaPorteController@carta_porte_obtener_operadores')->name('carta_porte_obtener_operadores')->middleware('revisaraccesomenu:menuregistroscartasporte');
     Route::get('/carta_porte_obtener_operador_por_numero', 'CartaPorteController@carta_porte_obtener_operador_por_numero')->name('carta_porte_obtener_operador_por_numero')->middleware('revisaraccesomenu:menuregistroscartasporte');
+    // Route::get('/carta_porte_obtener_productos','CartaPorteController@carta_porte_obtener_productos')->name('carta_porte_obtener_productos')->middleware('revisaraccesomenu:menuregistroscartasporte');
+    // Route::POST('/carta_porte_guardar','CartaPorteController@carta_porte_guardar')->name('carta_porte_guardar')->middleware('revisaraccesomenu:menuregistroscartasporte');
+    // Route::get('/carta_porte_obtener_claves_materiales_peligrosos','CartaPorteController@carta_porte_obtener_claves_materiales_peligrosos')->name('carta_porte_obtener_claves_materiales_peligrosos')->middleware('revisaraccesomenu:menuregistroscartasporte');
+    // Route::get('/carta_porte_obtener_claves_tipo_embalajes','CartaPorteController@carta_porte_obtener_claves_tipo_embalajes')->name('carta_porte_obtener_claves_tipo_embalajes')->middleware('revisaraccesomenu:menuregistroscartasporte');
+    // Route::POST('/carta_porte_guardar_configuracion_tabla','CartaPorteController@carta_porte_guardar_configuracion_tabla')->name('carta_porte_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistroscartasporte');
     //Produccion
     Route::get('/produccion', 'ProduccionController@produccion')->name('produccion')->middleware('revisaraccesomenu:menuregistrosproduccion');
     Route::get('/produccion_obtener', 'ProduccionController@produccion_obtener')->name('produccion_obtener')->middleware('revisaraccesomenu:menuregistrosproduccion');
@@ -1202,6 +1207,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/reporte_horas_tecnico_obtener_tecnicos', 'ReportesOrdenesTrabajoController@reporte_horas_tecnico_obtener_tecnicos')->name('reporte_horas_tecnico_obtener_tecnicos')->middleware('revisaraccesomenu:menureportesordenestrabajohorastecnico');
     Route::get('/reporte_horas_tecnico_generar_formato_excel', 'ReportesOrdenesTrabajoController@reporte_horas_tecnico_generar_formato_excel')->name('reporte_horas_tecnico_generar_formato_excel')->middleware('revisaraccesomenu:menureportesordenestrabajohorastecnico');
     Route::get('/reporte_horas_tecnico_generar_formato_pdf', 'ReportesOrdenesTrabajoController@reporte_horas_tecnico_generar_formato_pdf')->name('reporte_horas_tecnico_generar_formato_pdf')->middleware('revisaraccesomenu:menureportesordenestrabajohorastecnico');
+
+    //Comparativa Ordenes
+    Route::get('/vistaOrdenesTrabajoReporte', 'ReportesOrdenesTrabajoController@vistaOrdenesTrabajoReporte')->name('vistaOrdenesTrabajoReporte')->middleware('revisaraccesomenu:menureportesordenestrabajohorastecnico');
+    Route::POST('/reporte_ordenes_de_trabajo_comparativa', 'ReportesOrdenesTrabajoController@reporte_ordenes_de_trabajo_comparativa')->name('reporte_ordenes_de_trabajo_comparativa')->middleware('revisaraccesomenu:menureportesordenestrabajohorastecnico');
+
     //reporte unidades servicio
     Route::get('/reporte_unidades_servicio', 'ReporteUnidadesServicioController@reporte_unidades_servicio')->name('reporte_unidades_servicio')->middleware('revisaraccesomenu:menureporteunidadesservicio');
     Route::get('/reporte_unidades_servicio_obtener_clientes_facturaa', 'ReporteUnidadesServicioController@reporte_unidades_servicio_obtener_clientes_facturaa')->name('reporte_unidades_servicio_obtener_clientes_facturaa')->middleware('revisaraccesomenu:menureporteunidadesservicio');
