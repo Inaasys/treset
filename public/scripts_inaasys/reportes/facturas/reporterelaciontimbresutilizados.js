@@ -33,9 +33,9 @@ function init(){
                     '<li>Factura: '+element.Factura+'</li>'+
                     '<li>UUID: '+element.UUID+'</li>'+
                 '</ul>', "Mensaje", {
-                    "timeOut": "6000",
+                    "timeOut": "10000",
                     "progressBar": true,
-                    "extendedTImeout": "6000"
+                    "extendedTImeout": "10000"
                 });
             });
 
