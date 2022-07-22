@@ -929,6 +929,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/facturas_exportar_excel', 'FacturaController@facturas_exportar_excel')->name('facturas_exportar_excel')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::post('/facturas_guardar_configuracion_tabla', 'FacturaController@facturas_guardar_configuracion_tabla')->name('facturas_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_generar_diferencias','FacturaController@diferencias')->name('facturas_generar_diferencias')->middleware('revisaraccesomenu:menuregistrosfacturas');
+    Route::get('/validarDuplicados','FacturaController@validarDuplicados')->name('validarDuplicados')->middleware('revisaraccesomenu:menuregistrosfacturas');
+
 
     //Rentenciones
     Route::get('/retenciones_crearretencion', 'RetencionController@retenciones_crearretencion')->name('retenciones_crearretencion')->middleware('revisaraccesomenu:menuregistrosfacturas');
@@ -940,6 +942,8 @@ Route::group(['middleware' => ['auth']], function () {
     //Carta Porte
     Route::get('/carta_porte', 'CartaPorteController@carta_porte')->name('carta_porte')->middleware('revisaraccesomenu:menuregistroscartasporte');
     Route::get('/carta_porte_obtener', 'CartaPorteController@carta_porte_obtener')->name('carta_porte_obtener')->middleware('revisaraccesomenu:menuregistroscartasporte');
+    //carta_porte_obtener_carta_porte
+    //Route::get('/carta_porte_obtener_carta_porte', 'CartaPorteController@carta_porte_obtener_carta_porte')->name('carta_porte_obtener_carta_porte')->middleware('revisaraccesomenu:menuregistroscartasporte');
     Route::get('/carta_porte_obtener_obtener_ultimo_folio', 'CartaPorteController@carta_porte_obtener_obtener_ultimo_folio')->name('carta_porte_obtener_obtener_ultimo_folio')->middleware('revisaraccesomenu:menuregistroscartasporte');
     Route::get('/carta_porte_obtener_folios_fiscales', 'CartaPorteController@carta_porte_obtener_folios_fiscales')->name('carta_porte_obtener_folios_fiscales')->middleware('revisaraccesomenu:menuregistroscartasporte');
     Route::get('/carta_porte_obtener_ultimo_folio_serie_seleccionada', 'CartaPorteController@carta_porte_obtener_ultimo_folio_serie_seleccionada')->name('carta_porte_obtener_ultimo_folio_serie_seleccionada')->middleware('revisaraccesomenu:menuregistroscartasporte');

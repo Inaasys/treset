@@ -125,6 +125,7 @@
         var reporte_relacion_timbres_utilizados_obtener_series = '{!!URL::to('reporte_relacion_timbres_utilizados_obtener_series')!!}';
         var reporte_relacion_timbres_utilizados_obtener_serie_por_clave = '{!!URL::to('reporte_relacion_timbres_utilizados_obtener_serie_por_clave')!!}';
         var reporte_relacion_timbres_utilizados_generar_reporte = '{!!URL::to('reporte_relacion_timbres_utilizados_generar_reporte')!!}';
+        var validarDuplicados = '{!! URL::to('validarDuplicados') !!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="{{ asset('scripts_inaasys/reportes/facturas/reporterelaciontimbresutilizados.js') }}"></script>
