@@ -5,6 +5,42 @@ var form;
 function init(){
   asignarfechaactual();
   listar();
+
+}
+/**
+ * @author Jose Alonso Espinares Romero
+ * @description Obtiene la lista de Folios Duplicados
+ */
+ async function validarFoliosDuplicados() {
+    let claveserie = $("#claveserie").val();
+    let fechainicialreporte = $("#fechainicialreporte").val();
+    let fechafinalreporte = $("#fechafinalreporte").val();
+    let tipocomprobante = $("#tipocomprobante").val();
+    let reporte = $("#reporte").val();
+    await $.get(validarDuplicados,{
+        claveserie:claveserie,
+        fechainicialreporte:fechainicialreporte,
+        fechafinalreporte:fechafinalreporte,
+        reporte:reporte,
+        tipocomprobante:tipocomprobante
+    },function(data){
+        if (data.length > 0) {
+            console.log(data)
+            data.forEach(element => {
+                toastr.error( "Folio duplicado, "+
+                'datos registrados en sistema:<br>'+
+                '<ul>'+
+                    '<li>Factura: '+element.Factura+'</li>'+
+                    '<li>UUID: '+element.UUID+'</li>'+
+                '</ul>', "Mensaje", {
+                    "timeOut": "6000",
+                    "progressBar": true,
+                    "extendedTImeout": "6000"
+                });
+            });
+
+        }
+    })
 }
 //mostrar formulario
 function mostrarformulario(){
@@ -282,7 +318,7 @@ function listar(){
             }
         }
     });
-
+    validarFoliosDuplicados();
 }
 
 init();
