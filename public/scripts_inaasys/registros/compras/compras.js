@@ -1270,11 +1270,11 @@ function calculartotal(){
     retencionieps = new Decimal(retencionieps).plus($(".retencioniepspesospartida", this).val());
   });
   //IVA Y TOTAL
-  let ivaAux = 0
+  let ivaAux = parseFloat(iva.toFixed(parseInt(numerodecimales)))
   let totalRound = 0
-  if (iva > 0) {
-    ivaAux = subtotal * 0.16;
-  }
+//   if (iva > 0) {
+//     ivaAux = subtotal * 0.16;
+//   }
   totalRound = parseFloat(subtotal.toFixed(parseInt(numerodecimales))) + ivaAux
   $("#importe").val(number_format(round(importe, numerodecimales), numerodecimales, '.', ''));
   $("#descuento").val(number_format(round(descuento, numerodecimales), numerodecimales, '.', ''));
@@ -1308,13 +1308,13 @@ function calculartotal(){
   }*/
   //machar totales factura proveedor y orden de compra
   var totalxml = $("#totalxml").val();
-  if(parseFloat(total) > parseFloat(totalxml)){
-    var diferencia = new Decimal(total).minus(totalxml);
+  if(parseFloat(totalRound) > parseFloat(totalxml)){
+    var diferencia = new Decimal(totalRound).minus(totalxml);
     $("#diferenciafacturaproveedor").html("Diferencia del total por : $ "+number_format(round(diferencia, numerodecimales), numerodecimales, '.', ''));
-  }else if(parseFloat(total) < parseFloat(totalxml)){
-    var diferencia = new Decimal(totalxml).minus(total);
+  }else if(parseFloat(totalRound) < parseFloat(totalxml)){
+    var diferencia = new Decimal(totalxml).minus(totalRound);
     $("#diferenciafacturaproveedor").html("Diferencia del total por : $ -"+number_format(round(diferencia, numerodecimales), numerodecimales, '.', ''));
-  }else if(parseFloat(total) == parseFloat(totalxml)){
+  }else if(parseFloat(totalRound) == parseFloat(totalxml)){
     $("#diferenciafacturaproveedor").html("");
   }
   $("#diferenciatotales").val(number_format(round(diferencia, numerodecimales), numerodecimales, '.', ''));
