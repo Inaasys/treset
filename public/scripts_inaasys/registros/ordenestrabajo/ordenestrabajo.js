@@ -3188,7 +3188,7 @@ function configurar_tabla(){
   var campos = campos_activados.split(",");
   for (var i = 0; i < campos.length; i++) {
     var returncheckboxfalse = '';
-    if(campos[i] == 'Orden' || campos[i] == 'Status' || campos[i] == 'Periodo'){
+    if(campos[i] == 'Orden' || campos[i] == 'Status' || campos[i] == 'Periodo' || campos[i] == 'bloqueo'){
       returncheckboxfalse = 'onclick="javascript: return false;"';
     }
     checkboxscolumnas = checkboxscolumnas + '<div class="col-md-2 form-check">'+
