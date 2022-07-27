@@ -418,6 +418,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/ordenes_trabajo_exportar_excel', 'OrdenTrabajoController@ordenes_trabajo_exportar_excel')->name('ordenes_trabajo_exportar_excel')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
     Route::get('/orden_trabajo_exportar_excel/{orden}', 'OrdenTrabajoController@orden_trabajo_exportar_excel')->name('orden_trabajo_exportar_excel')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
     Route::post('/ordenes_trabajo_guardar_configuracion_tabla', 'OrdenTrabajoController@ordenes_trabajo_guardar_configuracion_tabla')->name('ordenes_trabajo_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+    //Bloqueo
+    Route::POST('/ordenes_trabajo_bloquear_desbloquear','OrdenTrabajoController@ordenes_trabajo_bloquear_desbloquear')->name('ordenes_trabajo_bloquear_desbloquear')->middleware('revisarpermisos:registros.ordenes.trabajo.bloqueos');
     //Cuentas por Pagar
     Route::get('/cuentas_por_pagar', 'CuentasPorPagarController@cuentas_por_pagar')->name('cuentas_por_pagar')->middleware('revisaraccesomenu:menuregistroscuentasxpagar');
     Route::get('/cuentas_por_pagar_obtener', 'CuentasPorPagarController@cuentas_por_pagar_obtener')->name('cuentas_por_pagar_obtener')->middleware('revisaraccesomenu:menuregistroscuentasxpagar');
@@ -940,10 +942,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/facturas_verificar_si_continua_baja_timbre', 'FacturaController@facturas_verificar_si_continua_baja_timbre')->name('facturas_verificar_si_continua_baja_timbre')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::post('/facturas_baja_timbre', 'FacturaController@facturas_baja_timbre')->name('facturas_baja_timbre')->middleware('revisarpermisos:registros.facturas.cancelartimbres');
     //Carta Porte
+
     Route::get('/carta_porte', 'CartaPorteController@carta_porte')->name('carta_porte')->middleware('revisaraccesomenu:menuregistroscartasporte');
     Route::get('/carta_porte_obtener', 'CartaPorteController@carta_porte_obtener')->name('carta_porte_obtener')->middleware('revisaraccesomenu:menuregistroscartasporte');
     //carta_porte_obtener_carta_porte
-    //Route::get('/carta_porte_obtener_carta_porte', 'CartaPorteController@carta_porte_obtener_carta_porte')->name('carta_porte_obtener_carta_porte')->middleware('revisaraccesomenu:menuregistroscartasporte');
+    Route::get('/carta_porte_obtener_carta_porte', 'CartaPorteController@carta_porte_obtener_carta_porte')->name('carta_porte_obtener_carta_porte')->middleware('revisaraccesomenu:menuregistroscartasporte');
+    //Guardar Modificación Carta Porte
+    //Route::POST('/carta_porte_guardar_modificacion','CartaPorteController@carta_porte_guardar_modificacion')->name('carta_porte_guardar_modificacion')->middleware('revisaraccesomenu:menuregistroscartasporte');
     Route::get('/carta_porte_obtener_obtener_ultimo_folio', 'CartaPorteController@carta_porte_obtener_obtener_ultimo_folio')->name('carta_porte_obtener_obtener_ultimo_folio')->middleware('revisaraccesomenu:menuregistroscartasporte');
     Route::get('/carta_porte_obtener_folios_fiscales', 'CartaPorteController@carta_porte_obtener_folios_fiscales')->name('carta_porte_obtener_folios_fiscales')->middleware('revisaraccesomenu:menuregistroscartasporte');
     Route::get('/carta_porte_obtener_ultimo_folio_serie_seleccionada', 'CartaPorteController@carta_porte_obtener_ultimo_folio_serie_seleccionada')->name('carta_porte_obtener_ultimo_folio_serie_seleccionada')->middleware('revisaraccesomenu:menuregistroscartasporte');

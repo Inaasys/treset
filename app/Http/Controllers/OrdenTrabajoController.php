@@ -67,6 +67,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
             $data = VistaOrdenTrabajo::select($configuraciones_tabla['campos_consulta'])->where('Periodo', $periodo);
+            $opcionBloqueo = '';
             return DataTables::of($data)
                     ->order(function ($query) use($configuraciones_tabla) {
                         if($configuraciones_tabla['configuracion_tabla']->primerordenamiento != 'omitir'){
@@ -104,7 +105,16 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                         return $data->sum('Utilidad');
                     })
                     ->addColumn('operaciones', function($data){
-                        $operaciones =  '<div class="dropdown">'.
+                        //Si la orden no se encuentra bloqueada y su estatus es abierto la función estara disponible
+                        if($data->Status == 'ABIERTA' || $data->Status == 'BLOQUEADA'){
+                            $opcionBloqueo = (!$data->bloqueo) ? '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="bloqueo(\''.$data->Orden.'\',1)">Bloquear</a></li>' :
+                                        '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="bloqueo(\''.$data->Orden.'\',0)">Debloquear</a></li>' ;
+                        }else {
+                            $opcionBloqueo = '';
+                        }
+                        //Si la OT no se encuentra Bloqueada tendra todas las operaciones disponibles
+                        if (!$data->bloqueo) {
+                            $operaciones =  '<div class="dropdown">'.
                                             '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
                                                 'OPERACIONES <span class="caret"></span>'.
                                             '</button>'.
@@ -112,6 +122,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Orden .'\')">Cambios</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="terminar(\''.$data->Orden .'\')">Terminar OT</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="abrirnuevamente(\''.$data->Orden .'\')">Abrir Nuevamente OT</a></li>'.
+                                                $opcionBloqueo.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->Orden .'\')">Bajas</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="'.route('ordenes_trabajo_generar_pdfs_indiv',$data->Orden).'" target="_blank">Ver Documento PDF</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Orden .'\')">Enviar Documento por Correo</a></li>'.
@@ -119,6 +130,25 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="generardocumentoeniframe(\''.$data->Orden .'\')">Imprimir Documento PDF</a></li>'.
                                             '</ul>'.
                                         '</div>';
+                        } else {
+                            $operaciones =  '<div class="dropdown">'.
+                                            '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                                                'OPERACIONES <span class="caret"></span>'.
+                                            '</button>'.
+                                            '<ul class="dropdown-menu">'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);">Cambios</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);">Terminar OT</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);">Abrir Nuevamente OT</a></li>'.
+                                                $opcionBloqueo.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);">Bajas</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);">Ver Documento PDF</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);">Enviar Documento por Correo</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);">Modificar Datos Generales</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);">Imprimir Documento PDF</a></li>'.
+                                            '</ul>'.
+                                        '</div>';
+                        }
+
                         return $operaciones;
                     })
                     ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
@@ -1759,4 +1789,35 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         return redirect()->route('ordenes_trabajo');
     }
 
+    /**
+     * @author Jose Alonso Espinares
+     */
+    public function ordenes_trabajo_bloquear_desbloquear(Request $request){
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $operacion = '';
+        $status = '';
+        if ((int)$request->operacion == 0) {
+            $operacion = 'Desbloqueo';
+            $status = 'ABIERTA';
+        } else {
+            $operacion = 'Bloqueo';
+            $status = 'BLOQUEADA';
+        }
+        $ot = OrdenTrabajo::where('Orden',$request->ot)->update([
+            "bloqueo"=>$request->operacion,
+            "Status"=> $status
+        ]);
+
+
+        $registro = new RegistrosAcciones;
+        $registro->user_id = Auth::user()->id;
+        $registro->accion = $operacion." de la Orden de Trabajo: ".$request->ot;
+        $registro->controlador = 'OrdenTrabajoController';
+        $registro->metodo = 'ordenes_trabajo_guardar';
+        $registro->descripcion = json_encode($request->all());
+        $registro->save();
+        return response()->json($ot);
+
+    }
 }

@@ -10,7 +10,6 @@ use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use App\OrdenTrabajo;
 
@@ -31,7 +30,7 @@ class ComparativaOrdenesTrabajoExport implements WithColumnFormatting,WithEvents
      */
     public function headings(): array{
         return [
-            'OT','PEDIDO','ECONOMICO','CANTIDAD','PRECIO','SUBTOTAL','IVA %','IVA $','TOTAL'
+            'NO.CONS','FACTURA','OT','PEDIDO','ECONOMICO','CANTIDAD','PRECIO','SUBTOTAL','IVA %','IVA $','TOTAL'
         ];
     }
     /**
@@ -57,15 +56,16 @@ class ComparativaOrdenesTrabajoExport implements WithColumnFormatting,WithEvents
     {
         return [
             'A' => 12.5,
-            'B' => 12.5,
-            'C' => 14,
+            'B' => 14,
+            'C' => 12.5,
             'D' => 12.5,
             'E' => 14,
             'F' => 12.5,
             'G' => 14,
             'H' => 12.5,
-            'I' => 12.5,
+            'I' => 14,
             'J' => 12.5,
+            'K' => 12.5,
         ];
     }
     /**
@@ -81,7 +81,7 @@ class ComparativaOrdenesTrabajoExport implements WithColumnFormatting,WithEvents
         $ivaOT = 0;
         $totalOT = 0;
         $totaLHoras = 0;
-        foreach ($this->listado as $orden) {
+        foreach ($this->listado as $item => $orden) {
             $importePartida = 0;
             $impuesto = 0;
             $total = 0;
@@ -89,30 +89,50 @@ class ComparativaOrdenesTrabajoExport implements WithColumnFormatting,WithEvents
             $ivaOT = 0;
             $totalOT = 0;
             $totaLHoras = 0;
-            foreach ($orden->detalles->sortBy('Partida') as $detalle) {
+            foreach ($orden->detalles->sortBy('Partida') as $key => $detalle) {
                 $importePartida = $detalle->Cantidad * $detalle->Precio;
                 $impuesto = $importePartida * ($detalle->Impuesto / 100);
                 $total = $importePartida + $impuesto;
                 $sumaImportes += $importePartida;
                 $totaLHoras += $detalle->Cantidad;
-                $registros[] = collect([
-                    "OT" => $detalle->Orden,
-                    "PEDIDO" => $orden->Pedido,
-                    "ECONOMICO" => $orden->Economico,
-                    "CANTIDAD" => $detalle->Cantidad,
-                    "PRECIO" => $detalle->Precio,
-                    "SUBTOTAL" => number_format($importePartida, $this->decimales, '.', ''),
-                    "IVA %" => $detalle->Impuesto / 100,
-                    "IVA $" => number_format($impuesto, $this->decimales, '.', ''),
-                    "TOTAL" => number_format($total, $this->decimales, '.', ''),
-                ]);
+                if ($key == $orden->detalles->count()-1) {
+                    $registros[] = collect([
+                        "NO.CONS" => $item+1,
+                        "FACTURA" => '',
+                        "OT" => $detalle->Orden,
+                        "PEDIDO" => $orden->Pedido,
+                        "ECONOMICO" => $orden->Economico,
+                        "CANTIDAD" => $detalle->Cantidad,
+                        "PRECIO" => $detalle->Precio,
+                        "SUBTOTAL" => number_format($importePartida, $this->decimales, '.', ''),
+                        "IVA %" => $detalle->Impuesto / 100,
+                        "IVA $" => number_format($impuesto, $this->decimales, '.', ''),
+                        "TOTAL" => number_format($total, $this->decimales, '.', ''),
+                    ]);
+                }else{
+                    $registros[] = collect([
+                        "NO.CONS" => '',
+                        "FACTURA" => '',
+                        "OT" => "",
+                        "PEDIDO" => "",
+                        "ECONOMICO" => "",
+                        "CANTIDAD" => $detalle->Cantidad,
+                        "PRECIO" => $detalle->Precio,
+                        "SUBTOTAL" => number_format($importePartida, $this->decimales, '.', ''),
+                        "IVA %" => $detalle->Impuesto / 100,
+                        "IVA $" => number_format($impuesto, $this->decimales, '.', ''),
+                        "TOTAL" => number_format($total, $this->decimales, '.', ''),
+                    ]);
+                }
             }
             $sumaImportes = number_format(round($sumaImportes,2), $this->decimales, '.', '');
             $ivaOT = number_format(round($sumaImportes,2), $this->decimales, '.', '') * 0.16;
             $ivaOT = number_format(round($ivaOT,2), $this->decimales, '.', '');
             $totalOT = $totalTotal = number_format(round($sumaImportes, 2), $this->decimales, '.', '') + number_format(round($ivaOT, 2), $this->decimales, '.', '');
             $registros[] = collect([
-                "OT" => $orden->Orden,
+                "NO.CONS" => '',
+                "FACTURA" => '',
+                "OT" => "",
                 "PEDIDO" => "",
                 "ECONOMICO" => "Total Cantidad",
                 "CANTIDAD" => $totaLHoras,

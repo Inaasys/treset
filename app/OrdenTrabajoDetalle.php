@@ -11,7 +11,7 @@ class OrdenTrabajoDetalle extends Model
     protected $primaryKey = null;
     public $incrementing = false;
     protected $fillable = [
-        'Orden', 
+        'Orden',
         'Cliente',
         'Agente',
         'Fecha',
@@ -54,4 +54,13 @@ class OrdenTrabajoDetalle extends Model
         'Cotizacion',
         'Partida'
     ];
+
+    /**
+     * Get the user that owns the OrdenTrabajoDetalle
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function OrdenTrabajo(){
+        return $this->belongsTo(OrdenTrabajo::class, 'Orden');
+    }
 }
