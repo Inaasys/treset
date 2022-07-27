@@ -13,14 +13,14 @@ function asignarfechaactual(){
   $.get(ordenes_trabajo_obtener_fecha_actual_datetimelocal, function(fechas){
     $("#fecha").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
     $("#fechaentregapromesa").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
-  }) 
+  })
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
   var serie = $("#serie").val();
   $.get(ordenes_trabajo_obtener_ultimo_folio, {serie:serie}, function(folio){
     $("#folio").val(folio);
-  })  
+  })
 }
 //cerrar modales
 function limpiarmodales(){
@@ -49,7 +49,7 @@ function mostrarmodalformulario(tipo, modificacionpermitida){
           $("#btnGuardar").hide();
           $("#btnGuardarModificacion").show();
         }
-    }   
+    }
 }
 //ocultar modal formulario
 function ocultarmodalformulario(){
@@ -107,7 +107,7 @@ function listar(){
   //agregar inputs de busqueda por columna
   $('#tbllistado tfoot th').each( function () {
     var titulocolumnatfoot = $(this).text();
-    var valor_encontrado_en_array = campos_busqueda.indexOf(titulocolumnatfoot); 
+    var valor_encontrado_en_array = campos_busqueda.indexOf(titulocolumnatfoot);
     if(valor_encontrado_en_array >= 0){
       $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
     }
@@ -133,8 +133,9 @@ function listar(){
             }
         },
         "createdRow": function( row, data, dataIndex){
-            if( data.Status ==  `ABIERTA`){ $(row).addClass('bg-red');}
-            else if( data.Status ==  `BAJA`){ $(row).addClass('bg-orange');}
+            if( data.Status ==  `ABIERTA` && data.bloqueo == 0){ $(row).addClass('bg-red');}
+            else if( data.Status ==  `Bloqueada` && data.bloqueo == 1){ $(row).addClass('bg-orange');}
+            else if( data.Status ==  `BAJA` || data.bloqueo == 1){ $(row).addClass('bg-orange');}
             else if( data.Status ==  `CERRADA`){ $(row).addClass('bg-light-green');}
             else{ $(row).addClass(''); }
         },
@@ -147,7 +148,7 @@ function listar(){
             $("#sumatotalfiltrado").html(number_format(round(data.json.sumatotal, numerodecimales), numerodecimales, '.', ''));
             $("#sumacostofiltrado").html(number_format(round(data.json.sumacosto, numerodecimales), numerodecimales, '.', ''));
             $("#sumacomisionfiltrado").html(number_format(round(data.json.sumacomision, numerodecimales), numerodecimales, '.', ''));
-            $("#sumautilidadfiltrado").html(number_format(round(data.json.sumautilidad, numerodecimales), numerodecimales, '.', '')); 
+            $("#sumautilidadfiltrado").html(number_format(round(data.json.sumautilidad, numerodecimales), numerodecimales, '.', ''));
         },
         initComplete: function () {
           // Aplicar busquedas por columna
@@ -165,15 +166,23 @@ function listar(){
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {
                 $('#tbllistado').DataTable().search( this.value ).draw();
-                $(".inputbusquedageneral").val(""); 
+                $(".inputbusquedageneral").val("");
               }
           });
         }
     });
     //modificacion al dar doble click
     $('#tbllistado tbody').on('dblclick', 'tr', function () {
-      var data = tabla.row( this ).data();
-      obtenerdatos(data.Orden);
+        var data = tabla.row( this ).data();
+        if(data.bloqueo == 0){
+            obtenerdatos(data.Orden);
+        }else{
+            toastr.error( "Orden de Trabajo Bloqueada","Mensaje", {
+                    "timeOut": "6000",
+                    "progressBar": true,
+                    "extendedTImeout": "6000"
+            });
+        }
     });
 }
 //realizar en reporte en excel
@@ -201,7 +210,7 @@ $("#btnenviarpartidasexcel").on('click', function(e){
   var tipooperacion = $("#tipooperacion").val();
   var hoy = $("#fecha").val();
   var form_data = new FormData();
-  form_data.append('partidasexcel', partidasexcel);  
+  form_data.append('partidasexcel', partidasexcel);
   form_data.append('numeroalmacen', numeroalmacen);
   form_data.append('contadorservicios', contadorservicios);
   form_data.append('contadorfilas', contadorfilas);
@@ -229,16 +238,16 @@ $("#btnenviarpartidasexcel").on('click', function(e){
       $(".inputnextdet").keyup(function (e) {
         //recomentable para mayor compatibilidad entre navegadores.
         var code = (e.keyCode ? e.keyCode : e.which);
-        var index = $(this).index(".inputnextdet");          
+        var index = $(this).index(".inputnextdet");
         switch(code){
           case 13:
-            //$(".inputnextdet").eq(index + 1).focus().select(); 
+            //$(".inputnextdet").eq(index + 1).focus().select();
             break;
           case 39:
-            $(".inputnextdet").eq(index + 1).focus().select(); 
+            $(".inputnextdet").eq(index + 1).focus().select();
             break;
           case 37:
-            $(".inputnextdet").eq(index - 1).focus().select(); 
+            $(".inputnextdet").eq(index - 1).focus().select();
             break;
         }
       });
@@ -246,19 +255,19 @@ $("#btnenviarpartidasexcel").on('click', function(e){
     error: function (data) {
       console.log(data);
     }
-  });                      
+  });
 });
 //obtener tipos ordenes de compra
 function obtenertiposordenestrabajo(){
     $.get(ordenes_trabajo_obtener_tipos_ordenes_trabajo, function(select_tipos_ordenes_trabajo){
       $("#tipoorden").html(select_tipos_ordenes_trabajo);
-    })  
+    })
 }
 //obtener tipos de unidades
 function obtenertiposunidades(){
   $.get(ordenes_trabajo_obtener_tipos_unidades, function(select_tipos_unidades){
     $("#tipounidad").html(select_tipos_unidades);
-  }) 
+  })
 }
 //obtener series documento
 function obtenerseriesdocumento(){
@@ -283,12 +292,12 @@ function obtenerseriesdocumento(){
                                       '<tbody></tbody>'+
                                     '</table>'+
                                   '</div>'+
-                                '</div>'+   
+                                '</div>'+
                               '</div>'+
                             '</div>'+
                             '<div class="modal-footer">'+
                               '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                            '</div>';  
+                            '</div>';
   $("#contenidomodaltablas").html(tablaseriesdocumento);
   var tserdoc = $('#tbllistadoseriedocumento').DataTable({
       keys: true,
@@ -296,7 +305,7 @@ function obtenerseriesdocumento(){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -322,7 +331,7 @@ function obtenerseriesdocumento(){
             }
         });
       },
-  });  
+  });
   //seleccionar registro al dar doble click
   $('#tbllistadoseriedocumento tbody').on('dblclick', 'tr', function () {
     var data = tserdoc.row( this ).data();
@@ -335,7 +344,7 @@ function seleccionarseriedocumento(Serie){
       $("#serie").val(Serie);
       $("#serietexto").html("Serie: "+Serie);
       mostrarformulario();
-  }) 
+  })
 }
 //obtener registros de clientes
 function listarclientesfacturaa(){
@@ -363,7 +372,7 @@ function listarclientesfacturaa(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
@@ -406,13 +415,13 @@ function listarclientesfacturaa(){
                 }
             });
         },
-    }); 
+    });
     //seleccionar registro al dar doble click
     $('#tbllistadoclientesfacturaa tbody').on('dblclick', 'tr', function () {
         var data = tclifacta.row( this ).data();
         seleccionarclientefacturaa(data.Numero, data.Nombre, data.Plazo, data.NumeroAgente, data.NombreAgente);
-    }); 
-} 
+    });
+}
 function seleccionarclientefacturaa(Numero, Nombre, Plazo, NumeroAgente, Agente){
   var numeroclientefacturaaanterior = $("#numeroclientefacturaaanterior").val();
   var numeroclientefacturaa = Numero;
@@ -456,7 +465,7 @@ function listarclientesdelcliente(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
@@ -499,13 +508,13 @@ function listarclientesdelcliente(){
                 }
             });
         },
-    }); 
+    });
     //seleccionar registro al dar doble click
     $('#tbllistadoclientesdelcliente tbody').on('dblclick', 'tr', function () {
         var data = tclidelcli.row( this ).data();
         seleccionarclientedelcliente(data.Numero, data.Nombre, data.Plazo);
-    }); 
-} 
+    });
+}
 function seleccionarclientedelcliente(Numero, Nombre, Plazo){
   var numeroclientedelclienteanterior = $("#numeroclientedelclienteanterior").val();
   var numeroclientedelcliente = Numero;
@@ -539,7 +548,7 @@ function listaragentes(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
@@ -578,13 +587,13 @@ function listaragentes(){
                 }
             });
         },
-    }); 
+    });
     //seleccionar registro al dar doble click
     $('#tbllistadoagente tbody').on('dblclick', 'tr', function () {
         var data = tagen.row( this ).data();
         seleccionaragente(data.Numero, data.Nombre);
-    }); 
-} 
+    });
+}
 function seleccionaragente(Numero, Nombre){
   var numeroagenteanterior = $("#numeroagenteanterior").val();
   var numeroagente = Numero;
@@ -598,7 +607,7 @@ function seleccionaragente(Numero, Nombre){
 }
 //obtener técnicos
 function listartecnicos(){
-  if(parseInt(contadortecnicos) < 5){  
+  if(parseInt(contadortecnicos) < 5){
     asignaciontecnicosocultarformulario();
     var tablatecnicos = '<div class="modal-header '+background_forms_and_modals+'">'+
                                 '<h4 class="modal-title">Técnicos</h4>'+
@@ -618,7 +627,7 @@ function listartecnicos(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
@@ -656,16 +665,16 @@ function listartecnicos(){
                 }
             });
         },
-    }); 
+    });
     //seleccionar registro al dar doble click
     $('#tbllistadotecnicos tbody').on('dblclick', 'tr', function () {
         var data = ttec.row( this ).data();
         agregarfilatecnico(data.Numero, data.Nombre);
-    }); 
+    });
   }else{
     msjsolo4tecnicospermitidos();
   }
-} 
+}
 //obtener registros de vines
 function listarvines(){
   ocultarformulario();
@@ -691,7 +700,7 @@ function listarvines(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
@@ -699,7 +708,7 @@ function listarvines(){
                               '</div>';
     $("#contenidomodaltablas").html(tablavines);
     var tvins = $('#tbllistadovines').DataTable({
-        keys: true, 
+        keys: true,
         "lengthMenu": [ 10, 50, 100, 250, 500 ],
         "pageLength": 250,
         "sScrollX": "110%",
@@ -736,13 +745,13 @@ function listarvines(){
                 }
             });
         },
-    }); 
+    });
     //seleccionar registro al dar doble click
     $('#tbllistadovines tbody').on('dblclick', 'tr', function () {
         var data = tvins.row( this ).data();
         seleccionarvin(data.Cliente, data.Economico, data.Vin, data.Placas, data.Motor, data.Marca, data.Modelo, data.Año, data.Color);
-    }); 
-} 
+    });
+}
 function seleccionarvin(Cliente, Economico, Vin, Placas, Motor, Marca, Modelo, Año, Color){
   var vinanterior = $("#vinanterior").val();
   var vin = Vin;
@@ -779,7 +788,7 @@ function obtenerclientefacturaapornumero(){
           $("#agente").val(data.nombreagente);
           $("#textonombreagente").html(data.nombreagente.substring(0, 40));
           mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -801,7 +810,7 @@ function obtenerclientedelclientepornumero(){
         $("#clientedelcliente").val(data.nombre);
         $("#textonombreclientedelcliente").html(data.nombre.substring(0, 40));
         mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -823,7 +832,7 @@ function obteneragentepornumero(){
           $("#agente").val(data.nombre);
           $("#textonombreagente").html(data.nombre.substring(0,40));
           mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -852,7 +861,7 @@ function obtenervinpornumero(){
           $("#economico").val(data.economico);
           $("#color").val(data.color);
           mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -886,7 +895,7 @@ function listarcotizaciones (){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                             '</div>'+
                             '<div class="modal-footer">'+
@@ -899,7 +908,7 @@ function listarcotizaciones (){
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
-        "bScrollCollapse": true,  
+        "bScrollCollapse": true,
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -931,13 +940,13 @@ function listarcotizaciones (){
                 }
             });
         },
-    });   
+    });
     //seleccionar registro al dar doble click
     $('#tbllistadocotizacion tbody').on('dblclick', 'tr', function () {
         var data = tcots.row( this ).data();
         seleccionarcotizacion(data.Folio, data.Cotizacion);
-    }); 
-} 
+    });
+}
 //obtener todos los datos de la cotizacion seleccionada
 function seleccionarcotizacion(Folio, Cotizacion){
     $('.page-loader-wrapper').css('display', 'block');
@@ -950,7 +959,7 @@ function seleccionarcotizacion(Folio, Cotizacion){
         $("#descuento").val(data.descuento);
         $("#subtotal").val(data.subtotal);
         $("#iva").val(data.iva);
-        $("#total").val(data.total);  
+        $("#total").val(data.total);
         $("#vin").val(data.cotizacion.Vin);
         $("#vinanterior").val(data.cotizacion.Vin);
         if(data.cotizacion.Vin != null){
@@ -971,7 +980,7 @@ function seleccionarcotizacion(Folio, Cotizacion){
         contadorservicios = data.contadorservicios;
         contadorfilas = data.contadorfilas;
         seleccionarselectscotizacion(data);
-    })  
+    })
 }
 async function seleccionarselectscotizacion(data){
     await retraso();
@@ -984,20 +993,20 @@ async function seleccionarselectscotizacion(data){
     $(".inputnextdet").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      var index = $(this).index(".inputnextdet");          
+      var index = $(this).index(".inputnextdet");
       switch(code){
         case 13:
-          //$(".inputnextdet").eq(index + 1).focus().select(); 
+          //$(".inputnextdet").eq(index + 1).focus().select();
           break;
         case 39:
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+          $(".inputnextdet").eq(index + 1).focus().select();
           break;
         case 37:
-          $(".inputnextdet").eq(index - 1).focus().select(); 
+          $(".inputnextdet").eq(index - 1).focus().select();
           break;
       }
     });
-} 
+}
 //listar productos para tab consumos
 function listarservicios(){
   ocultarformulario();
@@ -1021,12 +1030,12 @@ function listarservicios(){
                                   '<tbody></tbody>'+
                                 '</table>'+
                               '</div>'+
-                            '</div>'+  
+                            '</div>'+
                           '</div>'+
                         '</div>'+
                         '<div class="modal-footer">'+
                           '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                        '</div>';   
+                        '</div>';
   $("#contenidomodaltablas").html(tablaservicios);
   var tserv = $('#tbllistadoservicio').DataTable({
     keys: true,
@@ -1065,7 +1074,7 @@ function listarservicios(){
         }
       });
     },
-  }); 
+  });
   //seleccionar registro al dar doble click
   $('#tbllistadoservicio tbody').on('dblclick', 'tr', function () {
       var data = tserv.row( this ).data();
@@ -1082,13 +1091,13 @@ function obtenerservicioporcodigo(){
     }else{
       msjnoseencontroningunproducto();
     }
-  }) 
+  })
 }
 //calcular total detalles orden de trabajo
 function calculartotalesfilasordentrabajo(fila){
   // for each por cada fila:
   var cuentaFilas = 0;
-  $("tr.filasservicios").each(function () { 
+  $("tr.filasservicios").each(function () {
     if(fila === cuentaFilas){
       // obtener los datos de la fila:
       var cantidadpartida = $(".cantidadpartida", this).val();
@@ -1098,7 +1107,7 @@ function calculartotalesfilasordentrabajo(fila){
       var subtotalpartida = $('.subtotalpartida', this).val();
       var ivaporcentajepartida = $('.ivaporcentajepartida', this).val();
       var ivapesospartida = $('.ivapesospartida', this).val();
-      var totalpesospartida = $('.totalpesospartida', this).val(); 
+      var totalpesospartida = $('.totalpesospartida', this).val();
       //importe de la partida
       importepartida =  new Decimal(cantidadpartida).times(preciopartida);
       $('.importepartida', this).val(number_format(round(importepartida, numerodecimales), numerodecimales, '.', ''));
@@ -1115,7 +1124,7 @@ function calculartotalesfilasordentrabajo(fila){
       totalpesospartida = new Decimal(subtotalpartida).plus(ivapesospartida);
       $('.totalpesospartida', this).val(number_format(round(totalpesospartida, numerodecimales), numerodecimales, '.', ''));
       calculartotalordentrabajo();
-    }  
+    }
     cuentaFilas++;
   });
 }
@@ -1123,37 +1132,37 @@ function calculartotalesfilasordentrabajo(fila){
 function cambiodecantidadopreciopartida(fila,tipo){
   var cuentaFilas = 0;
   $("tr.filasservicios").each(function () {
-    if(fila === cuentaFilas){  
-      $('.descuentopesospartida', this).val('0.'+numerocerosconfigurados); 
+    if(fila === cuentaFilas){
+      $('.descuentopesospartida', this).val('0.'+numerocerosconfigurados);
       $('.descuentoporcentajepartida',this).val('0.'+numerocerosconfigurados);
       calculartotalesfilasordentrabajo(fila);
-    }  
+    }
     cuentaFilas++;
-  });  
+  });
 }
 //calcular el porcentaje de descuento cuando el descuento en pesos se modifique
 function calculardescuentoporcentajepartida(fila){
   var cuentaFilas = 0;
   $("tr.filasservicios").each(function () {
-    if(fila === cuentaFilas){  
+    if(fila === cuentaFilas){
       //descuento en porcentaje de la partida
-      var importepartida = $('.importepartida', this).val(); 
-      var descuentopesospartida = $('.descuentopesospartida', this).val(); 
+      var importepartida = $('.importepartida', this).val();
+      var descuentopesospartida = $('.descuentopesospartida', this).val();
       var multiplicaciondescuentoporcentajepartida  =  new Decimal(descuentopesospartida).times(100);
       if(multiplicaciondescuentoporcentajepartida.d[0] > parseInt(0)){
         var descuentoporcentajepartida = new Decimal(multiplicaciondescuentoporcentajepartida/importepartida);
         $('.descuentoporcentajepartida', this).val(number_format(round(descuentoporcentajepartida, numerodecimales), numerodecimales, '.', ''));
         calculartotalesfilasordentrabajo(fila);
       }
-    }  
+    }
     cuentaFilas++;
-  });    
+  });
 }
 //calcular el descuento en pesos cuando hay cambios en el porcentaje de descuento
 function calculardescuentopesospartida(fila){
   var cuentaFilas = 0;
   $("tr.filasservicios").each(function () {
-    if(fila === cuentaFilas){   
+    if(fila === cuentaFilas){
       //descuento en pesos de la partida
       var importepartida = $('.importepartida', this).val();
       var descuentoporcentajepartida = $('.descuentoporcentajepartida', this).val();
@@ -1163,10 +1172,10 @@ function calculardescuentopesospartida(fila){
         $('.descuentopesospartida', this).val(number_format(round(descuentopesospartida, numerodecimales), numerodecimales, '.', ''));
         calculartotalesfilasordentrabajo(fila);
       }
-    }  
+    }
     cuentaFilas++;
-  }); 
-} 
+  });
+}
 //calcular totales de orden de compra
 function calculartotalordentrabajo(){
   var importe = 0;
@@ -1180,7 +1189,7 @@ function calculartotalordentrabajo(){
     subtotal= new Decimal(subtotal).plus($(".subtotalpartida", this).val());
     iva = new Decimal(iva).plus($(".ivapesospartida", this).val());
     total = new Decimal(total).plus($(".totalpesospartida", this).val());
-  }); 
+  });
   $("#importe").val(number_format(round(importe, numerodecimales), numerodecimales, '.', ''));
   $("#descuento").val(number_format(round(descuento, numerodecimales), numerodecimales, '.', ''));
   $("#subtotal").val(number_format(round(subtotal, numerodecimales), numerodecimales, '.', ''));
@@ -1195,7 +1204,7 @@ var partida = 1;
 function agregarfilaservicio(Codigo, Servicio, Unidad, Costo, Venta, Cantidad, ClaveProducto, ClaveUnidad, tipooperacion){
     var impuesto = "16."+numerocerosconfigurados;
     var importepartida = new Decimal(Cantidad).times(Venta);
-    var multiplicacioncostoimpuesto =  new Decimal(importepartida).times(impuesto);      
+    var multiplicacioncostoimpuesto =  new Decimal(importepartida).times(impuesto);
     var ivapesos = new Decimal(multiplicacioncostoimpuesto/100);
     var total = new Decimal(importepartida).plus(ivapesos);
     var tipo = "alta";
@@ -1252,22 +1261,22 @@ function agregarfilaservicio(Codigo, Servicio, Unidad, Costo, Venta, Cantidad, C
     $("#numerofilastablaservicios").val(contadorservicios);
     $("#numerofilas").val(contadorservicios);
     mostrarformulario();
-    calculartotalordentrabajo(); 
+    calculartotalordentrabajo();
     $("#codigoabuscar").val("");
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
     $(".inputnextdet").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      var index = $(this).index(".inputnextdet");          
+      var index = $(this).index(".inputnextdet");
       switch(code){
         case 13:
-          //$(".inputnextdet").eq(index + 1).focus().select(); 
+          //$(".inputnextdet").eq(index + 1).focus().select();
           break;
         case 39:
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+          $(".inputnextdet").eq(index + 1).focus().select();
           break;
         case 37:
-          $(".inputnextdet").eq(index - 1).focus().select(); 
+          $(".inputnextdet").eq(index - 1).focus().select();
           break;
       }
     });
@@ -1337,7 +1346,7 @@ function asignaciontecnicos(fila){
                                           '<div class="col-md-6">'+
                                               '<label>Código Servicio</label>'+
                                               '<input type="text" class="form-control" name="asignaciontecnicoscodigo" id="asignaciontecnicoscodigo" readonly value="'+Codigo+'" onkeyup="tipoLetra(this);">'+
-                                          '</div>'+ 
+                                          '</div>'+
                                           '<div class="col-md-6">'+
                                               '<label>Servicio</label>'+
                                               '<input type="text" class="form-control" name="asignaciontecnicosservicio" id="asignaciontecnicosservicio" value="'+Servicio+'" readonly onkeyup="tipoLetra(this);">'+
@@ -1404,7 +1413,7 @@ function asignaciontecnicos(fila){
                                                           '<td class="tdmod text-center">'+
                                                             '<input type="checkbox" name="asignaciontecnicosdividirtiemposiguales" id="idasignaciontecnicosdividirtiemposiguales" class="asignaciontecnicosdividirtiemposiguales filled-in" value="0" onchange="dividirtiemposiguales()" checked>'+
                                                             '<label for="idasignaciontecnicosdividirtiemposiguales" ></label>'+
-                                                          '</td>'+                                                 
+                                                          '</td>'+
                                                       '</tr>'+
                                                     '</tfoot>'+
                                               '</table>'+
@@ -1460,7 +1469,7 @@ function agregarfilatecnico(Numero, Nombre){
                   '</td>'+
                 '</tr>';
     contadortecnicos++;
-    $("#tablatecnicosasignaciontiempos tbody").append(fila); 
+    $("#tablatecnicosasignaciontiempos tbody").append(fila);
     asignaciontecnicosmostrarformulario();
     dividirtiemposiguales();
   }else{
@@ -1489,7 +1498,7 @@ function sumarhorastrabajadastecnicos(asignaciontecnicostotalhorasfacturacion){
   var sumahorastrabajadastecnicos = 0;
   $("tr.filastecnicos").each(function () {
     sumahorastrabajadastecnicos= new Decimal(sumahorastrabajadastecnicos).plus($(".horastecnicopartida", this).val());
-  }); 
+  });
   $("#asignaciontecnicostotalhorastecnicos").val(number_format(round(sumahorastrabajadastecnicos, numerodecimales), numerodecimales, '.', ''));
   //obtener el total de horas tecnicos
   var asignaciontecnicostotalhorastecnicos = $("#asignaciontecnicostotalhorastecnicos").val();
@@ -1509,7 +1518,7 @@ function sumarhorastrabajadastecnicos(asignaciontecnicostotalhorasfacturacion){
     //renumerar filas
     $("tr.filastecnicos").each(function () {
       sumahorastrabajadastecnicos= new Decimal(sumahorastrabajadastecnicos).plus($(".horastecnicopartida", this).val());
-    }); 
+    });
     $("#asignaciontecnicostotalhorastecnicos").val(number_format(round(sumahorastrabajadastecnicos, numerodecimales), numerodecimales, '.', ''));
   }else if(parseFloat(asignaciontecnicostotalhorasfacturacion) < parseFloat(asignaciontecnicostotalhorastecnicos)){
     //si el total de horas tecnico es mayor se le resta mas 1 al primer tecnico para machar totales
@@ -1527,20 +1536,20 @@ function sumarhorastrabajadastecnicos(asignaciontecnicostotalhorasfacturacion){
     //renumerar filas
     $("tr.filastecnicos").each(function () {
       sumahorastrabajadastecnicos= new Decimal(sumahorastrabajadastecnicos).plus($(".horastecnicopartida", this).val());
-    }); 
+    });
     $("#asignaciontecnicostotalhorastecnicos").val(number_format(round(sumahorastrabajadastecnicos, numerodecimales), numerodecimales, '.', ''));
   }
 }
 //eliminar fila de la tabla de tecnicos
 function eliminarfilatecnico(numerofila){
-  var confirmacion = confirm("Esta seguro de eliminar el técnico?"); 
-  if (confirmacion == true) { 
+  var confirmacion = confirm("Esta seguro de eliminar el técnico?");
+  if (confirmacion == true) {
     $("#filatecnico"+numerofila).remove();
     contadortecnicos--; //importante restar la fila eliminada para calculos y funciones
-    renumerarfilastecnicos();//importante para todos los calculo en el modulo de orden de compra 
+    renumerarfilastecnicos();//importante para todos los calculo en el modulo de orden de compra
     $("#idasignaciontecnicosdividirtiemposiguales").change();//recalculartiempos
     sumarhorastrabajadastecnicos();//calcular suma total de horas trabajadas  por tecnicos
-  } 
+  }
 }
 //renumerar filas de la tabla de tecnicos
 function renumerarfilastecnicos(){
@@ -1569,7 +1578,7 @@ function renumerarfilastecnicos(){
     var numtecnico = parseInt(i)+parseInt(1);
     lista[i].innerHTML = numtecnico;
   }
-}  
+}
 //asignar tecnicos al servicio seleccionado
 function asignartecnicos(fila){
   var asignaciontecnicostotalhorasfacturacion = $("#asignaciontecnicostotalhorasfacturacion").val();
@@ -1670,7 +1679,7 @@ function alta(){
                               '<input type="hidden" class="form-control" name="clientefacturaa" id="clientefacturaa" required readonly>'+
                             '</div>'+
                           '</td>'+
-                        '</tr>'+  
+                        '</tr>'+
                       '</table>'+
                     '</div>'+
                     '<div class="col-md-3">'+
@@ -1680,14 +1689,14 @@ function alta(){
                           '<td>'+
                             '<div class="btn bg-blue waves-effect" onclick="listarclientesdelcliente()">Seleccionar</div>'+
                           '</td>'+
-                          '<td>'+    
+                          '<td>'+
                             '<div class="form-line">'+
                               '<input type="text" class="form-control inputnextdet" name="numeroclientedelcliente" id="numeroclientedelcliente" required data-parsley-type="integer" autocomplete="off">'+
                               '<input type="hidden" class="form-control" name="numeroclientedelclienteanterior" id="numeroclientedelclienteanterior" required data-parsley-type="integer">'+
                               '<input type="hidden" class="form-control" name="clientedelcliente" id="clientedelcliente" required readonly>'+
                             '</div>'+
-                          '</td>'+    
-                        '</tr> '+   
+                          '</td>'+
+                        '</tr> '+
                       '</table>'+
                     '</div>'+
                     '<div class="col-md-3">'+
@@ -1697,14 +1706,14 @@ function alta(){
                           '<td>'+
                             '<div class="btn bg-blue waves-effect" onclick="listaragentes()">Seleccionar</div>'+
                           '</td>'+
-                          '<td>'+   
+                          '<td>'+
                             '<div class="form-line">'+
                               '<input type="text" class="form-control inputnextdet" name="numeroagente" id="numeroagente" required data-parsley-type="integer" autocomplete="off">'+
                               '<input type="hidden" class="form-control" name="numeroagenteanterior" id="numeroagenteanterior" required data-parsley-type="integer">'+
                               '<input type="hidden" class="form-control" name="agente" id="agente" required readonly>'+
                             '</div>'+
-                          '</td>'+   
-                        '</tr>'+    
+                          '</td>'+
+                        '</tr>'+
                       '</table>'+
                     '</div>'+
                     '<div class="col-md-3" id="divcaso">'+
@@ -1720,20 +1729,20 @@ function alta(){
                             '<td>'+
                               '<div class="btn bg-blue waves-effect" id="btnobtenerservicios" onclick="listarservicios()">Ver Servicios</div>'+
                             '</td>'+
-                            '<td>'+ 
+                            '<td>'+
                               '<div class="form-line">'+
                                 '<input type="text" class="form-control inputnextdet" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del servicio y da enter" autocomplete="off">'+
                               '</div>'+
                             '</td>'+
-                          '</tr>'+    
+                          '</tr>'+
                         '</table>'+
                       '</div>'+
                       '<div class="col-md-2" id="divlistarcotizaciones">'+
                         '<label>Cotizaciones</label>'+
                         '<div class="btn btn-block bg-blue waves-effect" id="btnlistarcotizaciones" onclick="listarcotizaciones()">Ver Cotizaciones</div>'+
-                      '</div>'+ 
+                      '</div>'+
                     '</div>'+
-                '</div>'+ 
+                '</div>'+
                 '<div role="tabpanel" class="tab-pane fade" id="datostab">'+
                   '<div class="row">'+
                     '<div class="col-md-2">'+
@@ -1752,13 +1761,13 @@ function alta(){
                           '<td>'+
                             '<div class="btn bg-blue waves-effect" onclick="listarvines()">Seleccionar</div>'+
                           '</td>'+
-                          '<td>'+    
+                          '<td>'+
                             '<div class="form-line">'+
                               '<input type="text" class="form-control inputnextdet" name="vin" id="vin" required data-parsley-length="[1, 30]" autocomplete="off">'+
                               '<input type="hidden" class="form-control" name="vinanterior" id="vinanterior" required data-parsley-length="[1, 30]">'+
                             '</div>'+
-                          '</td>'+    
-                        '</tr>'+    
+                          '</td>'+
+                        '</tr>'+
                       '</table>'+
                     '</div>'+
                     '<div class="col-md-2">'+
@@ -1844,8 +1853,8 @@ function alta(){
                   '</div>'+
                 '</div>'+
               '</div>'+
-            '</div>'+ 
-            '<div class="col-md-12">'+   
+            '</div>'+
+            '<div class="col-md-12">'+
               '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
                 '<li role="presentation" class="active">'+
                   '<a href="#serviciostab" data-toggle="tab">Servicios</a>'+
@@ -1899,24 +1908,24 @@ function alta(){
                             '<th class="'+background_tables+'">Cotización</th>'+
                           '</tr>'+
                         '</thead>'+
-                        '<tbody>'+           
+                        '<tbody>'+
                         '</tbody>'+
                       '</table>'+
                     '</div>'+
-                  '</div>'+ 
+                  '</div>'+
                   '<div class="row">'+
-                    '<div class="col-md-12">'+   
+                    '<div class="col-md-12">'+
                       '<table>'+
                         '<tr>'+
                           '<td><div type="button" class="btn btn-success btn-sm" onclick="seleccionarpartidasexcel()">Importar partidas en excel</div></td>'+
                           '<td data-toggle="tooltip" data-placement="top" title data-original-title="Bajar plantilla"><a class="material-icons" onclick="descargar_plantilla()" id="btnGenerarPlantilla" target="_blank">get_app</a></td>'+
                         '</tr>'+
                       '</table>'+
-                    '</div>'+ 
+                    '</div>'+
                   '</div>'+
                   '<div class="row">'+
                     '<div class="col-md-9">'+
-                      '<div class="row">'+ 
+                      '<div class="row">'+
                         '<div class="col-md-3">'+
                           '<label>Falla</label>'+
                           '<textarea class="form-control inputnextdet" name="falla" id="falla"  required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"  rows="4" value=""></textarea>'+
@@ -1933,8 +1942,8 @@ function alta(){
                           '<label>Corrección</label>'+
                           '<textarea class="form-control inputnextdet" name="correccion" id="correccion"  data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rows="4" value=""></textarea>'+
                         '</div>'+
-                      '</div>'+  
-                    '</div>'+ 
+                      '</div>'+
+                    '</div>'+
                     '<div class="col-md-3">'+
                       '<table class="table table-striped table-hover">'+
                         '<tr>'+
@@ -1959,9 +1968,9 @@ function alta(){
                         '</tr>'+
                       '</table>'+
                     '</div>'+
-                  '</div>'+   
+                  '</div>'+
                 '</div>'+
-              '</div>'+ 
+              '</div>'+
             '</div>';
   $("#tabsform").html(tabs);
   //colocar autocomplette off  todo el formulario
@@ -1988,7 +1997,7 @@ function alta(){
   obtenertiposordenestrabajo()
   obtenertiposunidades();
   asignarfechaactual();
-  //reiniciar contadores  
+  //reiniciar contadores
   contadorservicios=0;
   contadorfilas = 0;
   item = 1;
@@ -2056,16 +2065,16 @@ function alta(){
   $(".inputnextdet").keyup(function (e) {
     //recomentable para mayor compatibilidad entre navegadores.
     var code = (e.keyCode ? e.keyCode : e.which);
-    var index = $(this).index(".inputnextdet");          
+    var index = $(this).index(".inputnextdet");
     switch(code){
       case 13:
-        //$(".inputnextdet").eq(index + 1).focus().select(); 
+        //$(".inputnextdet").eq(index + 1).focus().select();
         break;
       case 39:
-        $(".inputnextdet").eq(index + 1).focus().select(); 
+        $(".inputnextdet").eq(index + 1).focus().select();
         break;
       case 37:
-        $(".inputnextdet").eq(index - 1).focus().select(); 
+        $(".inputnextdet").eq(index - 1).focus().select();
         break;
     }
   });
@@ -2076,8 +2085,8 @@ function alta(){
 }
 //eliminar una fila en la tabla
 function eliminarfila(numerofila){
-  var confirmacion = confirm("Esta seguro de eliminar el servicio?"); 
-  if (confirmacion == true) { 
+  var confirmacion = confirm("Esta seguro de eliminar el servicio?");
+  if (confirmacion == true) {
     var traspasopartida = $("#filaservicio"+numerofila+" .traspasopartida").val();
     if(traspasopartida != ''){
       msjerrorcancelartraspaso();
@@ -2092,7 +2101,7 @@ function eliminarfila(numerofila){
       $("#numerofilastablaservicios").val(contadorservicios);
       $("#numerofilas").val(contadorservicios);
     }
-  } 
+  }
 }
 //renumerar las filas de la tabla
 function renumerarfilasordentrabajo(){
@@ -2134,7 +2143,7 @@ function renumerarfilasordentrabajo(){
     lista[i].setAttribute("value", i+parseInt(1));
   }
   */
-}  
+}
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
   e.preventDefault();
@@ -2193,7 +2202,7 @@ function desactivar(ordendesactivar){
       $("#divmotivobaja").hide();
       $("#btnbaja").hide();
       $('#estatusregistro').modal('show');
-    }else{ 
+    }else{
       if(data.resultadofechas != ''){
         $("#ordendesactivar").val(0);
         $("#textomodaldesactivar").html('Error solo se pueden dar de baja las ordenes de trabajo del mes actual, fecha de la orden de trabajo: ' + data.resultadofechas);
@@ -2217,8 +2226,51 @@ function desactivar(ordendesactivar){
         }
       }
     }
-  }) 
+  })
 }
+
+function bloqueo(ot, operacion){
+    let mensaje = ''
+    if (parseFloat(operacion) == 1) {
+        mensaje = '¿Estás seguro de bloquear la OT?'
+    } else if (parseFloat(operacion) == 0){
+        mensaje = '¿Estás seguro de desbloquear la OT?'
+    }
+    if (confirm(mensaje) == true) {
+        $.ajax({
+            headers:{
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: ordenes_trabajo_bloquear_desbloquear,
+            type: 'POST',
+            dataType: 'JSON',
+            data:{
+                'ot':ot,
+                'operacion':operacion
+            },
+            success:function(data) {
+                toastr.success( "OT Actualizada", "Mensaje", {
+                    "timeOut": "6000",
+                    "progressBar": true,
+                    "extendedTImeout": "6000"
+                });
+                relistar()
+            },
+            error:function(data) {
+                if(data.status == 403){
+                    msj_errorenpermisos();
+                }else{
+                    msj_errorajax();
+                }
+                $('#estatusregistro').modal('hide');
+                $('.page-loader-wrapper').css('display', 'none');
+            }
+        })
+    }else {
+
+    }
+}
+
 $("#btnbaja").on('click', function(e){
   e.preventDefault();
   var formData = new FormData($("#formdesactivar")[0]);
@@ -2317,7 +2369,7 @@ function obtenerdatos(ordenmodificar){
                                 '<input type="hidden" class="form-control" name="clientefacturaa" id="clientefacturaa" required readonly>'+
                               '</div>'+
                             '</td>'+
-                          '</tr>'+  
+                          '</tr>'+
                         '</table>'+
                       '</div>'+
                       '<div class="col-md-3">'+
@@ -2327,14 +2379,14 @@ function obtenerdatos(ordenmodificar){
                             '<td>'+
                               '<div class="btn bg-blue waves-effect" onclick="listarclientesdelcliente()">Seleccionar</div>'+
                             '</td>'+
-                            '<td>'+    
+                            '<td>'+
                               '<div class="form-line">'+
                                 '<input type="text" class="form-control inputnextdet" name="numeroclientedelcliente" id="numeroclientedelcliente" required data-parsley-type="integer" autocomplete="off">'+
                                 '<input type="hidden" class="form-control" name="numeroclientedelclienteanterior" id="numeroclientedelclienteanterior" required data-parsley-type="integer">'+
                                 '<input type="hidden" class="form-control" name="clientedelcliente" id="clientedelcliente" required readonly>'+
                               '</div>'+
-                            '</td>'+    
-                          '</tr> '+   
+                            '</td>'+
+                          '</tr> '+
                         '</table>'+
                       '</div>'+
                       '<div class="col-md-3">'+
@@ -2344,14 +2396,14 @@ function obtenerdatos(ordenmodificar){
                             '<td>'+
                               '<div class="btn bg-blue waves-effect" onclick="listaragentes()">Seleccionar</div>'+
                             '</td>'+
-                            '<td>'+   
+                            '<td>'+
                               '<div class="form-line">'+
                                 '<input type="text" class="form-control inputnextdet" name="numeroagente" id="numeroagente" required data-parsley-type="integer" autocomplete="off">'+
                                 '<input type="hidden" class="form-control" name="numeroagenteanterior" id="numeroagenteanterior" required data-parsley-type="integer">'+
                                 '<input type="hidden" class="form-control" name="agente" id="agente" required readonly>'+
                               '</div>'+
-                            '</td>'+   
-                          '</tr>'+    
+                            '</td>'+
+                          '</tr>'+
                         '</table>'+
                       '</div>'+
                       '<div class="col-md-3" id="divcaso">'+
@@ -2367,16 +2419,16 @@ function obtenerdatos(ordenmodificar){
                               '<td>'+
                                 '<div class="btn bg-blue waves-effect" id="btnobtenerservicios" onclick="listarservicios()">Ver Servicios</div>'+
                               '</td>'+
-                              '<td>'+ 
+                              '<td>'+
                                 '<div class="form-line">'+
                                   '<input type="text" class="form-control inputnextdet" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del servicio y da enter" autocomplete="off">'+
                                 '</div>'+
                               '</td>'+
-                            '</tr>'+    
+                            '</tr>'+
                           '</table>'+
                         '</div>'+
                       '</div>'+
-                  '</div>'+ 
+                  '</div>'+
                   '<div role="tabpanel" class="tab-pane fade" id="datostab">'+
                     '<div class="row">'+
                       '<div class="col-md-2">'+
@@ -2395,13 +2447,13 @@ function obtenerdatos(ordenmodificar){
                             '<td>'+
                               '<div class="btn bg-blue waves-effect" onclick="listarvines()">Seleccionar</div>'+
                             '</td>'+
-                            '<td>'+    
+                            '<td>'+
                               '<div class="form-line">'+
                                 '<input type="text" class="form-control inputnextdet" name="vin" id="vin" required data-parsley-length="[1, 30]" autocomplete="off">'+
                                 '<input type="hidden" class="form-control" name="vinanterior" id="vinanterior" required data-parsley-length="[1, 30]">'+
                               '</div>'+
-                            '</td>'+    
-                          '</tr>'+    
+                            '</td>'+
+                          '</tr>'+
                         '</table>'+
                       '</div>'+
                       '<div class="col-md-2">'+
@@ -2487,8 +2539,8 @@ function obtenerdatos(ordenmodificar){
                     '</div>'+
                   '</div>'+
                 '</div>'+
-              '</div>'+ 
-              '<div class="col-md-12">'+ 
+              '</div>'+
+              '<div class="col-md-12">'+
                 '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
                   '<li role="presentation" class="active">'+
                     '<a href="#serviciostab" data-toggle="tab">Servicios</a>'+
@@ -2542,24 +2594,24 @@ function obtenerdatos(ordenmodificar){
                               '<th class="'+background_tables+'">Cotización</th>'+
                             '</tr>'+
                           '</thead>'+
-                          '<tbody>'+           
+                          '<tbody>'+
                           '</tbody>'+
                         '</table>'+
                       '</div>'+
-                    '</div>'+ 
+                    '</div>'+
                     '<div class="row">'+
-                      '<div class="col-md-12">'+   
+                      '<div class="col-md-12">'+
                         '<table>'+
                           '<tr>'+
                             '<td><div type="button" class="btn btn-success btn-sm" onclick="seleccionarpartidasexcel()">Importar partidas en excel</div></td>'+
                             '<td data-toggle="tooltip" data-placement="top" title data-original-title="Bajar plantilla"><a class="material-icons" onclick="descargar_plantilla()" id="btnGenerarPlantilla" target="_blank">get_app</a></td>'+
                           '</tr>'+
                         '</table>'+
-                      '</div>'+ 
+                      '</div>'+
                     '</div>'+
                     '<div class="row">'+
-                      '<div class="col-md-9">'+  
-                        '<div class="row">'+ 
+                      '<div class="col-md-9">'+
+                        '<div class="row">'+
                           '<div class="col-md-3">'+
                             '<label>Falla</label>'+
                             '<textarea class="form-control inputnextdet" name="falla" id="falla"  required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rows="4"></textarea>'+
@@ -2577,7 +2629,7 @@ function obtenerdatos(ordenmodificar){
                             '<textarea class="form-control inputnextdet" name="correccion" id="correccion"  data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" rows="4"></textarea>'+
                           '</div>'+
                         '</div>'+
-                      '</div>'+ 
+                      '</div>'+
                       '<div class="col-md-3">'+
                         '<table class="table table-striped table-hover">'+
                           '<tr>'+
@@ -2602,9 +2654,9 @@ function obtenerdatos(ordenmodificar){
                           '</tr>'+
                         '</table>'+
                       '</div>'+
-                    '</div>'+   
-                  '</div>'+ 
-                '</div>'+ 
+                    '</div>'+
+                  '</div>'+
+                '</div>'+
               '</div>';
     $("#tabsform").html(tabs);
     //colocar autocomplette off  todo el formulario
@@ -2649,7 +2701,7 @@ function obtenerdatos(ordenmodificar){
     $("#promocion").val(data.ordentrabajo.Promocion);
     $("#bahia").val(data.ordentrabajo.Bahia);
     $("#horasreales").val(data.horasreales);
-    $("#rodar").val(data.ordentrabajo.Rodar);    
+    $("#rodar").val(data.ordentrabajo.Rodar);
     $("#plazodias").val(data.ordentrabajo.Plazo);
     $("#falla").val(data.ordentrabajo.Falla);
     $("#observaciones").val(data.ordentrabajo.ObsOrden);
@@ -2729,16 +2781,16 @@ function obtenerdatos(ordenmodificar){
     $(".inputnextdet").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      var index = $(this).index(".inputnextdet");          
+      var index = $(this).index(".inputnextdet");
       switch(code){
         case 13:
-          //$(".inputnextdet").eq(index + 1).focus().select(); 
+          //$(".inputnextdet").eq(index + 1).focus().select();
           break;
         case 39:
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+          $(".inputnextdet").eq(index + 1).focus().select();
           break;
         case 37:
-          $(".inputnextdet").eq(index - 1).focus().select(); 
+          $(".inputnextdet").eq(index - 1).focus().select();
           break;
       }
     });
@@ -2816,7 +2868,7 @@ function terminar(ordenterminar){
       $("#btnterminar").show();
       $('#modalterminarorden').modal('show');
     }
-  }) 
+  })
 }
 $("#btnterminar").on('click', function(e){
   e.preventDefault();
@@ -2867,7 +2919,7 @@ function abrirnuevamente(ordenabrir){
       $("#tituloabrirnuevamenteorden").html("La Orden No."+data.Orden+" no se puede abrir nuevamente porque se encuentra ABIERTA, dada de BAJA o FACTURADA");
       $('#modalabrirorden').modal('show');
     }
-  }) 
+  })
 }
 $("#btnabrirnuevamente").on('click', function(e){
   e.preventDefault();
@@ -2918,16 +2970,16 @@ function modificardatosgeneralesorden(Orden){
     $(".inputnextdet").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      var index = $(this).index(".inputnextdet");          
+      var index = $(this).index(".inputnextdet");
       switch(code){
         case 13:
-          //$(".inputnextdet").eq(index + 1).focus().select(); 
+          //$(".inputnextdet").eq(index + 1).focus().select();
           break;
         case 39:
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+          $(".inputnextdet").eq(index + 1).focus().select();
           break;
         case 37:
-          $(".inputnextdet").eq(index - 1).focus().select(); 
+          $(".inputnextdet").eq(index - 1).focus().select();
           break;
       }
     });
@@ -2995,7 +3047,7 @@ function enviardocumentoemail(documento){
         width: '78.00em',
         tokenSeparators: [',', ' ']
     })
-  })   
+  })
 }
 //enviar documento pdf por email
 $("#btnenviarpdfemail").on('click', function (e) {
@@ -3103,7 +3155,7 @@ function generardocumentoeniframe(Orden){
   var folios = [Orden];
   arraypdf.push(folios);
   var form_data = new FormData();
-  form_data.append('arraypdf', arraypdf); 
+  form_data.append('arraypdf', arraypdf);
   form_data.append('tipogeneracionpdf', 0);
   form_data.append('numerodecimalesdocumento', 2);
   form_data.append('imprimirdirectamente', 1);
@@ -3116,7 +3168,7 @@ function generardocumentoeniframe(Orden){
     processData: false,
     success: function (data) {
       $('#pdfiframe').attr("src", urlpdfsimpresionesrapidas+data);
-      setTimeout(function(){imprimirdirecto();},500);    
+      setTimeout(function(){imprimirdirecto();},500);
     },
     error: function (data) {
       console.log(data);

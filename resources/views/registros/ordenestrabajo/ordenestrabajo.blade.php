@@ -71,7 +71,7 @@
                                     <thead class="{{$empresa->background_tables}}">
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
-                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co)
                                                 <th id="th{{$co}}">{{$co}}</th>
                                             @endforeach
                                         </tr>
@@ -80,7 +80,7 @@
                                     <tfoot>
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
-                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co)
                                                 <th id="th{{$co}}">{{$co}}</th>
                                             @endforeach
                                         </tr>
@@ -98,10 +98,10 @@
                                                     <th>Sum Costo: <b id="sumacostofiltrado"></b></th>
                                                     <th>Sum Comisión: <b id="sumacomisionfiltrado"></b></th>
                                                     <th>Sum Utilidad: <b id="sumautilidadfiltrado"></b></th>
-                                                </tr>   
+                                                </tr>
                                             </table>
                                         </div>
-                                @endif 
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -130,12 +130,12 @@
                                     </div>
                                 </td>
                             </tr>
-                        </table>   
+                        </table>
                     </div>
                 </form>
                 <form id="formparsley" action="#">
                     <div class="modal-body">
-                        
+
                         <div class="col-md-12" id="tabsform">
                             <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
                         </div>
@@ -145,11 +145,11 @@
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
                     </div>
-                </form> 
+                </form>
             </div>
             <div id="contenidomodaltablas">
                 <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
-            </div> 
+            </div>
         </div>
     </div>
 </div>
@@ -163,10 +163,10 @@
             </div>
             <div id="asignaciontecnicoscontenidomodaltablas">
                 <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
-            </div>    
+            </div>
     	</div>
   	</div>
-</div> 
+</div>
 <!-- Modal Baja o Alta-->
 <div class="modal fade" data-backdrop="static" data-keyboard="false" id="estatusregistro" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   	<div class="modal-dialog" role="document">
@@ -182,7 +182,7 @@
                         <label>Motivo Baja</label>
                         <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required data-parsley-length="[1, 200]"></textarea>
                     </div>
-		        </form>	
+		        </form>
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
@@ -190,7 +190,7 @@
 	      	</div>
     	</div>
   	</div>
-</div> 
+</div>
 <!-- Modal Terminar Orden de Trabajo-->
 <div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalterminarorden" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   	<div class="modal-dialog" role="document">
@@ -213,8 +213,8 @@
                               <label >Fecha</label>
                             <input type="datetime-local" class="form-control" id="fechaordenterminar" name="fechaordenterminar" readonly>
                           </div>
-                      </div>                    
-		        </form>	
+                      </div>
+		        </form>
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
@@ -222,7 +222,7 @@
 	      	</div>
     	</div>
   	</div>
-</div> 
+</div>
 <!-- Modal ABRIR de nuevo Orden de Trabajo-->
 <div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalabrirorden" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   	<div class="modal-dialog" role="document">
@@ -240,8 +240,8 @@
                               <label >Orden</label>
                             <input type="text" class="form-control" id="ordenabrir" name="ordenabrir" readonly>
                           </div>
-                      </div>                    
-		        </form>	
+                      </div>
+		        </form>
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
@@ -249,7 +249,7 @@
 	      	</div>
     	</div>
   	</div>
-</div> 
+</div>
 <!-- Modal modificar datos generales Orden de Trabajo-->
 <div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalmodificardatosgeneralesorden" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   	<div class="modal-dialog" role="document">
@@ -283,8 +283,8 @@
                                 <label>Orden Cliente</label>
                                 <input type="text" class="form-control inputnextdet" id="ordenclientedatosgenerales" name="ordenclientedatosgenerales" onkeyup="tipoLetra(this)">
                           </div>
-                      </div>                    
-		        </form>	
+                      </div>
+		        </form>
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
@@ -292,7 +292,7 @@
 	      	</div>
     	</div>
   	</div>
-</div> 
+</div>
 <!-- modal para crear documento en PDF-->
 @include('secciones.modalcreardocumento')
 <!-- fin modal para crear documento en PDF-->
@@ -329,7 +329,7 @@
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';
-        var urlgenerarplantilla = '{{$urlgenerarplantilla}}';       
+        var urlgenerarplantilla = '{{$urlgenerarplantilla}}';
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var urlpdfsimpresionesrapidas = '{{asset("xml_descargados/")}}/';
         var ordenes_trabajo_obtener = '{!!URL::to('ordenes_trabajo_obtener')!!}';
@@ -355,21 +355,22 @@
         var ordenes_trabajo_obtener_servicio_por_codigo = '{!!URL::to('ordenes_trabajo_obtener_servicio_por_codigo')!!}';
         var ordenes_trabajo_obtener_tecnicos = '{!!URL::to('ordenes_trabajo_obtener_tecnicos')!!}';
         var ordenes_trabajo_guardar = '{!!URL::to('ordenes_trabajo_guardar')!!}';
-        var ordenes_trabajo_verificar_uso_en_modulos = '{!!URL::to('ordenes_trabajo_verificar_uso_en_modulos')!!}'; 
-        var ordenes_trabajo_alta_o_baja = '{!!URL::to('ordenes_trabajo_alta_o_baja')!!}'; 
-        var ordenes_trabajo_verificar_status_orden = '{!!URL::to('ordenes_trabajo_verificar_status_orden')!!}'; 
-        var ordenes_trabajo_terminar_orden = '{!!URL::to('ordenes_trabajo_terminar_orden')!!}'; 
-        var ordenes_trabajo_verificar_abrir_nuevamente_orden = '{!!URL::to('ordenes_trabajo_verificar_abrir_nuevamente_orden')!!}'; 
-        var ordenes_trabajo_abrir_nuevamente_orden = '{!!URL::to('ordenes_trabajo_abrir_nuevamente_orden')!!}'; 
-        var ordenes_trabajo_obtener_orden_trabajo = '{!!URL::to('ordenes_trabajo_obtener_orden_trabajo')!!}'; 
+        var ordenes_trabajo_verificar_uso_en_modulos = '{!!URL::to('ordenes_trabajo_verificar_uso_en_modulos')!!}';
+        var ordenes_trabajo_alta_o_baja = '{!!URL::to('ordenes_trabajo_alta_o_baja')!!}';
+        var ordenes_trabajo_verificar_status_orden = '{!!URL::to('ordenes_trabajo_verificar_status_orden')!!}';
+        var ordenes_trabajo_terminar_orden = '{!!URL::to('ordenes_trabajo_terminar_orden')!!}';
+        var ordenes_trabajo_verificar_abrir_nuevamente_orden = '{!!URL::to('ordenes_trabajo_verificar_abrir_nuevamente_orden')!!}';
+        var ordenes_trabajo_abrir_nuevamente_orden = '{!!URL::to('ordenes_trabajo_abrir_nuevamente_orden')!!}';
+        var ordenes_trabajo_obtener_orden_trabajo = '{!!URL::to('ordenes_trabajo_obtener_orden_trabajo')!!}';
         var ordenes_trabajo_guardar_modificacion = '{!!URL::to('ordenes_trabajo_guardar_modificacion')!!}';
         var ordenes_trabajo_obtener_datos_generales_orden = '{!!URL::to('ordenes_trabajo_obtener_datos_generales_orden')!!}';
         var ordenes_trabajo_guardar_modificacion_datos_generales = '{!!URL::to('ordenes_trabajo_guardar_modificacion_datos_generales')!!}';
         var ordenes_trabajo_obtener_datos_envio_email = '{!!URL::to('ordenes_trabajo_obtener_datos_envio_email')!!}';
         var ordenes_trabajo_enviar_pdfs_email = '{!!URL::to('ordenes_trabajo_enviar_pdfs_email')!!}';
-        var ordenes_trabajo_buscar_folio_string_like = '{!!URL::to('ordenes_trabajo_buscar_folio_string_like')!!}'; 
-        var ordenes_trabajo_generar_pdfs = '{!!URL::to('ordenes_trabajo_generar_pdfs')!!}'; 
+        var ordenes_trabajo_buscar_folio_string_like = '{!!URL::to('ordenes_trabajo_buscar_folio_string_like')!!}';
+        var ordenes_trabajo_generar_pdfs = '{!!URL::to('ordenes_trabajo_generar_pdfs')!!}';
+        var ordenes_trabajo_bloquear_desbloquear = '{!!URL::to('ordenes_trabajo_bloquear_desbloquear') !!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
-    <script src="scripts_inaasys/registros/ordenestrabajo/ordenestrabajo.js"></script>
+    <script src="{{ asset('scripts_inaasys/registros/ordenestrabajo/ordenestrabajo.js') }}"></script>
 @endsection
