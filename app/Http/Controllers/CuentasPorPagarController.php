@@ -239,7 +239,7 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
                         '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm abonoscompra" name="abonoscompra[]" value="'.Helpers::convertirvalorcorrecto($c->Abonos).'" readonly>'.Helpers::convertirvalorcorrecto($c->Abonos).'</td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm notascreditocompra" name="notascreditocompra[]" value="'.Helpers::convertirvalorcorrecto($detallenotacredito).'" readonly>'.Helpers::convertirvalorcorrecto($detallenotacredito).'</td>'.
                         '<td class="tdmod">'.
-                            '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm abonocompra"  name="abonocompra[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularnuevosaldo('.$contadorfilas.');">'.
+                            '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm abonocompra" min="0.01"  name="abonocompra[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularnuevosaldo('.$contadorfilas.');">'.
                         '</td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control divorinputmodsm saldocomprainicial" name="saldocomprainicial[]" value="'.Helpers::convertirvalorcorrecto($c->Saldo).'" readonly><input type="text" class="form-control divorinputmodsm saldocompra" name="saldocompra[]" value="'.Helpers::convertirvalorcorrecto($c->Saldo).'"  ondblclick="saldarcompra('.$contadorfilas.')" readonly></td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control contrarecibocompra" name="contrarecibocompra[]" value="'.$contrarecibo.'" readonly>'.$contrarecibo.'</td>'.
@@ -260,6 +260,9 @@ class CuentasPorPagarController extends ConfiguracionSistemaController{
         ini_set('max_input_vars','20000' );
         //obtener el ultimo id de la tabla
         $folio = Helpers::ultimofolioserietablamodulos('App\CuentaXPagar', $request->serie);
+        if (!isset($request->compra)) {
+            return response()->json(['message'=>'error'], 500);
+        }
         //INGRESAR DATOS A TABLA ORDEN COMPRA
         $pago = $folio.'-'.$request->serie;
 		$CuentaXPagar = new CuentaXPagar;
