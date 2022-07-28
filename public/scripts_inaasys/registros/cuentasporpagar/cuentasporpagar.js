@@ -12,14 +12,14 @@ function retraso(){
 function asignarfechaactual(){
   $.get(ordenes_compra_obtener_fecha_actual_datetimelocal, function(fechas){
     $("#fecha").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
-  }) 
+  })
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
     var serie = $("#serie").val();
     $.get(cuentas_por_pagar_obtener_ultimo_folio,{serie:serie}, function(folio){
         $("#folio").val(folio);
-    })  
+    })
 }
 //cerrar modales
 function limpiarmodales(){
@@ -48,7 +48,7 @@ function mostrarmodalformulario(tipo, modificacionpermitida){
             $("#btnGuardar").hide();
             $("#btnGuardarModificacion").show();
         }
-    }   
+    }
 }
 //ocultar modal formulario
 function ocultarmodalformulario(){
@@ -84,7 +84,7 @@ function listar(){
     //agregar inputs de busqueda por columna
     $('#tbllistado tfoot th').each( function () {
       var titulocolumnatfoot = $(this).text();
-      var valor_encontrado_en_array = campos_busqueda.indexOf(titulocolumnatfoot); 
+      var valor_encontrado_en_array = campos_busqueda.indexOf(titulocolumnatfoot);
       if(valor_encontrado_en_array >= 0){
         $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
       }
@@ -133,7 +133,7 @@ function listar(){
           $buscar.bind('keyup change', function(e) {
               if(e.keyCode == 13 || this.value == "") {
                 $('#tbllistado').DataTable().search( this.value ).draw();
-                $(".inputbusquedageneral").val(""); 
+                $(".inputbusquedageneral").val("");
               }
           });
         }
@@ -167,12 +167,12 @@ function obtenerseriesdocumento(){
                                             '<tbody></tbody>'+
                                         '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="modal-footer">'+
                                     '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                                '</div>';  
+                                '</div>';
     $("#contenidomodaltablas").html(tablaseriesdocumento);
     var tserdoc = $('#tbllistadoseriedocumento').DataTable({
         keys: true,
@@ -180,7 +180,7 @@ function obtenerseriesdocumento(){
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
-        "bScrollCollapse": true,  
+        "bScrollCollapse": true,
         processing: true,
         'language': {
           'loadingRecords': '&nbsp;',
@@ -206,7 +206,7 @@ function obtenerseriesdocumento(){
               }
           });
         },
-    });  
+    });
     //seleccionar registro al dar doble click
     $('#tbllistadoseriedocumento tbody').on('dblclick', 'tr', function () {
       var data = tserdoc.row( this ).data();
@@ -219,7 +219,7 @@ function seleccionarseriedocumento(Serie){
         $("#serie").val(Serie);
         $("#serietexto").html("Serie: "+Serie);
         mostrarformulario();
-    }) 
+    })
 }
 //obtener registros de proveedores
 function obtenerproveedores(){
@@ -246,7 +246,7 @@ function obtenerproveedores(){
                                       '<tbody></tbody>'+
                                   '</table>'+
                               '</div>'+
-                          '</div>'+   
+                          '</div>'+
                       '</div>'+
                     '</div>'+
                     '<div class="modal-footer">'+
@@ -288,13 +288,13 @@ function obtenerproveedores(){
                 }
             });
         },
-    }); 
+    });
     //seleccionar registro al dar doble click
     $('#tbllistadoproveedor tbody').on('dblclick', 'tr', function () {
       var data = tprov.row( this ).data();
       seleccionarproveedor(data.Numero, data.Nombre);
     });
-} 
+}
 //obtener registros de almacenes
 function obtenerbancos(){
     ocultarformulario();
@@ -316,7 +316,7 @@ function obtenerbancos(){
                                             '<tbody></tbody>'+
                                         '</table>'+
                                     '</div>'+
-                                '</div>'+   
+                                '</div>'+
                             '</div>'+
                         '</div>'+
                         '<div class="modal-footer">'+
@@ -354,7 +354,7 @@ function obtenerbancos(){
                     }
                 });
             },
-      });  
+      });
       //seleccionar registro al dar doble click
       $('#tbllistadobanco tbody').on('dblclick', 'tr', function () {
         var data = tban.row( this ).data();
@@ -362,7 +362,7 @@ function obtenerbancos(){
             seleccionarbanco(data.Numero, data.Nombre, ultimatransferencia[0].Transferencia);
         });
       });
-} 
+}
 function seleccionarproveedor(Numero, Nombre){
     $('.page-loader-wrapper').css('display', 'block');
     var numeroproveedoranterior = $("#numeroproveedoranterior").val();
@@ -417,7 +417,7 @@ function obtenerproveedorpornumero(){
                     $('.page-loader-wrapper').css('display', 'none');
                 });
                 mostrarformulario();
-            }) 
+            })
         }
     }
 }
@@ -441,7 +441,7 @@ function obtenerbancopornumero(){
                 }
                 $("#transferencia").val(parseInt(data.transferencia)+parseInt(1));
                 mostrarformulario();
-            }) 
+            })
         }
     }
 }
@@ -466,78 +466,78 @@ function alta(){
   mostrarmodalformulario('ALTA');
   mostrarformulario();
   //formulario alta
-  var tabs ='<div class="col-md-12">'+    
-                '<div class="row">'+ 
-                    '<div class="col-md-2">'+ 
-                        '<label>Pago <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+ 
-                        '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+ 
-                        '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+ 
-                    '</div>'+   
-                    '<div class="col-md-4">'+ 
-                        '<label>Proveedor <span class="label label-danger" id="textonombreproveedor"></span></label>'+ 
-                        '<table class="col-md-12">'+ 
-                            '<tr>'+ 
-                                '<td>'+ 
-                                    '<div class="btn bg-blue waves-effect" id="btnobtenerproveedores" onclick="obtenerproveedores()">Seleccionar</div>'+ 
-                                '</td>'+ 
-                                '<td>'+ 
-                                    '<div class="form-line">'+ 
-                                        '<input type="text" class="form-control inputnext" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer" autocomplete="off">'+ 
-                                        '<input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior" required data-parsley-type="integer">'+ 
-                                        '<input type="hidden" class="form-control" name="proveedor" id="proveedor" required readonly>'+ 
-                                    '</div>'+ 
-                                '</td>'+ 
-                            '</tr>'+     
-                        '</table>'+ 
-                    '</div>'+ 
-                    '<div class="col-md-4">'+ 
-                        '<label>Banco <span class="label label-danger" id="textonombrebanco"></span></label>'+ 
-                        '<table class="col-md-12">'+ 
-                            '<tr>'+ 
-                                '<td>'+ 
-                                    '<div class="btn bg-blue waves-effect" onclick="obtenerbancos()">Seleccionar</div>'+ 
-                                '</td>'+ 
-                                '<td>'+    
-                                    '<div class="form-line">'+ 
-                                        '<input type="text" class="form-control inputnext" name="numerobanco" id="numerobanco" required data-parsley-type="integer" autocomplete="off">'+ 
-                                        '<input type="hidden" class="form-control" name="numerobancoanterior" id="numerobancoanterior" required data-parsley-type="integer">'+ 
-                                        '<input type="hidden" class="form-control" name="banco" id="banco" required readonly>'+ 
-                                    '</div>'+ 
-                                '</td>'+     
-                            '</tr>'+   
-                        '</table>'+ 
-                    '</div>'+    
-                    '<div class="col-md-2">'+ 
+  var tabs ='<div class="col-md-12">'+
+                '<div class="row">'+
+                    '<div class="col-md-2">'+
+                        '<label>Pago <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
+                        '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                        '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
+                    '</div>'+
+                    '<div class="col-md-4">'+
+                        '<label>Proveedor <span class="label label-danger" id="textonombreproveedor"></span></label>'+
+                        '<table class="col-md-12">'+
+                            '<tr>'+
+                                '<td>'+
+                                    '<div class="btn bg-blue waves-effect" id="btnobtenerproveedores" onclick="obtenerproveedores()">Seleccionar</div>'+
+                                '</td>'+
+                                '<td>'+
+                                    '<div class="form-line">'+
+                                        '<input type="text" class="form-control inputnext" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer" autocomplete="off">'+
+                                        '<input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior" required data-parsley-type="integer">'+
+                                        '<input type="hidden" class="form-control" name="proveedor" id="proveedor" required readonly>'+
+                                    '</div>'+
+                                '</td>'+
+                            '</tr>'+
+                        '</table>'+
+                    '</div>'+
+                    '<div class="col-md-4">'+
+                        '<label>Banco <span class="label label-danger" id="textonombrebanco"></span></label>'+
+                        '<table class="col-md-12">'+
+                            '<tr>'+
+                                '<td>'+
+                                    '<div class="btn bg-blue waves-effect" onclick="obtenerbancos()">Seleccionar</div>'+
+                                '</td>'+
+                                '<td>'+
+                                    '<div class="form-line">'+
+                                        '<input type="text" class="form-control inputnext" name="numerobanco" id="numerobanco" required data-parsley-type="integer" autocomplete="off">'+
+                                        '<input type="hidden" class="form-control" name="numerobancoanterior" id="numerobancoanterior" required data-parsley-type="integer">'+
+                                        '<input type="hidden" class="form-control" name="banco" id="banco" required readonly>'+
+                                    '</div>'+
+                                '</td>'+
+                            '</tr>'+
+                        '</table>'+
+                    '</div>'+
+                    '<div class="col-md-2">'+
                         '<label>Fecha</label>'+
-                        '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  data-parsley-excluded="true" onkeydown="return false" required>'+ 
-                        '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+ 
-                    '</div>'+ 
-                    '</div>'+ 
-                    '<div class="row">'+ 
-                    '<div class="col-md-4">'+ 
-                        '<label>Transferencia</label>'+ 
-                        '<input type="text" class="form-control inputnext" name="transferencia" id="transferencia" value="0" required data-parsley-type="integer" autocomplete="off">'+ 
-                    '</div>'+ 
-                    '<div class="col-md-4">'+ 
-                        '<label>Cheque</label>'+ 
-                        '<input type="text" class="form-control inputnext" name="cheque" id="cheque" value="0" required data-parsley-type="integer" autocomplete="off">'+ 
-                    '</div>'+ 
-                    '<div class="col-md-4">'+ 
-                        '<label>Beneficiario</label>'+ 
-                        '<input type="text" class="form-control inputnext" name="beneficiario" id="beneficiario"  required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);" autocomplete="off">'+ 
-                    '</div>'+ 
-                    '</div>'+ 
-                    '<div class="row">'+ 
-                    '<div class="col-md-6">'+ 
-                        '<label>Cuenta a la que se Depositó</label>'+ 
-                        '<input type="text" class="form-control inputnext" name="cuentadeposito" id="cuentadeposito" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+ 
-                    '</div>'+ 
-                    '<div class="col-md-6">'+ 
-                        '<label>Anotación</label>'+ 
-                        '<textarea class="form-control inputnext" name="anotacion" id="anotacion" rows="2" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+ 
-                    '</div>'+ 
-                '</div>'+ 
-            '</div>'+ 
+                        '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  data-parsley-excluded="true" onkeydown="return false" required>'+
+                        '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
+                    '</div>'+
+                    '</div>'+
+                    '<div class="row">'+
+                    '<div class="col-md-4">'+
+                        '<label>Transferencia</label>'+
+                        '<input type="text" class="form-control inputnext" name="transferencia" id="transferencia" value="0" required data-parsley-type="integer" autocomplete="off">'+
+                    '</div>'+
+                    '<div class="col-md-4">'+
+                        '<label>Cheque</label>'+
+                        '<input type="text" class="form-control inputnext" name="cheque" id="cheque" value="0" required data-parsley-type="integer" autocomplete="off">'+
+                    '</div>'+
+                    '<div class="col-md-4">'+
+                        '<label>Beneficiario</label>'+
+                        '<input type="text" class="form-control inputnext" name="beneficiario" id="beneficiario"  required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                    '</div>'+
+                    '</div>'+
+                    '<div class="row">'+
+                    '<div class="col-md-6">'+
+                        '<label>Cuenta a la que se Depositó</label>'+
+                        '<input type="text" class="form-control inputnext" name="cuentadeposito" id="cuentadeposito" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                    '</div>'+
+                    '<div class="col-md-6">'+
+                        '<label>Anotación</label>'+
+                        '<textarea class="form-control inputnext" name="anotacion" id="anotacion" rows="2" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
+                    '</div>'+
+                '</div>'+
+            '</div>'+
             '<div class="col-md-12">'+
                 '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
                     '<li role="presentation" class="active">'+
@@ -565,16 +565,16 @@ function alta(){
                                           '<th class="'+background_tables+'">Contrarecibo</th>'+
                                         '</tr>'+
                                     '</thead>'+
-                                    '<tbody id="tabladetallecuentasporpagar">'+           
+                                    '<tbody id="tabladetallecuentasporpagar">'+
                                     '</tbody>'+
                                 '</table>'+
                             '</div>'+
-                        '</div>'+ 
+                        '</div>'+
                         '<div class="row">'+
-                          '<div class="col-md-6">'+   
+                          '<div class="col-md-6">'+
                             '<label>Contrarecibo</label>'+
                             '<input type="text" class="form-control inputnext" name="contrarecibo" id="contrarecibo" onkeyup="tipoLetra(this);" autocomplete="off" >'+
-                          '</div>'+ 
+                          '</div>'+
                           '<div class="col-md-3 col-md-offset-3">'+
                                 '<table class="table table-striped table-hover">'+
                                     '<tr>'+
@@ -583,9 +583,9 @@ function alta(){
                                     '</tr>'+
                                 '</table>'+
                             '</div>'+
-                        '</div>'+   
-                    '</div>'+ 
-                '</div>'+ 
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
             '</div>';
     $("#tabsform").html(tabs);
     //colocar autocomplette off  todo el formulario
@@ -624,8 +624,8 @@ function alta(){
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
-        var index = $(this).index(".inputnext");          
-        $(".inputnext").eq(index + 1).focus().select(); 
+        var index = $(this).index(".inputnext");
+        $(".inputnext").eq(index + 1).focus().select();
       }
     });
     setTimeout(function(){$("#folio").focus();},500);
@@ -633,7 +633,7 @@ function alta(){
 function calcularnuevosaldo(fila){
     var cuentaFilas = 0;
     $("tr.filascompras").each(function () {
-        if(fila === cuentaFilas){   
+        if(fila === cuentaFilas){
             //descuento en pesos de la partida
             var saldocomprainicial = $('.saldocomprainicial', this).val();
             var abonocompra = $('.abonocompra', this).val();
@@ -645,7 +645,7 @@ function calcularnuevosaldo(fila){
                 $('.saldocompra', this).val(number_format(round(nuevosaldo, numerodecimales), numerodecimales, '.', ''));
                 calculartotalcuentaporpagar();
             }
-        }  
+        }
         cuentaFilas++;
     });
 }
@@ -653,53 +653,65 @@ function calculartotalcuentaporpagar(){
     var total = 0;
     $("tr.filascompras").each(function () {
         total = new Decimal(total).plus($('.abonocompra', this).val());
-    }); 
+    });
     $("#total").val(number_format(round(total, numerodecimales), numerodecimales, '.', ''));
 }
 //guardar el registro
 $("#btnGuardar").on('click', function (e) {
     e.preventDefault();
     var form = $("#formparsley");
-    if (form.parsley().isValid()){
-        $('.page-loader-wrapper').css('display', 'block');
-        enviarfilasutilizadas().then(resultado=>{
-            var formData = new FormData($("#formparsley")[0]);
-            $.ajax({
-                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                url:cuentas_por_pagar_guardar,
-                type: "post",
-                dataType: "html",
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                success:function(data){
-                    msj_datosguardadoscorrectamente();
-                    limpiar();
-                    ocultarmodalformulario();
-                    limpiarmodales();
-                    $('.page-loader-wrapper').css('display', 'none');
-                },
-                error:function(data){
-                    if(data.status == 403){
-                        msj_errorenpermisos();
-                    }else{
-                        msj_errorajax();
-                    }
-                    $('.page-loader-wrapper').css('display', 'none');
-                }
-            })
-        })
+    let totalFilas = calcularfilas()
+    if (totalFilas < 1) {
+        alert('error')
     }else{
-        msjfaltandatosporcapturar();
+        if (form.parsley().isValid()){
+            $('.page-loader-wrapper').css('display', 'block');
+            enviarfilasutilizadas().then(resultado=>{
+                var formData = new FormData($("#formparsley")[0]);
+                $.ajax({
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    url:cuentas_por_pagar_guardar,
+                    type: "post",
+                    dataType: "html",
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success:function(data){
+                        msj_datosguardadoscorrectamente();
+                        limpiar();
+                        ocultarmodalformulario();
+                        limpiarmodales();
+                        $('.page-loader-wrapper').css('display', 'none');
+                    },
+                    error:function(data){
+                        if(data.status == 403){
+                            msj_errorenpermisos();
+                        }else if(data.status == 500){
+                            toastr.error( "Error al guardar registro, contacte al administrador del sistema","Mensaje", {
+                            "timeOut": "6000",
+                            "progressBar": true,
+                            "extendedTImeout": "6000"
+                        });
+                        }else{
+                            msj_errorajax();
+                        }
+                        $('.page-loader-wrapper').css('display', 'none');
+                    }
+                })
+            })
+        }else{
+            msjfaltandatosporcapturar();
+        }
     }
+
     //validar formulario
     form.parsley().validate();
 });
 //funcion asincrona para buscar existencias de la partida
 function enviarfilasutilizadas(){
     return new Promise((ejecuta)=>{
-        setTimeout(function(){ 
+        setTimeout(function(){
             var cuentaFilas = 0;
             $("tr.filascompras").each(function () {
                 var abonocompra = $(".abonocompra", this).val();
@@ -707,7 +719,7 @@ function enviarfilasutilizadas(){
                     $("#filacompra"+cuentaFilas).remove();
                 }
                 cuentaFilas++;
-            }); 
+            });
             var resultado = true;
             return ejecuta(resultado);
         },1000);
@@ -723,7 +735,7 @@ function desactivar(cxpdesactivar){
             $("#divmotivobaja").hide();
             $("#btnbaja").hide();
             $('#estatusregistro').modal('show');
-        }else{ 
+        }else{
             if(data.resultadofechas != ''){
                 $("#cxpdesactivar").val(0);
                 $("#textomodaldesactivar").html('Error solo se pueden dar de baja las cuentas por pagar del mes actual, fecha de la cuenta por pagar: ' + data.resultadofechas);
@@ -739,7 +751,7 @@ function desactivar(cxpdesactivar){
                 $('#estatusregistro').modal('show');
             }
         }
-    }) 
+    })
 }
 $("#btnbaja").on('click', function(e){
   e.preventDefault();
@@ -781,78 +793,78 @@ function obtenerdatos(cxpmodificar){
     $("#titulomodal").html('Modificación Cuenta por Pagar --- STATUS : ' + data.CuentaXPagar.Status);
     //formulario modificacion
     var tabladetcxp = 'tabladetcxp';
-    var tabs =  '<div class="col-md-12">'+    
-                    '<div class="row">'+ 
-                        '<div class="col-md-2">'+ 
-                            '<label>Pago <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+ 
-                            '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+ 
-                            '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+ 
-                        '</div>'+   
-                        '<div class="col-md-4">'+ 
-                            '<label>Proveedor <span class="label label-danger" id="textonombreproveedor"></span></label>'+ 
-                            '<table class="col-md-12">'+ 
-                                '<tr>'+ 
-                                    '<td hidden>'+ 
-                                        '<div class="btn bg-blue waves-effect" id="btnobtenerproveedores" onclick="obtenerproveedores()">Seleccionar</div>'+ 
-                                    '</td>'+ 
-                                    '<td>'+ 
-                                        '<div class="form-line">'+ 
-                                            '<input type="text" class="form-control inputnext" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer" autocomplete="off">'+ 
-                                            '<input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior" required data-parsley-type="integer">'+ 
-                                            '<input type="hidden" class="form-control" name="proveedor" id="proveedor" required readonly>'+ 
-                                        '</div>'+ 
-                                    '</td>'+ 
-                                '</tr>'+     
-                            '</table>'+ 
-                        '</div>'+ 
-                        '<div class="col-md-4">'+ 
-                            '<label>Banco <span class="label label-danger" id="textonombrebanco"></span></label>'+ 
-                            '<table class="col-md-12">'+ 
-                                '<tr>'+ 
-                                    '<td>'+ 
-                                        '<div class="btn bg-blue waves-effect" onclick="obtenerbancos()">Seleccionar</div>'+ 
-                                    '</td>'+ 
-                                    '<td>'+    
-                                        '<div class="form-line">'+ 
-                                            '<input type="text" class="form-control inputnext" name="numerobanco" id="numerobanco" required data-parsley-type="integer" autocomplete="off">'+ 
-                                            '<input type="hidden" class="form-control" name="numerobancoanterior" id="numerobancoanterior" required data-parsley-type="integer">'+ 
-                                            '<input type="hidden" class="form-control" name="banco" id="banco" required readonly>'+ 
-                                        '</div>'+ 
-                                    '</td>'+     
-                                '</tr>'+   
-                            '</table>'+ 
-                        '</div>'+    
-                        '<div class="col-md-2">'+ 
+    var tabs =  '<div class="col-md-12">'+
+                    '<div class="row">'+
+                        '<div class="col-md-2">'+
+                            '<label>Pago <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
+                            '<input type="text" class="form-control inputnext" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
+                            '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
+                        '</div>'+
+                        '<div class="col-md-4">'+
+                            '<label>Proveedor <span class="label label-danger" id="textonombreproveedor"></span></label>'+
+                            '<table class="col-md-12">'+
+                                '<tr>'+
+                                    '<td hidden>'+
+                                        '<div class="btn bg-blue waves-effect" id="btnobtenerproveedores" onclick="obtenerproveedores()">Seleccionar</div>'+
+                                    '</td>'+
+                                    '<td>'+
+                                        '<div class="form-line">'+
+                                            '<input type="text" class="form-control inputnext" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer" autocomplete="off">'+
+                                            '<input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior" required data-parsley-type="integer">'+
+                                            '<input type="hidden" class="form-control" name="proveedor" id="proveedor" required readonly>'+
+                                        '</div>'+
+                                    '</td>'+
+                                '</tr>'+
+                            '</table>'+
+                        '</div>'+
+                        '<div class="col-md-4">'+
+                            '<label>Banco <span class="label label-danger" id="textonombrebanco"></span></label>'+
+                            '<table class="col-md-12">'+
+                                '<tr>'+
+                                    '<td>'+
+                                        '<div class="btn bg-blue waves-effect" onclick="obtenerbancos()">Seleccionar</div>'+
+                                    '</td>'+
+                                    '<td>'+
+                                        '<div class="form-line">'+
+                                            '<input type="text" class="form-control inputnext" name="numerobanco" id="numerobanco" required data-parsley-type="integer" autocomplete="off">'+
+                                            '<input type="hidden" class="form-control" name="numerobancoanterior" id="numerobancoanterior" required data-parsley-type="integer">'+
+                                            '<input type="hidden" class="form-control" name="banco" id="banco" required readonly>'+
+                                        '</div>'+
+                                    '</td>'+
+                                '</tr>'+
+                            '</table>'+
+                        '</div>'+
+                        '<div class="col-md-2">'+
                             '<label>Fecha</label>'+
-                            '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  data-parsley-excluded="true" onkeydown="return false" required>'+ 
-                            '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+ 
-                        '</div>'+ 
-                        '</div>'+ 
-                        '<div class="row">'+ 
-                        '<div class="col-md-4">'+ 
-                            '<label>Transferencia</label>'+ 
-                            '<input type="text" class="form-control inputnext" name="transferencia" id="transferencia" value="0" required data-parsley-type="integer" autocomplete="off">'+ 
-                        '</div>'+ 
-                        '<div class="col-md-4">'+ 
-                            '<label>Cheque</label>'+ 
-                            '<input type="text" class="form-control inputnext" name="cheque" id="cheque" value="0" required data-parsley-type="integer" autocomplete="off">'+ 
-                        '</div>'+ 
-                        '<div class="col-md-4">'+ 
-                            '<label>Beneficiario</label>'+ 
-                            '<input type="text" class="form-control inputnext" name="beneficiario" id="beneficiario"  required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);" autocomplete="off">'+ 
-                        '</div>'+ 
-                        '</div>'+ 
-                        '<div class="row">'+ 
-                        '<div class="col-md-6">'+ 
-                            '<label>Cuenta a la que se Depositó</label>'+ 
-                            '<input type="text" class="form-control inputnext" name="cuentadeposito" id="cuentadeposito" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+ 
-                        '</div>'+ 
-                        '<div class="col-md-6">'+ 
-                            '<label>Anotación</label>'+ 
-                            '<textarea class="form-control inputnext" name="anotacion" id="anotacion" rows="2" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+ 
-                        '</div>'+ 
-                    '</div>'+ 
-                '</div>'+ 
+                            '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  data-parsley-excluded="true" onkeydown="return false" required>'+
+                            '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
+                        '</div>'+
+                        '</div>'+
+                        '<div class="row">'+
+                        '<div class="col-md-4">'+
+                            '<label>Transferencia</label>'+
+                            '<input type="text" class="form-control inputnext" name="transferencia" id="transferencia" value="0" required data-parsley-type="integer" autocomplete="off">'+
+                        '</div>'+
+                        '<div class="col-md-4">'+
+                            '<label>Cheque</label>'+
+                            '<input type="text" class="form-control inputnext" name="cheque" id="cheque" value="0" required data-parsley-type="integer" autocomplete="off">'+
+                        '</div>'+
+                        '<div class="col-md-4">'+
+                            '<label>Beneficiario</label>'+
+                            '<input type="text" class="form-control inputnext" name="beneficiario" id="beneficiario"  required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                        '</div>'+
+                        '</div>'+
+                        '<div class="row">'+
+                        '<div class="col-md-6">'+
+                            '<label>Cuenta a la que se Depositó</label>'+
+                            '<input type="text" class="form-control inputnext" name="cuentadeposito" id="cuentadeposito" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                        '</div>'+
+                        '<div class="col-md-6">'+
+                            '<label>Anotación</label>'+
+                            '<textarea class="form-control inputnext" name="anotacion" id="anotacion" rows="2" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);"></textarea>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
                 '<div class="col-md-12">'+
                     '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
                         '<li role="presentation" class="active">'+
@@ -879,22 +891,22 @@ function obtenerdatos(cxpmodificar){
                                             '<th class="'+background_tables+'" ondblclick="construirtabladinamicaporcolumna(\'saldocomprainicial\',\'Saldo $\');">Saldo $ (DOBLE CLICK)</th>'+
                                             '</tr>'+
                                         '</thead>'+
-                                        '<tbody id="tabladetallecuentasporpagar">'+           
+                                        '<tbody id="tabladetallecuentasporpagar">'+
                                         '</tbody>'+
                                     '</table>'+
                                     '<table class="table table-bordered tabladinamicaacopiar" hidden>'+
                                         '<thead class="'+background_tables+'" id="theadtabladinamicaacopiar">'+
                                         '</thead>'+
-                                        '<tbody id="tbodytabladinamicaacopiar">'+           
+                                        '<tbody id="tbodytabladinamicaacopiar">'+
                                         '</tbody>'+
                                     '</table>'+
                                 '</div>'+
-                            '</div>'+ 
+                            '</div>'+
                             '<div class="row">'+
-                            '<div class="col-md-6">'+   
+                            '<div class="col-md-6">'+
                                 '<label>Contrarecibo</label>'+
                                 '<input type="text" class="form-control inputnext" name="contrarecibo" id="contrarecibo" onkeyup="tipoLetra(this);"  autocomplete="off">'+
-                            '</div>'+ 
+                            '</div>'+
                             '<div class="col-md-3 col-md-offset-3">'+
                                     '<table class="table table-striped table-hover">'+
                                         '<tr>'+
@@ -903,13 +915,13 @@ function obtenerdatos(cxpmodificar){
                                         '</tr>'+
                                     '</table>'+
                                 '</div>'+
-                            '</div>'+   
-                        '</div>'+ 
-                    '</div>'+ 
+                            '</div>'+
+                        '</div>'+
+                    '</div>'+
                 '</div>';
     $("#tabsform").html(tabs);
     //colocar autocomplette off  todo el formulario
-    $(".form-control").attr('autocomplete','off');        
+    $(".form-control").attr('autocomplete','off');
     $("#periodohoy").val(data.CuentaXPagar.Periodo);
     $("#folio").val(data.CuentaXPagar.Folio);
     $("#serie").val(data.CuentaXPagar.Serie);
@@ -957,8 +969,8 @@ function obtenerdatos(cxpmodificar){
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
-        var index = $(this).index(".inputnext");          
-        $(".inputnext").eq(index + 1).focus().select(); 
+        var index = $(this).index(".inputnext");
+        $(".inputnext").eq(index + 1).focus().select();
       }
     });
     //copiar detalles tabla modulo
@@ -983,7 +995,7 @@ function obtenerdatos(cxpmodificar){
            document.execCommand('copy');
        }
        sel.removeAllRanges();
-       msj_tablacopiadacorrectamente(); 
+       msj_tablacopiadacorrectamente();
     };
     //btnCopyText.addEventListener('click', () => copyEl(elText));
     btnCopyTable.addEventListener('dblclick', () => copyEl(elTable));
@@ -992,7 +1004,7 @@ function obtenerdatos(cxpmodificar){
     mostrarmodalformulario('MODIFICACION', data.modificacionpermitida);
     $('.page-loader-wrapper').css('display', 'none');
   }).fail( function() {
-    msj_errorajax();    
+    msj_errorajax();
     $('.page-loader-wrapper').css('display', 'none');
   })
 }
@@ -1060,7 +1072,7 @@ function enviardocumentoemail(documento){
           width: '78.00em',
           tokenSeparators: [',', ' ']
       })
-    })   
+    })
 }
 //enviar documento pdf por email
 $("#btnenviarpdfemail").on('click', function (e) {
@@ -1168,7 +1180,7 @@ function buscarstringlike(){
     var folios = [Pago];
     arraypdf.push(folios);
     var form_data = new FormData();
-    form_data.append('arraypdf', arraypdf); 
+    form_data.append('arraypdf', arraypdf);
     form_data.append('tipogeneracionpdf', 0);
     form_data.append('numerodecimalesdocumento', 2);
     form_data.append('imprimirdirectamente', 1);
@@ -1181,7 +1193,7 @@ function buscarstringlike(){
       processData: false,
       success: function (data) {
         $('#pdfiframe').attr("src", urlpdfsimpresionesrapidas+data);
-        setTimeout(function(){imprimirdirecto();},500);    
+        setTimeout(function(){imprimirdirecto();},500);
       },
       error: function (data) {
         console.log(data);
@@ -1254,8 +1266,14 @@ function configurar_tabla(){
     }
   }
 
+  //Calcula el numero de filas
+  function calcularfilas() {
+    let contador = 0;
+    $('tr.filascompras').each(function() {
+        contador += 1;
+    });
 
-
- 
+    return contador
+  }
 
 init();
