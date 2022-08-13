@@ -11,7 +11,7 @@ class TraspasoDetalle extends Model
     protected $primaryKey = null;
     public $incrementing = false;
     protected $fillable = [
-        'Traspaso', 
+        'Traspaso',
         'Fecha',
         'Codigo',
         'Descripcion',
@@ -41,4 +41,12 @@ class TraspasoDetalle extends Model
         'Rollos',
         'Status'
     ];
+    /**
+     * Get the Traspaso that owns the TraspasoDetalle
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function Traspaso(){
+        return $this->belongsTo(Traspaso::class, 'Traspaso');
+    }
 }

@@ -66,7 +66,7 @@
                                     <thead class="{{$empresa->background_tables}}">
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
-                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co)
                                                 <th id="th{{$co}}">{{$co}}</th>
                                             @endforeach
                                         </tr>
@@ -75,7 +75,7 @@
                                     <tfoot>
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
-                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co)
                                                 <th id="th{{$co}}">{{$co}}</th>
                                             @endforeach
                                         </tr>
@@ -93,10 +93,10 @@
                                                     <th>Sum Costo: <b id="sumacostofiltrado"></b></th>
                                                     <th>Sum Comisión: <b id="sumacomisionfiltrado"></b></th>
                                                     <th>Sum Utilidad: <b id="sumautilidadfiltrado"></b></th>
-                                                </tr>   
+                                                </tr>
                                             </table>
                                         </div>
-                                @endif 
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -125,7 +125,7 @@
                                     </div>
                                 </td>
                             </tr>
-                        </table>   
+                        </table>
                     </div>
                 </form>
                 <form id="formparsley" action="#">
@@ -139,11 +139,11 @@
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
                     </div>
-                </form> 
+                </form>
             </div>
             <div id="contenidomodaltablas">
                 <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
-            </div> 
+            </div>
         </div>
     </div>
 </div>
@@ -162,7 +162,7 @@
                         <label>Motivo Baja</label>
                         <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required data-parsley-length="[1, 200]"></textarea>
                     </div>
-		        </form>	
+		        </form>
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
@@ -170,7 +170,7 @@
 	      	</div>
     	</div>
   	</div>
-</div> 
+</div>
 <!-- modal para crear documento en PDF-->
 @include('secciones.modalcreardocumento')
 <!-- fin modal para crear documento en PDF-->
@@ -208,7 +208,7 @@
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';
-        var urlgenerarplantilla = '{{$urlgenerarplantilla}}';       
+        var urlgenerarplantilla = '{{$urlgenerarplantilla}}';
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var requisiciones_obtener = '{!!URL::to('requisiciones_obtener')!!}';
         var requisiciones_descargar_plantilla = '{!!URL::to('requisiciones_descargar_plantilla')!!}';
@@ -222,13 +222,14 @@
         var requisiciones_obtener_productos = '{!!URL::to('requisiciones_obtener_productos')!!}';
         var requisiciones_obtener_producto_por_codigo = '{!!URL::to('requisiciones_obtener_producto_por_codigo')!!}';
         var requisiciones_guardar = '{!!URL::to('requisiciones_guardar')!!}';
+        var requisiciones_validar_partes_ot = '{!! URL::to('requisiciones_validar_partes_ot') !!}'
 
-        
+
         var requisiciones_verificar_baja = '{!!URL::to('requisiciones_verificar_baja')!!}';
-        var requisiciones_alta_o_baja = '{!!URL::to('requisiciones_alta_o_baja')!!}'; 
+        var requisiciones_alta_o_baja = '{!!URL::to('requisiciones_alta_o_baja')!!}';
 
 
-        var requisiciones_obtener_requisicion = '{!!URL::to('requisiciones_obtener_requisicion')!!}'; 
+        var requisiciones_obtener_requisicion = '{!!URL::to('requisiciones_obtener_requisicion')!!}';
         var requisiciones_guardar_modificacion = '{!!URL::to('requisiciones_guardar_modificacion')!!}';
 
         var requisiciones_obtener_datos_envio_email = '{!!URL::to('requisiciones_obtener_datos_envio_email')!!}';
@@ -236,7 +237,7 @@
         var requisiciones_buscar_folio_string_like = '{!!URL::to('requisiciones_buscar_folio_string_like')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
-    <script src="scripts_inaasys/registros/requisiciones/requisiciones.js"></script>
+    <script src="{{ asset('scripts_inaasys/registros/requisiciones/requisiciones.js') }}"></script>
 @endsection
 
 

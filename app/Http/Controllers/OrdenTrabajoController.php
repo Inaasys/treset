@@ -20,6 +20,8 @@ use App\CotizacionServicio;
 use App\CotizacionServicioDetalle;
 use App\TipoOrdenTrabajo;
 use App\TipoUnidad;
+use App\Traspaso;
+use App\CompraDetalle;
 use App\Cliente;
 use App\Agente;
 use App\Tecnico;
@@ -1820,4 +1822,65 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         return response()->json($ot);
 
     }
+
+    /**
+     * @author Jose Alonso Espinares Romero
+     * Valida si todos las NP de las compras fueron Cagadas a la OT
+     * @param Request $request
+     */
+    public function ordenes_trabajo_validar_numero_partes(Request $request){
+
+        ini_set('max_execution_time', 0);
+        ini_set('memory_limit', '-1');
+
+        $existentes = array();
+        $faltantesAux = array();
+        $existentesTraspaso = array();
+        $faltantes = array();
+
+        //Obtiene los NP Cargados por traspaso
+        $partesTraspaso = Traspaso::with(['detalles'])
+        ->where('Orden',$request->orden)->where('Status','!=','Baja')
+        ->get();
+
+        //Obtiene los NP de Compra Asignados a la OT
+        $partesCompras = CompraDetalle::Select('Codigo','Cantidad')
+        ->where('OT',$request->orden)->get();
+
+        //Arma array de cpdigo
+        foreach ($partesTraspaso as $i => $parteTraspaso) {
+            foreach ($parteTraspaso->detalles as $j => $detalle) {
+                if (!in_array($detalle->Codigo, $existentesTraspaso )) {
+                    array_push($existentesTraspaso, $detalle->Codigo);
+                }
+            }
+        }
+        //Valida los codigos que aun no se han cargado a la OT
+        foreach ($partesCompras as $i => $parteCompra) {
+            $sumaCodigos = 0;
+            if (!in_array($parteCompra->Codigo, $existentesTraspaso)) {
+                array_push($faltantes, array(
+                    'Codigo' => $parteCompra->Codigo,
+                    'Cantidad' => $parteCompra->Cantidad
+                ));
+            }else{
+                foreach ($partesTraspaso as $parteTraspaso) {
+                    foreach ($parteTraspaso->detalles as $detalle) {
+                        if ($detalle->Codigo == $parteCompra->Codigo) {
+                            $sumaCodigos += $detalle->Cantidad;
+                        }
+                    }
+                }
+                if (($parteCompra->Cantidad - $sumaCodigos) > 0 ) {
+                    array_push($faltantes, array(
+                        'Codigo' => $parteCompra->Codigo,
+                        'Cantidad' => Helpers::convertirvalorcorrecto($parteCompra->Cantidad - $sumaCodigos),
+                    ));
+                }
+            }
+        }
+
+        return response()->json($faltantes);
+    }
+
 }

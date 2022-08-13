@@ -30,4 +30,13 @@ class Requisicion extends Model
         'Usuario',
         'Periodo'
     ];
+
+    /**
+     * Get all of the Detalles for the Requisicion
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function detalles(){
+        return $this->hasMany(RequisicionDetalle::class, 'Requisicion','Requisicion');
+    }
 }

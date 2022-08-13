@@ -10,7 +10,7 @@ class Traspaso extends Model
     protected $table = 'Traspasos';
     protected $primaryKey = 'Folio';
     protected $fillable = [
-        'Traspaso', 
+        'Traspaso',
         'Serie',
         'Folio',
         'Fecha',
@@ -33,4 +33,13 @@ class Traspaso extends Model
         'Usuario',
         'Periodo'
     ];
+    /**
+     * Get all of the detalles for the Traspaso
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function detalles()
+    {
+        return $this->hasMany(TraspasoDetalle::class, 'Traspaso', 'Traspaso');
+    }
 }

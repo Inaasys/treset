@@ -2874,33 +2874,10 @@ $("#btnterminar").on('click', function(e){
   e.preventDefault();
   var formData = new FormData($("#formterminar")[0]);
   var form = $("#formterminar");
+  let orden = $('#ordenterminar').val()
   if (form.parsley().isValid()){
     $('.page-loader-wrapper').css('display', 'block');
-    $.ajax({
-      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-      url:ordenes_trabajo_terminar_orden,
-      type: "post",
-      dataType: "html",
-      data: formData,
-      cache: false,
-      contentType: false,
-      processData: false,
-      success:function(data){
-        $('#modalterminarorden').modal('hide');
-        msj_ordenterminada();
-        $("#formterminar")[0].reset();
-        $('.page-loader-wrapper').css('display', 'none');
-      },
-      error:function(data){
-        if(data.status == 403){
-          msj_errorenpermisos();
-        }else{
-          msj_errorajax();
-        }
-        $('#modalterminarorden').modal('hide');
-        $('.page-loader-wrapper').css('display', 'none');
-      }
-    })
+    validarNumPartes(orden, formData)
   }else{
     form.parsley().validate();
   }
@@ -3239,5 +3216,63 @@ function configurar_tabla(){
                       '</li>';
       $("#columnasnestable").append(columna);
   }
+}
+
+/**
+ * @author Jose Alonso Espinares Romero
+ * @description Realiza una peticion para validar si se han cargado todas las NP a la OT
+ * @param {*} params
+ */
+function validarNumPartes(ordentrabajo,formData) {
+    let faltantes = ''
+    $.get(ordenes_trabajo_validar_numero_partes,{orden:ordentrabajo },function(data){
+        if (data.length > 0) {
+            data.forEach(element => {
+                faltantes = faltantes+'<li style="list-style-type:none;">Codigo '+element.Codigo+
+                        '<ul>'+
+                            '<li>Cantidad '+parseFloat(number_format(element.Cantidad,numerodecimales))+'</li>'+
+                        '</ul>'
+                '</li>'
+            });
+
+            toastr.warning( "Aviso, Faltan NP por cargar "+ '<ul>'+faltantes+'</ul>', "Mensaje", {
+                "timeOut": "9000",
+                "progressBar": true,
+                "extendedTImeout": "9000"
+            });
+            $('#modalterminarorden').modal('hide');
+            $("#formterminar")[0].reset();
+            $('.page-loader-wrapper').css('display', 'none');
+        }else{
+            $.ajax({
+                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                url:ordenes_trabajo_terminar_orden,
+                type: "post",
+                dataType: "html",
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success:function(data){
+                    $('#modalterminarorden').modal('hide');
+                    msj_ordenterminada();
+                    $("#formterminar")[0].reset();
+                    $('.page-loader-wrapper').css('display', 'none');
+                },
+                error:function(data){
+                    if(data.status == 403){
+                    msj_errorenpermisos();
+                    }else{
+                    msj_errorajax();
+                    }
+                    $('#modalterminarorden').modal('hide');
+                    $('.page-loader-wrapper').css('display', 'none');
+                }
+            })
+        }
+      }).fail( function() {
+        msj_errorajax();
+        $('.page-loader-wrapper').css('display', 'none');
+      })
 }
 init();

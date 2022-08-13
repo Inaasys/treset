@@ -420,6 +420,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/ordenes_trabajo_guardar_configuracion_tabla', 'OrdenTrabajoController@ordenes_trabajo_guardar_configuracion_tabla')->name('ordenes_trabajo_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
     //Bloqueo
     Route::POST('/ordenes_trabajo_bloquear_desbloquear','OrdenTrabajoController@ordenes_trabajo_bloquear_desbloquear')->name('ordenes_trabajo_bloquear_desbloquear')->middleware('revisarpermisos:registros.ordenes.trabajo.bloqueos');
+    //Valida NP Cargadas a la OT
+    Route::GET('/ordenes_trabajo_validar_numero_partes','OrdenTrabajoController@ordenes_trabajo_validar_numero_partes')->name('ordenes_trabajo_validar_numero_partes')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
     //Cuentas por Pagar
     Route::get('/cuentas_por_pagar', 'CuentasPorPagarController@cuentas_por_pagar')->name('cuentas_por_pagar')->middleware('revisaraccesomenu:menuregistroscuentasxpagar');
     Route::get('/cuentas_por_pagar_obtener', 'CuentasPorPagarController@cuentas_por_pagar_obtener')->name('cuentas_por_pagar_obtener')->middleware('revisaraccesomenu:menuregistroscuentasxpagar');
@@ -1024,6 +1026,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/requisiciones_generar_pdfs_indiv/{documento}', 'RequisicionController@requisiciones_generar_pdfs_indiv')->name('requisiciones_generar_pdfs_indiv')->middleware('revisaraccesomenu:menuregistrosrequisiciones');
     Route::get('/requisiciones_exportar_excel', 'RequisicionController@requisiciones_exportar_excel')->name('requisiciones_exportar_excel')->middleware('revisaraccesomenu:menuregistrosrequisiciones');
     Route::post('/requisiciones_guardar_configuracion_tabla', 'RequisicionController@requisiciones_guardar_configuracion_tabla')->name('requisiciones_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrosrequisiciones');
+    Route::POST('/requisiciones_validar_partes_ot', 'RequisicionController@requisiciones_validar_partes_ot')->name('requisiciones_validar_partes_ot')->middleware('revisaraccesomenu:menuregistrosrequisiciones');
+
     //punto de venta
     Route::get('/punto_de_venta', 'PuntoDeVentaController@punto_de_venta')->name('punto_de_venta')->middleware('revisaraccesomenu:menuregistrosrequisiciones');
     Route::get('/punto_de_venta_obtener_producto_por_codigo', 'PuntoDeVentaController@punto_de_venta_obtener_producto_por_codigo')->name('punto_de_venta_obtener_producto_por_codigo')->middleware('revisaraccesomenu:menuregistrosrequisiciones');

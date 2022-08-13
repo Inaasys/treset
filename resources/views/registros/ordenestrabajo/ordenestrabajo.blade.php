@@ -370,6 +370,7 @@
         var ordenes_trabajo_buscar_folio_string_like = '{!!URL::to('ordenes_trabajo_buscar_folio_string_like')!!}';
         var ordenes_trabajo_generar_pdfs = '{!!URL::to('ordenes_trabajo_generar_pdfs')!!}';
         var ordenes_trabajo_bloquear_desbloquear = '{!!URL::to('ordenes_trabajo_bloquear_desbloquear') !!}';
+        var ordenes_trabajo_validar_numero_partes = '{!!URL::to('ordenes_trabajo_validar_numero_partes')!!}'
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="{{ asset('scripts_inaasys/registros/ordenestrabajo/ordenestrabajo.js') }}"></script>
