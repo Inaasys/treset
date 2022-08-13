@@ -143,7 +143,7 @@ class CompraController extends ConfiguracionSistemaController{
                     //->addColumn('Importe', function($data){ return $data->Importe; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        } 
+        }
     }
     //obtener series documento
     public function compras_obtener_series_documento(Request $request){
@@ -188,7 +188,7 @@ class CompraController extends ConfiguracionSistemaController{
             default:
                 $tipos_ordenes_compra = TipoOrdenCompra::where('STATUS', 'ALTA')->where('Nombre', '<>', 'GASTOS')->Where('Nombre', '<>', 'TOT')->get();
 
-        } 
+        }
         $select_tipos_ordenes_compra = "";
         foreach($tipos_ordenes_compra as $tipo){
             $select_tipos_ordenes_compra = $select_tipos_ordenes_compra."<option value='".$tipo->Nombre."'>".$tipo->Nombre."</option>";
@@ -204,8 +204,8 @@ class CompraController extends ConfiguracionSistemaController{
         $xml->move($mover_a_carpeta,$nombre_original);
         if (file_exists('xml_cargados/'.$nombre_original)) {
             //cargar xml
-            libxml_use_internal_errors(true); 
-            $xml = simplexml_load_file('xml_cargados/'.$nombre_original);                   
+            libxml_use_internal_errors(true);
+            $xml = simplexml_load_file('xml_cargados/'.$nombre_original);
             //obtener datos generales del xml nodo Comprobante
             $comprobante = $xml->attributes();
             $array_comprobante = array(
@@ -317,7 +317,7 @@ class CompraController extends ConfiguracionSistemaController{
                     "Descuento" => $atributos_concepto['Descuento'],
                     "NoIdentificacion" => $atributos_concepto['NoIdentificacion'],
                     "array_traslados" => $array_traslados
-                );   
+                );
                 /*
                 //detalles xml
                 //$producto = Producto::where('Codigo', $doc->Codigo)->first();
@@ -332,8 +332,8 @@ class CompraController extends ConfiguracionSistemaController{
                 $filasdetallesxml= $filasdetallesxml.
                 '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                     '<td class="tdmod"><div class="btn btn-danger btn-xs" >X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" readonly></td>'.
-                    '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$atributos_concepto['NoIdentificacion'].'" readonly><b style="font-size:12px;">'.$atributos_concepto['NoIdentificacion'].'</b></td>'.                    
-                    '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet nombreproductopartida" name="nombreproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($atributos_concepto['Descripcion'], ENT_QUOTES).'</textarea></td>'.                    
+                    '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$atributos_concepto['NoIdentificacion'].'" readonly><b style="font-size:12px;">'.$atributos_concepto['NoIdentificacion'].'</b></td>'.
+                    '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet nombreproductopartida" name="nombreproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($atributos_concepto['Descripcion'], ENT_QUOTES).'</textarea></td>'.
                     '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$atributos_concepto['Unidad'].'" readonly>'.$atributos_concepto['Unidad'].'</td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm porsurtirpartida"  name="porsurtirpartida[]" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($atributos_concepto['Cantidad']).'" data-parsley-min="0.1" data-parsley-max="'.Helpers::convertirvalorcorrecto($atributos_concepto['Cantidad']).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');"></td>'.
@@ -360,8 +360,8 @@ class CompraController extends ConfiguracionSistemaController{
                             '<div class="col-md-2">'.
                                 '<div class="btn bg-blue btn-xs waves-effect" data-toggle="tooltip" title="Ver Departamentos" onclick="listardepartamentos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                             '</div>'.
-                            '<div class="col-md-10">'.    
-                                '<input type="hidden" class="form-control divorinputmodsm numerodepartamentopartida" name="numerodepartamentopartida[]" readonly><input type="text" class="form-control inputnextdet divorinputmodmd departamentopartida" name="departamentopartida[]" readonly>'.   
+                            '<div class="col-md-10">'.
+                                '<input type="hidden" class="form-control divorinputmodsm numerodepartamentopartida" name="numerodepartamentopartida[]" readonly><input type="text" class="form-control inputnextdet divorinputmodmd departamentopartida" name="departamentopartida[]" readonly>'.
                             '</div>'.
                         '</div>'.
                     '</td>'.
@@ -375,7 +375,7 @@ class CompraController extends ConfiguracionSistemaController{
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm costoingresadopartida" name="costoingresadopartida[]" readonly></td>'.
                 '</tr>';
                 $contadorproductos++;
-                $contadorfilas++;   */       
+                $contadorfilas++;   */
             }
             //obtener UUID del xml timbrado digital
             $activar_namespaces = $namespaces->Complemento->getNameSpaces(true);
@@ -394,7 +394,7 @@ class CompraController extends ConfiguracionSistemaController{
                 "array_traslados_impuestos" => $array_traslados_impuestos,
                 "uuid" => $uuid,
                 "fechatimbrado" => $fechatimbrado ,
-                "filasdetallesxml" => $filasdetallesxml   
+                "filasdetallesxml" => $filasdetallesxml
             );
             //eliminar xml de public/xml_cargados
             $eliminarxml = public_path().'/xml_cargados/'.$nombre_original;
@@ -444,7 +444,7 @@ class CompraController extends ConfiguracionSistemaController{
             'numero' => $numero,
             'nombre' => $nombre,
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
     //obtener productos
     public function compras_obtener_productos(Request $request){
@@ -461,24 +461,24 @@ class CompraController extends ConfiguracionSistemaController{
                     break;
                 default:
                     $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%')->where('TipoProd', '<>', 'GASTOS')->Where('TipoProd', '<>', 'TOT');
-            } 
+            }
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($numeroalmacen, $tipooperacion){
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$tipooperacion.'\',\''.$data->Insumo.'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$data->NombreClaveProducto.'\',\''.$data->NombreClaveUnidad.'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\')">Seleccionar</div>';
                         return $boton;
                     })
-                    ->addColumn('Existencias', function($data){ 
+                    ->addColumn('Existencias', function($data){
                         return Helpers::convertirvalorcorrecto($data->Existencias);
                     })
-                    ->addColumn('Costo', function($data){ 
+                    ->addColumn('Costo', function($data){
                         return Helpers::convertirvalorcorrecto($data->Costo);
                     })
-                    ->addColumn('SubTotal', function($data){ 
+                    ->addColumn('SubTotal', function($data){
                         return Helpers::convertirvalorcorrecto($data->SubTotal);
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        } 
+        }
     }
     //obtener producto por codigo
     public function compras_obtener_producto_por_codigo(Request $request){
@@ -492,7 +492,7 @@ class CompraController extends ConfiguracionSistemaController{
                 break;
             default:
                 $contarproductos = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('TipoProd', '<>', 'GASTOS')->Where('TipoProd', '<>', 'TOT')->count();
-        } 
+        }
         if($contarproductos > 0){
             switch ($request->tipoalta) {
                 case "GASTOS":
@@ -503,7 +503,7 @@ class CompraController extends ConfiguracionSistemaController{
                     break;
                 default:
                     $producto = VistaObtenerExistenciaProducto::where('Codigo', $codigoabuscar)->where('TipoProd', '<>', 'GASTOS')->Where('TipoProd', '<>', 'TOT')->first();
-            } 
+            }
             $data = array(
                 'Codigo' => $producto->Codigo,
                 'Producto' => htmlspecialchars($producto->Producto, ENT_QUOTES),
@@ -607,7 +607,7 @@ class CompraController extends ConfiguracionSistemaController{
                                         ->where('Almacen', '>', 0)
                                         ->orderBy('Folio', 'DESC')
                                         ->get();
-            } 
+            }
             $tipoalta = $request->tipocompra;
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use($tipoalta){
@@ -633,7 +633,7 @@ class CompraController extends ConfiguracionSistemaController{
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        }        
+        }
     }
     //obtener claves productos
     public function compras_obtener_claves_productos(Request $request){
@@ -647,7 +647,7 @@ class CompraController extends ConfiguracionSistemaController{
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        }          
+        }
     }
     //obtener claves unidades
     public function compras_obtener_claves_unidades(Request $request){
@@ -661,12 +661,16 @@ class CompraController extends ConfiguracionSistemaController{
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        }         
+        }
     }
     //obtener datos de la orden de compra seleccionada
     public function compras_obtener_orden_compra(Request $request){
         $ordencompra = OrdenCompra::where('Orden', $request->Orden)->first();
         $almacen = Almacen::where('Numero', $ordencompra->Almacen)->first();
+        $tdOrden = '';
+        if($request->tipoalta == "PRODUCTOS"){
+            $tdOrden = '<td class="tdmod"><input type="text" class="form-control divorinputmodsm" required name="ordenTrabajo[]"</td>';
+        }
         //detalles orden compra
         $detallesordencompra = OrdenCompraDetalle::where('Orden', $request->Orden)->get();
         $numerodetallesordencompra = OrdenCompraDetalle::where('Orden', $request->Orden)->count();
@@ -689,9 +693,10 @@ class CompraController extends ConfiguracionSistemaController{
                     '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                         '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$doc->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$doc->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$doc->Codigo.'</b></td>'.
-                        '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet nombreproductopartida" name="nombreproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($doc->Descripcion, ENT_QUOTES).'</textarea></td>'.                    
+                        '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet nombreproductopartida" name="nombreproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($doc->Descripcion, ENT_QUOTES).'</textarea></td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$doc->Unidad.'" readonly data-parsley-length="[1, 5]">'.$doc->Unidad.'</td>'.
                         '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm porsurtirpartida"  name="porsurtirpartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Surtir).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                        $tdOrden.
                         '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Surtir).'" data-parsley-min="0.1" data-parsley-max="'.Helpers::convertirvalorcorrecto($doc->Surtir).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');"></td>'.
                         '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Precio).'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" readonly></td>'.
                         '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.Helpers::convertirvalorcorrecto($doc->Importe).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
@@ -716,8 +721,8 @@ class CompraController extends ConfiguracionSistemaController{
                                 '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                     '<div class="btn bg-blue btn-xs waves-effect btnlistardepartamentos" data-toggle="tooltip" title="Ver Departamentos" onclick="listardepartamentos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                 '</div>'.
-                                '<div class="col-xs-10 col-sm-10 col-md-10">'.    
-                                    '<input type="hidden" class="form-control divorinputmodsm numerodepartamentopartida" name="numerodepartamentopartida[]" readonly><input type="text" class="form-control inputnextdet divorinputmodmd departamentopartida" name="departamentopartida[]" readonly>'.   
+                                '<div class="col-xs-10 col-sm-10 col-md-10">'.
+                                    '<input type="hidden" class="form-control divorinputmodsm numerodepartamentopartida" name="numerodepartamentopartida[]" readonly><input type="text" class="form-control inputnextdet divorinputmodmd departamentopartida" name="departamentopartida[]" readonly>'.
                                 '</div>'.
                             '</div>'.
                         '</td>'.
@@ -739,7 +744,7 @@ class CompraController extends ConfiguracionSistemaController{
                                 '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                     '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                 '</div>'.
-                                '<div class="col-xs-10 col-sm-10 col-md-10">'.   
+                                '<div class="col-xs-10 col-sm-10 col-md-10">'.
                                     '<input type="text" class="form-control inputnextdet divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
                                 '</div>'.
                             '</div>'.
@@ -750,12 +755,12 @@ class CompraController extends ConfiguracionSistemaController{
                     '</tr>';
                     $contadorproductos++;
                     $contadorfilas++;
-                }  
+                }
                 array_push($arraycodigosdetallesordencompra, $doc->Codigo);
             }
         }else{
             $filasdetallesordencompra = '';
-        }        
+        }
         $data = array(
             "ordencompra" => $ordencompra,
             "arraycodigosdetallesordencompra" => $arraycodigosdetallesordencompra,
@@ -778,10 +783,11 @@ class CompraController extends ConfiguracionSistemaController{
         ini_set('max_input_vars','20000' );
         $uuid=$request->uuid;
         $solicitarxml=$request->solicitarxml;
+        $tipo = '';
 	    $ExisteUUID = Compra::where('UUID', $uuid )->where('Status', '<>', 'BAJA')->first();
 	    if($ExisteUUID == true && $solicitarxml == 1){
 	        $Compra = 1;
-	    }else{  
+	    }else{
             //obtener el ultimo id de la tabla
             $folio = Helpers::ultimofolioserietablamodulos('App\Compra',$request->serie);
             //INGRESAR DATOS A TABLA COMPRAS
@@ -800,12 +806,13 @@ class CompraController extends ConfiguracionSistemaController{
                     break;
                 default:
                     $Compra->Movimiento="ALMACEN".$request->numeroalmacen;
+                    $tipo = 'productos';
             }
             $Compra->Remision=$request->remision;
             $Compra->Factura=$request->factura;
             if($solicitarxml == 1){
                 $Compra->UUID=$request->uuid;
-                $Compra->FechaEmitida=$request->fechaemitida;
+                $Compra->FechaEmitida=Carbon::parse($request->fechaemitida)->toDateTimeString();
                 //$Compra->FechaTimbrado=$request->fechatimbrado;
             }else{
                 $Compra->UUID="N/A";
@@ -815,11 +822,11 @@ class CompraController extends ConfiguracionSistemaController{
             $Compra->Tipo=$request->tipo;
             $Compra->Plazo=$request->plazo;
             $Compra->Fecha=Carbon::parse($request->fecha)->toDateTimeString();
-            $Compra->Almacen=$request->numeroalmacen; 
-            $Compra->Orden=$request->orden;       
+            $Compra->Almacen=$request->numeroalmacen;
+            $Compra->Orden=$request->orden;
             $Compra->Importe=$request->importe;
             $Compra->Descuento=$request->descuento;
-            $Compra->Ieps=$request->ieps;  
+            $Compra->Ieps=$request->ieps;
             $Compra->SubTotal=$request->subtotal;
             $Compra->Iva=$request->iva;
             $Compra->IvaRetencion=$request->retencioniva;
@@ -845,7 +852,7 @@ class CompraController extends ConfiguracionSistemaController{
                     //obtener total costo y utilidad porque en la compra no se calcula
                     $totalcosto=0;
                     $totalutilidad=0;
-                    foreach ($request->codigoproductopartida as $key => $codigoproductopartida){  
+                    foreach ($request->codigoproductopartida as $key => $codigoproductopartida){
                         $producto = Producto::where('Codigo', $codigoproductopartida)->first();
                         $costopartida = Helpers::convertirvalorcorrecto($producto->Costo);
                         //costo total
@@ -868,7 +875,7 @@ class CompraController extends ConfiguracionSistemaController{
                                 ]);
 
                     break;
-            } 
+            }
             //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
             $BitacoraDocumento = new BitacoraDocumento;
             $BitacoraDocumento->Documento = "COMPRAS";
@@ -881,7 +888,7 @@ class CompraController extends ConfiguracionSistemaController{
             $BitacoraDocumento->save();
             //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
             $item = 1;
-            foreach ($request->codigoproductopartida as $key => $codigoproductopartida){             
+            foreach ($request->codigoproductopartida as $key => $codigoproductopartida){
                 $CompraDetalle=new CompraDetalle;
                 $CompraDetalle->Compra = $compra;
                 $CompraDetalle->Proveedor = $request->numeroproveedor;
@@ -889,6 +896,9 @@ class CompraController extends ConfiguracionSistemaController{
                 $CompraDetalle->Codigo = $codigoproductopartida;
                 $CompraDetalle->Descripcion = $request->nombreproductopartida [$key];
                 $CompraDetalle->Unidad = $request->unidadproductopartida [$key];
+                if($tipo == 'productos'){
+                    $CompraDetalle->OT = strtoupper($request->ordenTrabajo[$key]);
+                }
                 $CompraDetalle->Cantidad =  $request->cantidadpartida  [$key];
                 $CompraDetalle->Precio =  $request->preciopartida [$key];
                 $CompraDetalle->Importe = $request->importepartida [$key];
@@ -1029,7 +1039,7 @@ class CompraController extends ConfiguracionSistemaController{
                                     $ExistenciaAlmacen->Almacen = $request->numeroalmacen;
                                     $ExistenciaAlmacen->Existencias = $request->cantidadpartida [$key];
                                     $ExistenciaAlmacen->save();
-                            }  
+                            }
                         }
                         break;
                     default:
@@ -1049,8 +1059,8 @@ class CompraController extends ConfiguracionSistemaController{
                                 $ExistenciaAlmacen->Almacen = $request->numeroalmacen;
                                 $ExistenciaAlmacen->Existencias = $request->cantidadpartida [$key];
                                 $ExistenciaAlmacen->save();
-                        }      
-                } 
+                        }
+                }
                 $item++;
             }
             //modificar el status de la orden de compra a SURTIDO o BACKORDER
@@ -1066,14 +1076,15 @@ class CompraController extends ConfiguracionSistemaController{
                                         'Status' => "SURTIDO"
                                     ]);
             }
-        }    
-            return response()->json($Compra);         
+        }
+            return response()->json($Compra);
     }
     //obtener compra a modificar
     public function compras_obtener_compra(Request $request){
         $compra = Compra::where('Compra', $request->compramodificar)->first();
         $almacen = Almacen::where('Numero', $compra->Almacen)->first();
         $proveedor = Proveedor::where('Numero', $compra->Proveedor)->first();
+        $filaOT = '';
         //detalles orden compra
         $detallescompra = CompraDetalle::where('Compra', $request->compramodificar)->orderBy('Item', 'ASC')->get();
         $numerodetallescompra = CompraDetalle::where('Compra', $request->compramodificar)->count();
@@ -1118,13 +1129,17 @@ class CompraController extends ConfiguracionSistemaController{
                     if($dc->IepsRetencion > 0){
                         $porcentajeretencionieps = ($dc->IepsRetencion * 100) / $dc->SubTotal;
                     }
+                    if($compra->Movimiento != "GASTOS" && $compra->Movimiento != "TOT"){
+                        $filaOT = '<td class="tdmod"><input readonly type="text" class="form-control divorinputmodsm costoingresadopartida" name="costoingresadopartida[]" value="'.$dc->OT.'"></td>';
+                    }
                     $filasdetallescompra= $filasdetallescompra.
                     '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
                         '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dc->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$dc->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$dc->Codigo.'</b></td>'.
-                        '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet nombreproductopartida" name="nombreproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($dc->Descripcion, ENT_QUOTES).'</textarea></td>'.                    
+                        '<td class="tdmod"><textarea rows="1" class="form-control inputnextdet nombreproductopartida" name="nombreproductopartida[]" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off" style="font-size:10px;">'.htmlspecialchars($dc->Descripcion, ENT_QUOTES).'</textarea></td>'.
                         '<td class="tdmod"><input type="hidden" class="form-control unidadproductopartida" name="unidadproductopartida[]" value="'.$dc->Unidad.'" readonly data-parsley-length="[1, 5]">'.$dc->Unidad.'</td>'.
                         '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm porsurtirpartida"  name="porsurtirpartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                        $filaOT.
                         '<td class="tdmod">'.
                             '<input type="hidden" class="form-control cantidadinicialpartida" name="cantidadinicialpartida[]" value="'.Helpers::convertirvalorcorrecto($dc->Cantidad).'" >'.
                             '<input type="hidden" class="form-control cantidadincorrecta" name="cantidadincorrecta[]" >'.
@@ -1155,10 +1170,10 @@ class CompraController extends ConfiguracionSistemaController{
                         '<td class="tdmod">'.
                             '<div class="row divorinputmodxl">'.
                                 '<div class="col-xs-2 col-sm-2 col-md-2">'.
-                                    '<div class="btn bg-blue btn-xs waves-effect btnlistardepartamentos" data-toggle="tooltip" title="Ver Departamentos" onclick="listardepartamentos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.'</div>'.'<div class="col-md-10">'.    
+                                    '<div class="btn bg-blue btn-xs waves-effect btnlistardepartamentos" data-toggle="tooltip" title="Ver Departamentos" onclick="listardepartamentos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.'</div>'.'<div class="col-md-10">'.
                                 '</div>'.
                                 '<div class="col-xs-10 col-sm-10 col-md-10">'.
-                                    '<input type="hidden" class="form-control divorinputmodsm numerodepartamentopartida" name="numerodepartamentopartida[]" value="'.$numerodepartamento.'" readonly><input type="text" class="form-control inputnextdet divorinputmodmd departamentopartida" name="departamentopartida[]" value="'.$nombredepartamento.'" readonly>'.   
+                                    '<input type="hidden" class="form-control divorinputmodsm numerodepartamentopartida" name="numerodepartamentopartida[]" value="'.$numerodepartamento.'" readonly><input type="text" class="form-control inputnextdet divorinputmodmd departamentopartida" name="departamentopartida[]" value="'.$nombredepartamento.'" readonly>'.
                                 '</div>'.
                             '</div>'.
                         '</td>'.
@@ -1169,7 +1184,7 @@ class CompraController extends ConfiguracionSistemaController{
                                 '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                     '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                 '</div>'.
-                                '<div class="col-xs-10 col-sm-10 col-md-10">'.    
+                                '<div class="col-xs-10 col-sm-10 col-md-10">'.
                                     '<input type="text" class="form-control inputnextdet divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly data-parsley-length="[1, 20]">'.
                                 '</div>'.
                             '</div>'.
@@ -1180,7 +1195,7 @@ class CompraController extends ConfiguracionSistemaController{
                                 '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                     '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                 '</div>'.
-                                '<div class="col-xs-10 col-sm-10 col-md-10">'.  
+                                '<div class="col-xs-10 col-sm-10 col-md-10">'.
                                     '<input type="text" class="form-control inputnextdet divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
                                 '</div>'.
                             '</div>'.
@@ -1197,7 +1212,7 @@ class CompraController extends ConfiguracionSistemaController{
             foreach($detallesordencompra as $doc){
                 array_push($arraycodigosdetallesordencompra, $doc->Codigo);
             }
-        }  
+        }
         //permitir o no modificar registro
         if(Auth::user()->role_id == 1){
             if($compra->Status == 'LIQUIDADA' || $compra->Status == 'BAJA'){
@@ -1217,7 +1232,7 @@ class CompraController extends ConfiguracionSistemaController{
                     $modificacionpermitida = 1;
                 }
             }
-        }     
+        }
         $data = array(
             "compra" => $compra,
             "arraycodigosdetallesordencompra" => $arraycodigosdetallesordencompra,
@@ -1241,6 +1256,7 @@ class CompraController extends ConfiguracionSistemaController{
             "iepsretencion" => Helpers::convertirvalorcorrecto($compra->IepsRetencion),
             "total" => Helpers::convertirvalorcorrecto($compra->Total),
             "tipocambio" => Helpers::convertirvalorcorrecto($compra->TipoCambio),
+            "movimiento" => $compra->Movimiento,
             "modificacionpermitida" => $modificacionpermitida
         );
         return response()->json($data);
@@ -1318,7 +1334,7 @@ class CompraController extends ConfiguracionSistemaController{
                     $modificacionpermitida = 1;
                 }
             }
-        } 
+        }
         return response()->json($modificacionpermitida);
     }
     //guardar modificacion compra
@@ -1329,7 +1345,7 @@ class CompraController extends ConfiguracionSistemaController{
 	    $ExisteUUID = Compra::where('Compra', '<>', $compra)->where('UUID', $uuid )->where('Status', '<>', 'BAJA')->first();
 	    if($ExisteUUID == true && $uuid != "N/A"){
 	        $Compra = 1;
-	    }else{  
+	    }else{
             $Compra = Compra::where('Compra', $compra)->first();
             //validar si las partidas en las modiifcacion son las mismas que los detalles de los traspasos
             // si no son las mismas comparar y eliminar las partidas que corresponden en la tabla detalles de OrdenesTrabajo y Traspasos
@@ -1346,8 +1362,8 @@ class CompraController extends ConfiguracionSistemaController{
                 //array_push($ArrayDetallesCompraNuevo, $nuevocodigo);
                 if($request->agregadoen [$key] == 'NA'){
                     array_push($ArrayDetallesCompraNuevo, $compra.'#'.$nuevocodigo.'#'.$request->itempartida [$key]);
-                } 
-            }  
+                }
+            }
             //diferencias entre arreglos
             $diferencias_arreglos = array_diff($ArrayDetallesCompraAnterior, $ArrayDetallesCompraNuevo);
             //iteramos las diferencias entre arreglos
@@ -1360,7 +1376,7 @@ class CompraController extends ConfiguracionSistemaController{
                             //si es TOT restar del total de la orden de trabajo los totales de la partida de la compra y eliminar la partida de la orden de trabajo
                             //obtener total costo y utilidad porque en la compra no se calcula
                             $detallescompra = CompraDetalle::where('Compra', $explode_d[0])->where('Codigo', $explode_d[1])->where('Item', $explode_d[2])->get();
-                            foreach ($detallescompra as $detalle){  
+                            foreach ($detallescompra as $detalle){
                                 $producto = Producto::where('Codigo', $detalle->Codigo)->first();
                                 $costopartida = Helpers::convertirvalorcorrecto($producto->Costo);
                                 //costo total
@@ -1445,10 +1461,10 @@ class CompraController extends ConfiguracionSistemaController{
                 'Tipo'=>$request->tipo,
                 'Plazo'=>$request->plazo,
                 'Fecha'=>Carbon::parse($request->fecha)->toDateTimeString(),
-                'Almacen'=>$request->numeroalmacen, 
+                'Almacen'=>$request->numeroalmacen,
                 'Importe'=>$request->importe,
                 'Descuento'=>$request->descuento,
-                'Ieps'=>$request->ieps, 
+                'Ieps'=>$request->ieps,
                 'SubTotal'=>$request->subtotal,
                 'Iva'=>$request->iva,
                 'IvaRetencion'=>$request->retencioniva,
@@ -1477,9 +1493,9 @@ class CompraController extends ConfiguracionSistemaController{
             $BitacoraDocumento->Periodo = $this->periodohoy;
             $BitacoraDocumento->save();
             //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
-            foreach ($request->codigoproductopartida as $key => $codigoproductopartida){  
+            foreach ($request->codigoproductopartida as $key => $codigoproductopartida){
                 //if la partida se agrego en la modificacion se agrega en los detalles
-                if($request->agregadoen [$key] == 'modificacion'){    
+                if($request->agregadoen [$key] == 'modificacion'){
                     $contaritems = CompraDetalle::select('Item')->where('Compra', $compra)->count();
                     if($contaritems > 0){
                         $item = CompraDetalle::select('Item')->where('Compra', $compra)->orderBy('Item', 'DESC')->take(1)->get();
@@ -1620,7 +1636,7 @@ class CompraController extends ConfiguracionSistemaController{
                                         $ExistenciaAlmacen->Almacen = $request->numeroalmacen;
                                         $ExistenciaAlmacen->Existencias = $request->cantidadpartida [$key];
                                         $ExistenciaAlmacen->save();
-                                }  
+                                }
                             }
                             break;
                         default:
@@ -1640,8 +1656,8 @@ class CompraController extends ConfiguracionSistemaController{
                                     $ExistenciaAlmacen->Almacen = $request->numeroalmacen;
                                     $ExistenciaAlmacen->Existencias = $request->cantidadpartida [$key];
                                     $ExistenciaAlmacen->save();
-                            }   
-                    } 
+                            }
+                    }
                     $ultimoitem++;
                 }else{
                     //si la partida no se agrego en la modificacion solo se modifican los datos
@@ -1729,7 +1745,7 @@ class CompraController extends ConfiguracionSistemaController{
                             break;
                         case "CAJA CHICA":
                             if($request->numeroalmacen > 0){
-                                //restar existencias del almacen 
+                                //restar existencias del almacen
                                 $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
                                 if($ContarExistenciaAlmacen > 0){
                                     $ExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
@@ -1747,11 +1763,11 @@ class CompraController extends ConfiguracionSistemaController{
                                             ->where('Almacen', $request->numeroalmacen)
                                             ->update([
                                                 'Existencias' => Helpers::convertirvalorcorrecto($SumarExistenciaNuevaAlmacen)
-                                            ]); 
+                                            ]);
                             }
                             break;
                         default:
-                            //restar existencias del almacen 
+                            //restar existencias del almacen
                             $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->count();
                             if($ContarExistenciaAlmacen > 0){
                                 $ExistenciaAlmacen = Existencia::where('Codigo', $codigoproductopartida)->where('Almacen', $request->numeroalmacen)->first();
@@ -1769,8 +1785,8 @@ class CompraController extends ConfiguracionSistemaController{
                                         ->where('Almacen', $request->numeroalmacen)
                                         ->update([
                                             'Existencias' => Helpers::convertirvalorcorrecto($SumarExistenciaNuevaAlmacen)
-                                        ]); 
-                    } 
+                                        ]);
+                    }
                     //modificar detalle importante no mover de aqui
                     CompraDetalle::where('Compra', $compra)
                     ->where('Item', $request->itempartida [$key])
@@ -1798,7 +1814,7 @@ class CompraController extends ConfiguracionSistemaController{
                         'ClaveProducto' => $request->claveproductopartida [$key],
                         'ClaveUnidad' => $request->claveunidadpartida [$key]
                     ]);
-                }    
+                }
             }
             //modificar el status de la orden de compra a SURTIDO o BACKORDER
             $detallesordenporsurtir = OrdenCompraDetalle::where('Orden', $Compra->Orden)->where('Surtir', '>', Helpers::convertirvalorcorrecto(0))->count();
@@ -1813,8 +1829,8 @@ class CompraController extends ConfiguracionSistemaController{
                                 'Status' => "SURTIDO"
                             ]);
             }
-        }    
-        return response()->json($Compra); 
+        }
+        return response()->json($Compra);
     }
     //verificar si la compra tiene relacion con alguna cuenta por pagar
     public function compras_verificar_uso_en_modulos(Request $request){
@@ -1902,7 +1918,7 @@ class CompraController extends ConfiguracionSistemaController{
                 $totalcosto=0;
                 $totalutilidad=0;
                 $detallescompra = CompraDetalle::where('Compra', $request->compradesactivar)->get();
-                foreach ($detallescompra as $detalle){  
+                foreach ($detallescompra as $detalle){
                     $producto = Producto::where('Codigo', $detalle->Codigo)->first();
                     $costopartida = Helpers::convertirvalorcorrecto($producto->Costo);
                     //costo total
@@ -1925,7 +1941,7 @@ class CompraController extends ConfiguracionSistemaController{
                                 'Utilidad' => $OrdenTrabajoAnterior->Utilidad - Helpers::convertirvalorcorrecto($totalutilidad)
                             ]);
                 break;
-        } 
+        }
         //cambiar status y colocar valores en 0
         $MotivoBaja = $request->motivobaja.', '.Helpers::fecha_exacta_accion_datetimestring().', '.Auth::user()->user;
         Compra::where('Compra', $request->compradesactivar)
@@ -2075,7 +2091,7 @@ class CompraController extends ConfiguracionSistemaController{
                     return $total;
                 })
                 ->make(true);
-        } 
+        }
     }
     //generacion de formato en PDF
     public function compras_generar_pdfs(Request $request){
@@ -2084,11 +2100,11 @@ class CompraController extends ConfiguracionSistemaController{
         //primero eliminar todos los archivos zip
         Helpers::eliminararchivoszipgenerados();
         if($request->imprimirdirectamente == 1){
-            $compras = Compra::where('Compra', $request->arraypdf)->get(); 
+            $compras = Compra::where('Compra', $request->arraypdf)->get();
         }else{
             $tipogeneracionpdf = $request->tipogeneracionpdf;
             if($tipogeneracionpdf == 0){
-                $compras = Compra::whereIn('Compra', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
+                $compras = Compra::whereIn('Compra', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get();
             }else{
                 $fechainiciopdf = date($request->fechainiciopdf);
                 $fechaterminacionpdf = date($request->fechaterminacionpdf);
@@ -2118,7 +2134,7 @@ class CompraController extends ConfiguracionSistemaController{
                     "descuentodetalle" => Helpers::convertirvalorcorrecto($cd->Dcto),
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($cd->SubTotal)
                 );
-            } 
+            }
             $proveedor = Proveedor::where('Numero', $c->Proveedor)->first();
             //obtener firmas
             $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'Compras')->where('Documento', $c->Compra)->where('Status', 'ALTA')->count();
@@ -2156,7 +2172,7 @@ class CompraController extends ConfiguracionSistemaController{
             ->setOption('margin-bottom', 10);
             //return $pdf->stream();
             $ArchivoPDF = "PDF".$c->Compra.".pdf";
-            $pdf->save(storage_path('archivos_pdf_documentos_generados/'.$ArchivoPDF));  
+            $pdf->save(storage_path('archivos_pdf_documentos_generados/'.$ArchivoPDF));
         }
         $pdfMerger = PDFMerger::init(); //Initialize the merger
         //unir pdfs
@@ -2174,7 +2190,7 @@ class CompraController extends ConfiguracionSistemaController{
             return response()->json($ArchivoPDF);
         }else{
             if($request->descargar_xml == 0){
-                $pdfMerger->save("Compras.pdf", "browser");//mostrarlos en el navegador   
+                $pdfMerger->save("Compras.pdf", "browser");//mostrarlos en el navegador
             }else{
                 //carpeta donde se guardara el archivo zip
                 $public_dir=public_path();
@@ -2186,8 +2202,8 @@ class CompraController extends ConfiguracionSistemaController{
                     // Agregar archivos que se comprimiran
                     foreach($arrayfilespdf as $afp) {
                         $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
-                    }     
-                    //terminar proceso   
+                    }
+                    //terminar proceso
                     $zip->close();
                 }
                 // Set Encabezados para descargar
@@ -2205,7 +2221,7 @@ class CompraController extends ConfiguracionSistemaController{
 
     //generacion de formato en PDF
     public function compras_generar_pdfs_indiv($documento){
-        $compras = Compra::where('Compra', $documento)->orderBy('Folio', 'ASC')->get(); 
+        $compras = Compra::where('Compra', $documento)->orderBy('Folio', 'ASC')->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($compras as $c){
@@ -2224,7 +2240,7 @@ class CompraController extends ConfiguracionSistemaController{
                     "descuentodetalle" => Helpers::convertirvalorcorrecto($cd->Dcto),
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($cd->SubTotal)
                 );
-            } 
+            }
             $proveedor = Proveedor::where('Numero', $c->Proveedor)->first();
             //obtener firmas
             $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'Compras')->where('Documento', $c->Compra)->where('Status', 'ALTA')->count();
@@ -2290,7 +2306,7 @@ class CompraController extends ConfiguracionSistemaController{
 
     //enviar pdf por emial
     public function compras_enviar_pdfs_email(Request $request){
-        $compras = Compra::where('Compra', $request->emaildocumento)->orderBy('Folio', 'ASC')->get(); 
+        $compras = Compra::where('Compra', $request->emaildocumento)->orderBy('Folio', 'ASC')->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($compras as $c){
@@ -2309,7 +2325,7 @@ class CompraController extends ConfiguracionSistemaController{
                     "descuentodetalle" => Helpers::convertirvalorcorrecto($cd->Dcto),
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($cd->SubTotal)
                 );
-            } 
+            }
             $proveedor = Proveedor::where('Numero', $c->Proveedor)->first();
             //obtener firmas
             $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'Compras')->where('Documento', $c->Compra)->where('Status', 'ALTA')->count();
@@ -2347,7 +2363,7 @@ class CompraController extends ConfiguracionSistemaController{
         ->setOption('margin-bottom', 10);
         try{
             $datosdocumento = Compra::where('Compra', $request->emaildocumento)->first();
-            //enviar correo electrónico	
+            //enviar correo electrónico
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
             $arraycc = array();
@@ -2460,11 +2476,11 @@ class CompraController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Compras', Auth::user()->id);
-        return Excel::download(new ComprasExport($configuraciones_tabla['campos_consulta'],$request->periodo), "compras-".$request->periodo.".xlsx");   
+        return Excel::download(new ComprasExport($configuraciones_tabla['campos_consulta'],$request->periodo), "compras-".$request->periodo.".xlsx");
     }
     //generar excel compras individual
     public function compras_generar_excel_indiv($documento){
-        return Excel::download(new PlantillaCompraExport($documento), "compra-".$documento.".xlsx");   
+        return Excel::download(new PlantillaCompraExport($documento), "compra-".$documento.".xlsx");
     }
     //configuracion tabla
     public function compras_guardar_configuracion_tabla(Request $request){

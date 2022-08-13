@@ -38,4 +38,13 @@ class RequisicionDetalle extends Model
         'TipoDeCambio',
         'Item'
     ];
+
+    /**
+     * Get the user that owns the RequisicionDetalle
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function requisicion(){
+        return $this->belongsTo(Requisicion::class, 'Requisicion');
+    }
 }

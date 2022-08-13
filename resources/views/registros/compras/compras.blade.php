@@ -23,7 +23,7 @@
                                         <table>
                                             <tr>
                                                 <td >
-                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="alta('')">
+                                                    <div class="btn bg-blue btn-xs waves-effect" onclick="alta('PRODUCTOS')">
                                                         Altas Prod
                                                     </div>
                                                 </td>

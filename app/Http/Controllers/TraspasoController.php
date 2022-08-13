@@ -18,6 +18,7 @@ use App\Traspaso;
 use App\TraspasoDetalle;
 use App\Serie;
 use App\Almacen;
+use App\CompraDetalle;
 use App\Existencia;
 use App\BitacoraDocumento;
 use App\Producto;
@@ -37,7 +38,7 @@ use App\User_Rel_Almacen;
 use Config;
 use Mail;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
-use Storage; 
+use Storage;
 use ZipArchive;
 
 class TraspasoController extends ConfiguracionSistemaController{
@@ -124,11 +125,11 @@ class TraspasoController extends ConfiguracionSistemaController{
                     //->addColumn('utilidad', function($data){ return $data->Utilidad; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        } 
+        }
     }
     //descargar plantilla
     public function traspasos_generar_plantilla(){
-        return Excel::download(new PlantillasTraspasosExport(), "plantillatraspasos.xlsx"); 
+        return Excel::download(new PlantillasTraspasosExport(), "plantillatraspasos.xlsx");
     }
     //cargar partidas excel
     public function traspasos_cargar_partidas_excel(Request $request){
@@ -147,7 +148,7 @@ class TraspasoController extends ConfiguracionSistemaController{
         foreach($partidasexcel as $partida){
             if($rowexcel > 0){
                 if (in_array(strtoupper($partida[0]), $arraycodigosyaagregados)) {
-                    
+
                 }else{
                     $codigoabuscar = $partida[0];
                     $cantidadpartida = $partida[1];
@@ -242,7 +243,7 @@ class TraspasoController extends ConfiguracionSistemaController{
             "contadorproductos" => $contadorproductos,
             "contadorfilas" => $contadorfilas,
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
     //obtener series documento
     public function traspasos_obtener_series_documento(Request $request){
@@ -334,7 +335,7 @@ class TraspasoController extends ConfiguracionSistemaController{
             'numero' => $numero,
             'nombre' => $nombre,
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener alamcenes foraneos
@@ -403,7 +404,7 @@ class TraspasoController extends ConfiguracionSistemaController{
             'numero' => $numero,
             'nombre' => $nombre,
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener ordenes de trabajo
@@ -460,10 +461,10 @@ class TraspasoController extends ConfiguracionSistemaController{
             'unidad' => $unidad,
             'statusorden' => $statusorden
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
-    //obtener cotizaciones 
+    //obtener cotizaciones
     public function traspasos_obtener_cotizaciones(Request $request){
         if($request->ajax()){
             $mesactual = date("m");
@@ -532,7 +533,7 @@ class TraspasoController extends ConfiguracionSistemaController{
             }
         }else{
             $filasdetallescotizacion = '';
-        }        
+        }
         $data = array(
             "cotizacion" => $cotizacion,
             "filasdetallescotizacion" => $filasdetallescotizacion,
@@ -548,8 +549,8 @@ class TraspasoController extends ConfiguracionSistemaController{
         );
         return response()->json($data);
     }
-    
-    //obtener requisiciones 
+
+    //obtener requisiciones
     public function traspasos_obtener_requisiciones(Request $request){
         if($request->ajax()){
             $mesactual = date("m");
@@ -617,7 +618,7 @@ class TraspasoController extends ConfiguracionSistemaController{
             }
         }else{
             $filasdetallescotizacion = '';
-        }        
+        }
         $data = array(
             "requisicion" => $requisicion,
             "filasdetallesrequisicion" => $filasdetallesrequisicion,
@@ -653,18 +654,18 @@ class TraspasoController extends ConfiguracionSistemaController{
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($Existencias).'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\',\''.$tipooperacion.'\')">Seleccionar</div>';
                         return $boton;
                     })
-                    ->addColumn('Existencias', function($data){ 
+                    ->addColumn('Existencias', function($data){
                         return Helpers::convertirvalorcorrecto($data->Existencias);
                     })
-                    ->addColumn('Costo', function($data){ 
+                    ->addColumn('Costo', function($data){
                         return Helpers::convertirvalorcorrecto($data->Costo);
                     })
-                    ->addColumn('SubTotal', function($data){ 
+                    ->addColumn('SubTotal', function($data){
                         return Helpers::convertirvalorcorrecto($data->SubTotal);
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        } 
+        }
     }
     //obtener producto por codigo
     public function traspasos_obtener_producto_por_codigo(Request $request){
@@ -702,7 +703,7 @@ class TraspasoController extends ConfiguracionSistemaController{
                 'contarproductos' => $contarproductos
             );
         }
-        return response()->json($data);        
+        return response()->json($data);
     }
 
     //obtener existencias
@@ -731,6 +732,11 @@ class TraspasoController extends ConfiguracionSistemaController{
 
     //guardar
     public function traspasos_guardar(Request $request){
+
+        if($request->orden != ""){
+            $piezas = array();
+            $numerosPartes = DB::table('Compras Detalles')->select('Codigo','Cantidad')->where('OT',$request->orden)->get()->toArray();
+        }
         ini_set('max_input_vars','20000' );
         //obtener el ultimo folio de la tabla
         $folio = Helpers::ultimofolioserietablamodulos('App\Traspaso',$request->serie);
@@ -783,7 +789,7 @@ class TraspasoController extends ConfiguracionSistemaController{
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
         $item = 1;
-        foreach ($request->codigoproductopartida as $key => $codigoproductopartida){             
+        foreach ($request->codigoproductopartida as $key => $codigoproductopartida){
             $TraspasoDetalle=new TraspasoDetalle;
             $TraspasoDetalle->Traspaso = $traspaso;
             $TraspasoDetalle->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
@@ -1000,7 +1006,7 @@ class TraspasoController extends ConfiguracionSistemaController{
             if($Traspaso->Orden != ""){
                 $eliminarrefacciones = OrdenTrabajoDetalle::where('Traspaso', $request->traspasodesactivar)->where('Codigo', $detalle->Codigo)->forceDelete();
                 $detallestraspaso = TraspasoDetalle::where('Traspaso', $request->traspasodesactivar)->get();
-                foreach ($detallestraspaso as $dt){ 
+                foreach ($detallestraspaso as $dt){
                     if($dt->Requisicion != ""){
                         $RequisicionDetalle = RequisicionDetalle::where('Requisicion', $dt->Requisicion)->where('Codigo', $dt->Codigo)->first();
                         $Surtir = $RequisicionDetalle->Surtir+$dt->Cantidad;
@@ -1115,7 +1121,7 @@ class TraspasoController extends ConfiguracionSistemaController{
             }
         }else{
             $filasdetallestraspaso = '';
-        } 
+        }
         //permitir o no modificar registro
         if(Auth::user()->role_id == 1){
             if($traspaso->Status == 'BAJA'){
@@ -1135,7 +1141,7 @@ class TraspasoController extends ConfiguracionSistemaController{
                     $modificacionpermitida = 1;
                 }
             }
-        }        
+        }
         $data = array(
             "traspaso" => $traspaso,
             "almacende" => $almacende,
@@ -1161,7 +1167,7 @@ class TraspasoController extends ConfiguracionSistemaController{
         return response()->json($data);
     }
 
-    //guardar modificacion 
+    //guardar modificacion
     public function traspasos_guardar_modificacion(Request $request){
         ini_set('max_input_vars','20000' );
         $traspaso = $request->folio.'-'.$request->serie;
@@ -1179,7 +1185,7 @@ class TraspasoController extends ConfiguracionSistemaController{
                             'Total' => $OrdenTrabajoAnterior->Total - $TraspasoAnterior->Total + $request->total,
                             'Costo' => $OrdenTrabajoAnterior->Costo - $TraspasoAnterior->Costo + $request->costo,
                             'Utilidad' => $OrdenTrabajoAnterior->Utilidad - $TraspasoAnterior->Utilidad + $request->utilidad
-                        ]);            
+                        ]);
         }
         //validar si las partidas en las modiifcacion son las mismas que los detalles de los traspasos
         // si no son las mismas comparar y eliminar las partidas que corresponden en la tabla detalles de OrdenesTrabajo y Traspasos
@@ -1194,8 +1200,8 @@ class TraspasoController extends ConfiguracionSistemaController{
         foreach ($request->codigoproductopartida as $key => $nuevocodigo){
             if($request->agregadoen [$key] == 'NA'){
                 array_push($ArrayDetallesTraspasoNuevo, $traspaso.'#'.$nuevocodigo.'#'.$request->itempartida [$key]);
-            } 
-        }  
+            }
+        }
         //diferencias entre arreglos
         $diferencias_arreglos = array_diff($ArrayDetallesTraspasoAnterior, $ArrayDetallesTraspasoNuevo);
         //iteramos las diferencias entre arreglos
@@ -1277,9 +1283,9 @@ class TraspasoController extends ConfiguracionSistemaController{
         $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA DETALLES
-        foreach ($request->codigoproductopartida as $key => $codigoproductopartida){    
+        foreach ($request->codigoproductopartida as $key => $codigoproductopartida){
             //if la partida se agrego en la modificacion se agrega en los detalles de traspaso y de orden de trabajo si asi lo requiere
-            if($request->agregadoen [$key] == 'modificacion'){     
+            if($request->agregadoen [$key] == 'modificacion'){
                 $contaritems = TraspasoDetalle::select('Item')->where('Traspaso', $traspaso)->count();
                 if($contaritems > 0){
                     $item = TraspasoDetalle::select('Item')->where('Traspaso', $traspaso)->orderBy('Item', 'DESC')->take(1)->get();
@@ -1504,9 +1510,9 @@ class TraspasoController extends ConfiguracionSistemaController{
                     return $total;
                 })
                 ->make(true);
-        } 
+        }
     }
-    
+
     //generar documento pdf
     public function traspasos_generar_pdfs(Request $request){
         //primero eliminar todos los archivos de la carpeta
@@ -1515,7 +1521,7 @@ class TraspasoController extends ConfiguracionSistemaController{
         Helpers::eliminararchivoszipgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
-            $traspasos = Traspaso::whereIn('Traspaso', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
+            $traspasos = Traspaso::whereIn('Traspaso', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get();
         }else{
             $fechainiciopdf = date($request->fechainiciopdf);
             $fechaterminacionpdf = date($request->fechaterminacionpdf);
@@ -1544,7 +1550,7 @@ class TraspasoController extends ConfiguracionSistemaController{
                     "descuentodetalle" => Helpers::convertirvalorcorrecto($td->Dcto),
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($td->SubTotal)
                 );
-            } 
+            }
             $almacende = Almacen::where('Numero', $t->De)->first();
             $almacena = '';
             $orden = '';
@@ -1613,8 +1619,8 @@ class TraspasoController extends ConfiguracionSistemaController{
                 // Agregar archivos que se comprimiran
                 foreach($arrayfilespdf as $afp) {
                     $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
-                }     
-                //terminar proceso   
+                }
+                //terminar proceso
                 $zip->close();
             }
             // Set Encabezados para descargar
@@ -1631,7 +1637,7 @@ class TraspasoController extends ConfiguracionSistemaController{
 
     //generacion de formato en PDF
     public function traspasos_generar_pdfs_indiv($documento){
-        $traspasos = Traspaso::where('Traspaso', $documento)->get(); 
+        $traspasos = Traspaso::where('Traspaso', $documento)->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($traspasos as $t){
@@ -1650,7 +1656,7 @@ class TraspasoController extends ConfiguracionSistemaController{
                     "descuentodetalle" => Helpers::convertirvalorcorrecto($td->Dcto),
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($td->SubTotal)
                 );
-            } 
+            }
             $almacende = Almacen::where('Numero', $t->De)->first();
             $almacena = '';
             $orden = '';
@@ -1713,7 +1719,7 @@ class TraspasoController extends ConfiguracionSistemaController{
 
     //enviar pdf por emial
     public function traspasos_enviar_pdfs_email(Request $request){
-        $traspasos = Traspaso::where('Traspaso', $request->emaildocumento)->get(); 
+        $traspasos = Traspaso::where('Traspaso', $request->emaildocumento)->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($traspasos as $t){
@@ -1732,7 +1738,7 @@ class TraspasoController extends ConfiguracionSistemaController{
                     "descuentodetalle" => Helpers::convertirvalorcorrecto($td->Dcto),
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($td->SubTotal)
                 );
-            } 
+            }
             $almacende = Almacen::where('Numero', $t->De)->first();
             $almacena = '';
             $orden = '';
@@ -1777,7 +1783,7 @@ class TraspasoController extends ConfiguracionSistemaController{
         ->setOption('margin-bottom', 10);
         try{
             $datosdocumento = Traspaso::where('Traspaso', $request->emaildocumento)->first();
-            //enviar correo electrónico	
+            //enviar correo electrónico
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
             $arraycc = array();
@@ -1825,8 +1831,8 @@ class TraspasoController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Traspasos', Auth::user()->id);
-        return Excel::download(new TraspasosExport($configuraciones_tabla['campos_consulta'],$request->periodo), "traspasos-".$request->periodo.".xlsx");   
-  
+        return Excel::download(new TraspasosExport($configuraciones_tabla['campos_consulta'],$request->periodo), "traspasos-".$request->periodo.".xlsx");
+
     }
 
     //guardar configuracion tabla
@@ -1876,5 +1882,5 @@ class TraspasoController extends ConfiguracionSistemaController{
         }
         return redirect()->route('traspasos');
     }
-    
+
 }

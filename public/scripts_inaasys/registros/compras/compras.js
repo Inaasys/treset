@@ -751,7 +751,7 @@ function listarordenesdecompra (){
 //obtener todos los datos de la orden de compra seleccionada
 function seleccionarordencompra(Folio, Orden, tipoalta){
   $('.page-loader-wrapper').css('display', 'block');
-  $.get(compras_obtener_orden_compra, {Folio:Folio, Orden:Orden}, function(data){
+  $.get(compras_obtener_orden_compra, {Folio:Folio, Orden:Orden, tipoalta:tipoalta}, function(data){
     $("#orden").val(Orden);
     switch (tipoalta) {
       case 'GASTOS':
@@ -1537,6 +1537,12 @@ function alta(tipoalta){
   let subtotalxml = ''
   let ivaxml = ''
   let totalxml = ''
+  let headOT = ''
+
+  //Valida si debe Contener OT
+
+  if(tipoalta == 'PRODUCTOS') headOT = '<th class="" style="background-color: #F70707">OT</th>'
+
 
   if(solicitarxml){
     importexml = '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="importexml" id="importexml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'
@@ -1743,6 +1749,7 @@ function alta(tipoalta){
                                                 '<th class="customercolortheadth"><div style="width:400px !important;">Descripción</div></th>'+
                                                 '<th class="'+background_tables+'">Unidad</th>'+
                                                 '<th class="'+background_tables+'">Por Surtir</th>'+
+                                                headOT+
                                                 '<th class="customercolortheadth">Cantidad</th>'+
                                                 '<th class="customercolortheadth">Precio $</th>'+
                                                 '<th class="'+background_tables+'">Importe $</th>'+
@@ -2055,8 +2062,13 @@ $("#btnGuardar").on('click', function (e) {
 });
 //modificacion compra
 function obtenerdatos(compramodificar){
+    let OTHeader = ''
+    let inputOT = ''
   $('.page-loader-wrapper').css('display', 'block');
   $.get(compras_obtener_compra,{compramodificar:compramodificar },function(data){
+    if(data.movimiento.indexOf('ALMACEN') > -1){
+        OTHeader = '<th class="" style="background-color: #F70707">OT</th>'
+    }
     $("#titulomodal").html('Modificación Compra --- STATUS : ' + data.compra.Status);
     //formulario modificacion
     var tabs =    '<div class="row">'+
@@ -2245,10 +2257,11 @@ function obtenerdatos(compramodificar){
                                             '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
                                                 '<th class="'+background_tables+'">#</th>'+
-                                                '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
+                                                '<th class="'+background_tables+'"><div style="width:100px !important;">P</div></th>'+
                                                 '<th class="customercolortheadth"><div style="width:400px !important;">Descripción</div></th>'+
                                                 '<th class="'+background_tables+'">Unidad</th>'+
                                                 '<th class="'+background_tables+'" hidden>Por Surtir</th>'+
+                                                OTHeader+
                                                 '<th class="customercolortheadth">Cantidad</th>'+
                                                 '<th class="customercolortheadth">Precio $</th>'+
                                                 '<th class="'+background_tables+'">Importe $</th>'+

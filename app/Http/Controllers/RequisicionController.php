@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Helpers;
@@ -19,12 +17,8 @@ use App\Requisicion;
 use App\RequisicionDetalle;
 use App\Traspaso;
 use App\TraspasoDetalle;
-use App\TipoOrdenCompra;
 use App\Cliente;
 use App\Almacen;
-use App\Departamento;
-use App\ClaveProdServ;
-use App\ClaveUnidad;
 use App\Producto;
 use App\BitacoraDocumento;
 use App\Existencia;
@@ -33,14 +27,13 @@ use App\Configuracion_Tabla;
 use App\VistaRequisicion;
 use App\VistaObtenerExistenciaProducto;
 use App\OrdenTrabajo;
-use App\OrdenTrabajoDetalle;
 use App\Serie;
 use App\Firma_Rel_Documento;
 use Config;
 use Mail;
-use LynX39\LaraPdfMerger\Facades\PdfMerger;
-use Storage; 
+use Storage;
 use ZipArchive;
+use App\CompraDetalle;
 
 class RequisicionController extends ConfiguracionSistemaController{
 
@@ -126,11 +119,11 @@ class RequisicionController extends ConfiguracionSistemaController{
                     //->addColumn('utilidad', function($data){ return $data->Utilidad; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        } 
+        }
     }
     //descargar plantilla
     public function requisiciones_generar_plantilla(){
-        return Excel::download(new PlantillasRequisicionesExport(), "plantillarequisiciones.xlsx"); 
+        return Excel::download(new PlantillasRequisicionesExport(), "plantillarequisiciones.xlsx");
     }
     //cargar partidas excel
     public function requisiciones_cargar_partidas_excel(Request $request){
@@ -146,7 +139,7 @@ class RequisicionController extends ConfiguracionSistemaController{
         foreach($partidasexcel as $partida){
             if($rowexcel > 0){
                 if (in_array(strtoupper($partida[0]), $arraycodigosyaagregados)) {
-                    
+
                 }else{
                     $codigoabuscar = $partida[0];
                     $cantidadpartida = $partida[1];
@@ -223,7 +216,7 @@ class RequisicionController extends ConfiguracionSistemaController{
             "contadorproductos" => $contadorproductos,
             "contadorfilas" => $contadorfilas,
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
     //obtener series documento
     public function requisiciones_obtener_series_documento(Request $request){
@@ -302,7 +295,7 @@ class RequisicionController extends ConfiguracionSistemaController{
             'unidad' => $unidad,
             'statusorden' => $statusorden
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener productos
@@ -320,18 +313,18 @@ class RequisicionController extends ConfiguracionSistemaController{
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\',\''.$tipooperacion.'\')">Seleccionar</div>';
                         return $boton;
                     })
-                    ->addColumn('Existencias', function($data){ 
+                    ->addColumn('Existencias', function($data){
                         return Helpers::convertirvalorcorrecto($data->Existencias);
                     })
-                    ->addColumn('Costo', function($data){ 
+                    ->addColumn('Costo', function($data){
                         return Helpers::convertirvalorcorrecto($data->Costo);
                     })
-                    ->addColumn('SubTotal', function($data){ 
+                    ->addColumn('SubTotal', function($data){
                         return Helpers::convertirvalorcorrecto($data->SubTotal);
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        } 
+        }
     }
     //obtener producto por codigo
     public function requisiciones_obtener_producto_por_codigo(Request $request){
@@ -371,7 +364,7 @@ class RequisicionController extends ConfiguracionSistemaController{
                 'contarproductos' => $contarproductos
             );
         }
-        return response()->json($data);        
+        return response()->json($data);
     }
     //altas
     public function requisiciones_guardar(Request $request){
@@ -411,7 +404,7 @@ class RequisicionController extends ConfiguracionSistemaController{
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
         $item = 1;
-        foreach ($request->codigoproductopartida as $key => $codigoproductopartida){             
+        foreach ($request->codigoproductopartida as $key => $codigoproductopartida){
             $RequisicionDetalle=new RequisicionDetalle;
             $RequisicionDetalle->Requisicion = $requisicion;
             $RequisicionDetalle->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
@@ -560,7 +553,7 @@ class RequisicionController extends ConfiguracionSistemaController{
             }
         }else{
             $filasdetallesrequisicion = '';
-        }   
+        }
         //permitir o no modificar registro
         if(Auth::user()->role_id == 1){
             if($requisicion->Status == 'SURTIDO' || $requisicion->Status == 'BAJA'){
@@ -580,7 +573,7 @@ class RequisicionController extends ConfiguracionSistemaController{
                     $modificacionpermitida = 1;
                 }
             }
-        }    
+        }
         $data = array(
             "requisicion" => $requisicion,
             "ordentrabajo" => $ordentrabajo,
@@ -605,7 +598,7 @@ class RequisicionController extends ConfiguracionSistemaController{
         return response()->json($data);
     }
 
-    //guardar modificacion 
+    //guardar modificacion
     public function requisiciones_guardar_modificacion(Request $request){
         ini_set('max_input_vars','20000' );
         $requisicion = $request->folio.'-'.$request->serie;
@@ -623,8 +616,8 @@ class RequisicionController extends ConfiguracionSistemaController{
         foreach ($request->codigoproductopartida as $key => $nuevocodigo){
             if($request->agregadoen [$key] == 'NA'){
                 array_push($ArrayDetallesRequisicionNuevo, $requisicion.'#'.$nuevocodigo.'#'.$request->itempartida [$key]);
-            } 
-        }  
+            }
+        }
         //diferencias entre arreglos
         $diferencias_arreglos = array_diff($ArrayDetallesRequisicionAnterior, $ArrayDetallesRequisicionNuevo);
         //iteramos las diferencias entre arreglos
@@ -661,9 +654,9 @@ class RequisicionController extends ConfiguracionSistemaController{
         $BitacoraDocumento->save();
         //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
         $detallesporsurtir = 0;
-        foreach ($request->codigoproductopartida as $key => $codigoproductopartida){    
+        foreach ($request->codigoproductopartida as $key => $codigoproductopartida){
             //if la partida se agrego en la modificacion se agrega en los detalles
-            if($request->agregadoen [$key] == 'modificacion'){      
+            if($request->agregadoen [$key] == 'modificacion'){
                 $contaritems = RequisicionDetalle::select('Item')->where('Requisicion', $requisicion)->count();
                 if($contaritems > 0){
                     $item = RequisicionDetalle::select('Item')->where('Requisicion', $requisicion)->orderBy('Item', 'DESC')->take(1)->get();
@@ -699,7 +692,7 @@ class RequisicionController extends ConfiguracionSistemaController{
                 $RequisicionDetalle->TipoDeCambio =  $request->tipodecambiopartida [$key];
                 $RequisicionDetalle->Item = $ultimoitem;
                 $RequisicionDetalle->save();
-                $ultimoitem++;   
+                $ultimoitem++;
             }else{
                 //si la partida no se agrego en la modificacion solo se modifican los datos
                 //modificar detalle
@@ -746,13 +739,13 @@ class RequisicionController extends ConfiguracionSistemaController{
             }
         }
         //Cerrar la orden de compra si todas sus partidas tienen cero en por surtir
-        if($detallesporsurtir == 0){
-            Requisicion::where('Requisicion', $requisicion)
-                        ->update([
-                            'TipoDeCambio' =>  'SURTIDO'
-                        ]);
-        }
-    	return response()->json($Requisicion);     
+        // if($detallesporsurtir == 0){
+        //     Requisicion::where('Requisicion', $requisicion)
+        //                 ->update([
+        //                     'STATUS' =>  'SURTIDO'
+        //                 ]);
+        // }
+    	return response()->json($Requisicion);
     }
 
 
@@ -767,7 +760,7 @@ class RequisicionController extends ConfiguracionSistemaController{
                     return $total;
                 })
                 ->make(true);
-        } 
+        }
     }
     //generar documento pdf
     public function requisiciones_generar_pdfs(Request $request){
@@ -777,7 +770,7 @@ class RequisicionController extends ConfiguracionSistemaController{
         Helpers::eliminararchivoszipgenerados();
         $tipogeneracionpdf = $request->tipogeneracionpdf;
         if($tipogeneracionpdf == 0){
-            $requisiciones = Requisicion::whereIn('Requisicion', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get(); 
+            $requisiciones = Requisicion::whereIn('Requisicion', $request->arraypdf)->orderBy('Folio', 'ASC')->take(1500)->get();
         }else{
             $fechainiciopdf = date($request->fechainiciopdf);
             $fechaterminacionpdf = date($request->fechaterminacionpdf);
@@ -807,7 +800,7 @@ class RequisicionController extends ConfiguracionSistemaController{
                     "preciodetalle" => Helpers::convertirvalorcorrecto($rd->Precio),
                     "importedetalle" => Helpers::convertirvalorcorrecto($rd->Importe)
                 );
-            } 
+            }
             $ordentrabajo = OrdenTrabajo::where('Orden', $r->Orden)->first();
             $cliente = Cliente::where('Numero', $ordentrabajo->Cliente)->first();
             //obtener firmas
@@ -867,8 +860,8 @@ class RequisicionController extends ConfiguracionSistemaController{
                 // Agregar archivos que se comprimiran
                 foreach($arrayfilespdf as $afp) {
                     $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
-                }     
-                //terminar proceso   
+                }
+                //terminar proceso
                 $zip->close();
             }
             // Set Encabezados para descargar
@@ -884,7 +877,7 @@ class RequisicionController extends ConfiguracionSistemaController{
     }
     //generacion de formato en PDF
     public function requisiciones_generar_pdfs_indiv($documento){
-        $requisiciones = Requisicion::where('Requisicion', $documento)->get(); 
+        $requisiciones = Requisicion::where('Requisicion', $documento)->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($requisiciones as $r){
@@ -904,7 +897,7 @@ class RequisicionController extends ConfiguracionSistemaController{
                     "preciodetalle" => Helpers::convertirvalorcorrecto($rd->Precio),
                     "importedetalle" => Helpers::convertirvalorcorrecto($rd->Importe)
                 );
-            } 
+            }
             $ordentrabajo = OrdenTrabajo::where('Orden', $r->Orden)->first();
             $cliente = Cliente::where('Numero', $ordentrabajo->Cliente)->first();
             //obtener firmas
@@ -968,7 +961,7 @@ class RequisicionController extends ConfiguracionSistemaController{
     }
     //enviar pdf por emial
     public function requisiciones_enviar_pdfs_email(Request $request){
-        $requisiciones = Requisicion::where('Requisicion', $request->emaildocumento)->get(); 
+        $requisiciones = Requisicion::where('Requisicion', $request->emaildocumento)->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($requisiciones as $r){
@@ -988,7 +981,7 @@ class RequisicionController extends ConfiguracionSistemaController{
                     "preciodetalle" => Helpers::convertirvalorcorrecto($rd->Precio),
                     "importedetalle" => Helpers::convertirvalorcorrecto($rd->Importe)
                 );
-            } 
+            }
             $ordentrabajo = OrdenTrabajo::where('Orden', $r->Orden)->first();
             $cliente = Cliente::where('Numero', $ordentrabajo->Cliente)->first();
             //obtener firmas
@@ -1025,7 +1018,7 @@ class RequisicionController extends ConfiguracionSistemaController{
         ->setOption('margin-bottom', 10);
         try{
             $datosdocumento = Requisicion::where('Requisicion', $request->emaildocumento)->first();
-            //enviar correo electrónico	
+            //enviar correo electrónico
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
             $arraycc = array();
@@ -1072,7 +1065,7 @@ class RequisicionController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Requisiciones', Auth::user()->id);
-        return Excel::download(new RequisicionesExport($configuraciones_tabla['campos_consulta'],$request->periodo), "requisciones-".$request->periodo.".xlsx");   
+        return Excel::download(new RequisicionesExport($configuraciones_tabla['campos_consulta'],$request->periodo), "requisciones-".$request->periodo.".xlsx");
     }
     //guardar configuracion tabla
     public function requisiciones_guardar_configuracion_tabla(Request $request){
@@ -1120,5 +1113,112 @@ class RequisicionController extends ConfiguracionSistemaController{
             $Configuracion_Tabla->save();
         }
         return redirect()->route('requisiciones');
+    }
+    public function requisiciones_validar_partes_ot(Request $request)
+    {
+        ini_set('max_execution_time', 0);
+        ini_set('memory_limit', '-1');
+
+        $existentes = array();
+        $faltantesAux = array();
+        $existentesReq = array();
+        $faltantes = array();
+        $totalPartes = CompraDetalle::Select('Codigo','Cantidad')->where('OT',$request->orden)->where('Cantidad','>',0)->get();
+        //Arma Array de los Codigos que deben existir
+        foreach ($totalPartes as $parte) {
+            array_push($existentes, $parte->Codigo);
+        }
+
+        //Valida si ya exiten partes cargadas
+        $requisiciones = Requisicion::where('Orden',$request->orden)->with(['detalles'])->where('Status','!=','BAJA')->get();
+        if ($requisiciones->count() > 0) {
+            //Obtiene los codigos de las requisiciones
+            foreach ($requisiciones as $i => $req) {
+                foreach ($req->detalles as $j => $detalle) {
+                    array_push($existentesReq, $detalle->Codigo);
+                }
+            }
+            //Valida si los codigos de compras ya fueron cargados a la OT o Si estan en las partidas nuevas
+            foreach ($totalPartes as $key => $parte) {
+                if (!in_array($parte->Codigo, $request->codigoproductopartida) && !in_array($parte->Codigo, $existentesReq)) {
+                    array_push($faltantes, array(
+                        'Codigo' => $parte->Codigo,
+                        'Cantidad' => Helpers::convertirvalorcorrecto($parte->Cantidad),
+                    ));
+                }elseif(in_array($parte->Codigo, $request->codigoproductopartida) && !in_array($parte->Codigo, $existentesReq)){
+                    foreach ($request->codigoproductopartida as $key => $partida) {
+                        if ($request->codigoproductopartida[$key] == $parte->Codigo) {
+                            if ($request->cantidadpartida[$key] < $parte->Cantidad) {
+                                array_push($faltantes, array(
+                                    'Codigo' => $parte->Codigo,
+                                    'Cantidad' => Helpers::convertirvalorcorrecto($parte->Cantidad - $request->cantidadpartida[$key]),
+                                ));
+                            }
+                        }
+                    }
+                }elseif (!in_array($parte->Codigo, $request->codigoproductopartida) && in_array($parte->Codigo, $existentesReq)) {
+                    //Valida si hay codigos con piezas faltantes
+                    $sumaCodigos = 0;
+                    foreach ($requisiciones as $i => $req) {
+                        foreach ($req->detalles as $j => $detalle) {
+                            if ($detalle->Codigo == $parte->Codigo) {
+                                $sumaCodigos += $detalle->Cantidad;
+                            }
+                        }
+                    }
+                    if (($parte->Cantidad - $sumaCodigos) > 0 ) {
+                        array_push($faltantes, array(
+                            'Codigo' => $parte->Codigo,
+                            'Cantidad' => Helpers::convertirvalorcorrecto($parte->Cantidad - $sumaCodigos),
+                        ));
+                    }
+                }elseif (in_array($parte->Codigo, $request->codigoproductopartida) && in_array($parte->Codigo, $existentesReq)) {
+                    //Valida si hay codigos con piezas faltantes
+                    $sumaCodigos = 0;
+                    foreach ($requisiciones as $i => $req) {
+                        foreach ($req->detalles as $j => $detalle) {
+                            if ($detalle->Codigo == $parte->Codigo) {
+                                $sumaCodigos += $detalle->Cantidad;
+                            }
+                        }
+                    }
+                    //Suma la cantidad de la partida a la suma ya existentes
+                    foreach ($request->codigoproductopartida as $key => $partida) {
+                        if ($request->codigoproductopartida[$key] == $parte->Codigo) {
+                            $sumaCodigos += $request->cantidadpartida[$key];
+                        }
+                    }
+                    if (($parte->Cantidad - $sumaCodigos) > 0 ) {
+                        array_push($faltantes, array(
+                            'Codigo' => $parte->Codigo,
+                            'Cantidad' => Helpers::convertirvalorcorrecto($parte->Cantidad - $sumaCodigos),
+                        ));
+                    }
+                }
+            }
+            return response()->json($faltantes, 202);
+        }else{
+            foreach ($totalPartes as $key => $parte) {
+                if (!in_array($parte->Codigo, $request->codigoproductopartida)) {
+                    array_push($faltantes, array(
+                        'Codigo' => $parte->Codigo,
+                        'Cantidad' => Helpers::convertirvalorcorrecto($parte->Cantidad),
+                    ));
+                }else{
+                    foreach ($request->codigoproductopartida as $key => $partida) {
+                        if ($request->codigoproductopartida[$key] == $parte->Codigo) {
+                            if ($request->cantidadpartida[$key] < $parte->Cantidad) {
+                                array_push($faltantes, array(
+                                    'Codigo' => $parte->Codigo,
+                                    'Cantidad' => Helpers::convertirvalorcorrecto($parte->Cantidad - $request->cantidadpartida[$key]),
+                                ));
+                            }
+                        }
+                    }
+                }
+            }
+            return response()->json($faltantes,202);
+        }
+
     }
 }
