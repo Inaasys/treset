@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use View; 
+use View;
 use Helpers;
 use Carbon\Carbon;
 use App\Empresa;
@@ -72,7 +72,8 @@ class ConfiguracionSistemaController extends Controller
                                             'PedirObligatoriamenteEquipoEnRemisiones',
                                             'GenerarFormatoRequisicionTYT',
                                             'ModificarCreditoDeClientes',
-                                            'ModificarCostoyVentaDeServicios')
+                                            'ModificarCostoyVentaDeServicios',
+                                            'ligarOTaCompra')
                                 ->where('Numero', 1)->first();
         //actualizar datos de configuracion global
         config(['app.periodoincialmodulos' => $this->empresa->Periodo_Inicial_Modulos]);
@@ -100,6 +101,7 @@ class ConfiguracionSistemaController extends Controller
         config(['app.modificarcostosdeproductos' => $this->empresa->ModificarCostosDeProductos]);
         config(['app.modificarcreditodeclientes' => $this->empresa->ModificarCreditoDeClientes]);
         config(['app.modificarcostoyventadeservicios' => $this->empresa->ModificarCostoyVentaDeServicios]);
+        config(['app.ligarOTaCompra'=>$this->empresa->ligarOTaCompra]);
         ////////////OBTENER CONFIGURACIONES DEL SISTEMA////////////////
         $this->numerocerosconfigurados = Helpers::numerocerosconfiguracion(); //obtienes los ceros que se deben colocar con base a los decimales configurados en el sistemas ejemplo decimales para el sistema = 3 numero de ceros = 000
         $this->numerocerosconfiguradosinputnumberstep = Helpers::numerocerosconfiguracioninputnumberstep(); //obtienes los ceros que se deben colocar en los input type number con base a los decimales configurados en el sistemas ejemplo decimales para el sistema = 3 numero de ceros = 001
@@ -130,32 +132,34 @@ class ConfiguracionSistemaController extends Controller
         //correo por default en envios de documentos
         $this->correodefault1enviodocumentos = config('app.correodefault1enviodocumentos');
         $this->correodefault2enviodocumentos = config('app.correodefault2enviodocumentos');
-        //usuarios ue puedes modificar isnumos 
+        //usuarios ue puedes modificar isnumos
         $this->usuariosamodificarinsumos = config('app.usuariosamodificarinsumos');
         //usuarios que pueden modificar costos en productos
         $this->modificarcostosdeproductos = config('app.modificarcostosdeproductos');
-        //usuarios ue puedes modificar credito clientes 
+        //usuarios ue puedes modificar credito clientes
         $this->modificarcreditodeclientes = config('app.modificarcreditodeclientes');
         //usuarios que pueden modificar costo y venta servicio
         $this->modificarcostoyventadeservicios = config('app.modificarcostoyventadeservicios');
+        // Ligar Compras con OT
+        $this->ligarOTaCompra = config('app.ligarOTaCompra');
         //conexiones a otras bases
         $this->suc2 = config('app.suc2');
-        $this->connsuc2 = config('app.connsuc2');    
+        $this->connsuc2 = config('app.connsuc2');
         $this->suc3 = config('app.suc3');
-        $this->connsuc3 = config('app.connsuc3');  
+        $this->connsuc3 = config('app.connsuc3');
         $this->suc4 = config('app.suc4');
-        $this->connsuc4 = config('app.connsuc4');    
+        $this->connsuc4 = config('app.connsuc4');
         /*
         //obtener o actualizar el valor del dolar segun sea el caso
         $fechahoy = Carbon::now()->toDateString();
         $dia=date("w", strtotime($fechahoy));
         switch ($dia) {
             case "6":
-                $fechaviernes = new Carbon('last friday');   
+                $fechaviernes = new Carbon('last friday');
                 $fecha = Carbon::parse($fechaviernes)->toDateString();
                 break;
             case "0":
-                $fechaviernes = new Carbon('last friday');   
+                $fechaviernes = new Carbon('last friday');
                 $fecha = Carbon::parse($fechaviernes)->toDateString();
                 break;
             default:
@@ -212,7 +216,7 @@ class ConfiguracionSistemaController extends Controller
             $this->ultimo_valor_tipo_cambio_volvo = Helpers::convertirvalorcorrecto(0);
             $this->ultima_fecha_actualización_tipo_cambio_volvo = Helpers::convertirvalorcorrecto(0);
         }else{
-            $this->ultimo_valor_tipo_cambio_volvo = Helpers::convertirvalorcorrecto($this->ultimo_tipo_cambio_volvo[0]->Valor);  
+            $this->ultimo_valor_tipo_cambio_volvo = Helpers::convertirvalorcorrecto($this->ultimo_tipo_cambio_volvo[0]->Valor);
             $this->ultima_fecha_actualización_tipo_cambio_volvo = Carbon::parse($this->ultimo_tipo_cambio_volvo[0]->Fecha)->toDateTimeString();
         }
         //obtener ultimo valor dolar cummins y fecha de actualizacion
@@ -221,7 +225,7 @@ class ConfiguracionSistemaController extends Controller
             $this->ultimo_valor_tipo_cambio_cummins = Helpers::convertirvalorcorrecto(0);
             $this->ultima_fecha_actualización_tipo_cambio_cummins = Helpers::convertirvalorcorrecto(0);
         }else{
-            $this->ultimo_valor_tipo_cambio_cummins = Helpers::convertirvalorcorrecto($this->ultimo_tipo_cambio_cummins[0]->Valor);  
+            $this->ultimo_valor_tipo_cambio_cummins = Helpers::convertirvalorcorrecto($this->ultimo_tipo_cambio_cummins[0]->Valor);
             $this->ultima_fecha_actualización_tipo_cambio_cummins = Carbon::parse($this->ultimo_tipo_cambio_cummins[0]->Fecha)->toDateTimeString();
         }
         //timbres ingreso - facturas totales activos utilizados
@@ -324,12 +328,13 @@ class ConfiguracionSistemaController extends Controller
         View::share ( 'modificarcostosdeproductos', $this->modificarcostosdeproductos);
         View::share ( 'modificarconsecutivofolioenremisiones', $this->modificarconsecutivofolioenremisiones);
         View::share ( 'validarutilidadnegativa', $this->validarutilidadnegativa);
+        View::share ( 'ligarOTaCompra', $this->ligarOTaCompra);
         View::share ( 'suc2', $this->suc2);
-        View::share ( 'connsuc2', $this->connsuc2); 
+        View::share ( 'connsuc2', $this->connsuc2);
         View::share ( 'suc3', $this->suc3);
-        View::share ( 'connsuc3', $this->connsuc3); 
+        View::share ( 'connsuc3', $this->connsuc3);
         View::share ( 'suc4', $this->suc4);
-        View::share ( 'connsuc4', $this->connsuc4); 
+        View::share ( 'connsuc4', $this->connsuc4);
         //View::share ( 'array', ['name'=>'Franky','address'=>'Mars'] );
-    } 
+    }
 }

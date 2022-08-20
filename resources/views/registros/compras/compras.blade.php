@@ -265,6 +265,7 @@
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';
+        var ligarOTaCompra = '{{$empresa->ligarOTaCompra}}'
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var urlpdfsimpresionesrapidas = '{{asset("xml_descargados/")}}/';
         var compras_obtener = '{!!URL::to('compras_obtener')!!}';

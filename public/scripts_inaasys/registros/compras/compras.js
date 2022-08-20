@@ -1540,8 +1540,9 @@ function alta(tipoalta){
   let headOT = ''
 
   //Valida si debe Contener OT
-
-  if(tipoalta == 'PRODUCTOS') headOT = '<th class="" style="background-color: #F70707">OT</th>'
+  if(tipoalta == 'PRODUCTOS'){
+    if(ligarOTaCompra == 'S') headOT = '<th class="" style="background-color: #F70707">OT</th>'
+  }
 
 
   if(solicitarxml){
