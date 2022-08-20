@@ -167,6 +167,8 @@ return [
     'modificarcostosdeproductos' => '',
     'modificarcreditodeclientes' => '',
     'modificarcostoyventadeservicios' => '',
+    // Para ligar una OT a una NP
+    'ligarOTaCompra' => '',
     'suc2' => env('DB2_DATABASE'),
     'connsuc2' => 'sqlsrv2',
     'suc3' => env('DB3_DATABASE'),
@@ -174,7 +176,7 @@ return [
     'suc4' => env('DB4_DATABASE'),
     'connsuc4' => 'sqlsrv4',
 
-    
+
 
     /*
     |--------------------------------------------------------------------------

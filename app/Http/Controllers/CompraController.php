@@ -669,7 +669,7 @@ class CompraController extends ConfiguracionSistemaController{
         $almacen = Almacen::where('Numero', $ordencompra->Almacen)->first();
         $tdOrden = '';
         if($request->tipoalta == "PRODUCTOS"){
-            $tdOrden = '<td class="tdmod"><input type="text" class="form-control divorinputmodsm" required name="ordenTrabajo[]"</td>';
+            if($this->ligarOTaCompra == 'S') $tdOrden = '<td class="tdmod"><input type="text" class="form-control divorinputmodsm" required name="ordenTrabajo[]"</td>';
         }
         //detalles orden compra
         $detallesordencompra = OrdenCompraDetalle::where('Orden', $request->Orden)->get();
@@ -897,7 +897,7 @@ class CompraController extends ConfiguracionSistemaController{
                 $CompraDetalle->Descripcion = $request->nombreproductopartida [$key];
                 $CompraDetalle->Unidad = $request->unidadproductopartida [$key];
                 if($tipo == 'productos'){
-                    $CompraDetalle->OT = strtoupper($request->ordenTrabajo[$key]);
+                    if ($this->ligarOTaCompra == 'S') $CompraDetalle->OT = strtoupper($request->ordenTrabajo[$key]);
                 }
                 $CompraDetalle->Cantidad =  $request->cantidadpartida  [$key];
                 $CompraDetalle->Precio =  $request->preciopartida [$key];
