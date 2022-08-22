@@ -27,6 +27,7 @@ use App\Existencia;
 use App\Configuracion_Tabla;
 use App\VistaProducto;
 use App\ContraReciboDetalle;
+use App\RegistrosAcciones;
 use App\TipoOrdenCompra;
 use App\VistaObtenerExistenciaProducto;
 use GuzzleHttp\Client;
@@ -38,7 +39,7 @@ use Mail;
 class ProductoController extends ConfiguracionSistemaController{
 
     public function __construct(){
-        
+
         parent::__construct(); //carga las configuraciones del controlador ConfiguracionSistemaController
     }
 
@@ -116,8 +117,8 @@ class ProductoController extends ConfiguracionSistemaController{
                     ->setRowClass(function ($data) { return $data->Status == 'ALTA' ? '' : 'bg-orange'; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        } 
-    }  
+        }
+    }
     //obtener codigo
     public function productos_buscar_codigo_en_tabla(Request $request){
         $existecodigo = Producto::where('Codigo', $request->codigo)->count();
@@ -134,7 +135,7 @@ class ProductoController extends ConfiguracionSistemaController{
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        }        
+        }
     }
     //obtener claves unidades
     public function productos_obtener_claves_unidades(Request $request){
@@ -147,8 +148,8 @@ class ProductoController extends ConfiguracionSistemaController{
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        }        
-    } 
+        }
+    }
     //obtener marcas
     public function productos_obtener_marcas(Request $request){
         if($request->ajax()){
@@ -180,8 +181,8 @@ class ProductoController extends ConfiguracionSistemaController{
                     })
                     ->rawColumns(['operaciones','Utilidad1','Utilidad2','Utilidad3','Utilidad4','Utilidad5'])
                     ->make(true);
-        }        
-    }    
+        }
+    }
     //obtener lineas
     public function productos_obtener_lineas(Request $request){
         if($request->ajax()){
@@ -193,8 +194,8 @@ class ProductoController extends ConfiguracionSistemaController{
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        }        
-    } 
+        }
+    }
     //obtener monedas
     public function productos_obtener_monedas(Request $request){
         if($request->ajax()){
@@ -206,8 +207,8 @@ class ProductoController extends ConfiguracionSistemaController{
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        }        
-    }    
+        }
+    }
     public function pruebas(){
         return view ('pruebas.pruebas');
         /*
@@ -278,7 +279,7 @@ class ProductoController extends ConfiguracionSistemaController{
         dd($valor_dolar);
         */
 
-    } 
+    }
     //obtener claves productos
     public function productos_obtener_utilidades(Request $request){
         if($request->ajax()){
@@ -327,16 +328,16 @@ class ProductoController extends ConfiguracionSistemaController{
                         '<td>'.Helpers::convertirvalorcorrecto($totalpesos).'</td>'.
                     '</tr>';
                 }
-            return response()->json($filasutilidadesproducto);     
-        }      
-    }   
+            return response()->json($filasutilidadesproducto);
+        }
+    }
     //obtener existencias en almacenes
     public function productos_obtener_existencias_almacenes(Request $request){
         $codigo = $request->codigo;/*
         $existencias = DB::select("SELECT a.Numero AS Numero, a.Nombre AS Nombre, e.Existencias AS Existencias,
                                     (SELECT TOP 1 Ubicacion FROM [Productos Ubicaciones] WHERE almacen = a.Numero and Codigo = '".$codigo."') AS Ubicacion
-                                FROM Almacenes AS a 
-                                left join Existencias AS e on (e.Almacen = a.Numero and e.Codigo = '".$codigo."')");*/    
+                                FROM Almacenes AS a
+                                left join Existencias AS e on (e.Almacen = a.Numero and e.Codigo = '".$codigo."')");*/
         $almacenes = Almacen::where('Status', 'ALTA')->get();
         $filasexistenciasalmacen = '';
         foreach($almacenes as $almacen){
@@ -351,11 +352,11 @@ class ProductoController extends ConfiguracionSistemaController{
             '<tr>'.
                 '<td>'.$almacen->Numero.'</td>'.
                 '<td>'.$almacen->Nombre.'</td>'.
-                '<td>'.$existenciaproducto.'</td>'. 
+                '<td>'.$existenciaproducto.'</td>'.
             '</tr>';
         }
         return response()->json($filasexistenciasalmacen);
-    }        
+    }
     //obtener clientes
     public function productos_obtener_clientes(Request $request){
         if($request->ajax()){
@@ -368,8 +369,8 @@ class ProductoController extends ConfiguracionSistemaController{
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        }        
-    } 
+        }
+    }
     //obtener datos de cliente para agregar a la afila
     public function productos_obtener_datos_cliente_agregar_fila(Request $request){
         $numero = '';
@@ -402,7 +403,7 @@ class ProductoController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'nombre' => $nombre
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener clave unidad por clave
@@ -419,7 +420,7 @@ class ProductoController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'nombre' => $nombre
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener marca por numero
@@ -436,7 +437,7 @@ class ProductoController extends ConfiguracionSistemaController{
             'numero' => $numero,
             'nombre' => $nombre
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener linea por numero
@@ -453,7 +454,7 @@ class ProductoController extends ConfiguracionSistemaController{
             'numero' => $numero,
             'nombre' => $nombre
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener modenas por clave
@@ -470,7 +471,7 @@ class ProductoController extends ConfiguracionSistemaController{
             'clave' => $clave,
             'nombre' => $nombre
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener tipos prod
@@ -507,7 +508,7 @@ class ProductoController extends ConfiguracionSistemaController{
                     })
                     ->rawColumns(['operaciones', 'Existencias', 'Costo', 'SubTotal'])
                     ->make(true);
-        } 
+        }
     }
     //obtener datos de cliente para agregar a la afila
     public function productos_obtener_datos_producto_agregar_fila(Request $request){
@@ -538,14 +539,14 @@ class ProductoController extends ConfiguracionSistemaController{
         );
         return response()->json($data);
     }
-    
+
     //guardar en catalogo
     public function productos_guardar(Request $request){
         $codigo=$request->codigo;
 	    $ExisteProducto = Producto::where('Codigo', $codigo )->first();
 	    if($ExisteProducto == true){
 	        $Producto = 1;
-	    }else{        
+	    }else{
             $marca = Marca::where('Numero', $request->marca)->first();
             $utilidadrestante = Helpers::convertirvalorcorrecto(100) - $marca->Utilidad1;
             $subtotalpesos = $request->costo / ($utilidadrestante/100);
@@ -581,9 +582,9 @@ class ProductoController extends ConfiguracionSistemaController{
             $Producto->Precio1=$request->precio;
             Log::channel('producto')->info('Se registro un nuevo producto: '.$Producto.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
             $Producto->save();
-        }    
-        return response()->json($Producto); 
-    } 
+        }
+        return response()->json($Producto);
+    }
     //dar de baja o alta en catalogo
     public function productos_alta_o_baja(Request $request){
         $codigoproducto=$request->codigoproducto;
@@ -602,7 +603,7 @@ class ProductoController extends ConfiguracionSistemaController{
             Log::channel('producto')->info('El producto fue dado de alta: '.$Producto.' Por el empleado: '.Auth::user()->name.' correo: '.Auth::user()->email.' El: '.Helpers::fecha_exacta_accion());
         }
 	    return response()->json($Producto);
-    } 
+    }
     //obtener datos del catalogo
     public function productos_obtener_producto(Request $request){
         $producto = Producto::where('Codigo', $request->codigoproducto)->first();
@@ -701,7 +702,7 @@ class ProductoController extends ConfiguracionSistemaController{
             "numerofilasconsumos" => $numerofilasconsumos
         );
         return response()->json($data);
-    }  
+    }
     //validar si existe codigo
     public function productos_validar_si_existe_codigo(Request $request){
         $resultado = Producto::where('Codigo', $request->valorgenerarcodigobarras)->count();
@@ -882,6 +883,7 @@ class ProductoController extends ConfiguracionSistemaController{
             $img = $ImagenProducto->Imagen;
         }
         $Producto = Producto::where('Codigo', $codigo )->first();
+        $original = $Producto->toArray();
         Producto::where('Codigo', $codigo)
         ->update([
             //datos producto
@@ -908,7 +910,7 @@ class ProductoController extends ConfiguracionSistemaController{
             'Codigo2' => $request->codigo2,
             'Codigo3' => $request->codigo3,
             'Codigo4' => $request->codigo4,
-            'Codigo5' => $request->codigo5,   
+            'Codigo5' => $request->codigo5,
             //tabs consumo
             'Pt' => $request->consumosproductoterminado,
             //tabs fechas
@@ -942,10 +944,10 @@ class ProductoController extends ConfiguracionSistemaController{
         	    $ProductoPrecio->Cliente = $numerocliente;
         	    $ProductoPrecio->Precio = $request->precioproductocliente [$key];
         	    $ProductoPrecio->Item = $contador;
-                $ProductoPrecio->save();	
+                $ProductoPrecio->save();
                 $contador++;
-            }   
-        }  
+            }
+        }
         //Tabla Productos Consumos
         $eliminarconsumos = ProductoConsumo::where('Codigo', $codigo)->forceDelete();
         if($request->numerofilasconsumosproductoterminado > 0){
@@ -957,11 +959,20 @@ class ProductoController extends ConfiguracionSistemaController{
         	    $ProductoConsumo->Equivale = $codigoproductoconsumos;
         	    $ProductoConsumo->Cantidad = $request->cantidadproductoconsumos [$key];
         	    $ProductoConsumo->Item = $contador;
-                $ProductoConsumo->save();	
+                $ProductoConsumo->save();
                 $contador++;
-            }   
-        } 
-    	return response()->json($Producto); 
+            }
+        }
+        $registroProducto = Producto::where('Codigo', $codigo )->first();
+        $descripcion = ["original"=>$original,"cambios"=>$registroProducto->toArray(), "request"=>$request->all()];
+        $registro = new RegistrosAcciones;
+        $registro->user_id = Auth::user()->id;
+        $registro->accion = "Modificación Producto: ".$codigo;
+        $registro->controlador = 'ProductoController';
+        $registro->metodo = 'productos_guardar_modificacion';
+        $registro->descripcion = json_encode($descripcion);
+        $registro->save();
+    	return response()->json($Producto);
     }
 
     //obtener kardex
