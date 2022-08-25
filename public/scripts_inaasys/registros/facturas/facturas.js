@@ -869,6 +869,7 @@ function seleccionarformapago(Clave, Nombre){
     if(Nombre != null){
       $("#textonombreformapago").html(Nombre.substring(0, 40));
     }
+    $('#clavemetodopago').focus()
     if(Clave == '99'){
       seleccionarmetodopago('PPD','Pago en parcialidades o diferido');
     }else{
@@ -954,7 +955,10 @@ function seleccionarmetodopago(Clave, Nombre){
     if(Nombre != null){
       $("#textonombremetodopago").html(Nombre.substring(0, 40));
     }
+    $('#clavemetodopago').focus()
     mostrarformulario();
+  }else{
+    $('#clavemetodopago').focus()
   }
 }
 //obtener usos cfdi
@@ -1032,6 +1036,7 @@ function seleccionarusocfdi(Clave, Nombre){
   var claveusocfdianterior = $("#claveusocfdianterior").val();
   var claveusocfdi = Clave;
   if(claveusocfdianterior != claveusocfdi){
+    $('#seleccionarusocfdi').focus()
     $("#claveusocfdi").val(Clave);
     $("#claveusocfdianterior").val(Clave);
     $("#usocfdi").val(Nombre);
@@ -1039,6 +1044,8 @@ function seleccionarusocfdi(Clave, Nombre){
       $("#textonombreusocfdi").html(Nombre.substring(0, 40));
     }
     mostrarformulario();
+  }else{
+    $('#seleccionarusocfdi').focus()
   }
 }
 //obtener residencias fiscales
@@ -2152,12 +2159,14 @@ function obtenerformapagoporclave(){
         $("#formapago").val(data.nombre);
         if(data.nombre != null){
           $("#textonombreformapago").html(data.nombre.substring(0, 40));
+
         }
         if(data.clave == '99'){
           seleccionarmetodopago('PPD','Pago en parcialidades o diferido');
         }else{
           seleccionarmetodopago('PUE','Pago en una sola exhibición');
         }
+        $('#clavemetodopago').focus()
         mostrarformulario();
       })
     }
@@ -2184,7 +2193,9 @@ function obtenermetodopagoporclave(){
         mostrarformulario();
       })
     }
+    $('#claveusocfdi').focus()
   }
+  $('#claveusocfdi').focus()
 }
 //regresar clave
 function regresarclavemetodopago(){
@@ -2205,8 +2216,11 @@ function obtenerusocfdiporclave(){
           $("#textonombreusocfdi").html(data.nombre.substring(0, 40));
         }
         mostrarformulario();
+        $('#claveregimenfiscalreceptor').focus()
       })
     }
+  }else{
+    $('#claveregimenfiscalreceptor').focus()
   }
 }
 //regresar clave
@@ -2305,6 +2319,7 @@ function obtenerregimenesfiscalesreceptor(){
   $('#tbllistadoregimenfiscalreceptor tbody').on('dblclick', 'tr', function () {
       var data = tregfis.row( this ).data();
       seleccionarregimenfiscalreceptor(data.Clave, data.Nombre);
+      $('#condicionesdepago').focus()
   });
 }
 //seleccionar lugar expedicion
@@ -2312,13 +2327,17 @@ function seleccionarregimenfiscalreceptor(Clave, Nombre){
   var claveregimenfiscalreceptoranterior = $("#claveregimenfiscalreceptoranterior").val();
   var claveregimenfiscalreceptor = Clave;
   if(claveregimenfiscalreceptoranterior != claveregimenfiscalreceptor){
+    $('#condicionesdepago').focus()
     $("#claveregimenfiscalreceptor").val(Clave);
     $("#claveregimenfiscalreceptoranterior").val(Clave);
     $("#regimenfiscalreceptor").val(Nombre);
     if(Nombre != null){
       $("#textonombreregimenfiscalreceptor").html(Nombre.substring(0, 15));
     }
+    $('#condicionesdepago').focus()
     mostrarformulario();
+  }else{
+    $('#condicionesdepago').focus()
   }
 }
 //obtener por clave
@@ -2328,14 +2347,18 @@ function obtenerregimenfiscalreceptorporclave(){
   if(claveregimenfiscalreceptoranterior != claveregimenfiscalreceptor){
     if($("#claveregimenfiscalreceptor").parsley().isValid()){
       $.get(facturas_obtener_regimenfiscalreceptor_por_clave, {claveregimenfiscalreceptor:claveregimenfiscalreceptor}, function(data){
+        //$('#condicionesdepago').focus()
         $("#claveregimenfiscalreceptor").val(data.clave);
         $("#claveregimenfiscalreceptoranterior").val(data.clave);
         $("#regimenfiscalreceptor").val(data.nombre);
         if(data.nombre != null){
           $("#textonombreregimenfiscalreceptor").html(data.nombre.substring(0, 15));
+          $('#condicionesdepago').focus()
         }
         mostrarformulario();
       })
+    }else{
+        //$('#condicionesdepago').focus()
     }
   }
 }
@@ -3592,7 +3615,7 @@ function alta(){
                               '</div>'+
                               '<div class="col-md-2">'+
                                 '<label>Condiciones de Pago </label>'+
-                                '<input type="text" class="form-control inputnextdet" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                                '<input type="text" class="form-control inputnextdet" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);enterCondiciones(event)" autocomplete="off">'+
                               '</div>'+
                               '<div class="col-md-2">'+
                                 '<label>Num Reg Id Trib</label>'+
@@ -3973,6 +3996,7 @@ function alta(){
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
       obtenerregimenfiscalreceptorporclave();
+      $('#condicionesdepago').focus()
       }
   });
   //regresar clave
@@ -4751,7 +4775,7 @@ function obtenerdatos(facturamodificar){
                         '</div>'+
                         '<div class="col-md-2">'+
                           '<label>Condiciones de Pago</label>'+
-                          '<input type="text" class="form-control inputnextdet" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                          '<input type="text" class="form-control inputnextdet" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);enterCondiciones(event)" autocomplete="off">'+
                         '</div>'+
                         '<div class="col-md-2">'+
                           '<label>Num Reg Id Trib</label>'+
@@ -5185,6 +5209,7 @@ function obtenerdatos(facturamodificar){
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code==13){
       obtenermetodopagoporclave();
+      $('#claveusocfdi').focus()
       }
     });
     //regresar clave
@@ -5221,6 +5246,7 @@ function obtenerdatos(facturamodificar){
         var code = (e.keyCode ? e.keyCode : e.which);
         if(code==13){
         obtenerregimenfiscalreceptorporclave();
+        $('#condicionesdepago').focus()
         }
     });
     //regresar clave
@@ -5888,6 +5914,11 @@ function configurar_tabla(){
                       '</li>';
       $("#columnasnestable").append(columna);
   }
+}
+function enterCondiciones(e) {
+    if (e.keyCode === 13 || e.which === 13) {
+        $('#observaciones').focus();
+    }
 }
 init();
 

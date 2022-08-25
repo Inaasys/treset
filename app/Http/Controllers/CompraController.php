@@ -257,14 +257,26 @@ class CompraController extends ConfiguracionSistemaController{
                 $TotalImpuestosTrasladados = $impuesto['TotalImpuestosTrasladados'];
                 //obtener datos generales del xml nodo hijo traslado del nodo padre Impuestos
                 $array_traslados_impuestos = array();
-                foreach($namespaces->Impuestos->Traslados->Traslado as $traslado){
-                    $atributos_traslado = $traslado->attributes();
-                    $array_traslados_impuestos[] = array(
-                        "Impuesto" => $atributos_traslado['Impuesto'],
-                        "TipoFactor" => $atributos_traslado['TipoFactor'],
-                        "TasaOCuota" => $atributos_traslado['TasaOCuota'],
-                        "Importe" => $atributos_traslado['Importe']
-                    );
+                if (isset($namespaces->Impuestos->Traslados->Traslado)) {
+                    foreach($namespaces->Impuestos->Traslados->Traslado as $traslado){
+                        $atributos_traslado = $traslado->attributes();
+                        $array_traslados_impuestos[] = array(
+                            "Impuesto" => $atributos_traslado['Impuesto'],
+                            "TipoFactor" => $atributos_traslado['TipoFactor'],
+                            "TasaOCuota" => $atributos_traslado['TasaOCuota'],
+                            "Importe" => $atributos_traslado['Importe']
+                        );
+                    }
+                }else{
+                    $TotalImpuestosTrasladados = '0.00';
+                    //obtener datos generales del xml nodo hijo traslado del nodo padre Impuestos
+                    $array_traslados_impuestos = array();
+                        $array_traslados_impuestos[] = array(
+                            "Impuesto" => "",
+                            "TipoFactor" =>"",
+                            "TasaOCuota" => "0.160000",
+                            "Importe" => "0.00"
+                        );
                 }
             }else{
                 $TotalImpuestosTrasladados = '0.00';
@@ -275,7 +287,7 @@ class CompraController extends ConfiguracionSistemaController{
                         "TipoFactor" =>"",
                         "TasaOCuota" => "0.160000",
                         "Importe" => "0.00"
-                    );
+                );
             }
             //obtener todas las partidas ó conceptos del xml
             $array_conceptos = array();

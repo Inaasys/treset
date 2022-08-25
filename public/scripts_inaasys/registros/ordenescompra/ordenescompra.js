@@ -571,6 +571,7 @@ function obtenerproveedorpornumero(){
         }
         $("#plazo").val(data.plazo);
       })
+      $('#numeroalmacen').focus();
     }
   }
 }
@@ -592,6 +593,7 @@ function obteneralmacenpornumero(){
         if(data.nombre != null){
           $("#textonombrealmacen").html(data.nombre.substring(0, 60));
         }
+        $('#codigoabuscar').focus()
       })
     }
   }
@@ -717,6 +719,7 @@ function obtenerproductoporcodigo(){
     $.get(ordenes_compra_obtener_producto_por_codigo,{codigoabuscar:codigoabuscar,tipoalta:tipoalta}, function(data){
       if(parseInt(data.contarproductos) > 0){
         agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, tipooperacion);
+        $('#observaciones').focus();
       }else{
         var confirmacion = confirm("El código: " + codigoabuscar + " no existe, desea agregarlo al catalogo de productos?");
         if (confirmacion == true) {
@@ -1553,6 +1556,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, tipooper
           break;
       }
     });
+    $('#observaciones').focus()
   }else{
     msj_errorproductoyaagregado();
   }
@@ -1625,7 +1629,7 @@ function alta(tipoalta){
                 '</div>'+
                 '<div class="col-md-2">'+
                   '<label>Referencia</label>'+
-                  '<input type="text" class="form-control inputnextdet" name="referencia" id="referencia" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                  '<input type="text" class="form-control inputnextdet" name="referencia" id="referencia" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);enterRef(event)" autocomplete="off">'+
                 '</div>'+
                 '<div class="col-md-2">'+
                   '<label>Tipo</label>'+
@@ -2189,7 +2193,7 @@ function obtenerdatos(ordenmodificar){
                   '</div>'+
                   '<div class="col-md-2">'+
                     '<label>Referencia</label>'+
-                    '<input type="text" class="form-control inputnextdet" name="referencia" id="referencia" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);" autocomplete="off">'+
+                    '<input type="text" class="form-control inputnextdet" name="referencia" id="referencia" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);enterRef(event)" autocomplete="off">'+
                   '</div>'+
                   '<div class="col-md-2">'+
                     '<label>Tipo</label>'+
@@ -2817,4 +2821,10 @@ function configurar_tabla(){
       $("#columnasnestable").append(columna);
   }
 }
+function enterRef(e) {
+    if (e.keyCode === 13 || e.which === 13) {
+        $('#numeroproveedor').focus();
+    }
+}
+
 init();
