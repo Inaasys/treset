@@ -1641,7 +1641,7 @@ function alta(tipoalta){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Factura</label>'+
-                                        '<input type="text" class="form-control inputnextdet" name="factura" id="factura" required onkeyup="tipoLetra(this)" data-parsley-length="[1, 500]" autocomplete="off">'+
+                                        '<input type="text" class="form-control inputnextdet" name="factura" id="factura" required onkeyup="tipoLetra(this)" data-parsley-length="[1, 20]" autocomplete="off">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
@@ -2153,7 +2153,7 @@ function obtenerdatos(compramodificar){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Factura</label>'+
-                                        '<input type="text" class="form-control inputnextdet" name="factura" id="factura" required onkeyup="tipoLetra(this)" data-parsley-length="[1, 500]" autocomplete="off">'+
+                                        '<input type="text" class="form-control inputnextdet" name="factura" id="factura" required onkeyup="tipoLetra(this)" data-parsley-length="[1, 20]" autocomplete="off">'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
