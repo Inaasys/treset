@@ -81,7 +81,7 @@
                                     <thead class="{{$empresa->background_tables}}">
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
-                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co)
                                                     <th id="th{{$co}}">{{$co}}</th>
                                             @endforeach
                                         </tr>
@@ -90,7 +90,7 @@
                                     <tfoot>
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
-                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co)
                                                 <th id="th{{$co}}">{{$co}}</th>
                                             @endforeach
                                         </tr>
@@ -105,10 +105,10 @@
                                                     <th>Sum SubTotal: <b id="sumasubtotalfiltrado"></b></th>
                                                     <th>Sum Iva: <b id="sumaivafiltrado"></b></th>
                                                     <th>Sum Total: <b id="sumatotalfiltrado"></b></th>
-                                                </tr>   
+                                                </tr>
                                             </table>
                                         </div>
-                                @endif 
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -137,7 +137,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                            </table>   
+                            </table>
                         </div>
                     </form>
                     <form id="formparsley" action="#">
@@ -151,11 +151,11 @@
                             <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
                             <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
                         </div>
-                    </form> 
+                    </form>
                 </div>
                 <div id="contenidomodaltablas">
                     <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
-                </div> 
+                </div>
             </div>
         </div>
     </div>
@@ -170,18 +170,18 @@
                     <form id="formparsleyproducto" action="#">
                         <div class="modal-body">
                             <div class="col-md-12" id="tabsformproducto">
-                                
+
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger btn-sm" onclick="mostrarformularioorden();">Salir</button>
                             <button type="button" class="btn btn-success btn-sm" id="btnGuardarProducto">Guardar Producto</button>
                         </div>
-                    </form> 
+                    </form>
                 </div>
                 <div id="contenidomodaltablasproducto">
                     <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
-                </div>     
+                </div>
             </div>
         </div>
     </div>
@@ -198,7 +198,7 @@
                             <h5 id="textomodalautorizar">Estas seguro de autorizar la orden de compra?</h5>
                             <input type="hidden" id="ordenautorizar" name="ordenautorizar">
                             <input type="hidden" id="ordenquitarautorizacion" name="ordenquitarautorizacion">
-                        </form>	
+                        </form>
                     </div>
                     <div id="divmsjsurtimiento">
                         <h5 id="textomsjsurtimiento"></h5>
@@ -217,7 +217,7 @@
                 </div>
             </div>
         </div>
-    </div> 
+    </div>
     <!-- Modal Baja o Alta-->
     <div class="modal fade" data-backdrop="static" data-keyboard="false" id="estatusregistro" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -233,7 +233,7 @@
                             <label>Motivo Baja</label>
                             <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 data-parsley-length="[1, 200]" onkeyup="tipoLetra(this)" required></textarea>
                         </div>
-                    </form>	
+                    </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
@@ -241,7 +241,7 @@
                 </div>
             </div>
         </div>
-    </div> 
+    </div>
     <!-- modal para crear documento en PDF-->
     @include('secciones.modalcreardocumento')
     <!-- fin modal para crear documento en PDF-->
@@ -302,9 +302,9 @@
         var ordenes_compra_autorizar = '{!!URL::to('ordenes_compra_autorizar')!!}';
         var ordenes_compra_verificar_quitar_autorizacion  = '{!!URL::to('ordenes_compra_verificar_quitar_autorizacion')!!}';
         var ordenes_compra_quitar_autorizacion  = '{!!URL::to('ordenes_compra_quitar_autorizacion')!!}';
-        var ordenes_compra_verificar_uso_en_modulos = '{!!URL::to('ordenes_compra_verificar_uso_en_modulos')!!}'; 
-        var ordenes_compra_alta_o_baja = '{!!URL::to('ordenes_compra_alta_o_baja')!!}'; 
-        var ordenes_compra_obtener_orden_compra = '{!!URL::to('ordenes_compra_obtener_orden_compra')!!}'; 
+        var ordenes_compra_verificar_uso_en_modulos = '{!!URL::to('ordenes_compra_verificar_uso_en_modulos')!!}';
+        var ordenes_compra_alta_o_baja = '{!!URL::to('ordenes_compra_alta_o_baja')!!}';
+        var ordenes_compra_obtener_orden_compra = '{!!URL::to('ordenes_compra_obtener_orden_compra')!!}';
         var ordenes_compra_guardar_modificacion = '{!!URL::to('ordenes_compra_guardar_modificacion')!!}';
         var ordenes_compra_obtener_datos_envio_email = '{!!URL::to('ordenes_compra_obtener_datos_envio_email')!!}';
         var ordenes_compra_enviar_pdfs_email = '{!!URL::to('ordenes_compra_enviar_pdfs_email')!!}';
@@ -322,7 +322,7 @@
         var productos_obtener_linea_por_numero = '{!!URL::to('productos_obtener_linea_por_numero')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
-    <script src="scripts_inaasys/registros/ordenescompra/ordenescompra.js"></script>
+    <script src="{{ asset('scripts_inaasys/registros/ordenescompra/ordenescompra.js') }}"></script>
 @endsection
 
 
