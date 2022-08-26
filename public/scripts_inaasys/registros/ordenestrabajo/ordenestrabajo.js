@@ -72,6 +72,7 @@ function cambiarurlexportarexcel(){
   var periodo = $("#periodo").val();
   $("#btnGenerarFormatoExcel").attr("href", urlgenerarformatoexcel+'?periodo='+periodo);
 }
+//exporta a excel los detalles de la ot
 function cambiarurlexportarexceldetallesot(){
   var orden = $("#orden_detalles").val();
   $("#btnGenerarFormatoExcelDetalles").attr("href", urlgenerarformatoexceldetalles+'?orden='+orden);
