@@ -14,6 +14,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\PlantillasOrdenesTrabajoExport;
 use App\Imports\OrdenesTrabajoImport;
 use App\Exports\OrdenesDeTrabajoExport;
+use App\Exports\OrdenTrabajoDetallesExport;
 use App\OrdenTrabajo;
 use App\OrdenTrabajoDetalle;
 use App\CotizacionServicio;
@@ -38,6 +39,7 @@ use LynX39\LaraPdfMerger\Facades\PdfMerger;
 use Storage;
 use ZipArchive;
 use File;
+use FastExcel;
 
 class OrdenTrabajoController extends ConfiguracionSistemaController
 {
@@ -59,8 +61,9 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         $rutaconfiguraciontabla = route('ordenes_trabajo_guardar_configuracion_tabla');
         $rutacreardocumento = route('ordenes_trabajo_generar_pdfs');
         $urlgenerarformatoexcel = route('ordenes_trabajo_exportar_excel');
+        $urlgenerarformatoexceldetalles = route('orden_trabajo_detalles_exportar_excel');
         $urlgenerarplantilla = route('ordenes_trabajo_generar_plantilla');
-        return view('registros.ordenestrabajo.ordenestrabajo', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','rutacreardocumento','urlgenerarformatoexcel','urlgenerarplantilla'));
+        return view('registros.ordenestrabajo.ordenestrabajo', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','rutacreardocumento','urlgenerarformatoexcel', 'urlgenerarformatoexceldetalles','urlgenerarplantilla'));
     }
     //obtener todos los registros del modulo
     public function ordenes_trabajo_obtener(Request $request){
@@ -127,6 +130,7 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                                                 $opcionBloqueo.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->Orden .'\')">Bajas</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="'.route('ordenes_trabajo_generar_pdfs_indiv',$data->Orden).'" target="_blank">Ver Documento PDF</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="'.route('orden_trabajo_exportar_excel',$data->Orden).'">Excel</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Orden .'\')">Enviar Documento por Correo</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="modificardatosgeneralesorden(\''.$data->Orden .'\')">Modificar Datos Generales</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="generardocumentoeniframe(\''.$data->Orden .'\')">Imprimir Documento PDF</a></li>'.
@@ -1743,6 +1747,28 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
         $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('OrdenesDeTrabajo', Auth::user()->id);
         return Excel::download(new OrdenesDeTrabajoExport($configuraciones_tabla['campos_consulta'],$request->periodo), "ordenesdetrabajo-".$request->periodo.".xlsx");
     }
+    public function orden_trabajo_detalles_exportar_excel(Request $request){
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        //$configuraciones_tabla = Helpers::obtenerconfiguraciontabla('OrdenesDeTrabajo', Auth::user()->id);
+        $campos_consulta = [];
+        array_push($campos_consulta, 'Orden');
+        array_push($campos_consulta, 'Fecha');
+        array_push($campos_consulta, 'Codigo');
+        array_push($campos_consulta, 'Descripcion');
+        array_push($campos_consulta, 'Unidad');
+        array_push($campos_consulta, 'Cantidad');
+        array_push($campos_consulta, 'Precio');
+        array_push($campos_consulta, 'Importe');
+        array_push($campos_consulta, 'SubTotal');
+        array_push($campos_consulta, 'Iva');
+        array_push($campos_consulta, 'Total');
+        array_push($campos_consulta, 'Costo');
+        array_push($campos_consulta, 'CostoTotal');
+        array_push($campos_consulta, 'Traspaso');
+        return Excel::download(new OrdenTrabajoDetallesExport($campos_consulta,$request->orden), "ordenesdetrabajo-".$request->orden.".xlsx");
+                //dd($request->orden);
+        }
     //configuracion tabla
     public function ordenes_trabajo_guardar_configuracion_tabla(Request $request){
         if($request->string_datos_tabla_false == null){

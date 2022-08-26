@@ -326,6 +326,7 @@
         var nombreempresa = '{{$empresa->Nombre}}';
         var usuario = '{!!Auth::user()->user!!}';
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
+        var urlgenerarformatoexceldetalles = '{{$urlgenerarformatoexceldetalles}}';
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';
@@ -371,6 +372,7 @@
         var ordenes_trabajo_generar_pdfs = '{!!URL::to('ordenes_trabajo_generar_pdfs')!!}';
         var ordenes_trabajo_bloquear_desbloquear = '{!!URL::to('ordenes_trabajo_bloquear_desbloquear') !!}';
         var ordenes_trabajo_validar_numero_partes = '{!!URL::to('ordenes_trabajo_validar_numero_partes')!!}'
+        let orden_de_trabajo_exportar_excel = '{!! URL::to('orden_de_trabajo_exportar_excel')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="{{ asset('scripts_inaasys/registros/ordenestrabajo/ordenestrabajo.js') }}"></script>

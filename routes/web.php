@@ -422,6 +422,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::POST('/ordenes_trabajo_bloquear_desbloquear','OrdenTrabajoController@ordenes_trabajo_bloquear_desbloquear')->name('ordenes_trabajo_bloquear_desbloquear')->middleware('revisarpermisos:registros.ordenes.trabajo.bloqueos');
     //Valida NP Cargadas a la OT
     Route::GET('/ordenes_trabajo_validar_numero_partes','OrdenTrabajoController@ordenes_trabajo_validar_numero_partes')->name('ordenes_trabajo_validar_numero_partes')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+    // exporte a excel los detallas de las OT
+    Route::get('/orden_trabajo_detalles_exportar_excel', 'OrdenTrabajoController@orden_trabajo_detalles_exportar_excel')->name('orden_trabajo_detalles_exportar_excel')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+    
     //Cuentas por Pagar
     Route::get('/cuentas_por_pagar', 'CuentasPorPagarController@cuentas_por_pagar')->name('cuentas_por_pagar')->middleware('revisaraccesomenu:menuregistroscuentasxpagar');
     Route::get('/cuentas_por_pagar_obtener', 'CuentasPorPagarController@cuentas_por_pagar_obtener')->name('cuentas_por_pagar_obtener')->middleware('revisaraccesomenu:menuregistroscuentasxpagar');
