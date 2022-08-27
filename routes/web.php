@@ -329,6 +329,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/ordenes_compra_generar_pdfs_indiv/{documento}', 'OrdenCompraController@ordenes_compra_generar_pdfs_indiv')->name('ordenes_compra_generar_pdfs_indiv')->middleware('revisaraccesomenu:menuregistrosordenescompra');
     Route::get('/ordenes_compra_exportar_excel', 'OrdenCompraController@ordenes_compra_exportar_excel')->name('ordenes_compra_exportar_excel')->middleware('revisaraccesomenu:menuregistrosordenescompra');
     Route::post('/ordenes_compra_guardar_configuracion_tabla', 'OrdenCompraController@ordenes_compra_guardar_configuracion_tabla')->name('ordenes_compra_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrosordenescompra');
+    //Valida las existencias para las ordenes de compra
+    Route::post('/ordenes_compra_validar_existencias', 'OrdenCompraController@ordenes_compra_validar_existencias')->name('ordenes_compra_validar_existencias');
     //generales en todos los documentos
     Route::get('/ordenes_compra_obtener_fecha_actual_datetimelocal', 'OrdenCompraController@ordenes_compra_obtener_fecha_actual_datetimelocal')->name('ordenes_compra_obtener_fecha_actual_datetimelocal');
     Route::get('/ordenes_compra_obtener_tipos_ordenes_compra', 'OrdenCompraController@ordenes_compra_obtener_tipos_ordenes_compra')->name('ordenes_compra_obtener_tipos_ordenes_compra');
@@ -422,6 +424,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::POST('/ordenes_trabajo_bloquear_desbloquear','OrdenTrabajoController@ordenes_trabajo_bloquear_desbloquear')->name('ordenes_trabajo_bloquear_desbloquear')->middleware('revisarpermisos:registros.ordenes.trabajo.bloqueos');
     //Valida NP Cargadas a la OT
     Route::GET('/ordenes_trabajo_validar_numero_partes','OrdenTrabajoController@ordenes_trabajo_validar_numero_partes')->name('ordenes_trabajo_validar_numero_partes')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+    // exporte a excel los detallas de las OT
+    Route::get('/orden_trabajo_detalles_exportar_excel', 'OrdenTrabajoController@orden_trabajo_detalles_exportar_excel')->name('orden_trabajo_detalles_exportar_excel')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+
     //Cuentas por Pagar
     Route::get('/cuentas_por_pagar', 'CuentasPorPagarController@cuentas_por_pagar')->name('cuentas_por_pagar')->middleware('revisaraccesomenu:menuregistroscuentasxpagar');
     Route::get('/cuentas_por_pagar_obtener', 'CuentasPorPagarController@cuentas_por_pagar_obtener')->name('cuentas_por_pagar_obtener')->middleware('revisaraccesomenu:menuregistroscuentasxpagar');

@@ -71,7 +71,7 @@
                                     <thead class="{{$empresa->background_tables}}">
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
-                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co)
                                                 <th id="th{{$co}}">{{$co}}</th>
                                             @endforeach
                                         </tr>
@@ -80,7 +80,7 @@
                                     <tfoot>
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
-                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co)
                                                 <th id="th{{$co}}">{{$co}}</th>
                                             @endforeach
                                         </tr>
@@ -98,10 +98,10 @@
                                                     <th>Sum Costo: <b id="sumacostofiltrado"></b></th>
                                                     <th>Sum Comisión: <b id="sumacomisionfiltrado"></b></th>
                                                     <th>Sum Utilidad: <b id="sumautilidadfiltrado"></b></th>
-                                                </tr>   
+                                                </tr>
                                             </table>
                                         </div>
-                                @endif 
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -131,7 +131,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                            </table>   
+                            </table>
                         </div>
                     </form>
                     <form id="formparsley" action="#">
@@ -139,7 +139,7 @@
                             <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
                         </div>
                     </form>
-                </div> 
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
                     <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
@@ -148,7 +148,7 @@
             </div>
             <div id="contenidomodaltablas">
                 <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
-            </div> 
+            </div>
         </div>
     </div>
 </div>
@@ -167,7 +167,7 @@
                         <label>Motivo Baja</label>
                         <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 onkeyup="tipoLetra(this)" required data-parsley-length="[1, 200]"></textarea>
                     </div>
-		        </form>	
+		        </form>
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
@@ -175,7 +175,7 @@
 	      	</div>
     	</div>
   	</div>
-</div> 
+</div>
 <!-- Modal modificar datos generales-->
 <div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalmodificardatosgeneralesdocumento" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   	<div class="modal-dialog" role="document">
@@ -201,8 +201,8 @@
                                 <label>Equipo</label>
                                 <input type="text" class="form-control inputnextdet" id="equipodatosgenerales" name="equipodatosgenerales" onkeyup="tipoLetra(this)">
                           </div>
-                      </div>                    
-		        </form>	
+                      </div>
+		        </form>
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
@@ -210,7 +210,7 @@
 	      	</div>
     	</div>
   	</div>
-</div> 
+</div>
 <!-- modal para crear documento en PDF-->
 @include('secciones.modalcreardocumento')
 <!-- fin modal para crear documento en PDF-->
@@ -247,7 +247,7 @@
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';
-        var urlgenerarplantilla = '{{$urlgenerarplantilla}}';       
+        var urlgenerarplantilla = '{{$urlgenerarplantilla}}';
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var verificarinsumosremisionenot = '{{$empresa->VerificarPartidasRemisionEnOT}}';
         var controlarconsecutivonumrequisicion = '{{$empresa->ControlarConsecutivoNumeroRequisicionEnRemisiones}}';
@@ -288,9 +288,9 @@
         var remisiones_obtener_serierq_por_serie = '{!!URL::to('remisiones_obtener_serierq_por_serie')!!}';
         var remisiones_guardar = '{!!URL::to('remisiones_guardar')!!}';
         var remisiones_verificar_baja = '{!!URL::to('remisiones_verificar_baja')!!}';
-        var remisiones_alta_o_baja = '{!!URL::to('remisiones_alta_o_baja')!!}'; 
-        var remisiones_obtener_remision = '{!!URL::to('remisiones_obtener_remision')!!}'; 
-        var remisiones_generar_formato_req_tyt_en_modificacion_remision = '{!!URL::to('remisiones_generar_formato_req_tyt_en_modificacion_remision')!!}'; 
+        var remisiones_alta_o_baja = '{!!URL::to('remisiones_alta_o_baja')!!}';
+        var remisiones_obtener_remision = '{!!URL::to('remisiones_obtener_remision')!!}';
+        var remisiones_generar_formato_req_tyt_en_modificacion_remision = '{!!URL::to('remisiones_generar_formato_req_tyt_en_modificacion_remision')!!}';
         var remisiones_guardar_modificacion = '{!!URL::to('remisiones_guardar_modificacion')!!}';
         var remisiones_obtener_datos_generales = '{!!URL::to('remisiones_obtener_datos_generales')!!}';
         var remisiones_guardar_modificacion_datos_generales = '{!!URL::to('remisiones_guardar_modificacion_datos_generales')!!}';
@@ -301,7 +301,7 @@
         var remisiones_obtener_datos_agregar_fila_producto = '{!!URL::to('remisiones_obtener_datos_agregar_fila_producto')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
-    <script src="scripts_inaasys/registros/remisiones/remisiones.js"></script>
+    <script src="{{ asset('scripts_inaasys/registros/remisiones/remisiones.js') }}"></script>
 @endsection
 
 

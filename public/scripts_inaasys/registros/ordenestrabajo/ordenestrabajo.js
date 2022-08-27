@@ -50,6 +50,7 @@ function mostrarmodalformulario(tipo, modificacionpermitida){
           $("#btnGuardarModificacion").show();
         }
     }
+    cambiarurlexportarexceldetallesot();
 }
 //ocultar modal formulario
 function ocultarmodalformulario(){
@@ -70,6 +71,11 @@ function cambiarurlexportarexcel(){
   //colocar el periodo seleccionado como parametro para exportar a excel
   var periodo = $("#periodo").val();
   $("#btnGenerarFormatoExcel").attr("href", urlgenerarformatoexcel+'?periodo='+periodo);
+}
+//exporta a excel los detalles de la ot
+function cambiarurlexportarexceldetallesot(){
+  var orden = $("#orden_detalles").val();
+  $("#btnGenerarFormatoExcelDetalles").attr("href", urlgenerarformatoexceldetalles+'?orden='+orden);
 }
 //mostrar formulario en modal y ocultar tabla de seleccion
 function asignaciontecnicosmostrarformulario(){
@@ -2328,6 +2334,7 @@ function obtenerdatos(ordenmodificar){
                     '<div class="row">'+
                       '<div class="col-md-2">'+
                         '<label>Orden <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
+                        '<input type="hidden" class="form-control" name="orden_detalles" id="orden_detalles" required readonly>'+
                         '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                         '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                         '<input type="hidden" class="form-control" name="numerofilastablaservicios" id="numerofilastablaservicios" value="0" required readonly>'+
@@ -2605,7 +2612,8 @@ function obtenerdatos(ordenmodificar){
                           '<tr>'+
                             '<td><div type="button" class="btn btn-success btn-sm" onclick="seleccionarpartidasexcel()">Importar partidas en excel</div></td>'+
                             '<td data-toggle="tooltip" data-placement="top" title data-original-title="Bajar plantilla"><a class="material-icons" onclick="descargar_plantilla()" id="btnGenerarPlantilla" target="_blank">get_app</a></td>'+
-                          '</tr>'+
+                            '<td><a class="btn btn-success btn-sm" id="btnGenerarFormatoExcelDetalles" href="{{route("orden_trabajo_detalles_exportar_excel")}}" target="_blank"> Exporta a Excel..</a> <td>'+
+                            '</tr>'+
                         '</table>'+
                       '</div>'+
                     '</div>'+
@@ -2664,6 +2672,7 @@ function obtenerdatos(ordenmodificar){
     $("#periodohoy").val(data.ordentrabajo.Periodo);
     $("#folio").val(data.ordentrabajo.Folio);
     $("#serie").val(data.ordentrabajo.Serie);
+    $("#orden_detalles").val(data.ordentrabajo.Orden);
     $("#serietexto").html("Serie: "+data.ordentrabajo.Serie);
     $("#numerofilastablaservicios").val(data.numerodetallesordentrabajo);
     $("#numerofilas").val(data.numerodetallesordentrabajo);

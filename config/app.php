@@ -169,6 +169,8 @@ return [
     'modificarcostoyventadeservicios' => '',
     // Para ligar una OT a una NP
     'ligarOTaCompra' => '',
+    //Para validar existencias al generar compra
+    'validarExistenciasOC' => '',
     'suc2' => env('DB2_DATABASE'),
     'connsuc2' => 'sqlsrv2',
     'suc3' => env('DB3_DATABASE'),
@@ -301,6 +303,7 @@ return [
         'DNS1D' => Milon\Barcode\Facades\DNS1DFacade::class,
         'DNS2D' => Milon\Barcode\Facades\DNS2DFacade::class,
         'Agent' => Jenssegers\Agent\Facades\Agent::class,
+        //'FastExcel' => Rap2hpoutre\FastExcel\Facades\FastExcel::class,
 
     ],
 
