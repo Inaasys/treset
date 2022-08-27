@@ -273,6 +273,7 @@
         var formatercerordenamiento = '{{$configuracion_tabla->formatercerordenamiento}}';
         var campos_busquedas = '{{$configuracion_tabla->campos_busquedas}}';
         var nombreempresa = '{{$empresa->Nombre}}';
+        var validarExistenciasOC = '{{$empresa->validarExistenciasOC}}'
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
@@ -320,6 +321,7 @@
         var productos_obtener_clave_unidad_por_clave = '{!!URL::to('productos_obtener_clave_unidad_por_clave')!!}';
         var productos_obtener_marca_por_numero = '{!!URL::to('productos_obtener_marca_por_numero')!!}';
         var productos_obtener_linea_por_numero = '{!!URL::to('productos_obtener_linea_por_numero')!!}';
+        var ordenes_compra_validar_existencias = '{!! URL::to('ordenes_compra_validar_existencias') !!}'
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="{{ asset('scripts_inaasys/registros/ordenescompra/ordenescompra.js') }}"></script>

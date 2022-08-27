@@ -469,6 +469,9 @@ function seleccionaralmacen(Numero, Nombre){
       $("#textonombrealmacen").html(Nombre.substring(0, 60));
     }
     mostrarformulario();
+    $('#codigoabuscar').focus()
+  }else{
+    $('#codigoabuscar').focus()
   }
 }
 function obtenerordenestrabajo(){
@@ -573,6 +576,8 @@ function obtenerproveedorpornumero(){
       })
       $('#numeroalmacen').focus();
     }
+  }else{
+    $('#numeroalmacen').focus();
   }
 }
 //regresar numero
@@ -592,10 +597,13 @@ function obteneralmacenpornumero(){
         $("#almacen").val(data.nombre);
         if(data.nombre != null){
           $("#textonombrealmacen").html(data.nombre.substring(0, 60));
+          $('#codigoabuscar').focus()
         }
         $('#codigoabuscar').focus()
       })
     }
+  }else{
+    $('#codigoabuscar').focus()
   }
 }
 //regresar numero
@@ -1921,32 +1929,36 @@ $("#btnGuardar").on('click', function (e) {
   if (form.parsley().isValid()){
     var numerofilas = $("#numerofilas").val();
     if(parseInt(numerofilas) > 0 && parseInt(numerofilas) < 500){
-      $('.page-loader-wrapper').css('display', 'block');
-      $.ajax({
-        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-        url:ordenes_compra_guardar,
-        type: "post",
-        dataType: "html",
-        data: formData,
-        cache: false,
-        contentType: false,
-        processData: false,
-        success:function(data){
-          msj_datosguardadoscorrectamente();
-          limpiar();
-          ocultarmodalformulario();
-          limpiarmodales();
-          $('.page-loader-wrapper').css('display', 'none');
-        },
-        error:function(data){
-          if(data.status == 403){
-            msj_errorenpermisos();
-          }else{
-            msj_errorajax();
-          }
-          $('.page-loader-wrapper').css('display', 'none');
+        if (parseInt(validarExistenciasOC)) {
+            validaExistencias(formData);
+        }else{
+            $('.page-loader-wrapper').css('display', 'block');
+            $.ajax({
+                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                url:ordenes_compra_guardar,
+                type: "post",
+                dataType: "html",
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success:function(data){
+                    msj_datosguardadoscorrectamente();
+                    limpiar();
+                    ocultarmodalformulario();
+                    limpiarmodales();
+                    $('.page-loader-wrapper').css('display', 'none');
+                },
+                error:function(data){
+                    if(data.status == 403){
+                        msj_errorenpermisos();
+                    }else{
+                        msj_errorajax();
+                    }
+                    $('.page-loader-wrapper').css('display', 'none');
+                }
+            })
         }
-      })
     }else{
       msj_erroralmenosunaentrada();
     }
@@ -2825,6 +2837,56 @@ function enterRef(e) {
     if (e.keyCode === 13 || e.which === 13) {
         $('#numeroproveedor').focus();
     }
+}
+function validaExistencias(formData) {
+    $.ajax({
+        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+        url:ordenes_compra_validar_existencias,
+        type: "post",
+        dataType: "html",
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success:function(data) {
+            let json = jQuery.parseJSON(data);
+            if (json.length > 0) {
+                if (confirm("Se encontraron las siguientes existencias: "+data+"\n¿Desea Continuar?") == true) {
+                    $('.page-loader-wrapper').css('display', 'block');
+                    $.ajax({
+                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        url:ordenes_compra_guardar,
+                        type: "post",
+                        dataType: "html",
+                        data: formData,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success:function(data){
+                            msj_datosguardadoscorrectamente();
+                            limpiar();
+                            ocultarmodalformulario();
+                            limpiarmodales();
+                            $('.page-loader-wrapper').css('display', 'none');
+                        },
+                        error:function(data){
+                            if(data.status == 403){
+                                msj_errorenpermisos();
+                            }else{
+                                msj_errorajax();
+                            }
+                            $('.page-loader-wrapper').css('display', 'none');
+                        }
+                    })
+                }
+            }else{
+
+            }
+        },
+        error:function(data){
+            console.log(data)
+        }
+      })
 }
 
 init();
