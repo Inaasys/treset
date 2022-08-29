@@ -2880,7 +2880,31 @@ function validaExistencias(formData) {
                     })
                 }
             }else{
-
+                $.ajax({
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    url:ordenes_compra_guardar,
+                    type: "post",
+                    dataType: "html",
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success:function(data){
+                        msj_datosguardadoscorrectamente();
+                        limpiar();
+                        ocultarmodalformulario();
+                        limpiarmodales();
+                        $('.page-loader-wrapper').css('display', 'none');
+                    },
+                    error:function(data){
+                        if(data.status == 403){
+                            msj_errorenpermisos();
+                        }else{
+                            msj_errorajax();
+                        }
+                        $('.page-loader-wrapper').css('display', 'none');
+                    }
+                })
             }
         },
         error:function(data){
