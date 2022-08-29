@@ -39,6 +39,7 @@ use App\Existencia;
 use Storage;
 use ZipArchive;
 use File;
+use PdfMerger;
 
 class OrdenCompraController extends ConfiguracionSistemaController{
 
