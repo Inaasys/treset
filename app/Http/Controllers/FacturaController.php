@@ -4110,6 +4110,9 @@ class FacturaController extends ConfiguracionSistemaController{
         $totalTotal = 0;
         $decimalesConf = (int) config('app.numerodedecimales');
         $decimalesDoc = (int) config('app.numerodecimalesendocumentos');
+        $totalMano = 0;
+        $totalRefacc = 0;
+        $fechaAddenda =  date('d/m/Y');
 
         foreach($detallesfactura as $df){
             //Coloca las variables en 0 para hacer la validación de los montos
@@ -4177,6 +4180,9 @@ class FacturaController extends ConfiguracionSistemaController{
                 return response()->json($data);
 
             }
+            $totalMano = number_format(round($subtotalTotal, $decimalesDoc), $decimalesConf, '.', '');
+        }else{
+            $totalRefacc = number_format(round($subtotalTotal, $decimalesDoc), $decimalesConf, '.', '');
         }
 
         if($cliente->Rfc == 'XAXX010101000'){
@@ -4284,74 +4290,146 @@ class FacturaController extends ConfiguracionSistemaController{
                     array_push($arraydoc, $ddf->UUID);
                 }
                 //FACTURA
-                // Crea una nueva factura
-                $invoice = array(
-                    "customer" => array(
-                        "legal_name" => $cliente->Nombre,
-                        "tax_id" => $cliente->Rfc,
+                //Valida si el cliente es INBURSA PARA GENERAR LA ADENDA
+                if ((int)$cliente->Numero == 22) {
+                    // Crea una nueva factura con adenda
+                    $invoice = array(
+                        "customer" => array(
+                            "legal_name" => $cliente->Nombre,
+                            "tax_id" => $cliente->Rfc,
 
-                        //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
-                        "tax_system" => $cliente->RegimenFiscal,
-                        "address" =>
+                            //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
+                            "tax_system" => $cliente->RegimenFiscal,
+                            "address" =>
+                                array(
+                                    "zip" => $cliente->CodigoPostal,
+                                )
+                            //fin cfdi 4.0
+
+                        ),
+                        "items" => $arraytest,
+                        "payment_form" => $factura->FormaPago,
+                        "payment_method" => $factura->MetodoPago,
+
+                        //se debe cambiar la forma de relacion los documentos y en lugar de mandar arra products, se manda array items como en las facturas de ingreso con facturapi 2.0
+                        "related_documents" => array(
                             array(
-                                "zip" => $cliente->CodigoPostal,
+                                "relationship" => $factura->TipoRelacion,
+                                "documents" => $arraydoc
                             )
-                        //fin cfdi 4.0
+                        ),
+                        /*
+                        //datos para facturar en facturapi 1.0
+                        "relation" => $factura->TipoRelacion,
+                        "related" => $arraydoc,
+                        */
+                        "folio_number" => $factura->Folio,
+                        "series" => $factura->Serie,
+                        "currency" => $factura->Moneda,
+                        "exchange" => Helpers::convertirvalorcorrecto($factura->TipoCambio),
+                        "conditions" => $factura->CondicionesDePago,
+                        "addenda" => '<ReferenciaReceptor>'.
+                            '<Siniestro Afectado="A" Emisor="14202" Numero="7035789"/>'.
+                            '<Deducible Importe="0.00" />'.
+                            '<Descuento Importe="0.00" />'.
+                            '<TotalManoObra Importe="'.number_format($totalMano, $decimalesDoc, '.', '').'" />'.
+                            '<TotalRefacciones Importe="'.number_format($totalRefacc, $decimalesDoc, '.', '').'" />'.
+                            '<FechaEntregado Fecha="'.$fechaAddenda.'" />'.
+                        '</ReferenciaReceptor>'
+                    );
+                } else {
+                    // Crea una nueva factura sin adenda
+                    $invoice = array(
+                        "customer" => array(
+                            "legal_name" => $cliente->Nombre,
+                            "tax_id" => $cliente->Rfc,
 
-                    ),
-                    "items" => $arraytest,
-                    "payment_form" => $factura->FormaPago,
-                    "payment_method" => $factura->MetodoPago,
+                            //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
+                            "tax_system" => $cliente->RegimenFiscal,
+                            "address" =>
+                                array(
+                                    "zip" => $cliente->CodigoPostal,
+                                )
+                            //fin cfdi 4.0
 
-                    //se debe cambiar la forma de relacion los documentos y en lugar de mandar arra products, se manda array items como en las facturas de ingreso con facturapi 2.0
-                    "related_documents" => array(
-                        array(
-                            "relationship" => $factura->TipoRelacion,
-                            "documents" => $arraydoc
-                        )
-                    ),
-                    /*
-                    //datos para facturar en facturapi 1.0
-                    "relation" => $factura->TipoRelacion,
-                    "related" => $arraydoc,
-                    */
-                    "folio_number" => $factura->Folio,
-                    "series" => $factura->Serie,
-                    "currency" => $factura->Moneda,
-                    "exchange" => Helpers::convertirvalorcorrecto($factura->TipoCambio),
-                    "conditions" => $factura->CondicionesDePago
-                );
+                        ),
+                        "items" => $arraytest,
+                        "payment_form" => $factura->FormaPago,
+                        "payment_method" => $factura->MetodoPago,
+                        "folio_number" => $factura->Folio,
+                        "series" => $factura->Serie,
+                        "currency" => $factura->Moneda,
+                        "exchange" => Helpers::convertirvalorcorrecto($factura->TipoCambio),
+                        "conditions" => $factura->CondicionesDePago
+                    );
+                }
             }else{
                 //FACTURA
-                // Crea una nueva factura
-                $invoice = array(
-                    "customer" => array(
-                        "legal_name" => $cliente->Nombre,
-                        "tax_id" => $cliente->Rfc,
+                //Valida si el cliente es INBURSA PARA GENERAR LA ADENDA
+                if ((int)$cliente->Numero == 22) {
+                    // Crea una nueva factura con adenda
+                    $invoice = array(
+                        "customer" => array(
+                            "legal_name" => $cliente->Nombre,
+                            "tax_id" => $cliente->Rfc,
 
-                        //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
-                        "tax_system" => $cliente->RegimenFiscal,
-                        "address" =>
-                            array(
-                                "zip" => $cliente->CodigoPostal,
-                            )
-                        //fin cfdi 4.0
+                            //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
+                            "tax_system" => $cliente->RegimenFiscal,
+                            "address" =>
+                                array(
+                                    "zip" => $cliente->CodigoPostal,
+                                )
+                            //fin cfdi 4.0
 
-                    ),
-                    "items" => $arraytest,
-                    "payment_form" => $factura->FormaPago,
-                    "payment_method" => $factura->MetodoPago,
-                    "folio_number" => $factura->Folio,
-                    "series" => $factura->Serie,
-                    "currency" => $factura->Moneda,
-                    "exchange" => Helpers::convertirvalorcorrecto($factura->TipoCambio),
-                    "conditions" => $factura->CondicionesDePago
-                );
+                        ),
+                        "items" => $arraytest,
+                        "payment_form" => $factura->FormaPago,
+                        "payment_method" => $factura->MetodoPago,
+                        "folio_number" => $factura->Folio,
+                        "series" => $factura->Serie,
+                        "currency" => $factura->Moneda,
+                        "exchange" => Helpers::convertirvalorcorrecto($factura->TipoCambio),
+                        "conditions" => $factura->CondicionesDePago,
+                        "addenda" => '<ReferenciaReceptor>'.
+                            '<Siniestro Emisor="14202" Numero="7035789" Afectado="A"/>'.
+                            '<Deducible Importe="0.00" />'.
+                            '<Descuento Importe="0.00" />'.
+                            '<TotalManoObra Importe="'.number_format($totalMano, $decimalesDoc, '.', '').'" />'.
+                            '<TotalRefacciones Importe="'.number_format($totalRefacc, $decimalesDoc, '.', '').'" />'.
+                            '<FechaEntregado Fecha="'.$fechaAddenda.'" />'.
+                        '</ReferenciaReceptor>'
+                    );
+                } else {
+                    // Crea una nueva factura sin adenda
+                    $invoice = array(
+                        "customer" => array(
+                            "legal_name" => $cliente->Nombre,
+                            "tax_id" => $cliente->Rfc,
+
+                            //se debe agregar para version 2.0 de facturapi que integrado el timbrado de cfdi 4.0
+                            "tax_system" => $cliente->RegimenFiscal,
+                            "address" =>
+                                array(
+                                    "zip" => $cliente->CodigoPostal,
+                                )
+                            //fin cfdi 4.0
+
+                        ),
+                        "items" => $arraytest,
+                        "payment_form" => $factura->FormaPago,
+                        "payment_method" => $factura->MetodoPago,
+                        "folio_number" => $factura->Folio,
+                        "series" => $factura->Serie,
+                        "currency" => $factura->Moneda,
+                        "exchange" => Helpers::convertirvalorcorrecto($factura->TipoCambio),
+                        "conditions" => $factura->CondicionesDePago
+                    );
+                }
             }
         }
 
         $invoicesSearch = $this->facturapi->Invoices->all([
-            'q'=>$factura->Serie.$factura->Folio
+            'q'=>strtoupper($factura->Serie).$factura->Folio
         ]);
 
         if($invoicesSearch->total_results > 1){
