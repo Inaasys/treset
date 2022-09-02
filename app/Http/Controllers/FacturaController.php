@@ -4178,13 +4178,19 @@ class FacturaController extends ConfiguracionSistemaController{
                             'tipomensaje' => $tipomensaje
                         );
                 return response()->json($data);
-
             }
-            $totalMano = number_format(round($subtotalTotal, $decimalesDoc), $decimalesConf, '.', '');
+            $orden = OrdenTrabajo::where('Status', $factura->Factura)->first();
+            foreach ($orden->detalles as $detalle) {
+                if(isset($detalle->Traspaso)){
+                    $totalRefacc += number_format(round($detalle->SubTotal, $decimalesDoc), $decimalesConf, '.', '');
+                }else{
+                    $totalMano += number_format(round($detalle->SubTotal, $decimalesDoc), $decimalesConf, '.', '');
+                }
+            }
+
         }else{
             $totalRefacc = number_format(round($subtotalTotal, $decimalesDoc), $decimalesConf, '.', '');
         }
-
         if($cliente->Rfc == 'XAXX010101000'){
             //asignar periodicidad en ingles para facturas globales
             switch($factura->Periodicidad){
