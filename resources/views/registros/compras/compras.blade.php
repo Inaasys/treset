@@ -299,6 +299,8 @@
         var compras_enviar_pdfs_email = '{!!URL::to('compras_enviar_pdfs_email')!!}';
         var compras_generar_pdfs = '{!!URL::to('compras_generar_pdfs')!!}';
         var compras_buscar_folio_string_like = '{!!URL::to('compras_buscar_folio_string_like')!!}';
+        var urlgenerarformatoexceldetalles = '{{$urlgenerarformatoexceldetalles}}';
+        let orden_de_trabajo_exportar_excel = '{!! URL::to('orden_de_trabajo_exportar_excel')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="{{ asset('scripts_inaasys/registros/compras/compras.js') }}"></script>

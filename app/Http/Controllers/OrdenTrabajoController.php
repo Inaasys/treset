@@ -130,7 +130,6 @@ class OrdenTrabajoController extends ConfiguracionSistemaController
                                                 $opcionBloqueo.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->Orden .'\')">Bajas</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="'.route('ordenes_trabajo_generar_pdfs_indiv',$data->Orden).'" target="_blank">Ver Documento PDF</a></li>'.
-                                                '<li><a class="paddingmenuopciones" href="'.route('orden_trabajo_exportar_excel',$data->Orden).'">Excel</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Orden .'\')">Enviar Documento por Correo</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="modificardatosgeneralesorden(\''.$data->Orden .'\')">Modificar Datos Generales</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="generardocumentoeniframe(\''.$data->Orden .'\')">Imprimir Documento PDF</a></li>'.
