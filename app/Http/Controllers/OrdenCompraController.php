@@ -36,12 +36,11 @@ use App\Firma_Rel_Documento;
 use App\User_Rel_Almacen;
 use Config;
 use Mail;
-use Schema;
-use LynX39\LaraPdfMerger\Facades\PdfMerger;
+use App\Existencia;
 use Storage;
 use ZipArchive;
 use File;
-use FastExcel;
+
 
 class OrdenCompraController extends ConfiguracionSistemaController{
 
@@ -1000,7 +999,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     'Dcto' => $request->descuentoporcentajepartida [$key],
                     'Descuento' => $request->descuentopesospartida [$key],
                     'SubTotal' => $request->subtotalpartida [$key],
-                    'Impuesto' => $request->ivaporcentajepartida [$key],
+              ,      'Impuesto' => $request->ivaporcentajepartida [$key],
                     'Iva' => $request->ivapesospartida [$key],
                     'Total' => $request->totalpesospartida [$key],
                     'Surtir' => $request->porsurtirpartida [$key]
@@ -1604,6 +1603,25 @@ class OrdenCompraController extends ConfiguracionSistemaController{
             $Producto->save();
         }
         return response()->json($Producto);
+    }
+
+    public function ordenes_compra_validar_existencias(Request $request){
+        ini_set('max_execution_time', -1); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $arrayExistencias = array();
+        $codigos = $request->codigoproductopartida;
+        foreach ($codigos as $codigo) {
+            $Existencias = Existencia::where('Codigo',$codigo)->where('Almacen',$request->numeroalmacen)->get();
+            if ($Existencias->count() > 0) {
+                if ($Existencias[0]->Existencias > 0) {
+                    array_push($arrayExistencias, array(
+                        "Codigo" => $codigo,
+                        "Existencias"=> Helpers::convertirvalorcorrecto($Existencias[0]->Existencias)
+                    ));
+                }
+            }
+        }
+        return response()->json($arrayExistencias);
     }
 
 }

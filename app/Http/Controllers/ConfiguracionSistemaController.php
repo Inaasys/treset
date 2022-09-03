@@ -73,7 +73,8 @@ class ConfiguracionSistemaController extends Controller
                                             'GenerarFormatoRequisicionTYT',
                                             'ModificarCreditoDeClientes',
                                             'ModificarCostoyVentaDeServicios',
-                                            'ligarOTaCompra')
+                                            'ligarOTaCompra',
+                                            'validarExistenciasOC')
                                 ->where('Numero', 1)->first();
         //actualizar datos de configuracion global
         config(['app.periodoincialmodulos' => $this->empresa->Periodo_Inicial_Modulos]);
@@ -102,6 +103,7 @@ class ConfiguracionSistemaController extends Controller
         config(['app.modificarcreditodeclientes' => $this->empresa->ModificarCreditoDeClientes]);
         config(['app.modificarcostoyventadeservicios' => $this->empresa->ModificarCostoyVentaDeServicios]);
         config(['app.ligarOTaCompra'=>$this->empresa->ligarOTaCompra]);
+        config(['app.validarExistenciasOC'=>$this->empresa->validarExistenciasOC]);
         ////////////OBTENER CONFIGURACIONES DEL SISTEMA////////////////
         $this->numerocerosconfigurados = Helpers::numerocerosconfiguracion(); //obtienes los ceros que se deben colocar con base a los decimales configurados en el sistemas ejemplo decimales para el sistema = 3 numero de ceros = 000
         $this->numerocerosconfiguradosinputnumberstep = Helpers::numerocerosconfiguracioninputnumberstep(); //obtienes los ceros que se deben colocar en los input type number con base a los decimales configurados en el sistemas ejemplo decimales para el sistema = 3 numero de ceros = 001
@@ -142,6 +144,8 @@ class ConfiguracionSistemaController extends Controller
         $this->modificarcostoyventadeservicios = config('app.modificarcostoyventadeservicios');
         // Ligar Compras con OT
         $this->ligarOTaCompra = config('app.ligarOTaCompra');
+        //Validar Existencias compras
+        $this->validarExistenciasOC = config('app.validarExistenciasOC');
         //conexiones a otras bases
         $this->suc2 = config('app.suc2');
         $this->connsuc2 = config('app.connsuc2');
@@ -329,6 +333,7 @@ class ConfiguracionSistemaController extends Controller
         View::share ( 'modificarconsecutivofolioenremisiones', $this->modificarconsecutivofolioenremisiones);
         View::share ( 'validarutilidadnegativa', $this->validarutilidadnegativa);
         View::share ( 'ligarOTaCompra', $this->ligarOTaCompra);
+        View::share ( 'validarExistenciasOC', $this->validarExistenciasOC);
         View::share ( 'suc2', $this->suc2);
         View::share ( 'connsuc2', $this->connsuc2);
         View::share ( 'suc3', $this->suc3);
