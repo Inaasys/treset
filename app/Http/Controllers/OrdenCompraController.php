@@ -999,7 +999,7 @@ class OrdenCompraController extends ConfiguracionSistemaController{
                     'Dcto' => $request->descuentoporcentajepartida [$key],
                     'Descuento' => $request->descuentopesospartida [$key],
                     'SubTotal' => $request->subtotalpartida [$key],
-              ,      'Impuesto' => $request->ivaporcentajepartida [$key],
+                    'Impuesto' => $request->ivaporcentajepartida [$key],
                     'Iva' => $request->ivapesospartida [$key],
                     'Total' => $request->totalpesospartida [$key],
                     'Surtir' => $request->porsurtirpartida [$key]

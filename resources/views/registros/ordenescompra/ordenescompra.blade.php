@@ -275,6 +275,7 @@
         var nombreempresa = '{{$empresa->Nombre}}';
         var validarExistenciasOC = '{{$empresa->validarExistenciasOC}}'
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
+        var urlgenerarformatoexceldetalles = '{{$urlgenerarformatoexceldetalles}}'
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
         var background_tables = '{{$empresa->background_tables}}';
