@@ -14,6 +14,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\PlantillasRemisionesExport;
 use App\Imports\RemisionesImport;
 use App\Exports\RemisionesExport;
+use App\Exports\RemisionesDetallesExport;
 use App\Remision;
 use App\RemisionDetalle;
 use App\CotizacionProducto;
@@ -47,6 +48,7 @@ use LynX39\LaraPdfMerger\Facades\PdfMerger;
 use Storage;
 use ZipArchive;
 use File;
+use FastExcel;
 
 class RemisionController extends ConfiguracionSistemaController{
 
@@ -60,9 +62,10 @@ class RemisionController extends ConfiguracionSistemaController{
         $configuracion_tabla = $configuraciones_tabla['configuracion_tabla'];
         $rutaconfiguraciontabla = route('remisiones_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('remisiones_exportar_excel');
+        $urlgenerarformatoexceldetalles = route('remision_detalles_exportar_excel');
         $rutacreardocumento = route('remisiones_generar_pdfs');
         $urlgenerarplantilla = route('remisiones_generar_plantilla');
-        return view('registros.remisiones.remisiones', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','rutacreardocumento','urlgenerarplantilla'));
+        return view('registros.remisiones.remisiones', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','urlgenerarformatoexceldetalles','rutacreardocumento','urlgenerarplantilla'));
     }
 
     //obtener registros tabla
@@ -1908,7 +1911,25 @@ class RemisionController extends ConfiguracionSistemaController{
         $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Remisiones', Auth::user()->id);
         return Excel::download(new RemisionesExport($configuraciones_tabla['campos_consulta'],$request->periodo), "remisiones-".$request->periodo.".xlsx");
     }
-
+    public function remision_detalles_exportar_excel(Request $request){
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $campos_consulta = [];
+        array_push($campos_consulta, 'Remision');
+        array_push($campos_consulta, 'Fecha');
+        array_push($campos_consulta, 'Codigo');
+        array_push($campos_consulta, 'Descripcion');
+        array_push($campos_consulta, 'Unidad');
+        array_push($campos_consulta, 'Cantidad');
+        array_push($campos_consulta, 'Precio');
+        array_push($campos_consulta, 'Importe');
+        array_push($campos_consulta, 'SubTotal');
+        array_push($campos_consulta, 'Iva');
+        array_push($campos_consulta, 'Total');
+        array_push($campos_consulta, 'Costo');
+        array_push($campos_consulta, 'CostoTotal');
+        return Excel::download(new RemisionesDetallesExport($campos_consulta,$request->remision), "remision-".$request->remision.".xlsx");
+        }
     //guardar configuracion tabla
     public function remisiones_guardar_configuracion_tabla(Request $request){
         if($request->string_datos_tabla_false == null){

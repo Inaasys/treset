@@ -320,6 +320,9 @@
         var productos_obtener_clave_unidad_por_clave = '{!!URL::to('productos_obtener_clave_unidad_por_clave')!!}';
         var productos_obtener_marca_por_numero = '{!!URL::to('productos_obtener_marca_por_numero')!!}';
         var productos_obtener_linea_por_numero = '{!!URL::to('productos_obtener_linea_por_numero')!!}';
+        // exportar a excel detalles de la OC
+        var urlgenerarformatoexceldetalles = '{{$urlgenerarformatoexceldetalles}}';
+        let orden_de_compra_exportar_excel = '{!! URL::to('orden_de_compra_exportar_excel')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="{{ asset('scripts_inaasys/registros/ordenescompra/ordenescompra.js') }}"></script>

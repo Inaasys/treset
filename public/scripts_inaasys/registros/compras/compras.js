@@ -61,6 +61,7 @@ function mostrarmodalformulario(tipo, modificacionpermitida){
           $("#btnGuardarModificacion").show();
         }
     }
+    cambiarurlexportarexceldetallescompra();
 }
 //ocultar modal formulario
 function ocultarmodalformulario(){
@@ -81,6 +82,10 @@ function cambiarurlexportarexcel(){
   //colocar el periodo seleccionado como parametro para exportar a excel
   var periodo = $("#periodo").val();
   $("#btnGenerarFormatoExcel").attr("href", urlgenerarformatoexcel+'?periodo='+periodo);
+}
+function cambiarurlexportarexceldetallescompra(){
+  var compra = $("#compra_detalles").val();
+  $("#btnGenerarFormatoExcelDetalles").attr("href", urlgenerarformatoexceldetalles+'?compra='+compra);
 }
 function relistar(){
   cambiarurlexportarexcel();
@@ -2087,6 +2092,7 @@ function obtenerdatos(compramodificar){
                                 '<div class="row">'+
                                     '<div class="col-md-3">'+
                                         '<label>Compra <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b></label>'+
+                                        '<input type="hidden" class="form-control" name="compra_detalles" id="compra_detalles" required readonly>'+
                                         '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                                         '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                                         '<input type="hidden" class="form-control" name="compra" id="compra" required readonly>'+
@@ -2303,6 +2309,9 @@ function obtenerdatos(compramodificar){
                                       '<label>Observaciones</label>'+
                                       '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
                                   '</div>'+
+                                  '<div class="col-md-6">'+
+                                    '<a class="btn btn-success btn-sm" id="btnGenerarFormatoExcelDetalles" href="{{route("compra_detalles_exportar_excel")}}" target="_blank">Exporta a Excel..</a>'+
+                                  '</div>'+
                                   '<div class="col-md-3 col-md-offset-3">'+
                                         '<table class="table table-striped table-hover">'+
                                             '<tr>'+
@@ -2381,6 +2390,7 @@ function obtenerdatos(compramodificar){
     $("#ordentrabajo").val(data.compra.OrdenTrabajo);
     $("#ordentrabajoanterior").val(data.compra.OrdenTrabajo);
     $("#proveedor").val(data.proveedor.Nombre);
+    $("#compra_detalles").val(data.compra.Compra);
     if(data.proveedor.Nombre != null){
       $("#textonombreproveedor").html(data.proveedor.Nombre.substring(0, 40));
     }

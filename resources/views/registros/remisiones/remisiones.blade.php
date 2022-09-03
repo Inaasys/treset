@@ -299,6 +299,8 @@
         var remisiones_generar_pdfs = '{!!URL::to('remisiones_generar_pdfs')!!}';
         var remisiones_buscar_folio_string_like = '{!!URL::to('remisiones_buscar_folio_string_like')!!}';
         var remisiones_obtener_datos_agregar_fila_producto = '{!!URL::to('remisiones_obtener_datos_agregar_fila_producto')!!}';
+        var urlgenerarformatoexceldetalles = '{{$urlgenerarformatoexceldetalles}}';
+        let remisiones_exportar_excel = '{!! URL::to('remisiones_exportar_excel')!!}';
     </script>
     @include('secciones.libreriasregistrosycatalogos')
     <script src="scripts_inaasys/registros/remisiones/remisiones.js"></script>

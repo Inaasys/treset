@@ -49,6 +49,7 @@ function mostrarmodalformulario(tipo, modificacionpermitida){
           $("#btnGuardarModificacion").show();
         }
     }
+    cambiarurlexportarexceldetallesoc();   
 }
 //ocultar modal formulario
 function ocultarmodalformulario(){
@@ -69,6 +70,10 @@ function cambiarurlexportarexcel(){
   //colocar el periodo seleccionado como parametro para exportar a excel
   var periodo = $("#periodo").val();
   $("#btnGenerarFormatoExcel").attr("href", urlgenerarformatoexcel+'?periodo='+periodo);
+}
+function cambiarurlexportarexceldetallesoc(){
+  var orden = $("#orden_detalles").val();
+  $("#btnGenerarFormatoExcelDetalles").attr("href", urlgenerarformatoexceldetalles+'?orden='+orden);
 }
 function relistar(){
   cambiarurlexportarexcel();
@@ -2181,6 +2186,7 @@ function obtenerdatos(ordenmodificar){
                 '<div class="row">'+
                   '<div class="col-md-3">'+
                     '<label>Orden <b style="color:#F44336 !important;" id="serietexto"> Serie:</b></label>'+
+                    '<input type="hidden" class="form-control" name="orden_detalles" id="orden_detalles" required readonly>'+
                     '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                     '<input type="hidden" class="form-control" name="serie" id="serie"  data-parsley-length="[0, 10]" required readonly>'+
                     '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion"  readonly>'+
@@ -2321,6 +2327,9 @@ function obtenerdatos(ordenmodificar){
                         '<label>Observaciones</label>'+
                         '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" rows="5" data-parsley-length="[1, 255]" onkeyup="tipoLetra(this);" required></textarea>'+
                       '</div>'+
+                      '<div class="col-md-6">'+
+                      '<a class="btn btn-success btn-sm" id="btnGenerarFormatoExcelDetalles" href="{{route("orden_trabajo_detalles_exportar_excel")}}" target="_blank">Exporta a Excel..</a>'+
+                    '</div>'+
                       '<div class="col-md-3 col-md-offset-3">'+
                         '<table class="table table-striped table-hover">'+
                           '<tr>'+
@@ -2365,6 +2374,7 @@ function obtenerdatos(ordenmodificar){
     $("#numeroproveedor").val(data.proveedor.Numero);
     $("#numeroproveedoranterior").val(data.proveedor.Numero);
     $("#proveedor").val(data.proveedor.Nombre);
+    $("#orden_detalles").val(data.ordencompra.Orden);
     if(data.proveedor.Nombre != null){
       $("#textonombreproveedor").html(data.proveedor.Nombre.substring(0, 60));
     }

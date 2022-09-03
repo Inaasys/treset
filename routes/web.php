@@ -339,6 +339,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/ordenes_compra_obtener_marcas', 'OrdenCompraController@ordenes_compra_obtener_marcas')->name('ordenes_compra_obtener_marcas')->middleware('revisaraccesomenu:menuregistrosordenescompra');
     Route::get('/ordenes_compra_obtener_lineas', 'OrdenCompraController@ordenes_compra_obtener_lineas')->name('ordenes_compra_obtener_lineas')->middleware('revisaraccesomenu:menuregistrosordenescompra');
     Route::post('/ordenes_compra_guardar_producto', 'OrdenCompraController@ordenes_compra_guardar_producto')->name('ordenes_compra_guardar_producto')->middleware('revisarpermisos:catalogos.productos.altas');
+    // exporte a excel los detallas de las OC
+    Route::get('/orden_compra_exportar_excel/{orden}', 'OrdenCompraController@orden_compra_exportar_excel')->name('orden_compra_exportar_excel')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+    Route::get('/orden_compra_detalles_exportar_excel', 'OrdenCompraController@orden_compra_detalles_exportar_excel')->name('orden_compra_detalles_exportar_excel')->middleware('revisaraccesomenu:menuregistrosordenescompra');
+    
     //Compras
     Route::get('/compras', 'CompraController@compras')->name('compras')->middleware('revisaraccesomenu:menuregistroscompras');
     Route::get('/compras_obtener', 'CompraController@compras_obtener')->name('compras_obtener')->middleware('revisaraccesomenu:menuregistroscompras');
@@ -375,6 +379,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/compras_generar_excel_indiv/{documento}', 'CompraController@compras_generar_excel_indiv')->name('compras_generar_excel_indiv')->middleware('revisaraccesomenu:menuregistroscompras');
     Route::get('/compras_exportar_excel', 'CompraController@compras_exportar_excel')->name('compras_exportar_excel')->middleware('revisaraccesomenu:menuregistroscompras');
     Route::post('/compras_guardar_configuracion_tabla', 'CompraController@compras_guardar_configuracion_tabla')->name('compras_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistroscompras');
+        // exporte a excel los detallas de las Compras
+    Route::get('/compra_exportar_excel/{orden}', 'CompraController@compra_exportar_excel')->name('compra_exportar_excel')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+    Route::get('/compra_detalles_exportar_excel', 'CompraController@compra_detalles_exportar_excel')->name('compra_detalles_exportar_excel')->middleware('revisaraccesomenu:menuregistrosordenescompra');   
     //Ordenes de Trabajo
     Route::get('/ordenes_trabajo', 'OrdenTrabajoController@ordenes_trabajo')->name('ordenes_trabajo')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
     Route::get('/ordenes_trabajo_obtener', 'OrdenTrabajoController@ordenes_trabajo_obtener')->name('ordenes_trabajo_obtener')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
@@ -864,6 +871,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/remisiones_generar_pdfs_indiv_requisicion_tyt/{documento}', 'RemisionController@remisiones_generar_pdfs_indiv_requisicion_tyt')->name('remisiones_generar_pdfs_indiv_requisicion_tyt')->middleware('revisaraccesomenu:menuregistrosremisiones');
     Route::get('/remisiones_exportar_excel', 'RemisionController@remisiones_exportar_excel')->name('remisiones_exportar_excel')->middleware('revisaraccesomenu:menuregistrosremisiones');
     Route::post('/remisiones_guardar_configuracion_tabla', 'RemisionController@remisiones_guardar_configuracion_tabla')->name('remisiones_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistrosremisiones');
+        // exporte a excel los detallas de las remisiones.
+        Route::get('/remision_exportar_excel/{orden}', 'RemisionController@remision_exportar_excel')->name('remision_exportar_excel')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
+        Route::get('/remision_detalles_exportar_excel', 'RemisionController@remision_detalles_exportar_excel')->name('remision_detalles_exportar_excel')->middleware('revisaraccesomenu:menuregistrosordenescompra');
     //Facturas
     Route::get('/facturas', 'FacturaController@facturas')->name('facturas')->middleware('revisaraccesomenu:menuregistrosfacturas');
     Route::get('/facturas_obtener', 'FacturaController@facturas_obtener')->name('facturas_obtener')->middleware('revisaraccesomenu:menuregistrosfacturas');

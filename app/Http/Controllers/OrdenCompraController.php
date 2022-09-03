@@ -14,6 +14,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\PlantillasOrdenesCompraExport;
 use App\Imports\OrdenesCompraImport;
 use App\Exports\OrdenesDeCompraExport;
+use App\Exports\OrdenCompraDetallesExport;
 use App\OrdenCompra;
 use App\OrdenCompraDetalle;
 use App\TipoOrdenCompra;
@@ -40,6 +41,7 @@ use LynX39\LaraPdfMerger\Facades\PdfMerger;
 use Storage;
 use ZipArchive;
 use File;
+use FastExcel;
 
 class OrdenCompraController extends ConfiguracionSistemaController{
 
@@ -53,9 +55,10 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         $configuracion_tabla = $configuraciones_tabla['configuracion_tabla'];
         $rutaconfiguraciontabla = route('ordenes_compra_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('ordenes_compra_exportar_excel');
+        $urlgenerarformatoexceldetalles = route('orden_compra_detalles_exportar_excel');
         $rutacreardocumento = route('ordenes_compra_generar_pdfs');
         $urlgenerarplantilla = route('ordenes_compra_generar_plantilla');
-        return view('registros.ordenescompra.ordenescompra', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','rutacreardocumento','urlgenerarplantilla'));
+        return view('registros.ordenescompra.ordenescompra', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','urlgenerarformatoexceldetalles','rutacreardocumento','urlgenerarplantilla'));
     }
     //obtener todos los registros
     public function ordenes_compra_obtener(Request $request){
@@ -1424,7 +1427,24 @@ class OrdenCompraController extends ConfiguracionSistemaController{
         $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('OrdenesDeCompra', Auth::user()->id);
         return Excel::download(new OrdenesDeCompraExport($configuraciones_tabla['campos_consulta'],$request->periodo), "ordenesdecompra-".$request->periodo.".xlsx");
     }
-
+    public function orden_compra_detalles_exportar_excel(Request $request){
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $campos_consulta = [];
+        array_push($campos_consulta, 'Orden');
+        array_push($campos_consulta, 'Fecha');
+        array_push($campos_consulta, 'Codigo');
+        array_push($campos_consulta, 'Descripcion');
+        array_push($campos_consulta, 'Unidad');
+        array_push($campos_consulta, 'Cantidad');
+        array_push($campos_consulta, 'Precio');
+        array_push($campos_consulta, 'Importe');
+        array_push($campos_consulta, 'SubTotal');
+        array_push($campos_consulta, 'Iva');
+        array_push($campos_consulta, 'Total');
+        array_push($campos_consulta, 'Costo');
+        return Excel::download(new OrdenCompraDetallesExport($campos_consulta,$request->orden), "ordenesdecompra-".$request->orden.".xlsx");
+        }
     //configurar tabla
     public function ordenes_compra_guardar_configuracion_tabla(Request $request){
         if($request->string_datos_tabla_false == null){

@@ -15,6 +15,7 @@ use PDF;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ComprasExport;
 use App\Exports\PlantillaCompraExport;
+use App\Exports\ComprasDetallesExport;
 use App\Compra;
 use App\CompraDetalle;
 use App\TipoOrdenCompra;
@@ -48,6 +49,7 @@ use Mail;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
 use ZipArchive;
 use File;
+use FastExcel;
 
 class CompraController extends ConfiguracionSistemaController{
 
@@ -61,8 +63,9 @@ class CompraController extends ConfiguracionSistemaController{
         $configuracion_tabla = $configuraciones_tabla['configuracion_tabla'];
         $rutaconfiguraciontabla = route('compras_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('compras_exportar_excel');
+        $urlgenerarformatoexceldetalles = route('compra_detalles_exportar_excel');
         $rutacreardocumento = route('compras_generar_pdfs');
-        return view('registros.compras.compras', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','rutacreardocumento'));
+        return view('registros.compras.compras', compact('serieusuario','configuracion_tabla','rutaconfiguraciontabla','urlgenerarformatoexcel','urlgenerarformatoexceldetalles','rutacreardocumento'));
     }
     //obtener todos los registros
     public function compras_obtener(Request $request){
@@ -2490,6 +2493,26 @@ class CompraController extends ConfiguracionSistemaController{
         $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('Compras', Auth::user()->id);
         return Excel::download(new ComprasExport($configuraciones_tabla['campos_consulta'],$request->periodo), "compras-".$request->periodo.".xlsx");
     }
+    public function compra_detalles_exportar_excel(Request $request){
+        ini_set('max_execution_time', 300); // 5 minutos
+        ini_set('memory_limit', '-1');
+        $campos_consulta = [];
+        array_push($campos_consulta, 'Compra');
+        array_push($campos_consulta, 'Fecha');
+        array_push($campos_consulta, 'Codigo');
+        array_push($campos_consulta, 'Descripcion');
+        array_push($campos_consulta, 'Unidad');
+        array_push($campos_consulta, 'Cantidad');
+        array_push($campos_consulta, 'Precio');
+        array_push($campos_consulta, 'Importe');
+        array_push($campos_consulta, 'SubTotal');
+        array_push($campos_consulta, 'Iva');
+        array_push($campos_consulta, 'Total');
+        array_push($campos_consulta, 'Costo');
+        return Excel::download(new ComprasDetallesExport($campos_consulta,$request->compra), "compra-".$request->compra.".xlsx");
+    
+            //dd($request->compra);
+        }
     //generar excel compras individual
     public function compras_generar_excel_indiv($documento){
         return Excel::download(new PlantillaCompraExport($documento), "compra-".$documento.".xlsx");

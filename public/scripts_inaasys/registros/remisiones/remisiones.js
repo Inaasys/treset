@@ -62,6 +62,7 @@ function mostrarmodalformulario(tipo, modificacionpermitida){
           $("#btnGuardarModificacion").show();
         }
     }
+    cambiarurlexportarexceldetallesremision(); 
 }
 //ocultar modal formulario
 function ocultarmodalformulario(){
@@ -82,6 +83,10 @@ function cambiarurlexportarexcel(){
     //colocar el periodo seleccionado como parametro para exportar a excel
     var periodo = $("#periodo").val();
     $("#btnGenerarFormatoExcel").attr("href", urlgenerarformatoexcel+'?periodo='+periodo);
+}
+function cambiarurlexportarexceldetallesremision(){
+  var remision = $("#remision_detalles").val();
+  $("#btnGenerarFormatoExcelDetalles").attr("href", urlgenerarformatoexceldetalles+'?remision='+remision);
 }
 function relistar(){
     var tabla = $('.tbllistado').DataTable();
@@ -2149,6 +2154,7 @@ function obtenerdatos(remisionmodificar){
                         '<div class="row">'+
                             '<div class="col-md-3">'+
                                 '<label>Remisión <b style="color:#F44336 !important;" id="serietexto"> Serie:</b></label>'+
+                                '<input type="hidden" class="form-control" name="remision_detalles" id="remision_detalles" required readonly>'+
                                 '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);" ondblclick="obtenultimonumero()">'+
                                 '<input type="hidden" class="form-control" name="serie" id="serie" required readonly data-parsley-length="[1, 10]">'+
                                 '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
@@ -2371,6 +2377,9 @@ function obtenerdatos(remisionmodificar){
                             '<label>Observaciones</label>'+
                             '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]" rows="3"></textarea>'+
                           '</div>'+
+                           '<div class="col-md-6">'+
+                               '<a class="btn btn-success btn-sm" id="btnGenerarFormatoExcelDetalles" href="{{route("remision_detalles_exportar_excel")}}" target="_blank">Exporta a Excel..</a>'+
+                            '</div>'+
                             '<div class="col-md-3">'+
                                 '<table class="table table-striped table-hover">'+
                                     '<tr>'+
@@ -2480,6 +2489,7 @@ function obtenerdatos(remisionmodificar){
         $("#divbtngenerarformatoreqtyt").hide();
     }
     */
+    $("#remision_detalles").val(data.remision.Remision);
     $("#periodohoy").val(data.remision.Periodo);
     $("#folio").val(data.remision.Folio);
     $("#serie").val(data.remision.Serie);
