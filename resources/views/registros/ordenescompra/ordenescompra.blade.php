@@ -273,7 +273,7 @@
         var formatercerordenamiento = '{{$configuracion_tabla->formatercerordenamiento}}';
         var campos_busquedas = '{{$configuracion_tabla->campos_busquedas}}';
         var nombreempresa = '{{$empresa->Nombre}}';
-        var ordenes_compra_validar_existencias = '{{!!URL::to('ordenes_compra_validar_existencias')!!}}'
+        var ordenes_compra_validar_existencias = '{!!URL::to('ordenes_compra_validar_existencias')!!}'
         var validarExistenciasOC = '{{$empresa->validarExistenciasOC}}'
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var urlgenerarformatoexceldetalles = '{{$urlgenerarformatoexceldetalles}}'
