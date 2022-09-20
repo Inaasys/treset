@@ -34,7 +34,7 @@ use Config;
 use Mail;
 use App\Serie;
 use LynX39\LaraPdfMerger\Facades\PdfMerger;
-use Storage; 
+use Storage;
 use ZipArchive;
 use File;
 
@@ -58,7 +58,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
         }
         //FIN CONFIGURACIONES DE LA TABLA//
     }
-    
+
     public function notas_credito_proveedores(){
         $serieusuario = 'A';
         $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('NotasCreditoProveedor', Auth::user()->id);
@@ -134,7 +134,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                     //->addColumn('TipoCambio', function($data){ return $data->TipoCambio; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        } 
+        }
     }
     //obtener series documento
     public function notas_credito_proveedores_obtener_series_documento(Request $request){
@@ -205,7 +205,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             'rfc' => $rfc,
             'SolicitarXML' => $SolicitarXML
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener almacenes
@@ -271,7 +271,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             'numero' => $numero,
             'nombre' => $nombre,
         );
-        return response()->json($data); 
+        return response()->json($data);
     }
 
     //obtener compras
@@ -336,20 +336,20 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                         }
                         return $boton;
                     })
-                    ->addColumn('Existencias', function($data){ 
+                    ->addColumn('Existencias', function($data){
                         return Helpers::convertirvalorcorrecto($data->Existencias);
                     })
-                    ->addColumn('Costo', function($data){ 
+                    ->addColumn('Costo', function($data){
                         return Helpers::convertirvalorcorrecto($data->Costo);
                     })
-                    ->addColumn('SubTotal', function($data){ 
+                    ->addColumn('SubTotal', function($data){
                         return Helpers::convertirvalorcorrecto($data->SubTotal);
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        } 
+        }
     }
-    //obtener producto por codigo 
+    //obtener producto por codigo
     public function notas_credito_proveedores_obtener_producto_por_codigo(Request $request){
         $codigoabuscar = $request->codigoabuscar;
         $numeroalmacen = $request->numeroalmacen;
@@ -396,7 +396,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                 'contarproductos' => $contarproductos
             );
         }
-        return response()->json($data);  
+        return response()->json($data);
     }
 
     //obtener claves productos
@@ -411,7 +411,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        }          
+        }
     }
     //obtener claves unidades
     public function notas_credito_proveedores_obtener_claves_unidades(Request $request){
@@ -425,7 +425,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        }         
+        }
     }
 
     //obtener compra seleccionada
@@ -453,13 +453,13 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             "almacen" => $almacen,
             "filacompra" => $filacompra,
         );
-        return response()->json($data);        
+        return response()->json($data);
     }
 
     //obtener los codigos de la compra seleccionada
     public function notas_credito_proveedor_obtener_codigos_compra(Request $request){
         if($request->ajax()){
-            $fila = $request->fila;            
+            $fila = $request->fila;
             $data = DB::table('Compras Detalles AS cd')
                         ->Join('c_ClaveProdServ AS cp', 'cd.ClaveProducto', '=', 'cp.Clave')
                         ->Join('c_ClaveUnidad AS cu', 'cd.ClaveUnidad', '=', 'cu.Clave')
@@ -485,7 +485,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                     ->make(true);
         }
     }
-    
+
     //obtener datos almacen
     public function notas_credito_proveedores_obtener_datos_almacen(Request $request){
         $compra = Compra::where('Compra', $request->compra)->first();
@@ -505,8 +505,8 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
         $xml->move($mover_a_carpeta,$nombre_original);
         if (file_exists('xml_cargados/'.$nombre_original)) {
             //cargar xml
-            libxml_use_internal_errors(true); 
-            $xml = simplexml_load_file('xml_cargados/'.$nombre_original);                   
+            libxml_use_internal_errors(true);
+            $xml = simplexml_load_file('xml_cargados/'.$nombre_original);
             //obtener datos generales del xml nodo Comprobante
             $comprobante = $xml->attributes();
             $array_comprobante = array(
@@ -591,7 +591,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                     "Importe" => $atributos_concepto['Importe'],
                     "Descuento" => $atributos_concepto['Descuento'],
                     "array_traslados" => $array_traslados
-                );   
+                );
             }
             //obtener UUID del xml timbrado digital
             $activar_namespaces = $namespaces->Complemento->getNameSpaces(true);
@@ -609,7 +609,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                 "TotalImpuestosTrasladados" => $TotalImpuestosTrasladados,
                 "array_traslados_impuestos" => $array_traslados_impuestos,
                 "uuid" => $uuid,
-                "fechatimbrado" => $fechatimbrado    
+                "fechatimbrado" => $fechatimbrado
             );
             //eliminar xml de public/xml_cargados
             $eliminarxml = public_path().'/xml_cargados/'.$nombre_original;
@@ -652,7 +652,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
 	    $ExisteUUID = NotaProveedor::where('UUID', $uuid )->where('Status', '<>', 'BAJA')->first();
 	    if($ExisteUUID == true && $solicitarxml == 1){
 	        $NotaProveedor = 1;
-	    }else{  
+	    }else{
             //obtener el ultimo id de la tabla
             $folio = Helpers::ultimofolioserietablamodulos('App\NotaProveedor',$request->serie);
             //INGRESAR DATOS A TABLA COMPRAS
@@ -671,10 +671,10 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                 $NotaProveedor->FechaEmitida=Helpers::fecha_exacta_accion_datetimestring();
             }
             $NotaProveedor->NotaProveedor=$request->notaproveedor;
-            $NotaProveedor->Almacen=$request->numeroalmacen; 
+            $NotaProveedor->Almacen=$request->numeroalmacen;
             $NotaProveedor->Importe=$request->importe;
             $NotaProveedor->Descuento=$request->descuento;
-            $NotaProveedor->Ieps=$request->ieps;  
+            $NotaProveedor->Ieps=$request->ieps;
             $NotaProveedor->SubTotal=$request->subtotal;
             $NotaProveedor->Iva=$request->iva;
             $NotaProveedor->IvaRetencion=$request->retencioniva;
@@ -714,7 +714,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             $BitacoraDocumento->save();
             //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
             $item = 1;
-            foreach ($request->codigopartida as $key => $codigopartida){             
+            foreach ($request->codigopartida as $key => $codigopartida){
                 $NotaProveedorDetalle=new NotaProveedorDetalle;
                 $NotaProveedorDetalle->Nota = $notaproveedor;
                 $NotaProveedorDetalle->Proveedor = $request->numeroproveedor;
@@ -743,8 +743,8 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                 $NotaProveedorDetalle->ClaveUnidad = $request->claveunidadpartida [$key];
                 $NotaProveedorDetalle->Item = $item;
                 $NotaProveedorDetalle->save();
+                $compra = Compra::where('Compra', $request->stringcomprasseleccionadas)->first();
                 if($codigopartida != 'DPPP'){
-                    $compra = Compra::where('Compra', $request->stringcomprasseleccionadas)->first();
                     switch ($compra->Tipo){
                         case "TOT":
                             break;
@@ -761,11 +761,16 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                                     ]);
                     }
                 }
+                Compra::where('Compra', $request->stringcomprasseleccionadas)
+                        ->update([
+                        "Descuentos" => Helpers::convertirvalorcorrecto($compra->Descuentos) +
+                        Helpers::convertirvalorcorrecto($request->descuentopesoscomprapartida [$key])
+                ]);
                 $item++;
             }
             //INGRESAR DATOS A TABLA NOTA PROVEEDOR DOCUMENTOS
             $itemdocumento = 1;
-            foreach ($request->compraaplicarpartida as $key => $comprapartida){             
+            foreach ($request->compraaplicarpartida as $key => $comprapartida){
                 $NotaProveedorDocumento=new NotaProveedorDocumento;
                 $NotaProveedorDocumento->Nota = $notaproveedor;
                 $NotaProveedorDocumento->Compra = $comprapartida;
@@ -775,7 +780,6 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                 //Modificar Compra
                 Compra::where('Compra', $comprapartida)
                 ->update([
-                    'Descuentos' => $request->descuentopesoscomprapartida [$key],
                     'Saldo' => $request->saldocomprapartida [$key]
                 ]);
                 //Si el saldo es igual a 0 liquidar compra
@@ -787,8 +791,8 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                 }
                 $itemdocumento++;
             }
-        }    
-        return response()->json($NotaProveedor);   
+        }
+        return response()->json($NotaProveedor);
     }
 
     //verificar si se puede da de baja la nota
@@ -854,10 +858,10 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                                 'Total' => '0.000000',
                                 'PrecioMoneda' => '0.000000',
                                 'DescuentoMoneda' => '0.000000'
-                            ]);                                    
+                            ]);
         }
         //notasproveedor documentos
-        $detallesdocumentos = NotaProveedorDocumento::where('Nota', $request->notadesactivar)->get(); 
+        $detallesdocumentos = NotaProveedorDocumento::where('Nota', $request->notadesactivar)->get();
         foreach($detallesdocumentos as $detalledocumento){
             $notaproveedordocumento = NotaProveedorDocumento::where('Nota', $request->notadesactivar)->where('Compra', $detalledocumento->Compra)->first();
             $compradocumento = Compra::where('Compra', $detalledocumento->Compra)->first();
@@ -882,7 +886,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                                     ->update([
                                         'Descuento' => '0.000000',
                                         'Total' => '0.000000'
-                                    ]);  
+                                    ]);
         }
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
@@ -949,7 +953,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                         $filasdetallesnotaproveedor= $filasdetallesnotaproveedor.
                         '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                             '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfila" onclick="eliminarfila('.$contadorfilas.')" >X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dnp->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
-                            '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dnp->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$dnp->Codigo.'</b></td>'.         
+                            '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dnp->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$dnp->Codigo.'</b></td>'.
                             '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($dnp->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                             '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxs unidadpartida" name="unidadpartida[]" value="'.$dnp->Unidad.'" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)"></td>'.
                             '<td class="tdmod">'.
@@ -991,7 +995,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                                     '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                         '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                     '</div>'.
-                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.   
+                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.
                                         '<input type="text" class="form-control inputnextdet divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
                                     '</div>'.
                                 '</div>'.
@@ -1003,7 +1007,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                         $filasdetallesnotaproveedor= $filasdetallesnotaproveedor.
                         '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
                             '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfila" onclick="eliminarfila('.$contadorfilas.')" >X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dnp->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
-                            '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dnp->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$dnp->Codigo.'</b></td>'.         
+                            '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dnp->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$dnp->Codigo.'</b></td>'.
                             '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($dnp->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                             '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxs unidadpartida" name="unidadpartida[]" value="'.$dnp->Unidad.'" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)"></td>'.
                             '<td class="tdmod">'.
@@ -1049,7 +1053,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                                     '<div class="col-xs-2 col-sm-2 col-md-2">'.
                                         '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
                                     '</div>'.
-                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.   
+                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.
                                         '<input type="text" class="form-control inputnextdet divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
                                     '</div>'.
                                 '</div>'.
@@ -1061,7 +1065,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                     $contadorproductos++;
                     $contadorfilas++;
             }
-        }     
+        }
         //nota proveedor documentos
         $documentosnotaproveedor = NotaProveedorDocumento::where('Nota', $request->notamodificar)->orderBy('Item', 'ASC')->get();
         $numerodocumentosnotaproveedor = NotaProveedorDocumento::where('Nota', $request->notamodificar)->count();
@@ -1091,12 +1095,12 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                         '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd notascreditocomprapartida" name="notascreditocomprapartida[]" value="'.Helpers::convertirvalorcorrecto($descuentocomp).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                         '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdetcom divorinputmodmd descuentopesoscomprapartida" name="descuentopesoscomprapartida[]" value="'.Helpers::convertirvalorcorrecto($docnp->Descuento).'" data-parsley-max="'.Helpers::convertirvalorcorrecto($saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilastablacompras('.$contadorfilascompras.');" ></td>'.
                         '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd saldocomprapartida" name="saldocomprapartida[]" value="'.Helpers::convertirvalorcorrecto($compra->Saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '</tr>';  
+                    '</tr>';
                     $contadorproductos++;
                     $contadorfilas++;
                     $descuentocompras = $descuentocompras+$docnp->Descuento;
             }
-        } 
+        }
         $diferencia = $notaproveedor->Total - $descuentocompras;
         //permitir o no modificar registro
         if(Auth::user()->role_id == 1){
@@ -1159,7 +1163,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
 	    $ExisteUUID = NotaProveedor::where('Nota', '<>', $notaproveedor)->where('UUID', $uuid )->where('Status', '<>', 'BAJA')->first();
 	    if($ExisteUUID == true){
 	        $NotaProveedor = 1;
-	    }else{  
+	    }else{
             $NotaProveedor = NotaProveedor::where('Nota', $notaproveedor)->first();
             //array detalles antes de modificacion
             $ArrayDetallesNotaAnterior = Array();
@@ -1174,8 +1178,8 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                 //array_push($ArrayDetallesNotaNuevo, $nuevocodigo);
                 if($request->agregadoen [$key] == 'NA'){
                     array_push($ArrayDetallesNotaNuevo, $notaproveedor.'#'.$nuevocodigo.'#'.$request->itempartida [$key]);
-                } 
-            }  
+                }
+            }
             //diferencias entre arreglos
             $diferencias_arreglos = array_diff($ArrayDetallesNotaAnterior, $ArrayDetallesNotaNuevo);
             //iteramos las diferencias entre arreglos
@@ -1208,8 +1212,8 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                 //array_push($ArrayDetallesDocumentosNotaNuevo, $nuevacompra);
                 if($request->compraagregadoen [$key] == 'NA'){
                     array_push($ArrayDetallesDocumentosNotaNuevo, $notaproveedor.'#'.$nuevacompra.'#'.$request->itemcomprapartida [$key]);
-                } 
-            }  
+                }
+            }
             //diferencias entre arreglos
             $diferencias_arreglos = array_diff($ArrayDetallesDocumentosNotaAnterior, $ArrayDetallesDocumentosNotaNuevo);
             //iteramos las diferencias entre arreglos
@@ -1268,9 +1272,9 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             $BitacoraDocumento->Periodo = $this->periodohoy;
             $BitacoraDocumento->save();
             //detalles
-            foreach ($request->codigopartida as $key => $codigopartida){  
+            foreach ($request->codigopartida as $key => $codigopartida){
                 //if la partida se agrego en la modificacion se realiza un insert
-                if($request->agregadoen [$key] == 'modificacion'){         
+                if($request->agregadoen [$key] == 'modificacion'){
                     $contaritems = NotaProveedorDetalle::select('Item')->where('Nota', $notaproveedor)->count();
                     if($contaritems > 0){
                         $item = NotaProveedorDetalle::select('Item')->where('Nota', $notaproveedor)->orderBy('Item', 'DESC')->take(1)->get();
@@ -1348,7 +1352,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                         'ClaveUnidad' => $request->claveunidadpartida [$key]
                     ]);
                     if($codigopartida != 'DPPP'){
-                        //sumar existencias del almacen 
+                        //sumar existencias del almacen
                         $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigopartida)->where('Almacen', $request->numeroalmacen)->count();
                         if($ContarExistenciaAlmacen > 0){
                             $ExistenciaAlmacen = Existencia::where('Codigo', $codigopartida)->where('Almacen', $request->numeroalmacen)->first();
@@ -1374,12 +1378,12 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                                         'Existencias' => Helpers::convertirvalorcorrecto($ExistenciaNuevaAlmacen)
                                     ]);
                     }
-                }    
+                }
             }
             //detalles documentos
-            foreach ($request->compraaplicarpartida as $key => $comprapartida){     
+            foreach ($request->compraaplicarpartida as $key => $comprapartida){
                 //if la partida se agrego en la modificacion se realiza un insert
-                if($request->compraagregadoen [$key] == 'modificacion'){ 
+                if($request->compraagregadoen [$key] == 'modificacion'){
                     $itemdocumento = NotaProveedorDocumento::select('Item')->where('Nota', $notaproveedor)->orderBy('Item', 'DESC')->take(1)->get();
                     $ultimoitemdocumento = $itemdocumento[0]->Item+1;
                     $NotaProveedorDocumento=new NotaProveedorDocumento;
@@ -1432,10 +1436,10 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                                     'Status' => "LIQUIDADA"
                                 ]);
                     }
-                } 
+                }
             }
-        }    
-        return response()->json($NotaProveedor); 
+        }
+        return response()->json($NotaProveedor);
     }
 
     //buscar folio on key up
@@ -1449,7 +1453,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                     return $total;
                 })
                 ->make(true);
-        } 
+        }
     }
     //generacion de formato en PDF
     public function notas_credito_proveedores_generar_pdfs(Request $request){
@@ -1458,13 +1462,13 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
         //primero eliminar todos los archivos zip
         Helpers::eliminararchivoszipgenerados();
         if($request->imprimirdirectamente == 1){
-            $notascreditoproveedor = NotaProveedor::where('Nota', $request->arraypdf)->get(); 
+            $notascreditoproveedor = NotaProveedor::where('Nota', $request->arraypdf)->get();
         }else{
             $tipogeneracionpdf = $request->tipogeneracionpdf;
             if($tipogeneracionpdf == 0){
-                $notascreditoproveedor = NotaProveedor::whereIn('Nota', $request->arraypdf)->orderBy('Folio', 'ASC')->take(500)->get(); 
+                $notascreditoproveedor = NotaProveedor::whereIn('Nota', $request->arraypdf)->orderBy('Folio', 'ASC')->take(500)->get();
             }else{
-                //$contrarecibos = ContraRecibo::where('Fecha', $request->anopdf)->get(); 
+                //$contrarecibos = ContraRecibo::where('Fecha', $request->anopdf)->get();
                 $fechainiciopdf = date($request->fechainiciopdf);
                 $fechaterminacionpdf = date($request->fechaterminacionpdf);
                 if ($request->has("seriesdisponiblesdocumento")){
@@ -1500,7 +1504,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                     "preciodetalle" => Helpers::convertirvalorcorrecto($ncpd->Precio),
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($ncpd->SubTotal)
                 );
-            } 
+            }
             $proveedor = Proveedor::where('Numero', $ncp->Proveedor)->first();
             //obtener firmas
             $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'NotasCreditoProveedor')->where('Documento', $ncp->Nota)->where('Status', 'ALTA')->count();
@@ -1566,8 +1570,8 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                     // Agregar archivos que se comprimiran
                     foreach($arrayfilespdf as $afp) {
                         $zip->addFile(Storage::disk('local3')->getAdapter()->applyPathPrefix($afp),$afp);
-                    }     
-                    //terminar proceso   
+                    }
+                    //terminar proceso
                     $zip->close();
                 }
                 // Set Encabezados para descargar
@@ -1585,7 +1589,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
 
     //generacion de formato en PDF
     public function notas_credito_proveedores_generar_pdfs_indiv($documento){
-        $notascreditoproveedor = NotaProveedor::where('Nota', $documento)->get(); 
+        $notascreditoproveedor = NotaProveedor::where('Nota', $documento)->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($notascreditoproveedor as $ncp){
@@ -1611,7 +1615,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                     "preciodetalle" => Helpers::convertirvalorcorrecto($ncpd->Precio),
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($ncpd->SubTotal)
                 );
-            } 
+            }
             $proveedor = Proveedor::where('Numero', $ncp->Proveedor)->first();
             //obtener firmas
             $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'NotasCreditoProveedor')->where('Documento', $ncp->Nota)->where('Status', 'ALTA')->count();
@@ -1676,7 +1680,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
 
     //enviar pdf por emial
     public function notas_credito_proveedores_enviar_pdfs_email(Request $request){
-        $notascreditoproveedor = NotaProveedor::where('Nota', $request->emaildocumento)->get(); 
+        $notascreditoproveedor = NotaProveedor::where('Nota', $request->emaildocumento)->get();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $data=array();
         foreach ($notascreditoproveedor as $ncp){
@@ -1702,7 +1706,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                     "preciodetalle" => Helpers::convertirvalorcorrecto($ncpd->Precio),
                     "subtotaldetalle" => Helpers::convertirvalorcorrecto($ncpd->SubTotal)
                 );
-            } 
+            }
             $proveedor = Proveedor::where('Numero', $ncp->Proveedor)->first();
             //obtener firmas
             $numerofirmas = Firma_Rel_Documento::where('TipoDocumento', 'NotasCreditoProveedor')->where('Documento', $ncp->Nota)->where('Status', 'ALTA')->count();
@@ -1739,7 +1743,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
         ->setOption('margin-bottom', 10);
         try{
             $datosdocumento = NotaProveedor::where('Nota', $request->emaildocumento)->first();
-            //enviar correo electrónico	
+            //enviar correo electrónico
             $nombre = 'Receptor envio de correos';
             $receptor = $request->emailpara;
             $arraycc = array();
@@ -1787,7 +1791,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300); // 5 minutos
         ini_set('memory_limit', '-1');
         $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('NotasCreditoProveedor', Auth::user()->id);
-        return Excel::download(new NotasCreditoProveedoresExport($configuraciones_tabla['campos_consulta'],$request->periodo), "notascreditoproveedores-".$request->periodo.".xlsx");   
+        return Excel::download(new NotasCreditoProveedoresExport($configuraciones_tabla['campos_consulta'],$request->periodo), "notascreditoproveedores-".$request->periodo.".xlsx");
     }
     //configuracion tabla
     public function notas_credito_proveedor_guardar_configuracion_tabla(Request $request){

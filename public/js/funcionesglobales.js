@@ -84,6 +84,10 @@ function formatocorrectoinputcantidades(e){
     //e.value = truncar(e.value, numerodecimales).toFixed(parseInt(numerodecimales));
     e.value = number_format(round(e.value, numerodecimales), numerodecimales, '.', '')
 }
+function formatocorrectoinputcantidadesComma(e){
+    let auxValue = number_format(e.value,numerodecimales,'.','')
+    e.value = number_format(round(auxValue,numerodecimales),numerodecimales,'.',',')
+}
 //FIN DAR FORMATO CORRECTO A LOS INPUTS EN LOS QUE SE MANEJAN CANTIDADES EJEMPLO SI EL SISTEMA ESTA CONFIGURADO PARA 4 DECIMALES AL ESCRIBIR EL VALOR 4 SE FORMATEARA CON LOS DECIMALES ESTABLECIDOS 4.0000 SI ESCRIBIERA 4.56789 SE FORMATEARIA A 4.5678
 //VOLVER A APLICAR CONFIGURACION A DATATABLE PRINCIPAL PARA QUE SE REALIZE LA BUSQUEDA CON LA TECLA ENTER
 function regresarbusquedadatatableprincipal(){
