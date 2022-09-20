@@ -665,7 +665,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             $NotaProveedor->Fecha=Carbon::parse($request->fecha)->toDateTimeString();
             if($solicitarxml == 1){
                 $NotaProveedor->UUID=$request->uuid;
-                $NotaProveedor->FechaEmitida=$request->fechaemitida;
+                $NotaProveedor->FechaEmitida=Carbon::parse($request->fechaemitida)->toDateTimeString();
             }else{
                 $NotaProveedor->UUID="N/A";
                 $NotaProveedor->FechaEmitida=Helpers::fecha_exacta_accion_datetimestring();
