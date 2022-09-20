@@ -1641,14 +1641,24 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         $cliente = Cliente::where('Numero', $CXC->Cliente)->first();
         $arraydet = array();
         foreach($detallescxc as $dp){
+            $abono = 0;
+            $ivaAbonoParcial = 0;
+            $factura = Factura::where('Factura',$dp->Factura)->first();
+            if (($factura->Total-$dp->Abono) <= 0.1) {
+                $abono = $factura->SubTotal;
+            }else{
+                $abono = $dp->Abono / 1.16;
+                $abono = number_format(round($abono, 4), 4, '.', '');
+                //$abono = number_format(round($dp->Abono, 2), 2, '.', '') - number_format(round($ivaAbonoParcial, 2), 2, '.', '');
+            }
             //agregado para facturacion 4.0
             if($dp->ObjetoImp == '02'){//con impuestos
                 $taxes = array(
                     array(
                         //"base" => Helpers::convertirvalorcorrecto($dp->Abono),
-                        "base" => number_format(round($dp->Abono, 2), 2, '.', ''),
+                        "base" => number_format(round($abono, 2), 2, '.', ''),
                         "type" => "IVA",
-                        "rate" => 0.160000
+                        "rate" => 0.16
                     )
                 );
             }else{//sin impuestos

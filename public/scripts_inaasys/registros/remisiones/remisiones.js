@@ -1246,6 +1246,7 @@ function cambiodepreciopartida(fila,tipo){
               var nuevoiva = new Decimal(ivaporcentajepartida).dividedBy(100).plus(1);
               var precioneto = new Decimal(preciopartida).dividedBy(nuevoiva);
               $(".preciopartida", this).val(number_format(round(precioneto, numerodecimales), numerodecimales, '.', ''));
+              $(".preciopartidaAux", this).val(number_format(precioneto, numerodecimales), numerodecimales, '.', ',');
           }
           $('.descuentopesospartida', this).val('0.'+numerocerosconfigurados);
           $('.descuentoporcentajepartida',this).val('0.'+numerocerosconfigurados);
@@ -2628,7 +2629,7 @@ function obtenerdatos(remisionmodificar){
     $("#costo").val(data.costo);
     $("#costoAux").val(number_format(data.costo,numerodecimales,'.',','));
     $("#utilidad").val(data.utilidad);
-    $("#utilidadAux").val(data.utilidad,numerodecimales,'.',',');
+    $("#utilidadAux").val(number_format(data.utilidad,numerodecimales,'.',','));
     $("#comision").val(data.comision);
     $("#credito").val(number_format(round(data.credito, numerodecimales), numerodecimales, '.', ''));
     $("#creditoAux").val(number_format($("#credito").val(), numerodecimales, '.', ','));
@@ -2918,7 +2919,7 @@ function modificardatosgeneralesdocumento(Remision){
     $("#equipodatosgenerales").val(data.Eq);
     setTimeout(function(){$("#remisiondatosgenerales").focus();},500);
     //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
-    $(".inputnextdet").keyup(function (e) {
+    $(".inputnextdet").on('keyup',function (e) {
         //recomentable para mayor compatibilidad entre navegadores.
         var code = (e.keyCode ? e.keyCode : e.which);
         var index = $(this).index(".inputnextdet");
