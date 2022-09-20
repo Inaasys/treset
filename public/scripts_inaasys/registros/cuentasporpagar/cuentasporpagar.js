@@ -662,7 +662,11 @@ $("#btnGuardar").on('click', function (e) {
     var form = $("#formparsley");
     let totalFilas = calcularfilas()
     if (totalFilas < 1) {
-        alert('error')
+        toastr.error( "Error, debe seleccionar al menos una factura","Mensaje", {
+            "timeOut": "6000",
+            "progressBar": true,
+            "extendedTImeout": "6000"
+        })
     }else{
         if (form.parsley().isValid()){
             $('.page-loader-wrapper').css('display', 'block');

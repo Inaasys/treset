@@ -62,7 +62,7 @@ function mostrarmodalformulario(tipo, modificacionpermitida){
           $("#btnGuardarModificacion").show();
         }
     }
-    cambiarurlexportarexceldetallesremision(); 
+    cambiarurlexportarexceldetallesremision();
 }
 //ocultar modal formulario
 function ocultarmodalformulario(){
@@ -1144,8 +1144,10 @@ function calculartotalesfilas(fila){
   $("tr.filasproductos").each(function () {
     if(fila === cuentaFilas){
       // obtener los datos de la fila:
+      let preciopartidaAux = $('.preciopartidaAux', this).val()
+      $('.preciopartida',this).val(number_format(preciopartidaAux,numerodecimales,'.',''))
+      let preciopartida = $('.preciopartida',this).val()
       var cantidadpartida = $(".cantidadpartida", this).val();
-      var preciopartida = $('.preciopartida', this).val();
       var importepartida = $('.importepartida', this).val();
       var descuentopesospartida = $('.descuentopesospartida', this).val();
       var subtotalpartida = $('.subtotalpartida', this).val();
@@ -1160,16 +1162,20 @@ function calculartotalesfilas(fila){
       //importe de la partida
       importepartida =  new Decimal(cantidadpartida).times(preciopartida);
       $('.importepartida', this).val(number_format(round(importepartida, numerodecimales), numerodecimales, '.', ''));
+      $('.importepartidaAux', this).val(number_format(round(importepartida, numerodecimales), numerodecimales, '.', ','));
       //subtotal de la partida
       subtotalpartida =  new Decimal(importepartida).minus(descuentopesospartida);
       $('.subtotalpartida', this).val(number_format(round(subtotalpartida, numerodecimales), numerodecimales, '.', ''));
+      $('.subtotalpartidaAux', this).val(number_format(round(subtotalpartida, numerodecimales), numerodecimales, '.', ','));
       //iva en pesos de la partida
       var multiplicacionivapesospartida = new Decimal(subtotalpartida).times(ivaporcentajepartida);
       ivapesospartida = new Decimal(multiplicacionivapesospartida/100);
       $('.ivapesospartida', this).val(number_format(round(ivapesospartida, numerodecimales), numerodecimales, '.', ''));
+      $('.ivapesospartidaAux', this).val(number_format(round(ivapesospartida, numerodecimales), numerodecimales, '.', ','));
       //total en pesos de la partida
       totalpesospartida = new Decimal(subtotalpartida).plus(ivapesospartida);
       $('.totalpesospartida', this).val(number_format(round(totalpesospartida, numerodecimales), numerodecimales, '.', ''));
+      $('.totalpesospartidaAux', this).val(number_format(round(totalpesospartida, numerodecimales), numerodecimales, '.', ','));
       //costo total
       costototalpartida  = new Decimal(costopartida).times(cantidadpartida);
       $('.costototalpartida', this).val(number_format(round(costototalpartida, numerodecimales), numerodecimales, '.', ''));
@@ -1180,6 +1186,7 @@ function calculartotalesfilas(fila){
       //utilidad de la partida
       utilidadpartida = new Decimal(subtotalpartida).minus(costototalpartida).minus(comisionespesospartida);
       $(".utilidadpartida", this).val(number_format(round(utilidadpartida, numerodecimales), numerodecimales, '.', ''));
+      $(".utilidadpartidaAux", this).val(number_format(round(utilidadpartida, numerodecimales), numerodecimales, '.', ','));
       calculartotal();
     }
     cuentaFilas++;
@@ -1253,6 +1260,8 @@ function calculardescuentoporcentajepartida(fila){
   $("tr.filasproductos").each(function () {
     if(fila === cuentaFilas){
         //descuento en porcentaje de la partida
+        let descuentoPesosAux = number_format($('.descuentopesospartidaAux', this).val(),numerodecimales,'.','')
+        $('.descuentopesospartida', this).val(number_format(round(descuentoPesosAux,numerodecimales),numerodecimales,'.',''));
         var importepartida = $('.importepartida', this).val();
         var descuentopesospartida = $('.descuentopesospartida', this).val();
         var multiplicaciondescuentoporcentajepartida  =  new Decimal(descuentopesospartida).times(100);
@@ -1273,6 +1282,7 @@ function calculardescuentopesospartida(fila){
         var descuentoporcentajepartida = $('.descuentoporcentajepartida', this).val();
         var multiplicaciondescuentopesospartida  =  new Decimal(importepartida).times(descuentoporcentajepartida);
         var descuentopesospartida = new Decimal(multiplicaciondescuentopesospartida/100);
+        $('.descuentopesospartidaAux', this).val(number_format(round(descuentopesospartida, numerodecimales), numerodecimales, '.', ','));
         $('.descuentopesospartida', this).val(number_format(round(descuentopesospartida, numerodecimales), numerodecimales, '.', ''));
         calculartotalesfilas(fila);
     }
@@ -1295,9 +1305,9 @@ function calculartotal(){
         subtotal= new Decimal(subtotal).plus($(".subtotalpartida", this).val());
         iva = new Decimal(iva).plus($(".ivapesospartida", this).val());
         total = new Decimal(total).plus($(".totalpesospartida", this).val());
-        costo = new Decimal(costo).plus($(".costototalpartida ", this).val());
+        costo = new Decimal(costo).plus($(".costototalpartida", this).val());
         utilidad = new Decimal(utilidad).plus($(".utilidadpartida", this).val());
-        comision = new Decimal(comision).plus($(".comisionespesospartida", this).val());
+        // comision = new Decimal(comision).plus($(".comisionespesospartida", this).val());
     });
     $("#importe").val(number_format(round(importe, numerodecimales), numerodecimales, '.', ''));
     $("#descuento").val(number_format(round(descuento, numerodecimales), numerodecimales, '.', ''));
@@ -1306,8 +1316,26 @@ function calculartotal(){
     $("#total").val(number_format(round(total, numerodecimales), numerodecimales, '.', ''));
     $("#costo").val(number_format(round(costo, numerodecimales), numerodecimales, '.', ''));
     $("#utilidad").val(number_format(round(utilidad, numerodecimales), numerodecimales, '.', ''));
-    $("#comision").val(number_format(round(comision, numerodecimales), numerodecimales, '.', ''));
-    //nuevo saldo
+    // $("#comision").val(number_format(round(comision, numerodecimales), numerodecimales, '.', ''));
+    // //Fomato con commas
+    let costoAux = $("#costo").val()
+    let utilidadAux = $("#utilidad").val()
+    let importeAux = $("#importe").val()
+    let descuentoAux = $("#descuento").val()
+    let subAux = $("#subtotal").val()
+    let ivaAux = $("#iva").val()
+    let totalAux = $("#total").val()
+    // let comisionAux = $("#comision").val()
+    $("#costoAux").val(number_format(costoAux, numerodecimales, '.', ','))
+    $("#utilidadAux").val(number_format(utilidadAux, numerodecimales, '.', ','))
+    $("#importeAux").val(number_format(importeAux, numerodecimales, '.', ','))
+    $("#descuentoAux").val(number_format(descuentoAux, numerodecimales, '.', ','))
+    $("#subtotalAux").val(number_format(subAux, numerodecimales, '.', ','))
+    $("#ivaAux").val(number_format(ivaAux, numerodecimales, '.', ','))
+    $("#totalAux").val(number_format(totalAux, numerodecimales, '.', ','))
+    //$("#comisionAux").val(number_format(comisionAux, numerodecimales, '.', ','))
+
+    // //nuevo saldo
     var numerocliente = $("#numerocliente").val();
     $.get(remisiones_obtener_nuevo_saldo_cliente,{numerocliente:numerocliente}, function(saldo){
         var nuevosaldo = new Decimal(saldo).plus(total);
@@ -1319,6 +1347,10 @@ function calculartotal(){
         }else{
             $("#mensajecreditoexcedido").html("");
         }
+        let auxSaldo = number_format($("#saldo").val(),numerodecimales,'.',',')
+        let auxCredito = number_format($("#credito").val(),numerodecimales,'.',',')
+        $("#saldoAux").val(auxSaldo)
+        $("#creditoAux").val(auxCredito);
     })
 }
 //obtener dato para agtegar fila producto
@@ -1415,14 +1447,19 @@ function colocarcostosinivaenpartidas(){
 }
 //eliminar una fila en la tabla de precios clientes
 function eliminarfila(numerofila){
-  var confirmacion = confirm("Esta seguro de eliminar la fila?");
-  if (confirmacion == true) {
-    $("#filaproducto"+numerofila).remove();
-    contadorfilas--;
-    contadorproductos--;
-    comprobarfilas();
-    renumerarfilas();//importante para todos los calculo en el modulo de orden de compra
-    calculartotal();
+    let aux = 0
+    var confirmacion = confirm("Esta seguro de eliminar la fila?");
+    if (confirmacion == true) {
+        $("#filaproducto"+numerofila).remove();
+        $("tr.filasproductos").each(function(){
+          $(this).attr('id','filaproducto'+aux);
+          aux++
+        })
+        contadorfilas--;
+        contadorproductos--;
+        comprobarfilas();
+        renumerarfilas();//importante para todos los calculo en el modulo de orden de compra
+        calculartotal();
   }
 }
 //comprobar numero filas de la tabla precios clientes
@@ -1438,11 +1475,17 @@ function renumerarfilas(){
   lista = document.getElementsByClassName("cantidadpartida");
   for (var i = 0; i < lista.length; i++) {
     lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+');cambiodecantidadpartida('+i+',\''+tipo +'\')');
+
   }
+
   //renumero el precio de la partida
   lista = document.getElementsByClassName("preciopartida");
   for (var i = 0; i < lista.length; i++) {
     lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+');cambiodepreciopartida('+i+',\''+tipo +'\')');
+  }
+  lista = document.getElementsByClassName("preciopartidaAux");
+  for (var i = 0; i < lista.length; i++) {
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidadesComma(this);calculartotalesfilas("+i+');cambiodepreciopartida('+i+',\''+tipo +'\')');
   }
   //renumerar descuento en pesos
   lista = document.getElementsByClassName("descuentoporcentajepartida");
@@ -1451,6 +1494,10 @@ function renumerarfilas(){
   }
   //renumerar porcentaje de descuento
   lista = document.getElementsByClassName("descuentopesospartida");
+  for (var i = 0; i < lista.length; i++) {
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculardescuentoporcentajepartida("+i+')');
+  }
+  lista = document.getElementsByClassName("descuentopesospartidaAux");
   for (var i = 0; i < lista.length; i++) {
     lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculardescuentoporcentajepartida("+i+')');
   }
@@ -1698,6 +1745,7 @@ function alta(){
                                           '<th class="customercolortheadth" id="thinsumospartidas">Insumo</th>'+
                                           '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
                                           '<th class="customercolortheadth"><div style="width:400px !important;">Descripción</div></th>'+
+                                          '<th class="'+background_tables+'">Existencias</th>'+
                                           '<th class="'+background_tables+'">Unidad</th>'+
                                           '<th class="customercolortheadth">Por Remisionar</th>'+
                                           '<th class="customercolortheadth">Cantidad</th>'+
@@ -1761,19 +1809,27 @@ function alta(){
                                     '</tr>'+
                                     '<tr>'+
                                         '<td style="padding:0px !important;">Crédito</td>'+
-                                        '<td style="padding:0px !important;"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="credito" id="credito" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '<td style="padding:0px !important;"><input type="text" class="form-control" style="width:100% !important;height:25px !important;" name="creditoAux" id="creditoAux" value="0.'+numerocerosconfigurados+'" required readonly></td>'+
+                                        '<td style="padding:0px !important;"><input type="hidden" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="credito" id="credito" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
                                     '</tr>'+
                                     '<tr>'+
                                         '<td style="padding:0px !important;">Saldo</td>'+
-                                        '<td style="padding:0px !important;"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="saldo" id="saldo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '<td style="padding:0px !important;"><input type="text" class="form-control" style="width:100% !important;height:25px !important;" name="saldoAux" id="saldoAux" value="0.'+numerocerosconfigurados+'" required readonly></td>'+
+                                        '<td style="padding:0px !important;"><input type="hidden" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="saldo" id="saldo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
                                     '</tr>'+
                                     '<tr>'+
                                         '<td style="padding:0px !important;">Utilidad</td>'+
-                                        '<td style="padding:0px !important;"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="utilidad" id="utilidad" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '<td style="padding:0px !important;">'+
+                                            '<input type="text" class="form-control" style="width:100% !important;height:25px !important;" name="utilidadAux" id="utilidadAux" value="0.'+numerocerosconfigurados+'" required readonly>'+
+                                            '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important; display:none;" name="utilidad" id="utilidad" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                        '</td>'+
                                     '</tr>'+
                                     '<tr>'+
                                         '<td style="padding:0px !important;">Costo</td>'+
-                                        '<td style="padding:0px !important;"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="costo" id="costo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '<td style="padding:0px !important;">'+
+                                            '<input type="text" class="form-control" style="width:100% !important;height:25px !important;" name="costoAux" id="costoAux" value="0.'+numerocerosconfigurados+'" required readonly>'+
+                                            '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important; display:none;" name="costo" id="costo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                        '</td>'+
                                     '</tr>'+
                                 '</table>'+
                             '</div>'+
@@ -1781,27 +1837,33 @@ function alta(){
                                 '<table class="table table-striped table-hover">'+
                                     '<tr>'+
                                         '<td style="padding:0px !important;">Importe</td>'+
-                                        '<td style="padding:0px !important;"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="importe" id="importe" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '<td style="padding:0px !important;"><input type="text" class="form-control" style="width:100% !important;height:25px !important;" name="importeAux" id="importeAux" value="0.'+numerocerosconfigurados+'" required readonly></td>'+
+                                        '<td style="padding:0px !important;"><input type="hidden" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="importe" id="importe" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
                                     '</tr>'+
                                     '<tr>'+
                                         '<td style="padding:0px !important;">Descuento</td>'+
-                                        '<td style="padding:0px !important;"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="descuento" id="descuento" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '<td style="padding:0px !important;"><input type="text" class="form-control" style="width:100% !important;height:25px !important;" name="descuentoAux" id="descuentoAux" value="0.'+numerocerosconfigurados+'" required readonly></td>'+
+                                        '<td style="padding:0px !important;"><input type="hidden" class="form-control" style="width:100% !important;height:25px !important;" name="descuento" id="descuento" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
                                     '</tr>'+
                                     '<tr>'+
                                         '<td style="padding:0px !important;">SubTotal</td>'+
-                                        '<td style="padding:0px !important;"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="subtotal" id="subtotal" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '<td style="padding:0px !important;"><input type="text" class="form-control" style="width:100% !important;height:25px !important;" name="subtotalAux" id="subtotalAux" value="0.'+numerocerosconfigurados+'" required readonly></td>'+
+                                        '<td style="padding:0px !important;" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="subtotal" id="subtotal" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
                                     '</tr>'+
                                     '<tr>'+
                                         '<td style="padding:0px !important;">Iva</td>'+
-                                        '<td style="padding:0px !important;"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="iva" id="iva" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '<td style="padding:0px !important;"><input type="text" class="form-control" style="width:100% !important;height:25px !important;" name="ivaAux" id="ivaAux" value="0.'+numerocerosconfigurados+'" required readonly></td>'+
+                                        '<td style="padding:0px !important;" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="iva" id="iva" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
                                     '</tr>'+
                                     '<tr>'+
                                         '<td style="padding:0px !important;">Total</td>'+
-                                        '<td style="padding:0px !important;"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '<td style="padding:0px !important;"><input type="text" class="form-control" style="width:100% !important;height:25px !important;" name="totalAux" id="totalAux" value="0.'+numerocerosconfigurados+'" required readonly></td>'+
+                                        '<td style="padding:0px !important;" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
                                     '</tr>'+
                                     '<tr hidden>'+
                                         '<td style="padding:0px !important;">Comisión</td>'+
-                                        '<td style="padding:0px !important;"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="comision" id="comision" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '<td style="padding:0px !important;"><input type="text" class="form-control" style="width:100% !important;height:25px !important;" name="comisionAux" id="comisionAux" value="0.'+numerocerosconfigurados+'" required readonly></td>'+
+                                        '<td style="padding:0px !important;" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="comision" id="comision" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
                                     '</tr>'+
                                 '</table>'+
                             '</div>'+
@@ -2340,6 +2402,7 @@ function obtenerdatos(remisionmodificar){
                                           '<th class="customercolortheadth" id="thinsumospartidas">Insumo</th>'+
                                           '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
                                           '<th class="customercolortheadth"><div style="width:400px !important;">Descripción</div></th>'+
+                                          '<th class="'+background_tables+'">Existencias</th>'+
                                           '<th class="'+background_tables+'">Unidad</th>'+
                                           '<th class="customercolortheadth">Por Remisionar</th>'+
                                           '<th class="customercolortheadth">Cantidad</th>'+
@@ -2396,19 +2459,31 @@ function obtenerdatos(remisionmodificar){
                                     '</tr>'+
                                     '<tr>'+
                                         '<td style="padding:0px !important;">Crédito</td>'+
-                                        '<td style="padding:0px !important;"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="credito" id="credito" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '<td style="padding:0px !important;">'+
+                                            '<input type="text" class="form-control" style="width:100% !important;height:25px !important;" name="creditoAux" id="creditoAux" value="0.'+numerocerosconfigurados+'" required readonly>'+
+                                            '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="credito" id="credito" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                        '</td>'+
                                     '</tr>'+
                                     '<tr>'+
                                         '<td style="padding:0px !important;">Saldo</td>'+
-                                        '<td style="padding:0px !important;"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="saldo" id="saldo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '<td style="padding:0px !important;">'+
+                                            '<input type="text" class="form-control" style="width:100% !important;height:25px !important;" name="saldoAux" id="saldoAux" value="0.'+numerocerosconfigurados+'" required readonly>'+
+                                            '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="saldo" id="saldo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                        '</td>'+
                                     '</tr>'+
                                     '<tr>'+
                                         '<td style="padding:0px !important;">Utilidad</td>'+
-                                        '<td style="padding:0px !important;"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="utilidad" id="utilidad" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '<td style="padding:0px !important;">'+
+                                            '<input type="text" class="form-control" style="width:100% !important;height:25px !important;" name="utilidadAux" id="utilidadAux" value="0.'+numerocerosconfigurados+'" required readonly>'+
+                                            '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="utilidad" id="utilidad" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                        '</td>'+
                                     '</tr>'+
                                     '<tr>'+
                                         '<td style="padding:0px !important;">Costo</td>'+
-                                        '<td style="padding:0px !important;"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="costo" id="costo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '<td style="padding:0px !important;">'+
+                                            '<input type="text" class="form-control" style="width:100% !important;height:25px !important;" name="costoAux" id="costoAux" value="0.'+numerocerosconfigurados+'" required readonly>'+
+                                            '<input type="number" style="display:none" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="costo" id="costo" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                        '</td>'+
                                     '</tr>'+
                                 '</table>'+
                             '</div>'+
@@ -2416,23 +2491,38 @@ function obtenerdatos(remisionmodificar){
                                 '<table class="table table-striped table-hover">'+
                                     '<tr>'+
                                         '<td style="padding:0px !important;">Importe</td>'+
-                                        '<td style="padding:0px !important;"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="importe" id="importe" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '<td style="padding:0px !important;">'+
+                                            '<input type="text" class="form-control" style="width:100% !important;height:25px !important;" name="importeAux" id="importeAux" value="0.'+numerocerosconfigurados+'" required readonly>'+
+                                            '<input type="number" style="display:none" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="importe" id="importe" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                        '</td>'+
                                     '</tr>'+
                                     '<tr>'+
                                         '<td style="padding:0px !important;">Descuento</td>'+
-                                        '<td style="padding:0px !important;"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="descuento" id="descuento" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '<td style="padding:0px !important;">'+
+                                            '<input type="text" class="form-control" style="width:100% !important;height:25px !important;" name="descuentoAux" id="descuentoAux" value="0.'+numerocerosconfigurados+'"  required readonly>'+
+                                            '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="descuento" id="descuento" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                        '</td>'+
                                     '</tr>'+
                                     '<tr>'+
                                         '<td style="padding:0px !important;">SubTotal</td>'+
-                                        '<td style="padding:0px !important;"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="subtotal" id="subtotal" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '<td style="padding:0px !important;">'+
+                                            '<input type="text" class="form-control" style="width:100% !important;height:25px !important;" name="subtotalAux" id="subtotalAux" value="0.'+numerocerosconfigurados+'" required readonly>'+
+                                            '<input type="number" style="display:none" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="subtotal" id="subtotal" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                        '</td>'+
                                     '</tr>'+
                                     '<tr>'+
                                         '<td style="padding:0px !important;">Iva</td>'+
-                                        '<td style="padding:0px !important;"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="iva" id="iva" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '<td style="padding:0px !important;">'+
+                                            '<input type="text" class="form-control" style="width:100% !important;height:25px !important;" name="ivaAux" id="ivaAux" value="0.'+numerocerosconfigurados+'" required readonly>'+
+                                            '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="iva" id="iva" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                        '</td>'+
                                     '</tr>'+
                                     '<tr>'+
                                         '<td style="padding:0px !important;">Total</td>'+
-                                        '<td style="padding:0px !important;"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '<td style="padding:0px !important;">'+
+                                            '<input type="text" class="form-control" style="width:100% !important;height:25px !important;" name="totalAux" id="totalAux" value="0.'+numerocerosconfigurados+'" required readonly>'+
+                                            '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control" style="width:100% !important;height:25px !important;" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                        '</td>'+
                                     '</tr>'+
                                     '<tr hidden>'+
                                         '<td style="padding:0px !important;">Comisión</td>'+
@@ -2526,15 +2616,24 @@ function obtenerdatos(remisionmodificar){
     $("#requisicion").val(data.remision.Rq);
     $("#observaciones").val(data.remision.Obs);
     $("#importe").val(data.importe);
+    $("#importeAux").val(number_format(data.importe,numerodecimales,'.',','));
     $("#descuento").val(data.descuento);
+    $("#descuentoAux").val(number_format(data.descuento,numerodecimales,'.',','));
     $("#subtotal").val(data.subtotal);
+    $("#subtotalAux").val(number_format(data.subtotal,numerodecimales,'.',','));
     $("#iva").val(data.iva);
+    $("#ivaAux").val(number_format(data.iva,numerodecimales,'.',','));
     $("#total").val(data.total);
+    $("#totalAux").val(number_format(data.total,numerodecimales,'.',','));
     $("#costo").val(data.costo);
+    $("#costoAux").val(number_format(data.costo,numerodecimales,'.',','));
     $("#utilidad").val(data.utilidad);
+    $("#utilidadAux").val(data.utilidad,numerodecimales,'.',',');
     $("#comision").val(data.comision);
     $("#credito").val(number_format(round(data.credito, numerodecimales), numerodecimales, '.', ''));
+    $("#creditoAux").val(number_format($("#credito").val(), numerodecimales, '.', ','));
     $("#saldo").val(data.saldo);
+    $("#saldoAux").val(number_format(data.saldo,numerodecimales,'.',','));
     //detalles
     $("#tablaproductosremisiones tbody").html(data.filasdetallesremision);
     $("#numerofilas").val(data.numerodetallesremision);
