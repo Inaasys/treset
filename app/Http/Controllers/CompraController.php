@@ -1145,7 +1145,9 @@ class CompraController extends ConfiguracionSistemaController{
                         $porcentajeretencionieps = ($dc->IepsRetencion * 100) / $dc->SubTotal;
                     }
                     if($compra->Movimiento != "GASTOS" && $compra->Movimiento != "TOT"){
-                        $filaOT = '<td class="tdmod"><input readonly type="text" class="form-control divorinputmodsm costoingresadopartida" name="costoingresadopartida[]" value="'.$dc->OT.'"></td>';
+                        if($this->ligarOTaCompra == 'S'){
+                            $filaOT = '<td class="tdmod"><input readonly type="text" class="form-control divorinputmodsm costoingresadopartida" name="costoingresadopartida[]" value="'.$dc->OT.'"></td>';
+                        }
                     }
                     $filasdetallescompra= $filasdetallescompra.
                     '<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
@@ -2510,7 +2512,7 @@ class CompraController extends ConfiguracionSistemaController{
         array_push($campos_consulta, 'Total');
         array_push($campos_consulta, 'Costo');
         return Excel::download(new ComprasDetallesExport($campos_consulta,$request->compra), "compra-".$request->compra.".xlsx");
-    
+
             //dd($request->compra);
         }
     //generar excel compras individual
