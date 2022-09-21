@@ -838,6 +838,16 @@ class RemisionController extends ConfiguracionSistemaController{
 
     //obtener ultimo numero de serie de requisicon seleccionada
     public function remisiones_obtener_ultimo_numero_serierq_seleccionada(Request $request){
+        // if($request->$request->SerieRq == 'C' || $request->$request->SerieRq == 'L'){
+        //     $ultimonumero = Remision::select("Rq")
+        //     ->where('SerieRq', $request->$request->SerieRq)
+        //     ->where('Rq','>',9999)
+        //     ->orderBy("Rq", "DESC")->take(1)->get();
+        // }else{
+        //     $ultimonumero = Remision::select("Rq")
+        //     ->where('SerieRq', $request->$request->SerieRq)
+        //     ->orderBy("Rq", "DESC")->take(1)->get();
+        // }
         $ultimonumero = Remision::select("Rq")->where('SerieRq', $request->SerieRq)->orderBy("Rq", "DESC")->take(1)->get();
         if(sizeof($ultimonumero) == 0 || sizeof($ultimonumero) == "" || sizeof($ultimonumero) == null){
             $numerorequisicion = 1;
@@ -849,6 +859,23 @@ class RemisionController extends ConfiguracionSistemaController{
 
     //obtener serie rq por serie
     public function remisiones_obtener_serierq_por_serie(Request $request){
+
+        // if($request->serierequisicion == 'C' || $request->serierequisicion == 'L'){
+        //     $ultimonumero = Remision::select("Rq")
+        //     ->where('SerieRq', $request->serierequisicion)
+        //     ->where('Rq','>',9999)
+        //     ->orderBy("Rq", "DESC")->take(1)->get();
+        // }else{
+        //     $ultimonumero = Remision::select("Rq")
+        //     ->where('SerieRq', $request->serierequisicion)
+        //     ->orderBy("Rq", "DESC")->take(1)->get();
+        // }
+        // if(sizeof($ultimonumero) == 0 || sizeof($ultimonumero) == "" || sizeof($ultimonumero) == null){
+        //     $numerorequisicion = 1;
+        // }else{
+        //     $numerorequisicion = $ultimonumero[0]->Rq+1;
+        // }
+
         $ultimonumero = Remision::select("Rq")->where('SerieRq', $request->serierequisicion)->orderBy("Rq", "DESC")->take(1)->get();
         if(sizeof($ultimonumero) == 0 || sizeof($ultimonumero) == "" || sizeof($ultimonumero) == null){
             $numerorequisicion = 1;
