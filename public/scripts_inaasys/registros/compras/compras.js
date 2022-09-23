@@ -2073,7 +2073,9 @@ function obtenerdatos(compramodificar){
   $('.page-loader-wrapper').css('display', 'block');
   $.get(compras_obtener_compra,{compramodificar:compramodificar },function(data){
     if(data.movimiento.indexOf('ALMACEN') > -1){
-        OTHeader = '<th class="" style="background-color: #F70707">OT</th>'
+        if (ligarOTaCompra == 'S') {
+            OTHeader = '<th class="" style="background-color: #F70707">OT</th>'
+        }
     }
     $("#titulomodal").html('Modificación Compra --- STATUS : ' + data.compra.Status);
     //formulario modificacion
