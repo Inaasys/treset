@@ -2331,33 +2331,69 @@ class FacturaController extends ConfiguracionSistemaController{
             }
         }
         //modificar
-        Factura::where('Factura', $factura)
-        ->update([
-            'Agente' => $request->numeroagente,
-            'Fecha' => Carbon::parse($request->fecha)->toDateTimeString(),
-            'Hora' => Carbon::parse($request->fecha)->toDateTimeString(),
-            'Plazo' => $request->plazo,
-            'Pedido' => $request->pedido,
-            'Tipo' => $request->tipo,
-            'Unidad' => $request->tipounidad,
-            'Moneda' => $request->moneda,
-            'TipoCambio' => $request->pesosmoneda,
-            'Obs' => $request->observaciones,
-            'Descripcion' => $request->descripcion,
-            'CondicionesDePago' => $request->condicionesdepago,
-            'LugarExpedicion' => $request->lugarexpedicion,
-            'RegimenFiscal' => $request->claveregimenfiscal,
-            'TipoRelacion' => $request->clavetiporelacion,
-            'Confirmacion' => $request->confirmacion,
-            'FormaPago' => $request->claveformapago,
-            'MetodoPago' => $request->clavemetodopago,
-            'UsoCfdi' => $request->claveusocfdi,
-            'ResidenciaFiscal' => $request->claveresidenciafiscal,
-            'RegimenFiscalReceptor' => $request->claveregimenfiscalreceptor,
-            'Periodicidad'=> $request->claveperiodicidad,
-            'Meses' => $request->clavemes,
-            'NumRegIdTrib' => $request->numeroregidtrib
-        ]);
+        //Adenda
+        $cliente = Cliente::where('Numero', $Factura->Cliente)->first();
+        if ($cliente->Nombre == 'SEGUROS INBURSA, S.A., GRUPO FINANCIERO INBURSA' && $cliente->Numero == 22) {
+            Factura::where('Factura', $factura)
+            ->update([
+                'Agente' => $request->numeroagente,
+                'Fecha' => Carbon::parse($request->fecha)->toDateTimeString(),
+                'Hora' => Carbon::parse($request->fecha)->toDateTimeString(),
+                'Plazo' => $request->plazo,
+                'Pedido' => $request->pedido,
+                'Tipo' => $request->tipo,
+                'Unidad' => $request->tipounidad,
+                'Moneda' => $request->moneda,
+                'TipoCambio' => $request->pesosmoneda,
+                'Obs' => $request->observaciones,
+                'Descripcion' => $request->descripcion,
+                'CondicionesDePago' => $request->condicionesdepago,
+                'LugarExpedicion' => $request->lugarexpedicion,
+                'RegimenFiscal' => $request->claveregimenfiscal,
+                'TipoRelacion' => $request->clavetiporelacion,
+                'Confirmacion' => $request->confirmacion,
+                'FormaPago' => $request->claveformapago,
+                'MetodoPago' => $request->clavemetodopago,
+                'UsoCfdi' => $request->claveusocfdi,
+                'ResidenciaFiscal' => $request->claveresidenciafiscal,
+                'RegimenFiscalReceptor' => $request->claveregimenfiscalreceptor,
+                'Periodicidad'=> $request->claveperiodicidad,
+                'Meses' => $request->clavemes,
+                'Afectado' =>$request->afectadoAdenda,
+                'EmisorSiniestro' => $request->emisorSiniestroAdenda,
+                'NumeroSiniestro' => $request->numeroSiniestroAdenda,
+                'NumRegIdTrib' => $request->numeroregidtrib
+            ]);
+        }else{
+            Factura::where('Factura', $factura)
+            ->update([
+                'Agente' => $request->numeroagente,
+                'Fecha' => Carbon::parse($request->fecha)->toDateTimeString(),
+                'Hora' => Carbon::parse($request->fecha)->toDateTimeString(),
+                'Plazo' => $request->plazo,
+                'Pedido' => $request->pedido,
+                'Tipo' => $request->tipo,
+                'Unidad' => $request->tipounidad,
+                'Moneda' => $request->moneda,
+                'TipoCambio' => $request->pesosmoneda,
+                'Obs' => $request->observaciones,
+                'Descripcion' => $request->descripcion,
+                'CondicionesDePago' => $request->condicionesdepago,
+                'LugarExpedicion' => $request->lugarexpedicion,
+                'RegimenFiscal' => $request->claveregimenfiscal,
+                'TipoRelacion' => $request->clavetiporelacion,
+                'Confirmacion' => $request->confirmacion,
+                'FormaPago' => $request->claveformapago,
+                'MetodoPago' => $request->clavemetodopago,
+                'UsoCfdi' => $request->claveusocfdi,
+                'ResidenciaFiscal' => $request->claveresidenciafiscal,
+                'RegimenFiscalReceptor' => $request->claveregimenfiscalreceptor,
+                'Periodicidad'=> $request->claveperiodicidad,
+                'Meses' => $request->clavemes,
+                'NumRegIdTrib' => $request->numeroregidtrib
+            ]);
+        }
+
         //ver si se puede modificar la factura siempre y cuando sea una factura libre y no tenga ningun documento ligado a ella
         switch($Factura->Serie){
             case "LST":
