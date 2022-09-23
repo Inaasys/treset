@@ -215,12 +215,12 @@ class FacturaController extends ConfiguracionSistemaController{
                         return $operaciones;
                     })
                     ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
-                    //->addColumn('SubTotal', function($data){ return $data->SubTotal; })
-                    //->addColumn('Iva', function($data){ return $data->Iva; })
-                    //->addColumn('Total', function($data){ return $data->Total; })
-                    //->addColumn('Abonos', function($data){ return $data->Abonos; })
-                    //->addColumn('Descuentos', function($data){ return $data->Descuentos; })
-                    //->addColumn('Saldo', function($data){ return $data->Saldo; })
+                    ->addColumn('SubTotal', function($data){ return number_format($data->SubTotal,$this->numerodecimales,'.',','); })
+                    ->addColumn('Iva', function($data){ return number_format($data->Iva,$this->numerodecimales,'.',','); })
+                    ->addColumn('Total', function($data){ return number_format($data->Total,$this->numerodecimales,'.',','); })
+                    ->addColumn('Abonos', function($data){ return number_format($data->Abonos, $this->numerodecimales,'.',','); })
+                    ->addColumn('Descuentos', function($data){ return number_format($data->Descuentos, $this->numerodecimales, '.',','); })
+                    ->addColumn('Saldo', function($data){ return number_format($data->Saldo,$this->numerodecimales,'.',','); })
                     ->addColumn('ImpLocTraslados', function($data){ return $data->ImpLocTraslados; })
                     ->addColumn('ImpLocRetenciones', function($data){ return $data->ImpLocRetenciones; })
                     ->addColumn('IepsRetencion', function($data){ return $data->IepsRetencion; })
@@ -228,11 +228,11 @@ class FacturaController extends ConfiguracionSistemaController{
                     ->addColumn('IvaRetencion', function($data){ return $data->IvaRetencion; })
                     ->addColumn('Ieps', function($data){ return $data->Ieps; })
                     //->addColumn('Descuento', function($data){ return $data->Descuento; })
-                    //->addColumn('Importe', function($data){ return $data->Importe; })
+                    ->addColumn('Importe', function($data){ return $data->Importe; })
                     ->addColumn('TipoCambio', function($data){ return $data->TipoCambio; })
                     //->addColumn('Costo', function($data){ return $data->Costo; })
                     //->addColumn('Comision', function($data){ return $data->Comision; })
-                    //->addColumn('Utilidad', function($data){ return $data->Utilidad; })
+                    ->addColumn('Utilidad', function($data){ return number_format($data->Utilidad,$this->numerodecimales,'.','.'); })
                     ->rawColumns(['operaciones'])
                     ->make();
         }
@@ -1154,20 +1154,50 @@ class FacturaController extends ConfiguracionSistemaController{
                         '<input type="hidden" class="form-control realizarbusquedaexistencias" name="realizarbusquedaexistencias[]" value="1" >'.
                         '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'.
                     '</td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Precio).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Importe).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                    '<td class="tdmod">'.
+                        '<input type="number" class="form-control inputnextdet divorinputmodsm preciopartidaAux" name="preciopartidaAux[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Precio),$this->numerodecimales,'.',',').'" onchange="formatocorrectoinputcantidadesComma(this);calculartotalesfilas('.$contadorfilas.');" readonly>'.
+                        '<input type="number" style="display:none;" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Precio).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" readonly>'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="text" class="form-control divorinputmodsm importepartidaAux" name="importepartidaAux[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Importe),$this->numerodecimales,'.',',').'" readonly>'.
+                        '<input type="number" style="display:none;" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Importe).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
+                    '</td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Dcto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Descuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importedescuentopesospartida" name="importedescuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($ImporteDescuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->SubTotal).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                    '<td class="tdmod">'.
+                        '<input type="text" class="form-control inputnextdet divorinputmodsm descuentopesospartidaAux" name="descuentopesospartidaAux[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Descuento),$this->numerodecimales,'.',',').'" onchange="formatocorrectoinputcantidadesComma(this);calculartotalesfilas('.$contadorfilas.');" readonly>'.
+                        '<input type="number" style="display:none;" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Descuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" readonly>'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="text" class="form-control divorinputmodsm importedescuentopesospartidaAux" name="importedescuentopesospartidaAux[]" value="'.number_format(Helpers::convertirvalorcorrecto($ImporteDescuento),$this->numerodecimales,'.',',').'" onchange="formatocorrectoinputcantidades(this);" readonly>'.
+                        '<input type="number" style="display:none;" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importedescuentopesospartida" name="importedescuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($ImporteDescuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly>'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="text" class="form-control divorinputmodsm subtotalpartidaAux" name="subtotalpartidaAux[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->SubTotal),$this->numerodecimales,'.',',').'" readonly>'.
+                        '<input type="number" style="display:none;" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->SubTotal).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
+                    '</td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Impuesto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm trasladoivapesospartida" name="trasladoivapesospartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Iva).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Total).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->CostoTotal).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                    '<td class="tdmod">'.
+                        '<input type="text" class="form-control divorinputmodsm trasladoivapesospartidaAux" name="trasladoivapesospartidaAux[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Iva),$this->numerodecimales,'.',',').'" readonly>'.
+                        '<input type="number" style="display:none;" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm trasladoivapesospartida" name="trasladoivapesospartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Iva).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="text" class="form-control divorinputmodsm totalpesospartidaAux" name="totalpesospartidaAux[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Total),$this->numerodecimales,'.',',').'" readonly>'.
+                        '<input type="number" style="display:none;" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Total).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="text" class="form-control divorinputmodsm costopartidaAux" name="costopartidaAux[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Costo),$this->numerodecimales,'.',',').'" readonly>'.
+                        '<input type="number" style="display:none;" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="text" class="form-control divorinputmodsm costototalpartidaAux" name="costototalpartidaAux[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->CostoTotal),$this->numerodecimales,'.','.').'" readonly>'.
+                        '<input type="number" style="display:none;" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->CostoTotal).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
+                    '</td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm comisionporcentajepartida" name="comisionporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm comisionpesospartida" name="comisionpesospartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Utilidad).'" readonly></td>'.
+                    '<td class="tdmod">'.
+                        '<input type="text" class="form-control divorinputmodsm utilidadpartidaAux" name="utilidadpartidaAux[]" value="'. number_format(Helpers::convertirvalorcorrecto($detalle->Utilidad),$this->numerodecimales,'.',',').'" readonly>'.
+                        '<input type="number" style="display:none;" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Utilidad).'" readonly>'.
+                    '</td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm remisionpartida" name="remisionpartida[]"  value="'.$detalle->Remision.'" readonly></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm cartaportepartida" name="cartaportepartida[]"  value="" readonly></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm ordenpartida" name="ordenpartida[]"  value="" readonly></td>'.
@@ -1838,7 +1868,8 @@ class FacturaController extends ConfiguracionSistemaController{
         $ivaTotal = 0;
         $subtotalTotal = 0;
         $totalTotal = 0;
-
+        //Cliente
+        $cliente = Cliente::where('Numero', $request->numerocliente)->first();
         $decimalesConf = (int)config('app.numerodedecimales');
         $decimalesDoc = (int)config('app.numerodecimalesendocumentos');
         //obtener el ultimo id de la tabla
@@ -1911,9 +1942,14 @@ class FacturaController extends ConfiguracionSistemaController{
         $Factura->Periodo=$this->periodohoy;
         $Factura->Periodicidad=$request->claveperiodicidad;
         $Factura->Meses=$request->clavemes;
+        //Adenda
+        if ($cliente->Nombre == 'SEGUROS INBURSA, S.A., GRUPO FINANCIERO INBURSA' && $cliente->Numero == 22) {
+            $Factura->Afectado = $request->afectadoAdenda;
+            $Factura->EmisorSiniestro = $request->emisorSiniestroAdenda;
+            $Factura->NumeroSiniestro = $request->numeroSiniestroAdenda;
+        }
         $Factura->save();
         //Modificar saldo cliente
-        $cliente = Cliente::where('Numero', $request->numerocliente)->first();
         $nuevosaldo = $cliente->Saldo + number_format(round($totalTotal, $decimalesDoc), $decimalesConf, '.', '');
         Cliente::where('Numero', $request->numerocliente)
                             ->update([
@@ -2075,20 +2111,52 @@ class FacturaController extends ConfiguracionSistemaController{
                         '<input type="hidden" class="form-control realizarbusquedaexistencias" name="realizarbusquedaexistencias[]" value="1" >'.
                         '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'.
                     '</td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($df->Precio).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" '.$readonly.'></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.Helpers::convertirvalorcorrecto($df->Importe).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($df->Dcto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" '.$readonly.'></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($df->Descuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" '.$readonly.'></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importedescuentopesospartida" name="importedescuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($df->ImporteDescuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'.Helpers::convertirvalorcorrecto($df->SubTotal).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                    '<td class="tdmod">'.
+                        '<input type="text" class="form-control inputnextdet divorinputmodsm preciopartidaAux" name="preciopartidaAux[]" value="'.number_format(Helpers::convertirvalorcorrecto($df->Precio), $this->numerodecimales,'.',',').'" onchange="formatocorrectoinputcantidadesComma(this);calculartotalesfilas('.$contadorfilas.');" '.$readonly.'>'.
+                        '<input type="number" style="display:none;" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($df->Precio).'" data-parsley-min="0.'.$this->numerocerosconfiguradosinputnumberstep.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" '.$readonly.'>'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="text" class="form-control divorinputmodsm importepartidaAux" name="importepartidaAux[]" value="'.number_format(Helpers::convertirvalorcorrecto($df->Importe),$this->numerodecimales,'.',',').'" readonly>'.
+                        '<input type="number" style="display:none;" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.Helpers::convertirvalorcorrecto($df->Importe).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($df->Dcto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentopesospartida('.$contadorfilas.')" '.$readonly.'>'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="text" class="form-control inputnextdet divorinputmodsm descuentopesospartidaAux" name="descuentopesospartidaAux[]" value="'.number_format(Helpers::convertirvalorcorrecto($df->Descuento), $this->numerodecimales,'.',',').'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidadesComma(this);calculardescuentoporcentajepartida('.$contadorfilas.');" '.$readonly.'>'.
+                        '<input type="number" style="display:none;" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($df->Descuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculardescuentoporcentajepartida('.$contadorfilas.');" '.$readonly.'>'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="text" class="form-control divorinputmodsm importedescuentopesospartidaAux" name="importedescuentopesospartidaAux[]" value="'.number_format(Helpers::convertirvalorcorrecto($df->ImporteDescuento), $this->numerodecimales,'.',',').'" onchange="formatocorrectoinputcantidades(this);" readonly>'.
+                        '<input type="number" style="display:none;" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importedescuentopesospartida" name="importedescuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($df->ImporteDescuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly>'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="text" class="form-control divorinputmodsm subtotalpartidaAux" name="subtotalpartidaAux[]" value="'.number_format(Helpers::convertirvalorcorrecto($df->SubTotal),$this->numerodecimales,'.',',').'" readonly>'.
+                        '<input type="number" style="display:none;" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'.Helpers::convertirvalorcorrecto($df->SubTotal).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
+                    '</td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($df->Impuesto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" '.$readonly.'></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm trasladoivapesospartida" name="trasladoivapesospartida[]" value="'.Helpers::convertirvalorcorrecto($df->Iva).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto($df->Total).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'.Helpers::convertirvalorcorrecto($df->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="'.Helpers::convertirvalorcorrecto($df->CostoTotal).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                    '<td class="tdmod">'.
+                        '<input type="text" class="form-control divorinputmodsm trasladoivapesospartidaAux" name="trasladoivapesospartidaAux[]" value="'.number_format(Helpers::convertirvalorcorrecto($df->Iva),$this->numerodecimales,',','.').'" readonly>'.
+                        '<input type="number" style="display:none;" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm trasladoivapesospartida" name="trasladoivapesospartida[]" value="'.Helpers::convertirvalorcorrecto($df->Iva).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="text" class="form-control divorinputmodsm totalpesospartidaAux" name="totalpesospartidaAux[]" value="'.number_format(Helpers::convertirvalorcorrecto($df->Total),$this->numerodecimales,'.',',').'" readonly>'.
+                        '<input type="number" style="display:none;" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto($df->Total).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="text" class="form-control divorinputmodsm costopartidaAux" name="costopartidaAux[]" value="'.number_format(Helpers::convertirvalorcorrecto($df->Costo),$this->numerodecimales,'.',',').'" readonly>'.
+                        '<input type="number" style="display:none;" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'.Helpers::convertirvalorcorrecto($df->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="text" class="form-control divorinputmodsm costototalpartidaAux" name="costototalpartidaAux[]" value="'.number_format(Helpers::convertirvalorcorrecto($df->CostoTotal),$this->numerodecimales,'.',',').'" readonly>'.
+                        '<input type="number" style="display:none;" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costototalpartida" name="costototalpartida[]" value="'.Helpers::convertirvalorcorrecto($df->CostoTotal).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
+                    '</td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm comisionporcentajepartida" name="comisionporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($df->Com).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                     '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm comisionpesospartida" name="comisionpesospartida[]" value="'.Helpers::convertirvalorcorrecto($df->Comision).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'.Helpers::convertirvalorcorrecto($df->Utilidad).'" readonly></td>'.
+                    '<td class="tdmod">'.
+                        '<input type="text" class="form-control divorinputmodsm utilidadpartidaAux" name="utilidadpartidaAux[]" value="'.number_format(Helpers::convertirvalorcorrecto($df->Utilidad),$this->numerodecimales,'.',',').'" readonly>'.
+                        '<input type="number" style="display:none;" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm utilidadpartida" name="utilidadpartida[]" value="'.Helpers::convertirvalorcorrecto($df->Utilidad).'" readonly>'.
+                    '</td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm remisionpartida" name="remisionpartida[]"  value="'.$df->Remision.'" readonly></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm cartaportepartida" name="cartaportepartida[]"  value="" readonly></td>'.
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodsm ordenpartida" name="ordenpartida[]"  value="'.$df->Orden.'" readonly></td>'.
@@ -2218,7 +2286,10 @@ class FacturaController extends ConfiguracionSistemaController{
             "saldo" => Helpers::convertirvalorcorrecto($cliente->Saldo),
             "utilidad" => Helpers::convertirvalorcorrecto($factura->Utilidad),
             "costo" => Helpers::convertirvalorcorrecto($factura->Costo),
-            "modificacionpermitida" => $modificacionpermitida
+            "modificacionpermitida" => $modificacionpermitida,
+            "Afectado" => $factura->Afectado,
+            "EmisorSiniestro" => $factura->EmisorSiniestro,
+            "NumeroSiniestro" => $factura->NumeroSiniestro
         );
         return response()->json($data);
     }
@@ -4297,7 +4368,7 @@ class FacturaController extends ConfiguracionSistemaController{
                 }
                 //FACTURA
                 //Valida si el cliente es INBURSA PARA GENERAR LA ADENDA
-                if ((int)$cliente->Numero == 22) {
+                if ((int)$cliente->Numero == 22 && $cliente->Nombre == 'SEGUROS INBURSA, S.A., GRUPO FINANCIERO INBURSA') {
                     // Crea una nueva factura con adenda
                     $invoice = array(
                         "customer" => array(
@@ -4335,7 +4406,7 @@ class FacturaController extends ConfiguracionSistemaController{
                         "exchange" => Helpers::convertirvalorcorrecto($factura->TipoCambio),
                         "conditions" => $factura->CondicionesDePago,
                         "addenda" => '<ReferenciaReceptor>'.
-                            '<Siniestro Afectado="A" Emisor="14202" Numero="7035789"/>'.
+                            '<Siniestro Emisor="'.$factura->EmisorSiniestro.'" Numero="'.$factura->NumeroSiniestro.'" Afectado="'.$factura->Afectado.'"/>'.
                             '<Deducible Importe="0.00" />'.
                             '<Descuento Importe="0.00" />'.
                             '<TotalManoObra Importe="'.number_format($totalMano, $decimalesDoc, '.', '').'" />'.
@@ -4372,7 +4443,7 @@ class FacturaController extends ConfiguracionSistemaController{
             }else{
                 //FACTURA
                 //Valida si el cliente es INBURSA PARA GENERAR LA ADENDA
-                if ((int)$cliente->Numero == 22) {
+                if ((int)$cliente->Numero == 22 && $cliente->Nombre == 'SEGUROS INBURSA, S.A., GRUPO FINANCIERO INBURSA') {
                     // Crea una nueva factura con adenda
                     $invoice = array(
                         "customer" => array(
@@ -4397,7 +4468,7 @@ class FacturaController extends ConfiguracionSistemaController{
                         "exchange" => Helpers::convertirvalorcorrecto($factura->TipoCambio),
                         "conditions" => $factura->CondicionesDePago,
                         "addenda" => '<ReferenciaReceptor>'.
-                            '<Siniestro Emisor="14202" Numero="7035789" Afectado="A"/>'.
+                            '<Siniestro Emisor="'.$factura->EmisorSiniestro.'" Numero="'.$factura->NumeroSiniestro.'" Afectado="'.$factura->Afectado.'"/>'.
                             '<Deducible Importe="0.00" />'.
                             '<Descuento Importe="0.00" />'.
                             '<TotalManoObra Importe="'.number_format($totalMano, $decimalesDoc, '.', '').'" />'.
