@@ -31,6 +31,7 @@ use App\RegistrosAcciones;
 use App\TipoOrdenCompra;
 use App\VistaObtenerExistenciaProducto;
 use GuzzleHttp\Client;
+use App\Exports\KardexProductoExport;
 use DNS1D;
 use DNS2D;
 use PDF;
@@ -1050,6 +1051,7 @@ class ProductoController extends ConfiguracionSistemaController{
             'salidas' => Helpers::convertirvalorcorrecto($salidas),
             'existencias' => Helpers::convertirvalorcorrecto($existencias),
             'selectalmacenes' => $selectalmacenes,
+            'almacen_kardex' => $almacen_kardex
         );
         return response()->json($data);
     }
@@ -1107,5 +1109,9 @@ class ProductoController extends ConfiguracionSistemaController{
             $Configuracion_Tabla->save();
         }
         return redirect()->route('productos');
+    }
+
+    public function productos_download_excel_kardex(Request $request){
+        return Excel::download(new KardexProductoExport($request->codigo,$request->almacen),'kardex_'.$request->codigo.'.xlsx');
     }
 }

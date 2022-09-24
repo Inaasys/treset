@@ -156,6 +156,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/productos_guardar_modificacion', 'ProductoController@productos_guardar_modificacion')->name('productos_guardar_modificacion')->middleware('revisarpermisos:catalogos.productos.cambios');
     Route::get('/productos_exportar_excel', 'ProductoController@productos_exportar_excel')->name('productos_exportar_excel')->middleware('revisaraccesomenu:menucatalogoproductos');
     Route::post('/productos_guardar_configuracion_tabla', 'ProductoController@productos_guardar_configuracion_tabla')->name('productos_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menucatalogoproductos');
+    Route::get('/productos_download_excel_kardex','ProductoController@productos_download_excel_kardex')->name('productos_download_excel_kardex')->middleware('revisaraccesomenu:menucatalogoproductos');
     //Bancos
     Route::get('/bancos', 'BancoController@bancos')->name('bancos')->middleware('revisaraccesomenu:menucatalogobancos');
     Route::get('/bancos_obtener', 'BancoController@bancos_obtener')->name('bancos_obtener')->middleware('revisaraccesomenu:menucatalogobancos');
@@ -344,7 +345,7 @@ Route::group(['middleware' => ['auth']], function () {
     // exporte a excel los detallas de las OC
     Route::get('/orden_compra_exportar_excel/{orden}', 'OrdenCompraController@orden_compra_exportar_excel')->name('orden_compra_exportar_excel')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
     Route::get('/orden_compra_detalles_exportar_excel', 'OrdenCompraController@orden_compra_detalles_exportar_excel')->name('orden_compra_detalles_exportar_excel')->middleware('revisaraccesomenu:menuregistrosordenescompra');
-    
+
     //Compras
     Route::get('/compras', 'CompraController@compras')->name('compras')->middleware('revisaraccesomenu:menuregistroscompras');
     Route::get('/compras_obtener', 'CompraController@compras_obtener')->name('compras_obtener')->middleware('revisaraccesomenu:menuregistroscompras');
@@ -383,7 +384,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/compras_guardar_configuracion_tabla', 'CompraController@compras_guardar_configuracion_tabla')->name('compras_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistroscompras');
         // exporte a excel los detallas de las Compras
     Route::get('/compra_exportar_excel/{orden}', 'CompraController@compra_exportar_excel')->name('compra_exportar_excel')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
-    Route::get('/compra_detalles_exportar_excel', 'CompraController@compra_detalles_exportar_excel')->name('compra_detalles_exportar_excel')->middleware('revisaraccesomenu:menuregistrosordenescompra');   
+    Route::get('/compra_detalles_exportar_excel', 'CompraController@compra_detalles_exportar_excel')->name('compra_detalles_exportar_excel')->middleware('revisaraccesomenu:menuregistrosordenescompra');
     //Ordenes de Trabajo
     Route::get('/ordenes_trabajo', 'OrdenTrabajoController@ordenes_trabajo')->name('ordenes_trabajo')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
     Route::get('/ordenes_trabajo_obtener', 'OrdenTrabajoController@ordenes_trabajo_obtener')->name('ordenes_trabajo_obtener')->middleware('revisaraccesomenu:menuregistrosordenestrabajo');
