@@ -1686,6 +1686,7 @@ function obtenerkardex(codigo,almacen){
             var numerodocumento = $(this).find("td").eq(2).html();
             obtenerdocumento(documento,numerodocumento);
         });
+        $('#btn-descarga').attr('href',productos_download_excel_kardex+'?codigo='+codigo+'&almacen='+data.almacen_kardex)
     });
 }
 //obtener kardex al dar enter en el input del codigo
