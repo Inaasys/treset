@@ -243,11 +243,12 @@
                                     <tbody id="filasmovimientos"></tbody>
                                 </table>
                             </div>
+                            <a id="btn-descarga" class="btn btn-success btm-sm" target="_blank">Descarga</a>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <h5 id="infomovimientos"></h5>
+                    <h5 id="infomovimientos"></h5><br>
                 </div>
             </div>
         </div>
@@ -461,6 +462,7 @@
         var productos_generar_codigos_barras_catalogo = '{!!URL::to('productos_generar_codigos_barras_catalogo')!!}';
         var productos_generar_pdf_codigo_barras = '{!!URL::to('productos_generar_pdf_codigo_barras')!!}';
         var productos_guardar_modificacion = '{!!URL::to('productos_guardar_modificacion')!!}';
+        var productos_download_excel_kardex = '{!!URL::to('productos_download_excel_kardex')!!}'
         //compras
         var compras_obtener_tipos_ordenes_compra = '{!!URL::to('compras_obtener_tipos_ordenes_compra')!!}';
         var compras_cargar_xml_alta = '{!!URL::to('compras_cargar_xml_alta')!!}';

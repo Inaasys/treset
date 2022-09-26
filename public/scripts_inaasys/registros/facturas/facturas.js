@@ -1312,7 +1312,8 @@ function listarremisiones(){
                           '</div>'+
                           '<div class="col-md-2">'+
                             '<label>Total $</label>'+
-                            '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="totalafacturar" id="totalafacturar" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                            '<input type="text" class="form-control divorinputmodmd" name="totalafacturarAux" id="totalafacturarAux" value="0.'+numerocerosconfigurados+'" required readonly>'+
+                            '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="totalafacturar" id="totalafacturar" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
                           '</div>'+
                         '</div>'+
                       '</div>'+
@@ -1417,7 +1418,8 @@ function seleccionarremisionesporpedido(){
                               '</div>'+
                               '<div class="col-md-2">'+
                                 '<label>Total $</label>'+
-                                '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="totalafacturar" id="totalafacturar" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                '<input type="text" class="form-control divorinputmodmd" name="totalafacturarAux" id="totalafacturarAux" value="0.'+numerocerosconfigurados+'" required readonly>'+
+                                '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="totalafacturar" id="totalafacturar" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
                               '</div>'+
                             '</div>'+
                           '</div>'+
@@ -1630,7 +1632,8 @@ function listarordenes(){
                           '</div>'+
                           '<div class="col-md-2">'+
                             '<label>Total $</label>'+
-                            '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="totalafacturar" id="totalafacturar" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                            '<input type="text" class="form-control divorinputmodmd" name="totalafacturarAux" id="totalafacturarAux" value="0.'+numerocerosconfigurados+'" required readonly>'+
+                            '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="totalafacturar" id="totalafacturar" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
                           '</div>'+
                         '</div>'+
                       '</div>'+
@@ -3253,7 +3256,7 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
                         '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm importedescuentopesospartida" name="importedescuentopesospartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly>'+
                     '</td>'+
                     '<td class="tdmod">'+
-                        '<input type="text" class="form-control divorinputmodsm subtotalpartidaAux" name="subtotalpartidaAux[]" value="'+preciopartida+'" readonly>'+
+                        '<input type="text" class="form-control divorinputmodsm subtotalpartidaAux" name="subtotalpartidaAux[]" value="'+number_format(preciopartida,numerodecimales,'.',',W')+'" readonly>'+
                         '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly>'+
                     '</td>'+
                     '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'+Impuesto+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');"></td>'+
@@ -4439,6 +4442,7 @@ function calculartotal(){
   $("#totalAux").val(number_format($("#total").val(), numerodecimales, '.', ','));
 
   $("#totalafacturar").val(number_format(round(totalRound, 2), numerodecimales, '.', ''));
+  $("#totalafacturarAux").val(number_format($("#totalafacturar").val(), numerodecimales, '.', ','));
   $("#utilidad").val(number_format(round(utilidad, 2), numerodecimales, '.', ''));
   $("#utilidadAux").val(number_format($("#utilidad").val(), numerodecimales, '.', ','));
 
@@ -4470,6 +4474,7 @@ function calculartotalafacturar(tipo){
   var stringordenesseleccionadas = $("#stringordenesseleccionadas").val();
   $.get(facturas_obtener_total_a_facturar,{stringremisionesseleccionadas:stringremisionesseleccionadas,stringordenesseleccionadas:stringordenesseleccionadas,tipo:tipo}, function(totalafacturar){
     $("#totalafacturar").val(totalafacturar);
+    $("#totalafacturarAux").val(number_format($("#totalafacturar").val(), numerodecimales, '.', ','));
   })
 }
 //eliminar una fila en la tabla de precios clientes
