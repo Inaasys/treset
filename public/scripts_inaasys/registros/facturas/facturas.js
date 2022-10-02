@@ -436,23 +436,23 @@ function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapag
         }
 
         //Adenda
-        // if(Numero== 22 && Nombre == 'SEGUROS INBURSA, S.A., GRUPO FINANCIERO INBURSA'){
-        //     $('#afectadoAdenda').attr("disabled", false);
-        //     $('#emisorSiniestroAdenda').attr("disabled", false);
-        //     $('#numeroSiniestroAdenda').attr("disabled", false);
+        if(Numero== 22 && Nombre == 'SEGUROS INBURSA, S.A., GRUPO FINANCIERO INBURSA'){
+            $('#afectadoAdenda').attr("disabled", false);
+            $('#emisorSiniestroAdenda').attr("disabled", false);
+            $('#numeroSiniestroAdenda').attr("disabled", false);
 
-        //     $('#afectadoAdenda').attr("required", true);
-        //     $('#emisorSiniestroAdenda').attr("required", true);
-        //     $('#numeroSiniestroAdenda').attr("required", true);
-        //   }else{
-        //     $('#afectadoAdenda').attr("disabled", true);
-        //     $('#emisorSiniestroAdenda').attr("disabled", true);
-        //     $('#numeroSiniestroAdenda').attr("disabled", true);
+            $('#afectadoAdenda').attr("required", true);
+            $('#emisorSiniestroAdenda').attr("required", true);
+            $('#numeroSiniestroAdenda').attr("required", true);
+          }else{
+            $('#afectadoAdenda').attr("disabled", true);
+            $('#emisorSiniestroAdenda').attr("disabled", true);
+            $('#numeroSiniestroAdenda').attr("disabled", true);
 
-        //     $('#emisorSiniestroAdenda').attr("required", false);
-        //     $('#numeroSiniestroAdenda').attr("required", false);
-        //     $('#afectadoAdenda').attr("required", false);
-        //   }
+            $('#emisorSiniestroAdenda').attr("required", false);
+            $('#numeroSiniestroAdenda').attr("required", false);
+            $('#afectadoAdenda').attr("required", false);
+          }
         //datos agente
         $.get(facturas_obtener_datos_agente, {NumeroAgente:NumeroAgente}, function(Agente){
           $("#numeroagente").val(Agente.Numero);
@@ -1836,23 +1836,23 @@ function obtenerclientepornumero(){
                   })
               }
               //Adenda
-            //   if(data.numero== 22 && data.nombre == 'SEGUROS INBURSA, S.A., GRUPO FINANCIERO INBURSA'){
-            //     $('#afectadoAdenda').attr("disabled", false);
-            //     $('#emisorSiniestroAdenda').attr("disabled", false);
-            //     $('#numeroSiniestroAdenda').attr("disabled", false);
+              if(data.numero== 22 && data.nombre == 'SEGUROS INBURSA, S.A., GRUPO FINANCIERO INBURSA'){
+                $('#afectadoAdenda').attr("disabled", false);
+                $('#emisorSiniestroAdenda').attr("disabled", false);
+                $('#numeroSiniestroAdenda').attr("disabled", false);
 
-            //     $('#afectadoAdenda').attr("required", true);
-            //     $('#emisorSiniestroAdenda').attr("required", true);
-            //     $('#numeroSiniestroAdenda').attr("required", true);
-            //   }else{
-            //     $('#afectadoAdenda').attr("disabled", true);
-            //     $('#emisorSiniestroAdenda').attr("disabled", true);
-            //     $('#numeroSiniestroAdenda').attr("disabled", true);
+                $('#afectadoAdenda').attr("required", true);
+                $('#emisorSiniestroAdenda').attr("required", true);
+                $('#numeroSiniestroAdenda').attr("required", true);
+              }else{
+                $('#afectadoAdenda').attr("disabled", true);
+                $('#emisorSiniestroAdenda').attr("disabled", true);
+                $('#numeroSiniestroAdenda').attr("disabled", true);
 
-            //     $('#emisorSiniestroAdenda').attr("required", false);
-            //     $('#numeroSiniestroAdenda').attr("required", false);
-            //     $('#afectadoAdenda').attr("required", false);
-            //   }
+                $('#emisorSiniestroAdenda').attr("required", false);
+                $('#numeroSiniestroAdenda').attr("required", false);
+                $('#afectadoAdenda').attr("required", false);
+              }
             $("#tabladetallesfactura tbody").html("");
             $("#numerocliente").val(data.numero);
             $("#numeroclienteanterior").val(data.numero);
@@ -1969,23 +1969,23 @@ function obtenerclienteremisionesseleccionadas(){
               $("#textonombrecliente").html(data.nombre.substring(0, 40));
             }
             //Adenda
-            // if(data.cliente.Numero== 22 && data.cliente.Nombre == 'SEGUROS INBURSA, S.A., GRUPO FINANCIERO INBURSA'){
-            //     $('#afectadoAdenda').attr("disabled", false);
-            //     $('#emisorSiniestroAdenda').attr("disabled", false);
-            //     $('#numeroSiniestroAdenda').attr("disabled", false);
+            if(data.cliente.Numero== 22 && data.cliente.Nombre == 'SEGUROS INBURSA, S.A., GRUPO FINANCIERO INBURSA'){
+                $('#afectadoAdenda').attr("disabled", false);
+                $('#emisorSiniestroAdenda').attr("disabled", false);
+                $('#numeroSiniestroAdenda').attr("disabled", false);
 
-            //     $('#afectadoAdenda').attr("required", true);
-            //     $('#emisorSiniestroAdenda').attr("required", true);
-            //     $('#numeroSiniestroAdenda').attr("required", true);
-            //   }else{
-            //     $('#afectadoAdenda').attr("disabled", true);
-            //     $('#emisorSiniestroAdenda').attr("disabled", true);
-            //     $('#numeroSiniestroAdenda').attr("disabled", true);
+                $('#afectadoAdenda').attr("required", true);
+                $('#emisorSiniestroAdenda').attr("required", true);
+                $('#numeroSiniestroAdenda').attr("required", true);
+              }else{
+                $('#afectadoAdenda').attr("disabled", true);
+                $('#emisorSiniestroAdenda').attr("disabled", true);
+                $('#numeroSiniestroAdenda').attr("disabled", true);
 
-            //     $('#emisorSiniestroAdenda').attr("required", false);
-            //     $('#numeroSiniestroAdenda').attr("required", false);
-            //     $('#afectadoAdenda').attr("required", false);
-            //   }
+                $('#emisorSiniestroAdenda').attr("required", false);
+                $('#numeroSiniestroAdenda').attr("required", false);
+                $('#afectadoAdenda').attr("required", false);
+              }
             $("#rfccliente").val(data.rfc);
             $("#plazo").val(data.plazo);
             //credito y saldo
@@ -2063,23 +2063,23 @@ function obtenerclienteserviciosseleccionados(){
               $("#textonombrecliente").html(data.nombre.substring(0, 40));
             }
             //Adenda
-            // if(data.cliente.Numero== 22 && data.cliente.Nombre == 'SEGUROS INBURSA, S.A., GRUPO FINANCIERO INBURSA'){
-            //     $('#afectadoAdenda').attr("disabled", false);
-            //     $('#emisorSiniestroAdenda').attr("disabled", false);
-            //     $('#numeroSiniestroAdenda').attr("disabled", false);
+            if(data.numero== 22 && data.nombre == 'SEGUROS INBURSA, S.A., GRUPO FINANCIERO INBURSA'){
+                $('#afectadoAdenda').attr("disabled", false);
+                $('#emisorSiniestroAdenda').attr("disabled", false);
+                $('#numeroSiniestroAdenda').attr("disabled", false);
 
-            //     $('#afectadoAdenda').attr("required", true);
-            //     $('#emisorSiniestroAdenda').attr("required", true);
-            //     $('#numeroSiniestroAdenda').attr("required", true);
-            //   }else{
-            //     $('#afectadoAdenda').attr("disabled", true);
-            //     $('#emisorSiniestroAdenda').attr("disabled", true);
-            //     $('#numeroSiniestroAdenda').attr("disabled", true);
+                $('#afectadoAdenda').attr("required", true);
+                $('#emisorSiniestroAdenda').attr("required", true);
+                $('#numeroSiniestroAdenda').attr("required", true);
+              }else{
+                $('#afectadoAdenda').attr("disabled", true);
+                $('#emisorSiniestroAdenda').attr("disabled", true);
+                $('#numeroSiniestroAdenda').attr("disabled", true);
 
-            //     $('#emisorSiniestroAdenda').attr("required", false);
-            //     $('#numeroSiniestroAdenda').attr("required", false);
-            //     $('#afectadoAdenda').attr("required", false);
-            // }
+                $('#emisorSiniestroAdenda').attr("required", false);
+                $('#numeroSiniestroAdenda').attr("required", false);
+                $('#afectadoAdenda').attr("required", false);
+            }
             $("#rfccliente").val(data.rfc);
             $("#plazo").val(data.plazo);
             //credito y saldo
@@ -3789,20 +3789,20 @@ function alta(){
                                     '</table>'+
                               '</div>'+
                               //Adenda
-                            //   '<div class="col-md-9">'+
-                            //         '<div class="col-md-3">'+
-                            //             '<label>Afectado</label>'+
-                            //             '<input disabled type="text" class="form-control inputnextdet" name="afectadoAdenda" id="afectadoAdenda" onkeyup="tipoLetra(this)" autocomplete="off" required>'+
-                            //         '</div>'+
-                            //         '<div class="col-md-3">'+
-                            //             '<label>Emisor Siniestro</label>'+
-                            //             '<input disabled type="text" class="form-control inputnextdet" name="emisorSiniestroAdenda" id="emisorSiniestroAdenda" required onkeyup="tipoLetra(this)" data-parsley-maxlength="5" data-parsley-minlength="5" autocomplete="off">'+
-                            //         '</div>'+
-                            //         '<div class="col-md-3">'+
-                            //             '<label>Número Siniestro</label>'+
-                            //             '<input disabled type="text" class="form-control inputnextdet" name="numeroSiniestroAdenda" id="numeroSiniestroAdenda" required onkeyup="tipoLetra(this)" autocomplete="off" data-parsley-maxlength="7" data-parsley-minlength="7">'+
-                            //         '</div>'+
-                            //   '</div>'+
+                              '<div class="col-md-9">'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Afectado</label>'+
+                                        '<input disabled type="text" class="form-control inputnextdet" name="afectadoAdenda" id="afectadoAdenda" onkeyup="tipoLetra(this)" autocomplete="off" required>'+
+                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Emisor Siniestro</label>'+
+                                        '<input disabled type="text" class="form-control inputnextdet" name="emisorSiniestroAdenda" id="emisorSiniestroAdenda" required onkeyup="tipoLetra(this)" data-parsley-maxlength="5" data-parsley-minlength="5" autocomplete="off">'+
+                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Número Siniestro</label>'+
+                                        '<input disabled type="text" class="form-control inputnextdet" name="numeroSiniestroAdenda" id="numeroSiniestroAdenda" required onkeyup="tipoLetra(this)" autocomplete="off" data-parsley-maxlength="7" data-parsley-minlength="7">'+
+                                    '</div>'+
+                              '</div>'+
                               //Fin adenda
                             '</div>'+
                           '</div>'+
@@ -5030,20 +5030,20 @@ function obtenerdatos(facturamodificar){
                               '</table>'+
                         '</div>'+
                         //Adenda
-                        // '<div class="col-md-9">'+
-                        //     '<div class="col-md-3">'+
-                        //         '<label>Afectado</label>'+
-                        //         '<input disabled required type="text" class="form-control inputnextdet" name="afectadoAdenda" id="afectadoAdenda" onkeyup="tipoLetra(this)" autocomplete="off">'+
-                        //     '</div>'+
-                        //     '<div class="col-md-3">'+
-                        //         '<label>Emisor Siniestro</label>'+
-                        //         '<input disabled required type="text" class="form-control inputnextdet" name="emisorSiniestroAdenda" id="emisorSiniestroAdenda" onkeyup="tipoLetra(this)" data-parsley-maxlength="5" data-parsley-minlength="5" autocomplete="off">'+
-                        //     '</div>'+
-                        //     '<div class="col-md-3">'+
-                        //         '<label>Número Siniestro</label>'+
-                        //         '<input disabled required type="text" class="form-control inputnextdet" name="numeroSiniestroAdenda" id="numeroSiniestroAdenda" onkeyup="tipoLetra(this)" autocomplete="off" data-parsley-maxlength="7" data-parsley-minlength="7">'+
-                        //     '</div>'+
-                        // '</div>'+
+                        '<div class="col-md-9">'+
+                            '<div class="col-md-3">'+
+                                '<label>Afectado</label>'+
+                                '<input disabled required type="text" class="form-control inputnextdet" name="afectadoAdenda" id="afectadoAdenda" onkeyup="tipoLetra(this)" autocomplete="off">'+
+                            '</div>'+
+                            '<div class="col-md-3">'+
+                                '<label>Emisor Siniestro</label>'+
+                                '<input disabled required type="text" class="form-control inputnextdet" name="emisorSiniestroAdenda" id="emisorSiniestroAdenda" onkeyup="tipoLetra(this)" data-parsley-maxlength="5" data-parsley-minlength="5" autocomplete="off">'+
+                            '</div>'+
+                            '<div class="col-md-3">'+
+                                '<label>Número Siniestro</label>'+
+                                '<input disabled required type="text" class="form-control inputnextdet" name="numeroSiniestroAdenda" id="numeroSiniestroAdenda" onkeyup="tipoLetra(this)" autocomplete="off" data-parsley-maxlength="7" data-parsley-minlength="7">'+
+                            '</div>'+
+                        '</div>'+
                         //Fin adenda
                       '</div>'+
                     '</div>'+
@@ -5243,29 +5243,29 @@ function obtenerdatos(facturamodificar){
     $("#numerocliente").val(data.cliente.Numero);
     $("#numeroclienteanterior").val(data.cliente.Numero);
     //Adenda
-    // if(data.cliente.Numero== 22 && data.cliente.Nombre == 'SEGUROS INBURSA, S.A., GRUPO FINANCIERO INBURSA'){
-    //   $('#afectadoAdenda').attr("disabled", false);
-    //   $('#emisorSiniestroAdenda').attr("disabled", false);
-    //   $('#numeroSiniestroAdenda').attr("disabled", false);
+    if(data.cliente.Numero== 22 && data.cliente.Nombre == 'SEGUROS INBURSA, S.A., GRUPO FINANCIERO INBURSA'){
+      $('#afectadoAdenda').attr("disabled", false);
+      $('#emisorSiniestroAdenda').attr("disabled", false);
+      $('#numeroSiniestroAdenda').attr("disabled", false);
 
-    //   $('#afectadoAdenda').attr("required", true);
-    //   $('#emisorSiniestroAdenda').attr("required", true);
-    //   $('#numeroSiniestroAdenda').attr("required", true);
+      $('#afectadoAdenda').attr("required", true);
+      $('#emisorSiniestroAdenda').attr("required", true);
+      $('#numeroSiniestroAdenda').attr("required", true);
 
 
-    //   //Datos adenda
-    //   $('#afectadoAdenda').val(data.Afectado);
-    //   $('#emisorSiniestroAdenda').val(data.EmisorSiniestro);
-    //   $('#numeroSiniestroAdenda').val(data.NumeroSiniestro);
-    // }else{
-    //   $('#afectadoAdenda').attr("disabled", true);
-    //   $('#emisorSiniestroAdenda').attr("disabled", true);
-    //   $('#numeroSiniestroAdenda').attr("disabled", true);
+      //Datos adenda
+      $('#afectadoAdenda').val(data.Afectado);
+      $('#emisorSiniestroAdenda').val(data.EmisorSiniestro);
+      $('#numeroSiniestroAdenda').val(data.NumeroSiniestro);
+    }else{
+      $('#afectadoAdenda').attr("disabled", true);
+      $('#emisorSiniestroAdenda').attr("disabled", true);
+      $('#numeroSiniestroAdenda').attr("disabled", true);
 
-    //   $('#emisorSiniestroAdenda').attr("required", false);
-    //   $('#numeroSiniestroAdenda').attr("required", false);
-    //   $('#afectadoAdenda').attr("required", false);
-    // }
+      $('#emisorSiniestroAdenda').attr("required", false);
+      $('#numeroSiniestroAdenda').attr("required", false);
+      $('#afectadoAdenda').attr("required", false);
+    }
     $("#rfccliente").val(data.cliente.Rfc);
     if(data.agente != null){
       $("#agente").val(data.agente.Nombre);
