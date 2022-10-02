@@ -2551,6 +2551,7 @@ class CompraController extends ConfiguracionSistemaController{
         array_push($campos_consulta, 'Fecha');
         array_push($campos_consulta, 'Codigo');
         array_push($campos_consulta, 'Descripcion');
+        array_push($campos_consulta, 'OT');
         array_push($campos_consulta, 'Unidad');
         array_push($campos_consulta, 'Cantidad');
         array_push($campos_consulta, 'Precio');
