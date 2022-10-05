@@ -1144,6 +1144,8 @@ function calculartotalesfilas(fila){
     if(fila === cuentaFilas){
       // obtener los datos de la fila:
       var cantidadpartida = $(".cantidadpartida", this).val();
+      let preciopartidaAux = $('.preciopartidaAux', this).val()
+      $('.preciopartida',this).val(number_format(preciopartidaAux,numerodecimales,'.',''))
       var preciopartida = $('.preciopartida', this).val();
       var importepartida = $('.importepartida', this).val();
       var descuentopesospartida = $('.descuentopesospartida', this).val();
@@ -1163,6 +1165,7 @@ function calculartotalesfilas(fila){
       //importe de la partida
       importepartida =  new Decimal(cantidadpartida).times(preciopartida);
       $('.importepartida', this).val(number_format(round(importepartida, numerodecimales), numerodecimales, '.', ''));
+      $('.importepartidaAux', this).val(number_format(round(importepartida, numerodecimales), numerodecimales, '.', ','));
       //descuento porcentaje
       var multiplicaciondescuentoporcentajepartida  =  new Decimal(descuentopesospartida).times(100);
       if(multiplicaciondescuentoporcentajepartida.d[0] > parseInt(0)){
@@ -1172,17 +1175,21 @@ function calculartotalesfilas(fila){
       //importe menos descuento de la partida
       importedescuentopesospartida =  new Decimal(importepartida).minus(descuentopesospartida);
       $('.importedescuentopesospartida', this).val(number_format(round(importedescuentopesospartida, numerodecimales), numerodecimales, '.', ''));
+      $('.importedescuentopesospartidaAux', this).val(number_format(round(importedescuentopesospartida, numerodecimales), numerodecimales, '.', ','));
       //ieps partida
       var multiplicaciontrasladoiepspesospartida = new Decimal(importedescuentopesospartida).times(iepsporcentajepartida);
       trasladoiepspesospartida = new Decimal(multiplicaciontrasladoiepspesospartida/100);
       $('.trasladoiepspesospartida', this).val(number_format(round(trasladoiepspesospartida, numerodecimales), numerodecimales, '.', ''));
+      $('.trasladoiepspesospartidaAux', this).val(number_format(round(trasladoiepspesospartida, numerodecimales), numerodecimales, '.', ','));
       //subtotal partida
       subtotalpartida = new Decimal(importedescuentopesospartida).plus(trasladoiepspesospartida);
       $(".subtotalpartida", this).val(number_format(round(subtotalpartida, numerodecimales), numerodecimales, '.', ''));
+      $(".subtotalpartidaAux", this).val(number_format(round(subtotalpartida, numerodecimales), numerodecimales, '.', ','));
       //iva en pesos de la partida
       var multiplicacionivapesospartida = new Decimal(subtotalpartida).times(ivaporcentajepartida);
       trasladoivapesospartida = new Decimal(multiplicacionivapesospartida/100);
       $('.trasladoivapesospartida', this).val(number_format(round(trasladoivapesospartida, numerodecimales), numerodecimales, '.', ''));
+      $('.trasladoivapesospartidaAux', this).val(number_format(round(trasladoivapesospartida, numerodecimales), numerodecimales, '.', ','));
       //retencion iva partida
       var multiplicacionretencionivapesospartida = new Decimal(subtotalpartida).times(retencionivaporcentajepartida);
       retencionivapesospartida = new Decimal(multiplicacionretencionivapesospartida/100);
@@ -1202,6 +1209,7 @@ function calculartotalesfilas(fila){
       var menosretencioniepspesospartida = new Decimal(menosretencionisrpesospartida).minus(retencioniepspesospartida);
       totalpesospartida = new Decimal(menosretencioniepspesospartida);
       $('.totalpesospartida', this).val(truncar(totalpesospartida, numerodecimales).toFixed(parseInt(numerodecimales)));
+      $('.totalpesospartidaAux', this).val(number_format($('.totalpesospartida', this).val(),numerodecimales,'.',','));
       calculartotal();
       //asignar el traslado traslado iva partida
       $(".trasladoivapartida", this).val(ivaporcentajepartida+',Tasa');
@@ -1287,10 +1295,15 @@ function calculartotal(){
 //   }
   totalRound = parseFloat(subtotal.toFixed(parseInt(numerodecimales))) + ivaAux
   $("#importe").val(number_format(round(importe, numerodecimales), numerodecimales, '.', ''));
+  $("#importeAux").val(number_format(round(importe, numerodecimales), numerodecimales, '.', ','));
   $("#descuento").val(number_format(round(descuento, numerodecimales), numerodecimales, '.', ''));
+  $("#descuentoAux").val(number_format(round(descuento, numerodecimales), numerodecimales, '.', ','));
   $("#subtotal").val(number_format(round(subtotal, numerodecimales), numerodecimales, '.', ''));
+  $("#subtotalAux").val(number_format(round(subtotal, numerodecimales), numerodecimales, '.', ','));
   $("#iva").val(number_format(round(ivaAux, numerodecimales), numerodecimales, '.', ''));
+  $("#ivaAux").val(number_format(round(ivaAux, numerodecimales), numerodecimales, '.', ','));
   $("#total").val(number_format(round(totalRound, numerodecimales), numerodecimales, '.', ''));
+  $("#totalAux").val(number_format(round(totalRound, numerodecimales), numerodecimales, '.', ','));
   $("#ieps").val(number_format(round(ieps, numerodecimales), numerodecimales, '.', ''));
   $("#retencioniva").val(number_format(round(retencioniva, numerodecimales), numerodecimales, '.', ''));
   $("#retencionisr").val(number_format(round(retencionisr, numerodecimales), numerodecimales, '.', ''));
