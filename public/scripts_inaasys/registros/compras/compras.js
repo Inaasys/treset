@@ -1471,15 +1471,20 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
 }
 //eliminar una fila en la tabla de precios clientes
 function eliminarfila(numerofila){
-  var confirmacion = confirm("Esta seguro de eliminar la fila?");
-  if (confirmacion == true) {
-    $("#filaproducto"+numerofila).remove();
-    contadorfilas--;
-    contadorproductos--;
-    comprobarfilas();
-    renumerarfilas();//importante para todos los calculo en el modulo de orden de compra
-    calculartotal();
-  }
+    let aux = 0
+    var confirmacion = confirm("Esta seguro de eliminar la fila?");
+    if (confirmacion == true) {
+        $("#filaproducto"+numerofila).remove();
+        $("tr.filasproductos").each(function(){
+            $(this).attr('id','filaproducto'+aux);
+            aux++
+        })
+        contadorfilas--;
+        contadorproductos--;
+        comprobarfilas();
+        renumerarfilas();//importante para todos los calculo en el modulo de orden de compra
+        calculartotal();
+    }
 }
 //comprobar numero filas de la tabla precios clientes
 function comprobarfilas(){
@@ -1497,6 +1502,10 @@ function renumerarfilas(){
   }
   //renumerar preciopartida
   lista = document.getElementsByClassName("preciopartida");
+  for (var i = 0; i < lista.length; i++) {
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+')');
+  }
+  lista = document.getElementsByClassName("preciopartidaAux");
   for (var i = 0; i < lista.length; i++) {
     lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+')');
   }
