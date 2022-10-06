@@ -1507,7 +1507,7 @@ function renumerarfilas(){
   }
   lista = document.getElementsByClassName("preciopartidaAux");
   for (var i = 0; i < lista.length; i++) {
-    lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+')');
+    lista[i].setAttribute("onchange", "formatocorrectoinputcantidadesComma(this);calculartotalesfilas("+i+')');
   }
   //renumerar descuentopesospartida
   lista = document.getElementsByClassName("descuentopesospartida");
