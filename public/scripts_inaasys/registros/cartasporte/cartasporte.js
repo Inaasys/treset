@@ -15,7 +15,7 @@ function asignarfechaactual(){
       $("#fecha").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
       $("#fechasalida").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
       $("#fechallegada").val(fechas.fecha).attr('min', fechas.fechamin).attr('max', fechas.fechamax);
-    }) 
+    })
 }
 //obtener el ultimo id de la tabla
 function obtenultimonumero(){
@@ -45,7 +45,7 @@ function mostrarbotonlistarfacturas(){
     $("#btnlistarfacturas").show();
   }else{
     $("#btnlistarfacturas").hide();
-  } 
+  }
 }
 //mostrar modal formulario
 function mostrarmodalformulario(tipo, modificacionpermitida){
@@ -61,7 +61,7 @@ function mostrarmodalformulario(tipo, modificacionpermitida){
           $("#btnGuardar").hide();
           $("#btnGuardarModificacion").show();
         }
-    }   
+    }
 }
 //ocultar modal formulario
 function ocultarmodalformulario(){
@@ -90,68 +90,69 @@ function relistar(){
 }
 //listar todos los registros de la tabla
 function listar(){
-  cambiarurlexportarexcel();
-  //Campos ordenados a mostras
-  var campos = columnas_ordenadas.split(",");
-  var campos_busqueda = campos_busquedas.split(",");
-  //agregar inputs de busqueda por columna
-  $('#tbllistado tfoot th').each( function () {
-    var titulocolumnatfoot = $(this).text();
-    var valor_encontrado_en_array = campos_busqueda.indexOf(titulocolumnatfoot); 
-    if(valor_encontrado_en_array >= 0){
-      $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
-    }
-  });
-  // armar columas para datatable se arma desde funcionesglobales.js
-  var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
-  tabla=$('#tbllistado').DataTable({
-    keys: true,
-    "lengthMenu": [ 100, 250, 500, 1000 ],
-    "pageLength": 100,
-    "sScrollX": "110%",
-    "sScrollY": "350px",  
-    processing: true,
-    'language': {
-        'loadingRecords': '&nbsp;',
-        'processing': '<div class="spinner"></div>'
-    },
-    serverSide: true,
-    ajax: {
-        url: carta_porte_obtener,
-        data: function (d) {
-            d.periodo = $("#periodo").val();
-        }
-    },
-    "createdRow": function( row, data, dataIndex){
-        if( data.Status ==  `BAJA`){ $(row).addClass('bg-orange');}
-    },
-    columns: campos_tabla,
-    initComplete: function () {
-      // Aplicar busquedas por columna
-      this.api().columns().every( function () {
-        var that = this;
-        $('input',this.footer()).on( 'change', function(){
-          if(that.search() !== this.value){
-            that.search(this.value).draw();
+    cambiarurlexportarexcel();
+    //Campos ordenados a mostras
+    var campos = columnas_ordenadas.split(",");
+    var campos_busqueda = campos_busquedas.split(",");
+    //agregar inputs de busqueda por columna
+    $('#tbllistado tfoot th').each( function () {
+      var titulocolumnatfoot = $(this).text();
+      var valor_encontrado_en_array = campos_busqueda.indexOf(titulocolumnatfoot);
+      if(valor_encontrado_en_array >= 0){
+        $(this).html( '<input type="text" placeholder="Buscar en columna '+titulocolumnatfoot+'" />' );
+      }
+    });
+    // armar columas para datatable se arma desde funcionesglobales.js
+    var campos_tabla = armar_columas_datatable(campos,campos_busqueda);
+
+    tabla=$('#tbllistado').DataTable({
+      keys: true,
+      "lengthMenu": [ 100, 250, 500, 1000 ],
+      "pageLength": 100,
+      "sScrollX": "110%",
+      "sScrollY": "350px",
+      processing: true,
+      'language': {
+          'loadingRecords': '&nbsp;',
+          'processing': '<div class="spinner"></div>'
+      },
+      serverSide: true,
+      ajax: {
+          url: carta_porte_obtener,
+          data: function (d) {
+              d.periodo = $("#periodo").val();
           }
+      },
+      "createdRow": function( row, data, dataIndex){
+          if( data.Status ==  `BAJA`){ $(row).addClass('bg-orange');}
+      },
+      columns: campos_tabla,
+      initComplete: function () {
+        // Aplicar busquedas por columna
+        this.api().columns().every( function () {
+          var that = this;
+          $('input',this.footer()).on( 'change', function(){
+            if(that.search() !== this.value){
+              that.search(this.value).draw();
+            }
+          });
         });
-      });
-      //Aplicar busqueda general
-      var $buscar = $('div.dataTables_filter input');
-      $buscar.unbind();
-      $buscar.bind('keyup change', function(e) {
-          if(e.keyCode == 13 || this.value == "") {
-            $('#tbllistado').DataTable().search( this.value ).draw();
-          }
-      });
-    }
-  });
-  //modificacion al dar doble click
-  $('#tbllistado tbody').on('dblclick', 'tr', function () {
-    var data = tabla.row( this ).data();
-    obtenerdatos(data.Nota);
-  });
-}
+        //Aplicar busqueda general
+        var $buscar = $('div.dataTables_filter input');
+        $buscar.unbind();
+        $buscar.bind('keyup change', function(e) {
+            if(e.keyCode == 13 || this.value == "") {
+              $('#tbllistado').DataTable().search( this.value ).draw();
+            }
+        });
+      }
+    });
+    // //modificacion al dar doble click
+    $('#tbllistado tbody').on('dblclick', 'tr', function () {
+       var data = tabla.row( this ).data();
+       obtenerdatos(data.CartaPorte);
+    });
+}//Aqui
 //obtener registros de proveedores
 function obtenerclientes(){
   ocultarformulario();
@@ -178,7 +179,7 @@ function obtenerclientes(){
                                       '<tbody></tbody>'+
                                   '</table>'+
                               '</div>'+
-                          '</div>'+   
+                          '</div>'+
                       '</div>'+
                     '</div>'+
                     '<div class="modal-footer">'+
@@ -191,7 +192,7 @@ function obtenerclientes(){
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
-        "bScrollCollapse": true,  
+        "bScrollCollapse": true,
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -221,18 +222,18 @@ function obtenerclientes(){
                 }
             });
         },
-    }); 
+    });
     //seleccionar registro al dar doble click
     $('#tbllistadocliente tbody').on('dblclick', 'tr', function () {
         var data = tcli.row( this ).data();
         seleccionarcliente(data.Numero, data.Nombre, data.Plazo, data.Rfc, data.ClaveFormaPago, data.NombreFormaPago, data.ClaveMetodoPago, data.NombreMetodoPago, data.ClaveUsoCfdi, data.NombreUsoCfdi, "", "", data.Calle, data.NoExterior, data.NoInterior, data.Colonia, data.Localidad, data.Referencia, data.Municipio, data.Estado, data.CodigoPostal);
-    }); 
-} 
+    });
+}
 //seleccionar proveedor
 function seleccionarcliente(Numero, Nombre, Plazo, Rfc, claveformapago, formapago, clavemetodopago, metodopago, claveusocfdi, usocfdi, claveresidenciafiscal, residenciafiscal, calle, noexterior, nointerior, colonia, localidad, referencia, municipio, estado, codigopostal){
   var numeroclienteanterior = $("#numeroclienteanterior").val();
   var numerocliente = Numero;
-  if(numeroclienteanterior != numerocliente){ 
+  if(numeroclienteanterior != numerocliente){
     $("#numerocliente").val(Numero);
     $("#numeroclienteanterior").val(Numero);
     $("#cliente").val(Nombre);
@@ -299,7 +300,7 @@ function obtenermunicipios(tipo){
                                             '<tbody></tbody>'+
                                         '</table>'+
                                     '</div>'+
-                                '</div>'+   
+                                '</div>'+
                             '</div>'+
                         '</div>'+
                         '<div class="modal-footer">'+
@@ -312,7 +313,7 @@ function obtenermunicipios(tipo){
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
-        "bScrollCollapse": true,  
+        "bScrollCollapse": true,
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -341,13 +342,13 @@ function obtenermunicipios(tipo){
                 }
             });
         },
-    }); 
+    });
     //seleccionar registro al dar doble click
     $('#tbllistadomunicipio tbody').on('dblclick', 'tr', function () {
         var data = talmun.row( this ).data();
         seleccionarmunicipio(data.Numero, data.Nombre, tipo);
-    }); 
-} 
+    });
+}
 //seleccionar mun
 function seleccionarmunicipio(Numero, Nombre, tipo){
   switch(tipo){
@@ -377,6 +378,16 @@ function seleccionarmunicipio(Numero, Nombre, tipo){
           mostrarformulario();
         }
       break;
+    case 'operador':
+        let numeromunicipiooperadoranterior = $('#numeromunicipiooperadoranterior').val()
+        let numeromunicipiooperador = Numero
+        if (numeromunicipiooperadoranterior != numeromunicipiooperador) {
+            $('#numeromunicipiooperadoranterior').val(Numero)
+            $('#numeromunicipiooperador').val(Numero)
+            $('#municipiooperador').val(Nombre)
+            mostrarformulario();
+        }
+        break
   }
 }
 //obtener registros de est
@@ -401,7 +412,7 @@ function obtenerestados(tipo){
                                             '<tbody></tbody>'+
                                         '</table>'+
                                     '</div>'+
-                                '</div>'+   
+                                '</div>'+
                             '</div>'+
                         '</div>'+
                         '<div class="modal-footer">'+
@@ -414,7 +425,7 @@ function obtenerestados(tipo){
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
-        "bScrollCollapse": true,  
+        "bScrollCollapse": true,
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -443,13 +454,13 @@ function obtenerestados(tipo){
                 }
             });
         },
-    }); 
+    });
     //seleccionar registro al dar doble click
     $('#tbllistadoestado tbody').on('dblclick', 'tr', function () {
         var data = talest.row( this ).data();
         seleccionarestado(data.Numero, data.Nombre, tipo);
-    }); 
-} 
+    });
+}
 //seleccionar est
 function seleccionarestado(Numero, Nombre, tipo){
   switch(tipo){
@@ -479,6 +490,19 @@ function seleccionarestado(Numero, Nombre, tipo){
           mostrarformulario();
         }
       break;
+    case 'operador':
+        let numeroestadooperadoranterior = $('#numeroestadooperadoranterior').val()
+        let numeroestadooperador = Numero;
+        if(numeroestadooperadoranterior != numeroestadooperador){
+            $("#numeroestadooperador").val(Numero);
+            $("#numeroestadooperadoranterior").val(Numero);
+            $("#estadooperador").val(Nombre);
+            if(Nombre != null){
+              $("#textonombreestadodestinatario").html(Nombre.substring(0, 40));
+            }
+            mostrarformulario();
+        }
+        break;
   }
 }
 //obtener registros de pai
@@ -502,7 +526,7 @@ function obtenerpaises(tipo){
                                             '<tbody></tbody>'+
                                         '</table>'+
                                     '</div>'+
-                                '</div>'+   
+                                '</div>'+
                             '</div>'+
                         '</div>'+
                         '<div class="modal-footer">'+
@@ -515,7 +539,7 @@ function obtenerpaises(tipo){
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
-        "bScrollCollapse": true,  
+        "bScrollCollapse": true,
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -543,13 +567,13 @@ function obtenerpaises(tipo){
                 }
             });
         },
-    }); 
+    });
     //seleccionar registro al dar doble click
     $('#tbllistadopais tbody').on('dblclick', 'tr', function () {
         var data = talpai.row( this ).data();
         seleccionarpais(data.Numero, data.Nombre, tipo);
-    }); 
-} 
+    });
+}
 //seleccionar pai
 function seleccionarpais(Numero, Nombre, tipo){
   switch(tipo){
@@ -579,6 +603,16 @@ function seleccionarpais(Numero, Nombre, tipo){
           mostrarformulario();
         }
       break;
+    case 'operador':
+        let numeropaisoperadoranterior = $('#numeropaisoperadoranterior').val()
+        let numeropaisoperador = Numero
+        if (numeropaisoperadoranterior != numeropaisoperador) {
+            $('#numeropaisoperadoranterior').val(Numero)
+            $('#numeropaisoperador').val(Numero)
+            $("#paisoperador").val(Nombre);
+            mostrarformulario();
+        }
+        break;
   }
 }
 //obtener registros de cp
@@ -603,7 +637,7 @@ function obtenercps(tipo){
                                             '<tbody></tbody>'+
                                         '</table>'+
                                     '</div>'+
-                                '</div>'+   
+                                '</div>'+
                             '</div>'+
                         '</div>'+
                         '<div class="modal-footer">'+
@@ -616,7 +650,7 @@ function obtenercps(tipo){
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
-        "bScrollCollapse": true,  
+        "bScrollCollapse": true,
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -645,13 +679,13 @@ function obtenercps(tipo){
                 }
             });
         },
-    }); 
+    });
     //seleccionar registro al dar doble click
     $('#tbllistadocp tbody').on('dblclick', 'tr', function () {
         var data = talcps.row( this ).data();
         seleccionarcp(data.Numero, data.Clave, tipo);
-    }); 
-} 
+    });
+}
 //seleccionar est
 function seleccionarcp(Numero, Clave, tipo){
   switch(tipo){
@@ -681,6 +715,16 @@ function seleccionarcp(Numero, Clave, tipo){
           mostrarformulario();
         }
       break;
+    case 'operador':
+        let numerocpoperadoranterior = $('#numerocpoperadoranterior').val()
+        let numerocpoperador = Numero
+        if (numerocpoperador != numerocpoperadoranterior) {
+            $('#numerocpoperadoranterior').val(Numero)
+            $('#numerocpoperador').val(Numero)
+            $('#cpoperador').val(Clave)
+            mostrarformulario();
+        }
+    break
   }
 }
 //obtener registros de config auto
@@ -705,7 +749,7 @@ function obtenerconfigautotransporte(){
                                             '<tbody></tbody>'+
                                         '</table>'+
                                     '</div>'+
-                                '</div>'+   
+                                '</div>'+
                             '</div>'+
                         '</div>'+
                         '<div class="modal-footer">'+
@@ -718,7 +762,7 @@ function obtenerconfigautotransporte(){
           "pageLength": 250,
           "sScrollX": "110%",
           "sScrollY": "370px",
-          "bScrollCollapse": true,  
+          "bScrollCollapse": true,
           processing: true,
           'language': {
               'loadingRecords': '&nbsp;',
@@ -744,13 +788,13 @@ function obtenerconfigautotransporte(){
                   }
               });
           },
-      }); 
+      });
       //seleccionar registro al dar doble click
       $('#tbllistadoconfigautotransporte tbody').on('dblclick', 'tr', function () {
           var data = tconfauto.row( this ).data();
           seleccionarconfigautotransporte(data.Numero, data.Clave, data.Descripcion);
-      }); 
-} 
+      });
+}
 //seleccionar
 function seleccionarconfigautotransporte(Numero, Clave, Descripcion){
   var claveconfigautotransporteanterior = $("#claveconfigautotransporteanterior").val();
@@ -787,7 +831,7 @@ function obtenerclavestransporte(){
                                           '<tbody></tbody>'+
                                       '</table>'+
                                   '</div>'+
-                              '</div>'+   
+                              '</div>'+
                           '</div>'+
                       '</div>'+
                       '<div class="modal-footer">'+
@@ -800,7 +844,7 @@ function obtenerclavestransporte(){
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
-        "bScrollCollapse": true,  
+        "bScrollCollapse": true,
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -826,13 +870,13 @@ function obtenerclavestransporte(){
                 }
             });
         },
-    }); 
+    });
     //seleccionar registro al dar doble click
     $('#tbllistadoclavetransporte tbody').on('dblclick', 'tr', function () {
         var data = tclavtrans.row( this ).data();
         seleccionarclavetransporte(data.Numero, data.Clave, data.Descripcion);
-    }); 
-} 
+    });
+}
 //seleccionar
 function seleccionarclavetransporte(Numero, Clave, Descripcion){
   var clavetransporteanterior = $("#clavetransporteanterior").val();
@@ -868,7 +912,7 @@ function obteneralmacenes(){
                                             '<tbody></tbody>'+
                                         '</table>'+
                                     '</div>'+
-                                '</div>'+   
+                                '</div>'+
                             '</div>'+
                         '</div>'+
                         '<div class="modal-footer">'+
@@ -881,7 +925,7 @@ function obteneralmacenes(){
           "pageLength": 250,
           "sScrollX": "110%",
           "sScrollY": "370px",
-          "bScrollCollapse": true,  
+          "bScrollCollapse": true,
           processing: true,
           'language': {
               'loadingRecords': '&nbsp;',
@@ -906,13 +950,13 @@ function obteneralmacenes(){
                   }
               });
           },
-      }); 
+      });
       //seleccionar registro al dar doble click
       $('#tbllistadoalmacen tbody').on('dblclick', 'tr', function () {
           var data = talm.row( this ).data();
           seleccionaralmacen(data.Numero, data.Nombre);
-      }); 
-} 
+      });
+}
 //seleccionar almacen
 function seleccionaralmacen(Numero, Nombre){
   var numeroalmacenanterior = $("#numeroalmacenanterior").val();
@@ -950,12 +994,12 @@ function obtenerlugaresexpedicion(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                              '</div>';  
+                              '</div>';
   $("#contenidomodaltablas").html(tablacodigospostales);
   var tcodpost = $('#tbllistadocodigopostal').DataTable({
       keys: true,
@@ -963,7 +1007,7 @@ function obtenerlugaresexpedicion(){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -991,14 +1035,14 @@ function obtenerlugaresexpedicion(){
               $('#tbllistadocodigopostal').DataTable().search( this.value ).draw();
             }
         });
-      }, 
+      },
   });
   //seleccionar registro al dar doble click
   $('#tbllistadocodigopostal tbody').on('dblclick', 'tr', function () {
       var data = tcodpost.row( this ).data();
       seleccionarlugarexpedicion(data.Clave);
-  }); 
-} 
+  });
+}
 //seleccionar lugar expedicion
 function seleccionarlugarexpedicion(Clave){
   var lugarexpedicionanterior = $("#lugarexpedicionanterior").val();
@@ -1032,12 +1076,12 @@ function obtenerregimenesfiscales(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                              '</div>';  
+                              '</div>';
   $("#contenidomodaltablas").html(tablaregimenesfiscales);
   var tregfis = $('#tbllistadoregimenfiscal').DataTable({
       keys: true,
@@ -1045,7 +1089,7 @@ function obtenerregimenesfiscales(){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -1077,8 +1121,8 @@ function obtenerregimenesfiscales(){
   $('#tbllistadoregimenfiscal tbody').on('dblclick', 'tr', function () {
       var data = tregfis.row( this ).data();
       seleccionarregimenfiscal(data.Clave, data.Nombre);
-  }); 
-} 
+  });
+}
 //seleccionar lugar expedicion
 function seleccionarregimenfiscal(Clave, Nombre){
   var claveregimenfiscalanterior = $("#claveregimenfiscalanterior").val();
@@ -1114,12 +1158,12 @@ function obtenertiposrelaciones(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                              '</div>';  
+                              '</div>';
   $("#contenidomodaltablas").html(tablatiposrelaciones);
   var ttiprel = $('#tbllistadotiporelacion').DataTable({
       keys: true,
@@ -1127,7 +1171,7 @@ function obtenertiposrelaciones(){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -1157,8 +1201,8 @@ function obtenertiposrelaciones(){
   $('#tbllistadotiporelacion tbody').on('dblclick', 'tr', function () {
       var data = ttiprel.row( this ).data();
       seleccionartiporelacion(data.Clave, data.Nombre);
-  }); 
-} 
+  });
+}
 //seleccionar lugar expedicion
 function seleccionartiporelacion(Clave, Nombre){
   var clavetiporelacionanterior = $("#clavetiporelacionanterior").val();
@@ -1195,12 +1239,12 @@ function obtenerformaspago(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                              '</div>';  
+                              '</div>';
   $("#contenidomodaltablas").html(tablaformaspago);
   var tforpag = $('#tbllistadoformapago').DataTable({
       keys: true,
@@ -1208,7 +1252,7 @@ function obtenerformaspago(){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -1239,8 +1283,8 @@ function obtenerformaspago(){
   $('#tbllistadoformapago tbody').on('dblclick', 'tr', function () {
       var data = tforpag.row( this ).data();
       seleccionarformapago(data.Clave, data.Nombre);
-  }); 
-} 
+  });
+}
 //seleccionar forma pago
 function seleccionarformapago(Clave, Nombre){
   var claveformapagoanterior = $("#claveformapagoanterior").val();
@@ -1276,12 +1320,12 @@ function obtenermetodospago(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                              '</div>';  
+                              '</div>';
   $("#contenidomodaltablas").html(tablametodospago);
   var tmetpag = $('#tbllistadometodopago').DataTable({
       keys: true,
@@ -1289,7 +1333,7 @@ function obtenermetodospago(){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -1320,7 +1364,7 @@ function obtenermetodospago(){
       var data = tmetpag.row( this ).data();
       seleccionarmetodopago(data.Clave, data.Nombre);
   });
-} 
+}
 //seleccionar metodo pago
 function seleccionarmetodopago(Clave, Nombre){
   var clavemetodopagoanterior = $("#clavemetodopagoanterior").val();
@@ -1358,12 +1402,12 @@ function obtenerusoscfdi(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                              '</div>';  
+                              '</div>';
   $("#contenidomodaltablas").html(tablausoscfdi);
   var tusocfdi = $('#tbllistadousocfdi').DataTable({
       keys: true,
@@ -1371,7 +1415,7 @@ function obtenerusoscfdi(){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -1403,8 +1447,8 @@ function obtenerusoscfdi(){
   $('#tbllistadousocfdi tbody').on('dblclick', 'tr', function () {
       var data = tusocfdi.row( this ).data();
       seleccionarusocfdi(data.Clave, data.Nombre);
-  }); 
-} 
+  });
+}
 //seleccionar uso cfdi
 function seleccionarusocfdi(Clave, Nombre){
   var claveusocfdianterior = $("#claveusocfdianterior").val();
@@ -1440,12 +1484,12 @@ function obtenerresidenciasfiscales(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                              '</div>';  
+                              '</div>';
   $("#contenidomodaltablas").html(tablaresidenciasfiscales);
   var tresfis = $('#tbllistadoresidencialfiscal').DataTable({
       keys: true,
@@ -1453,7 +1497,7 @@ function obtenerresidenciasfiscales(){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -1483,8 +1527,8 @@ function obtenerresidenciasfiscales(){
   $('#tbllistadoresidencialfiscal tbody').on('dblclick', 'tr', function () {
       var data = tresfis.row( this ).data();
       seleccionarresidenciafiscal(data.Clave, data.Nombre);
-  }); 
-} 
+  });
+}
 //seleccionar residencia fiscal
 function seleccionarresidenciafiscal(Clave, Nombre){
   var claveresidenciafiscalanterior = $("#claveresidenciafiscalanterior").val();
@@ -1520,12 +1564,12 @@ function obtenerfoliosnotas(){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                              '</div>';  
+                              '</div>';
   $("#contenidomodaltablas").html(tablafoliosfiscales);
   var tfolfis = $('#tbllistadofoliofiscal').DataTable({
       keys: true,
@@ -1533,7 +1577,7 @@ function obtenerfoliosnotas(){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -1558,21 +1602,21 @@ function obtenerfoliosnotas(){
             }
         });
       },
-  });  
+  });
   //seleccionar registro al dar doble click
   $('#tbllistadofoliofiscal tbody').on('dblclick', 'tr', function () {
       var data = tfolfis.row( this ).data();
       seleccionarfoliofiscal(data.Serie, data.Esquema);
-  }); 
+  });
 }
 function seleccionarfoliofiscal(Serie, Esquema){
   var numerofilas = $("#numerofilas").val()
   if(parseInt(numerofilas) > 0){
-    var confirmacion = confirm("Esta seguro de cambiar el folio fiscal?"); 
+    var confirmacion = confirm("Esta seguro de cambiar el folio fiscal?");
   }else{
     var confirmacion = true;
   }
-  if (confirmacion == true) { 
+  if (confirmacion == true) {
     $.get(carta_porte_obtener_ultimo_folio_serie_seleccionada, {Serie:Serie,Esquema:Esquema}, function(folio){
       $("#folio").val(folio);
       $("#serie").val(Serie);
@@ -1580,7 +1624,7 @@ function seleccionarfoliofiscal(Serie, Esquema){
       $("#serietexto").html("Serie: "+Serie);
       $("#esquematexto").html("Esquema: "+Esquema);
       mostrarformulario();
-    }) 
+    })
   }
 }
 //obtener vehiculos
@@ -1607,12 +1651,12 @@ function obtenervehiculosempresa (){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                              '</div>';  
+                              '</div>';
   $("#contenidomodaltablas").html(tablavehiculos);
   var tvehi = $('#tbllistadovehiculo').DataTable({
       keys: true,
@@ -1620,7 +1664,7 @@ function obtenervehiculosempresa (){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -1653,8 +1697,8 @@ function obtenervehiculosempresa (){
   $('#tbllistadovehiculo tbody').on('dblclick', 'tr', function () {
       var data = tvehi.row( this ).data();
       seleccionarvehiculo(data.id, data.PermisoSCT, data.NumeroPermisoSCT, data.NombreAseguradora, data.NumeroPolizaSeguro, data.Placa, data.Año, data.SubTipoRemolque, data.PlacaSubTipoRemolque, data.Marca, data.Modelo);
-  }); 
-} 
+  });
+}
 //seleccionar residencia fiscal
 function seleccionarvehiculo(id, PermisoSCT, NumeroPermisoSCT, NombreAseguradora, NumeroPolizaSeguro, Placa, Año, SubTipoRemolque, PlacaSubTipoRemolque, Marca, Modelo){
   var numerovehiculoempresaanterior = $("#numerovehiculoempresaanterior").val();
@@ -1699,7 +1743,7 @@ function obtenervehiculopornumero(){
           $("#textonombrevehiculoempresa").html(data.Marca +" - "+data.Modelo);
         }
         mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -1738,12 +1782,12 @@ function obteneroperadoresempresa (){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                               '</div>'+
                               '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                              '</div>';  
+                              '</div>';
   $("#contenidomodaltablas").html(tablaoperadores);
   var toper = $('#tbllistadooperador').DataTable({
       keys: true,
@@ -1751,7 +1795,7 @@ function obteneroperadoresempresa (){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
         'loadingRecords': '&nbsp;',
@@ -1783,8 +1827,8 @@ function obteneroperadoresempresa (){
   $('#tbllistadooperador tbody').on('dblclick', 'tr', function () {
       var data = toper.row( this ).data();
       seleccionaroperador(data.id, data.Rfc, data.Nombre, data.NumeroLicencia, data.Calle, data.NoExterior, data.NoInterior, data.Colonia, data.Localidad, data.Referencia, data.Municipio, data.Estado, data.Pais, data.CodigoPostal);
-  }); 
-} 
+  });
+}
 //seleccionar residencia fiscal
 function seleccionaroperador(id, Rfc, Nombre, NumeroLicencia, Calle, NoExterior, NoInterior, Colonia, Localidad, Referencia, Municipio, Estado, Pais, CodigoPostal){
   var numerooperadoranterior = $("#numerooperadoranterior").val();
@@ -1837,7 +1881,7 @@ function obteneroperadorpornumero(){
           $("#textonombreoperador").html(data.Nombre);
         }
         mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -1874,7 +1918,7 @@ function listarfacturas (){
                                 '<tbody></tbody>'+
                               '</table>'+
                             '</div>'+
-                          '</div>'+   
+                          '</div>'+
                         '</div>'+
                       '</div>'+
                       '<div class="modal-footer">'+
@@ -1887,7 +1931,7 @@ function listarfacturas (){
         "pageLength": 250,
         "sScrollX": "110%",
         "sScrollY": "370px",
-        "bScrollCollapse": true,  
+        "bScrollCollapse": true,
         processing: true,
         'language': {
             'loadingRecords': '&nbsp;',
@@ -1923,13 +1967,13 @@ function listarfacturas (){
                 }
             });
         },
-    });  
+    });
     //seleccionar registro al dar doble click
     $('#tbllistadofactura tbody').on('dblclick', 'tr', function () {
       var data = tfact.row( this ).data();
       seleccionarfactura(data.Folio, data.Factura);
     });
-} 
+}
 //obtener todos los datos de la orden de compra seleccionada
 function seleccionarfactura(Folio, Factura){
     $('.page-loader-wrapper').css('display', 'block');
@@ -1951,16 +1995,16 @@ function seleccionarfactura(Folio, Factura){
       $(".inputnextdet").keyup(function (e) {
         //recomentable para mayor compatibilidad entre navegadores.
         var code = (e.keyCode ? e.keyCode : e.which);
-        var index = $(this).index(".inputnextdet");          
+        var index = $(this).index(".inputnextdet");
         switch(code){
           case 13:
-            $(".inputnextdet").eq(index + 1).focus().select(); 
+            $(".inputnextdet").eq(index + 1).focus().select();
             break;
           case 39:
-            $(".inputnextdet").eq(index + 1).focus().select(); 
+            $(".inputnextdet").eq(index + 1).focus().select();
             break;
           case 37:
-            $(".inputnextdet").eq(index - 1).focus().select(); 
+            $(".inputnextdet").eq(index - 1).focus().select();
             break;
         }
       });
@@ -1970,7 +2014,7 @@ function seleccionarfactura(Folio, Factura){
 //crear array de compras seleccionadas
 function construirarrayfacturasseleccionadas(){
   var arrayfacturasseleccionadas = [];
-  $("tr.filasfacturas").each(function () { 
+  $("tr.filasfacturas").each(function () {
       // obtener los datos de la fila
       var facturaaplicarpartida = $(".facturaaplicarpartida", this).val();
       arrayfacturasseleccionadas.push(facturaaplicarpartida);
@@ -1981,7 +2025,7 @@ function construirarrayfacturasseleccionadas(){
 function calculartotalesfilastablafacturas(fila){
   // for each por cada fila:
   var cuentaFilas = 0;
-  $("tr.filasfacturas").each(function () { 
+  $("tr.filasfacturas").each(function () {
     if(fila === cuentaFilas){
       // obtener los datos de la fila:
       var totalpesosfacturapartida = $(".totalpesosfacturapartida", this).val();
@@ -1991,10 +2035,9 @@ function calculartotalesfilastablafacturas(fila){
       var abonosfacturapartida = $('.abonosfacturapartida', this).val();
       //saldo de la factura partida
       saldofacturapartida =  new Decimal(totalpesosfacturapartida).minus(abonosfacturapartida).minus(notascreditofacturapartida).minus(descuentopesosfacturapartida);
-      $('.saldofacturapartida', this).val(number_format(round(saldofacturapartida, numerodecimales), numerodecimales, '.', ''));     
-      calculartotal();
+      $('.saldofacturapartida', this).val(number_format(round(saldofacturapartida, numerodecimales), numerodecimales, '.', ''));
       calculartotalcompranotacliente();
-    }  
+    }
     cuentaFilas++;
   });
 }
@@ -2004,7 +2047,7 @@ function calculartotalcompranotacliente(){
   var diferencia= 0;
   $("tr.filasfacturas").each(function(){
     descuentofacturas = new Decimal(descuentofacturas).plus($(".descuentopesosfacturapartida", this).val());
-  }); 
+  });
   var totalnota = $("#totalnota").val();
   $("#descuentofacturas").val(number_format(round(descuentofacturas, numerodecimales), numerodecimales, '.', ''));
   diferencia = new Decimal(totalnota).minus(descuentofacturas);
@@ -2012,11 +2055,11 @@ function calculartotalcompranotacliente(){
 }
 //eliminar una fila en la tabla de compras
 function eliminarfilafacturanotacliente(fila){
-  var confirmacion = confirm("Esta seguro de eliminar la fila?"); 
-  if (confirmacion == true) { 
+  var confirmacion = confirm("Esta seguro de eliminar la fila?");
+  if (confirmacion == true) {
     $("#filafactura"+fila).remove();
     contadorfilasfacturas--; //importante para todos los calculos se debe restar al contador
-    renumerarfilasfacturanotacliente();//importante para todos los calculo en el modulo de orden de compra 
+    renumerarfilasfacturanotacliente();//importante para todos los calculo en el modulo de orden de compra
     comprobarfilasfacturanotacliente();
     calculartotalcompranotacliente();
     construirarrayfacturasseleccionadas();
@@ -2074,7 +2117,7 @@ function renumerarfilasfacturanotacliente(){
   for (var i = 0; i < lista.length; i++){
     lista[i].setAttribute("onclick", "listarclavesunidades("+i+')');
   }
-}  
+}
 //detectar cuando en el input de buscar por codigo de producto el usuario presione la tecla enter, si es asi se realizara la busqueda con el codigo escrito
 $(document).ready(function(){
   $("#codigoabuscar").keypress(function(e) {
@@ -2139,7 +2182,7 @@ function obtenerclientepornumero(){
         }
         */
         mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -2163,7 +2206,7 @@ function obteneralmacenpornumero(){
           }
           mostrarbotonlistarfacturas();
           mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -2185,7 +2228,7 @@ function obtenerlugarexpedicionporclave(){
           $("#textonombrelugarexpedicion").html(data.estado.substring(0, 40));
         }
         mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -2208,7 +2251,7 @@ function obtenerregimenfiscalporclave(){
           $("#textonombreregimenfiscal").html(data.nombre.substring(0, 40));
         }
         mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -2225,13 +2268,13 @@ function obtenertiporelacionporclave(){
     if($("#clavetiporelacion").parsley().isValid()){
       $.get(notas_credito_clientes_obtener_tipo_relacion_por_clave, {clavetiporelacion:clavetiporelacion}, function(data){
         $("#clavetiporelacion").val(data.clave);
-        $("#clavetiporelacionanterior").val(data.clave);  
+        $("#clavetiporelacionanterior").val(data.clave);
         $("#tiporelacion").val(data.nombre);
         if(data.nombre != null){
           $("#textonombretiporelacion").html(data.nombre.substring(0, 40));
         }
         mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -2254,7 +2297,7 @@ function obtenerformapagoporclave(){
           $("#textonombreformapago").html(data.nombre.substring(0, 40));
         }
         mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -2277,7 +2320,7 @@ function obtenermetodopagoporclave(){
           $("#textonombremetodopago").html(data.nombre.substring(0, 40));
         }
         mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -2300,7 +2343,7 @@ function obtenerusocfdiporclave(){
           $("#textonombreusocfdi").html(data.nombre.substring(0, 40));
         }
         mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -2323,7 +2366,7 @@ function obtenerresidenciafiscalporclave(){
           $("#textonombreresidenciafiscal").html(data.nombre.substring(0, 40));
         }
         mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -2347,7 +2390,7 @@ function obtenerconfigautotransporteporclave(){
             $("#textonombreconfigautotransporte").html(data.descripcion.substring(0, 40));
           }
           mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -2370,7 +2413,7 @@ function obtenerclavetransporteporclave(){
             $("#textonombreclavetransporte").html(data.descripcion.substring(0, 40));
           }
           mostrarformulario();
-      }) 
+      })
     }
   }
 }
@@ -2417,12 +2460,12 @@ function listarproductos(){
                                       '<tbody></tbody>'+
                                     '</table>'+
                                   '</div>'+
-                                '</div>'+  
+                                '</div>'+
                               '</div>'+
                             '</div>'+
                             '<div class="modal-footer">'+
                               '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                            '</div>';   
+                            '</div>';
       $("#contenidomodaltablas").html(tablaproductos);
       var tprod = $('#tbllistadoproducto').DataTable({
         keys: true,
@@ -2438,7 +2481,7 @@ function listarproductos(){
           },
         serverSide: true,
         ajax: {
-          url: notas_credito_clientes_obtener_productos,
+          url: carta_porte_obtener_productos,
           data: function (d) {
             d.codigoabuscar = $("#codigoabuscar").val();
             d.numeroalmacen = $("#numeroalmacen").val();
@@ -2455,7 +2498,7 @@ function listarproductos(){
           { data: 'Existencias', name: 'Existencias', orderable: false, searchable: false  },
           { data: 'Almacen', name: 'Almacen', orderable: false, searchable: false  },
           { data: 'Costo', name: 'Costo', orderable: false, searchable: false  },
-          { data: 'SubTotal', name: 'SubTotal', orderable: false, searchable: false  } 
+          { data: 'SubTotal', name: 'SubTotal', orderable: false, searchable: false  }
         ],
         "initComplete": function() {
           var $buscar = $('div.dataTables_filter input');
@@ -2472,7 +2515,7 @@ function listarproductos(){
       $('#tbllistadoproducto tbody').on('dblclick', 'tr', function () {
           var data = tprod.row( this ).data();
           var tipooperacion = $("#tipooperacion").val();
-          agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, data.SubTotal, data.Existencias, tipooperacion, data.Insumo, data.ClaveProducto, data.ClaveUnidad, data.NombreClaveProducto, data.NombreClaveUnidad, data.CostoDeLista);
+          agregarfilaproducto(data.MaterialPeligroso,data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, data.SubTotal, data.Existencias, tipooperacion, data.Insumo, data.ClaveProducto, data.ClaveUnidad, data.NombreClaveProducto, data.NombreClaveUnidad, data.CostoDeLista);
       });
     }
   }
@@ -2494,11 +2537,11 @@ function obtenerproductoporcodigo(){
       var tipooperacion = $("#tipooperacion").val();
       $.get(notas_credito_clientes_obtener_producto_por_codigo,{codigoabuscar:codigoabuscar,numeroalmacen:numeroalmacen,stringfacturasseleccionadas:stringfacturasseleccionadas}, function(data){
         if(parseInt(data.contarproductos) > 0){
-          agregarfilaproducto(data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, data.SubTotal, data.Existencias, tipooperacion, data.Insumo, data.ClaveProducto, data.ClaveUnidad, data.NombreClaveProducto, data.NombreClaveUnidad, data.CostoDeLista);
+          agregarfilaproducto(data.MaterialPeligroso,data.Codigo, data.Producto, data.Unidad, data.Costo, data.Impuesto, data.SubTotal, data.Existencias, tipooperacion, data.Insumo, data.ClaveProducto, data.ClaveUnidad, data.NombreClaveProducto, data.NombreClaveUnidad, data.CostoDeLista);
         }else{
           msjnoseencontroningunproducto();
         }
-      }) 
+      })
     }
   }
 }
@@ -2523,12 +2566,12 @@ function listarclavesproductos(fila){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+  
+                                    '</div>'+
                                 '</div>'+
                             '</div>'+
                             '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                            '</div>';   
+                            '</div>';
   $("#contenidomodaltablas").html(tablaclavesproducto);
   var tclavprod = $('#tbllistadoclaveproducto').DataTable({
       keys: true,
@@ -2536,7 +2579,7 @@ function listarclavesproductos(fila){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
           'loadingRecords': '&nbsp;',
@@ -2571,6 +2614,171 @@ function listarclavesproductos(fila){
       seleccionarclaveproducto(data.Clave, data.Nombre, fila);
   });
 }
+/**
+ * @author Jose Alonso Espinares
+ * @param {*} params
+ * @description Lista las claves de mercancias pesligrosas
+ */
+function listarclavespeligrosos(fila) {
+    ocultarformulario()
+    let tablaclavepeligrosos = '<div class="modal-header '+background_forms_and_modals+'">'+
+        '<h4 class="modal-title">Materiales Peligrosos</h4>'+
+        '</div>'+
+        '<div class="modal-body">'+
+            '<div class="row">'+
+                '<div class="col-md-12">'+
+                    '<div class="table-responsive">'+
+                        '<table id="tbllistadoclavespeligrosos" class="tbllistadoclavespeligrosos table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                            '<thead class="'+background_tables+'">'+
+                                '<tr>'+
+                                    '<th>Operaciones</th>'+
+                                    '<th>Clave</th>'+
+                                    '<th>Descripción</th>'+
+                                    '<th>Nombre Técnico</th>'+
+                                '</tr>'+
+                            '</thead>'+
+                            '<tbody></tbody>'+
+                        '</table>'+
+                    '</div>'+
+                '</div>'+
+            '</div>'+
+        '</div>'+
+        '<div class="modal-footer">'+
+            '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+        '</div>';
+    $("#contenidomodaltablas").html(tablaclavepeligrosos);
+
+    var tclavprod = $('#tbllistadoclavespeligrosos').DataTable({
+        keys: true,
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,
+        processing: true,
+        'language': {
+            'loadingRecords': '&nbsp;',
+            'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+            url: carta_porte_obtener_claves_materiales_peligrosos,
+            data: function (d) {
+              d.fila = fila;
+            }
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Clave', name: 'Clave' },
+            { data: 'Descripcion', name: 'Descripcion' },
+            { data: 'NombreTecnico', name: 'NombreTecnico' }
+        ],
+        "initComplete": function() {
+            var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
+            $buscar.unbind();
+            $buscar.bind('keyup change', function(e) {
+                if(e.keyCode == 13 || this.value == "") {
+                  $('#tbllistadoclavespeligrosos').DataTable().search( this.value ).draw();
+                }
+            });
+        },
+    });
+}
+
+/**
+ * @author Jose Alonso Espinares
+ * @param {*} fila
+ * @description Lista los tipos de embalajes
+ */
+function listartiposembalaje(fila) {
+    ocultarformulario()
+    let tablatiposembalajes = '<div class="modal-header '+background_forms_and_modals+'">'+
+        '<h4 class="modal-title">Tipos Embalaje</h4>'+
+        '</div>'+
+        '<div class="modal-body">'+
+            '<div class="row">'+
+                '<div class="col-md-12">'+
+                    '<div class="table-responsive">'+
+                        '<table id="tbltiposembalaje" class="tbltiposembalaje table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                            '<thead class="'+background_tables+'">'+
+                                '<tr>'+
+                                    '<th>Operaciones</th>'+
+                                    '<th>Clave</th>'+
+                                    '<th>Descripción</th>'+
+                                '</tr>'+
+                            '</thead>'+
+                            '<tbody></tbody>'+
+                        '</table>'+
+                    '</div>'+
+                '</div>'+
+            '</div>'+
+        '</div>'+
+        '<div class="modal-footer">'+
+            '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+        '</div>';
+    $("#contenidomodaltablas").html(tablatiposembalajes);
+    var tclavprod = $('#tbltiposembalaje').DataTable({
+        keys: true,
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,
+        processing: true,
+        'language': {
+            'loadingRecords': '&nbsp;',
+            'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+            url: carta_porte_obtener_claves_tipo_embalajes,
+            data: function (d) {
+              d.fila = fila;
+            }
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'Clave', name: 'Clave' },
+            { data: 'Descripcion', name: 'Descripcion' },
+        ],
+        "initComplete": function() {
+            var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
+            $buscar.unbind();
+            $buscar.bind('keyup change', function(e) {
+                if(e.keyCode == 13 || this.value == "") {
+                  $('#tbltiposembalaje').DataTable().search( this.value ).draw();
+                }
+            });
+        },
+    });
+}
+
+/**
+ * @author Jose Alonso Espinares Romero
+ * @param {*} clave
+ * @param {*} descripcion
+ * @param {*} fila
+ * @description Agrega la clave de Material Peligroso a la partida
+ */
+function seleccionarclavepeligroso(clave, descripcion, fila){
+    $("#filaproducto"+fila+" .clavematerialpeligrosopartida").val(clave);
+    $("#filaproducto"+fila+" .descripcionclavepeligrosopartida").val(descripcion);
+    mostrarformulario();
+}
+/**
+ * @author Jose Alonso Espinares Romero
+ * @param {*} clave
+ * @param {*} descripcion
+ * @param {*} fila
+ * @description Agrega la clave de Tipo Embalaje a la partida
+ */
+ function seleccionarclavembalaje(clave, descripcion, fila){
+    $("#filaproducto"+fila+" .clavetipoembalajepartida").val(clave);
+    $("#filaproducto"+fila+" .descripcionembalajepartida").val(descripcion);
+    mostrarformulario();
+}
 //seleccion de clave producto
 function seleccionarclaveproducto(clave, nombre, fila){
   $("#filaproducto"+fila+" .claveproductopartida").val(clave);
@@ -2598,12 +2806,12 @@ function listarclavesunidades(fila){
                                                 '<tbody></tbody>'+
                                             '</table>'+
                                         '</div>'+
-                                    '</div>'+  
+                                    '</div>'+
                                 '</div>'+
                             '</div>'+
                             '<div class="modal-footer">'+
                                 '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
-                            '</div>';   
+                            '</div>';
   $("#contenidomodaltablas").html(tablaclavesunidades);
   var tclavuni = $('#tbllistadoclaveunidad').DataTable({
       keys: true,
@@ -2611,7 +2819,7 @@ function listarclavesunidades(fila){
       "pageLength": 250,
       "sScrollX": "110%",
       "sScrollY": "370px",
-      "bScrollCollapse": true,  
+      "bScrollCollapse": true,
       processing: true,
       'language': {
           'loadingRecords': '&nbsp;',
@@ -2673,7 +2881,7 @@ function evaluarproductoexistente(Codigo){
       var result = false;
   }
   return result;
-} 
+}
 //eliminar filas dppp
 function eliminarfilasdppp(){
   var cuentaFilas = 0;
@@ -2685,9 +2893,8 @@ function eliminarfilasdppp(){
     }
     cuentaFilas++;
   });
-  renumerarfilas();//importante para todos los calculo en el modulo de orden de compra 
+  renumerarfilas();//importante para todos los calculo en el modulo de orden de compra
   comprobarfilas();
-  calculartotal();
 }
 //eliminar filas codigos
 function eliminarfilascodigos(){
@@ -2700,9 +2907,8 @@ function eliminarfilascodigos(){
     }
     cuentaFilas++;
   });
-  renumerarfilas();//importante para todos los calculo en el modulo de orden de compra 
+  renumerarfilas();//importante para todos los calculo en el modulo de orden de compra
   comprobarfilas();
-  calculartotal();
 }
 //agregar una fila en la tabla de precios productos codigo ó dppp
 var contadorproductos=0;
@@ -2713,8 +2919,8 @@ function agregarfiladppp(){
   if(result == false){
     var tipooperacion = $("#tipooperacion").val();
     var fila= '<tr class="filasproductos" id="filaproducto'+contadorfilas+'">'+
-                '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfila" onclick="eliminarfila('+contadorfilas+')" >X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
-                '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="DPPP" readonly data-parsley-length="[1, 20]">DPPP</td>'+         
+                '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfila" onclick="eliminarfila(2)" >X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
+                '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="DPPP" readonly data-parsley-length="[1, 20]">DPPP</td>'+
                 '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="DESCUENTO POR PRONTO PAGO" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
                 '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxs unidadpartida" name="unidadpartida[]" value="ACTIV" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
                 '<td class="tdmod">'+
@@ -2744,7 +2950,7 @@ function agregarfiladppp(){
                     '<div class="col-xs-2 col-sm-2 col-md-2">'+
                       '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('+contadorfilas+');" ><i class="material-icons">remove_red_eye</i></div>'+
                     '</div>'+
-                    '<div class="col-xs-10 col-sm-10 col-md-10">'+    
+                    '<div class="col-xs-10 col-sm-10 col-md-10">'+
                       '<input type="text" class="form-control inputnextdet divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="84111506" readonly data-parsley-length="[1, 20]">'+
                     '</div>'+
                   '</div>'+
@@ -2755,7 +2961,7 @@ function agregarfiladppp(){
                     '<div class="col-xs-2 col-sm-2 col-md-2">'+
                       '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('+contadorfilas+');" ><i class="material-icons">remove_red_eye</i></div>'+
                     '</div>'+
-                    '<div class="col-xs-10 col-sm-10 col-md-10">'+    
+                    '<div class="col-xs-10 col-sm-10 col-md-10">'+
                       '<input type="text" class="form-control inputnextdet divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="ACT" readonly data-parsley-length="[1, 5]">'+
                     '</div>'+
                   '</div>'+
@@ -2765,9 +2971,8 @@ function agregarfiladppp(){
     contadorproductos++;
     contadorfilas++;
     $("#tabladetallesnotacliente").append(fila);
-    mostrarformulario();      
+    mostrarformulario();
     comprobarfilas();
-    calculartotal();
     eliminarfilascodigos();
     //colocar el tipo de detalles
     $("#tipodetalles").val("dppp");
@@ -2778,16 +2983,16 @@ function agregarfiladppp(){
     $(".inputnextdet").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      var index = $(this).index(".inputnextdet");          
+      var index = $(this).index(".inputnextdet");
       switch(code){
         case 13:
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+          $(".inputnextdet").eq(index + 1).focus().select();
           break;
         case 39:
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+          $(".inputnextdet").eq(index + 1).focus().select();
           break;
         case 37:
-          $(".inputnextdet").eq(index - 1).focus().select(); 
+          $(".inputnextdet").eq(index - 1).focus().select();
           break;
       }
     });
@@ -2797,63 +3002,154 @@ function agregarfiladppp(){
     $('.page-loader-wrapper').css('display', 'none');
   }
 }
-function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal, Existencias, tipooperacion, Insumo, ClaveProducto, ClaveUnidad, NombreClaveProducto, NombreClaveUnidad, CostoDeLista){
+function agregarfilaproducto(Material,Codigo, Producto, Unidad, Costo, Impuesto, SubTotal, Existencias, tipooperacion, Insumo, ClaveProducto, ClaveUnidad, NombreClaveProducto, NombreClaveUnidad, CostoDeLista){
     $('.page-loader-wrapper').css('display', 'block');
-    var result = evaluarproductoexistente(Codigo);
+    var result = evaluarproductoexistente(Codigo)
     if(result == false){
-        var multiplicacioncostoimpuesto =  new Decimal(Costo).times(Impuesto);      
+        var multiplicacioncostoimpuesto =  new Decimal(Costo).times(Impuesto);
         var ivapesos = new Decimal(multiplicacioncostoimpuesto/100);
         var total = new Decimal(Costo).plus(ivapesos);
         var preciopartida = Costo;
+        let MaterialPeligrosoHTML = ''
+        let Embalaje = ''
+        let totalpartidas = $('#numerototalmercancias').val()
+        let partidasAux = 0
+        if(totalpartidas > 0){
+            partidasAux = totalpartidas
+        }
+        if(Material == "0"){
+            MaterialPeligrosoHTML = '<div class="row divorinputmodxl">'+
+                '<div class="col-xs-2 col-sm-2 col-md-2">'+
+                    '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Material Peligroso"><i class="material-icons">remove_red_eye</i></div>'+
+                '</div>'+
+                '<div class="col-xs-5 col-sm-5 col-md-5">'+
+                    '<input type="text" class="form-control inputnextdet divorinputmodsm clavematerialpeligrosopartida" name="clavematerialpeligrosopartida[]"  value="" disabled readonly'+
+                '</div>'+
+                '<div class="col-xs-5 col-sm-5 col-md-5">'+
+                    '<input type="hidden" class="form-control divorinputmodmd descripcionclavepeligrosopartida" name="descripcionclavepeligrosopartida[]" disabled  value="">'
+                '</div>'+
+            '</div>'
+            Embalaje = '<div class="row divorinputmodxl">'+
+                '<div class="col-xs-2 col-sm-2 col-md-2">'+
+                    '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Tipos Embalaje"><i class="material-icons">remove_red_eye</i></div>'+
+                '</div>'+
+                '<div class="col-xs-5 col-sm-5 col-md-5">'+
+                    '<input type="text" class="form-control inputnextdet divorinputmodsm clavetipoembalajepartida" name="clavetipoembalajepartida[]"  value="" disabled readonly'+
+                '</div>'+
+                '<div class="col-xs-5 col-sm-5 col-md-5">'+
+                    '<input type="hidden" class="form-control divorinputmodmd descripcionclavepeligrosopartida" name="descripcionclavepeligrosopartida[]" disabled  value="">'
+                '</div>'+
+            '</div>'
+        }else if(Material == "1"){
+            MaterialPeligrosoHTML = '<div class="row divorinputmodxl">'+
+                '<div class="col-xs-2 col-sm-2 col-md-2">'+
+                    '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Material Peligroso" onclick="listarclavespeligrosos('+partidasAux+');" ><i class="material-icons">remove_red_eye</i></div>'+
+                '</div>'+
+                '<div class="col-xs-5 col-sm-5 col-md-5">'+
+                    '<input type="text" class="form-control inputnextdet divorinputmodsm clavematerialpeligrosopartida" name="clavematerialpeligrosopartida[]"  value="" required readonly'+
+                '</div>'+
+                '<div class="col-xs-5 col-sm-5 col-md-5">'+
+                    '<input type="hidden" class="form-control divorinputmodmd descripcionclavepeligrosopartida" name="descripcionclavepeligrosopartida[]" required  value="">'
+                '</div>'+
+            '</div>'
+            Embalaje = '<div class="row divorinputmodxl">'+
+                '<div class="col-xs-2 col-sm-2 col-md-2">'+
+                    '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Tipos Embalaje" onclick="listarclavespeligrosos('+partidasAux+');" ><i class="material-icons">remove_red_eye</i></div>'+
+                '</div>'+
+                '<div class="col-xs-5 col-sm-5 col-md-5">'+
+                    '<input type="text" class="form-control inputnextdet divorinputmodsm clavetipoembalajepartida" name="clavetipoembalajepartida[]"  value="" required readonly'+
+                '</div>'+
+                '<div class="col-xs-5 col-sm-5 col-md-5">'+
+                    '<input type="hidden" class="form-control divorinputmodmd descripcionembalajepartida" name="descripcionembalajepartida[]" required  value="">'
+                '</div>'+
+            '</div>'
+        }else{
+            MaterialPeligrosoHTML = '<div class="row divorinputmodxl">'+
+                '<div class="col-xs-2 col-sm-2 col-md-2">'+
+                    '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavespeligrosos('+partidasAux+');" ><i class="material-icons">remove_red_eye</i></div>'+
+                '</div>'+
+                '<div class="col-xs-5 col-sm-5 col-md-5">'+
+                    '<input type="text" class="form-control inputnextdet divorinputmodsm clavematerialpeligrosopartida" name="clavematerialpeligrosopartida[]"  value="" readonly'+
+                '</div>'+
+                '<div class="col-xs-5 col-sm-5 col-md-5">'+
+                    '<input type="hidden" class="form-control divorinputmodmd descripcionclavepeligrosopartida" name="descripcionclavepeligrosopartida[]"  value="">'
+                '</div>'+
+            '</div>'
+            Embalaje = '<div class="row divorinputmodxl">'+
+                '<div class="col-xs-2 col-sm-2 col-md-2">'+
+                    '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Tipos Embalaje" onclick="listartiposembalaje('+partidasAux+');" ><i class="material-icons">remove_red_eye</i></div>'+
+                '</div>'+
+                '<div class="col-xs-5 col-sm-5 col-md-5">'+
+                    '<input type="text" class="form-control inputnextdet divorinputmodsm clavetipoembalajepartida" name="clavetipoembalajepartida[]"  value="" readonly'+
+                '</div>'+
+                '<div class="col-xs-5 col-sm-5 col-md-5">'+
+                    '<input type="hidden" class="form-control divorinputmodmd descripcionembalajepartida" name="descripcionembalajepartida[]"  value="">'
+                '</div>'+
+            '</div>'
+        }
+
         var tipo = "alta";
-        var fila= '<tr class="filasproductos" id="filaproducto'+contadorfilas+'">'+
-                    '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfila" onclick="eliminarfila('+contadorfilas+')" >X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
-                    '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+         
+        var fila= '<tr class="filasproductos" id="filaproducto'+partidasAux+'">'+
+                    '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfila" onclick="eliminarfila(2)" >X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'+tipooperacion+'" readonly></td>'+
+                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm partidapartida" name="partidapartida[]" value="" autocomplete="off" readonly></td>'+
+                    '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'+Codigo+'" readonly data-parsley-length="[1, 20]">'+Codigo+'</td>'+
                     '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'+Producto+'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
-                    '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxs unidadpartida" name="unidadpartida[]" value="'+Unidad+'" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)" autocomplete="off"></td>'+
                     '<td class="tdmod">'+
-                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');revisarcantidadnotavscantidadfactura('+contadorfilas+');">'+
+                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm cantidadPartida" name="cantidadPartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calcularPesoPartida('+partidasAux+')" >'+
+                        '<input type="hidden" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+partidasAux+');revisarcantidadnotavscantidadfactura('+contadorfilas+');">'+
                         '<input type="hidden" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
                         '<input type="hidden" class="form-control cantidadincorrecta" name="cantidadincorrecta[]" >'+
                         '<input type="hidden" class="form-control realizarbusquedaexistencias" name="realizarbusquedaexistencias[]" value="1" >'+
                         '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'+
                     '</td>'+
-                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'+preciopartida+'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');"></td>'+
-                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
-                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" ></td>'+
-                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm importedescuentopesospartida" name="importedescuentopesospartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                    '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm iepsporcentajepartida" name="iepsporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" readonly></td>'+
+                    '<td class="tdmod">'+
+                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm pesopartida" name="pesobrutopartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calcularPesoPartida('+partidasAux+')">'+
+                        '<input type="hidden" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm pesototal" name="preciopartida[]" value="'+preciopartida+'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+partidasAux+');">'+
+                    '</td>'+
+                    '<td class="tdmod">'+
+                        '<input type="hidden" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly>'+
+                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm pesototalpartida" name="pesototal[]" value="0.'+numerocerosconfigurados+'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly>'+
+                    '</td>'+
+                    '<td class="tdmod">'+
+                        '<input type="hidden" name="materialpeligrosopartida[]" value="'+Material+'"></input>'+
+                        MaterialPeligrosoHTML+
+                    '</td>'+
+                    '<td class="tdmod">'+
+                        Embalaje+
+                    '</td>'+
+                    '<td class="tdmod" hidden><input type="hidden" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+partidasAux+');" ></td>'+
+                    '<td class="tdmod" hidden><input type="hidden" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm importedescuentopesospartida" name="importedescuentopesospartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
+                    '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm iepsporcentajepartida" name="iepsporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+partidasAux+');" readonly></td>'+
                     '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm trasladoiepspesospartida" name="trasladoiepspesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
-                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'+Impuesto+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');"></td>'+
-                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm trasladoivapesospartida" name="trasladoivapesospartida[]" value="'+number_format(round(ivapesos, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
-                    '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm retencionivaporcentajepartida" name="retencionivaporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" readonly></td>'+
+                    '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'+preciopartida+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
+                    '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'+Impuesto+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+partidasAux+');"></td>'+
+                    '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm trasladoivapesospartida" name="trasladoivapesospartida[]" value="'+number_format(round(ivapesos, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
+                    '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm retencionivaporcentajepartida" name="retencionivaporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+partidasAux+');" readonly></td>'+
                     '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencionivapesospartida" name="retencionivapesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                    '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm retencionisrporcentajepartida" name="retencionisrporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" readonly></td>'+
+                    '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm retencionisrporcentajepartida" name="retencionisrporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+partidasAux+');" readonly></td>'+
                     '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencionisrpesospartida" name="retencionisrpesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                    '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm retencioniepsporcentajepartida" name="retencioniepsporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+contadorfilas+');" readonly></td>'+
+                    '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet divorinputmodsm retencioniepsporcentajepartida" name="retencioniepsporcentajepartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('+partidasAux+');" readonly></td>'+
                     '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm retencioniepspesospartida" name="retencioniepspesospartida[]" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'+
-                    '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'+number_format(round(total, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
+                    '<td class="tdmod" hidden><input type="hidden" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'+number_format(round(total, numerodecimales), numerodecimales, '.', '')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly>'+
+                        '<input type="text" name="moneda[]" value="MXN" class="form-control divorinputmodsm"></td>'+
                     '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'+Costo+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly></td>'+
-                    '<td class="tdmod"><input type="text" class="form-control divorinputmodsm partidapartida" name="partidapartida[]" value="0" autocomplete="off"></td>'+
                     '<td class="tdmod">'+
                       '<div class="row divorinputmodxl">'+
-                        '<div class="col-xs-2 col-sm-2 col-md-2">'+
-                          '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('+contadorfilas+');" ><i class="material-icons">remove_red_eye</i></div>'+
-                        '</div>'+
-                        '<div class="col-xs-10 col-sm-10 col-md-10">'+    
-                          '<input type="text" class="form-control inputnextdet divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'+ClaveProducto+'" readonly data-parsley-length="[1, 20]">'+
-                        '</div>'+
+                            '<div class="col-xs-2 col-sm-2 col-md-2">'+
+                                '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('+partidasAux+');" ><i class="material-icons">remove_red_eye</i></div>'+
+                            '</div>'+
+                            '<div class="col-xs-10 col-sm-10 col-md-10">'+
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'+ClaveProducto+'" readonly data-parsley-length="[1, 20]">'+
+                            '</div>'+
                       '</div>'+
                     '</td>'+
                     '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'+NombreClaveProducto+'" readonly></td>'+
                     '<td class="tdmod">'+
                       '<div class="row divorinputmodxl">'+
                         '<div class="col-xs-2 col-sm-2 col-md-2">'+
-                          '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('+contadorfilas+');" ><i class="material-icons">remove_red_eye</i></div>'+
+                          '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('+partidasAux+');" ><i class="material-icons">remove_red_eye</i></div>'+
                         '</div>'+
-                        '<div class="col-xs-10 col-sm-10 col-md-10">'+    
+                        '<div class="col-xs-10 col-sm-10 col-md-10">'+
                           '<input type="text" class="form-control inputnextdet divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'+ClaveUnidad+'" readonly data-parsley-length="[1, 5]">'+
                         '</div>'+
                       '</div>'+
@@ -2863,29 +3159,30 @@ function agregarfilaproducto(Codigo, Producto, Unidad, Costo, Impuesto, SubTotal
         contadorproductos++;
         contadorfilas++;
         $("#tabladetallesnotacliente").append(fila);
-        mostrarformulario();      
+        mostrarformulario();
         comprobarfilas();
-        calculartotal();
+        //calculartotal();
         eliminarfilasdppp();
         //colocar el tipo de detalles
         $("#tipodetalles").val("codigos");
         //colocar almacen 0
         comprobarfilasfacturanotacliente();
+        calcularpartidas()
         $("#codigoabuscar").val("");
         //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
         $(".inputnextdet").keyup(function (e) {
           //recomentable para mayor compatibilidad entre navegadores.
           var code = (e.keyCode ? e.keyCode : e.which);
-          var index = $(this).index(".inputnextdet");          
+          var index = $(this).index(".inputnextdet");
           switch(code){
             case 13:
-              $(".inputnextdet").eq(index + 1).focus().select(); 
+              $(".inputnextdet").eq(index + 1).focus().select();
               break;
             case 39:
-              $(".inputnextdet").eq(index + 1).focus().select(); 
+              $(".inputnextdet").eq(index + 1).focus().select();
               break;
             case 37:
-              $(".inputnextdet").eq(index - 1).focus().select(); 
+              $(".inputnextdet").eq(index - 1).focus().select();
               break;
           }
         });
@@ -2934,7 +3231,9 @@ function alta(){
                                         '<input type="hidden" class="form-control" name="tipodetalles" id="tipodetalles" readonly>'+
                                         '<input type="hidden" class="form-control" name="diferenciatotales" id="diferenciatotales" readonly required>'+
                                         '<input type="hidden" class="form-control" name="esquema" id="esquema" value="'+esquema+'" readonly data-parsley-length="[1, 10]">'+
-                                    '</div>'+  
+                                        '<input type="hidden" class="form-control" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" readonly>'+
+                                        '<input type="hidden" class="form-control" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" readonly>'+
+                                    '</div>'+
                                     '<div class="col-md-3">'+
                                       '<label>Cliente <span class="label label-danger" id="textonombrecliente"></span></label>'+
                                       '<table class="col-md-12">'+
@@ -2949,21 +3248,21 @@ function alta(){
                                               '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
                                               '<input type="hidden" class="form-control" name="rfccliente" id="rfccliente" required readonly>'+
                                             '</div>'+
-                                          '</td>'+    
-                                        '</tr>'+    
+                                          '</td>'+
+                                        '</tr>'+
                                       '</table>'+
-                                    '</div>'+ 
+                                    '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Fecha</label>'+
                                         '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required  data-parsley-excluded="true" onkeydown="return false">'+
                                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                         '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
-                                '<div class="row">'+   
+                                '<div class="row">'+
                                     '<div class="col-md-2">'+
                                       '<label>Transporte Internacional</label>'+
-                                      '<select name="transporteinternacional" id="transporteinternacional" class="form-control select2" style="width:100% !important;" required>'+ 
+                                      '<select name="transporteinternacional" id="transporteinternacional" class="form-control select2" style="width:100% !important;" required>'+
                                         '<option value="Si">Si</option>'+
                                         '<option value="No" selected>No</option>'+
                                       '</select>'+
@@ -2976,6 +3275,10 @@ function alta(){
                                         '<label>Total mercancias</label>'+
                                         '<input type="number" class="form-control inputnextdet" name="numerototalmercancias" id="numerototalmercancias" value="0" required readonly>'+
                                     '</div>'+
+                                    '<div class="col-md-2">'+
+                                        '<label>Peso Total Bruto</label>'+
+                                        '<input readonly type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet" name="pesoTotalBruto" id="pesoTotalBruto" value="0.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" readonly>'+
+                                    '</div>'+
                                     '<div class="col-md-3" id="divbuscarcodigoproducto">'+
                                       '<label>Escribe el código y presiona la tecla ENTER</label>'+
                                       '<table class="col-md-12">'+
@@ -2983,16 +3286,37 @@ function alta(){
                                           '<td>'+
                                             '<div class="btn bg-blue waves-effect" id="btnobtenerproductos" onclick="listarproductos()">Ver Productos</div>'+
                                           '</td>'+
-                                          '<td>'+ 
+                                          '<td>'+
                                             '<div class="form-line">'+
                                               '<input type="text" class="form-control inputnextdet" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" readonly autocomplete="off">'+
                                             '</div>'+
                                           '</td>'+
-                                        '</tr>'+    
+                                        '</tr>'+
                                       '</table>'+
-                                    '</div>'+                                 
+                                    '</div>'+
                                 '</div>'+
-                            '</div>'+   
+                                '<div class="row">'+
+                                    '<div class="col-md-8">'+
+                                        '<div class="row">'+
+                                            '<div class="col-md-12 table-responsive cabecerafija" style="height: 125px;overflow-y: scroll;padding: 0px 0px;">'+
+                                                '<input type="hidden" class="form-control" name="numerofilasuuid" id="numerofilasuuid" value="0" readonly>'+
+                                                '<table id="tablauuidrelacionados" class="table table-bordered tablauuidrelacionados">'+
+                                                    '<thead class="'+background_tables+'">'+
+                                                        '<tr>'+
+                                                            '<th class="customercolortheadth">Factura relacionada</th>'+
+                                                            '<th class="customercolortheadth">'+
+                                                                '<div class="col-md-6">'+
+                                                                    '<label class="btn btn-success" onclick="listaruuidrelacionados();">Selecciona factura relacionada</label>'+
+                                                                '</div>'+
+                                                            '</th>'+
+                                                        '</tr>'+
+                                                    '</thead>'+
+                                                '</table>'+
+                                            '</div>'+
+                                        '</div>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
                             '<div role="tabpanel" class="tab-pane fade" id="origentab">'+
                                 '<div class="row">'+
                                     '<div class="col-md-2">'+
@@ -3046,10 +3370,10 @@ function alta(){
                                               '<input type="hidden" class="form-control" name="numeromunicipioremitenteanterior" id="numeromunicipioremitenteanterior" required data-parsley-type="integer">'+
                                               '<input type="text" class="form-control inputnextdet" name="municipioremitente" id="municipioremitente" value="'+municipioempresa+'" required>'+
                                             '</div>'+
-                                          '</td>'+    
-                                        '</tr>'+    
+                                          '</td>'+
+                                        '</tr>'+
                                       '</table>'+
-                                    '</div>'+ 
+                                    '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-md-3">'+
@@ -3065,10 +3389,10 @@ function alta(){
                                               '<input type="hidden" class="form-control" name="numeroestadoremitenteanterior" id="numeroestadoremitenteanterior" required data-parsley-type="integer">'+
                                               '<input type="text" class="form-control inputnextdet" name="estadoremitente" id="estadoremitente" value="'+estadoempresa+'" required>'+
                                             '</div>'+
-                                          '</td>'+    
-                                        '</tr>'+    
+                                          '</td>'+
+                                        '</tr>'+
                                       '</table>'+
-                                    '</div>'+ 
+                                    '</div>'+
                                     '<div class="col-md-3">'+
                                       '<label>Pais <span class="label label-danger" id="textonombrepaisremitente"></span></label>'+
                                       '<table class="col-md-12">'+
@@ -3082,10 +3406,10 @@ function alta(){
                                               '<input type="hidden" class="form-control" name="numeropaisremitenteanterior" id="numeropaisremitenteanterior" required data-parsley-type="integer">'+
                                               '<input type="text" class="form-control inputnextdet" name="paisremitente" id="paisremitente" value="'+paisempresa+'" required>'+
                                             '</div>'+
-                                          '</td>'+    
-                                        '</tr>'+    
+                                          '</td>'+
+                                        '</tr>'+
                                       '</table>'+
-                                    '</div>'+ 
+                                    '</div>'+
                                     '<div class="col-md-3">'+
                                       '<label>Código Postal <span class="label label-danger" id="textonombrecpremitente"></span></label>'+
                                       '<table class="col-md-12">'+
@@ -3099,12 +3423,12 @@ function alta(){
                                               '<input type="hidden" class="form-control" name="numerocpremitenteanterior" id="numerocpremitenteanterior" required data-parsley-type="integer">'+
                                               '<input type="text" class="form-control inputnextdet" name="cpremitente" id="cpremitente" value="'+cpempresa+'" required>'+
                                             '</div>'+
-                                          '</td>'+    
-                                        '</tr>'+    
+                                          '</td>'+
+                                        '</tr>'+
                                       '</table>'+
-                                    '</div>'+ 
+                                    '</div>'+
                                 '</div>'+
-                            '</div>'+ 
+                            '</div>'+
                             '<div role="tabpanel" class="tab-pane fade" id="destinotab">'+
                               '<div class="row">'+
                                   '<div class="col-md-2">'+
@@ -3158,10 +3482,10 @@ function alta(){
                                             '<input type="hidden" class="form-control" name="numeromunicipiodestinatarioanterior" id="numeromunicipiodestinatarioanterior" required data-parsley-type="integer">'+
                                             '<input type="text" class="form-control inputnextdet" name="municipiodestinatario" id="municipiodestinatario" required>'+
                                           '</div>'+
-                                        '</td>'+    
-                                      '</tr>'+    
+                                        '</td>'+
+                                      '</tr>'+
                                     '</table>'+
-                                  '</div>'+ 
+                                  '</div>'+
                               '</div>'+
                               '<div class="row">'+
                                   '<div class="col-md-3">'+
@@ -3177,10 +3501,10 @@ function alta(){
                                             '<input type="hidden" class="form-control" name="numeroestadodestinatarioanterior" id="numeroestadodestinatarioanterior" required data-parsley-type="integer">'+
                                             '<input type="text" class="form-control inputnextdet" name="estadodestinatario" id="estadodestinatario" required>'+
                                           '</div>'+
-                                        '</td>'+    
-                                      '</tr>'+    
+                                        '</td>'+
+                                      '</tr>'+
                                     '</table>'+
-                                  '</div>'+ 
+                                  '</div>'+
                                   '<div class="col-md-3">'+
                                     '<label>Pais <span class="label label-danger" id="textonombrepaisdestinatario"></span></label>'+
                                     '<table class="col-md-12">'+
@@ -3194,10 +3518,10 @@ function alta(){
                                             '<input type="hidden" class="form-control" name="numeropaisdestinatarioanterior" id="numeropaisdestinatarioanterior" required data-parsley-type="integer">'+
                                             '<input type="text" class="form-control inputnextdet" name="paisdestinatario" id="paisdestinatario" required>'+
                                           '</div>'+
-                                        '</td>'+    
-                                      '</tr>'+    
+                                        '</td>'+
+                                      '</tr>'+
                                     '</table>'+
-                                  '</div>'+ 
+                                  '</div>'+
                                   '<div class="col-md-3">'+
                                     '<label>Código Postal <span class="label label-danger" id="textonombrecpdestinatario"></span></label>'+
                                     '<table class="col-md-12">'+
@@ -3211,10 +3535,10 @@ function alta(){
                                             '<input type="hidden" class="form-control" name="numerocpdestinatarioanterior" id="numerocpdestinatarioanterior" required data-parsley-type="integer">'+
                                             '<input type="text" class="form-control inputnextdet" name="cpdestinatario" id="cpdestinatario" required>'+
                                           '</div>'+
-                                        '</td>'+    
-                                      '</tr>'+    
+                                        '</td>'+
+                                      '</tr>'+
                                     '</table>'+
-                                  '</div>'+ 
+                                  '</div>'+
                               '</div>'+
                             '</div>'+
                             '<div role="tabpanel" class="tab-pane fade" id="autotransportetab">'+
@@ -3232,10 +3556,10 @@ function alta(){
                                           '<input type="hidden" class="form-control" name="numerovehiculoempresaanterior" id="numerovehiculoempresaanterior" required data-parsley-type="integer">'+
                                           '<input type="hidden" class="form-control" name="vehiculoempresa" id="vehiculoempresa" required readonly>'+
                                         '</div>'+
-                                      '</td>'+    
-                                    '</tr>'+    
+                                      '</td>'+
+                                    '</tr>'+
                                   '</table>'+
-                                '</div>'+ 
+                                '</div>'+
                                 '<div class="col-md-2">'+
                                     '<label>Permiso de la SCT</label>'+
                                     '<input type="text" class="form-control inputnextdet" name="permisosct" id="permisosct" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
@@ -3267,10 +3591,10 @@ function alta(){
                                           '<input type="hidden" class="form-control" name="claveconfigautotransporteanterior" id="claveconfigautotransporteanterior" required data-parsley-type="integer">'+
                                           '<input type="hidden" class="form-control" name="configautotransporte" id="configautotransporte" required readonly>'+
                                         '</div>'+
-                                      '</td>'+    
-                                    '</tr>'+    
+                                      '</td>'+
+                                    '</tr>'+
                                   '</table>'+
-                                '</div>'+ 
+                                '</div>'+
                                 '<div class="col-md-2">'+
                                     '<label>Placa Vehículo Motor</label>'+
                                     '<input type="text" class="form-control inputnextdet" name="placavehiculo" id="placavehiculo" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
@@ -3284,9 +3608,9 @@ function alta(){
                                     '<input type="text" class="form-control inputnextdet" name="subtiporemolque" id="subtiporemolque" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                                 '<div class="col-md-2">'+
-                                    '<label>Placa</label>'+
+                                    '<label>Placa Remolque</label>'+
                                     '<input type="text" class="form-control inputnextdet" name="placaremolque" id="placaremolque" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
-                                '</div>'+  
+                                '</div>'+
                               '</div>'+
                             '</div>'+
                             '<div role="tabpanel" class="tab-pane fade" id="operadortab">'+
@@ -3296,7 +3620,7 @@ function alta(){
                                   '<table class="col-md-12">'+
                                     '<tr>'+
                                       '<td>'+
-                                        '<div class="btn bg-blue waves-effect" id="btnobteneroperadores" onclick="obteneroperadores()">Seleccionar</div>'+
+                                        '<div class="btn bg-blue waves-effect" id="btnobteneroperadores" onclick="obteneroperadoresempresa()">Seleccionar</div>'+
                                       '</td>'+
                                       '<td>'+
                                         '<div class="form-line">'+
@@ -3304,10 +3628,10 @@ function alta(){
                                           '<input type="hidden" class="form-control" name="numerooperadoranterior" id="numerooperadoranterior" required data-parsley-type="integer">'+
                                           '<input type="hidden" class="form-control" name="operador" id="operador" required readonly>'+
                                         '</div>'+
-                                      '</td>'+    
-                                    '</tr>'+    
+                                      '</td>'+
+                                    '</tr>'+
                                   '</table>'+
-                                '</div>'+ 
+                                '</div>'+
                                 '<div class="col-md-3">'+
                                   '<label>Clave de Transporte <span class="label label-danger" id="textonombreclavetransporte"></span></label>'+
                                   '<table class="col-md-12">'+
@@ -3321,10 +3645,10 @@ function alta(){
                                           '<input type="hidden" class="form-control" name="clavetransporteanterior" id="clavetransporteanterior" required data-parsley-type="integer">'+
                                           '<input type="hidden" class="form-control" name="nombreclavetransporte" id="nombreclavetransporte" required readonly>'+
                                         '</div>'+
-                                      '</td>'+    
-                                    '</tr>'+    
+                                      '</td>'+
+                                    '</tr>'+
                                   '</table>'+
-                                '</div>'+ 
+                                '</div>'+
                                 '<div class="col-md-2">'+
                                     '<label>R.F.C.</label>'+
                                     '<input type="text" class="form-control inputnextdet" name="rfcoperador" id="rfcoperador" required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
@@ -3378,10 +3702,10 @@ function alta(){
                                         '<input type="hidden" class="form-control" name="numeromunicipiooperadoranterior" id="numeromunicipiooperadoranterior" required data-parsley-type="integer">'+
                                         '<input type="text" class="form-control inputnextdet" name="municipiooperador" id="municipiooperador" required>'+
                                       '</div>'+
-                                    '</td>'+    
-                                  '</tr>'+    
+                                    '</td>'+
+                                  '</tr>'+
                                 '</table>'+
-                              '</div>'+ 
+                              '</div>'+
                               '<div class="col-md-3">'+
                                 '<label>Estado <span class="label label-danger" id="textonombreestadooperador"></span></label>'+
                                 '<table class="col-md-12">'+
@@ -3395,10 +3719,10 @@ function alta(){
                                         '<input type="hidden" class="form-control" name="numeroestadooperadoranterior" id="numeroestadooperadoranterior" required data-parsley-type="integer">'+
                                         '<input type="text" class="form-control inputnextdet" name="estadooperador" id="estadooperador"  required>'+
                                       '</div>'+
-                                    '</td>'+    
-                                  '</tr>'+    
+                                    '</td>'+
+                                  '</tr>'+
                                 '</table>'+
-                              '</div>'+ 
+                              '</div>'+
                               '<div class="col-md-3">'+
                                 '<label>Pais <span class="label label-danger" id="textonombrepaisoperador"></span></label>'+
                                 '<table class="col-md-12">'+
@@ -3412,10 +3736,10 @@ function alta(){
                                         '<input type="hidden" class="form-control" name="numeropaisoperadoranterior" id="numeropaisoperadoranterior" required data-parsley-type="integer">'+
                                         '<input type="text" class="form-control inputnextdet" name="paisoperador" id="paisoperador"  required>'+
                                       '</div>'+
-                                    '</td>'+    
-                                  '</tr>'+    
+                                    '</td>'+
+                                  '</tr>'+
                                 '</table>'+
-                              '</div>'+ 
+                              '</div>'+
                               '<div class="col-md-3">'+
                                 '<label>Código Postal <span class="label label-danger" id="textonombrecpoperador"></span></label>'+
                                 '<table class="col-md-12">'+
@@ -3429,10 +3753,10 @@ function alta(){
                                         '<input type="hidden" class="form-control" name="numerocpoperadoranterior" id="numerocpoperadoranterior" required data-parsley-type="integer">'+
                                         '<input type="text" class="form-control inputnextdet" name="cpoperador" id="cpoperador" required>'+
                                       '</div>'+
-                                    '</td>'+    
-                                  '</tr>'+    
+                                    '</td>'+
+                                  '</tr>'+
                                 '</table>'+
-                              '</div>'+ 
+                              '</div>'+
                             '</div>'+
                           '</div>'+
                         '</div>'+
@@ -3453,51 +3777,52 @@ function alta(){
                                             '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
                                                   '<th class="'+background_tables+'">#</th>'+
+                                                  '<th class="customercolortheadth">Partida</th>'+
                                                   '<th class="'+background_tables+'">Código</th>'+
                                                   '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
-                                                  '<th class="customercolortheadth">Uda</th>'+
                                                   '<th class="customercolortheadth">Cantidad</th>'+
-                                                  '<th class="customercolortheadth">Precio $</th>'+
-                                                  '<th class="'+background_tables+'">Importe $</th>'+
+                                                  '<th class="customercolortheadth">Peso Unitario KG</th>'+
+                                                  '<th class="'+background_tables+'">Peso Total</th>'+
                                                   '<th class="customercolortheadth" hidden>Dcto %</th>'+
                                                   '<th class="customercolortheadth" hidden>Dcto $</th>'+
                                                   '<th class="'+background_tables+'" hidden>Importe Descuento $</th>'+
                                                   '<th class="customercolortheadth" hidden>Ieps %</th>'+
                                                   '<th class="'+background_tables+'" hidden>Traslado Ieps $</th>'+
-                                                  '<th class="'+background_tables+'">SubTotal $</th>'+
-                                                  '<th class="customercolortheadth">Iva %</th>'+
-                                                  '<th class="'+background_tables+'">Traslado Iva $</th>'+
+                                                  '<th class="'+background_tables+' hidden">SubTotal $</th>'+
+                                                  '<th class="customercolortheadth" hidden>Iva %</th>'+
+                                                  '<th class="'+background_tables+' hidden">Traslado Iva $</th>'+
                                                   '<th class="customercolortheadth" hidden>Retención Iva %</th>'+
                                                   '<th class="'+background_tables+'" hidden>Retención Iva $</th>'+
                                                   '<th class="customercolortheadth" hidden>Retención Isr %</th>'+
                                                   '<th class="'+background_tables+'" hidden>Retención Isr $</th>'+
                                                   '<th class="customercolortheadth" hidden>Retención Ieps %</th>'+
                                                   '<th class="'+background_tables+'" hidden>Retención Ieps $</th>'+
-                                                  '<th class="'+background_tables+'">Total $</th>'+
+                                                  '<th class="'+background_tables+' hidden">Total $</th>'+
                                                   '<th class="customercolortheadth">Material Peligroso</th>'+
-                                                  '<th class="customercolortheadth">Peso en KG</th>'+
-                                                  '<th class="customercolortheadth">Moneda</th>'+
+                                                  '<th class="customercolortheadth">Embalaje</th>'+
+                                                  '<th class="customercolortheadth" hidden>Peso en KG</th>'+
+                                                  '<th class="customercolortheadth" hidden>Moneda</th>'+
                                                   '<th class="customercolortheadth">ClaveProducto</th>'+
                                                   '<th class="'+background_tables+'">Nombre ClaveProducto</th>'+
                                                   '<th class="customercolortheadth">ClaveUnidad</th>'+
                                                   '<th class="'+background_tables+'">Nombre ClaveUnidad</th>'+
                                                 '</tr>'+
                                             '</thead>'+
-                                            '<tbody>'+           
+                                            '<tbody>'+
                                             '</tbody>'+
                                         '</table>'+
                                     '</div>'+
-                                '</div>'+ 
-                            '</div>'+ 
+                                '</div>'+
+                            '</div>'+
                         '</div>'+
                         '<div class="row">'+
-                          '<div class="col-md-6">'+   
+                          '<div class="col-md-6">'+
                               '<label>Observaciones</label>'+
                               '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
-                          '</div>'+ 
-                          '<div class="col-md-3">'+
                           '</div>'+
                           '<div class="col-md-3">'+
+                          '</div>'+
+                          /*'<div class="col-md-3">'+
                               '<table class="table table-striped table-hover">'+
                                   '<tr>'+
                                       '<td class="tdmod">Importe</td>'+
@@ -3520,11 +3845,11 @@ function alta(){
                                       '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
                                   '</tr>'+
                               '</table>'+
-                          '</div>'+
+                          '</div>'+*/
                         '</div>'+
                         '<div class="row">'+
-                          '<div class="col-md-12">'+   
-                            '<h5 id="mensajecalculoscompra"></h5>'+  
+                          '<div class="col-md-12">'+
+                            '<h5 id="mensajecalculoscompra"></h5>'+
                           '</div>'+
                         '</div>'+
                     '</div>'+
@@ -3712,32 +4037,77 @@ function alta(){
   $(".inputnextdet").keyup(function (e) {
     //recomentable para mayor compatibilidad entre navegadores.
     var code = (e.keyCode ? e.keyCode : e.which);
-    var index = $(this).index(".inputnextdet");          
+    var index = $(this).index(".inputnextdet");
     switch(code){
       case 13:
-        $(".inputnextdet").eq(index + 1).focus().select(); 
+        $(".inputnextdet").eq(index + 1).focus().select();
         break;
       case 39:
-        $(".inputnextdet").eq(index + 1).focus().select(); 
+        $(".inputnextdet").eq(index + 1).focus().select();
         break;
       case 37:
-        $(".inputnextdet").eq(index - 1).focus().select(); 
+        $(".inputnextdet").eq(index - 1).focus().select();
         break;
     }
   });
   setTimeout(function(){$("#folio").focus();},500);
   $("#ModalAlta").modal('show');
 }
+/**
+ * @author Jose Alonso Espinares Romero
+ * @param {*} fila
+ * @description Función que calcula el peso total de la partida
+ */
+function calcularPesoPartida(fila){
+    let cuentaFilas= 0
+    $("tr.filasproductos").each(function () {
+        if(fila === cuentaFilas){
+            let cantidadPartida = $(".cantidadPartida", this).val();
+            let pesoUnitario = $('.pesopartida', this).val()
+            let pesototalpartida = $('.pesototalpartida',this).val()
+
+            pesototalpartida = new Decimal(cantidadPartida).times(pesoUnitario)
+
+            $('.pesototalpartida', this).val(number_format(round(pesototalpartida, numerodecimales), numerodecimales, '.', ''));
+        }
+        cuentaFilas++;
+    })
+    calcularpartidas()
+    //calcula los totales monetarios
+}
+/**
+ * @author Jose Alonso Espinares Romero
+ * @description Función que calcula el numero de mercancias y el peso bruto total
+ */
+ function calcularpartidas(){
+    let cuentaFilas= 0
+    let peso = 0
+    $("tr.filasproductos").each(function () {
+        cuentaFilas++;
+    })
+    $('#numerototalmercancias').val(cuentaFilas)
+
+    cuentaFilas = 0
+    //calcula El total del peso bruto total de la partida
+    $("tr.filasproductos").each(function(){
+        peso = new Decimal(peso).plus($('.pesototalpartida', this).val())
+        $('.partidapartida',this).val(cuentaFilas+1)
+        cuentaFilas ++
+    })
+    $('#pesoTotalBruto').val(number_format(peso, numerodecimales, '.', ''))
+
+
+}
 //calcular total de la orden de compra
 function calculartotalesfilas(fila){
   // for each por cada fila:
   var cuentaFilas = 0;
-  $("tr.filasproductos").each(function () { 
+  $("tr.filasproductos").each(function () {
     if(fila === cuentaFilas){
       // obtener los datos de la fila:
       var cantidadpartida = $(".cantidadpartida", this).val();
       var preciopartida = $('.preciopartida', this).val();
-      var importepartida = $('.importepartida', this).val(); 
+      var importepartida = $('.importepartida', this).val();
       var descuentopesospartida = $('.descuentopesospartida', this).val();
       var importedescuentopesospartida = $('.importedescuentopesospartida', this).val();
       var iepsporcentajepartida = $(".iepsporcentajepartida", this).val();
@@ -3751,7 +4121,7 @@ function calculartotalesfilas(fila){
       var retencionisrpesospartida = $(".retencionisrpesospartida", this).val();
       var retencioniepsporcentajepartida = $(".retencioniepsporcentajepartida", this).val();
       var retencioniepspesospartida = $(".retencioniepspesospartida", this).val();
-      var totalpesospartida = $('.totalpesospartida', this).val(); 
+      var totalpesospartida = $('.totalpesospartida', this).val();
       //importe de la partida
       importepartida =  new Decimal(cantidadpartida).times(preciopartida);
       $('.importepartida', this).val(number_format(round(importepartida, numerodecimales), numerodecimales, '.', ''));
@@ -3760,7 +4130,7 @@ function calculartotalesfilas(fila){
       if(multiplicaciondescuentoporcentajepartida.d[0] > parseInt(0)){
         var descuentoporcentajepartida = new Decimal(multiplicaciondescuentoporcentajepartida/importepartida);
         $('.descuentoporcentajepartida', this).val(number_format(round(descuentoporcentajepartida, numerodecimales), numerodecimales, '.', ''));
-      }      
+      }
       //importe menos descuento de la partida
       importedescuentopesospartida =  new Decimal(importepartida).minus(descuentopesospartida);
       $('.importedescuentopesospartida', this).val(number_format(round(importedescuentopesospartida, numerodecimales), numerodecimales, '.', ''));
@@ -3794,11 +4164,10 @@ function calculartotalesfilas(fila){
       var menosretencioniepspesospartida = new Decimal(menosretencionisrpesospartida).minus(retencioniepspesospartida);
       totalpesospartida = new Decimal(menosretencioniepspesospartida);
       $('.totalpesospartida', this).val(truncar(totalpesospartida, numerodecimales).toFixed(parseInt(numerodecimales)));
-      calculartotal();
       calculartotalcompranotacliente();
       //asignar el traslado traslado iva partida
       $(".trasladoivapartida", this).val(ivaporcentajepartida+',Tasa');
-    }  
+    }
     cuentaFilas++;
   });
 }
@@ -3806,38 +4175,36 @@ function calculartotalesfilas(fila){
 function cambiodecantidadopreciopartida(fila){
   var cuentaFilas = 0;
   $("tr.filasproductos").each(function () {
-    if(fila === cuentaFilas){  
+    if(fila === cuentaFilas){
       calculardescuentoporcentajepartida(fila);
       calculartotalesfilas(fila);
-      calculartotal();
-    }  
+    }
     cuentaFilas++;
-  });  
+  });
 }
 //calcular el porcentaje de descuento cuando el descuento en pesos se modifique
 function calculardescuentoporcentajepartida(fila){
   var cuentaFilas = 0;
   $("tr.filasproductos").each(function () {
-    if(fila === cuentaFilas){  
+    if(fila === cuentaFilas){
       //descuento en porcentaje de la partida
-      var importepartida = $('.importepartida', this).val(); 
-      var descuentopesospartida = $('.descuentopesospartida', this).val(); 
+      var importepartida = $('.importepartida', this).val();
+      var descuentopesospartida = $('.descuentopesospartida', this).val();
       var multiplicaciondescuentoporcentajepartida  =  new Decimal(descuentopesospartida).times(100);
       if(multiplicaciondescuentoporcentajepartida.d[0] > parseInt(0)){
         var descuentoporcentajepartida = new Decimal(multiplicaciondescuentoporcentajepartida/importepartida);
         $('.descuentoporcentajepartida', this).val(number_format(round(descuentoporcentajepartida, numerodecimales), numerodecimales, '.', ''));
         calculartotalesfilas(fila);
-        calculartotal();
       }
-    }  
+    }
     cuentaFilas++;
-  });    
+  });
 }
 //calcular el descuento en pesos cuando hay cambios en el porcentaje de descuento
 function calculardescuentopesospartida(fila){
   var cuentaFilas = 0;
   $("tr.filasproductos").each(function () {
-    if(fila === cuentaFilas){   
+    if(fila === cuentaFilas){
       //descuento en pesos de la partida
       var importepartida = $('.importepartida', this).val();
       var descuentoporcentajepartida = $('.descuentoporcentajepartida', this).val();
@@ -3846,57 +4213,22 @@ function calculardescuentopesospartida(fila){
         var descuentopesospartida = new Decimal(multiplicaciondescuentopesospartida/100);
         $('.descuentopesospartida', this).val(number_format(round(descuentopesospartida, numerodecimales), numerodecimales, '.', ''));
         calculartotalesfilas(fila);
-        calculartotal();
       }
-    }  
+    }
     cuentaFilas++;
-  }); 
-}      
-//calcular totales de orden de compra
-function calculartotal(){
-  var importe = 0;
-  var descuento = 0;
-  var subtotal= 0;
-  var iva = 0;
-  var total = 0;
-  var totalnota = 0;
-  var ieps = 0;
-  var retencioniva = 0;
-  var retencionisr = 0;
-  var retencionieps = 0;
-  $("tr.filasproductos").each(function(){
-    importe = new Decimal(importe).plus($(".importepartida", this).val());
-    descuento = new Decimal(descuento).plus($(".descuentopesospartida", this).val());
-    subtotal = new Decimal(subtotal).plus($(".subtotalpartida", this).val());
-    iva = new Decimal(iva).plus($(".trasladoivapesospartida", this).val());
-    total = new Decimal(total).plus($(".totalpesospartida", this).val());
-    totalnota = new Decimal(total).plus($(".totalpesospartida", this).val());
-    ieps = new Decimal(ieps).plus($(".trasladoiepspesospartida", this).val());
-    retencioniva = new Decimal(retencioniva).plus($(".retencionivapesospartida", this).val());
-    retencionisr = new Decimal(retencionisr).plus($(".retencionisrpesospartida", this).val());
-    retencionieps = new Decimal(retencionieps).plus($(".retencioniepspesospartida", this).val());
-  }); 
-  $("#importe").val(number_format(round(importe, numerodecimales), numerodecimales, '.', ''));
-  $("#descuento").val(number_format(round(descuento, numerodecimales), numerodecimales, '.', ''));
-  $("#subtotal").val(number_format(round(subtotal, numerodecimales), numerodecimales, '.', ''));
-  $("#iva").val(number_format(round(iva, numerodecimales), numerodecimales, '.', ''));
-  $("#total").val(number_format(round(total, numerodecimales), numerodecimales, '.', ''));
-  $("#totalnota").val(number_format(round(total, numerodecimales), numerodecimales, '.', ''));
-  $("#ieps").val(number_format(round(ieps, numerodecimales), numerodecimales, '.', ''));
-  $("#retencioniva").val(number_format(round(retencioniva, numerodecimales), numerodecimales, '.', ''));
-  $("#retencionisr").val(number_format(round(retencionisr, numerodecimales), numerodecimales, '.', ''));
-  $("#retencionieps").val(number_format(round(retencionieps, numerodecimales), numerodecimales, '.', ''));
+  });
 }
 //eliminar una fila en la tabla
 function eliminarfila(fila){
-  var confirmacion = confirm("Esta seguro de eliminar la fila?"); 
-  if (confirmacion == true) { 
+  var confirmacion = confirm("Esta seguro de eliminar la fila?");
+  if (confirmacion == true) {
     $("#filaproducto"+fila).remove();
     contadorfilas--; //importante para todos los calculo en el modulo de orden de compra se debe restar al contadorfilas la fila que se acaba de eliminar
-    renumerarfilas();//importante para todos los calculo en el modulo de orden de compra 
+    renumerarfilas();//importante para todos los calculo en el modulo de orden de compra
     comprobarfilas();
     comprobarfilasfacturanotacliente();
-    calculartotal();
+    calcularpartidas()
+    calcularPesoPartida()
   }
 }
 //comprobar numero filas de la tabla precios clientes
@@ -3957,7 +4289,7 @@ function renumerarfilas(){
   for (var i = 0; i < lista.length; i++) {
     lista[i].setAttribute("onchange", "formatocorrectoinputcantidades(this);calculartotalesfilas("+i+')');
   }
-}  
+}
 //revisar si hay existencias de la partida en el almacen
 function revisarcantidadnotavscantidadfactura(fila){
   var folio = $("#folio").val();
@@ -3977,7 +4309,7 @@ function revisarcantidadnotavscantidadfactura(fila){
 //funcion asincrona para buscar existencias de la partida
 function comprobarcantidadnotavscantidadfactura(almacen, codigopartida, folio, serie, factura){
   return new Promise((ejecuta)=>{
-    setTimeout(function(){ 
+    setTimeout(function(){
       $.get(notas_credito_cliente_comprobar_cantidad_nota_vs_cantidad_factura,{'almacen':almacen,'codigopartida':codigopartida,'folio':folio,'serie':serie,'factura':factura},cantidadmaximapermitida=>{
         return ejecuta(cantidadmaximapermitida);
       })
@@ -3992,13 +4324,13 @@ $("#btnGuardar").on('click', function (e) {
   if (form.parsley().isValid()){
     var numerofilas = $("#numerofilas").val();
     var numerofilasfacturas = $("#numerofilasfacturas").val();
-    if(parseInt(numerofilas) > 0 && parseInt(numerofilasfacturas) > 0){
+    if(parseInt(numerofilas) > 0){
       var diferencia = $("#diferencia").val();
-      if(parseFloat(diferencia) <= parseFloat(0.01)){
+      if(true){
         $('.page-loader-wrapper').css('display', 'block');
         $.ajax({
           headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-          url:notas_credito_clientes_guardar,
+          url:carta_porte_guardar,
           type: "post",
           dataType: "html",
           data: formData,
@@ -4034,276 +4366,561 @@ $("#btnGuardar").on('click', function (e) {
   form.parsley().validate();
 });
 //modificacion compra
-function obtenerdatos(notamodificar){
+function obtenerdatos(cartaporte){
   $('.page-loader-wrapper').css('display', 'block');
-  $.get(notas_credito_clientes_obtener_nota_cliente,{notamodificar:notamodificar },function(data){
-    $("#titulomodal").html('Modificación Nota Crédito Cliente --- STATUS : ' + data.notacliente.Status);
+  $.get(carta_porte_obtener_carta_porte,{cartaporte:cartaporte },function(data){
+    $("#titulomodal").html('Modificación Carta Porte --- STATUS : MODIFICACIÓN');
     //formulario modificacion
     var tabs =    '<div class="row">'+
                     '<div class="col-md-12">'+
                         '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
                             '<li role="presentation" class="active">'+
-                                '<a href="#compratab" data-toggle="tab">Nota</a>'+
+                                '<a href="#cartaportetab" data-toggle="tab">Carta Porte</a>'+
                             '</li>'+
                             '<li role="presentation">'+
-                                '<a href="#emisortab" data-toggle="tab">Emisor</a>'+
+                                '<a href="#origentab" data-toggle="tab">Datos Remitente</a>'+
                             '</li>'+
                             '<li role="presentation">'+
-                                '<a href="#receptortab" data-toggle="tab">Receptor ó Cliente</a>'+
+                                '<a href="#destinotab" data-toggle="tab">Datos Destinatario</a>'+
+                            '</li>'+
+                            '<li role="presentation">'+
+                                '<a href="#autotransportetab" data-toggle="tab">Datos Auto Transparente</a>'+
+                            '</li>'+
+                            '<li role="presentation">'+
+                                '<a href="#operadortab" data-toggle="tab">Datos Operador</a>'+
                             '</li>'+
                         '</ul>'+
                         '<div class="tab-content">'+
-                            '<div role="tabpanel" class="tab-pane fade in active" id="compratab">'+
-                                '<div class="row">'+
+                        '<div role="tabpanel" class="tab-pane fade in active" id="cartaportetab">'+
+                            '<div class="row">'+
                                     '<div class="col-md-3">'+
-                                        '<label>Nota <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp;<b style="color:#F44336 !important;" id="esquematexto"> Esquema: '+esquema+'</b>  <div class="btn btn-xs bg-red waves-effect" id="btnobtenerfoliosnotas" onclick="obtenerfoliosnotas()">Cambiar</div></label>'+
+                                        '<label>Nota <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp; <b style="color:#F44336 !important;" id="esquematexto"> Esquema: '+esquema+'</b>  <div class="btn btn-xs bg-red waves-effect" id="btnobtenerfoliosnotas" onclick="obtenerfoliosnotas()">Cambiar</div></label>'+
                                         '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                                         '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
                                         '<input type="hidden" class="form-control" name="stringfacturasseleccionadas" id="stringfacturasseleccionadas" readonly required>'+
-                                        '<input type="hidden" class="form-control" name="notaclientebd" id="notaclientebd" readonly>'+
                                         '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
                                         '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
                                         '<input type="hidden" class="form-control" name="numerofilasfacturas" id="numerofilasfacturas" readonly>'+
                                         '<input type="hidden" class="form-control" name="tipodetalles" id="tipodetalles" readonly>'+
                                         '<input type="hidden" class="form-control" name="diferenciatotales" id="diferenciatotales" readonly required>'+
                                         '<input type="hidden" class="form-control" name="esquema" id="esquema" value="'+esquema+'" readonly data-parsley-length="[1, 10]">'+
-                                    '</div>'+  
+                                        '<input type="hidden" class="form-control" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" readonly>'+
+                                        '<input type="hidden" class="form-control" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" readonly>'+
+                                    '</div>'+
                                     '<div class="col-md-3">'+
-                                        '<label>Cliente <span class="label label-danger" id="textonombrecliente"></span></label>'+
-                                        '<table class="col-md-12">'+
-                                            '<tr>'+
-                                                '<td>'+
-                                                    '<div class="btn bg-blue waves-effect" id="btnobtenerclientes" onclick="obtenerclientes()">Seleccionar</div>'+
-                                                '</td>'+
-                                                '<td>'+
-                                                    '<div class="form-line">'+
-                                                        '<input type="text" class="form-control" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
-                                                        '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
-                                                        '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
-                                                        '<input type="hidden" class="form-control" name="rfccliente" id="rfccliente" required readonly>'+
-                                                    '</div>'+
-                                                '</td>'+    
-                                            '</tr>'+    
-                                        '</table>'+
-                                    '</div>'+ 
-                                    '<div class="col-md-3">'+
-                                        '<label>Almacen <span class="label label-danger" id="textonombrealmacen"></span></label>'+
-                                        '<table class="col-md-12">'+
-                                            '<tr>'+
-                                                '<td>'+
-                                                    '<div class="btn bg-blue waves-effect" id="btnobteneralmacenes" onclick="obteneralmacenes()">Seleccionar</div>'+
-                                                '</td>'+
-                                                '<td>'+
-                                                    '<div class="form-line">'+
-                                                        '<input type="text" class="form-control inputnextdet" name="numeroalmacen" id="numeroalmacen" required readonly onkeyup="tipoLetra(this)" autocomplete="off">'+
-                                                        '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior"  required data-parsley-type="integer">'+
-                                                        '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
-                                                    '</div>'+
-                                                '</td>'+
-                                            '</tr>'+    
-                                        '</table>'+
+                                    '<label>Cliente <span class="label label-danger" id="textonombrecliente"></span></label>'+
+                                    '<table class="col-md-12">'+
+                                        '<tr>'+
+                                        '<td>'+
+                                            '<div class="btn bg-blue waves-effect" id="btnobtenerclientes" onclick="obtenerclientes()">Seleccionar</div>'+
+                                        '</td>'+
+                                        '<td>'+
+                                            '<div class="form-line">'+
+                                            '<input type="text" class="form-control inputnextdet" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off">'+
+                                            '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
+                                            '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
+                                            '<input type="hidden" class="form-control" name="rfccliente" id="rfccliente" required readonly>'+
+                                            '</div>'+
+                                        '</td>'+
+                                        '</tr>'+
+                                    '</table>'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Fecha</label>'+
-                                        '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required  onkeydown="return false">'+
+                                        '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required  data-parsley-excluded="true" onkeydown="return false">'+
                                         '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+periodohoy+'">'+
                                         '<input type="hidden" class="form-control" name="meshoy" id="meshoy" value="'+meshoy+'">'+
-                                    '</div>'+   
+                                    '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
+                                    '<div class="col-md-2">'+
+                                    '<label>Transporte Internacional</label>'+
+                                    '<select name="transporteinternacional" id="transporteinternacional" class="form-control select2" style="width:100% !important;" required>'+
+                                        '<option value="Si">Si</option>'+
+                                        '<option value="No" selected>No</option>'+
+                                    '</select>'+
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
+                                        '<label>Total Distancia Recorrida KM</label>'+
+                                        '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet" name="totaldistanciarecorrida" id="totaldistanciarecorrida" value="1.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
+                                        '<label>Total mercancias</label>'+
+                                        '<input type="number" class="form-control inputnextdet" name="numerototalmercancias" id="numerototalmercancias" value="0" required readonly>'+
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
+                                        '<label>Peso Total Bruto</label>'+
+                                        '<input type="number" readonly step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet" name="pesoTotalBruto" id="pesoTotalBruto" value="0.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/">'+
+                                    '</div>'+
+                                    '<div class="col-md-3" id="divbuscarcodigoproducto">'+
+                                    '<label>Escribe el código y presiona la tecla ENTER</label>'+
+                                    '<table class="col-md-12">'+
+                                        '<tr>'+
+                                        '<td>'+
+                                            '<div class="btn bg-blue waves-effect" id="btnobtenerproductos" onclick="listarproductos()">Ver Productos</div>'+
+                                        '</td>'+
+                                        '<td>'+
+                                            '<div class="form-line">'+
+                                            '<input type="text" class="form-control inputnextdet" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" readonly autocomplete="off">'+
+                                            '</div>'+
+                                        '</td>'+
+                                        '</tr>'+
+                                    '</table>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-md-8">'+
+                                    '</div>'
+                                '</div>'+
+                            '</div>'+
+                            //Datos Origen
+                            '<div role="tabpanel" class="tab-pane fade" id="origentab">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-2">'+
+                                        '<label>R.F.C.</label>'+
+                                        '<input type="text" class="form-control inputnextdet" name="rfcremitente" id="rfcremitente" value="'+rfcempresa+'"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                    '</div>'+
+                                    '<div class="col-md-4">'+
+                                        '<label>Nombre</label>'+
+                                        '<input type="text" class="form-control inputnextdet" name="nombreremitente" id="nombreremitente" value="'+nombreempresa+'" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
+                                        '<label>Fecha y Hora Salida</label>'+
+                                        '<input type="datetime-local" class="form-control" name="fechasalida" id="fechasalida" required data-parsley-excluded="true" onkeydown="return false">'+
+                                    '</div>'+
+                                    '<div class="col-md-4">'+
+                                        '<label>Calle</label>'+
+                                        '<input type="text" class="form-control inputnextdet" name="calleremitente" id="calleremitente" value="'+calleempresa+'" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-md-1">'+
+                                        '<label>Número Ext</label>'+
+                                        '<input type="text" class="form-control inputnextdet" name="numeroextremitente" id="numeroextremitente" value="'+noexteriorempresa+'" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '</div>'+
+                                    '<div class="col-md-1">'+
+                                        '<label>Número Int</label>'+
+                                        '<input type="text" class="form-control inputnextdet" name="numerointremitente" id="numerointremitente" value="'+nointeriorempresa+'" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
+                                        '<label>Colonia</label>'+
+                                        '<input type="text" class="form-control inputnextdet" name="coloniaremitente" id="coloniaremitente" value="'+coloniaempresa+'" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
+                                        '<label>Localidad</label>'+
+                                        '<input type="text" class="form-control inputnextdet" name="localidadremitente" id="localidadremitente" value="'+localidadempresa+'" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '</div>'+
                                     '<div class="col-md-3">'+
+                                        '<label>Referencia</label>'+
+                                        '<input type="text" class="form-control inputnextdet" name="referenciaremitente" id="referenciaremitente" value="'+referenciaempresa+'" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                      '<label>Municipio <span class="label label-danger" id="textonombremunicipioremitente"></span></label>'+
                                       '<table class="col-md-12">'+
                                         '<tr>'+
                                           '<td>'+
-                                            '<label>Moneda</label>'+
-                                            '<select name="moneda" id="moneda" class="form-control select2" style="width:100% !important;" required>'+
-                                              '<option value="MXN">MXN</option>'+
-                                              '<option value="USD">USD</option>'+
-                                              '<option value="EUR">EUR</option>'+
-                                            '</select>'+
+                                            '<div class="btn bg-blue waves-effect" id="btnobtenermunicipiosremitente" onclick="obtenermunicipios('+"'remitente'"+')">Seleccionar</div>'+
                                           '</td>'+
                                           '<td>'+
-                                            '<label>Pesos</label>'+
-                                            '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet" name="pesosmoneda" id="pesosmoneda" value="1.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                            '<div class="form-line">'+
+                                              '<input type="hidden" class="form-control" name="numeromunicipioremitente" id="numeromunicipioremitente" required data-parsley-type="integer" autocomplete="off">'+
+                                              '<input type="hidden" class="form-control" name="numeromunicipioremitenteanterior" id="numeromunicipioremitenteanterior" required data-parsley-type="integer">'+
+                                              '<input type="text" class="form-control inputnextdet" name="municipioremitente" id="municipioremitente" value="'+municipioempresa+'" required>'+
+                                            '</div>'+
                                           '</td>'+
                                         '</tr>'+
                                       '</table>'+
-                                    '</div>'+ 
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
                                     '<div class="col-md-3">'+
-                                        '<label>Cargar Facturas</label>'+
-                                        '<div class="btn btn-block bg-blue waves-effect" id="btnlistarfacturas" onclick="listarfacturas()" style="display:none">Agregar Factura</div>'+
-                                    '</div>'+      
-                                    '<div class="col-md-3" id="divbuscarcodigoproducto">'+
-                                      '<label>Escribe DPPP ó el Código y presiona la tecla ENTER</label>'+
+                                      '<label>Estado <span class="label label-danger" id="textonombreestadoremitente"></span></label>'+
                                       '<table class="col-md-12">'+
                                         '<tr>'+
                                           '<td>'+
-                                            '<div class="btn bg-blue waves-effect" id="btnobtenerproductos" onclick="listarproductos()">Ver Productos</div>'+
+                                            '<div class="btn bg-blue waves-effect" id="btnobtenerestadosremitente" onclick="obtenerestados('+"'remitente'"+')">Seleccionar</div>'+
                                           '</td>'+
-                                          '<td>'+ 
+                                          '<td>'+
                                             '<div class="form-line">'+
-                                              '<input type="text" class="form-control inputnextdet" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" readonly autocomplete="off">'+
+                                              '<input type="hidden" class="form-control" name="numeroestadoremitente" id="numeroestadoremitente" required data-parsley-type="integer" autocomplete="off">'+
+                                              '<input type="hidden" class="form-control" name="numeroestadoremitenteanterior" id="numeroestadoremitenteanterior" required data-parsley-type="integer">'+
+                                              '<input type="text" class="form-control inputnextdet" name="estadoremitente" id="estadoremitente" value="'+estadoempresa+'" required>'+
                                             '</div>'+
                                           '</td>'+
-                                        '</tr>'+    
+                                        '</tr>'+
                                       '</table>'+
-                                    '</div>'+                                  
-                                '</div>'+
-                            '</div>'+   
-                            '<div role="tabpanel" class="tab-pane fade" id="emisortab">'+
-                                '<div class="row">'+
-                                    '<div class="col-md-4">'+
-                                        '<label>R.F.C.</label>'+
-                                        '<input type="text" class="form-control inputnextdet" name="emisorrfc" id="emisorrfc" value="'+rfcempresa+'"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                     '</div>'+
-                                    '<div class="col-md-4">'+
-                                        '<label>Emisor Nombre</label>'+
-                                        '<input type="text" class="form-control inputnextdet" name="emisornombre" id="emisornombre" value="'+nombreempresa+'" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
-                                    '</div>'+
-                                    '<div class="col-md-4">'+
-                                        '<label>Confirmación</label>'+
-                                        '<input type="text" class="form-control inputnextdet" name="confirmacion" id="confirmacion" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);">'+
-                                    '</div>'+
-                                '</div>'+
-                                '<div class="row">'+
-                                  '<div class="col-md-4">'+
-                                      '<label>Lugar Expedición <span class="label label-danger" id="textonombrelugarexpedicion"></span></label>'+
+                                    '<div class="col-md-3">'+
+                                      '<label>Pais <span class="label label-danger" id="textonombrepaisremitente"></span></label>'+
                                       '<table class="col-md-12">'+
-                                          '<tr>'+
-                                              '<td>'+
-                                                  '<div class="btn bg-blue waves-effect" onclick="obtenerlugaresexpedicion()">Seleccionar</div>'+
-                                              '</td>'+
-                                              '<td>'+
-                                                  '<div class="form-line">'+
-                                                      '<input type="text" class="form-control inputnextdet" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" required autocomplete="off">'+
-                                                      '<input type="hidden" class="form-control" name="lugarexpedicionanterior" id="lugarexpedicionanterior" value="'+lugarexpedicion+'" required>'+
-                                                  '</div>'+
-                                              '</td>'+
-                                          '</tr>'+    
+                                        '<tr>'+
+                                          '<td>'+
+                                            '<div class="btn bg-blue waves-effect" id="btnobtenerpaisesremitente" onclick="obtenerpaises('+"'remitente'"+')">Seleccionar</div>'+
+                                          '</td>'+
+                                          '<td>'+
+                                            '<div class="form-line">'+
+                                              '<input type="hidden" class="form-control" name="numeropaisremitente" id="numeropaisremitente" required data-parsley-type="integer" autocomplete="off">'+
+                                              '<input type="hidden" class="form-control" name="numeropaisremitenteanterior" id="numeropaisremitenteanterior" required data-parsley-type="integer">'+
+                                              '<input type="text" class="form-control inputnextdet" name="paisremitente" id="paisremitente" value="'+paisempresa+'" required>'+
+                                            '</div>'+
+                                          '</td>'+
+                                        '</tr>'+
                                       '</table>'+
+                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                      '<label>Código Postal <span class="label label-danger" id="textonombrecpremitente"></span></label>'+
+                                      '<table class="col-md-12">'+
+                                        '<tr>'+
+                                          '<td>'+
+                                            '<div class="btn bg-blue waves-effect" id="btnobtenercpsremitente" onclick="obtenercps('+"'remitente'"+')">Seleccionar</div>'+
+                                          '</td>'+
+                                          '<td>'+
+                                            '<div class="form-line">'+
+                                              '<input type="hidden" class="form-control" name="numerocpremitente" id="numerocpremitente" required data-parsley-type="integer" autocomplete="off">'+
+                                              '<input type="hidden" class="form-control" name="numerocpremitenteanterior" id="numerocpremitenteanterior" required data-parsley-type="integer">'+
+                                              '<input type="text" class="form-control inputnextdet" name="cpremitente" id="cpremitente" value="'+cpempresa+'" required>'+
+                                            '</div>'+
+                                          '</td>'+
+                                        '</tr>'+
+                                      '</table>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                            //Datos Destino
+                            '<div role="tabpanel" class="tab-pane fade" id="destinotab">'+
+                              '<div class="row">'+
+                                  '<div class="col-md-2">'+
+                                      '<label>R.F.C.</label>'+
+                                      '<input type="text" class="form-control inputnextdet" name="rfcdestinatario" id="rfcdestinatario"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                   '</div>'+
                                   '<div class="col-md-4">'+
-                                      '<label>Régimen Fiscal <span class="label label-danger" id="textonombreregimenfiscal">'+regimenfiscal+'</span></label>'+
-                                      '<table class="col-md-12">'+
-                                          '<tr>'+
-                                              '<td>'+
-                                                  '<div class="btn bg-blue waves-effect" onclick="obtenerregimenesfiscales()">Seleccionar</div>'+
-                                              '</td>'+
-                                              '<td>'+
-                                                  '<div class="form-line">'+
-                                                      '<input type="text" class="form-control inputnextdet" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" required onkeyup="tipoLetra(this)" autocomplete="off">'+
-                                                      '<input type="hidden" class="form-control" name="claveregimenfiscalanterior" id="claveregimenfiscalanterior" value="'+claveregimenfiscal+'" required readonly onkeyup="tipoLetra(this)">'+
-                                                      '<input type="hidden" class="form-control" name="regimenfiscal" id="regimenfiscal" value="'+regimenfiscal+'" required readonly>'+
-                                                  '</div>'+
-                                              '</td>'+
-                                          '</tr>'+    
-                                      '</table>'+
+                                      '<label>Nombre</label>'+
+                                      '<input type="text" class="form-control inputnextdet" name="nombredestinatario" id="nombredestinatario" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                  '</div>'+
+                                  '<div class="col-md-2">'+
+                                      '<label>Fecha y Hora Llegada</label>'+
+                                      '<input type="datetime-local" class="form-control" name="fechallegada" id="fechallegada" required  data-parsley-excluded="true" onkeydown="return false">'+
                                   '</div>'+
                                   '<div class="col-md-4">'+
-                                      '<label>Tipo Relación  <span class="label label-danger" id="textonombretiporelacion"></span></label>'+
-                                      '<table class="col-md-12">'+
-                                          '<tr>'+
-                                              '<td>'+
-                                                  '<div class="btn bg-blue waves-effect" onclick="obtenertiposrelaciones()">Seleccionar</div>'+
-                                              '</td>'+
-                                              '<td>'+
-                                                  '<div class="form-line">'+
-                                                      '<input type="text" class="form-control inputnextdet" name="clavetiporelacion" id="clavetiporelacion"  onkeyup="tipoLetra(this)" required autocomplete="off">'+
-                                                      '<input type="hidden" class="form-control" name="clavetiporelacionanterior" id="clavetiporelacionanterior"  readonly onkeyup="tipoLetra(this)">'+
-                                                      '<input type="hidden" class="form-control" name="tiporelacion" id="tiporelacion" readonly>'+
-                                                  '</div>'+
-                                              '</td>'+
-                                          '</tr>'+    
-                                      '</table>'+
+                                      '<label>Calle</label>'+
+                                      '<input type="text" class="form-control inputnextdet" name="calledestinatario" id="calledestinatario" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                   '</div>'+
+                              '</div>'+
+                              '<div class="row">'+
+                                  '<div class="col-md-1">'+
+                                      '<label>Número Ext</label>'+
+                                      '<input type="text" class="form-control inputnextdet" name="numeroextdestinatario" id="numeroextdestinatario" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                  '</div>'+
+                                  '<div class="col-md-1">'+
+                                      '<label>Número Int</label>'+
+                                      '<input type="text" class="form-control inputnextdet" name="numerointdestinatario" id="numerointdestinatario" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                  '</div>'+
+                                  '<div class="col-md-2">'+
+                                      '<label>Colonia</label>'+
+                                      '<input type="text" class="form-control inputnextdet" name="coloniadestinatario" id="coloniadestinatario" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                  '</div>'+
+                                  '<div class="col-md-2">'+
+                                      '<label>Localidad</label>'+
+                                      '<input type="text" class="form-control inputnextdet" name="localidaddestinatario" id="localidaddestinatario" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                  '</div>'+
+                                  '<div class="col-md-3">'+
+                                      '<label>Referencia</label>'+
+                                      '<input type="text" class="form-control inputnextdet" name="referenciadestinatario" id="referenciadestinatario" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                  '</div>'+
+                                  '<div class="col-md-3">'+
+                                    '<label>Municipio <span class="label label-danger" id="textonombremunicipiodestinatario"></span></label>'+
+                                    '<table class="col-md-12">'+
+                                      '<tr>'+
+                                        '<td>'+
+                                          '<div class="btn bg-blue waves-effect" id="btnobtenermunicipiosdestinatario">Seleccionar</div>'+
+                                        '</td>'+
+                                        '<td>'+
+                                          '<div class="form-line">'+
+                                            '<input type="hidden" class="form-control" name="numeromunicipiodestinatario" id="numeromunicipiodestinatario" required data-parsley-type="integer" autocomplete="off">'+
+                                            '<input type="hidden" class="form-control" name="numeromunicipiodestinatarioanterior" id="numeromunicipiodestinatarioanterior" required data-parsley-type="integer">'+
+                                            '<input type="text" class="form-control inputnextdet" name="municipiodestinatario" id="municipiodestinatario" required>'+
+                                          '</div>'+
+                                        '</td>'+
+                                      '</tr>'+
+                                    '</table>'+
+                                  '</div>'+
+                              '</div>'+
+                              '<div class="row">'+
+                                  '<div class="col-md-3">'+
+                                    '<label>Estado <span class="label label-danger" id="textonombreestadodestinatario"></span></label>'+
+                                    '<table class="col-md-12">'+
+                                      '<tr>'+
+                                        '<td>'+
+                                          '<div class="btn bg-blue waves-effect" disabled id="btnobtenerestadosdestinatario">Seleccionar</div>'+
+                                        '</td>'+
+                                        '<td>'+
+                                          '<div class="form-line">'+
+                                            '<input type="hidden" class="form-control" name="numeroestadodestinatario" id="numeroestadodestinatario" required data-parsley-type="integer" autocomplete="off">'+
+                                            '<input type="hidden" class="form-control" name="numeroestadodestinatarioanterior" id="numeroestadodestinatarioanterior" required data-parsley-type="integer">'+
+                                            '<input type="text" class="form-control inputnextdet" name="estadodestinatario" id="estadodestinatario" required>'+
+                                          '</div>'+
+                                        '</td>'+
+                                      '</tr>'+
+                                    '</table>'+
+                                  '</div>'+
+                                  '<div class="col-md-3">'+
+                                    '<label>Pais <span class="label label-danger" id="textonombrepaisdestinatario"></span></label>'+
+                                    '<table class="col-md-12">'+
+                                      '<tr>'+
+                                        '<td>'+
+                                          '<div class="btn bg-blue waves-effect" disabled id="btnobtenerpaisesdestinatario">Seleccionar</div>'+
+                                        '</td>'+
+                                        '<td>'+
+                                          '<div class="form-line">'+
+                                            '<input type="hidden" class="form-control" name="numeropaisdestinatario" id="numeropaisdestinatario" required data-parsley-type="integer" autocomplete="off">'+
+                                            '<input type="hidden" class="form-control" name="numeropaisdestinatarioanterior" id="numeropaisdestinatarioanterior" required data-parsley-type="integer">'+
+                                            '<input type="text" class="form-control inputnextdet" name="paisdestinatario" id="paisdestinatario" required>'+
+                                          '</div>'+
+                                        '</td>'+
+                                      '</tr>'+
+                                    '</table>'+
+                                  '</div>'+
+                                  '<div class="col-md-3">'+
+                                    '<label>Código Postal <span class="label label-danger" id="textonombrecpdestinatario"></span></label>'+
+                                    '<table class="col-md-12">'+
+                                      '<tr>'+
+                                        '<td>'+
+                                          '<div class="btn bg-blue waves-effect" disabled id="btnobtenercpsdestinatario">Seleccionar</div>'+
+                                        '</td>'+
+                                        '<td>'+
+                                          '<div class="form-line">'+
+                                            '<input type="hidden" class="form-control" name="numerocpdestinatario" id="numerocpdestinatario" required data-parsley-type="integer" autocomplete="off">'+
+                                            '<input type="hidden" class="form-control" name="numerocpdestinatarioanterior" id="numerocpdestinatarioanterior" required data-parsley-type="integer">'+
+                                            '<input type="text" class="form-control inputnextdet" name="cpdestinatario" id="cpdestinatario" required>'+
+                                          '</div>'+
+                                        '</td>'+
+                                      '</tr>'+
+                                    '</table>'+
+                                  '</div>'+
+                              '</div>'+
+                            '</div>'+
+                            //Autotransporte
+                            '<div role="tabpanel" class="tab-pane fade" id="autotransportetab">'+
+                              '<div class="row">'+
+                                '<div class="col-md-4">'+
+                                  '<label>Vehiculo Empresa <span class="label label-danger" id="textonombrevehiculoempresa"></span></label>'+
+                                  '<table class="col-md-12">'+
+                                    '<tr>'+
+                                      '<td>'+
+                                        '<div class="btn bg-blue waves-effect" id="btnobtenervehiculosempresa" onclick="obtenervehiculosempresa()">Seleccionar</div>'+
+                                      '</td>'+
+                                      '<td>'+
+                                        '<div class="form-line">'+
+                                          '<input type="text" class="form-control inputnextdet" name="numerovehiculoempresa" id="numerovehiculoempresa" required data-parsley-type="integer" autocomplete="off">'+
+                                          '<input type="hidden" class="form-control" name="numerovehiculoempresaanterior" id="numerovehiculoempresaanterior" required data-parsley-type="integer">'+
+                                          '<input type="hidden" class="form-control" name="vehiculoempresa" id="vehiculoempresa" required readonly>'+
+                                        '</div>'+
+                                      '</td>'+
+                                    '</tr>'+
+                                  '</table>'+
                                 '</div>'+
-                            '</div>'+ 
+                                '<div class="col-md-2">'+
+                                    '<label>Permiso de la SCT</label>'+
+                                    '<input type="text" class="form-control inputnextdet" name="permisosct" id="permisosct" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                                '<div class="col-md-2">'+
+                                    '<label>Número de Permiso de la SCT</label>'+
+                                    '<input type="text" class="form-control inputnextdet" name="numeropermisosct" id="numeropermisosct" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                                '<div class="col-md-2">'+
+                                    '<label>Nombre de Aseguradora</label>'+
+                                    '<input type="text" class="form-control inputnextdet" name="nombreaseguradora" id="nombreaseguradora" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                                '<div class="col-md-2">'+
+                                    '<label>Número de Póliza de Seguro</label>'+
+                                    '<input type="text" class="form-control inputnextdet" name="numeropolizaseguro" id="numeropolizaseguro" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                              '</div>'+
+                              '<div class="row">'+
+                                '<div class="col-md-3">'+
+                                  '<label>Configuración Vehicular <span class="label label-danger" id="textonombreconfigautotransporte"></span></label>'+
+                                  '<table class="col-md-12">'+
+                                    '<tr>'+
+                                      '<td>'+
+                                        '<div class="btn bg-blue waves-effect" id="btnobtenerconfigautotransporte" onclick="obtenerconfigautotransporte()">Seleccionar</div>'+
+                                      '</td>'+
+                                      '<td>'+
+                                        '<div class="form-line">'+
+                                          '<input type="text" class="form-control inputnextdet" name="claveconfigautotransporte" id="claveconfigautotransporte" required autocomplete="off" onkeyup="tipoLetra(this);">'+
+                                          '<input type="hidden" class="form-control" name="claveconfigautotransporteanterior" id="claveconfigautotransporteanterior" required data-parsley-type="integer">'+
+                                          '<input type="hidden" class="form-control" name="configautotransporte" id="configautotransporte" required readonly>'+
+                                        '</div>'+
+                                      '</td>'+
+                                    '</tr>'+
+                                  '</table>'+
+                                '</div>'+
+                                '<div class="col-md-2">'+
+                                    '<label>Placa Vehículo Motor</label>'+
+                                    '<input type="text" class="form-control inputnextdet" name="placavehiculo" id="placavehiculo" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                                '<div class="col-md-2">'+
+                                    '<label>Año Modelo Vehículo Motor</label>'+
+                                    '<input type="text" class="form-control inputnextdet" name="anovehiculo" id="anovehiculo" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                                '<div class="col-md-2">'+
+                                    '<label>SubTipo de Remolque</label>'+
+                                    '<input type="text" class="form-control inputnextdet" name="subtiporemolque" id="subtiporemolque" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                                '<div class="col-md-2">'+
+                                    '<label>Placa Remolque</label>'+
+                                    '<input type="text" class="form-control inputnextdet" name="placaremolque" id="placaremolque" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                              '</div>'+
+                            '</div>'+
+                            //Datos Operador
+                            '<div role="tabpanel" class="tab-pane fade" id="operadortab">'+
+                              '<div class="row">'+
+                                '<div class="col-md-3">'+
+                                  '<label>Operador <span class="label label-danger" id="textonombreoperador"></span></label>'+
+                                  '<table class="col-md-12">'+
+                                    '<tr>'+
+                                      '<td>'+
+                                        '<div class="btn bg-blue waves-effect" id="btnobteneroperadores" onclick="obteneroperadoresempresa()">Seleccionar</div>'+
+                                      '</td>'+
+                                      '<td>'+
+                                        '<div class="form-line">'+
+                                          '<input type="text" class="form-control inputnextdet" name="numerooperador" id="numerooperador" required data-parsley-type="integer" autocomplete="off">'+
+                                          '<input type="hidden" class="form-control" name="numerooperadoranterior" id="numerooperadoranterior" required data-parsley-type="integer">'+
+                                          '<input type="hidden" class="form-control" name="operador" id="operador" required readonly>'+
+                                        '</div>'+
+                                      '</td>'+
+                                    '</tr>'+
+                                  '</table>'+
+                                '</div>'+
+                                '<div class="col-md-3">'+
+                                  '<label>Clave de Transporte <span class="label label-danger" id="textonombreclavetransporte"></span></label>'+
+                                  '<table class="col-md-12">'+
+                                    '<tr>'+
+                                      '<td>'+
+                                        '<div class="btn bg-blue waves-effect" id="btnobtenerclavestransporte" onclick="obtenerclavestransporte()">Seleccionar</div>'+
+                                      '</td>'+
+                                      '<td>'+
+                                        '<div class="form-line">'+
+                                          '<input type="text" class="form-control inputnextdet" name="clavetransporte" id="clavetransporte" required autocomplete="off">'+
+                                          '<input type="hidden" class="form-control" name="clavetransporteanterior" id="clavetransporteanterior" required data-parsley-type="integer">'+
+                                          '<input type="hidden" class="form-control" name="nombreclavetransporte" id="nombreclavetransporte" required readonly>'+
+                                        '</div>'+
+                                      '</td>'+
+                                    '</tr>'+
+                                  '</table>'+
+                                '</div>'+
+                                '<div class="col-md-2">'+
+                                    '<label>R.F.C.</label>'+
+                                    '<input type="text" class="form-control inputnextdet" name="rfcoperador" id="rfcoperador" required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                '</div>'+
+                                '<div class="col-md-2">'+
+                                    '<label>Nombre</label>'+
+                                    '<input type="text" class="form-control inputnextdet" name="nombreoperador" id="nombreoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                                '<div class="col-md-2">'+
+                                    '<label>Número de Licencia</label>'+
+                                    '<input type="text" class="form-control inputnextdet" name="numerolicenciaoperador" id="numerolicenciaoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                              '</div>'+
+                              '<div class="row">'+
+                                '<div class="col-md-4">'+
+                                    '<label>Calle</label>'+
+                                    '<input type="text" class="form-control inputnextdet" name="calleoperador" id="calleoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                                '<div class="col-md-1">'+
+                                    '<label>Número Ext</label>'+
+                                    '<input type="text" class="form-control inputnextdet" name="numeroextoperador" id="numeroextoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                                '<div class="col-md-1">'+
+                                    '<label>Número Int</label>'+
+                                    '<input type="text" class="form-control inputnextdet" name="numerointoperador" id="numerointoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                                '<div class="col-md-2">'+
+                                    '<label>Colonia</label>'+
+                                    '<input type="text" class="form-control inputnextdet" name="coloniaoperador" id="coloniaoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                                '<div class="col-md-2">'+
+                                    '<label>Localidad</label>'+
+                                    '<input type="text" class="form-control inputnextdet" name="localidadoperador" id="localidadoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                                '<div class="col-md-2">'+
+                                    '<label>Referencia</label>'+
+                                    '<input type="text" class="form-control inputnextdet" name="referenciaoperador" id="referenciaoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                '</div>'+
+                              '</div>'+
+                              '<div class="row">'+
+                              '<div class="col-md-3">'+
+                                '<label>Municipio <span class="label label-danger" id="textonombremunicipiooperador"></span></label>'+
+                                '<table class="col-md-12">'+
+                                  '<tr>'+
+                                    '<td>'+
+                                      '<div class="btn bg-blue waves-effect" id="btnobtenermunicipiosoperador" onclick="obtenermunicipios('+"'operador'"+')">Seleccionar</div>'+
+                                    '</td>'+
+                                    '<td>'+
+                                      '<div class="form-line">'+
+                                        '<input type="hidden" class="form-control" name="numeromunicipiooperador" id="numeromunicipiooperador" required data-parsley-type="integer" autocomplete="off">'+
+                                        '<input type="hidden" class="form-control" name="numeromunicipiooperadoranterior" id="numeromunicipiooperadoranterior" required data-parsley-type="integer">'+
+                                        '<input type="text" class="form-control inputnextdet" name="municipiooperador" id="municipiooperador" required>'+
+                                      '</div>'+
+                                    '</td>'+
+                                  '</tr>'+
+                                '</table>'+
+                              '</div>'+
+                              '<div class="col-md-3">'+
+                                '<label>Estado <span class="label label-danger" id="textonombreestadooperador"></span></label>'+
+                                '<table class="col-md-12">'+
+                                  '<tr>'+
+                                    '<td>'+
+                                      '<div class="btn bg-blue waves-effect" id="btnobtenerestadosoperador" onclick="obtenerestados('+"'operador'"+')">Seleccionar</div>'+
+                                    '</td>'+
+                                    '<td>'+
+                                      '<div class="form-line">'+
+                                        '<input type="hidden" class="form-control" name="numeroestadooperador" id="numeroestadooperador" required data-parsley-type="integer" autocomplete="off">'+
+                                        '<input type="hidden" class="form-control" name="numeroestadooperadoranterior" id="numeroestadooperadoranterior" required data-parsley-type="integer">'+
+                                        '<input type="text" class="form-control inputnextdet" name="estadooperador" id="estadooperador"  required>'+
+                                      '</div>'+
+                                    '</td>'+
+                                  '</tr>'+
+                                '</table>'+
+                              '</div>'+
+                              '<div class="col-md-3">'+
+                                '<label>Pais <span class="label label-danger" id="textonombrepaisoperador"></span></label>'+
+                                '<table class="col-md-12">'+
+                                  '<tr>'+
+                                    '<td>'+
+                                      '<div class="btn bg-blue waves-effect" id="btnobtenerpaisesoperador" onclick="obtenerpaises('+"'operador'"+')">Seleccionar</div>'+
+                                    '</td>'+
+                                    '<td>'+
+                                      '<div class="form-line">'+
+                                        '<input type="hidden" class="form-control" name="numeropaisoperador" id="numeropaisoperador" required data-parsley-type="integer" autocomplete="off">'+
+                                        '<input type="hidden" class="form-control" name="numeropaisoperadoranterior" id="numeropaisoperadoranterior" required data-parsley-type="integer">'+
+                                        '<input type="text" class="form-control inputnextdet" name="paisoperador" id="paisoperador"  required>'+
+                                      '</div>'+
+                                    '</td>'+
+                                  '</tr>'+
+                                '</table>'+
+                              '</div>'+
+                              '<div class="col-md-3">'+
+                                '<label>Código Postal <span class="label label-danger" id="textonombrecpoperador"></span></label>'+
+                                '<table class="col-md-12">'+
+                                  '<tr>'+
+                                    '<td>'+
+                                      '<div class="btn bg-blue waves-effect" id="btnobtenercpsoperador" onclick="obtenercps('+"'operador'"+')">Seleccionar</div>'+
+                                    '</td>'+
+                                    '<td>'+
+                                      '<div class="form-line">'+
+                                        '<input type="hidden" class="form-control" name="numerocpoperador" id="numerocpoperador" required data-parsley-type="integer" autocomplete="off">'+
+                                        '<input type="hidden" class="form-control" name="numerocpoperadoranterior" id="numerocpoperadoranterior" required data-parsley-type="integer">'+
+                                        '<input type="text" class="form-control inputnextdet" name="cpoperador" id="cpoperador" required>'+
+                                      '</div>'+
+                                    '</td>'+
+                                  '</tr>'+
+                                '</table>'+
+                              '</div>'+
+                            '</div>'+
+                            //Borrar
                             '<div role="tabpanel" class="tab-pane fade" id="receptortab">'+
                                 '<div class="row">'+
-                                    '<div class="col-md-3">'+
-                                        '<label>R.F.C.</label>'+
-                                        '<input type="text" class="form-control inputnextdet" name="receptorrfc" id="receptorrfc"   required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
-                                    '</div>'+
-                                    '<div class="col-md-3">'+
-                                        '<label>Nombre</label>'+
-                                        '<input type="text" class="form-control inputnextdet" name="receptornombre" id="receptornombre"  required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
-                                    '</div>'+
-                                    '<div class="col-md-3">'+
-                                        '<label>Forma de Pago <span class="label label-danger" id="textonombreformapago"></span></label>'+
-                                        '<table class="col-md-12">'+
-                                            '<tr>'+
-                                                '<td>'+
-                                                    '<div class="btn bg-blue waves-effect" onclick="obtenerformaspago()">Seleccionar</div>'+
-                                                '</td>'+
-                                                '<td>'+
-                                                    '<div class="form-line">'+
-                                                        '<input type="text" class="form-control inputnextdet" name="claveformapago" id="claveformapago" required onkeyup="tipoLetra(this)" autocomplete="off">'+
-                                                        '<input type="hidden" class="form-control" name="claveformapagoanterior" id="claveformapagoanterior" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="hidden" class="form-control" name="formapago" id="formapago" required readonly>'+
-                                                    '</div>'+
-                                                '</td>'+
-                                            '</tr>'+    
-                                        '</table>'+
-                                    '</div>'+
-                                    '<div class="col-md-3">'+
-                                        '<label>Método de Pago <span class="label label-danger" id="textonombremetodopago"></span></label>'+
-                                        '<table class="col-md-12">'+
-                                            '<tr>'+
-                                                '<td>'+
-                                                    '<div class="btn bg-blue waves-effect" onclick="obtenermetodospago()">Seleccionar</div>'+
-                                                '</td>'+
-                                                '<td>'+
-                                                    '<div class="form-line">'+
-                                                        '<input type="text" class="form-control inputnextdet" name="clavemetodopago" id="clavemetodopago" required onkeyup="tipoLetra(this)" autocomplete="off">'+
-                                                        '<input type="hidden" class="form-control" name="clavemetodopagoanterior" id="clavemetodopagoanterior" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="hidden" class="form-control" name="metodopago" id="metodopago" required readonly>'+
-                                                    '</div>'+
-                                                '</td>'+
-                                            '</tr>'+    
-                                        '</table>'+
-                                    '</div>'+
-                                    '<div class="col-md-3">'+
-                                        '<label>Condiciones de Pago</label>'+
-                                        '<input type="text" class="form-control inputnextdet" name="condicionesdepago" id="condicionesdepago" value="CREDITO" required data-parsley-length="[1, 50]" onkeyup="tipoLetra(this);" autocomplete="off">'+
-                                    '</div>'+
-                                    '<div class="col-md-3">'+
-                                        '<label>Uso CFDI  <span class="label label-danger" id="textonombreusocfdi"></span></label>'+
-                                        '<table class="col-md-12">'+
-                                            '<tr>'+
-                                                '<td>'+
-                                                    '<div class="btn bg-blue waves-effect" onclick="obtenerusoscfdi()">Seleccionar</div>'+
-                                                '</td>'+
-                                                '<td>'+
-                                                    '<div class="form-line">'+
-                                                        '<input type="text" class="form-control inputnextdet" name="claveusocfdi" id="claveusocfdi" required onkeyup="tipoLetra(this)" autocomplete="off">'+
-                                                        '<input type="hidden" class="form-control" name="claveusocfdianterior" id="claveusocfdianterior" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="hidden" class="form-control" name="usocfdi" id="usocfdi" required readonly>'+
-                                                    '</div>'+
-                                                '</td>'+
-                                            '</tr>'+    
-                                        '</table>'+
-                                    '</div>'+
-                                    '<div class="col-md-3">'+
-                                        '<label>Residencial Fiscal <span class="label label-danger" id="textonombreresidenciafiscal"></span></label>'+
-                                        '<table class="col-md-12">'+
-                                            '<tr>'+
-                                                '<td>'+
-                                                    '<div class="btn bg-blue waves-effect" onclick="obtenerresidenciasfiscales()">Seleccionar</div>'+
-                                                '</td>'+
-                                                '<td>'+
-                                                    '<div class="form-line">'+
-                                                        '<input type="text" class="form-control inputnextdet" name="claveresidenciafiscal" id="claveresidenciafiscal" required onkeyup="tipoLetra(this)" autocomplete="off">'+
-                                                        '<input type="hidden" class="form-control" name="claveresidenciafiscalanterior" id="claveresidenciafiscalanterior" required readonly onkeyup="tipoLetra(this)">'+
-                                                        '<input type="hidden" class="form-control" name="residenciafiscal" id="residenciafiscal" required readonly>'+
-                                                    '</div>'+
-                                                '</td>'+
-                                            '</tr>'+    
-                                        '</table>'+
-                                    '</div>'+
-                                    '<div class="col-md-3">'+
-                                        '<label>Num Reg Id Trib</label>'+
-                                        '<input type="text" class="form-control inputnextdet" name="numeroregidtrib" id="numeroregidtrib" data-parsley-length="[1, 40]" onkeyup="tipoLetra(this);" autocomplete="off">'+
-                                    '</div>'+
                                 '</div>'+
                                 '</div>'+
                             '</div>'+
@@ -4316,9 +4933,6 @@ function obtenerdatos(notamodificar){
                             '<li role="presentation" class="active">'+
                                 '<a href="#productostab" data-toggle="tab">Códigos ó DPPP</a>'+
                             '</li>'+
-                            '<li role="presentation">'+
-                                '<a href="#facturastab" data-toggle="tab">Facturas</a>'+
-                            '</li>'+
                         '</ul>'+
                         '<div class="tab-content">'+
                             '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
@@ -4328,113 +4942,31 @@ function obtenerdatos(notamodificar){
                                             '<thead class="'+background_tables+'">'+
                                                 '<tr>'+
                                                   '<th class="'+background_tables+'">#</th>'+
+                                                  '<th class="customercolortheadth">Partida</th>'+
                                                   '<th class="'+background_tables+'">Código</th>'+
                                                   '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
-                                                  '<th class="customercolortheadth">Uda</th>'+
                                                   '<th class="customercolortheadth">Cantidad</th>'+
-                                                  '<th class="customercolortheadth">Precio $</th>'+
-                                                  '<th class="'+background_tables+'">Importe $</th>'+
-                                                  '<th class="customercolortheadth">Dcto %</th>'+
-                                                  '<th class="customercolortheadth">Dcto $</th>'+
-                                                  '<th class="'+background_tables+'">Importe Descuento $</th>'+
-                                                  '<th class="customercolortheadth" hidden>Ieps %</th>'+
-                                                  '<th class="'+background_tables+'" hidden>Traslado Ieps $</th>'+
-                                                  '<th class="'+background_tables+'">SubTotal $</th>'+
-                                                  '<th class="customercolortheadth">Iva %</th>'+
-                                                  '<th class="'+background_tables+'">Traslado Iva $</th>'+
-                                                  '<th class="customercolortheadth" hidden>Retención Iva %</th>'+
-                                                  '<th class="'+background_tables+'" hidden>Retención Iva $</th>'+
-                                                  '<th class="customercolortheadth" hidden>Retención Isr %</th>'+
-                                                  '<th class="'+background_tables+'" hidden>Retención Isr $</th>'+
-                                                  '<th class="customercolortheadth" hidden>Retención Ieps %</th>'+
-                                                  '<th class="'+background_tables+'" hidden>Retención Ieps $</th>'+
-                                                  '<th class="'+background_tables+'">Total $</th>'+
-                                                  '<th class="customercolortheadth">Partida</th>'+
+                                                  '<th class="customercolortheadth">Peso Unitario KG </th>'+
+                                                  '<th class="'+background_tables+'">Peso Total</th>'+
+                                                  '<th class="'+background_tables+'">Material Peligroso</th>'+
+                                                  '<th class="'+background_tables+'">Embalaje</th>'+
                                                   '<th class="customercolortheadth">ClaveProducto</th>'+
                                                   '<th class="'+background_tables+'">Nombre ClaveProducto</th>'+
                                                   '<th class="customercolortheadth">ClaveUnidad</th>'+
                                                   '<th class="'+background_tables+'">Nombre ClaveUnidad</th>'+
                                                 '</tr>'+
                                             '</thead>'+
-                                            '<tbody>'+           
+                                            '<tbody>'+
                                             '</tbody>'+
                                         '</table>'+
                                     '</div>'+
-                                '</div>'+ 
-                            '</div>'+ 
-                            '<div role="tabpanel" class="tab-pane fade" id="facturastab">'+
-                                '<div class="row">'+
-                                  '<div class="col-md-12 table-responsive cabecerafija" style="height: 200px;overflow-y: scroll;padding: 0px 0px;">'+
-                                    '<table id="tabladetallesfacturasnotascliente" class="table table-bordered tabladetallesfacturasnotascliente">'+
-                                        '<thead class="'+background_tables+'">'+
-                                            '<tr>'+
-                                            '<th class="'+background_tables+'">#</th>'+
-                                            '<th class="customercolortheadth">Factura</th>'+
-                                            '<th class="'+background_tables+'">Fecha</th>'+
-                                            '<th class="'+background_tables+'">UUID</th>'+
-                                            '<th class="'+background_tables+'">Total $</th>'+
-                                            '<th class="'+background_tables+'">Abonos $</th>'+
-                                            '<th class="'+background_tables+'">Notas Crédito $</th>'+
-                                            '<th class="customercolortheadth">Descuento $</th>'+
-                                            '<th class="'+background_tables+'">Saldo $</th>'+
-                                            '</tr>'+
-                                        '</thead>'+
-                                        '<tbody>'+           
-                                        '</tbody>'+
-                                    '</table>'+
-                                  '</div>'+
                                 '</div>'+
-                            '</div>'+ 
+                            '</div>'+
                         '</div>'+
                         '<div class="row">'+
-                          '<div class="col-md-6">'+   
+                          '<div class="col-md-6">'+
                               '<label>Observaciones</label>'+
                               '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]"></textarea>'+
-                          '</div>'+ 
-                          '<div class="col-md-3">'+
-                              '<table class="table table-striped table-hover">'+
-                                  '<tr>'+
-                                      '<td class="tdmod">Total Nota</td>'+
-                                      '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="totalnota" id="totalnota" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                  '</tr>'+
-                                  '<tr>'+
-                                      '<td class="tdmod">Descuentos</td>'+
-                                      '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="descuentofacturas" id="descuentofacturas" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                  '</tr>'+
-                                  '<tr>'+
-                                      '<td class="tdmod">Diferencia</td>'+
-                                      '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="diferencia" id="diferencia" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                  '</tr>'+
-                              '</table>'+
-                          '</div>'+
-                          '<div class="col-md-3">'+
-                              '<table class="table table-striped table-hover">'+
-                                  '<tr>'+
-                                      '<td class="tdmod">Importe</td>'+
-                                      '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="importe" id="importe" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                  '</tr>'+
-                                  '<tr>'+
-                                      '<td class="tdmod">Descuento</td>'+
-                                      '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="descuento" id="descuento" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                  '</tr>'+
-                                  '<tr>'+
-                                      '<td class="tdmod">SubTotal</td>'+
-                                      '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="subtotal" id="subtotal" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                  '</tr>'+
-                                  '<tr>'+
-                                      '<td class="tdmod">Iva</td>'+
-                                      '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="iva" id="iva" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                  '</tr>'+
-                                  '<tr>'+
-                                      '<td class="tdmod">Total</td>'+
-                                      '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
-                                  '</tr>'+
-                              '</table>'+
-                          '</div>'+
-                        '</div>'+
-                        '<div class="row">'+
-                          '<div class="col-md-12">'+   
-                            '<h5 id="mensajecalculoscompra"></h5>'+  
                           '</div>'+
                         '</div>'+
                     '</div>'+
@@ -4447,16 +4979,79 @@ function obtenerdatos(notamodificar){
     $("#btnlistarfacturas").hide();
     $("#btnobteneralmacenes").hide();
     $("#btnobtenerfoliosnotas").hide();
-    $("#periodohoy").val(data.notacliente.Periodo);
-    $("#folio").val(data.notacliente.Folio);
-    $("#serie").val(data.notacliente.Serie);
-    $("#serietexto").html("Serie: "+data.notacliente.Serie);
-    $("#esquema").val(data.notacliente.Esquema);
-    $("#esquematexto").html("Esquema: "+data.notacliente.Esquema);
-    $("#stringfacturasseleccionadas").val(data.arrayfacturas);
-    $("#notaclientebd").val(data.notacliente.Nota);
-    $("#numerofilas").val(data.numerodetallesnotacliente);
-    $("#numerofilasfacturas").val(data.numerodocumentosnotacliente);
+    $("#periodohoy").val(data.cartaporte.Periodo);
+    $('#totaldistanciarecorrida').val(parseFloat(data.cartaporte.TotalDistanciaRecorrida).toFixed(parseInt(numerodecimales)))
+    $('#numerototalmercancias').val(data.cartaporte.TotalMercancias)
+    $('#pesoTotalBruto').val(number_format(data.cartaporte.PesoBrutoTotal,numerodecimales))
+    $('#fechasalida').val(data.cartaporte.FechaSalida)
+    $('#referenciaremitente').val(data.cartaporte.ReferenciaRemitente)
+    $('#numerointremitente').val(data.cartaporte.NoInteriorRemitente)
+    //Datos Destino
+    $('#rfcdestinatario').val(data.cartaporte.RfcDestinatario)
+    $('#nombredestinatario').val(data.cartaporte.NombreDestinatario)
+    $('#fechallegada').val(data.cartaporte.FechaLlegada)
+    $('#calledestinatario').val(data.cartaporte.CalleDestinatario)
+    $('#numeroextdestinatario').val(data.cartaporte.NoExteriorDestinatario)
+    $('#numerointdestinatario').val(data.cartaporte.NoInteriorDestinatario)
+    $('#coloniadestinatario').val(data.cartaporte.ColoniaDestinatario)
+    $('#localidaddestinatario').val(data.cartaporte.LocalidadDestinatario)
+    $('#referenciadestinatario').val(data.cartaporte.ReferenciaDestinatario)
+    $('#municipiodestinatario').val(data.cartaporte.MunicipioDestinatario)
+    $('#estadodestinatario').val(data.cartaporte.EstadoDestinatario)
+    $('#paisdestinatario').val(data.cliente.Pais)
+    $('#cpdestinatario').val(data.cartaporte.CodigoPostalDestinatario)
+    //Datos transporte
+    $('#numerovehiculoempresa').val(data.vehiculoEmpresa.id)
+    $('#numerovehiculoempresaanterior').val(data.vehiculoEmpresa.id)
+    $('#textonombrevehiculoempresa').text(data.vehiculoEmpresa.Marca+' - '+data.vehiculoEmpresa.Modelo)
+    $('#vehiculoempresa').val(data.vehiculoEmpresa.Marca)
+    $('#permisosct').val(data.cartaporte.PermisoSCT)
+    $('#numeropermisosct').val(data.cartaporte.NumeroPermisoSCT)
+    $('#nombreaseguradora').val(data.cartaporte.NombreAsegurado)
+    $('#numeropolizaseguro').val(data.cartaporte.NumeroPolizaSeguro)
+    let cutStringConfAuto = data.configuracionVehicular.Descripcion.substr(0, 30)
+    $('#textonombreconfigautotransporte').text(cutStringConfAuto)
+    $('#claveconfigautotransporte').val(data.configuracionVehicular.Clave)
+    $('#claveconfigautotransporteanterior').val(data.configuracionVehicular.Clave)
+    $('#configautotransporte').val(data.configuracionVehicular.Numero)
+    $('#placavehiculo').val(data.cartaporte.PlacaVehiculoMotor)
+    $('#anovehiculo').val(data.cartaporte.AnoModeloVehiculoMotor)
+    $('#subtiporemolque').val(data.cartaporte.SubTipoRemolque)
+    $('#placaremolque').val(data.cartaporte.PlacaRemolque)
+
+    //Datos Operador
+    $('#textonombreoperador').text(data.Operador.Nombre)
+    $('#numerooperador').val(data.Operador.id)
+    $('#numerooperadoranterior').val(data.Operador.id)
+    $('#rfcoperador').val(data.Operador.Rfc)
+    $('#nombreoperador').val(data.Operador.Nombre)
+    $('#textonombreclavetransporte').text(data.clavetransporte.Descripcion)
+    $('#clavetransporte').val(data.clavetransporte.Clave)
+    $('#clavetransporteanterior').val(data.clavetransporte.Clave)
+    $('#nombreclavetransporte').val(data.clavetransporte.Descripcion)
+    $('#numerolicenciaoperador').val(data.cartaporte.NumeroLicencia)
+    $('#calleoperador').val(data.cartaporte.CalleOperador)
+    $('#numeroextoperador').val(data.cartaporte.NoExteriorOperador)
+    $('#numerointoperador').val(data.cartaporte.NoInteriorOperador)
+    $('#coloniaoperador').val(data.cartaporte.ColoniaOperador)
+    $('#localidadoperador').val(data.cartaporte.LocalidadOperador)
+    $('#referenciaoperador').val(data.cartaporte.ReferenciaOperador)
+    $('#municipiooperador').val(data.cartaporte.MunicipioOperador)
+    $('#estadooperador').val(data.cartaporte.EstadoOperador)
+    $('#paisoperador').val(data.cartaporte.PaisOperador)
+    $('#cpoperador').val(data.cartaporte.CodigoPostalOperador)
+
+
+    //Otros datos
+    $("#folio").val(data.cartaporte.Folio);
+    $("#serie").val(data.cartaporte.Serie);
+    $("#serietexto").html("Serie: "+data.cartaporte.Serie);
+    $("#esquema").val(data.cartaporte.Esquema);
+    $("#esquematexto").html("Esquema: "+data.cartaporte.Esquema);
+    //$("#stringfacturasseleccionadas").val(data.arrayfacturas);
+    $("#notaclientebd").val(data.cartaporte.CartaPorte);
+    $("#numerofilas").val(data.numerodetallescarta);
+    //$("#numerofilasfacturas").val(data.numerodocumentosnotacliente);
     $("#tipodetalles").val(data.tipodetalles);
     $("#fecha").val(data.fecha);
     $("#cliente").val(data.cliente.Nombre);
@@ -4466,87 +5061,87 @@ function obtenerdatos(notamodificar){
     $("#numerocliente").val(data.cliente.Numero);
     $("#numeroclienteanterior").val(data.cliente.Numero);
     $("#rfccliente").val(data.cliente.Rfc);
-    if(parseInt(data.almacen) == parseInt(0)){
-      $("#almacen").val(0);
-      $("#textonombrealmacen").html("");
-      $("#numeroalmacen").val(0);
-      $("#numeroalmacenanterior").val(0);
-    }else{
-      $("#almacen").val(data.almacen.Nombre);
-      if(data.almacen.Nombre != null){
-        $("#textonombrealmacen").html(data.almacen.Nombre.substring(0, 40));
-      }
-      $("#numeroalmacen").val(data.almacen.Numero);
-      $("#numeroalmacenanterior").val(data.almacen.Numero);
-    }
-    $("#moneda").val(data.notacliente.Moneda).change();
-    $("#pesosmoneda").val(data.tipocambio);
-    $("#observaciones").val(data.notacliente.Obs);
-    $("#emisorrfc").val(data.notacliente.EmisorRfc);
-    $("#emisornombre").val(data.notacliente.EmisorNombre);
-    $("#confirmacion").val(data.notacliente.Confirmacion);
-    $("#lugarexpedicion").val(data.notacliente.LugarExpedicion);
-    $("#lugarexpedicionanterior").val(data.notacliente.LugarExpedicion);
-    $("#regimenfiscal").val(data.regimenfiscal.Nombre);
-    if(data.regimenfiscal.Nombre != null){
-      $("#textonombreregimenfiscal").html(data.regimenfiscal.Nombre.substring(0, 40));
-    }
-    $("#claveregimenfiscal").val(data.regimenfiscal.Clave);
-    $("#claveregimenfiscalanterior").val(data.regimenfiscal.Clave);
-    if(data.tiporelacion != null){
-      $("#tiporelacion").val(data.tiporelacion.Nombre);
-      if(data.tiporelacion.Nombre != null){
-        $("#textonombretiporelacion").html(data.tiporelacion.Nombre.substring(0, 40));
-      }
-      $("#clavetiporelacion").val(data.tiporelacion.Clave);
-      $("#clavetiporelacionanterior").val(data.tiporelacion.Clave);
-    }
-    $("#receptorrfc").val(data.notacliente.ReceptorRfc);
-    $("#receptornombre").val(data.notacliente.ReceptorNombre);
-    $("#formapago").val(data.formapago.Nombre);
-    if(data.formapago.Nombre != null){
-      $("#textonombreformapago").html(data.formapago.Nombre.substring(0, 40));
-    }
-    $("#claveformapago").val(data.formapago.Clave);
-    $("#claveformapagoanterior").val(data.formapago.Clave);
-    $("#metodopago").val(data.metodopago.Nombre);
-    if(data.metodopago.Nombre != null){
-      $("#textonombremetodopago").html(data.metodopago.Nombre.substring(0, 40));
-    }
-    $("#clavemetodopago").val(data.metodopago.Clave);
-    $("#clavemetodopagoanterior").val(data.metodopago.Clave);
-    $("#condicionesdepago").val(data.notacliente.CondicionesDePago);
-    $("#usocfdi").val(data.usocfdi.Nombre);
-    if(data.usocfdi.Nombre != null){
-      $("#textonombreusocfdi").html(data.usocfdi.Nombre.substring(0, 40));
-    }
-    $("#claveusocfdi").val(data.usocfdi.Clave);
-    $("#claveusocfdianterior").val(data.usocfdi.Clave);
-    $("#residenciafiscal").val(data.residenciafiscal.Nombre);
-    if(data.residenciafiscal.Nombre != null){
-      $("#textonombreresidenciafiscal").html(data.residenciafiscal.Nombre.substring(0, 40));
-    }
-    $("#claveresidenciafiscal").val(data.residenciafiscal.Clave);
-    $("#claveresidenciafiscalanterior").val(data.residenciafiscal.Clave);
-    $("#numeroregidtrib").val(data.notacliente.NumRegIdTrib);
+    // if(parseInt(data.almacen) == parseInt(0)){
+    //   $("#almacen").val(0);
+    //   $("#textonombrealmacen").html("");
+    //   $("#numeroalmacen").val(0);
+    //   $("#numeroalmacenanterior").val(0);
+    // }else{
+    //   $("#almacen").val(data.almacen.Nombre);
+    //   if(data.almacen.Nombre != null){
+    //     $("#textonombrealmacen").html(data.almacen.Nombre.substring(0, 40));
+    //   }
+    //   $("#numeroalmacen").val(data.almacen.Numero);
+    //   $("#numeroalmacenanterior").val(data.almacen.Numero);
+    // }
+    $("#moneda").val(data.cartaporte.Moneda).change();
+    //$("#pesosmoneda").val(data.tipocambio);
+    $("#observaciones").val(data.cartaporte.Obs);
+    $("#emisorrfc").val(data.cartaporte.RfcRemitente);
+    $("#emisornombre").val(data.cartaporte.NombreRemitente);
+    // $("#confirmacion").val(data.cartaporte.Confirmacion);
+    // $("#lugarexpedicion").val(data.cartaporte.LugarExpedicion);
+    // $("#lugarexpedicionanterior").val(data.cartaporte.LugarExpedicion);
+    // $("#regimenfiscal").val(data.regimenfiscal.Nombre);
+    // if(data.regimenfiscal.Nombre != null){
+    //   $("#textonombreregimenfiscal").html(data.regimenfiscal.Nombre.substring(0, 40));
+    // }
+    // $("#claveregimenfiscal").val(data.regimenfiscal.Clave);
+    // $("#claveregimenfiscalanterior").val(data.regimenfiscal.Clave);
+    // if(data.tiporelacion != null){
+    //   $("#tiporelacion").val(data.tiporelacion.Nombre);
+    //   if(data.tiporelacion.Nombre != null){
+    //     $("#textonombretiporelacion").html(data.tiporelacion.Nombre.substring(0, 40));
+    //   }
+    //   $("#clavetiporelacion").val(data.tiporelacion.Clave);
+    //   $("#clavetiporelacionanterior").val(data.tiporelacion.Clave);
+    // }
+    // $("#receptorrfc").val(data.notacliente.RfcDestinatario);
+    // $("#receptornombre").val(data.notacliente.NombreDestinatario);
+    // $("#formapago").val(data.formapago.Nombre);
+    // if(data.formapago.Nombre != null){
+    //   $("#textonombreformapago").html(data.formapago.Nombre.substring(0, 40));
+    // }
+    // $("#claveformapago").val(data.formapago.Clave);
+    // $("#claveformapagoanterior").val(data.formapago.Clave);
+    // $("#metodopago").val(data.metodopago.Nombre);
+    // if(data.metodopago.Nombre != null){
+    //   $("#textonombremetodopago").html(data.metodopago.Nombre.substring(0, 40));
+    // }
+    // $("#clavemetodopago").val(data.metodopago.Clave);
+    // $("#clavemetodopagoanterior").val(data.metodopago.Clave);
+    // $("#condicionesdepago").val(data.notacliente.CondicionesDePago);
+    // $("#usocfdi").val(data.usocfdi.Nombre);
+    // if(data.usocfdi.Nombre != null){
+    //   $("#textonombreusocfdi").html(data.usocfdi.Nombre.substring(0, 40));
+    // }
+    // $("#claveusocfdi").val(data.usocfdi.Clave);
+    // $("#claveusocfdianterior").val(data.usocfdi.Clave);
+    // $("#residenciafiscal").val(data.residenciafiscal.Nombre);
+    // if(data.residenciafiscal.Nombre != null){
+    //   $("#textonombreresidenciafiscal").html(data.residenciafiscal.Nombre.substring(0, 40));
+    // }
+    // $("#claveresidenciafiscal").val(data.residenciafiscal.Clave);
+    // $("#claveresidenciafiscalanterior").val(data.residenciafiscal.Clave);
+    // $("#numeroregidtrib").val(data.notacliente.NumRegIdTrib);
     //cargar todos los detalles
-    $("#tabladetallesnotacliente tbody").html(data.filasdetallesnotacliente);
+    $("#tabladetallesnotacliente tbody").html(data.filasdetallescartaporte);
     //totales compra
-    $("#importe").val(data.importe);
-    $("#descuento").val(data.descuento);
-    $("#ieps").val(data.ieps);
-    $("#subtotal").val(data.subtotal);
-    $("#iva").val(data.iva);
-    $("#retencioniva").val(data.ivaretencion);
-    $("#retencionisr").val(data.isrretencion);
-    $("#retencionieps").val(data.iepsretencion);
-    $("#total").val(data.total);  
+    // $("#importe").val(data.importe);
+    // $("#descuento").val(data.descuento);
+    // $("#ieps").val(data.ieps);
+    // $("#subtotal").val(data.subtotal);
+    // $("#iva").val(data.iva);
+    // $("#retencioniva").val(data.ivaretencion);
+    // $("#retencionisr").val(data.isrretencion);
+    // $("#retencionieps").val(data.iepsretencion);
+    // $("#total").val(data.total);
     //cargar nota proveedor documentos
     $("#tabladetallesfacturasnotascliente tbody").html(data.filasdocumentosnotacliente);
     //totales descuentos y nota
-    $("#totalnota").val(data.total);
-    $("#descuentofacturas").val(data.descuentofacturas);
-    $("#diferencia").val(data.diferencia);
+    // $("#totalnota").val(data.total);
+    // $("#descuentofacturas").val(data.descuentofacturas);
+    // $("#diferencia").val(data.diferencia);
     //asignar el tipo de operacion que se realizara
     $("#tipooperacion").val("modificacion");
     //se debe motrar el input para buscar los productos
@@ -4663,16 +5258,16 @@ function obtenerdatos(notamodificar){
     $(".inputnextdet").keyup(function (e) {
       //recomentable para mayor compatibilidad entre navegadores.
       var code = (e.keyCode ? e.keyCode : e.which);
-      var index = $(this).index(".inputnextdet");          
+      var index = $(this).index(".inputnextdet");
       switch(code){
         case 13:
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+          $(".inputnextdet").eq(index + 1).focus().select();
           break;
         case 39:
-          $(".inputnextdet").eq(index + 1).focus().select(); 
+          $(".inputnextdet").eq(index + 1).focus().select();
           break;
         case 37:
-          $(".inputnextdet").eq(index - 1).focus().select(); 
+          $(".inputnextdet").eq(index - 1).focus().select();
           break;
       }
     });
@@ -4689,16 +5284,27 @@ $("#btnGuardarModificacion").on('click', function (e) {
   e.preventDefault();
   var formData = new FormData($("#formparsley")[0]);
   var form = $("#formparsley");
+    // $('#formparsley').parsley().on('form:error', function (formInstance) {
+    //     var errors = [];
+
+    //     // You have access to each field instance with `formInstance.fields`
+    //     for (var idx in formInstance.fields) {
+    //         errors.push((formInstance.fields[idx].getErrorsMessages()));
+
+    //         // Use $element to access the jQuery element of each field
+    //         console.log(formInstance.fields[idx].$element);
+    //         console.log(formInstance.fields[idx].getErrorsMessages())
+    //     }
+
+    //     alert(errors);
+    // });
   if (form.parsley().isValid()){
     var numerofilas = $("#numerofilas").val();
-    var numerofilasfacturas = $("#numerofilasfacturas").val();
-    if(parseInt(numerofilas) > 0 && parseInt(numerofilasfacturas) > 0){
-      var diferencia = $("#diferencia").val();
-      if(parseFloat(diferencia) <= parseFloat(0.01)){
+    if(parseInt(numerofilas) > 0){
         $('.page-loader-wrapper').css('display', 'block');
         $.ajax({
           headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-          url:notas_credito_clientes_guardar_modificacion,
+          url:carta_porte_guardar_modificacion,
           type: "post",
           dataType: "html",
           data: formData,
@@ -4721,9 +5327,6 @@ $("#btnGuardarModificacion").on('click', function (e) {
             $('.page-loader-wrapper').css('display', 'none');
           }
         })
-      }else{
-        msj_errorendiferenciatotalnotatotaldescuentos();
-      }
     }else{
       msj_erroralmenosunapartidaagregada();
     }
@@ -4742,7 +5345,7 @@ function desactivar(notadesactivar){
       $("#divmotivobaja").hide();
       $("#btnbaja").hide();
       $('#estatusregistro').modal('show');
-    }else{ 
+    }else{
       if(data.resultadofechas != ''){
         $("#notadesactivar").val(0);
         $("#textomodaldesactivar").html('Error solo se pueden dar de baja las notas del mes actual, fecha de la nota: ' + data.resultadofechas);
@@ -4766,7 +5369,7 @@ function desactivar(notadesactivar){
         }
       }
     }
-  }) 
+  })
 }
 $("#btnbaja").on('click', function(e){
   e.preventDefault();
@@ -4823,7 +5426,7 @@ function enviardocumentoemail(documento){
     $(".dropify-clear").trigger("click");
     $("#divadjuntararchivo").show();
     $("#modalenviarpdfemail").modal('show');
-  })   
+  })
 }
 //enviar documento pdf por email
 $("#btnenviarpdfemail").on('click', function (e) {
@@ -4873,7 +5476,7 @@ function timbrarnota(nota){
           $("#textomodaltimbrado").html('Aviso, esta Nota se encuentra dada de baja');
           $('#modaltimbrado').modal('show');
           $("#btntimbrarnota").hide();
-      }else{ 
+      }else{
           if(data.UUID != ""){
               $("#notatimbrado").val(0);
               $("#textomodaltimbrado").html('Aviso, esta Nota ya se timbro');
@@ -4886,7 +5489,7 @@ function timbrarnota(nota){
               $("#btntimbrarnota").show();
           }
       }
-  }) 
+  })
 }
 $("#btntimbrarnota").on('click', function(e){
   e.preventDefault();
@@ -4922,7 +5525,7 @@ $("#btntimbrarnota").on('click', function(e){
   }else{
     form.parsley().validate();
   }
-});  
+});
 
 //cancelar timbre
 function cancelartimbre(facturabajatimbre){
@@ -4949,14 +5552,14 @@ function cancelartimbre(facturabajatimbre){
         $("#btnbajatimbre").hide();
         $('#modalbajatimbre').modal('show');
       }
-    }else{ 
+    }else{
       $("#facturabajatimbre").val(0);
       $("#iddocumentofacturapi").val(0);
       $("#textomodalbajatimbre").html('Aviso, la Nota No.'+ facturabajatimbre +' no esta timbrada');
       $("#btnbajatimbre").hide();
       $('#modalbajatimbre').modal('show');
     }
-  })   
+  })
 }
 $("#btnbajatimbre").on('click', function(e){
   e.preventDefault();
@@ -5038,7 +5641,7 @@ function configurar_tabla(){
   var campos = campos_activados.split(",");
   for (var i = 0; i < campos.length; i++) {
     var returncheckboxfalse = '';
-    if(campos[i] == 'Nota' || campos[i] == 'Status' || campos[i] == 'Periodo'){
+    if(campos[i] == 'CartaPorte' || campos[i] == 'Status' || campos[i] == 'Periodo'){
       returncheckboxfalse = 'onclick="javascript: return false;"';
     }
     checkboxscolumnas = checkboxscolumnas + '<div class="col-md-2 form-check">'+
@@ -5090,4 +5693,170 @@ function configurar_tabla(){
       $("#columnasnestable").append(columna);
   }
 }
+
+//renumerar las filas de la orden de compra
+function renumerarfilasuuid(){
+    var lista;
+    //renumerar filas tr
+    lista = document.getElementsByClassName("filasuuid");
+    for (var i = 0; i < lista.length; i++) {
+        lista[i].setAttribute("id", "filauuid"+i);
+    }
+    //renumerar btn eliminar fila
+    lista = document.getElementsByClassName("btneliminaruuid");
+    for (var i = 0; i < lista.length; i++) {
+        lista[i].setAttribute("onclick", "eliminarfilauuid("+i+')');
+    }
+}
+function comprobarfilasuuid(){
+    let numerofilasuuid = $("#tablauuidrelacionados tbody tr").length;
+    $("#numerofilasuuid").val(numerofilasuuid);
+}
+//eliminar una fila en la tabla
+function eliminarfilauuid(fila){
+    var confirmacion = confirm("Esta seguro de eliminar la fila?");
+    if (confirmacion == true) {
+        $("#filauuid"+fila).remove();
+        renumerarfilasuuid();
+        comprobarfilasuuid();
+    }
+}
+
+//Obtiene los detalles de la factura
+function obtenerDetallesFactura(factura){
+    $('.page-loader-wrapper').css('display', 'block');
+    $.get(carta_porte_obtener_datos_factura,{facturacarta:factura },function(data){
+        $('.tabladetallesnotacliente tbody').append(data.filasdetallesfactura)
+        mostrarformulario();
+        comprobarfilas();
+        //calculartotal();
+        eliminarfilasdppp();
+        //colocar el tipo de detalles
+        $("#tipodetalles").val("codigos");
+        //colocar almacen 0
+        comprobarfilasfacturanotacliente();
+        calcularpartidas()
+        $("#codigoabuscar").val("");
+        //hacer que los inputs del formulario pasen de una  otro al dar enter en TAB PRINCIPAL
+        $(".inputnextdet").keyup(function (e) {
+          //recomentable para mayor compatibilidad entre navegadores.
+          var code = (e.keyCode ? e.keyCode : e.which);
+          var index = $(this).index(".inputnextdet");
+          switch(code){
+            case 13:
+              $(".inputnextdet").eq(index + 1).focus().select();
+              break;
+            case 39:
+              $(".inputnextdet").eq(index + 1).focus().select();
+              break;
+            case 37:
+              $(".inputnextdet").eq(index - 1).focus().select();
+              break;
+          }
+        });
+        $('.page-loader-wrapper').css('display', 'none');
+    })
+}
+
+/**
+ * @author Jose Alonso Espinares
+ * @description lista las facturas del cliente seleccionado
+ * @param {*}
+ */
+function listaruuidrelacionados(){
+    ocultarformulario();
+    let numerocliente = $('#numerocliente').val()
+    let tablafacturasrel =  '<div class="modal-header '+background_forms_and_modals+'">'+
+                                    '<h4 class="modal-title">Comprobantes UUIDS</h4>'+
+                                        '</div>'+
+                                        '<div class="modal-body">'+
+                                            '<div class="row">'+
+                                                '<div class="col-md-12">'+
+                                                    '<div class="table-responsive">'+
+                                                        '<table id="tbllistadofacturarel" class="tbllistadofacturarel table table-bordered table-striped table-hover" style="width:100% !important;">'+
+                                                            '<thead class="'+background_tables+'">'+
+                                                                '<tr>'+
+                                                                    '<th>Operaciones</th>'+
+                                                                    '<th>UUID</th>'+
+                                                                    '<th>Emisor</th>'+
+                                                                    '<th>Receptor</th>'+
+                                                                    '<th>Serie</th>'+
+                                                                    '<th>Folio</th>'+
+                                                                    '<th>Fecha</th>'+
+                                                                    '<th>Total</th>'+
+                                                                '</tr>'+
+                                                            '</thead>'+
+                                                            '<tbody></tbody>'+
+                                                        '</table>'+
+                                                    '</div>'+
+                                                '</div>'+
+                                            '</div>'+
+                                        '</div>'+
+                                        '<div class="modal-footer">'+
+                                            '<button type="button" class="btn btn-danger btn-sm" onclick="mostrarformulario();">Regresar</button>'+
+                            '</div>';
+    $("#contenidomodaltablas").html(tablafacturasrel);
+    let tfacrel = $('#tbllistadofacturarel').DataTable({
+        keys: true,
+        "lengthMenu": [ 10, 50, 100, 250, 500 ],
+        "pageLength": 250,
+        "sScrollX": "110%",
+        "sScrollY": "370px",
+        "bScrollCollapse": true,
+        processing: true,
+        'language': {
+            'loadingRecords': '&nbsp;',
+            'processing': '<div class="spinner"></div>'
+        },
+        serverSide: true,
+        ajax: {
+            url: carta_porte_obtener_facturas_cliente,
+            data: function (d) {
+                d.numerocliente = numerocliente;
+            }
+        },
+        columns: [
+            { data: 'operaciones', name: 'operaciones', orderable: false, searchable: false },
+            { data: 'UUID', name: 'UUID' },
+            { data: 'EmisorRfc', name: 'EmisorRfc' },
+            { data: 'ReceptorRfc', name: 'ReceptorRfc' },
+            { data: 'Serie', name: 'Serie' },
+            { data: 'Folio', name: 'Folio' },
+            { data: 'Fecha', name: 'Fecha' },
+            { data: 'Total', name: 'Total' }
+        ],
+        "initComplete": function() {
+            var $buscar = $('div.dataTables_filter input');
+            $buscar.focus();
+            $buscar.unbind();
+            $buscar.bind('keyup change', function(e) {
+                if(e.keyCode == 13 || this.value == "") {
+                  $('#tbllistadofacturarel').DataTable().search( this.value ).draw();
+                }
+            });
+        },
+    })
+    //seleccionar registro al dar doble click
+    $('#tbllistadofacturarel tbody').on('dblclick', 'tr', function () {
+        var data = tfacrel.row( this ).data();
+        seleccionarfacturarel(data.UUID, data.Factura);
+    });
+}
+function seleccionarfacturarel(UUID, Factura){
+    let tipooperacion = $("#tipooperacion").val();
+    let uuidrelacionado ='<tr class="filasuuid" id="filauuid0">'+
+                            '<td class="tdmod">'+
+                                '<div class="btn btn-danger btn-xs btneliminaruuid" onclick="eliminarfilauuid(0)">X</div><input type="hidden" class="form-control uuidagregadoen" name="uuidagregadoen[]" value="'+tipooperacion+'" readonly>'+
+                            '</td>'+
+                            '<td class="tdmod">'+
+                                '<input type="hidden" class="form-control divorinputmodsm uuidrelacionado" name="uuidrelacionado[]" value="'+UUID+'" readonly required>'+UUID+
+                                '<input type="text" style="display:none"; class="form-control divorinputmodsm" name="factura[]" value="'+Factura+'" readonly>'
+                            '</td>'+
+                        '</tr>';
+    $("#tablauuidrelacionados").append('<tbody>'+uuidrelacionado+'</tbody>');
+    renumerarfilasuuid();
+    comprobarfilasuuid();
+    obtenerDetallesFactura(Factura)
+    mostrarformulario();
+  }
 init();

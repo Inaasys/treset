@@ -21,4 +21,14 @@ class CartaPorteDetalles extends Model
         'MaterialPeligroso',
         'PesoEnKilogramos'
     ];
+
+    /**
+     * Get the CartaPorte that owns the CartaPorteDetalles
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function CartaPorte()
+    {
+        return $this->belongsTo(CartaPorte::class, 'CartaPorte', 'CartaPorte');
+    }
 }

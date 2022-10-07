@@ -13,6 +13,7 @@ use PDF;
 use Luecano\NumeroALetras\NumeroALetras;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\NotasCreditoClientesExport;
+use App\CartaPorteDocumentos;
 use App\NotaCliente;
 use App\NotaClienteDetalle;
 use App\NotaClienteDocumento;
@@ -44,6 +45,11 @@ use App\c_ConfiguracionAutoTransporte;
 use App\c_CveTransporte;
 use App\Operador;
 use App\Vehiculo;
+use App\CartaPorte;
+use App\CartaPorteDetalles;
+use App\c_MaterialPeligroso;
+use App\c_TipoEmbalaje;
+use App\c_ClaveProdServCP;
 use Config;
 use Mail;
 use Facturapi\Facturapi;
@@ -72,7 +78,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
         }
         $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('CartaPorte', Auth::user()->id);
         $configuracion_tabla = $configuraciones_tabla['configuracion_tabla'];
-        $rutaconfiguraciontabla = route('notas_credito_clientes_guardar_configuracion_tabla');
+        $rutaconfiguraciontabla = route('carta_porte_guardar_configuracion_tabla');
         $urlgenerarformatoexcel = route('notas_credito_clientes_exportar_excel');
         $rutacreardocumento = route('notas_credito_clientes_generar_pdfs');
         $lugarexpedicion = $this->lugarexpedicion;
@@ -89,58 +95,29 @@ class CartaPorteController extends ConfiguracionSistemaController{
     public function carta_porte_obtener(Request $request){
         if($request->ajax()){
             $configuraciones_tabla = Helpers::obtenerconfiguraciontabla('CartaPorte', Auth::user()->id);
+
             $fechahoy = Carbon::now()->toDateString();
             $tipousuariologueado = Auth::user()->role_id;
             $periodo = $request->periodo;
             $data = VistaCartaPorte::select($configuraciones_tabla['campos_consulta'])->where('Periodo', $periodo);
             return DataTables::of($data)
-                    ->order(function ($query) {
-                        if($configuraciones_tabla['configuracion_tabla']->primerordenamiento != 'omitir'){
-                            $query->orderBy($configuraciones_tabla['configuracion_tabla']->primerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formaprimerordenamiento . '');
-                        }
-                        if($configuraciones_tabla['configuracion_tabla']->segundoordenamiento != 'omitir'){
-                            $query->orderBy($configuraciones_tabla['configuracion_tabla']->segundoordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formasegundoordenamiento . '');
-                        }
-                        if($configuraciones_tabla['configuracion_tabla']->tercerordenamiento != 'omitir'){
-                            $query->orderBy($configuraciones_tabla['configuracion_tabla']->tercerordenamiento, '' . $configuraciones_tabla['configuracion_tabla']->formatercerordenamiento . '');
-                        }
-                    })
                     ->addColumn('operaciones', function($data){
                         $operaciones = '<div class="dropdown">'.
                                             '<button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
                                                 'OPERACIONES <span class="caret"></span>'.
                                             '</button>'.
                                             '<ul class="dropdown-menu">'.
-                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->Nota .'\')">Cambios</a></li>'.
-                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->Nota .'\')">Bajas</a></li>'.
-                                                '<li><a class="paddingmenuopciones" href="'.route('notas_credito_clientes_generar_pdfs_indiv',$data->Nota).'" target="_blank">Ver Documento PDF</a></li>'.
-                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="enviardocumentoemail(\''.$data->Nota .'\')">Enviar Documento por Correo</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);">Cambios</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);">Bajas</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);">Timbrar</a></li>'.
+                                                '<li><a class="paddingmenuopciones">Ver Documento PDF</a></li>'.
+                                                '<li><a class="paddingmenuopciones">Enviar Documento por Correo</a></li>'.
                                                 //'<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="timbrarnota(\''.$data->Nota .'\')">Timbrar Nota</a></li>'.
                                                 //'<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="cancelartimbre(\''.$data->Nota .'\')">Cancelar Timbre</a></li>'.
                                             '</ul>'.
                                         '</div>';
                         return $operaciones;
                     })
-                    ->addColumn('Fecha', function($data){ return Carbon::parse($data->Fecha)->toDateTimeString(); })
-                    //->addColumn('SubTotal', function($data){ return $data->SubTotal; })
-                    //->addColumn('Iva', function($data){ return $data->Iva; })
-                    //->addColumn('Total', function($data){ return $data->Total; })
-                    //->addColumn('Abonos', function($data){ return $data->Abonos; })
-                    //->addColumn('Descuentos', function($data){ return $data->Descuentos; })
-                    //->addColumn('Saldo', function($data){ return $data->Saldo; })
-                    ->addColumn('ImpLocTraslados', function($data){ return $data->ImpLocTraslados; })
-                    ->addColumn('ImpLocRetenciones', function($data){ return $data->ImpLocRetenciones; })
-                    ->addColumn('IepsRetencion', function($data){ return $data->IepsRetencion; })
-                    ->addColumn('IsrRetencion', function($data){ return $data->IsrRetencion; })
-                    ->addColumn('IvaRetencion', function($data){ return $data->IvaRetencion; })
-                    ->addColumn('Ieps', function($data){ return $data->Ieps; })
-                    //->addColumn('Descuento', function($data){ return $data->Descuento; })
-                    //->addColumn('Importe', function($data){ return $data->Importe; })
-                    ->addColumn('TipoCambio', function($data){ return $data->TipoCambio; })
-                    //->addColumn('Costo', function($data){ return $data->Costo; })
-                    //->addColumn('Comision', function($data){ return $data->Comision; })
-                    //->addColumn('Utilidad', function($data){ return $data->Utilidad; })
-                    //->addColumn('TotalDistanciaRecorrida', function($data){ return $data->TotalDistanciaRecorrida; })
                     ->rawColumns(['operaciones'])
                     ->make(true);
         }
@@ -736,7 +713,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
     }
 
     //obtener productos
-    public function notas_credito_clientes_obtener_productos(Request $request){
+    public function carta_porte_obtener_productos(Request $request){
         if($request->ajax()){
             $codigoabuscar = $request->codigoabuscar;
             $numeroalmacen = $request->numeroalmacen;
@@ -749,11 +726,11 @@ class CartaPorteController extends ConfiguracionSistemaController{
                     array_push($arrayproductosseleccionables, $detalle->Codigo);
                 }
             }
-            $data = VistaObtenerExistenciaProducto::whereIn('Codigo', $arrayproductosseleccionables)->where('Codigo', 'like', '%' . $codigoabuscar . '%');
+            $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%');
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($numeroalmacen, $tipooperacion, $stringfacturasseleccionadas){
                         if($data->Almacen == $numeroalmacen || $data->Almacen == NULL){
-                            $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$tipooperacion.'\',\''.$data->Insumo.'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$data->NombreClaveProducto.'\',\''.$data->NombreClaveUnidad.'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\')">Seleccionar</div>';
+                            $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->MaterialPeligroso.'\',\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$tipooperacion.'\',\''.$data->Insumo.'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$data->NombreClaveProducto.'\',\''.$data->NombreClaveUnidad.'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\')">Seleccionar</div>';
                         }else{
                             $boton = '';
                         }
@@ -784,10 +761,15 @@ class CartaPorteController extends ConfiguracionSistemaController{
                 array_push($arrayproductosseleccionables, $detalle->Codigo);
             }
         }
-        $contarproductos = VistaObtenerExistenciaProducto::whereIn('Codigo', $arrayproductosseleccionables)->where('Codigo', $codigoabuscar)->where('Almacen', $numeroalmacen)->count();
+        $contarproductos = VistaObtenerExistenciaProducto::whereIn('Codigo', $arrayproductosseleccionables)
+        ->where('Codigo', $codigoabuscar)
+        ->whereNotIn('Almacen', [6,7])->count();
         if($contarproductos > 0){
-            $producto = VistaObtenerExistenciaProducto::whereIn('Codigo', $arrayproductosseleccionables)->where('Codigo', $codigoabuscar)->where('Almacen', $numeroalmacen)->first();
+            $producto = VistaObtenerExistenciaProducto::whereIn('Codigo', $arrayproductosseleccionables)
+            ->where('Codigo', $codigoabuscar)
+            ->whereNotIn('Almacen', [6,7])->first();
             $data = array(
+                'MaterialPeligroso' => $producto->MaterialPeligroso,
                 'Codigo' => $producto->Codigo,
                 'Producto' => htmlspecialchars($producto->Producto, ENT_QUOTES),
                 'Unidad' => $producto->Unidad,
@@ -804,6 +786,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             );
         }else{
             $data = array(
+                'MaterialPeligroso' => '',
                 'Codigo' => '',
                 'Producto' => '',
                 'Unidad' => '',
@@ -836,6 +819,40 @@ class CartaPorteController extends ConfiguracionSistemaController{
                     ->make(true);
         }
     }
+    /**
+     * @author Jose Alonso Espinares Romero
+     * @return claves
+     */
+    public function carta_porte_obtener_claves_materiales_peligrosos(Request $request){
+        if($request->ajax()){
+            $fila = $request->fila;
+            $data = c_MaterialPeligroso::query();
+            return DataTables::of($data)
+            ->addColumn('operaciones', function($data) use ($fila){
+                $boton = $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarclavepeligroso(\''.$data->Clave .'\',\''.htmlspecialchars($data->Descripcion,ENT_QUOTES) .'\','.$fila.')">Seleccionar</div>';
+                return $boton;
+            })
+            ->rawColumns(['operaciones'])
+            ->make(true);
+        }
+    }
+    /**
+     * @author Jose Alonso Espinares Romero
+     * @return embalajes
+     */
+    public function carta_porte_obtener_claves_tipo_embalajes(Request $request){
+        if($request->ajax()){
+            $fila = $request->fila;
+            $data = c_TipoEmbalaje::query();
+            return DataTables::of($data)
+            ->addColumn('operaciones', function($data) use ($fila){
+                $boton = $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarclavembalaje(\''.$data->Clave .'\',\''.htmlspecialchars($data->Descripcion,ENT_QUOTES) .'\','.$fila.')">Seleccionar</div>';
+                return $boton;
+            })
+            ->rawColumns(['operaciones'])
+            ->make(true);
+        }
+    }
     //obtener claves unidades
     public function notas_credito_clientes_obtener_claves_unidades(Request $request){
         if($request->ajax()){
@@ -843,7 +860,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             $data = ClaveUnidad::query();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($fila){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarclaveunidad(\''.$data->Clave .'\',\''.$data->Nombre .'\','.$fila.')">Seleccionar</div>';
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarclavepeligroso(\''.$data->Clave .'\',\''.$data->Nombre .'\','.$fila.')">Seleccionar</div>';
                         return $boton;
                     })
                     ->rawColumns(['operaciones'])
@@ -1018,148 +1035,136 @@ class CartaPorteController extends ConfiguracionSistemaController{
     }
 
     //alta
-    public function notas_credito_clientes_guardar(Request $request){
+    public function carta_porte_guardar(Request $request){
         ini_set('max_input_vars','20000' );
-            //obtener el ultimo id de la tabla
-            $folio = Helpers::ultimofolioserietablamodulos('App\NotaCliente', $request->serie);
-            //INGRESAR DATOS A TABLA COMPRAS
-            $notacliente = $folio.'-'.$request->serie;
-            $NotaCliente = new NotaCliente;
-            $NotaCliente->Nota=$notacliente;
-            $NotaCliente->Serie=$request->serie;
-            $NotaCliente->Folio=$folio;
-            $NotaCliente->Esquema=$request->esquema;
-            $NotaCliente->Cliente=$request->numerocliente;
-            $NotaCliente->Fecha=Carbon::parse($request->fecha)->toDateTimeString();
-            $NotaCliente->Almacen=$request->numeroalmacen;
-            $NotaCliente->Importe=$request->importe;
-            $NotaCliente->Descuento=$request->descuento;
-            $NotaCliente->Ieps=$request->ieps;
-            $NotaCliente->SubTotal=$request->subtotal;
-            $NotaCliente->Iva=$request->iva;
-            $NotaCliente->IvaRetencion=$request->retencioniva;
-            $NotaCliente->IsrRetencion=$request->retencionisr;
-            $NotaCliente->IepsRetencion=$request->retencionieps;
-            $NotaCliente->Total=$request->total;
-            $NotaCliente->Moneda=$request->moneda;
-            $NotaCliente->TipoCambio=$request->pesosmoneda;
-            $NotaCliente->Obs=$request->observaciones;
-            $NotaCliente->Status="ALTA";
-            $NotaCliente->Usuario=Auth::user()->user;
-            $NotaCliente->CondicionesDePago=$request->condicionesdepago;
-            $NotaCliente->LugarExpedicion=$request->lugarexpedicion;
-            $NotaCliente->RegimenFiscal=$request->claveregimenfiscal;
-            $NotaCliente->TipoRelacion=$request->clavetiporelacion;
-            $NotaCliente->Confirmacion=$request->confirmacion;
-            $NotaCliente->FormaPago=$request->claveformapago;
-            $NotaCliente->MetodoPago=$request->clavemetodopago;
-            $NotaCliente->UsoCfdi=$request->claveusocfdi;
-            $NotaCliente->ResidenciaFiscal=$request->claveresidenciafiscal;
-            $NotaCliente->NumRegIdTrib=$request->numeroregidtrib;
-            $NotaCliente->EmisorRfc=$request->emisorrfc;
-            $NotaCliente->EmisorNombre=$request->emisornombre;
-            $NotaCliente->ReceptorRfc=$request->receptorrfc;
-            $NotaCliente->ReceptorNombre=$request->receptornombre;
-            $NotaCliente->Hora=Carbon::parse($request->fecha)->toDateTimeString();
-            $NotaCliente->Periodo=$this->periodohoy;
-            $NotaCliente->save();
-            //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO NOTAS PROVEEDOR
-            $BitacoraDocumento = new BitacoraDocumento;
-            $BitacoraDocumento->Documento = "NOTAS CLIENTE";
-            $BitacoraDocumento->Movimiento = $notacliente;
-            $BitacoraDocumento->Aplicacion = "ALTA";
-            $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
-            $BitacoraDocumento->Status = "ALTA";
-            $BitacoraDocumento->Usuario = Auth::user()->user;
-            $BitacoraDocumento->Periodo = $this->periodohoy;
-            $BitacoraDocumento->save();
-            //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO NOTAS PROVEEDOR DOC
-            $BitacoraDocumento = new BitacoraDocumento;
-            $BitacoraDocumento->Documento = "NOTAS CLIENTE DOC";
-            $BitacoraDocumento->Movimiento = $notacliente;
-            $BitacoraDocumento->Aplicacion = "ALTA";
-            $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
-            $BitacoraDocumento->Status = "ALTA";
-            $BitacoraDocumento->Usuario = Auth::user()->user;
-            $BitacoraDocumento->Periodo = $this->periodohoy;
-            $BitacoraDocumento->save();
-            //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
-            $item = 1;
-            foreach ($request->codigopartida as $key => $codigopartida){
-                $NotaClienteDetalle=new NotaClienteDetalle;
-                $NotaClienteDetalle->Nota = $notacliente;
-                $NotaClienteDetalle->Cliente = $request->numerocliente;
-                $NotaClienteDetalle->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
-                $NotaClienteDetalle->Codigo = $codigopartida;
-                $NotaClienteDetalle->Descripcion = $request->descripcionpartida [$key];
-                $NotaClienteDetalle->Unidad = $request->unidadpartida [$key];
-                $NotaClienteDetalle->Cantidad =  $request->cantidadpartida  [$key];
-                $NotaClienteDetalle->Precio =  $request->preciopartida [$key];
-                $NotaClienteDetalle->Importe = $request->importepartida [$key];
-                $NotaClienteDetalle->Dcto = $request->descuentoporcentajepartida [$key];
-                $NotaClienteDetalle->Descuento = $request->descuentopesospartida [$key];
-                $NotaClienteDetalle->ImporteDescuento = $request->importedescuentopesospartida [$key];
-                $NotaClienteDetalle->Ieps = $request->trasladoiepspesospartida [$key];
-                $NotaClienteDetalle->SubTotal = $request->subtotalpartida [$key];
-                $NotaClienteDetalle->Impuesto = $request->ivaporcentajepartida [$key];
-                $NotaClienteDetalle->Iva = $request->trasladoivapesospartida [$key];
-                $NotaClienteDetalle->IvaRetencion = $request->retencionivapesospartida [$key];
-                $NotaClienteDetalle->IsrRetencion = $request->retencionisrpesospartida [$key];
-                $NotaClienteDetalle->IepsRetencion = $request->retencioniepspesospartida [$key];
-                $NotaClienteDetalle->Total = $request->totalpesospartida [$key];
-                $NotaClienteDetalle->Costo = $request->costopartida [$key];
-                $NotaClienteDetalle->Partida = $request->partidapartida [$key];
-                $NotaClienteDetalle->ClaveProducto = $request->claveproductopartida [$key];
-                $NotaClienteDetalle->ClaveUnidad = $request->claveunidadpartida [$key];
-                $NotaClienteDetalle->Item = $item;
-                $NotaClienteDetalle->save();
-                if($codigopartida != 'DPPP'){
-                    //sumar existencias del almacen
-                    $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigopartida)->where('Almacen', $request->numeroalmacen)->count();
-                    if($ContarExistenciaAlmacen > 0){
-                        $ExistenciaAlmacen = Existencia::where('Codigo', $codigopartida)->where('Almacen', $request->numeroalmacen)->first();
-                        $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias + $request->cantidadpartida [$key];
-                        Existencia::where('Codigo', $codigopartida)
-                                    ->where('Almacen', $request->numeroalmacen)
-                                    ->update([
-                                        'Existencias' => Helpers::convertirvalorcorrecto($ExistenciaNuevaAlmacen)
-                                    ]);
-                    }else{
-                        $ExistenciaAlmacen = new Existencia;
-                        $ExistenciaAlmacen->Codigo = $codigopartida;
-                        $ExistenciaAlmacen->Almacen = $request->numeroalmacen;
-                        $ExistenciaAlmacen->Existencias = $request->cantidadpartida [$key];
-                        $ExistenciaAlmacen->save();
-                    }
-                }
-                $item++;
+        //obtener el ultimo id de la tabla
+        $folio = Helpers::ultimofolioserietablamodulos('App\CartaPorte', $request->serie);
+        //INGRESAR DATOS A TABLA COMPRAS
+        $cartaporte = $folio.'-'.$request->serie;
+        $CartaPorte = new CartaPorte;
+        $CartaPorte->CartaPorte = $cartaporte;
+        $CartaPorte->Serie= $request->serie;
+        $CartaPorte->RegimenFiscal = $request->claveregimenfiscal;
+        $CartaPorte->Folio= $folio;
+        $CartaPorte->Fecha=Carbon::parse($request->fecha)->toDateTimeString();
+        $CartaPorte->Cliente=$request->numerocliente;
+        $CartaPorte->Status="ALTA";
+        $CartaPorte->Periodo=$this->periodohoy;
+        $CartaPorte->Esquema=$request->esquema;
+        $CartaPorte->Importe = Helpers::convertirvalorcorrecto($request->importe);
+        $CartaPorte->Descuento = Helpers::convertirvalorcorrecto($request->descuento);
+        $CartaPorte->SubTotal = Helpers::convertirvalorcorrecto($request->subtotal);
+        $CartaPorte->Iva = Helpers::convertirvalorcorrecto($request->iva);
+        $CartaPorte->Total = Helpers::convertirvalorcorrecto($request->total);
+        $CartaPorte->Moneda = 'MXN';
+        $CartaPorte->Obs=$request->observaciones;
+        $CartaPorte->Usuario=Auth::user()->user;
+        $CartaPorte->LugarExpedicion=$request->lugarexpedicion;
+        $CartaPorte->RegimenFiscal=$request->claveregimenfiscal;
+        $CartaPorte->UsoCfdi = 'P01' ;
+        $CartaPorte->Hora=Carbon::parse($request->fecha)->toDateTimeString();
+        $CartaPorte->TransporteInternacional = $request->transporteinternacional;
+        $CartaPorte->TotalDistanciaRecorrida = $request->totaldistanciarecorrida;
+        $CartaPorte->RfcRemitente=$request->rfcremitente;
+        $CartaPorte->NombreRemitente=$request->nombreremitente;
+        $CartaPorte->FechaSalida = Carbon::parse($request->fechasalida)->toDateTimeString();
+        $CartaPorte->CalleRemitente = $request->calleremitente;
+        $CartaPorte->NoExteriorRemitente = $request->numeroextremitente;
+        $CartaPorte->NoInteriorRemitente = $request->numerointremitente;
+        $CartaPorte->ColoniaRemitente =  $request->coloniaremitente;
+        $CartaPorte->LocalidadRemitente = $request->localidadremitente;
+        $CartaPorte->ReferenciaRemitente = $request->referenciaremitente;
+        $CartaPorte->MunicipioRemitente = $request->municipioremitente;
+        $CartaPorte->EstadoRemitente = $request->estadoremitente;
+        $CartaPorte->PaisRemitente = $request->paisremitente;
+        $CartaPorte->CodigoPostalRemitente = $request->cpremitente;
+        $CartaPorte->RfcDestinatario=$request->rfcdestinatario;
+        $CartaPorte->NombreDestinatario=$request->nombredestinatario;
+        $CartaPorte->FechaLlegada = Carbon::parse($request->fechallegada)->toDateTimeString();
+        $CartaPorte->CalleDestinatario = $request->calledestinatario;
+        $CartaPorte->NoExteriorDestinatario = $request->numeroextdestinatario;
+        $CartaPorte->NoInteriorDestinatario = $request->numerointdestinatario;
+        $CartaPorte->ColoniaDestinatario = $request->coloniadestinatario;
+        $CartaPorte->LocalidadDestinatario = $request->localidaddestinatario;
+        $CartaPorte->ReferenciaDestinatario = $request->referenciadestinatario;
+        $CartaPorte->MunicipioDestinatario = $request->municipiodestinatario;
+        $CartaPorte->EstadoDestinatario = $request->estadodestinatario;
+        $CartaPorte->PaisDestinatario = $request->paisdestinatario;
+        $CartaPorte->CodigoPostalDestinatario = $request->cpdestinatario;
+        $CartaPorte->ClaveTransporte = $request->clavetransporte;
+        $CartaPorte->RfcOperador = $request->rfcoperador;
+        $CartaPorte->NombreOperador = $request->nombreoperador;
+        $CartaPorte->NumeroLicencia = $request->numerolicenciaoperador;
+        $CartaPorte->CalleOperador = $request->calleoperador;
+        $CartaPorte->NoExteriorOperador = $request->numeroextoperador;
+        $CartaPorte->NoInteriorOperador = $request->numerointoperador;
+        $CartaPorte->ColoniaOperador = $request->coloniaoperador;
+        $CartaPorte->LocalidadOperador = $request->localidadoperador;
+        $CartaPorte->ReferenciaOperador = $request->referenciaoperador;
+        $CartaPorte->MunicipioOperador = $request->municipiooperador;
+        $CartaPorte->EstadoOperador = $request->estadooperador;
+        $CartaPorte->PaisOperador = $request->paisoperador;
+        $CartaPorte->CodigoPostalOperador = $request->cpoperador;
+        $CartaPorte->PermisoSCT = $request->permisosct;
+        $CartaPorte->NumeroPermisoSCT = $request->numeropermisosct;
+        $CartaPorte->NombreAsegurado = $request->nombreaseguradora;
+        $CartaPorte->NumeroPolizaSeguro = $request->numeropolizaseguro;
+        $CartaPorte->ConfiguracionVehicular = $request->claveconfigautotransporte;
+        $CartaPorte->PlacaVehiculoMotor = $request->placavehiculo;
+        $CartaPorte->AnoModeloVehiculoMotor = $request->anovehiculo;
+        $CartaPorte->SubTipoRemolque = $request->subtiporemolque;
+        $CartaPorte->PlacaRemolque = $request->placaremolque;
+        $CartaPorte->TotalMercancias = $request->numerototalmercancias;
+        $CartaPorte->PesoBrutoTotal = $request->pesoTotalBruto;
+        $CartaPorte->save();
+
+        //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO NOTAS PROVEEDOR
+        $BitacoraDocumento = new BitacoraDocumento;
+        $BitacoraDocumento->Documento = "CARTA PORTE";
+        $BitacoraDocumento->Movimiento = $cartaporte;
+        $BitacoraDocumento->Aplicacion = "ALTA";
+        $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
+        $BitacoraDocumento->Status = "ALTA";
+        $BitacoraDocumento->Usuario = Auth::user()->user;
+        $BitacoraDocumento->Periodo = $this->periodohoy;
+        $BitacoraDocumento->save();
+
+        //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
+        $item = 1;
+        foreach ($request->codigopartida as $key => $codigos) {
+            $CartaPorteDetalle = new CartaPorteDetalles;
+            $CartaPorteDetalle->Fecha = Helpers::fecha_exacta_accion_datetimestring();
+            $CartaPorteDetalle->CartaPorte = $cartaporte;
+            $CartaPorteDetalle->Codigo = $request->codigopartida[$key];
+            $CartaPorteDetalle->Descripcion = $request->descripcionpartida[$key];
+            $CartaPorteDetalle->Unidad =  $request->nombreclaveunidadpartida[$key];
+            $CartaPorteDetalle->Cantidad = $request->cantidadPartida[$key];
+            $CartaPorteDetalle->ClaveUnidad = $request->claveunidadpartida[$key];
+            $CartaPorteDetalle->ClaveProducto = $request->claveproductopartida[$key];
+            $CartaPorteDetalle->MaterialPeligroso = $request->materialpeligrosopartida[$key];
+            $CartaPorteDetalle->Moneda = 'MXN';
+            if(isset($request->clavematerialpeligrosopartida)){
+                $CartaPorteDetalle->CveMaterialPeligroso = $request->clavematerialpeligrosopartida[$key];
             }
-            //INGRESAR DATOS A TABLA NOTA CLIENTES DOCUMENTOS
-            $itemdocumento = 1;
-            foreach ($request->facturaaplicarpartida as $key => $facturapartida){
-                $NotaClienteDocumento=new NotaClienteDocumento;
-                $NotaClienteDocumento->Nota = $notacliente;
-                $NotaClienteDocumento->Factura = $facturapartida;
-                $NotaClienteDocumento->UUID = $request->uuidfacturapartida [$key];
-                $NotaClienteDocumento->Descuento = $request->descuentopesosfacturapartida [$key];
-                $NotaClienteDocumento->Item = $itemdocumento;
-                $NotaClienteDocumento->save();
-                //Modificar Factura
-                Factura::where('Factura', $facturapartida)
-                ->update([
-                    'Descuentos' => $request->descuentopesosfacturapartida [$key],
-                    'Saldo' => $request->saldofacturapartida [$key]
-                ]);
-                //Si el saldo es igual a 0 liquidar factura
-                if($request->saldofacturapartida [$key] == Helpers::convertirvalorcorrecto(0)){
-                    Factura::where('Factura', $facturapartida)
-                            ->update([
-                                'Status' => "LIQUIDADO"
-                            ]);
-                }
-                $itemdocumento++;
+            if(isset($request->clavetipoembalajepartida)){
+                $CartaPorteDetalle->Embalaje = $request->clavetipoembalajepartida[$key];
             }
-            return response()->json($NotaCliente);
+            if(isset($request->descripcionembalajepartida)){
+                $CartaPorteDetalle->DescripEmbalaje = $request->descripcionembalajepartida[$key];
+            }
+            $CartaPorteDetalle->PesoEnKilogramos = $request->pesototal[$key];
+            $CartaPorteDetalle->Item = $item;
+            $CartaPorteDetalle->save();
+            $item++;
+        }
+        foreach ($request->uuidrelacionado as $key => $uuid) {
+            $documento = new CartaPorteDocumentos;
+            $documento->CartaPorte = $cartaporte;
+            $documento->Factura = $request->factura[$key];
+            $documento->UUID = $request->uuidrelacionado[$key];
+            $documento->save();
+        }
+        return response()->json($CartaPorte);
     }
 
     //verificar si se puede dar de bajar nota cliente
@@ -1278,85 +1283,140 @@ class CartaPorteController extends ConfiguracionSistemaController{
     }
 
     //obtener nota cliente
-    public function notas_credito_clientes_obtener_nota_cliente(Request $request){
-        $notacliente = NotaCliente::where('Nota', $request->notamodificar)->first();
-        $almacen = 0;
-        if($notacliente->Almacen != 0){
-            $almacen = Almacen::where('Numero', $notacliente->Almacen)->first();
-        }
-        $cliente = Cliente::where('Numero', $notacliente->Cliente)->first();
-        $regimenfiscal = c_RegimenFiscal::where('Clave', $notacliente->RegimenFiscal)->first();
-        $tiporelacion = c_TipoRelacion::where('Clave', $notacliente->TipoRelacion)->first();
-        $formapago = FormaPago::where('Clave', $notacliente->FormaPago)->first();
-        $metodopago = MetodoPago::where('Clave', $notacliente->MetodoPago)->first();
-        $usocfdi = UsoCFDI::where('Clave', $notacliente->UsoCfdi)->first();
-        $residenciafiscal = Pais::where('Clave', $notacliente->ResidenciaFiscal)->first();
+    public function carta_porte_obtener_carta_porte(Request $request){
+        $cartaporte = CartaPorte::where('CartaPorte', $request->cartaporte)->first();
+        $cliente = Cliente::where('Numero', $cartaporte->Cliente)->first();
+        $regimenfiscal = c_RegimenFiscal::where('Clave', $cartaporte->RegimenFiscal)->first();
+        //$tiporelacion = c_TipoRelacion::where('Clave', $notacliente->TipoRelacion)->first();
+        //$formapago = FormaPago::where('Clave', $notacliente->FormaPago)->first();
+        //$metodopago = MetodoPago::where('Clave', $notacliente->MetodoPago)->first();
+        //$usocfdi = UsoCFDI::where('Clave', $notacliente->UsoCfdi)->first();
+        $residenciafiscal = Pais::where('Clave', $cartaporte->ResidenciaFiscal)->first();
+        $vehiculoEmpresa = Vehiculo::where('Placa',$cartaporte->PlacaVehiculoMotor)->first();
+        $configuracionVehicular = c_ConfiguracionAutoTransporte::where('Clave', $cartaporte->ConfiguracionVehicular)->first();
+        $operador = Operador::where('Rfc', $cartaporte->RfcOperador)->first();
+        $clavetransporte = c_CveTransporte::where('Clave',$cartaporte->ClaveTransporte)->first();
+        $MaterialPeligrosoHTML = '';
+        $Embalaje = '';
         //detalles
-        $detallesnotacliente = NotaClienteDetalle::where('Nota', $request->notamodificar)->orderBy('Item', 'ASC')->get();
-        $numerodetallesnotacliente = NotaClienteDetalle::where('Nota', $request->notamodificar)->count();
-        $filasdetallesnotacliente = '';
-        if($numerodetallesnotacliente > 0){
+        $numerodetallescarta = $cartaporte->detalles->count();
+        $pesoUnitario =  0;
+        $filasdetallescartaporte = '';
+        $filasdocumentosrelacionados = '';
+        if($numerodetallescarta > 0){
             $contadorproductos = 0;
             $contadorfilas = 0;
+
             $tipo="modificacion";
-            foreach($detallesnotacliente as $dnc){
-                    $producto = "";
-                    $Existencia = 0;
-                    if($notacliente->Almacen != 0){
-                        $Existencia = Existencia::where('Codigo', $dnc->Codigo)->where('Almacen', $notacliente->Almacen)->first();
-                        $producto = Producto::where('Codigo', $dnc->Codigo)->first();
+            foreach($cartaporte->detalles as $cpd){
+                    $pesoUnitario = ($cpd->PesoEnKilogramos / $cpd->Cantidad);
+
+                    //Inicia Bloque Material Peligro
+                    if($cpd->MaterialPeligroso == "0"){
+                        $MaterialPeligrosoHTML = '<div class="row divorinputmodxl">'.
+                            '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                                '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Material Peligroso"><i class="material-icons">remove_red_eye</i></div>'.
+                            '</div>'.
+                            '<div class="col-xs-5 col-sm-5 col-md-5">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm clavematerialpeligrosopartida" name="clavematerialpeligrosopartida[]"  value="" disabled readonly'.
+                            '</div>'.
+                            '<div class="col-xs-5 col-sm-5 col-md-5">'.
+                                '<input type="hidden" class="form-control divorinputmodmd descripcionclavepeligrosopartida" name="descripcionclavepeligrosopartida[]" disabled  value="">'.
+                            '</div>'.
+                        '</div>';
+                        $Embalaje = '<div class="row divorinputmodxl">'.
+                            '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                                '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Tipos Embalaje"><i class="material-icons">remove_red_eye</i></div>'.
+                            '</div>'.
+                            '<div class="col-xs-5 col-sm-5 col-md-5">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm clavetipoembalajepartida" name="clavetipoembalajepartida[]"  value="" disabled readonly'.
+                            '</div>'.
+                            '<div class="col-xs-5 col-sm-5 col-md-5">'.
+                                '<input type="hidden" class="form-control divorinputmodmd descripcionclavepeligrosopartida" name="descripcionclavepeligrosopartida[]" disabled  value="">'.
+                            '</div>'.
+                        '</div>';
+                    }else if($cpd->MaterialPeligroso == "1"){
+                        $MaterialPeligrosoHTML = '<div class="row divorinputmodxl">'.
+                            '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                                '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Material Peligroso" onclick="listarclavespeligrosos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
+                            '</div>'.
+                            '<div class="col-xs-5 col-sm-5 col-md-5">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm clavematerialpeligrosopartida" name="clavematerialpeligrosopartida[]"  value="'.$cpd->CvaMaterialPeligroso.'" required readonly'.
+                            '</div>'.
+                            '<div class="col-xs-5 col-sm-5 col-md-5">'.
+                                '<input type="hidden" class="form-control divorinputmodmd descripcionclavepeligrosopartida" name="descripcionclavepeligrosopartida[]" required  value="">'.
+                            '</div>'.
+                        '</div>';
+                        $Embalaje = '<div class="row divorinputmodxl">'.
+                            '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                                '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Tipos Embalaje" onclick="listarclavespeligrosos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
+                            '</div>'.
+                            '<div class="col-xs-5 col-sm-5 col-md-5">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm clavetipoembalajepartida" name="clavetipoembalajepartida[]"  value="'.$cpd->Embalaje.'" required readonly'.
+                            '</div>'.
+                            '<div class="col-xs-5 col-sm-5 col-md-5">'.
+                                '<input type="hidden" class="form-control divorinputmodmd descripcionembalajepartida" name="descripcionembalajepartida[]" required  value="'.$cpd->DescripEmbalaje.'" readonly>'.
+                            '</div>'.
+                        '</div>';
+                    }else{
+                        $MaterialPeligrosoHTML = '<div class="row divorinputmodxl">'.
+                            '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                                '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavespeligrosos('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
+                            '</div>'.
+                            '<div class="col-xs-5 col-sm-5 col-md-5">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm clavematerialpeligrosopartida" name="clavematerialpeligrosopartida[]"  value="'.$cpd->CveMaterialPeligroso.'" readonly'.
+                            '</div>'.
+                            '<div class="col-xs-5 col-sm-5 col-md-5">'.
+                                '<input type="hidden" class="form-control divorinputmodmd descripcionclavepeligrosopartida" name="descripcionclavepeligrosopartida[]"  value="">'.
+                            '</div>'.
+                        '</div>';
+                        $Embalaje = '<div class="row divorinputmodxl">'.
+                            '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                                '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Tipos Embalaje" onclick="listartiposembalaje('.$contadorfilas.');" ><i class="material-icons">remove_red_eye</i></div>'.
+                            '</div>'.
+                            '<div class="col-xs-5 col-sm-5 col-md-5">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm clavetipoembalajepartida" name="clavetipoembalajepartida[]"  value="'.$cpd->Embalaje.'" readonly'.
+                            '</div>'.
+                            '<div class="col-xs-5 col-sm-5 col-md-5">'.
+                                '<input type="hidden" class="form-control divorinputmodmd descripcionembalajepartida" name="descripcionembalajepartida[]"  value="'.$cpd->DescripEmbalaje.'" readonly>'.
+                            '</div>'.
+                        '</div>';
                     }
-                    $claveproductopartida = ClaveProdServ::where('Clave', $dnc->ClaveProducto)->first();
-                    $claveunidadpartida = ClaveUnidad::where('Clave', $dnc->ClaveUnidad)->first();
+                    //Termina Bloque Material Peligroso
+                    $claveproductopartida = ClaveProdServ::where('Clave', $cpd->ClaveProducto)->first();
+                    $claveunidadpartida = ClaveUnidad::where('Clave', $cpd->ClaveUnidad)->first();
                     $claveproducto = $claveproductopartida ? $claveproductopartida->Clave : '';
                     $nombreclaveproducto = $claveproductopartida ? $claveproductopartida->Nombre : '';
                     $claveunidad = $claveunidadpartida ? $claveunidadpartida->Clave : '';
                     $nombreclaveunidad = $claveunidadpartida ? $claveunidadpartida->Nombre : '';
-                    //importante porque si se quiere hacer una divison con 0 marca ERROR
-                    $porcentajeieps = 0;
-                    $porcentajeretencioniva = 0;
-                    $porcentajeretencionisr = 0;
-                    $porcentajeretencionieps = 0;
-                    if($dnc->Ieps > 0){
-                        $porcentajeieps = ($dnc->Ieps * 100) / $dnc->ImporteDescuento;
-                    }
-                    if($dnc->IvaRetencion > 0){
-                        $porcentajeretencioniva = ($dnc->IvaRetencion * 100) / $dnc->SubTotal;
-                    }
-                    if($dnc->IsrRetencion > 0){
-                        $porcentajeretencionisr = ($dnc->IsrRetencion * 100) / $dnc->SubTotal;
-                    }
-                    if($dnc->IepsRetencion > 0){
-                        $porcentajeretencionieps = ($dnc->IepsRetencion * 100) / $dnc->SubTotal;
-                    }
-                    if($dnc->Codigo == 'DPPP'){
-                        $filasdetallesnotacliente= $filasdetallesnotacliente.
+                    if($cpd->Codigo == 'DPPP'){
+                        $filasdetallescartaporte .=
                         '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
-                            '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfila" onclick="eliminarfila('.$contadorfilas.')" >X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dnc->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
-                            '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dnc->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$dnc->Codigo.'</b></td>'.
-                            '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($dnc->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
-                            '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxs unidadpartida" name="unidadpartida[]" value="'.$dnc->Unidad.'" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)"></td>'.
+                            '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfila" onclick="eliminarfila('.$contadorfilas.')" >X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$cpd->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$cpd->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$cpd->Codigo.'</b></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($cpd->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxs unidadpartida" name="unidadpartida[]" value="'.$cpd->Unidad.'" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)"></td>'.
                             '<td class="tdmod">'.
-                                '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Cantidad).'" data-parsley-min="0.1" data-parsley-max="1.0"  data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');">'.
+                                '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadPartida" name="cantidadPartida[]" value="'.Helpers::convertirvalorcorrecto($cpd->Cantidad).'" data-parsley-min="0.1"  data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');">'.
                             '</td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Precio).'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');"></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Importe).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Dcto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Descuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" ></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importedescuentopesospartida" name="importedescuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->ImporteDescuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($cpd->Precio).'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.Helpers::convertirvalorcorrecto($cpd->Importe).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($cpd->Dcto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($cpd->Descuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" ></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importedescuentopesospartida" name="importedescuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($cpd->ImporteDescuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
                             '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm iepsporcentajepartida" name="iepsporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($porcentajeieps).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" readonly></td>'.
-                            '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm trasladoiepspesospartida" name="trasladoiepspesospartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Ieps).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->SubTotal).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Impuesto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');"></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm trasladoivapesospartida" name="trasladoivapesospartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Iva).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                            '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm trasladoiepspesospartida" name="trasladoiepspesospartida[]" value="'.Helpers::convertirvalorcorrecto($cpd->Ieps).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'.Helpers::convertirvalorcorrecto($cpd->SubTotal).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($cpd->Impuesto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm trasladoivapesospartida" name="trasladoivapesospartida[]" value="'.Helpers::convertirvalorcorrecto($cpd->Iva).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                             '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm retencionivaporcentajepartida" name="retencionivaporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($porcentajeretencioniva).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" readonly></td>'.
-                            '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm retencionivapesospartida" name="retencionivapesospartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->IvaRetencion).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                            '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm retencionivapesospartida" name="retencionivapesospartida[]" value="'.Helpers::convertirvalorcorrecto($cpd->IvaRetencion).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
                             '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm retencionisrporcentajepartida" name="retencionisrporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($porcentajeretencionisr).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" readonly></td>'.
-                            '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm retencionisrpesospartida" name="retencionisrpesospartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->IsrRetencion).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                            '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm retencionisrpesospartida" name="retencionisrpesospartida[]" value="'.Helpers::convertirvalorcorrecto($cpd->IsrRetencion).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
                             '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm retencioniepsporcentajepartida" name="retencioniepsporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($porcentajeretencionieps).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" readonly></td>'.
-                            '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm retencioniepspesospartida" name="retencioniepspesospartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->IepsRetencion).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Total).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                            '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                            '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm retencioniepspesospartida" name="retencioniepspesospartida[]" value="'.Helpers::convertirvalorcorrecto($cpd->IepsRetencion).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto($cpd->Total).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                            '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'.Helpers::convertirvalorcorrecto($cpd->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                             '<td class="tdmod"><input type="text" class="form-control divorinputmodsm partidapartida" name="partidapartida[]"  value="0" readonly></td>'.
                             '<td class="tdmod">'.
                                 '<div class="row divorinputmodxl">'.
@@ -1383,38 +1443,29 @@ class CartaPorteController extends ConfiguracionSistemaController{
                         '</tr>';
                         $tipodetalles = 'dppp';
                     }else{
-                        $filasdetallesnotacliente= $filasdetallesnotacliente.
+                        $filasdetallescartaporte= $filasdetallescartaporte.
                         '<tr class="filasproductos" id="filaproducto'.$contadorfilas.'">'.
-                            '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfila" onclick="eliminarfila('.$contadorfilas.')" >X</div><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$dnc->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
-                            '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$dnc->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$dnc->Codigo.'</b></td>'.
-                            '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($dnc->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
-                            '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxs unidadpartida" name="unidadpartida[]" value="'.$dnc->Unidad.'" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)"></td>'.
+                            '<td class="tdmod"><input type="hidden" class="btn btn-danger btn-xs btneliminarfila"><input type="hidden" class="form-control itempartida" name="itempartida[]" value="'.$cpd->Item.'" readonly><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="NA" readonly></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm partidapartida" name="partidapartida[]" value="'.$cpd->Item.'"></td>'.
+                            '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$cpd->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$cpd->Codigo.'</b></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($cpd->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                             '<td class="tdmod">'.
-                                '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Cantidad).'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');revisarcantidadnotavscantidadfactura('.$contadorfilas.');">'.
-                                '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="'.Helpers::convertirvalorcorrecto($dnc->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);">'.
+                                '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadPartida" name="cantidadPartida[]" value="'.Helpers::convertirvalorcorrecto($cpd->Cantidad).'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularPesoPartida('.$contadorfilas.')"></td>'.
+                                '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($cpd->Cantidad).'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');revisarcantidadnotavscantidadfactura('.$contadorfilas.');">'.
+                                '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="'.Helpers::convertirvalorcorrecto($cpd->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);">'.
                                 '<input type="hidden" class="form-control cantidadincorrecta" name="cantidadincorrecta[]" >'.
                                 '<input type="hidden" class="form-control realizarbusquedaexistencias" name="realizarbusquedaexistencias[]" value="1" >'.
                                 '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'.
                             '</td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Precio).'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');"></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Importe).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Dcto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Descuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" ></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importedescuentopesospartida" name="importedescuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->ImporteDescuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
-                            '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm iepsporcentajepartida" name="iepsporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($porcentajeieps).'"  data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" readonly></td>'.
-                            '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm trasladoiepspesospartida" name="trasladoiepspesospartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Ieps).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->SubTotal).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Impuesto).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');"></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm trasladoivapesospartida" name="trasladoivapesospartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Iva).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                            '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm retencionivaporcentajepartida" name="retencionivaporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($porcentajeretencioniva).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" readonly></td>'.
-                            '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm retencionivapesospartida" name="retencionivapesospartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->IvaRetencion).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
-                            '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm retencionisrporcentajepartida" name="retencionisrporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($porcentajeretencionisr).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" readonly></td>'.
-                            '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm retencionisrpesospartida" name="retencionisrpesospartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->IsrRetencion).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
-                            '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm retencioniepsporcentajepartida" name="retencioniepsporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($porcentajeretencionieps).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');" readonly></td>'.
-                            '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm retencioniepspesospartida" name="retencioniepspesospartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->IepsRetencion).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);" readonly></td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Total).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                            '<td class="tdmod" hidden><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm costopartida" name="costopartida[]" value="'.Helpers::convertirvalorcorrecto($dnc->Costo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                            '<td class="tdmod"><input type="text" class="form-control divorinputmodsm partidapartida" name="partidapartida[]" value="0"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm pesopartida" name="pesobrutopartida[]" value="'.Helpers::convertirvalorcorrecto($pesoUnitario).'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularPesoPartida('.$contadorfilas.');"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm pesototalpartida" name="pesototal[]" value="'.Helpers::convertirvalorcorrecto($cpd->PesoEnKilogramos).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
+                            '<td class="tdmod">'.
+                                '<input type="hidden" name="materialpeligrosopartida[]" value="'.$cpd->MaterialPeligroso.'"></input>'.
+                                $MaterialPeligrosoHTML
+                            .'</td>'.
+                            '<td class="tdmod">'.
+                                $Embalaje
+                            .'</td>'.
                             '<td class="tdmod">'.
                                 '<div class="row divorinputmodxl">'.
                                     '<div class="col-xs-2 col-sm-2 col-md-2">'.
@@ -1444,53 +1495,34 @@ class CartaPorteController extends ConfiguracionSistemaController{
                     $contadorfilas++;
             }
         }
-        //nota proveedor documentos
-        $documentosnotacliente = NotaClienteDocumento::where('Nota', $request->notamodificar)->orderBy('Item', 'ASC')->get();
-        $numerodocumentosnotacliente = NotaClienteDocumento::where('Nota', $request->notamodificar)->count();
-        $filasdocumentosnotacliente = '';
-        $arrayfacturas = array();
-        if($numerodocumentosnotacliente > 0){
-            $contadorfilasfacturas = 0;
-            $tipo="modificacion";
-            $descuentofacturas = 0;
-            foreach($documentosnotacliente as $docnc){
-                    array_push($arrayfacturas, $docnc->Factura);
-                    $descuentofac = 0;
-                    $descuentosfactura = NotaClienteDocumento::where('Nota', '<>', $request->notamodificar)->where('Factura', $docnc->Factura)->get();
-                    foreach($descuentosfactura as $descuento){
-                        $descuentofac = $descuentofac + $descuento->Descuento;
-                    }
-                    $factura = Factura::where('Factura', $docnc->Factura)->first();
-                    $saldo = $factura->Saldo + $factura->Descuentos;
-                    $filasdocumentosnotacliente= $filasdocumentosnotacliente.
-                    '<tr class="filasfacturas" id="filafactura'.$contadorfilasfacturas.'">'.
-                        '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfilafactura" onclick="eliminarfilafacturanotacliente('.$contadorfilasfacturas.')" >X</div><input type="hidden" class="form-control itemfacturapartida" name="itemfacturapartida[]" value="'.$docnc->Item.'" readonly><input type="hidden" class="form-control facturaagregadoen" name="facturaagregadoen[]" value="NA" readonly></td>'.
-                        '<td class="tdmod"><input type="hidden" class="form-control facturaaplicarpartida" name="facturaaplicarpartida[]" value="'.$factura->Factura.'" readonly>'.$factura->Factura.'</td>'.
-                        '<td class="tdmod"><input type="hidden" class="form-control fechafacturapartida" name="fechafacturapartida[]" value="'.$factura->Fecha.'" readonly>'.$factura->Fecha.'</td>'.
-                        '<td class="tdmod"><input type="hidden" class="form-control uuidfacturapartida" name="uuidfacturapartida[]" value="'.$factura->UUID.'" readonly>'.$factura->UUID.'</td>'.
-                        '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd totalpesosfacturapartida" name="totalpesosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto($factura->Total).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                        '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd abonosfacturapartida" name="abonosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto($factura->Abonos).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                        '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd notascreditofacturapartida" name="notascreditofacturapartida[]" value="'.Helpers::convertirvalorcorrecto($descuentofac).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                        '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdetfac divorinputmodmd descuentopesosfacturapartida" name="descuentopesosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto($docnc->Descuento).'" data-parsley-max="'.Helpers::convertirvalorcorrecto($saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilastablafacturas('.$contadorfilasfacturas.');" ></td>'.
-                        '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd saldofacturapartida" name="saldofacturapartida[]" value="'.Helpers::convertirvalorcorrecto($factura->Saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-                    '</tr>';
-                    $descuentofacturas = $descuentofacturas+$docnc->Descuento;
+        $filasdocumentosrelacionados = '';
+        if ($cartaporte->documentos->count() > 0) {
+            foreach ($cartaporte->documentos as $documento) {
+                $filasdocumentosrelacionados .=
+                '<tr class="filasuuid" id="filauuid0"></tr>';
+            //     $filasdocumentosrelacionados.= '<tr class="filasuuid" id="filauuid0">'.
+            //     '<td class="tdmod">'.
+            //         '<div class="btn btn-danger btn-xs btneliminaruuid">X</div><input type="hidden" class="form-control uuidagregadoen" name="uuidagregadoen[]" value="NA" readonly>'.
+            //     '</td>'.
+            //     '<td class="tdmod">'.
+            //         '<input type="hidden" class="form-control divorinputmodsm uuidrelacionado" name="uuidrelacionado[]" value="'.$documento->UUID.'" readonly required>'.$documento->UUID.
+            //         '<input type="text" style="display:none"; class="form-control divorinputmodsm" name="factura[]" value="'.$documento->Factura.'" readonly>'.
+            //     '</td>'.
+            // '</tr>';
             }
         }
-        $diferencia = $notacliente->Total - $descuentofacturas;
-        //permitir o no modificar registro
         if(Auth::user()->role_id == 1){
-            if($notacliente->Status == 'BAJA'){
+            if($cartaporte->Status == 'BAJA'){
                 $modificacionpermitida = 0;
             }else{
                 $modificacionpermitida = 1;
             }
         }
         if(Auth::user()->role_id != 1){
-            if($notacliente->Status == 'BAJA'){
+            if($cartaporte->Status == 'BAJA'){
                 $modificacionpermitida = 0;
             }else{
-                $resultadofechas = Helpers::compararanoymesfechas($notacliente->Fecha);
+                $resultadofechas = Helpers::compararanoymesfechas($cartaporte->Fecha);
                 if($resultadofechas != ''){
                     $modificacionpermitida = 0;
                 }else{
@@ -1499,332 +1531,170 @@ class CartaPorteController extends ConfiguracionSistemaController{
             }
         }
         $data = array(
-            "notacliente" => $notacliente,
-            "filasdetallesnotacliente" => $filasdetallesnotacliente,
-            "numerodetallesnotacliente" => $numerodetallesnotacliente,
+            "cartaporte" => $cartaporte,
+            "filasdetallescartaporte" => $filasdetallescartaporte,
+            "filasdocumentosrelacionados" => $filasdocumentosrelacionados,
+            "numerodetallescarta" => $numerodetallescarta,
             "contadorproductos" => $contadorproductos,
             "contadorfilas" => $contadorfilas,
             "tipodetalles" => $tipodetalles,
-            "almacen" => $almacen,
             "cliente" => $cliente,
             "regimenfiscal" => $regimenfiscal,
-            "tiporelacion" => $tiporelacion,
-            "formapago" => $formapago,
-            "metodopago" => $metodopago,
-            "usocfdi" => $usocfdi,
+            "vehiculoEmpresa" => $vehiculoEmpresa,
+            "configuracionVehicular" => $configuracionVehicular,
+            'clavetransporte' => $clavetransporte,
             "residenciafiscal" => $residenciafiscal,
-            "filasdocumentosnotacliente" => $filasdocumentosnotacliente,
-            "numerodocumentosnotacliente" => $numerodocumentosnotacliente,
-            "contadorfilasfacturas" => $contadorfilasfacturas,
-            "arrayfacturas" => $arrayfacturas,
-            "descuentofacturas" => Helpers::convertirvalorcorrecto($descuentofacturas),
-            "diferencia" => Helpers::convertirvalorcorrecto($diferencia),
-            "fecha" => Helpers::formatoinputdatetime($notacliente->Fecha),
-            "importe" => Helpers::convertirvalorcorrecto($notacliente->Importe),
-            "descuento" => Helpers::convertirvalorcorrecto($notacliente->Descuento),
-            "ieps" => Helpers::convertirvalorcorrecto($notacliente->Ieps),
-            "subtotal" => Helpers::convertirvalorcorrecto($notacliente->SubTotal),
-            "iva" => Helpers::convertirvalorcorrecto($notacliente->Iva),
-            "ivaretencion" => Helpers::convertirvalorcorrecto($notacliente->IvaRetencion),
-            "isrretencion" => Helpers::convertirvalorcorrecto($notacliente->IsrRetencion),
-            "iepsretencion" => Helpers::convertirvalorcorrecto($notacliente->IepsRetencion),
-            "total" => Helpers::convertirvalorcorrecto($notacliente->Total),
-            "tipocambio" => Helpers::convertirvalorcorrecto($notacliente->TipoCambio),
-            "modificacionpermitida" => $modificacionpermitida
+            "fecha" => Carbon::parse($cartaporte->Fecha)->toDateTimeString(),
+            "Operador" => $operador,
+            "modificacionpermitida" => $modificacionpermitida,
         );
         return response()->json($data);
     }
 
     //cambios
-    public function notas_credito_clientes_guardar_modificacion(Request $request){
+    public function carta_porte_guardar_modificacion(Request $request){
         ini_set('max_input_vars','20000' );
-            $notacliente = $request->notaclientebd;
-            $NotaCliente = NotaCliente::where('Nota', $notacliente)->first();
-            //array detalles antes de modificacion
-            $ArrayDetallesNotaAnterior = Array();
-            $DetallesNotaAnterior = NotaClienteDetalle::where('Nota', $notacliente)->get();
-            foreach($DetallesNotaAnterior as $detalle){
-                array_push($ArrayDetallesNotaAnterior, $detalle->Nota.'#'.$detalle->Codigo.'#'.$detalle->Item);
-            }
-            //array detalles despues de modificacion
-            $ArrayDetallesNotaNuevo = Array();
-            foreach ($request->codigopartida as $key => $nuevocodigo){
-                if($request->agregadoen [$key] == 'NA'){
-                    array_push($ArrayDetallesNotaNuevo, $notacliente.'#'.$nuevocodigo.'#'.$request->itempartida [$key]);
-                }
-            }
-            //diferencias entre arreglos
-            $diferencias_arreglos = array_diff($ArrayDetallesNotaAnterior, $ArrayDetallesNotaNuevo);
-            //iteramos las diferencias entre arreglos
-            if(count($diferencias_arreglos) > 0){
-                foreach($diferencias_arreglos as $eliminapartida){
-                    $explode_d = explode("#",$eliminapartida);
-                    $detallenota = NotaClienteDetalle::where('Nota', $explode_d[0])->where('Codigo', $explode_d[1])->where('Item', $explode_d[2])->first();
-                    //restar existencias a almacen principal
-                    $RestarExistenciaAlmacen = Existencia::where('Codigo', $explode_d[1])->where('Almacen', $request->numeroalmacen)->first();
-                    $RestarExistenciaNuevaAlmacen = $RestarExistenciaAlmacen->Existencias - $detallenota->Cantidad;
-                    Existencia::where('Codigo', $explode_d[1])
-                                ->where('Almacen', $request->numeroalmacen)
-                                ->update([
-                                    'Existencias' => Helpers::convertirvalorcorrecto($RestarExistenciaNuevaAlmacen)
-                                ]);
-                    //eliminar detalle
-                    $eliminardetalle= NotaClienteDetalle::where('Nota', $explode_d[0])->where('Codigo', $explode_d[1])->where('Item', $explode_d[2])->forceDelete();
-                }
-            }
-            //array detalles documentos antes de modificacion
-            $ArrayDetallesDocumentosNotaAnterior = Array();
-            $DetallesDocumentosNotaAnterior = NotaClienteDocumento::where('Nota', $notacliente)->get();
-            foreach($DetallesDocumentosNotaAnterior as $detalledocumento){
-                array_push($ArrayDetallesDocumentosNotaAnterior, $detalledocumento->Nota.'#'.$detalledocumento->Factura.'#'.$detalledocumento->Item);
-            }
-            //array detalles documentos despues de modificacion
-            $ArrayDetallesDocumentosNotaNuevo = Array();
-            foreach ($request->facturaaplicarpartida as $key => $nuevafactura){
-                if($request->facturaagregadoen [$key] == 'NA'){
-                    array_push($ArrayDetallesDocumentosNotaNuevo, $notacliente.'#'.$nuevafactura.'#'.$request->itemfacturapartida [$key]);
-                }
-            }
-            //diferencias entre arreglos
-            $diferencias_arreglos = array_diff($ArrayDetallesDocumentosNotaAnterior, $ArrayDetallesDocumentosNotaNuevo);
-            //iteramos las diferencias entre arreglos
-            if(count($diferencias_arreglos) > 0){
-                foreach($diferencias_arreglos as $eliminapartida){
-                    $explode_d = explode("#",$eliminapartida);
-                    $detalledocumentonota = NotaClienteDocumento::where('Nota', $explode_d[0])->where('Factura', $explode_d[1])->where('Item', $explode_d[2])->first();
-                    //Regresar saldo y descuentos a la factura
-                    $notaclientedocumento = NotaClienteDocumento::where('Nota', $explode_d[0])->where('Factura', $explode_d[1])->where('Item', $explode_d[2])->first();
-                    $facturadocumento = Factura::where('Factura', $explode_d[1])->first();
-                    $NuevoDescuentos = $facturadocumento->Descuentos - $notaclientedocumento->Descuento;
-                    $NuevoSaldo = $facturadocumento->Saldo + $notaclientedocumento->Descuento;
-                    Factura::where('Factura', $explode_d[1])
-                    ->update([
-                        'Descuentos' => Helpers::convertirvalorcorrecto($NuevoDescuentos),
-                        'Saldo' => Helpers::convertirvalorcorrecto($NuevoSaldo)
-                    ]);
-                    //eliminar detalle
-                    $eliminardetalledocumento= NotaClienteDocumento::where('Nota', $explode_d[0])->where('Factura', $explode_d[1])->where('Item', $explode_d[2])->forceDelete();
-                }
-            }
+            $cartaporte = $request->folio.'-'.$request->serie;
+            $CartaPorte = CartaPorte::where('CartaPorte', $cartaporte)->first();
+            $MaterialPeligroso = null;
+            $Embalaje = null;
+            $descripcionEmbalaje = null;
             //modificar nota
-            NotaCliente::where('Nota', $notacliente)
+            CartaPorte::where('CartaPorte', $cartaporte)
             ->update([
-                'Cliente' => $request->numerocliente,
-                'Fecha' => Carbon::parse($request->fecha)->toDateTimeString(),
-                'Almacen' => $request->numeroalmacen,
-                'Importe' => $request->importe,
-                'Descuento' => $request->descuento,
-                'Ieps' => $request->ieps,
-                'SubTotal' => $request->subtotal,
-                'Iva' => $request->iva,
-                'IvaRetencion' => $request->retencioniva,
-                'IsrRetencion' => $request->retencionisr,
-                'IepsRetencion' => $request->retencionieps,
-                'Total' => $request->total,
-                'Moneda' => $request->moneda,
-                'TipoCambio' => $request->pesosmoneda,
-                'Obs' => $request->observaciones,
-                'CondicionesDePago' => $request->condicionesdepago,
-                'LugarExpedicion' => $request->lugarexpedicion,
-                'RegimenFiscal' => $request->claveregimenfiscal,
-                'TipoRelacion' => $request->clavetiporelacion,
-                'Confirmacion' => $request->confirmacion,
-                'FormaPago' => $request->claveformapago,
-                'MetodoPago' => $request->clavemetodopago,
-                'UsoCfdi' => $request->claveusocfdi,
-                'ResidenciaFiscal' => $request->claveresidenciafiscal,
-                'NumRegIdTrib' => $request->numeroregidtrib,
-                'EmisorRfc' => $request->emisorrfc,
-                'EmisorNombre' => $request->emisornombre,
-                'ReceptorRfc' => $request->receptorrfc,
-                'ReceptorNombre' => $request->receptornombre
+                'Cliente' =>$request->numerocliente,
+                'Periodo' =>$this->periodohoy,
+                'Esquema' =>$request->esquema,
+                'Obs' =>$request->observaciones,
+                'Usuario' =>Auth::user()->user,
+                'LugarExpedicion' =>$request->lugarexpedicion,
+                'RegimenFiscal' =>$request->claveregimenfiscal,
+                'Hora' =>Carbon::parse($request->fecha)->toDateTimeString(),
+                'TransporteInternacional ' => $request->transporteinternacional,
+                'TotalDistanciaRecorrida ' => $request->totaldistanciarecorrida,
+                'RfcRemitente' =>$request->rfcremitente,
+                'NombreRemitente' =>$request->nombreremitente,
+                'FechaSalida ' => Carbon::parse($request->fechasalida)->toDateTimeString(),
+                'CalleRemitente ' => $request->calleremitente,
+                'NoExteriorRemitente ' => $request->numeroextremitente,
+                'NoInteriorRemitente ' => $request->numerointremitente,
+                'ColoniaRemitente ' =>  $request->coloniaremitente,
+                'LocalidadRemitente ' => $request->localidadremitente,
+                'ReferenciaRemitente ' => $request->referenciaremitente,
+                'MunicipioRemitente ' => $request->municipioremitente,
+                'EstadoRemitente ' => $request->estadoremitente,
+                'PaisRemitente ' => $request->paisremitente,
+                'CodigoPostalRemitente ' => $request->cpremitente,
+                'RfcDestinatario' =>$request->rfcdestinatario,
+                'NombreDestinatario' =>$request->nombredestinatario,
+                'FechaLlegada ' => Carbon::parse($request->fechallegada)->toDateTimeString(),
+                'CalleDestinatario ' => $request->calledestinatario,
+                'NoExteriorDestinatario ' => $request->numeroextdestinatario,
+                'NoInteriorDestinatario ' => $request->numerointdestinatario,
+                'ColoniaDestinatario ' => $request->coloniadestinatario,
+                'LocalidadDestinatario ' => $request->localidaddestinatario,
+                'ReferenciaDestinatario ' => $request->referenciadestinatario,
+                'MunicipioDestinatario ' => $request->municipiodestinatario,
+                'EstadoDestinatario ' => $request->estadodestinatario,
+                'PaisDestinatario ' => $request->paisdestinatario,
+                'CodigoPostalDestinatario ' => $request->cpdestinatario,
+                'ClaveTransporte ' => $request->clavetransporte,
+                'RfcOperador ' => $request->rfcoperador,
+                'NombreOperador ' => $request->nombreoperador,
+                'NumeroLicencia ' => $request->numerolicenciaoperador,
+                'CalleOperador ' => $request->calleoperador,
+                'NoExteriorOperador ' => $request->numeroextoperador,
+                'NoInteriorOperador ' => $request->numerointoperador,
+                'ColoniaOperador ' => $request->coloniaoperador,
+                'LocalidadOperador ' => $request->localidadoperador,
+                'ReferenciaOperador ' => $request->referenciaoperador,
+                'MunicipioOperador ' => $request->municipiooperador,
+                'EstadoOperador ' => $request->estadooperador,
+                'PaisOperador ' => $request->paisoperador,
+                'CodigoPostalOperador ' => $request->cpoperador,
+                'PermisoSCT ' => $request->permisosct,
+                'NumeroPermisoSCT ' => $request->numeropermisosct,
+                'NombreAsegurado ' => $request->nombreaseguradora,
+                'NumeroPolizaSeguro ' => $request->numeropolizaseguro,
+                'ConfiguracionVehicular ' => $request->claveconfigautotransporte,
+                'PlacaVehiculoMotor ' => $request->placavehiculo,
+                'AnoModeloVehiculoMotor ' => $request->anovehiculo,
+                'SubTipoRemolque ' => $request->subtiporemolque,
+                'PlacaRemolque ' => $request->placaremolque,
+                'TotalMercancias ' => $request->numerototalmercancias,
+                'PesoBrutoTotal ' => $request->pesoTotalBruto
             ]);
             //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
-            $BitacoraDocumento = new BitacoraDocumento;
-            $BitacoraDocumento->Documento = "NOTAS CLIENTE";
-            $BitacoraDocumento->Movimiento = $notacliente;
+            $BitacoraDocumento =  new BitacoraDocumento;
+            $BitacoraDocumento->Documento = "CARTA PORTE";
+            $BitacoraDocumento->Movimiento = $cartaporte;
             $BitacoraDocumento->Aplicacion = "CAMBIO";
             $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
-            $BitacoraDocumento->Status = $NotaCliente->Status;
+            $BitacoraDocumento->Status = 'ALTA';
             $BitacoraDocumento->Usuario = Auth::user()->user;
             $BitacoraDocumento->Periodo = $this->periodohoy;
             $BitacoraDocumento->save();
             //detalles
             foreach ($request->codigopartida as $key => $codigopartida){
                 //if la partida se agrego en la modificacion se realiza un insert
+
+                if(isset($request->clavematerialpeligrosopartida)){
+                    $MaterialPeligroso = $request->clavematerialpeligrosopartida[$key];
+                }
+                if(isset($request->clavetipoembalajepartida)){
+                    $Embalaje = $request->clavetipoembalajepartida[$key];
+                }
+                if(isset($request->descripcionembalajepartida)){
+                    $descripcionEmbalaje = $request->descripcionembalajepartida[$key];
+                }
+
                 if($request->agregadoen [$key] == 'modificacion'){
-                    $contaritems = NotaClienteDetalle::select('Item')->where('Nota', $notacliente)->count();
+                    $contaritems = CartaPorteDetalles::select('Item')->where('CartaPorte', $cartaporte)->count();
                     if($contaritems > 0){
-                        $item = NotaClienteDetalle::select('Item')->where('Nota', $notacliente)->orderBy('Item', 'DESC')->take(1)->get();
+                        $item = CartaPorteDetalles::select('Item')->where('CartaPorte', $cartaporte)->orderBy('Item', 'DESC')->take(1)->get();
                         $ultimoitem = $item[0]->Item+1;
                     }else{
                         $ultimoitem = 1;
                     }
-                    $NotaClienteDetalle=new NotaClienteDetalle;
-                    $NotaClienteDetalle->Nota = $notacliente;
-                    $NotaClienteDetalle->Cliente = $request->numerocliente;
-                    $NotaClienteDetalle->Fecha = Carbon::parse($request->fecha)->toDateTimeString();
-                    $NotaClienteDetalle->Codigo = $codigopartida;
-                    $NotaClienteDetalle->Descripcion = $request->descripcionpartida [$key];
-                    $NotaClienteDetalle->Unidad = $request->unidadpartida [$key];
-                    $NotaClienteDetalle->Cantidad =  $request->cantidadpartida  [$key];
-                    $NotaClienteDetalle->Precio =  $request->preciopartida [$key];
-                    $NotaClienteDetalle->Importe = $request->importepartida [$key];
-                    $NotaClienteDetalle->Dcto = $request->descuentoporcentajepartida [$key];
-                    $NotaClienteDetalle->Descuento = $request->descuentopesospartida [$key];
-                    $NotaClienteDetalle->ImporteDescuento = $request->importedescuentopesospartida [$key];
-                    $NotaClienteDetalle->Ieps = $request->trasladoiepspesospartida [$key];
-                    $NotaClienteDetalle->SubTotal = $request->subtotalpartida [$key];
-                    $NotaClienteDetalle->Impuesto = $request->ivaporcentajepartida [$key];
-                    $NotaClienteDetalle->Iva = $request->trasladoivapesospartida [$key];
-                    $NotaClienteDetalle->IvaRetencion = $request->retencionivapesospartida [$key];
-                    $NotaClienteDetalle->IsrRetencion = $request->retencionisrpesospartida [$key];
-                    $NotaClienteDetalle->IepsRetencion = $request->retencioniepspesospartida [$key];
-                    $NotaClienteDetalle->Total = $request->totalpesospartida [$key];
-                    $NotaClienteDetalle->Costo = $request->costopartida [$key];
-                    $NotaClienteDetalle->Partida = $request->partida [$key];
-                    $NotaClienteDetalle->ClaveProducto = $request->claveproductopartida [$key];
-                    $NotaClienteDetalle->ClaveUnidad = $request->claveunidadpartida [$key];
-                    $NotaClienteDetalle->Item = $ultimoitem;
-                    $NotaClienteDetalle->save();
-                    if($codigopartida != 'DPPP'){
-                        //sumar existencias del almacen
-                        $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigopartida)->where('Almacen', $request->numeroalmacen)->count();
-                        if($ContarExistenciaAlmacen > 0){
-                            $ExistenciaAlmacen = Existencia::where('Codigo', $codigopartida)->where('Almacen', $request->numeroalmacen)->first();
-                            $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias + $request->cantidadpartida [$key];
-                            Existencia::where('Codigo', $codigopartida)
-                                        ->where('Almacen', $request->numeroalmacen)
-                                        ->update([
-                                            'Existencias' => Helpers::convertirvalorcorrecto($ExistenciaNuevaAlmacen)
-                                        ]);
-                        }else{
-                            $ExistenciaAlmacen = new Existencia;
-                            $ExistenciaAlmacen->Codigo = $codigopartida;
-                            $ExistenciaAlmacen->Almacen = $request->numeroalmacen;
-                            $ExistenciaAlmacen->Existencias = $request->cantidadpartida [$key];
-                            $ExistenciaAlmacen->save();
-                        }
-                    }
+                    $CartaPorteDetalle = new CartaPorteDetalles;
+                    $CartaPorteDetalle->Fecha = Helpers::fecha_exacta_accion_datetimestring();
+                    $CartaPorteDetalle->CartaPorte = $cartaporte;
+                    $CartaPorteDetalle->Codigo = $request->codigopartida[$key];
+                    $CartaPorteDetalle->Descripcion = $request->descripcionpartida[$key];
+                    $CartaPorteDetalle->Unidad =  $request->nombreclaveunidadpartida[$key];
+                    $CartaPorteDetalle->Cantidad = $request->cantidadPartida[$key];
+                    $CartaPorteDetalle->ClaveUnidad = $request->claveunidadpartida[$key];
+                    $CartaPorteDetalle->ClaveProducto = $request->claveproductopartida[$key];
+                    $CartaPorteDetalle->MaterialPeligroso = $request->materialpeligrosopartida[$key];
+                    $CartaPorteDetalle->CveMaterialPeligroso = $MaterialPeligroso;
+                    $CartaPorteDetalle->Embalaje = $Embalaje;
+                    $CartaPorteDetalle->DescripEmbalaje = $descripcionEmbalaje;
+                    $CartaPorteDetalle->PesoEnKilogramos = $request->pesototal[$key];
+                    $CartaPorteDetalle->Item = $ultimoitem;
+                    $CartaPorteDetalle->save();
                 }else{
                     //si la partida no se agrego en la modificacion solo se modifican los datos
                     //modificar detalle
-                    NotaClienteDetalle::where('Nota', $notacliente)
-                    ->where('Item', $request->itempartida [$key])
+                    CartaPorteDetalles::where('CartaPorte', $cartaporte)
+                    ->where('Item', $request->partidapartida[$key])
                     ->update([
-                        'Cliente' => $request->numerocliente,
-                        'Fecha' => Carbon::parse($request->fecha)->toDateTimeString(),
-                        'Codigo' => $codigopartida,
-                        'Descripcion' => $request->descripcionpartida [$key],
-                        'Unidad' => $request->unidadpartida [$key],
-                        'Cantidad' =>  $request->cantidadpartida  [$key],
-                        'Precio' =>  $request->preciopartida [$key],
-                        'Importe' => $request->importepartida [$key],
-                        'Dcto' => $request->descuentoporcentajepartida [$key],
-                        'Descuento' => $request->descuentopesospartida [$key],
-                        'ImporteDescuento' => $request->importedescuentopesospartida [$key],
-                        'Ieps' => $request->trasladoiepspesospartida [$key],
-                        'SubTotal' => $request->subtotalpartida [$key],
-                        'Impuesto' => $request->ivaporcentajepartida [$key],
-                        'Iva' => $request->trasladoivapesospartida [$key],
-                        'IvaRetencion' => $request->retencionivapesospartida [$key],
-                        'IsrRetencion' => $request->retencionisrpesospartida [$key],
-                        'IepsRetencion' => $request->retencioniepspesospartida [$key],
-                        'Total' => $request->totalpesospartida [$key],
-                        'Costo' => $request->costopartida [$key],
-                        'Partida' => $request->partidapartida [$key],
-                        'ClaveProducto' => $request->claveproductopartida [$key],
-                        'ClaveUnidad' => $request->claveunidadpartida [$key]
+                        'Fecha' => Helpers::fecha_exacta_accion_datetimestring(),
+                        'CartaPorte' => $cartaporte,
+                        'Codigo' => $request->codigopartida[$key],
+                        'Descripcion' => $request->descripcionpartida[$key],
+                        'Unidad' =>  $request->nombreclaveunidadpartida[$key],
+                        'Cantidad' => $request->cantidadPartida[$key],
+                        'ClaveUnidad' => $request->claveunidadpartida[$key],
+                        'ClaveProducto' => $request->claveproductopartida[$key],
+                        'MaterialPeligroso' => $request->materialpeligrosopartida[$key],
+                        'CveMaterialPeligroso' => $MaterialPeligroso,
+                        'Embalaje' => $Embalaje,
+                        'DescripEmbalaje' => $descripcionEmbalaje,
+                        'PesoEnKilogramos' => $request->pesototal[$key],
                     ]);
-                    if($codigopartida != 'DPPP'){
-                        //restar existencias a almacen principal
-                        $ExistenciaAlmacen = Existencia::where('Codigo', $codigopartida)->where('Almacen', $request->numeroalmacen)->first();
-                        $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias - $request->cantidadpartidadb [$key];
-                        Existencia::where('Codigo', $codigopartida)
-                                    ->where('Almacen', $request->numeroalmacen)
-                                    ->update([
-                                        'Existencias' => Helpers::convertirvalorcorrecto($ExistenciaNuevaAlmacen)
-                                    ]);
-                        //sumar existencias del almacen
-                        $ContarExistenciaAlmacen = Existencia::where('Codigo', $codigopartida)->where('Almacen', $request->numeroalmacen)->count();
-                        if($ContarExistenciaAlmacen > 0){
-                            $ExistenciaAlmacen = Existencia::where('Codigo', $codigopartida)->where('Almacen', $request->numeroalmacen)->first();
-                            $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias + $request->cantidadpartida [$key];
-                            Existencia::where('Codigo', $codigopartida)
-                                        ->where('Almacen', $request->numeroalmacen)
-                                        ->update([
-                                            'Existencias' => Helpers::convertirvalorcorrecto($ExistenciaNuevaAlmacen)
-                                        ]);
-                        }else{
-                            $ExistenciaAlmacen = new Existencia;
-                            $ExistenciaAlmacen->Codigo = $codigopartida;
-                            $ExistenciaAlmacen->Almacen = $request->numeroalmacen;
-                            $ExistenciaAlmacen->Existencias = $request->cantidadpartida [$key];
-                            $ExistenciaAlmacen->save();
-                        }
-                    }
                 }
             }
-            //detalles documentos
-            foreach ($request->facturaaplicarpartida as $key => $facturapartida){
-                //if la partida se agrego en la modificacion se realiza un insert
-                if($request->facturaagregadoen [$key] == 'modificacion'){
-                    $itemdocumento = NotaClienteDocumento::select('Item')->where('Nota', $notacliente)->orderBy('Item', 'DESC')->take(1)->get();
-                    $ultimoitemdocumento = $itemdocumento[0]->Item+1;
-                    $NotaClienteDocumento=new NotaClienteDocumento;
-                    $NotaClienteDocumento->Nota = $notacliente;
-                    $NotaClienteDocumento->Factura = $facturapartida;
-                    $NotaClienteDocumento->UUID = $request->uuidfacturapartida [$key];
-                    $NotaClienteDocumento->Descuento = $request->descuentopesosfacturapartida [$key];
-                    $NotaClienteDocumento->Item = $ultimoitemdocumento;
-                    $NotaClienteDocumento->save();
-                    //Modificar Factura
-                    Factura::where('Factura', $facturapartida)
-                    ->update([
-                        'Descuentos' => $request->descuentopesosfacturapartida [$key],
-                        'Saldo' => $request->saldofacturapartida [$key]
-                    ]);
-                    //Si el saldo es igual a 0 liquidar factura
-                    if($request->saldofacturapartida [$key] == Helpers::convertirvalorcorrecto(0)){
-                        Factura::where('Factura', $facturapartida)
-                                ->update([
-                                    'Status' => "LIQUIDADO"
-                                ]);
-                    }
-                }else{
-                    //si la partida no se agrego en la modificacion solo se modifican los datos
-                    //modificar detalle
-                    NotaClienteDocumento::where('Nota', $notacliente)
-                    ->where('Item', $request->itemfacturapartida [$key])
-                    ->update([
-                        'Descuento' => $request->descuentopesosfacturapartida [$key]
-                    ]);
-                    //Regresar saldo y descuentos a la factura
-                    $notaclientedocumento = NotaClienteDocumento::where('Nota', $notacliente)->where('Factura', $facturapartida)->where('Item', $request->itemfacturapartida [$key])->first();
-                    $facturadocumento = Factura::where('Factura', $facturapartida)->first();
-                    $NuevoDescuentos = $facturadocumento->Descuentos - $notaclientedocumento->Descuento;
-                    $NuevoSaldo = $facturadocumento->Saldo + $notaclientedocumento->Descuento;
-                    Factura::where('Factura', $facturapartida)
-                    ->update([
-                        'Descuentos' => Helpers::convertirvalorcorrecto($NuevoDescuentos),
-                        'Saldo' => Helpers::convertirvalorcorrecto($NuevoSaldo)
-                    ]);
-                    //Modificar Factura
-                    Factura::where('Factura', $facturapartida)
-                    ->update([
-                        'Descuentos' => $request->descuentopesosfacturapartida [$key],
-                        'Saldo' => $request->saldofacturapartida [$key]
-                    ]);
-                    //Si el saldo es igual a 0 liquidar factura
-                    if($request->saldofacturapartida [$key] == Helpers::convertirvalorcorrecto(0)){
-                        Factura::where('Factura', $facturapartida)
-                                ->update([
-                                    'Status' => "LIQUIDADO"
-                                ]);
-                    }
-                }
-            }
-            return response()->json($NotaCliente);
+            return response()->json($CartaPorte);
     }
 
     //buscar folio on key up
@@ -2270,7 +2140,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
         return Excel::download(new NotasCreditoClientesExport($this->campos_consulta,$request->periodo), "notascreditoclientes-".$request->periodo.".xlsx");
     }
     //configuracion tabla
-    public function notas_credito_clientes_guardar_configuracion_tabla(Request $request){
+    public function carta_porte_guardar_configuracion_tabla(Request $request){
         if($request->string_datos_tabla_false == null){
             $string_datos_tabla_false = "todos los campos fueron seleccionados";
         }else{
@@ -2280,7 +2150,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
         foreach($request->selectfiltrosbusquedas as $campofiltro){
             $selectmultiple = $selectmultiple.",".$campofiltro;
         }
-        Configuracion_Tabla::where('tabla', 'NotasCreditoCliente')
+        Configuracion_Tabla::where('tabla', 'CartaPorte')->where('IdUsuario',Auth::user()->id)
         ->update([
             'campos_activados' => $request->string_datos_tabla_true,
             'campos_desactivados' => $string_datos_tabla_false,
@@ -2294,7 +2164,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             'formatercerordenamiento' => $request->deorderby3,
             'campos_busquedas' => substr($selectmultiple, 1),
         ]);
-        return redirect()->route('notas_credito_clientes');
+        return redirect()->route('carta_porte');
     }
     //verificar si se puede timbrar la factura
     public function notas_credito_clientes_verificar_si_continua_timbrado(Request $request){
@@ -2455,6 +2325,166 @@ class CartaPorteController extends ConfiguracionSistemaController{
         //cancelar timbre facturapi
         $timbrecancelado = $this->facturapi->Invoices->cancel($request->iddocumentofacturapi);
         return response()->json($timbrecancelado);
+    }
+
+    //obtener facturas relaciinadas
+    public function carta_porte_obtener_facturas_cliente(Request $request){
+        if($request->ajax()){
+            $data = Factura::where('Cliente', $request->numerocliente)
+            ->where('Status','<>','BAJA')
+            ->where('Esquema','CFDI')
+            ->where('Depto', '!=','SERVICIOS')
+            ->where('Periodo',$this->periodohoy)
+            ->where('UUID', '<>', '');
+            return DataTables::of($data)
+                    ->addColumn('operaciones', function($data){
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarfacturarel(\''.$data->UUID .'\',\''.$data->Factura.'\')">Seleccionar</div>';
+                        return $boton;
+                    })
+                    ->addColumn('Total', function($data){
+                        return Helpers::convertirvalorcorrecto($data->Total);
+                    })
+                    ->rawColumns(['operaciones'])
+                    ->make(true);
+        }
+
+    }
+    //Obtiene los codigos de la factura relacionada
+    public function carta_porte_obtener_datos_factura(Request $request){
+        $detallesfactura = FacturaDetalle::where('Factura',$request->facturacarta)->get();
+        $numerodetallesfactura = $detallesfactura->count();
+
+        if ($numerodetallesfactura > 0 ) {
+            $filasdetalles = '';
+            $contadorproductos = 0;
+            $contadorfilas = 0;
+            $tipo = "alta";
+            foreach ($detallesfactura as $detalle) {
+                $MaterialPeligroso = '';
+                $Embalaje = '';
+                $functionbtnmaterial = 'onclick="listarclavespeligrosos('.$contadorproductos.')"';
+                $fuincionbtnembalaje = 'onclick="listartiposembalaje('.$contadorfilas.');"';
+                $peligroso = c_ClaveProdServCP::where('Clave',$detalle->ClaveProducto)->first();
+                $valorpeligroso = (isset($peligroso) ? $peligroso->MaterialPeligroso : '0,1') ;
+                $descripcionclaveproducto = ClaveProdServ::where('Clave',$detalle->ClaveProducto)->first();
+                $descripcionclaveunidad = ClaveUnidad::where('Clave',$detalle->ClaveUnidad)->first();
+                switch ($valorpeligroso) {
+                    case 0:
+                        $MaterialPeligroso = ' readonly ';
+                        $Embalaje = ' readonly ';
+                        $functionbtnmaterial = '';
+                        $fuincionbtnembalaje = '';
+                        break;
+                    case 1:
+                        $MaterialPeligroso = ' required ';
+                        $Embalaje = ' required ';
+                        $functionbtnmaterial = 'onclick="listarclavespeligrosos('.$contadorproductos.')"';
+                        $fuincionbtnembalaje = 'onclick="listartiposembalaje('.$contadorfilas.');"';
+                    default:
+                        break;
+                }
+                if ($valorpeligroso == '0,1') {
+                    $MaterialPeligroso = '';
+                    $Embalaje = '';
+                    $functionbtnmaterial = 'onclick="listarclavespeligrosos('.$contadorproductos.')"';
+                    $fuincionbtnembalaje = 'onclick="listartiposembalaje('.$contadorfilas.');"';
+                }
+                $filasdetalles = $filasdetalles.'<tr class="filasproductos" id="filaproducto'.$contadorproductos.'">'.
+                    '<td class="tdmod"><div class="btn btn-danger btn-xs" onclick="eliminarfila('.$contadorproductos.')">X</div><input type="hidden" class="form-control agregadoen" name="agregadoen[]" value="'.$tipo.'" readonly></td>'.
+                    '<td>'.
+                        '<input type="hidden" class="form-control divorinputmodsm partidapartida" name="partidapartida[]" value="'.($contadorproductos+1).'" />'.
+                        '<span class="textopartida">'.($contadorproductos+1).'</span>'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$detalle->Codigo.'" readonly data-parsley-length="[1, 20]">'.$detalle->Codigo.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="hidden" class="form-control descripcionpartida" name="descripcionpartida[]" value="'.$detalle->Descripcion.'" readonly data-parsley-length="[1, 20]">'.$detalle->Descripcion.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadPartida" name="cantidadPartida[]" value="1.'.$this->numerocerosconfigurados.'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularPesoPartida('.$contadorfilas.')" >'.
+                        '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'.$this->numerocerosconfigurados.'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorproductos.');revisarcantidadnotavscantidadfactura('.$contadorfilas.');">'.
+                        '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);">'.
+                        '<input type="hidden" class="form-control cantidadincorrecta" name="cantidadincorrecta[]" >'.
+                        '<input type="hidden" class="form-control realizarbusquedaexistencias" name="realizarbusquedaexistencias[]" value="1" >'.
+                        '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm pesopartida" name="pesobrutopartida[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularPesoPartida('.$contadorfilas.')">'.
+                        '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm pesototal" name="preciopartida[]" value="'.$detalle->Precio.'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');">'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.$detalle->Precio.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
+                        '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm pesototalpartida" name="pesototal[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="hidden" name="materialpeligrosopartida[]" value="'.$valorpeligroso.'"></input>'.
+                        '<div class="row divorinputmodxl">'.
+                            '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                                '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Material Peligroso" '.$functionbtnmaterial.'><i class="material-icons">remove_red_eye</i></div>'.
+                            '</div>'.
+                            '<div class="col-xs-5 col-sm-5 col-md-5">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm clavematerialpeligrosopartida" name="clavematerialpeligrosopartida[]"  value="" '.$MaterialPeligroso.'>'.
+                            '</div>'.
+                            '<div class="col-xs-5 col-sm-5 col-md-5">'.
+                                '<input type="hidden" class="form-control divorinputmodmd descripcionclavepeligrosopartida" name="descripcionclavepeligrosopartida[]" readonly  value="">'.
+                            '</div>'.
+                        '</div>'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<div class="row divorinputmodxl">'.
+                            '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                                '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Tipos Embalaje" '.$fuincionbtnembalaje.'><i class="material-icons">remove_red_eye</i></div>'.
+                            '</div>'.
+                            '<div class="col-xs-5 col-sm-5 col-md-5">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm clavetipoembalajepartida" name="clavetipoembalajepartida[]"  value=""'. $Embalaje .'>'.
+                            '</div>'.
+                            '<div class="col-xs-5 col-sm-5 col-md-5">'.
+                                '<input type="hidden" class="form-control divorinputmodmd descripcionembalajepartida" name="descripcionembalajepartida[]"  value="">'.
+                            '</div>'.
+                        '</div>'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                      '<div class="row divorinputmodxl">'.
+                            '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                                '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesproductos" data-toggle="tooltip" title="Ver Claves Productos o Servicios" onclick="listarclavesproductos('.$contadorproductos.');" ><i class="material-icons">remove_red_eye</i></div>'.
+                            '</div>'.
+                            '<div class="col-xs-10 col-sm-10 col-md-10">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'. $detalle->ClaveProducto .'" readonly data-parsley-length="[1, 20]">'.
+                            '</div>'.
+                      '</div>'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$descripcionclaveproducto->Nombre.'" readonly>'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                      '<div class="row divorinputmodxl">'.
+                        '<div class="col-xs-2 col-sm-2 col-md-2">'.
+                          '<div class="btn bg-blue btn-xs waves-effect btnlistarclavesunidades" data-toggle="tooltip" title="Ver Claves Unidades" onclick="listarclavesunidades('.$contadorproductos.');" ><i class="material-icons">remove_red_eye</i></div>'.
+                        '</div>'.
+                        '<div class="col-xs-10 col-sm-10 col-md-10">'.
+                          '<input type="text" class="form-control inputnextdet divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$detalle->ClaveUnidad.'" readonly data-parsley-length="[1, 5]">'.
+                        '</div>'.
+                      '</div>'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$descripcionclaveunidad->Nombre.'" readonly>'.
+                    '</td>'.
+                '</tr>';
+                $contadorproductos++;
+                $contadorfilas++;
+            }
+
+        }else{
+            $filasdetalles = '';
+        }
+        $data = array(
+            "filasdetallesfactura" => $filasdetalles,
+            "numerodetallesfactura" => $numerodetallesfactura,
+            "contadorproductos" => $contadorproductos,
+            'MaterialPeligroso' => $MaterialPeligroso
+        );
+        return response()->json($data);
     }
 
 }
