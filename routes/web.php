@@ -966,7 +966,7 @@ Route::group(['middleware' => ['auth']], function () {
     //carta_porte_obtener_carta_porte
     Route::get('/carta_porte_obtener_carta_porte', 'CartaPorteController@carta_porte_obtener_carta_porte')->name('carta_porte_obtener_carta_porte')->middleware('revisaraccesomenu:menuregistroscartasporte');
     //Guardar Modificación Carta Porte
-    //Route::POST('/carta_porte_guardar_modificacion','CartaPorteController@carta_porte_guardar_modificacion')->name('carta_porte_guardar_modificacion')->middleware('revisaraccesomenu:menuregistroscartasporte');
+    Route::POST('/carta_porte_guardar_modificacion','CartaPorteController@carta_porte_guardar_modificacion')->name('carta_porte_guardar_modificacion')->middleware('revisaraccesomenu:menuregistroscartasporte');
     Route::get('/carta_porte_obtener_obtener_ultimo_folio', 'CartaPorteController@carta_porte_obtener_obtener_ultimo_folio')->name('carta_porte_obtener_obtener_ultimo_folio')->middleware('revisaraccesomenu:menuregistroscartasporte');
     Route::get('/carta_porte_obtener_folios_fiscales', 'CartaPorteController@carta_porte_obtener_folios_fiscales')->name('carta_porte_obtener_folios_fiscales')->middleware('revisaraccesomenu:menuregistroscartasporte');
     Route::get('/carta_porte_obtener_ultimo_folio_serie_seleccionada', 'CartaPorteController@carta_porte_obtener_ultimo_folio_serie_seleccionada')->name('carta_porte_obtener_ultimo_folio_serie_seleccionada')->middleware('revisaraccesomenu:menuregistroscartasporte');
@@ -984,11 +984,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/carta_porte_obtener_vehiculo_por_numero', 'CartaPorteController@carta_porte_obtener_vehiculo_por_numero')->name('carta_porte_obtener_vehiculo_por_numero')->middleware('revisaraccesomenu:menuregistroscartasporte');
     Route::get('/carta_porte_obtener_operadores', 'CartaPorteController@carta_porte_obtener_operadores')->name('carta_porte_obtener_operadores')->middleware('revisaraccesomenu:menuregistroscartasporte');
     Route::get('/carta_porte_obtener_operador_por_numero', 'CartaPorteController@carta_porte_obtener_operador_por_numero')->name('carta_porte_obtener_operador_por_numero')->middleware('revisaraccesomenu:menuregistroscartasporte');
-    // Route::get('/carta_porte_obtener_productos','CartaPorteController@carta_porte_obtener_productos')->name('carta_porte_obtener_productos')->middleware('revisaraccesomenu:menuregistroscartasporte');
-    // Route::POST('/carta_porte_guardar','CartaPorteController@carta_porte_guardar')->name('carta_porte_guardar')->middleware('revisaraccesomenu:menuregistroscartasporte');
-    // Route::get('/carta_porte_obtener_claves_materiales_peligrosos','CartaPorteController@carta_porte_obtener_claves_materiales_peligrosos')->name('carta_porte_obtener_claves_materiales_peligrosos')->middleware('revisaraccesomenu:menuregistroscartasporte');
-    // Route::get('/carta_porte_obtener_claves_tipo_embalajes','CartaPorteController@carta_porte_obtener_claves_tipo_embalajes')->name('carta_porte_obtener_claves_tipo_embalajes')->middleware('revisaraccesomenu:menuregistroscartasporte');
-    // Route::POST('/carta_porte_guardar_configuracion_tabla','CartaPorteController@carta_porte_guardar_configuracion_tabla')->name('carta_porte_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistroscartasporte');
+    Route::get('/carta_porte_obtener_productos','CartaPorteController@carta_porte_obtener_productos')->name('carta_porte_obtener_productos')->middleware('revisaraccesomenu:menuregistroscartasporte');
+    Route::POST('/carta_porte_guardar','CartaPorteController@carta_porte_guardar')->name('carta_porte_guardar')->middleware('revisaraccesomenu:menuregistroscartasporte');
+    Route::get('/carta_porte_obtener_claves_materiales_peligrosos','CartaPorteController@carta_porte_obtener_claves_materiales_peligrosos')->name('carta_porte_obtener_claves_materiales_peligrosos')->middleware('revisaraccesomenu:menuregistroscartasporte');
+    Route::get('/carta_porte_obtener_claves_tipo_embalajes','CartaPorteController@carta_porte_obtener_claves_tipo_embalajes')->name('carta_porte_obtener_claves_tipo_embalajes')->middleware('revisaraccesomenu:menuregistroscartasporte');
+    Route::POST('/carta_porte_guardar_configuracion_tabla','CartaPorteController@carta_porte_guardar_configuracion_tabla')->name('carta_porte_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistroscartasporte');
+    Route::GET('/carta_porte_obtener_facturas_cliente','CartaPorteController@carta_porte_obtener_facturas_cliente')->name('carta_porte_obtener_facturas_cliente')->middleware('revisaraccesomenu:menuregistroscartasporte');
+    Route::get('/carta_porte_obtener_datos_factura','CartaPorteController@carta_porte_obtener_datos_factura')->name('carta_porte_obtener_datos_factura')->middleware('revisaraccesomenu:menuregistroscartasporte');
     //Produccion
     Route::get('/produccion', 'ProduccionController@produccion')->name('produccion')->middleware('revisaraccesomenu:menuregistrosproduccion');
     Route::get('/produccion_obtener', 'ProduccionController@produccion_obtener')->name('produccion_obtener')->middleware('revisaraccesomenu:menuregistrosproduccion');

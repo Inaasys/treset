@@ -66,7 +66,7 @@
                                     <thead class="{{$empresa->background_tables}}">
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
-                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co)
                                                 <th id="th{{$co}}">{{$co}}</th>
                                             @endforeach
                                         </tr>
@@ -75,7 +75,7 @@
                                     <tfoot>
                                         <tr>
                                             <th><div style="width:100px !important;">Operaciones</div></th>
-                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co) 
+                    						@foreach(explode(',', $configuracion_tabla->columnas_ordenadas) as $co)
                                                 <th id="th{{$co}}">{{$co}}</th>
                                             @endforeach
                                         </tr>
@@ -102,19 +102,19 @@
                         <div class="col-md-12" id="tabsform">
                             <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
                         </div>
-                    </form> 
+                    </form>
                 </div>
                 <div class="modal-footer">
                     <div class="col-md-12">
                         <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardar">Guardar</button>
                         <button type="button" class="btn btn-success btn-sm" id="btnGuardarModificacion">Confirmar Cambios</button>
-                    </div> 
+                    </div>
                 </div>
             </div>
             <div id="contenidomodaltablas">
                 <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
-            </div> 
+            </div>
         </div>
     </div>
 </div>
@@ -133,7 +133,7 @@
                         <label>Motivo Baja</label>
                         <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 required data-parsley-length="[1, 200]" onkeyup="tipoLetra(this)"></textarea>
                     </div>
-		        </form>	
+		        </form>
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
@@ -153,7 +153,7 @@
 		      	<form id="formtimbrado" action="#">
 		        	<h5 id="textomodaltimbrado"> </h5>
                     <input type="hidden" class="form-control" id="notatimbrado" name="notatimbrado">
-		        </form>	
+		        </form>
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
@@ -174,7 +174,7 @@
 		        	<h5 id="textomodalbajatimbre"> </h5>
                     <input type="hidden" class="form-control" id="iddocumentofacturapi" name="iddocumentofacturapi" readonly>
                     <input type="hidden" class="form-control" id="facturabajatimbre" name="facturabajatimbre" readonly>
-		        </form>	
+		        </form>
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
@@ -232,7 +232,7 @@
         var urlgenerarformatoexcel = '{{$urlgenerarformatoexcel}}';
         var background_navbar = '{{$empresa->background_navbar}}';
         var background_forms_and_modals = '{{$empresa->background_forms_and_modals}}';
-        var background_tables = '{{$empresa->background_tables}}';       
+        var background_tables = '{{$empresa->background_tables}}';
         var rol_usuario_logueado = '{{Auth::user()->role_id}}';
         var carta_porte_obtener = '{!!URL::to('carta_porte_obtener')!!}';
         var carta_porte_obtener_obtener_ultimo_folio = '{!!URL::to('carta_porte_obtener_obtener_ultimo_folio')!!}';
@@ -247,13 +247,14 @@
         var carta_porte_obtener_codigospostales = '{!!URL::to('carta_porte_obtener_codigospostales')!!}';
         var carta_porte_obtener_coonfiguracionesautotransporte = '{!!URL::to('carta_porte_obtener_coonfiguracionesautotransporte')!!}';
         var carta_porte_obtener_configuracionautotransporte_por_clave = '{!!URL::to('carta_porte_obtener_configuracionautotransporte_por_clave')!!}';
-        var  carta_porte_obtener_vehiculos = '{!!URL::to('carta_porte_obtener_vehiculos')!!}';
+        var carta_porte_obtener_vehiculos = '{!!URL::to('carta_porte_obtener_vehiculos')!!}';
         var carta_porte_obtener_vehiculo_por_numero = '{!!URL::to('carta_porte_obtener_vehiculo_por_numero')!!}';
         var carta_porte_obtener_operadores = '{!!URL::to('carta_porte_obtener_operadores')!!}';
         var carta_porte_obtener_operador_por_numero = '{!!URL::to('carta_porte_obtener_operador_por_numero')!!}';
         var carta_porte_obtener_clavestransporte = '{!!URL::to('carta_porte_obtener_clavestransporte')!!}';
         var carta_porte_obtener_clavetransporte_por_clave = '{!!URL::to('carta_porte_obtener_clavetransporte_por_clave')!!}';
-
+        var carta_porte_obtener_facturas_cliente = '{!!URL::to('carta_porte_obtener_facturas_cliente')!!}'
+        var carta_porte_obtener_datos_factura = '{!!URL::to('carta_porte_obtener_datos_factura')!!}'
 
         var notas_credito_clientes_obtener_almacenes = '{!!URL::to('notas_credito_clientes_obtener_almacenes')!!}';
         var notas_credito_clientes_obtener_almacen_por_numero = '{!!URL::to('notas_credito_clientes_obtener_almacen_por_numero')!!}';
@@ -271,31 +272,31 @@
         var notas_credito_clientes_obtener_uso_cfdi_por_clave = '{!!URL::to('notas_credito_clientes_obtener_uso_cfdi_por_clave')!!}';
         var notas_credito_clientes_obtener_residencias_fiscales = '{!!URL::to('notas_credito_clientes_obtener_residencias_fiscales')!!}';
         var notas_credito_clientes_obtener_residencia_fiscal_por_clave = '{!!URL::to('notas_credito_clientes_obtener_residencia_fiscal_por_clave')!!}';
-        var notas_credito_clientes_obtener_facturas = '{!!URL::to('notas_credito_clientes_obtener_facturas')!!}'; 
+        var notas_credito_clientes_obtener_facturas = '{!!URL::to('notas_credito_clientes_obtener_facturas')!!}';
         var notas_credito_clientes_obtener_factura = '{!!URL::to('notas_credito_clientes_obtener_factura')!!}';
-        var notas_credito_clientes_obtener_productos = '{!!URL::to('notas_credito_clientes_obtener_productos')!!}';
+        var carta_porte_obtener_productos = '{!!URL::to('carta_porte_obtener_productos')!!}';
         var notas_credito_clientes_obtener_producto_por_codigo = '{!!URL::to('notas_credito_clientes_obtener_producto_por_codigo')!!}';
         var notas_credito_clientes_obtener_claves_productos = '{!!URL::to('notas_credito_clientes_obtener_claves_productos')!!}';
         var notas_credito_clientes_obtener_claves_unidades = '{!!URL::to('notas_credito_clientes_obtener_claves_unidades')!!}';
         var notas_credito_clientes_obtener_datos_almacen  = '{!!URL::to('notas_credito_clientes_obtener_datos_almacen')!!}';
         var notas_credito_cliente_comprobar_cantidad_nota_vs_cantidad_factura = '{!!URL::to('notas_credito_cliente_comprobar_cantidad_nota_vs_cantidad_factura')!!}';
-        var notas_credito_clientes_guardar = '{!!URL::to('notas_credito_clientes_guardar')!!}';
+        var carta_porte_guardar = '{!!URL::to('carta_porte_guardar')!!}';
         var notas_credito_clientes_verificar_si_continua_baja = '{!!URL::to('notas_credito_clientes_verificar_si_continua_baja')!!}';
-        var notas_credito_clientes_alta_o_baja = '{!!URL::to('notas_credito_clientes_alta_o_baja')!!}'; 
-        var notas_credito_clientes_obtener_nota_cliente = '{!!URL::to('notas_credito_clientes_obtener_nota_cliente')!!}';
-        var notas_credito_clientes_guardar_modificacion = '{!!URL::to('notas_credito_clientes_guardar_modificacion')!!}';
+        var notas_credito_clientes_alta_o_baja = '{!!URL::to('notas_credito_clientes_alta_o_baja')!!}';
+        var carta_porte_obtener_carta_porte = '{!!URL::to('carta_porte_obtener_carta_porte')!!}';
+        var carta_porte_guardar_modificacion = '{!!URL::to('carta_porte_guardar_modificacion')!!}';
         var notas_credito_clientes_obtener_datos_envio_email = '{!!URL::to('notas_credito_clientes_obtener_datos_envio_email')!!}';
         var notas_credito_clientes_enviar_pdfs_email = '{!!URL::to('notas_credito_clientes_enviar_pdfs_email')!!}';
-        var notas_credito_clientes_buscar_folio_string_like = '{!!URL::to('notas_credito_clientes_buscar_folio_string_like')!!}'; 
+        var notas_credito_clientes_buscar_folio_string_like = '{!!URL::to('notas_credito_clientes_buscar_folio_string_like')!!}';
         var notas_credito_clientes_verificar_si_continua_timbrado=  '{!!URL::to('notas_credito_clientes_verificar_si_continua_timbrado')!!}';
         var notas_credito_clientes_timbrar_nota=  '{!!URL::to('notas_credito_clientes_timbrar_nota')!!}';
         var notas_credito_clientes_verificar_si_continua_baja_timbre=  '{!!URL::to('notas_credito_clientes_verificar_si_continua_baja_timbre')!!}';
         var notas_credito_clientes_baja_timbre=  '{!!URL::to('notas_credito_clientes_baja_timbre')!!}';
+        var carta_porte_obtener_claves_materiales_peligrosos = '{!!URL::to('carta_porte_obtener_claves_materiales_peligrosos')!!}'
+        var carta_porte_obtener_claves_tipo_embalajes = '{!! URL::to('carta_porte_obtener_claves_tipo_embalajes') !!}'
 
-
-        
     </script>
     @include('secciones.libreriasregistrosycatalogos')
-    <script src="scripts_inaasys/registros/cartasporte/cartasporte.js"></script>
-    
+    <script src="{{ asset('scripts_inaasys/registros/cartasporte/cartasporte.js') }}"></script>
+
 @endsection

@@ -11,7 +11,7 @@ class CartaPorte extends Model
     protected $table = 'CartaPorte';
     protected $primaryKey = 'Folio';
     protected $fillable = [
-        'CartaPorte', 
+        'CartaPorte',
         'Serie',
         'Folio',
         'Fecha',
@@ -191,5 +191,25 @@ class CartaPorte extends Model
     //distancia recorrida
     public function getDistanciaRecorridaAttribute($value){
         return Helpers::convertirvalorcorrecto($value);
+    }
+
+    /**
+     * Get all of the Detalles for the CartaPorte
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function detalles()
+    {
+        return $this->hasMany(CartaPorteDetalles::class, 'CartaPorte', 'CartaPorte')->orderBy('Item','ASC');
+    }
+
+    /**
+     * Get all of the documentos relacionados for the CartaPorte
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function documentos()
+    {
+        return $this->hasMany(CartaPorteDocumentos::class, 'CartaPorte', 'CartaPorte');
     }
 }
