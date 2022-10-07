@@ -607,10 +607,11 @@ class ProductoController extends ConfiguracionSistemaController{
     }
     //obtener datos del catalogo
     public function productos_obtener_producto(Request $request){
-        $producto = Producto::where('Codigo', $request->codigoproducto)->first();
+        $codigoproducto = htmlspecialchars_decode($request->codigoproducto,ENT_QUOTES);
+        $producto = Producto::where('Codigo', $codigoproducto)->first();
         $barcode = DNS1D::getBarcodeSVG($request->codigoproducto, 'C128', 1,55,'black', true);
         //$barcode = DNS2D::getBarcodeSVG($request->codigoproducto, 'QRCODE', 2, 2, true);
-        $valores_producto = Producto::where('Codigo', $request->codigoproducto)->first();
+        $valores_producto = Producto::where('Codigo', $codigoproducto)->first();
         $marca = Marca::where('Numero', $producto->Marca)->first();
         $linea = Linea::where('Numero', $producto->Linea)->first();
         $precio = Helpers::convertirvalorcorrecto($producto->Precio);
@@ -853,6 +854,7 @@ class ProductoController extends ConfiguracionSistemaController{
     }
     //modificar en catalogo
     public function productos_guardar_modificacion(Request $request){
+
         $codigo= $request->codigo;
         $costodeventa = $request->costo;
         $marca = Marca::where('Numero', $request->marca)->first();
@@ -870,7 +872,7 @@ class ProductoController extends ConfiguracionSistemaController{
             $file->move($destinationPath,$fileName);
             $img = $fileName;
             //eliminar imagen anterior
-            $ImagenProducto = Producto::where('Codigo', $codigo )->first();
+            $ImagenProducto = Producto::where('Codigo', htmlspecialchars_decode($codigo,ENT_QUOTES) )->first();
             if($ImagenProducto->Imagen == NULL){
                 $url = public_path().'/imagenes_productos/'.'NULL';
             }else{
@@ -880,12 +882,12 @@ class ProductoController extends ConfiguracionSistemaController{
                 unlink($url);
             }
         }else{
-            $ImagenProducto = Producto::where('Codigo', $codigo )->first();
+            $ImagenProducto = Producto::where('Codigo', htmlspecialchars_decode($codigo,ENT_QUOTES) )->first();
             $img = $ImagenProducto->Imagen;
         }
-        $Producto = Producto::where('Codigo', $codigo )->first();
+        $Producto = Producto::where('Codigo', htmlspecialchars_decode($codigo,ENT_QUOTES) )->first();
         $original = $Producto->toArray();
-        Producto::where('Codigo', $codigo)
+        Producto::where('Codigo', htmlspecialchars_decode($codigo,ENT_QUOTES))
         ->update([
             //datos producto
             'ClaveProducto' => $request->claveproducto,
@@ -964,7 +966,7 @@ class ProductoController extends ConfiguracionSistemaController{
                 $contador++;
             }
         }
-        $registroProducto = Producto::where('Codigo', $codigo )->first();
+        $registroProducto = Producto::where('Codigo', htmlspecialchars_decode($codigo,ENT_QUOTES) )->first();
         $descripcion = ["original"=>$original,"cambios"=>$registroProducto->toArray(), "request"=>$request->all()];
         $registro = new RegistrosAcciones;
         $registro->user_id = Auth::user()->id;
