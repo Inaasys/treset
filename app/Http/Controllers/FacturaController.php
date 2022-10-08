@@ -4526,11 +4526,24 @@ class FacturaController extends ConfiguracionSistemaController{
                         "items" => $arraytest,
                         "payment_form" => $factura->FormaPago,
                         "payment_method" => $factura->MetodoPago,
+
+                        //se debe cambiar la forma de relacion los documentos y en lugar de mandar arra products, se manda array items como en las facturas de ingreso con facturapi 2.0
+                        "related_documents" => array(
+                            array(
+                                "relationship" => $factura->TipoRelacion,
+                                "documents" => $arraydoc
+                            )
+                        ),
+                        /*
+                        //datos para facturar en facturapi 1.0
+                        "relation" => $factura->TipoRelacion,
+                        "related" => $arraydoc,
+                        */
                         "folio_number" => $factura->Folio,
                         "series" => $factura->Serie,
                         "currency" => $factura->Moneda,
                         "exchange" => Helpers::convertirvalorcorrecto($factura->TipoCambio),
-                        "conditions" => $factura->CondicionesDePago
+                        "conditions" => $factura->CondicionesDePago,
                     );
                 }
             }else{
