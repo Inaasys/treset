@@ -716,6 +716,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
             $item = 1;
             foreach ($request->codigopartida as $key => $codigopartida){
+                $auxExistencia = 0;
                 $NotaProveedorDetalle=new NotaProveedorDetalle;
                 $NotaProveedorDetalle->Nota = $notaproveedor;
                 $NotaProveedorDetalle->Proveedor = $request->numeroproveedor;
@@ -755,11 +756,17 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                         //restar existencias a almacen principal
                         $RestarExistenciaAlmacen = Existencia::where('Codigo', $codigopartida)->where('Almacen', $request->numeroalmacen)->first();
                         $RestarExistenciaNuevaAlmacen = $RestarExistenciaAlmacen->Existencias - $request->cantidadpartida  [$key];
+                        if ($RestarExistenciaNuevaAlmacen < 0 ) {
+                            $auxExistencia = 0;
+                        } else {
+                            $auxExistencia = $RestarExistenciaNuevaAlmacen;
+                        }
+
                         Existencia::where('Codigo', $codigopartida)
                                     ->where('Almacen', $request->numeroalmacen)
                                     ->update([
                                         'Existencias' => Helpers::convertirvalorcorrecto($RestarExistenciaNuevaAlmacen)
-                                    ]);
+                        ]);
                     }
                 }
                 // Compra::where('Compra', $request->stringcomprasseleccionadas)
