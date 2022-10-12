@@ -952,6 +952,7 @@ class FacturaController extends ConfiguracionSistemaController{
             $data = Remision:://where('Cliente', $request->numerocliente)
                                 where('Status', 'POR FACTURAR')
                                 ->where('Total', '>', 0)
+                                ->where('Pedido',$numeropedidoremisiones)
                                 ->orderBy('Folio', 'DESC')
                                 ->get();
             return DataTables::of($data)
