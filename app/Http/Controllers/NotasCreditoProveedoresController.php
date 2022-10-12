@@ -774,7 +774,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                 //         "Descuentos" => Helpers::convertirvalorcorrecto($compra->Descuentos) +
                 //         Helpers::convertirvalorcorrecto($request->descuentopesoscomprapartida [$key])
                 // ]);
-                // $item++;
+                $item++;
             }
             //INGRESAR DATOS A TABLA NOTA PROVEEDOR DOCUMENTOS
             $itemdocumento = 1;
