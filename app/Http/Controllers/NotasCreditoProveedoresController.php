@@ -647,6 +647,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
 
     public function notas_credito_proveedor_guardar(Request $request){
         ini_set('max_input_vars','20000' );
+
         $uuid=$request->uuid;
         $solicitarxml=$request->solicitarxml;
 	    $ExisteUUID = NotaProveedor::where('UUID', $uuid )->where('Status', '<>', 'BAJA')->first();
@@ -715,6 +716,7 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
             //INGRESAR DATOS A TABLA ORDEN COMPRA DETALLES
             $item = 1;
             foreach ($request->codigopartida as $key => $codigopartida){
+                $auxExistencia = 0;
                 $NotaProveedorDetalle=new NotaProveedorDetalle;
                 $NotaProveedorDetalle->Nota = $notaproveedor;
                 $NotaProveedorDetalle->Proveedor = $request->numeroproveedor;
@@ -754,24 +756,32 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                         //restar existencias a almacen principal
                         $RestarExistenciaAlmacen = Existencia::where('Codigo', $codigopartida)->where('Almacen', $request->numeroalmacen)->first();
                         $RestarExistenciaNuevaAlmacen = $RestarExistenciaAlmacen->Existencias - $request->cantidadpartida  [$key];
+                        if ($RestarExistenciaNuevaAlmacen < 0 ) {
+                            $auxExistencia = 0;
+                        } else {
+                            $auxExistencia = $RestarExistenciaNuevaAlmacen;
+                        }
+
                         Existencia::where('Codigo', $codigopartida)
                                     ->where('Almacen', $request->numeroalmacen)
                                     ->update([
                                         'Existencias' => Helpers::convertirvalorcorrecto($RestarExistenciaNuevaAlmacen)
-                                    ]);
+                        ]);
                     }
                 }
-                Compra::where('Compra', $request->stringcomprasseleccionadas)
-                        ->update([
-                        "Descuentos" => Helpers::convertirvalorcorrecto($compra->Descuentos) +
-                        Helpers::convertirvalorcorrecto($request->descuentopesoscomprapartida [$key])
-                ]);
-                $item++;
+                // Compra::where('Compra', $request->stringcomprasseleccionadas)
+                //         ->update([
+                //         "Descuentos" => Helpers::convertirvalorcorrecto($compra->Descuentos) +
+                //         Helpers::convertirvalorcorrecto($request->descuentopesoscomprapartida [$key])
+                // ]);
+                // $item++;
             }
             //INGRESAR DATOS A TABLA NOTA PROVEEDOR DOCUMENTOS
             $itemdocumento = 1;
             foreach ($request->compraaplicarpartida as $key => $comprapartida){
                 $NotaProveedorDocumento=new NotaProveedorDocumento;
+                $compraAux = Compra::where('Compra', $comprapartida)->first();
+                $descuentoAux = Helpers::convertirvalorcorrecto($compraAux->Descuentos) + Helpers::convertirvalorcorrecto($request->descuentopesoscomprapartida [$key]);
                 $NotaProveedorDocumento->Nota = $notaproveedor;
                 $NotaProveedorDocumento->Compra = $comprapartida;
                 $NotaProveedorDocumento->Descuento = $request->descuentopesoscomprapartida [$key];
@@ -780,7 +790,8 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
                 //Modificar Compra
                 Compra::where('Compra', $comprapartida)
                 ->update([
-                    'Saldo' => $request->saldocomprapartida [$key]
+                    'Saldo' => $request->saldocomprapartida [$key],
+                    'Descuentos' => number_format(round($descuentoAux, ), $this->numerodecimales,'.','')
                 ]);
                 //Si el saldo es igual a 0 liquidar compra
                 if($request->saldocomprapartida [$key] == Helpers::convertirvalorcorrecto(0)){
@@ -913,6 +924,8 @@ class NotasCreditoProveedoresController extends ConfiguracionSistemaController{
         $detallesnotaproveedor = NotaProveedorDetalle::where('Nota', $request->notamodificar)->orderBy('Item', 'ASC')->get();
         $numerodetallesnotaproveedor = NotaProveedorDetalle::where('Nota', $request->notamodificar)->count();
         $filasdetallesnotaproveedor = '';
+        $descuentocompras = 0;
+        $contadorfilascompras = 0;
         if($numerodetallesnotaproveedor > 0){
             $contadorproductos = 0;
             $contadorfilas = 0;
