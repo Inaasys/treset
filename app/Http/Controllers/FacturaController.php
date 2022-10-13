@@ -4424,7 +4424,8 @@ class FacturaController extends ConfiguracionSistemaController{
                     "series" => $factura->Serie,
                     "currency" => $factura->Moneda,
                     "exchange" => Helpers::convertirvalorcorrecto($factura->TipoCambio),
-                    "conditions" => $factura->CondicionesDePago
+                    "conditions" => $factura->CondicionesDePago,
+                    'use' => $factura->UsoCfdi
                 );
             }else{
                 //FACTURA
@@ -4444,6 +4445,7 @@ class FacturaController extends ConfiguracionSistemaController{
 
                     ),
                     "items" => $arraytest,
+                    'use' => $factura->UsoCfdi,
                     "payment_form" => $factura->FormaPago,
                     "payment_method" => $factura->MetodoPago,
                     "global" => $global,
