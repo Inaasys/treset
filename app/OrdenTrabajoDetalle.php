@@ -63,4 +63,43 @@ class OrdenTrabajoDetalle extends Model
     public function OrdenTrabajo(){
         return $this->belongsTo(OrdenTrabajo::class, 'Orden');
     }
+    /**
+     * Get the tecnico1 associated with the OrdenTrabajoDetalle
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function tecnico1()
+    {
+        return $this->hasOne(Tecnico::class, 'Numero', 'Tecnico1');
+    }
+
+    /**
+     * Get the tecnico2 associated with the OrdenTrabajoDetalle
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function tecnico2()
+    {
+        return $this->hasOne(Tecnico::class, 'Numero', 'Tecnico2');
+    }
+
+    /**
+     * Get the tecnico3 associated with the OrdenTrabajoDetalle
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function tecnico3()
+    {
+        return $this->hasOne(Tecnico::class, 'Numero', 'Tecnico3');
+    }
+
+    /**
+     * Get the tecnico4 associated with the OrdenTrabajoDetalle
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function tecnico4()
+    {
+        return $this->hasOne(Tecnico::class, 'Nombre', 'Tecnico4');
+    }
 }

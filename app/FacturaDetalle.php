@@ -11,7 +11,7 @@ class FacturaDetalle extends Model
     protected $primaryKey = null;
     public $incrementing = false;
     protected $fillable = [
-        'Factura', 
+        'Factura',
         'Fecha',
         'Codigo',
         'Descripcion',
@@ -65,4 +65,14 @@ class FacturaDetalle extends Model
         'Venta',
         'PrecioNeto'
     ];
+
+    /**
+     * Get the Factura that owns the FacturaDetalle
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function factura()
+    {
+        return $this->belongsTo(Factura::class, 'Factura', 'Factura');
+    }
 }
