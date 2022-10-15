@@ -11,7 +11,7 @@ class Factura extends Model
     protected $table = 'Facturas';
     protected $primaryKey = 'Folio';
     protected $fillable = [
-        'Factura', 
+        'Factura',
         'Serie',
         'Folio',
         'Esquema',
@@ -146,5 +146,31 @@ class Factura extends Model
     //tipo cambio
     public function getTipoCambioAttribute($value){
         return Helpers::convertirvalorcorrecto($value);
+    }
+    /**
+     * Get all of the detalles for the Factura
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function detalles()
+    {
+        return $this->hasMany(FacturaDetalle::class, 'Factura', 'Factura');
+    }
+
+    /**
+     * Get all of the comments for the Factura
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     */
+    public function ordenDetalles()
+    {
+        return $this->hasManyThrough(
+            FacturaDetalle::class,
+            OrdenTrabajoDetalle::class,
+            'Status',
+            'Factura',
+            'Factura',
+            'Status'
+        );
     }
 }
