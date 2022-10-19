@@ -405,6 +405,50 @@
             </div>
         </div>
     </div>
+
+    {{-- Modal datos movimiento --}}
+    <div class="modal fade" data-keyboard="false" id="ModalDatosMovimiento" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header {{$empresa->background_forms_and_modals}}">
+                    <h5 class="modal-title" >
+                        <div class="row">
+                            <div class="col-xs-10 col-sm-10 col-md-11">
+                                <label id="titulomodaldatosmovimiento1"></label><br>
+                                <label id="titulomodaldatosmovimiento2"></label>
+                            </div>
+                            <div class="col-xs-2 col-sm-2 col-md-1">
+                                <button type="button" class="btn btn-link waves-effect" data-dismiss="modal">Cerrar</button>
+                            </div>
+                        </div>
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="table-responsive cabecerafija" style="height: 450px;overflow-y: scroll;padding: 0px 0px;">
+                                <table class="table table-bordered table-striped table-hover" id="tablakardexproducto">
+                                    <thead>
+                                        <tr>
+                                            <td class="{{$empresa->background_tables}}">Documento</td>
+                                            <td class="{{$empresa->background_tables}}">Movimiento</td>
+                                            <td class="{{$empresa->background_tables}}">Fecha</td>
+                                            <td class="{{$empresa->background_tables}}">Usuario</td>
+                                            <td class="{{$empresa->background_tables}}">Status</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="filasmovimientosmovimiento"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <h5 id="infomovimientos"></h5><br>
+                </div>
+            </div>
+        </div>
+    </div>
 <!-- modal para configuraciones de tablas-->
 @include('secciones.modalconfiguraciontablas')
 <!-- fin modal para configuraciones de tablas-->
@@ -463,6 +507,7 @@
         var productos_generar_pdf_codigo_barras = '{!!URL::to('productos_generar_pdf_codigo_barras')!!}';
         var productos_guardar_modificacion = '{!!URL::to('productos_guardar_modificacion')!!}';
         var productos_download_excel_kardex = '{!!URL::to('productos_download_excel_kardex')!!}'
+        var ver_movimiento_kardex = '{!!URL::to('ver_movimiento_kardex')!!}'
         //compras
         var compras_obtener_tipos_ordenes_compra = '{!!URL::to('compras_obtener_tipos_ordenes_compra')!!}';
         var compras_cargar_xml_alta = '{!!URL::to('compras_cargar_xml_alta')!!}';

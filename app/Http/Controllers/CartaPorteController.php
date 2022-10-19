@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Helpers;
@@ -17,7 +16,6 @@ use App\CartaPorteDocumentos;
 use App\NotaCliente;
 use App\NotaClienteDetalle;
 use App\NotaClienteDocumento;
-use App\Remision;
 use App\Factura;
 use App\FacturaDetalle;
 use App\Cliente;
@@ -107,9 +105,9 @@ class CartaPorteController extends ConfiguracionSistemaController{
                                                 'OPERACIONES <span class="caret"></span>'.
                                             '</button>'.
                                             '<ul class="dropdown-menu">'.
-                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);">Cambios</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->CartaPorte .'\')">Cambios</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);">Bajas</a></li>'.
-                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);">Timbrar</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="timbrarcarta(\''. $data->CartaPorte .'\')">Timbrar</a></li>'.
                                                 '<li><a class="paddingmenuopciones">Ver Documento PDF</a></li>'.
                                                 '<li><a class="paddingmenuopciones">Enviar Documento por Correo</a></li>'.
                                                 //'<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="timbrarnota(\''.$data->Nota .'\')">Timbrar Nota</a></li>'.
@@ -386,331 +384,6 @@ class CartaPorteController extends ConfiguracionSistemaController{
         return response()->json($data);
     }
 
-    //obtener almacenes
-    public function notas_credito_clientes_obtener_almacenes(Request $request){
-        if($request->ajax()){
-            $data = Almacen::where('Status', 'ALTA')->orderBy("Numero", "ASC")->get();
-            return DataTables::of($data)
-                ->addColumn('operaciones', function($data){
-                    $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionaralmacen('.$data->Numero.',\''.$data->Nombre .'\')">Seleccionar</div>';
-                    return $boton;
-                })
-                ->rawColumns(['operaciones'])
-                ->make(true);
-        }
-    }
-
-    //obtener almacen por numero
-    public function notas_credito_clientes_obtener_almacen_por_numero(Request $request){
-        $numero = '';
-        $nombre = '';
-        $existealmacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->count();
-        if($existealmacen > 0){
-            $almacen = Almacen::where('Numero', $request->numeroalmacen)->where('Status', 'ALTA')->first();
-            $numero = $almacen->Numero;
-            $nombre = $almacen->Nombre;
-        }
-        $data = array(
-            'numero' => $numero,
-            'nombre' => $nombre,
-        );
-        return response()->json($data);
-    }
-
-    //obtener codifos postales
-    public function notas_credito_clientes_obtener_codigos_postales(Request $request){
-        if($request->ajax()){
-            $data = CodigoPostal::query();
-            return DataTables::of($data)
-                    ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarlugarexpedicion(\''.$data->Clave .'\')">Seleccionar</div>';
-                        return $boton;
-                    })
-                    ->rawColumns(['operaciones'])
-                    ->make(true);
-        }
-    }
-
-    //obtener lugar expedicion por clave
-    public function notas_credito_clientes_obtener_lugar_expedicion_por_clave(Request $request){
-        $clave = '';
-        $estado = '';
-        $existelugarexpedicion = CodigoPostal::where('Clave', $request->lugarexpedicion)->count();
-        if($existelugarexpedicion > 0){
-            $lugarexpedicion = CodigoPostal::where('Clave', $request->lugarexpedicion)->first();
-            $clave = $lugarexpedicion->Clave;
-            $estado = $lugarexpedicion->Estado;
-        }
-        $data = array(
-            'clave' => $clave,
-            'estado' => $estado
-        );
-        return response()->json($data);
-    }
-
-    //obtener regimenes fiscales
-    public function notas_credito_clientes_obtener_regimenes_fiscales(Request $request){
-        if($request->ajax()){
-            $data = c_RegimenFiscal::query();
-            return DataTables::of($data)
-                    ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarregimenfiscal(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';
-                        return $boton;
-                    })
-                    ->rawColumns(['operaciones'])
-                    ->make(true);
-        }
-    }
-
-    //obtener regimen fiscal por clave
-    public function notas_credito_clientes_obtener_regimen_fiscal_por_clave(Request $request){
-        $clave = '';
-        $nombre = '';
-        $existeregimenfiscal = c_RegimenFiscal::where('Clave', $request->claveregimenfiscal)->count();
-        if($existeregimenfiscal > 0){
-            $regimenfiscal = c_RegimenFiscal::where('Clave', $request->claveregimenfiscal)->first();
-            $clave = $regimenfiscal->Clave;
-            $nombre = $regimenfiscal->Nombre;
-        }
-        $data = array(
-            'clave' => $clave,
-            'nombre' => $nombre
-        );
-        return response()->json($data);
-    }
-
-    //obtener tipos relacion
-    public function notas_credito_clientes_obtener_tipos_relacion(Request $request){
-        if($request->ajax()){
-            $data = c_TipoRelacion::query();
-            return DataTables::of($data)
-                    ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionartiporelacion(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';
-                        return $boton;
-                    })
-                    ->rawColumns(['operaciones'])
-                    ->make(true);
-        }
-    }
-
-    //obtener tipo relacion por clave
-    public function notas_credito_clientes_obtener_tipo_relacion_por_clave(Request $request){
-        $clave = '';
-        $nombre = '';
-        $existeretiporelacion = c_TipoRelacion::where('Clave', $request->clavetiporelacion)->count();
-        if($existeretiporelacion > 0){
-            $tiporelacion = c_TipoRelacion::where('Clave', $request->clavetiporelacion)->first();
-            $clave = $tiporelacion->Clave;
-            $nombre = $tiporelacion->Nombre;
-        }
-        $data = array(
-            'clave' => $clave,
-            'nombre' => $nombre
-        );
-        return response()->json($data);
-    }
-
-    //obtener formas pago
-    public function notas_credito_clientes_obtener_formas_pago(Request $request){
-        if($request->ajax()){
-            $data = FormaPago::query();
-            return DataTables::of($data)
-                    ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarformapago(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';
-                        return $boton;
-                    })
-                    ->rawColumns(['operaciones'])
-                    ->make(true);
-        }
-    }
-
-    //obtener forma pago por clave
-    public function notas_credito_clientes_obtener_forma_pago_por_clave(Request $request){
-        $clave = '';
-        $nombre = '';
-        $existereformapago = FormaPago::where('Clave', $request->claveformapago)->count();
-        if($existereformapago > 0){
-            $formapago = FormaPago::where('Clave', $request->claveformapago)->first();
-            $clave = $formapago->Clave;
-            $nombre = $formapago->Nombre;
-        }
-        $data = array(
-            'clave' => $clave,
-            'nombre' => $nombre
-        );
-        return response()->json($data);
-    }
-
-    //obtener metodos pago
-    public function notas_credito_clientes_obtener_metodos_pago(Request $request){
-        if($request->ajax()){
-            $data = MetodoPago::query();
-            return DataTables::of($data)
-                    ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarmetodopago(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';
-                        return $boton;
-                    })
-                    ->rawColumns(['operaciones'])
-                    ->make(true);
-        }
-    }
-
-    //obtener metodo pago por clave
-    public function notas_credito_clientes_obtener_metodo_pago_por_clave(Request $request){
-        $clave = '';
-        $nombre = '';
-        $existeremetodopago = MetodoPago::where('Clave', $request->clavemetodopago)->count();
-        if($existeremetodopago > 0){
-            $metodopago = MetodoPago::where('Clave', $request->clavemetodopago)->first();
-            $clave = $metodopago->Clave;
-            $nombre = $metodopago->Nombre;
-        }
-        $data = array(
-            'clave' => $clave,
-            'nombre' => $nombre
-        );
-        return response()->json($data);
-    }
-
-    //obtener usos cfdi
-    public function notas_credito_clientes_obtener_usos_cfdi(Request $request){
-        if($request->ajax()){
-            $data = UsoCFDI::query();
-            return DataTables::of($data)
-                    ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarusocfdi(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';
-                        return $boton;
-                    })
-                    ->rawColumns(['operaciones'])
-                    ->make(true);
-        }
-    }
-
-    //obtener uso cfdi por clave
-    public function notas_credito_clientes_obtener_uso_cfdi_por_clave(Request $request){
-        $clave = '';
-        $nombre = '';
-        $existereusocfdi = UsoCFDI::where('Clave', $request->claveusocfdi)->count();
-        if($existereusocfdi > 0){
-            $usocfdi = UsoCFDI::where('Clave', $request->claveusocfdi)->first();
-            $clave = $usocfdi->Clave;
-            $nombre = $usocfdi->Nombre;
-        }
-        $data = array(
-            'clave' => $clave,
-            'nombre' => $nombre
-        );
-        return response()->json($data);
-    }
-
-    //obtener residencias fiscales
-    public function notas_credito_clientes_obtener_residencias_fiscales(Request $request){
-        if($request->ajax()){
-            $data = Pais::query();
-            return DataTables::of($data)
-                    ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarresidenciafiscal(\''.$data->Clave .'\',\''.$data->Nombre .'\')">Seleccionar</div>';
-                        return $boton;
-                    })
-                    ->rawColumns(['operaciones'])
-                    ->make(true);
-        }
-    }
-
-    //obtener residencia fiscal por clave
-    public function notas_credito_clientes_obtener_residencia_fiscal_por_clave(Request $request){
-        $clave = '';
-        $nombre = '';
-        $existeresidenciafiscal = Pais::where('Clave', $request->claveresidenciafiscal)->count();
-        if($existeresidenciafiscal > 0){
-            $residencialfiscal = Pais::where('Clave', $request->claveresidenciafiscal)->first();
-            $clave = $residencialfiscal->Clave;
-            $nombre = $residencialfiscal->Nombre;
-        }
-        $data = array(
-            'clave' => $clave,
-            'nombre' => $nombre
-        );
-        return response()->json($data);
-    }
-
-    //obtener facturas
-    public function notas_credito_clientes_obtener_facturas(Request $request){
-        if($request->ajax()){
-            $arrayfacturasseleccionadas = Array();
-            foreach(explode(",", $request->stringfacturasseleccionadas) as $factura){
-                array_push($arrayfacturasseleccionadas, $factura);
-            }
-            $data = Factura::where('Cliente', $request->numerocliente)
-                                ->whereNotIn('Factura', $arrayfacturasseleccionadas)
-                                ->where('Status', 'POR COBRAR')
-                                ->orderBy('Folio', 'DESC')
-                                ->get();
-            return DataTables::of($data)
-                    ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarfactura('.$data->Folio.',\''.$data->Factura .'\')">Seleccionar</div>';
-                        return $boton;
-                    })
-                    ->addColumn('Fecha', function($data){
-                        return Helpers::fecha_espanol($data->Fecha);
-                    })
-                    ->addColumn('Items', function($data){
-                        return FacturaDetalle::where('Factura', $data->Factura)->count();
-                    })
-                    ->addColumn('Total', function($data){
-                        return Helpers::convertirvalorcorrecto($data->Total);
-                    })
-                    ->addColumn('Abonos', function($data){
-                        return Helpers::convertirvalorcorrecto($data->Abonos);
-                    })
-                    ->addColumn('Descuentos', function($data){
-                        return Helpers::convertirvalorcorrecto($data->Descuentos);
-                    })
-                    ->addColumn('Saldo', function($data){
-                        return Helpers::convertirvalorcorrecto($data->Saldo);
-                    })
-                    ->rawColumns(['operaciones','Fecha','Total'])
-                    ->make(true);
-        }
-    }
-
-    //obtener factura
-    public function notas_credito_clientes_obtener_factura(Request $request){
-        $factura = Factura::where('Factura', $request->Factura)->first();
-        $porcentajeiva = Helpers::calcular_porcentaje_iva_aritmetico($factura->Iva, $factura->SubTotal);
-        $tipooperacion = $request->tipooperacion;
-        //detalles factura
-        $filafactura = '';
-        $filafactura= $filafactura.
-        '<tr class="filasfacturas" id="filafactura'.$request->contadorfilasfacturas.'">'.
-            '<td class="tdmod"><div class="btn btn-danger btn-xs btneliminarfilafactura" onclick="eliminarfilafacturanotacliente('.$request->contadorfilasfacturas.')" >X</div><input type="hidden" class="form-control facturaagregadoen" name="facturaagregadoen[]" value="'.$tipooperacion.'" readonly></td>'.
-            '<td class="tdmod"><input type="hidden" class="form-control facturaaplicarpartida" name="facturaaplicarpartida[]" value="'.$factura->Factura.'" readonly>'.$factura->Factura.'</td>'.
-            '<td class="tdmod"><input type="hidden" class="form-control fechafacturapartida" name="fechafacturapartida[]" value="'.$factura->Fecha.'" readonly>'.$factura->Fecha.'</td>'.
-            '<td class="tdmod"><input type="hidden" class="form-control uuidfacturapartida" name="uuidfacturapartida[]" value="'.$factura->UUID.'" readonly>'.$factura->UUID.'</td>'.
-            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd totalpesosfacturapartida" name="totalpesosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto($factura->Total).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd abonosfacturapartida" name="abonosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto($factura->Abonos).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd notascreditofacturapartida" name="notascreditofacturapartida[]" value="'.Helpers::convertirvalorcorrecto($factura->Descuentos).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdetfac divorinputmodmd descuentopesosfacturapartida" name="descuentopesosfacturapartida[]" value="'.Helpers::convertirvalorcorrecto(0).'" data-parsley-max="'.Helpers::convertirvalorcorrecto($factura->Saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilastablafacturas('.$request->contadorfilasfacturas.');" ></td>'.
-            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodmd saldofacturapartida" name="saldofacturapartida[]" value="'.Helpers::convertirvalorcorrecto($factura->Saldo).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
-        '</tr>';
-        $data = array(
-            "factura" => $factura,
-            "filafactura" => $filafactura,
-        );
-        return response()->json($data);
-    }
-
-    //obtener datos almacen
-    public function notas_credito_clientes_obtener_datos_almacen(Request $request){
-        $factura = Factura::where('Factura', $request->factura)->first();
-        $remision = Remision::where('Status', $request->factura)->first();
-        $almacen = Almacen::where('Numero', $remision->Almacen)->first();
-        $data = array(
-            'factura' => $factura,
-            'almacen' => $almacen
-        );
-        return response()->json($data);
-    }
 
     //obtener productos
     public function carta_porte_obtener_productos(Request $request){
@@ -749,76 +422,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                     ->make(true);
         }
     }
-    //obtener producto por codigo
-    public function notas_credito_clientes_obtener_producto_por_codigo(Request $request){
-        $codigoabuscar = $request->codigoabuscar;
-        $numeroalmacen = $request->numeroalmacen;
-        $stringfacturasseleccionadas = $request->stringfacturasseleccionadas;
-        $arrayproductosseleccionables = Array();
-        foreach(explode(",", $request->stringfacturasseleccionadas) as $factura){
-            $detallesfactura = FacturaDetalle::where('Factura', $factura)->get();
-            foreach($detallesfactura as $detalle){
-                array_push($arrayproductosseleccionables, $detalle->Codigo);
-            }
-        }
-        $contarproductos = VistaObtenerExistenciaProducto::whereIn('Codigo', $arrayproductosseleccionables)
-        ->where('Codigo', $codigoabuscar)
-        ->whereNotIn('Almacen', [6,7])->count();
-        if($contarproductos > 0){
-            $producto = VistaObtenerExistenciaProducto::whereIn('Codigo', $arrayproductosseleccionables)
-            ->where('Codigo', $codigoabuscar)
-            ->whereNotIn('Almacen', [6,7])->first();
-            $data = array(
-                'MaterialPeligroso' => $producto->MaterialPeligroso,
-                'Codigo' => $producto->Codigo,
-                'Producto' => htmlspecialchars($producto->Producto, ENT_QUOTES),
-                'Unidad' => $producto->Unidad,
-                'Costo' => Helpers::convertirvalorcorrecto($producto->Costo),
-                'Impuesto' => Helpers::convertirvalorcorrecto($producto->Impuesto),
-                'SubTotal' => Helpers::convertirvalorcorrecto($producto->SubTotal),
-                'Existencias' => Helpers::convertirvalorcorrecto($producto->Existencias),
-                'Insumo' => $producto->Insumo,
-                'ClaveProducto' => $producto->ClaveProducto,
-                'ClaveUnidad' => $producto->ClaveUnidad,
-                'NombreClaveProducto' => $producto->NombreClaveProducto,
-                'NombreClaveUnidad' => $producto->NombreClaveUnidad,
-                'contarproductos' => $contarproductos
-            );
-        }else{
-            $data = array(
-                'MaterialPeligroso' => '',
-                'Codigo' => '',
-                'Producto' => '',
-                'Unidad' => '',
-                'Costo' => '',
-                'Impuesto' => '',
-                'SubTotal' => '',
-                'Existencias' => '',
-                'Insumo' => '',
-                'ClaveProducto' => '',
-                'ClaveUnidad' => '',
-                'NombreClaveProducto' => '',
-                'NombreClaveUnidad' => '',
-                'contarproductos' => $contarproductos
-            );
-        }
-        return response()->json($data);
-    }
 
-    //obtener claves productos
-    public function notas_credito_clientes_obtener_claves_productos(Request $request){
-        if($request->ajax()){
-            $fila = $request->fila;
-            $data = ClaveProdServ::query();
-            return DataTables::of($data)
-                    ->addColumn('operaciones', function($data) use ($fila){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarclaveproducto(\''.$data->Clave .'\',\''.$data->Nombre .'\','.$fila.')">Seleccionar</div>';
-                        return $boton;
-                    })
-                    ->rawColumns(['operaciones'])
-                    ->make(true);
-        }
-    }
     /**
      * @author Jose Alonso Espinares Romero
      * @return claves
@@ -851,55 +455,6 @@ class CartaPorteController extends ConfiguracionSistemaController{
             })
             ->rawColumns(['operaciones'])
             ->make(true);
-        }
-    }
-    //obtener claves unidades
-    public function notas_credito_clientes_obtener_claves_unidades(Request $request){
-        if($request->ajax()){
-            $fila = $request->fila;
-            $data = ClaveUnidad::query();
-            return DataTables::of($data)
-                    ->addColumn('operaciones', function($data) use ($fila){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarclavepeligroso(\''.$data->Clave .'\',\''.$data->Nombre .'\','.$fila.')">Seleccionar</div>';
-                        return $boton;
-                    })
-                    ->rawColumns(['operaciones'])
-                    ->make(true);
-        }
-    }
-
-    //comprobar cantidad nota vs cantidad factura
-    public function notas_credito_cliente_comprobar_cantidad_nota_vs_cantidad_factura(Request $request){
-        $notacliente = $request->folio.'-'.$request->serie;
-        $facturadetalle = FacturaDetalle::where('Factura', $request->factura)->where('Codigo', $request->codigopartida)->first();
-        $cantidadfactura = $facturadetalle->Cantidad;
-        $cantidadesenotrasnotas = 0;
-        $existencantidadesenotrasnotas = NotaClienteDocumento::where('Nota', '<>', $notacliente)->where('Factura', $request->factura)->count();
-        if($existencantidadesenotrasnotas > 0){
-            $detallesnotasutilizadas = NotaClienteDocumento::where('Nota', '<>', $notacliente)->where('Factura', $request->factura)->get();
-            foreach($detallesnotasutilizadas as $dnu){
-                $existedetallenota = NotaClienteDetalle::where('Nota', $dnu->Nota)->where('Codigo', $request->codigopartida)->count();
-                if($existedetallenota > 0){
-                    $detallenota = NotaClienteDetalle::where('Nota', $dnu->Nota)->where('Codigo', $request->codigopartida)->first();
-                    $cantidadesenotrasnotas = $cantidadesenotrasnotas + $detallenota->Cantidad;
-                }
-            }
-        }
-        $cantidadmaximapermitida = $cantidadfactura + $cantidadesenotrasnotas;
-        return response()->json(Helpers::convertirvalorcorrecto($cantidadmaximapermitida));
-    }
-
-    //obtener folios notas
-    public function notas_credito_clientes_obtener_folios_fiscales(Request $request){
-        if($request->ajax()){
-            $data = FolioComprobanteTraslado::where('Status', 'ALTA')->OrderBy('Numero', 'DESC')->get();
-            return DataTables::of($data)
-                    ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarfoliofiscal(\''.$data->Serie.'\',\''.$data->Esquema.'\')">Seleccionar</div>';
-                        return $boton;
-                    })
-                    ->rawColumns(['operaciones'])
-                    ->make(true);
         }
     }
 
@@ -1028,12 +583,6 @@ class CartaPorteController extends ConfiguracionSistemaController{
 
     }
 
-    //obtener datos folio seleccionado
-    public function notas_credito_clientes_obtener_ultimo_folio_serie_seleccionada(Request $request){
-        $folio = Helpers::ultimofolioserietablamodulos('App\NotaCliente', $request->Serie);
-        return response()->json($folio);
-    }
-
     //alta
     public function carta_porte_guardar(Request $request){
         ini_set('max_input_vars','20000' );
@@ -1050,7 +599,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
         $CartaPorte->Cliente=$request->numerocliente;
         $CartaPorte->Status="ALTA";
         $CartaPorte->Periodo=$this->periodohoy;
-        $CartaPorte->Esquema=$request->esquema;
+        $CartaPorte->Esquema= 'CFDI';
         $CartaPorte->Importe = Helpers::convertirvalorcorrecto($request->importe);
         $CartaPorte->Descuento = Helpers::convertirvalorcorrecto($request->descuento);
         $CartaPorte->SubTotal = Helpers::convertirvalorcorrecto($request->subtotal);
@@ -1499,7 +1048,14 @@ class CartaPorteController extends ConfiguracionSistemaController{
         if ($cartaporte->documentos->count() > 0) {
             foreach ($cartaporte->documentos as $documento) {
                 $filasdocumentosrelacionados .=
-                '<tr class="filasuuid" id="filauuid0"></tr>';
+                '<tr class="filasuuid" id="filauuid0">'.
+                    '<td class="tdmod">'.
+                    '</td>'.
+                    '<td class="tdmod">'.
+                        '<input type="hidden" class="form-control divorinputmodsm uuidrelacionado" name="uuidrelacionado[]" value="'.$documento->UUID.'" readonly required>'.$documento->UUID.
+                        '<input type="text" style="display:none"; class="form-control divorinputmodsm" name="factura[]" value="'.$documento->Factura.'" readonly>'.
+                    '</td>'.
+                '</tr>';
             //     $filasdocumentosrelacionados.= '<tr class="filasuuid" id="filauuid0">'.
             //     '<td class="tdmod">'.
             //         '<div class="btn btn-danger btn-xs btneliminaruuid">X</div><input type="hidden" class="form-control uuidagregadoen" name="uuidagregadoen[]" value="NA" readonly>'.
@@ -1564,7 +1120,6 @@ class CartaPorteController extends ConfiguracionSistemaController{
             ->update([
                 'Cliente' =>$request->numerocliente,
                 'Periodo' =>$this->periodohoy,
-                'Esquema' =>$request->esquema,
                 'Obs' =>$request->observaciones,
                 'Usuario' =>Auth::user()->user,
                 'LugarExpedicion' =>$request->lugarexpedicion,
@@ -1697,24 +1252,6 @@ class CartaPorteController extends ConfiguracionSistemaController{
             return response()->json($CartaPorte);
     }
 
-    //buscar folio on key up
-    public function notas_credito_clientes_buscar_folio_string_like(Request $request){
-        if($request->ajax()){
-            $string = $request->string;
-            $data = NotaCliente::where('Nota', 'like', '%' . $string . '%')->orderBy('Folio', 'ASC')->take(3)->get();
-            return DataTables::of($data)
-                ->addColumn('operaciones', function($data){
-                    $boton =    '<div class="btn bg-amber btn-xs waves-effect" data-toggle="tooltip" title="Agregar para generar PDF" onclick="agregararraypdf(\''.$data->Nota.'\')"><i class="material-icons">done</i></div> ';
-                    return $boton;
-                })
-                ->addColumn('Total', function($data){
-                    $total = Helpers::convertirvalorcorrecto($data->Total);
-                    return $total;
-                })
-                ->rawColumns(['operaciones','Total'])
-                ->make(true);
-        }
-    }
     //generacion de formato en PDF
     public function notas_credito_clientes_generar_pdfs(Request $request){
         //primero eliminar todos los archivos de la carpeta
@@ -2166,54 +1703,56 @@ class CartaPorteController extends ConfiguracionSistemaController{
         ]);
         return redirect()->route('carta_porte');
     }
-    //verificar si se puede timbrar la factura
-    public function notas_credito_clientes_verificar_si_continua_timbrado(Request $request){
-        $nota = NotaCliente::where('Nota', $request->nota)->first();
+    //verificar si se puede timbrar
+    public function carta_porte_verificar_si_continua_timbrado(Request $request){
+        $carta = CartaPorte::where('CartaPorte', $request->carta)->first();
         $data = array(
-            'Esquema' => $nota->Esquema,
-            'Status' => $nota->Status,
-            'UUID' => $nota->UUID
+            'Status' => $carta->Status,
+            'UUID' => $carta->UUID
         );
         return response()->json($data);
     }
     //timbrar factura
-    public function notas_credito_clientes_timbrar_nota(Request $request){
-        $nota = NotaCliente::where('Nota', $request->notatimbrado)->first();
-        $detallesnota = NotaClienteDetalle::where('Nota', $request->notatimbrado)->get();
-        $detallesdocumentosnota = NotaClienteDocumento::where('Nota', $request->notatimbrado)->where('Descuento', '>', 0)->get();
-        $cliente = Cliente::where('Numero', $nota->Cliente)->first();
+    public function carta_porte_timbrar_carta(Request $request){
+
+        $carta = CartaPorte::where('CartaPorte', $request->cartatimbrado)->first();
+        $cliente = Cliente::where('Numero', $carta->Cliente)->first();
         $arraydet = array();
-        foreach($detallesnota as $dn){
-            array_push($arraydet,   array(
-                                        "description" => $dn->Descripcion,
-                                        "product_key" => $dn->ClaveProducto,
-                                        "price" => Helpers::convertirvalorcorrecto($dn->Precio),
-                                        "tax_included" => false,
-                                        "sku" => $dn->Codigo
-                                    )
+        foreach($carta->detalles as $detalle){
+            array_push($arraydet, array(
+                    "quantity" => Helpers::convertirvalorcorrecto($detalle->Cantidad),
+                    "product" =>
+                        array(
+                            "description" => $detalle->Descripcion,
+                            "product_key" => $detalle->ClaveProducto,
+                            "unit_key" => $detalle->ClaveUnidad,
+                            "sku" => $detalle->Codigo
+                    )
+                )
             );
         }
         $arraydoc = array();
-        foreach($detallesdocumentosnota as $ddn){
-            array_push($arraydoc, $ddn->UUID);
+        foreach($carta->documentos as $documento){
+            array_push($arraydoc, $documento->UUID);
         }
         //NOTAS DE CREDITO PROVEEDOR
         $invoice = array(
-            "type" => \Facturapi\InvoiceType::EGRESO,
+            "type" => \Facturapi\InvoiceType::TRASLADO,
             "customer" => array(
-                "legal_name" => $cliente->Nombre,
-                "tax_id" => $cliente->Rfc
+                "tax_id" => $carta->RfcRemitente,
+                "tax_system" => $carta->RegimenFiscal,
             ),
-            "payment_form" => $nota->FormaPago,
-            "payment_method" => $nota->MetodoPago,
-            "relation" => $nota->TipoRelacion,
-            "related" => $arraydoc,
-            "products" => $arraydet,
-            "folio_number" => $nota->Folio,
-            "series" => $nota->Serie,
-            "currency" => $nota->Moneda,
-            "exchange" => Helpers::convertirvalorcorrecto($nota->TipoCambio),
-            "conditions" => $nota->CondicionesDePago
+            "related_documents" => array(
+                array(
+                    "relationship" => '05',
+                    "documents" => $arraydoc
+                )
+            ),
+            "items" => $arraydet,
+
+            "folio_number" => $carta->Folio,
+            "series" => $carta->Serie,
+            "currency" => 'XXX'
         );
         $new_invoice = $this->facturapi->Invoices->create( $invoice );
         $result = json_encode($new_invoice);
@@ -2246,21 +1785,21 @@ class CartaPorteController extends ConfiguracionSistemaController{
             $cadenaoriginal = "||".$atributos_complemento['Version']."|".$new_invoice->uuid."|".$atributos_complemento['FechaTimbrado']."|".$atributos_complemento['SelloCFD']."|".$atributos_complemento['NoCertificadoSAT']."||";
             //guardar en tabla comprobante
             $Comprobante = new Comprobante;
-            $Comprobante->Comprobante = 'Nota';
+            $Comprobante->Comprobante = 'Carta Porte';
             $Comprobante->Tipo = $new_invoice->type;
             $Comprobante->Version = '3.3';
             $Comprobante->Serie = $new_invoice->series;
             $Comprobante->Folio = $new_invoice->folio_number;
             $Comprobante->UUID = $new_invoice->uuid;
             $Comprobante->Fecha = Helpers::fecha_exacta_accion_datetimestring();
-            $Comprobante->SubTotal = $nota->SubTotal;
-            $Comprobante->Descuento = $nota->Descuento;
-            $Comprobante->Total = $nota->Total;
-            $Comprobante->EmisorRfc = $nota->EmisorRfc;
-            $Comprobante->ReceptorRfc = $nota->ReceptorRfc;
+            $Comprobante->SubTotal = $carta->SubTotal;
+            $Comprobante->Descuento = $carta->Descuento;
+            $Comprobante->Total = $carta->Total;
+            $Comprobante->EmisorRfc = $carta->EmisorRfc;
+            $Comprobante->ReceptorRfc = $carta->ReceptorRfc;
             $Comprobante->FormaPago = $new_invoice->payment_form;
             $Comprobante->MetodoPago = $new_invoice->payment_method;
-            $Comprobante->UsoCfdi = $nota->UsoCfdi;
+            $Comprobante->UsoCfdi = $carta->UsoCfdi;
             $Comprobante->Moneda = $new_invoice->currency;
             $Comprobante->TipoCambio = Helpers::convertirvalorcorrecto($new_invoice->exchange);
             $Comprobante->CertificadoSAT = $NoCertificadoSAT;
@@ -2275,7 +1814,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             $Comprobante->UrlVerificarCfdi = $new_invoice->verification_url;
             $Comprobante->save();
             //Colocar UUID en documento
-            NotaCliente::where('Nota', $request->notatimbrado)
+            CartaPorte::where('Nota', $request->cartatimbrado)
                             ->update([
                                 'FechaTimbrado' => $fechatimbrado,
                                 'UUID' => $new_invoice->uuid
@@ -2284,7 +1823,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             $this->facturapi->Invoices->send_by_email(
                 $new_invoice->id,
                 array(
-                    "osbaldo.anzaldo@utpcamiones.com.mx",
+                    "alonso.espinares@socasa.com.mx",
                     //"marco.baltazar@utpcamiones.com.mx",
                 )
             );
@@ -2335,6 +1874,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             ->where('Esquema','CFDI')
             ->where('Depto', '!=','SERVICIOS')
             ->where('Periodo',$this->periodohoy)
+            ->whereNotIn('Factura', CartaPorteDocumentos::select('Factura')->get()->toArray())
             ->where('UUID', '<>', '');
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
@@ -2410,12 +1950,12 @@ class CartaPorteController extends ConfiguracionSistemaController{
                         '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'.
                     '</td>'.
                     '<td class="tdmod">'.
-                        '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm pesopartida" name="pesobrutopartida[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularPesoPartida('.$contadorfilas.')">'.
+                        '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm pesopartida" name="pesobrutopartida[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-min="0.'. $this->numerocerosconfigurados .'1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularPesoPartida('.$contadorfilas.')">'.
                         '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm pesototal" name="preciopartida[]" value="'.$detalle->Precio.'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');">'.
                     '</td>'.
                     '<td class="tdmod">'.
                         '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.$detalle->Precio.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
-                        '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm pesototalpartida" name="pesototal[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
+                        '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm pesototalpartida" name="pesototal[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-min="0.'. $this->numerocerosconfigurados .'1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
                     '</td>'.
                     '<td class="tdmod">'.
                         '<input type="hidden" name="materialpeligrosopartida[]" value="'.$valorpeligroso.'"></input>'.

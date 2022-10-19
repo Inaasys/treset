@@ -10,7 +10,7 @@ class AjusteInventario extends Model
     protected $table = 'Ajustes de Inventario';
     protected $primaryKey = 'Folio';
     protected $fillable = [
-        'Ajuste', 
+        'Ajuste',
         'Serie',
         'Folio',
         'Fecha',
@@ -24,4 +24,14 @@ class AjusteInventario extends Model
         'Usuario',
         'Periodo'
     ];
+
+    /**
+     * Get all of the detalles for the AjusteInventario
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function detalles()
+    {
+        return $this->hasMany(AjusteInventarioDetalle::class, 'Ajuste', 'Ajuste');
+    }
 }
