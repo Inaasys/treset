@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-use SoapClient;
 use Helpers;
 use DB;
 use DataTables;
@@ -26,16 +25,17 @@ use App\Almacen;
 use App\Existencia;
 use App\Configuracion_Tabla;
 use App\VistaProducto;
-use App\ContraReciboDetalle;
 use App\RegistrosAcciones;
 use App\TipoOrdenCompra;
 use App\VistaObtenerExistenciaProducto;
-use GuzzleHttp\Client;
+use App\AjusteInventario;
+use App\Remision;
+use App\Compra;
+use App\Traspaso;
 use App\Exports\KardexProductoExport;
 use DNS1D;
 use DNS2D;
 use PDF;
-use Mail;
 
 class ProductoController extends ConfiguracionSistemaController{
 
@@ -212,73 +212,6 @@ class ProductoController extends ConfiguracionSistemaController{
     }
     public function pruebas(){
         return view ('pruebas.pruebas');
-        /*
-        $endpoint = config('app.endpointapicurrencylayer');
-        $access_key = config('app.keyapicurrencylayer');
-        define('VT_URL', 'http://api.currencylayer.com/'.$endpoint.'?access_key='.$access_key.'&currencies=MXN');
-        //crear cliente Guzzle HTTP
-        $cliente = new Client();
-        //respuesta de API
-        $respuesta = $cliente->request('GET', VT_URL, []);
-        $resultado = json_decode($respuesta->getBody());
-        //obtener valor del dolar
-        $valor_dolar = $resultado->quotes->USDMXN;
-        dd($valor_dolar);
-        */
-
-		/*
-		$nombre = 'Receptor envio de correos';
-        $receptor = 'osbaldo.anzaldo@utpcamiones.com.mx';
-        $correos = ['al221410832@gmail.com','marco.baltazar@utpcamiones.com.mx'];
-        $name = "Receptor envio de correos";
-        $body = "Nuevo respaldo de la base de datos";
-        $horaaccion = Helpers::fecha_exacta_accion_datetimestring();
-        //$urlpublic = url("/");
-        //$url = explode("public", $urlpublic);
-        //$urlinventarioactual = $url[0]."storage/excel/exportaciones/inventarioactual.xlsx";
-        //$urlreporteventas = $url[0]."storage/excel/exportaciones/reporteventas.xlsx";
-
-        Mail::send('correos.respaldos.respaldos', compact('name', 'body', 'receptor', 'horaaccion'), function($message) use ($nombre, $receptor, $correos) {
-            $message->to($receptor, $nombre)
-                    ->cc($correos)
-                    ->subject('Respaldo');
-                    //->attach($urlinventarioactual)
-                    //->attach($urlreporteventas);
-        });
-        */
-
-        /*
-        $pdf = \PDF::loadView('pruebas.pruebas');
-        $pdf->setOption('enable-javascript', true);
-        $pdf->setOption('javascript-delay', 15000);
-        $pdf->setOption('enable-smart-shrinking', true);
-        $pdf->setOption('no-stop-slow-scripts', true);
-        $pdf->setOption('lowquality', false);
-        return $pdf->stream('graph.pdf');
-        */
-
-        /*
-        $pdf = PDF::loadView('welcome');
-        $pdf->setOption('enable-javascript', true);
-        $pdf->setOption('javascript-delay', 1000);
-        $pdf->setOption('no-stop-slow-scripts', true);
-        $pdf->setOption('enable-smart-shrinking', true);
-        return $pdf->download();
-        */
-
-        /*
-        $endpoint = config('app.endpointapicurrencylayer');
-        $access_key = config('app.keyapicurrencylayer');
-        define('VT_URL', 'http://api.currencylayer.com/'.$endpoint.'?access_key='.$access_key.'&currencies=MXN');
-        //crear cliente Guzzle HTTP
-        $cliente = new Client();
-        //respuesta de API
-        $respuesta = $cliente->request('GET', VT_URL, []);
-        $resultado = json_decode($respuesta->getBody());
-        //obtener valor del dolar
-        $valor_dolar = $resultado->quotes->USDMXN;
-        dd($valor_dolar);
-        */
 
     }
     //obtener claves productos
@@ -980,6 +913,7 @@ class ProductoController extends ConfiguracionSistemaController{
 
     //obtener kardex
     public function productos_obtener_kardex(Request $request){
+        $ip = route('ver_movimiento_kardex');
         $almacenes = Almacen::where('Status', 'ALTA')->get();
         $selectalmacenes = "<option selected disabled hidden>Selecciona el almacén</option>";
         if($request->almacen == null){
@@ -1036,7 +970,8 @@ class ProductoController extends ConfiguracionSistemaController{
             '<tr class="'.$d['colorfila'].'">'.
                 '<td><b>'.$d['nummovimiento'].'</b></td>'.
                 '<td>'.$d['documento'].'</td>'.
-                '<td>'.$d['movimiento'].'</td>'.
+                //'<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerkardex(\''. htmlspecialchars($data->Codigo , ENT_QUOTES) .'\','.$data->Almacen.')">Ver Movimientos</a></li>'.
+                '<td><a class="paddingmenuopciones" href="javascript:void(0);" onclick="mostrarMovimiento(\''.$d['documento'].'\',\''.$d['movimiento'].'\',\''.htmlspecialchars($request->codigo , ENT_QUOTES).'\')">'.$d['movimiento'].'</a></td>'.
                 '<td>'.$d['fecha'].'</td>'.
                 '<td>'.$d['almacen'].'</td>'.
                 '<td>'.$d['entradas'].'</td>'.
@@ -1115,5 +1050,42 @@ class ProductoController extends ConfiguracionSistemaController{
 
     public function productos_download_excel_kardex(Request $request){
         return Excel::download(new KardexProductoExport($request->codigo,$request->almacen),'kardex_'.$request->codigo.'.xlsx');
+    }
+    public function ver_movimiento_kardex(Request $request){
+        $documento  = $request->documento;
+        $numero = $request->numero;
+        $codigo = $request->codigo;
+
+        switch ($documento) {
+            case 'Ajustes':
+                $movimiento = AjusteInventario::where('Ajuste',$numero)
+                ->first();
+                break;
+            case 'Compras':
+                $movimiento = Compra::where('Compra',$numero)
+                ->first();
+            case 'Remisiones':
+                $movimiento = Remision::where('Remision', $numero)
+                ->first();
+            case 'Traspasos':
+                $movimiento = Traspaso::where('Traspaso', $numero)
+                ->first();
+            default:
+                # code...
+                break;
+        }
+        $datosmovimiento = '<tr>'.
+            '<td>'.$documento.'</td>'.
+            '<td>'.$numero.'</td>'.
+            '<td>'.$movimiento->Fecha.'</td>'.
+            '<td>'.$movimiento->Usuario.'</td>'.
+            '<td>'.$movimiento->Status.'</td>'.
+        '</tr>';
+
+        $data = array(
+            'fila'=> $datosmovimiento
+        );
+        return response()->json($data);
+
     }
 }

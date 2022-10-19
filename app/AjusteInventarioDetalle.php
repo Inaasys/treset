@@ -11,7 +11,7 @@ class AjusteInventarioDetalle extends Model
     protected $primaryKey = null;
     public $incrementing = false;
     protected $fillable = [
-        'Ajuste', 
+        'Ajuste',
         'Fecha',
         'Codigo',
         'Descripcion',
@@ -25,4 +25,13 @@ class AjusteInventarioDetalle extends Model
         'Anotacion',
         'Item'
     ];
+    /**
+     * Get the Ajuste that owns the AjusteInventarioDetalle
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function ajuste(): BelongsTo
+    {
+        return $this->belongsTo(Ajuste::class, 'Ajuste', 'Ajuste');
+    }
 }

@@ -157,6 +157,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/productos_exportar_excel', 'ProductoController@productos_exportar_excel')->name('productos_exportar_excel')->middleware('revisaraccesomenu:menucatalogoproductos');
     Route::post('/productos_guardar_configuracion_tabla', 'ProductoController@productos_guardar_configuracion_tabla')->name('productos_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menucatalogoproductos');
     Route::get('/productos_download_excel_kardex','ProductoController@productos_download_excel_kardex')->name('productos_download_excel_kardex')->middleware('revisaraccesomenu:menucatalogoproductos');
+    Route::get('/ver_movimiento_kardex','ProductoController@ver_movimiento_kardex')->name('ver_movimiento_kardex')->middleware('revisaraccesomenu:menucatalogoproductos');
     //Bancos
     Route::get('/bancos', 'BancoController@bancos')->name('bancos')->middleware('revisaraccesomenu:menucatalogobancos');
     Route::get('/bancos_obtener', 'BancoController@bancos_obtener')->name('bancos_obtener')->middleware('revisaraccesomenu:menucatalogobancos');
@@ -991,6 +992,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::POST('/carta_porte_guardar_configuracion_tabla','CartaPorteController@carta_porte_guardar_configuracion_tabla')->name('carta_porte_guardar_configuracion_tabla')->middleware('revisaraccesomenu:menuregistroscartasporte');
     Route::GET('/carta_porte_obtener_facturas_cliente','CartaPorteController@carta_porte_obtener_facturas_cliente')->name('carta_porte_obtener_facturas_cliente')->middleware('revisaraccesomenu:menuregistroscartasporte');
     Route::get('/carta_porte_obtener_datos_factura','CartaPorteController@carta_porte_obtener_datos_factura')->name('carta_porte_obtener_datos_factura')->middleware('revisaraccesomenu:menuregistroscartasporte');
+    Route::POST('/carta_porte_timbrar_carta','CartaPorteController@carta_porte_timbrar_carta')->name('carta_porte_timbrar_carta');
+    Route::get('/carta_porte_verificar_si_continua_timbrado','CartaPorteController@carta_porte_verificar_si_continua_timbrado')->name('carta_porte_verificar_si_continua_timbrado')->middleware('revisaraccesomenu:menuregistroscartasporte');
     //Produccion
     Route::get('/produccion', 'ProduccionController@produccion')->name('produccion')->middleware('revisaraccesomenu:menuregistrosproduccion');
     Route::get('/produccion_obtener', 'ProduccionController@produccion_obtener')->name('produccion_obtener')->middleware('revisaraccesomenu:menuregistrosproduccion');

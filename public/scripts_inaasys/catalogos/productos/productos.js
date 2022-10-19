@@ -1855,6 +1855,24 @@ function configurar_tabla(){
                                 '<input type="hidden" class="inputnestable" value="'+campos_ordenados[i]+'">'+
                             '</li>';
             $("#columnasnestable").append(columna);
-        }
+        }Romero
+}
+/**
+ * @author Jose Alonso Espinares Romero
+ * @description Muestra los datos de un movimiento seleccionado
+ */
+function mostrarMovimiento(documento, numero, codigo) {
+    $('.page-loader-wrapper').css('display', 'block');
+    $('#titulomodaldatosmovimiento1').html();
+    $('#titulomodaldatosmovimiento2').html();
+    $("#filasmovimientosmovimiento").html('');
+    $.get(ver_movimiento_kardex, {documento:documento,numero:numero,codigo:codigo}, function(data){
+
+        $('#titulomodaldatosmovimiento1').html('Documento: '+documento);
+        $('#titulomodaldatosmovimiento2').html('Movimiento: '+numero);
+        $("#filasmovimientosmovimiento").html(data.fila);
+        $("#ModalDatosMovimiento").modal('show');
+        $('.page-loader-wrapper').css('display', 'none');
+    })
 }
 init();
