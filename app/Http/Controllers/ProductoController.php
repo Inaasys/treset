@@ -1064,9 +1064,11 @@ class ProductoController extends ConfiguracionSistemaController{
             case 'Compras':
                 $movimiento = Compra::where('Compra',$numero)
                 ->first();
+                break;
             case 'Remisiones':
                 $movimiento = Remision::where('Remision', $numero)
                 ->first();
+                break;
             case 'Traspasos':
                 $movimiento = Traspaso::where('Traspaso', $numero)
                 ->first();
