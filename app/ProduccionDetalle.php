@@ -11,7 +11,7 @@ class ProduccionDetalle extends Model
     protected $primaryKey = null;
     public $incrementing = false;
     protected $fillable = [
-        'Produccion', 
+        'Produccion',
         'Fecha',
         'Codigo',
         'Descripcion',
@@ -25,4 +25,14 @@ class ProduccionDetalle extends Model
         'Item',
         'Periodo'
     ];
+
+    /**
+     * Get the Produccion that owns the ProduccionDetalle
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function Produccion()
+    {
+        return $this->belongsTo(Produccion::class, 'Produccion', 'Produccion');
+    }
 }

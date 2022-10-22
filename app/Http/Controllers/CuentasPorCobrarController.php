@@ -210,17 +210,16 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
         if($existecliente > 0){
             $cliente = Cliente::where('Numero', $request->numerocliente)->where('Status', 'ALTA')->first();
             $datos = DB::table('Clientes as c')
-            ->leftJoin('c_FormaPago as fp', 'fp.Clave', '=', 'c.FormaPago')
             ->leftJoin('c_MetodoPago as mp', 'mp.Clave', '=', 'c.MetodoPago')
             ->leftJoin('c_UsoCFDI as uc', 'uc.Clave', '=', 'c.UsoCfdi')
             ->leftJoin('c_Pais as p', 'p.Clave', '=', 'c.Pais')
             ->leftJoin('c_RegimenFiscal as rf', 'rf.Clave', '=', 'c.RegimenFiscal')
-            ->select('c.Numero', 'c.Status', 'fp.Clave AS claveformapago', 'fp.Nombre AS formapago', 'mp.Clave AS clavemetodopago', 'mp.Nombre AS metodopago', 'uc.Clave AS claveusocfdi', 'uc.Nombre AS usocfdi', 'p.Clave AS claveresidenciafiscal', 'p.Nombre AS residenciafiscal', 'rf.Clave as ClaveRegimenFiscal', 'rf.Nombre as RegimenFiscal')
+            ->select('c.Numero', 'c.Status', 'mp.Clave AS clavemetodopago', 'mp.Nombre AS metodopago', 'uc.Clave AS claveusocfdi', 'uc.Nombre AS usocfdi', 'p.Clave AS claveresidenciafiscal', 'p.Nombre AS residenciafiscal', 'rf.Clave as ClaveRegimenFiscal', 'rf.Nombre as RegimenFiscal')
             ->where('c.Numero', $request->numerocliente)
             ->where('c.Status', 'ALTA')
             ->get();
-            $claveformapago = $datos[0]->claveformapago;
-            $formapago = $datos[0]->formapago;
+            $claveformapago = '03';
+            $formapago = 'Transferencia electrónica de fondos';
             $claveregimenfiscalreceptor = $datos[0]->ClaveRegimenFiscal;
             $regimenfiscalreceptor = $datos[0]->RegimenFiscal;
             $numero = $cliente->Numero;
@@ -1305,6 +1304,11 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                 $clientedetalle = Cliente::where('Numero', $cxcd->Cliente)->first();
                 $facturadetalle = Factura::where('Factura', $cxcd->Factura)->first();
                 $metodopagofacturadetalle = MetodoPago::where('Clave', $facturadetalle->MetodoPago)->first();
+                if ($cxcd->Abono < $facturadetalle->Total) {
+                    $totalFactura = $cxcd->Abono / 1.16;
+                }else{
+                    $totalFactura = $facturadetalle->SubTotal;
+                }
                 $datadetalle[]=array(
                     "clientedetalle"=> $clientedetalle,
                     "iddocumentodetalle" => $cxcd->idDocumento,
@@ -1312,7 +1316,7 @@ class CuentasPorCobrarController extends ConfiguracionSistemaController{
                     "fechadetalle" => Carbon::parse($facturadetalle->Fecha)->toDateString(),
                     "plazodetalle" => $facturadetalle->Plazo,
                     "vencedetalle" => Carbon::parse($facturadetalle->Fecha)->addDays($facturadetalle->Plazo)->toDateString(),
-                    "totalfactura" => Helpers::convertirvalorcorrecto($facturadetalle->Total),
+                    "totalfactura" => Helpers::convertirvalorcorrecto($totalFactura),
                     "objetoimpdetalle" => $cxcd->ObjetoImp,
                     "numparcialidaddetalle" => $cxcd->NumParcialidad,
                     "impsaldoantdetalle" => Helpers::convertirvalorcorrecto($cxcd->ImpSaldoAnt),

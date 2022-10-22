@@ -11,7 +11,7 @@ class RemisionDetalle extends Model
     protected $primaryKey = null;
     public $incrementing = false;
     protected $fillable = [
-        'Remision', 
+        'Remision',
         'Cliente',
         'Fecha',
         'Codigo',
@@ -44,4 +44,13 @@ class RemisionDetalle extends Model
         'PrecioNeto',
         'PorRemisionar'
     ];
+    /**
+     * Get the Remision that owns the RemisionDetalle
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function Remision()
+    {
+        return $this->belongsTo(Remision::class, 'Remision', 'Remision');
+    }
 }

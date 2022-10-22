@@ -11,19 +11,19 @@ class Produccion extends Model
     protected $table = 'Produccion';
     protected $primaryKey = 'Folio';
     protected $fillable = [
-        'Produccion', 
-        'Serie', 
-        'Folio', 
-        'Fecha', 
-        'Codigo', 
-        'Almacen', 
-        'Cantidad', 
-        'Costo', 
-        'Obs', 
-        'Status', 
-        'Motivo de Baja', 
-        'Equipo', 
-        'Usuario', 
+        'Produccion',
+        'Serie',
+        'Folio',
+        'Fecha',
+        'Codigo',
+        'Almacen',
+        'Cantidad',
+        'Costo',
+        'Obs',
+        'Status',
+        'Motivo de Baja',
+        'Equipo',
+        'Usuario',
         'Periodo',
         'Total',
         'Cliente',
@@ -41,5 +41,14 @@ class Produccion extends Model
     //Total
     public function getTotalAttribute($value){
         return Helpers::convertirvalorcorrecto($value);
+    }
+    /**
+     * Get all of the detalles for the Produccion
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function detalles()
+    {
+        return $this->hasMany(ProduccionDetalle::class, 'Produccion', 'Produccion');
     }
 }

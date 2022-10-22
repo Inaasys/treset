@@ -10,7 +10,7 @@ class Compra extends Model
     protected $table = 'Compras';
     protected $primaryKey = 'Folio';
     protected $fillable = [
-        'Compra', 
+        'Compra',
         'Serie',
         'Folio',
         'Proveedor',
@@ -55,4 +55,13 @@ class Compra extends Model
         'Periodo',
         'OrdenTrabajo'
     ];
+    /**
+     * Get all of the detalles for the Compra
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function detalles()
+    {
+        return $this->hasMany(CompraDetalle::class, 'Compra', 'Compra');
+    }
 }

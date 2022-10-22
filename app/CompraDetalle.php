@@ -11,7 +11,7 @@ class CompraDetalle extends Model
     protected $primaryKey = null;
     public $incrementing = false;
     protected $fillable = [
-        'Compra', 
+        'Compra',
         'Proveedor',
         'Fecha',
         'Codigo',
@@ -43,4 +43,13 @@ class CompraDetalle extends Model
         'OtroMontoBase',
         'Item'
     ];
+    /**
+     * Get the Compra that owns the CompraDetalle
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function Compra(): BelongsTo
+    {
+        return $this->belongsTo(Compra::class, 'Compra', 'Compra');
+    }
 }

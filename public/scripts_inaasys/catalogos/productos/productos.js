@@ -1863,16 +1863,985 @@ function configurar_tabla(){
  */
 function mostrarMovimiento(documento, numero, codigo) {
     $('.page-loader-wrapper').css('display', 'block');
-    $('#titulomodaldatosmovimiento1').html();
-    $('#titulomodaldatosmovimiento2').html();
     $("#filasmovimientosmovimiento").html('');
     $.get(ver_movimiento_kardex, {documento:documento,numero:numero,codigo:codigo}, function(data){
+        console.log(data)
+        let tabs = ''
+        switch (data.documento) {
 
-        $('#titulomodaldatosmovimiento1').html('Documento: '+documento);
-        $('#titulomodaldatosmovimiento2').html('Movimiento: '+numero);
-        $("#filasmovimientosmovimiento").html(data.fila);
-        $("#ModalDatosMovimiento").modal('show');
-        $('.page-loader-wrapper').css('display', 'none');
+            case 'Compras':
+                $("#ModalFormularioCompra").modal('show');
+                tabs =    '<div class="row">'+
+                    '<div class="col-md-12">'+
+                        '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                            '<li role="presentation" class="active">'+
+                                '<a href="#compratab" data-toggle="tab">Compra</a>'+
+                            '</li>'+
+                            '<li role="presentation">'+
+                                '<a href="#emisorreceptortab" data-toggle="tab">Emisor, Receptor</a>'+
+                            '</li>'+
+                        '</ul>'+
+                        '<div class="tab-content">'+
+                            '<div role="tabpanel" class="tab-pane fade in active" id="compratab">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Compra <b style="color:#F44336 !important;" id="serietexto"> Serie: '+data.movimiento.Serie+'</b></label>'+
+                                        '<input type="text" class="form-control inputnextdet" name="folio" id="folio" value="'+data.movimiento.Folio+'">'+
+                                        '<input type="hidden" class="form-control" name="serie" id="serie" value="'+data.movimiento.Serie+'"  required readonly data-parsley-length="[1, 10]">'+
+                                        '<input type="hidden" class="form-control" name="uuid" id="uuid" readonly required data-parsley-length="[1, 50]">'+
+                                        '<input type="hidden" class="form-control" name="diferenciatotales" id="diferenciatotales" readonly required>'+
+                                        '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
+                                        '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
+                                        '<input type="hidden" class="form-control" name="arraycodigosdetallesordencompra" id="arraycodigosdetallesordencompra" readonly>'+
+                                        '<input type="hidden" class="form-control" name="solicitarxml" id="solicitarxml" readonly>'+
+                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Plazo Días (proveedor)</label>'+
+                                        '<input type="text" class="form-control inputnextdet" name="plazo" id="plazo"  required onkeyup="tipoLetra(this);" autocomplete="off" value="'+data.movimiento.Plazo+'">'+
+                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Fecha</label>'+
+                                        '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required style="min-width:95%;" data-parsley-excluded="true" onkeydown="return false" value="'+data.movimiento.Fecha+'">'+
+                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Emitida</label>'+
+                                        '<input type="datetime-local" class="form-control" name="fechaemitida" id="fechaemitida" data-parsley-excluded="true" onkeydown="return false" required readonly value="'+data.movimiento.FechaEmitida+'">'+
+                                        '<input type="hidden" class="form-control" name="fechatimbrado" id="fechatimbrado" >'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Proveedor <span class="label label-danger" id="textonombreproveedor">'+data.proveedor.Nombre+'</span> </label>'+
+                                        '<table class="col-md-12">'+
+                                            '<tr>'+
+                                                '<td>'+
+                                                    '<div class="form-line">'+
+                                                        '<input type="text" class="form-control inputnextdet" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer" autocomplete="off" value="'+data.movimiento.Proveedor+'">'+
+                                                        '<input type="hidden" class="form-control" name="numeroproveedoranterior" id="numeroproveedoranterior" required data-parsley-type="integer">'+
+                                                        '<input type="hidden" class="form-control" name="proveedor" id="proveedor" required readonly>'+
+                                                    '</div>'+
+                                                '</td>'+
+                                            '</tr>'+
+                                        '</table>'+
+                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Almacen <span class="label label-danger" id="textonombrealmacen">'+data.almacen+'</span></label>'+
+                                        '<table class="col-md-12">'+
+                                            '<tr>'+
+                                                '<td>'+
+                                                    '<div class="form-line">'+
+                                                        '<input type="text" class="form-control inputnextdet" name="numeroalmacen" id="numeroalmacen" required readonly data-parsley-type="integer" autocomplete="off" value="'+data.movimiento.Almacen+'">'+
+                                                        '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required readonly data-parsley-type="integer">'+
+                                                        '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
+                                                    '</div>'+
+                                                '</td>'+
+                                            '</tr>'+
+                                        '</table>'+
+                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Remisión</label>'+
+                                        '<input type="text" class="form-control inputnextdet" name="remision" id="remision" onkeyup="tipoLetra(this)" data-parsley-length="[1, 20]" autocomplete="off" value="'+data.movimiento.Remision+'">'+
+                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Factura</label>'+
+                                        '<input type="text" class="form-control inputnextdet" name="factura" id="factura" required onkeyup="tipoLetra(this)" data-parsley-length="[1, 20]" autocomplete="off" value="'+data.movimiento.Factura+'">'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-md-2">'+
+                                        '<label>Tipo</label>'+
+                                        '<input type="text" class="form-control" name="tipocompra" id="tipocompra"  value="'+data.movimiento.Tipo+'">'+
+                                    '</div>'+
+                                    '<div class="col-md-2">'+
+                                        '<table class="col-md-12">'+
+                                            '<tr>'+
+                                                '<td>'+
+                                                    '<label>Moneda</label>'+
+                                                    '<select name="moneda" id="moneda" class="form-control select2" style="width:100% !important;" required data-parsley-length="[1, 5]">'+
+                                                        '<option value="MXN" selected>MXN</option>'+
+                                                        '<option value="USD">USD</option>'+
+                                                        '<option value="EUR">EUR</option>'+
+                                                    '</select>'+
+                                                '</td>'+
+                                                '<td>'+
+                                                    '<label>Pesos</label>'+
+                                                    '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet" name="pesosmoneda" id="pesosmoneda" value="1.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                                '</td>'+
+                                            '</tr>'+
+                                        '</table>'+
+                                    '</div>'+
+                                    '<div class="col-md-3" id="busquedaordenestrabajo">'+
+                                      '<label>Orden Trabajo <span class="label label-danger" id="textonombreordentrabajo"></span></label>'+
+                                      '<table class="col-md-12">'+
+                                        '<tr>'+
+                                          '<td>'+
+                                            '<div class="form-line">'+
+                                              '<input type="text" class="form-control" name="ordentrabajo" id="ordentrabajo" readonly onkeyup="tipoLetra(this);" autocomplete="off">'+
+                                              '<input type="hidden" class="form-control" name="ordentrabajoanterior" id="ordentrabajoanterior" readonly>'+
+                                            '</div>'+
+                                          '</td>'+
+                                        '</tr>'+
+                                      '</table>'+
+                                    '</div>'+
+                                    '<div class="col-md-3" id="divbuscarcodigoproducto" hidden>'+
+                                      '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
+                                      '<table class="col-md-12">'+
+                                        '<tr>'+
+                                          '<td>'+
+                                            '<div class="btn bg-blue waves-effect" id="btnobtenerproductos" onclick="listarproductos()">Ver Productos</div>'+
+                                          '</td>'+
+                                          '<td>'+
+                                            '<div class="form-line">'+
+                                              '<input type="text" class="form-control inputnextdet" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                                            '</div>'+
+                                          '</td>'+
+                                        '</tr>'+
+                                      '</table>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                            '<div role="tabpanel" class="tab-pane fade" id="emisorreceptortab">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-6">'+
+                                        '<label>Emisor R.F.C.</label>'+
+                                        '<input type="text" class="form-control inputnexttabem" name="emisorrfc" id="emisorrfc"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);" value="'+data.movimiento.EmisorRfc+'">'+
+                                        '<input type="hidden" class="form-control" name="emisorrfcdb" id="emisorrfcdb"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                    '</div>'+
+                                    '<div class="col-md-6">'+
+                                        '<label>Emisor Nombre</label>'+
+                                        '<input type="text" class="form-control inputnexttabem" name="emisornombre" id="emisornombre" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);" value="'+data.movimiento.EmisorNombre+'">'+
+                                        '<input type="hidden" class="form-control" name="emisornombredb" id="emisornombredb" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '</div>'+
+                                    '<div class="col-md-6">'+
+                                        '<label>Receptor R.F.C.</label>'+
+                                        '<input type="text" class="form-control inputnexttabem" name="receptorrfc" id="receptorrfc"  value="'+data.movimiento.ReceptorRfc+'" required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                    '</div>'+
+                                    '<div class="col-md-6">'+
+                                        '<label>Receptor Nombre</label>'+
+                                        '<input type="text" class="form-control inputnexttabem" name="receptornombre" id="receptornombre" value="'+data.movimiento.ReceptorNombre+'" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+                '<div class="row">'+
+                    '<div class="col-md-12">'+
+                        '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                            '<li role="presentation" class="active">'+
+                                '<a href="#productostab" data-toggle="tab">Productos</a>'+
+                            '</li>'+
+                        '</ul>'+
+                        '<div class="tab-content">'+
+                            '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-12 table-responsive cabecerafija" style="height: 200px;overflow-y: scroll;padding: 0px 0px;">'+
+                                        '<table id="tablaproductoscompras" class="table table-bordered tablaproductoscompras">'+
+                                            '<thead class="'+background_tables+'">'+
+                                                '<tr>'+
+                                                    '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
+                                                    '<th class="customercolortheadth"><div style="width:400px !important;">Descripción</div></th>'+
+                                                    '<th class="'+background_tables+'">Unidad</th>'+
+                                                    '<th class="customercolortheadth">Cantidad</th>'+
+                                                    '<th class="customercolortheadth">Precio $</th>'+
+                                                    '<th class="'+background_tables+'">Importe $</th>'+
+                                                    '<th class="customercolortheadth">Dcto %</th>'+
+                                                    '<th class="customercolortheadth">Dcto $</th>'+
+                                                    '<th class="'+background_tables+'">Importe Descuento $</th>'+
+                                                    '<th class="'+background_tables+'">SubTotal $</th>'+
+                                                    '<th class="customercolortheadth">Iva %</th>'+
+                                                    '<th class="customercolortheadth">Iva $</th>'+
+                                                    '<th class="'+background_tables+'">Total $</th>'+
+                                                    '<th class="customercolortheadth">Orden</th>'+
+                                                    '<th class="'+background_tables+'">Usuario</th>'+
+                                                '</tr>'+
+                                            '</thead>'+
+                                            '<tbody>'+
+                                            '</tbody>'+
+                                        '</table>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                  '<div class="col-md-6">'+
+                                      '<label>Observaciones</label>'+
+                                      '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]">'+data.movimiento.Obs+'</textarea>'+
+                                  '</div>'+
+                                  '<div class="col-md-3 col-md-offset-3">'+
+                                        '<table class="table table-striped table-hover">'+
+                                            '<tr>'+
+                                                '<td class="tdmod">Importe</td>'+
+                                                '<td class="tdmod">'+
+                                                    '<input type="text" class="form-control divorinputmodmd" name="importeAux" id="importeAux" value="'+number_format(data.movimiento.Importe, numerodecimales, '.', ',')+'" required readonly>'+
+                                                    '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="importe" id="importe" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                                '</td>'+
+
+                                            '</tr>'+
+                                            '<tr>'+
+                                                '<td class="tdmod">Descuento</td>'+
+                                                '<td class="tdmod">'+
+                                                    '<input type="text" class="form-control divorinputmodmd" name="descuentoAux" id="descuentoAux" value="'+number_format(data.movimiento.Descuento, numerodecimales, '.', ',')+'" required readonly>'+
+                                                    '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="descuento" id="descuento" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                                '</td>'+
+                                            '</tr>'+
+                                            '<tr id="trieps" hidden>'+
+                                              '<td class="tdmod">Ieps</td>'+
+                                              '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="ieps" id="ieps" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                              '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="iepsxml" id="iepsxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                            '</tr>'+
+                                            '<tr>'+
+                                                '<td class="tdmod">SubTotal</td>'+
+                                                '<td class="tdmod">'+
+                                                    '<input type="text" class="form-control divorinputmodmd" name="subtotalAux" id="subtotalAux" value="'+number_format(data.movimiento.SubTotal, numerodecimales, '.', ',')+'" required readonly>'+
+                                                    '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="subtotal" id="subtotal" value="0.'+numerocerosconfigurados+'" required readonly>'+
+                                                '</td>'+
+                                            '</tr>'+
+                                            '<tr>'+
+                                                '<td class="tdmod">Iva</td>'+
+                                                '<td class="tdmod">'+
+                                                    '<input type="text" class="form-control divorinputmodmd" name="ivaAux" id="ivaAux" value="'+number_format(data.movimiento.Iva, numerodecimales, '.', ',')+'" required readonly>'+
+                                                    '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="iva" id="iva" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                                '</td>'+
+                                            '</tr>'+
+                                            '<tr id="trretencioniva" hidden>'+
+                                              '<td class="tdmod">Retención Iva</td>'+
+                                              '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencioniva" id="retencioniva" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                              '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionivaxml" id="retencionivaxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                            '</tr>'+
+                                            '<tr id="trretencionisr" hidden>'+
+                                              '<td class="tdmod">Retención Isr</td>'+
+                                              '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionisr" id="retencionisr" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                              '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionisrxml" id="retencionisrxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                            '</tr>'+
+                                            '<tr id="trretencionieps" hidden>'+
+                                              '<td class="tdmod">Retención Ieps</td>'+
+                                              '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionieps" id="retencionieps" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                              '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencioniepsxml" id="retencioniepsxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                            '</tr>'+
+                                            '<tr>'+
+                                                '<td class="tdmod">Total</td>'+
+                                                '<td class="tdmod">'+
+                                                    '<input type="text" class="form-control divorinputmodmd" name="totalAux" id="totalAux" value="'+number_format(data.movimiento.Total, numerodecimales, '.', ',')+'" required readonly>'+
+                                                    '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                                '</td>'+
+                                            '</tr>'+
+                                        '</table>'+
+                                  '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                  '<div class="col-md-12">'+
+                                    '<h5 id="mensajecalculoscompra"></h5>'+
+                                  '</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>';
+                $("#tabsformCompra").html(tabs);
+                $("#tablaproductoscompras tbody").html(data.filasmovimiento);
+                $('.page-loader-wrapper').css('display', 'none');
+                break;
+
+
+            case 'Remisiones':
+                $('#ModalFormularioRemision').modal('show');
+                tabs ='<div class="col-md-12">'+
+                '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                    '<li role="presentation" class="active">'+
+                        '<a href="#remisiontab" data-toggle="tab">Remisión</a>'+
+                    '</li>'+
+                    '<li role="presentation">'+
+                        '<a href="#pedidotab" data-toggle="tab">Pedido</a>'+
+                    '</li>'+
+                    '<li role="presentation" id="tabrevisioninsumosottab">'+
+                        '<a href="#revisioninsumosottab" data-toggle="tab">Insumos carg. en OT</a>'+
+                    '</li>'+
+                '</ul>'+
+                '<div class="tab-content">'+
+                    '<div role="tabpanel" class="tab-pane fade in active" id="remisiontab">'+
+                        '<div class="row">'+
+                            '<div class="col-md-3">'+
+                                '<label>Remisión <b style="color:#F44336 !important;" id="serietexto"> Serie: '+data.movimiento.Serie+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
+                                '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required onkeyup="tipoLetra(this);"  ondblclick="obtenultimonumero()" value="'+data.movimiento.Folio+'">'+
+                                '<input type="hidden" class="form-control" name="serie" id="serie" value="'+data.movimiento.Serie+'" required readonly data-parsley-length="[1, 10]">'+
+                                '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
+                                '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
+                            '</div>'+
+                            '<div class="col-md-3">'+
+                                '<label>Cliente <span class="label label-danger" id="textonombrecliente">'+data.cliente+'</span></label>'+
+                                '<table class="col-md-12">'+
+                                    '<tr>'+
+                                        '<td>'+
+                                            '<div class="form-line">'+
+                                                '<input type="text" class="form-control inputnextdet" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off" value="'+data.movimiento.Cliente+'">'+
+                                            '</div>'+
+                                        '</td>'+
+                                    '</tr>'+
+                                '</table>'+
+                            '</div>'+
+                            '<div class="col-md-3">'+
+                                '<label>Agente <span class="label label-danger" id="textonombreagente">'+data.agente+'</span></label>'+
+                                '<table class="col-md-12">'+
+                                    '<tr>'+
+                                        '<td>'+
+                                            '<div class="form-line">'+
+                                                '<input type="text" class="form-control inputnextdet" name="numeroagente" id="numeroagente"  required data-parsley-type="integer" autocomplete="off" value="'+data.movimiento.Agente+'">'+
+                                                '<input type="hidden" class="form-control" name="numeroagenteanterior" id="numeroagenteanterior"  required data-parsley-type="integer">'+
+                                                '<input type="hidden" class="form-control" name="agente" id="agente" required readonly>'+
+                                            '</div>'+
+                                        '</td>'+
+                                    '</tr>'+
+                                '</table>'+
+                            '</div>'+
+                            '<div class="col-md-3">'+
+                                '<label>Fecha </label>'+
+                                '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required  data-parsley-excluded="true" onkeydown="return false" value="'+data.movimiento.Fecha+'">'+
+                                '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+data.movimiento.Periodo+'">'+
+                            '</div>'+
+                        '</div>'+
+                        '<div class="row">'+
+                            '<div class="col-md-2">'+
+                                '<label>Almacén <span class="label label-danger" id="textonombrealmacen">'+data.almacen+'</span></label>'+
+                                '<table class="col-md-12">'+
+                                    '<tr>'+
+                                        '<td>'+
+                                            '<div class="form-line">'+
+                                                '<input type="text" class="form-control inputnextdet" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer" autocomplete="off" value="'+data.movimiento.Almacen+'">'+
+                                                '<input type="hidden" class="form-control" name="numeroalmacenanterior" id="numeroalmacenanterior" required data-parsley-type="integer">'+
+                                                '<input type="hidden" class="form-control" name="almacen" id="almacen" required readonly>'+
+                                            '</div>'+
+                                        '</td>'+
+                                    '</tr>'+
+                                '</table>'+
+                            '</div>'+
+                            '<div class="col-md-2">'+
+                                '<label>Tipo</label>'+
+                                '<input type="text" class="form-control" style="width:100% !important;" value="'+data.movimiento.Tipo+'">'+
+                            '</div>'+
+                            '<div class="col-md-2">'+
+                                '<label>Unidad</label>'+
+                                '<input type="text" class="form-control" style="width:100% !important;" value="'+data.movimiento.Unidad+'">'+
+                            '</div>'+
+                            '<div class="col-md-1">'+
+                                '<label>Plazo Días </label>'+
+                                '<input type="text" class="form-control inputnextdet" name="plazo" id="plazo" value="5" onkeyup="tipoLetra(this);" autocomplete="off" value="'+data.movimiento.Plazo+'">'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>'+
+                    '<div role="tabpanel" class="tab-pane fade" id="pedidotab">'+
+                        '<div class="row">'+
+                            '<div class="col-md-4">'+
+                                '<label>Pedido</label>'+
+                                '<input type="text" class="form-control inputnextdet" name="pedido" id="pedido" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off" value="'+data.movimiento.Pedido+'">'+
+                            '</div>'+
+                            '<div class="col-md-4">'+
+                                '<label>Solicitado por</label>'+
+                                '<input type="text" class="form-control inputnextdet" name="solicitadopor" id="solicitadopor" onkeyup="tipoLetra(this);" data-parsley-length="[1, 50]" autocomplete="off" value="'+data.movimiento.Solicita+'">'+
+                            '</div>'+
+                            '<div class="col-md-4">'+
+                                '<label>Destino del Pedido </label>'+
+                                '<input type="text" class="form-control inputnextdet" name="destinodelpedido" id="destinodelpedido" onkeyup="tipoLetra(this);" data-parsley-length="[1, 255]" autocomplete="off"> value="'+data.movimiento.Destino+'"'+
+                            '</div>'+
+                        '</div>'+
+                        '<div class="row">'+
+                            '<div class="col-md-3">'+
+                                '<label>Referencia</label>'+
+                                '<input type="text" class="form-control inputnextdet" name="referencia" id="referencia" onkeyup="tipoLetra(this);"  data-parsley-length="[1, 50]" autocomplete="off" value="'+data.movimiento.Referencia+'">'+
+                            '</div>'+
+                            '<div class="col-md-2">'+
+                                '<label>Orden Servicio</label>'+
+                                '<input type="text" class="form-control inputnextdet" name="ordenservicio" id="ordenservicio" onkeyup="tipoLetra(this);"  data-parsley-length="[1, 20]" autocomplete="off" value="'+data.movimiento.Os+'">'+
+                            '</div>'+
+                            '<div class="col-md-2">'+
+                                '<label>Equipo </label>'+
+                                '<input type="text" class="form-control inputnextdet" name="equipo" id="equipo" onkeyup="tipoLetra(this);"  data-parsley-length="[1, 20]" autocomplete="off" value="'+data.movimiento.Eq+'">'+
+                            '</div>'+
+                            '<div class="col-md-3">'+
+                                '<label>Requisición</label>'+
+                                '<table class="col-md-12">'+
+                                    '<tr>'+
+                                        '<td>'+
+                                            '<div class="form-line">'+
+                                                '<input type="text" class="form-control inputnextdet" name="serierequisicion" id="serierequisicion" placeholder="Serie" autocomplete="off" onkeyup="tipoLetra(this);" value="'+data.movimiento.SerieRq+'">'+
+                                                '<input type="hidden" class="form-control" name="serierequisicionanterior" id="serierequisicionanterior" placeholder="Serie" autocomplete="off" onkeyup="tipoLetra(this);">'+
+                                            '</div>'+
+                                        '</td>'+
+                                        '<td>'+
+                                            '<div class="form-line">'+
+                                            '<input type="text" class="form-control inputnextdet" name="requisicion" id="requisicion" placeholder="Número" autocomplete="off" value="'+data.movimiento.Rq+'">'+
+                                            '</div>'+
+                                        '</td>'+
+                                    '</tr>'+
+                                '</table>'+
+                            '</div>'+
+                            '<div class="col-md-2" id="divbtngenerarformatoreqtyt" hidden>'+
+                                '<label>Generar Formato REQ TYT</label>'+
+                                '<div class="btn bg-blue waves-effect" id="btngenerarformatoreqtyt" onclick="actualizarurlexportarformatoreqtyt()">Generar Formato REQ TYT</div>'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>'+
+                    '<div role="tabpanel" class="tab-pane fade" id="revisioninsumosottab" >'+
+                        '<div class="row">'+
+                            '<div class="col-md-3">'+
+                                '<label>Número O.T. <span class="label label-danger" id="textonombreorden"></span></label>'+
+                                '<table class="col-md-12">'+
+                                    '<tr>'+
+                                        '<td>'+
+                                            '<div class="form-line">'+
+                                                '<input type="text" class="form-control" name="orden" id="orden" autocomplete="off" onkeyup="tipoLetra(this);">'+
+                                                '<input type="hidden" class="form-control" name="ordenanterior" id="ordenanterior">'+
+                                            '</div>'+
+                                        '</td>'+
+                                    '</tr>'+
+                                '</table>'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+            '</div>'+
+            '<div class="col-md-12">'+
+                '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                    '<li role="presentation" class="active">'+
+                        '<a href="#productostab" data-toggle="tab">Productos</a>'+
+                    '</li>'+
+                '</ul>'+
+                '<div class="tab-content">'+
+                    '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
+                        '<div class="row">'+
+                            '<div class="col-md-12 table-responsive cabecerafija" style="height: 200px;overflow-y: scroll;padding: 0px 0px;">'+
+                                '<table id="tablaproductosremisiones" class="table table-bordered tablaproductosremisiones">'+
+                                    '<thead class="'+background_tables+'">'+
+                                        '<tr>'+
+                                            '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
+                                            '<th class="customercolortheadth"><div style="width:400px !important;">Descripción</div></th>'+
+                                            '<th class="'+background_tables+'">Unidad</th>'+
+                                            '<th class="customercolortheadth">Cantidad</th>'+
+                                            '<th class="customercolortheadth">Precio $</th>'+
+                                            '<th class="'+background_tables+'">Importe $</th>'+
+                                            '<th class="customercolortheadth">Dcto %</th>'+
+                                            '<th class="customercolortheadth">Dcto $</th>'+
+                                            '<th class="'+background_tables+'">Importe Descuento $</th>'+
+                                            '<th class="'+background_tables+'">SubTotal $</th>'+
+                                            '<th class="customercolortheadth">Iva %</th>'+
+                                            '<th class="customercolortheadth">Iva $</th>'+
+                                            '<th class="'+background_tables+'">Total $</th>'+
+                                            '<th class="customercolortheadth"></th>'+
+                                            '<th class="'+background_tables+'">Usuario</th>'+
+                                        '</tr>'+
+                                    '</thead>'+
+                                    '<tbody>'+
+                                    '</tbody>'+
+                                '</table>'+
+                            '</div>'+
+                        '</div>'+
+                        '<div class="row">'+
+                          '<div class="col-md-6">'+
+                            '<label>Observaciones</label>'+
+                            '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]" rows="3">'+data.movimiento.Obs+'</textarea>'+
+                          '</div>'+
+                            '<div class="col-md-3">'+
+                            '<table class="table table-striped table-hover">'+
+                                '<tr>'+
+                                    '<td class="tdmod">Importe</td>'+
+                                    '<td class="tdmod">'+
+                                        '<input type="text" class="form-control divorinputmodmd" name="importeAux" id="importeAux" value="'+number_format(data.movimiento.Importe, numerodecimales, '.', ',')+'" required readonly>'+
+                                        '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="importe" id="importe" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                    '</td>'+
+
+                                '</tr>'+
+                                '<tr>'+
+                                    '<td class="tdmod">Descuento</td>'+
+                                    '<td class="tdmod">'+
+                                        '<input type="text" class="form-control divorinputmodmd" name="descuentoAux" id="descuentoAux" value="'+number_format(data.movimiento.Descuento, numerodecimales, '.', ',')+'" required readonly>'+
+                                        '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="descuento" id="descuento" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                    '</td>'+
+                                '</tr>'+
+                                '<tr id="trieps" hidden>'+
+                                '<td class="tdmod">Ieps</td>'+
+                                '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="ieps" id="ieps" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="iepsxml" id="iepsxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                '</tr>'+
+                                '<tr>'+
+                                    '<td class="tdmod">SubTotal</td>'+
+                                    '<td class="tdmod">'+
+                                        '<input type="text" class="form-control divorinputmodmd" name="subtotalAux" id="subtotalAux" value="'+number_format(data.movimiento.SubTotal, numerodecimales, '.', ',')+'" required readonly>'+
+                                        '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="subtotal" id="subtotal" value="0.'+numerocerosconfigurados+'" required readonly>'+
+                                    '</td>'+
+                                '</tr>'+
+                                '<tr>'+
+                                    '<td class="tdmod">Iva</td>'+
+                                    '<td class="tdmod">'+
+                                        '<input type="text" class="form-control divorinputmodmd" name="ivaAux" id="ivaAux" value="'+number_format(data.movimiento.Iva, numerodecimales, '.', ',')+'" required readonly>'+
+                                        '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="iva" id="iva" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                    '</td>'+
+                                '</tr>'+
+                                '<tr id="trretencioniva" hidden>'+
+                                '<td class="tdmod">Retención Iva</td>'+
+                                '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencioniva" id="retencioniva" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionivaxml" id="retencionivaxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                '</tr>'+
+                                '<tr id="trretencionisr" hidden>'+
+                                '<td class="tdmod">Retención Isr</td>'+
+                                '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionisr" id="retencionisr" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionisrxml" id="retencionisrxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                '</tr>'+
+                                '<tr id="trretencionieps" hidden>'+
+                                '<td class="tdmod">Retención Ieps</td>'+
+                                '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionieps" id="retencionieps" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencioniepsxml" id="retencioniepsxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                '</tr>'+
+                                '<tr>'+
+                                    '<td class="tdmod">Total</td>'+
+                                    '<td class="tdmod">'+
+                                        '<input type="text" class="form-control divorinputmodmd" name="totalAux" id="totalAux" value="'+number_format(data.movimiento.Total, numerodecimales, '.', ',')+'" required readonly>'+
+                                        '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                    '</td>'+
+                                '</tr>'+
+                            '</table>'+
+                            '</div>'+
+                        '</div>'+
+                        '<div class="row">'+
+                            '<div class="col-md-12">'+
+                                '<h4 class="font-bold col-red" id="mensajecreditoexcedido"></h4>'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+            '</div>';
+
+                $("#tabsformRemision").html(tabs);
+                $('#tablaproductosremisiones tbody').html(data.filasmovimiento)
+                $('.page-loader-wrapper').css('display', 'none');
+                break;
+
+            case 'Traspasos':
+                $('#ModalFormularioTraspaso').modal('show');
+                tabs ='<div class="col-md-12">'+
+                '<div class="row">'+
+                  '<div class="col-md-3">'+
+                    '<label>Traspaso <b style="color:#F44336 !important;" id="serietexto"> Serie: '+data.movimiento.Serie+'</b></label>'+
+                    '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);" value="'+data.movimiento.Folio+'">'+
+                    '<input type="hidden" class="form-control" name="serie" id="serie" value="'+data.movimiento.Serie+'" required readonly data-parsley-length="[1, 10]">'+
+                    '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
+                    '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" readonly>'+
+                  '</div>'+
+                  '<div class="col-md-3">'+
+                    '<label>De Almacén <span class="label label-danger" id="textonombrealmacende">'+data.almacen+'</span></label>'+
+                    '<table class="col-md-12">'+
+                      '<tr>'+
+                        '<td>'+
+                          '<div class="form-line">'+
+                            '<input type="text" class="form-control inputnextdet" name="numeroalmacende" id="numeroalmacende" required data-parsley-type="integer" autocomplete="off" value="'+data.movimiento.De+'">'+
+                            '<input type="hidden" class="form-control" name="numeroalmacendeanterior" id="numeroalmacendeanterior" required data-parsley-type="integer" >'+
+                            '<input type="hidden" class="form-control" name="almacende" id="almacende" required readonly>'+
+                          '</div>'+
+                        '</td>'+
+                      '</tr>'+
+                     '</table>'+
+                  '</div>'+
+                  '<div class="col-md-3">'+
+                    '<label>A Foráneo <span class="label label-danger" id="textonombrealmacena">'+data.almacen2+'</span></label>'+
+                    '<table class="col-md-12">'+
+                      '<tr>'+
+                        '<td>'+
+                          '<div class="form-line">'+
+                            '<input type="text" class="form-control inputnextdet" name="numeroalmacena" id="numeroalmacena"  required data-parsley-type="integer" autocomplete="off" value="'+((data.movimiento.A == 0) ? "" : data.movimiento.A)+'">'+
+                            '<input type="hidden" class="form-control" name="numeroalmacenaanterior" id="numeroalmacenaanterior"  required data-parsley-type="integer">'+
+                            '<input type="hidden" class="form-control" name="almacena" id="almacena"  readonly>'+
+                          '</div>'+
+                        '</td>'+
+                      '</tr>'+
+                    '</table>'+
+                  '</div>'+
+                  '<div class="col-md-3">'+
+                    '<label>Fecha </label>'+
+                    '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required data-parsley-excluded="true" onkeydown="return false" value="'+data.movimiento.Fecha+'">'+
+                    '<input type="hidden" class="form-control" name="periodohoy" id="periodohoy" value="'+data.movimiento.Periodo+'">'+
+                  '</div>'+
+                '</div>'+
+                '<div class="row">'+
+                  '<div class="col-md-3">'+
+                    '<label>Orden Trabajo <span class="label label-danger" id="textonombreorden"></span></label>'+
+                    '<table class="col-md-12">'+
+                      '<tr>'+
+                        '<td>'+
+                          '<div class="form-line">'+
+                            '<input type="text" class="form-control inputnextdet" name="orden" id="orden" onkeyup="tipoLetra(this);" autocomplete="off"  value="'+data.orden+'">'+
+                            '<input type="hidden" class="form-control" name="ordenanterior" id="ordenanterior" >'+
+                            '<input type="hidden" class="form-control" name="fechaorden" id="fechaorden"  readonly>'+
+                            '<input type="hidden" class="form-control" name="tipo" id="tipo"  readonly>'+
+                            '<input type="hidden" class="form-control" name="unidad" id="unidad"  readonly>'+
+                          '</div>'+
+                        '</td>'+
+                      '</tr> '+
+                    '</table>'+
+                  '</div>'+
+                  '<div class="col-md-2">'+
+                    '<label>Status Orden</label>'+
+                    '<input type="text" class="form-control inputnextdet" name="statusorden" id="statusorden"  required readonly onkeyup="tipoLetra(this);" autocomplete="off"  value="'+data.ordenStatus+'">'+
+                  '</div>'+
+                  '<div class="col-md-2">'+
+                    '<label>Cliente </label>'+
+                    '<input type="text" class="form-control inputnextdet" name="clienteorden" id="clienteorden"  required readonly onkeyup="tipoLetra(this);" autocomplete="off" value="'+data.cliente+'">'+
+                  '</div>'+
+                  '<div class="col-md-2">'+
+                    '<label>Referencia </label>'+
+                    '<input type="text" class="form-control inputnextdet" name="referencia" id="referencia" data-parsley-length="[1, 200]" onkeyup="tipoLetra(this);" autocomplete="off" value="'+data.movimiento.Referencia+'">'+
+                  '</div>'+
+                  '<div class="col-md-3" id="divbuscarcodigoproducto" hidden>'+
+                    '<label>Escribe el código a buscar y presiona la tecla ENTER</label>'+
+                    '<table class="col-md-12">'+
+                      '<tr>'+
+                        '<td>'+
+                          '<div class="btn bg-blue waves-effect" id="btnobtenerproductos" onclick="listarproductos()">Ver Productos</div>'+
+                        '</td>'+
+                        '<td>'+
+                          '<div class="form-line">'+
+                            '<input type="text" class="form-control inputnextdet" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" autocomplete="off">'+
+                          '</div>'+
+                        '</td>'+
+                      '</tr>'+
+                    '</table>'+
+                  '</div>'+
+                '</div>'+
+                '<div class="row">'+
+                  '<div class="col-md-2" id="divlistarrequisiciones" hidden>'+
+                    '<label>Requisiciones</label>'+
+                    '<div class="btn btn-block bg-blue waves-effect" id="btnlistarrequisiciones" onclick="listarrequisiciones()">Ver Requisiciones</div>'+
+                    '<input type="hidden" class="form-control" name="requisicion" id="requisicion" readonly>'+
+                  '</div>'+
+                  '<div class="col-md-2" id="divlistarcotizaciones" hidden>'+
+                    '<label>Cotizaciones</label>'+
+                    '<div class="btn btn-block bg-blue waves-effect" id="btnlistarcotizaciones" onclick="listarcotizaciones()">Ver Cotizaciones</div>'+
+                    '<input type="hidden" class="form-control" name="cotizacion" id="cotizacion" readonly>'+
+                  '</div>'+
+                '</div>'+
+              '</div>'+
+              '<div class="col-md-12">'+
+                '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                  '<li role="presentation" class="active">'+
+                    '<a href="#productostab" data-toggle="tab">Productos</a>'+
+                  '</li>'+
+                '</ul>'+
+                '<div class="tab-content">'+
+                  '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
+                    '<div class="row">'+
+                      '<div class="col-md-12 table-responsive cabecerafija" style="height: 225px;overflow-y: scroll;padding: 0px 0px;">'+
+                        '<table id="tablaproductostraspasos" class="table table-bordered tablaproductostraspasos">'+
+                          '<thead class="'+background_tables+'">'+
+                            '<tr>'+
+                                '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
+                                '<th class="customercolortheadth"><div style="width:400px !important;">Descripción</div></th>'+
+                                '<th class="'+background_tables+'">Unidad</th>'+
+                                '<th class="customercolortheadth">Cantidad</th>'+
+                                '<th class="customercolortheadth">Precio $</th>'+
+                                '<th class="'+background_tables+'">Importe $</th>'+
+                                '<th class="customercolortheadth">Dcto %</th>'+
+                                '<th class="customercolortheadth">Dcto $</th>'+
+                                '<th class="'+background_tables+'">Importe Descuento $</th>'+
+                                '<th class="'+background_tables+'">SubTotal $</th>'+
+                                '<th class="customercolortheadth">Iva %</th>'+
+                                '<th class="customercolortheadth">Iva $</th>'+
+                                '<th class="'+background_tables+'">Total $</th>'+
+                                '<th class="customercolortheadth">Requisición</th>'+
+                                '<th class="'+background_tables+'">Usuario</th>'+
+                            '</tr>'+
+                          '</thead>'+
+                          '<tbody>'+
+                          '</tbody>'+
+                        '</table>'+
+                      '</div>'+
+                    '</div>'+
+                    '<div class="row" id="divimportarpartidas" hidden>'+
+                      '<div class="col-md-12">'+
+                        '<table>'+
+                          '<tr>'+
+                            '<td><div type="button" class="btn btn-success btn-sm" onclick="seleccionarpartidasexcel()">Importar partidas en excel</div></td>'+
+                            '<td data-toggle="tooltip" data-placement="top" title data-original-title="Bajar plantilla"><a class="material-icons" onclick="descargar_plantilla()" id="btnGenerarPlantilla" target="_blank">get_app</a></td>'+
+                          '</tr>'+
+                        '</table>'+
+                      '</div>'+
+                    '</div>'+
+                    '<div class="row">'+
+                      '<div class="col-md-6">'+
+                        '<label>Observaciones</label>'+
+                        '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]">'+data.movimiento.Obs+'</textarea>'+
+                      '</div>'+
+                      '<div class="col-md-3 col-md-offset-3">'+
+                      //aqui
+                        '<table class="table table-striped table-hover">'+
+                            '<tr>'+
+                                '<td class="tdmod">Importe</td>'+
+                                '<td class="tdmod">'+
+                                    '<input type="text" class="form-control divorinputmodmd" name="importeAux" id="importeAux" value="'+number_format(data.movimiento.Importe, numerodecimales, '.', ',')+'" required readonly>'+
+                                    '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="importe" id="importe" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                '</td>'+
+
+                            '</tr>'+
+                            '<tr>'+
+                                '<td class="tdmod">Descuento</td>'+
+                                '<td class="tdmod">'+
+                                    '<input type="text" class="form-control divorinputmodmd" name="descuentoAux" id="descuentoAux" value="'+number_format(data.movimiento.Descuento, numerodecimales, '.', ',')+'" required readonly>'+
+                                    '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="descuento" id="descuento" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                '</td>'+
+                            '</tr>'+
+                            '<tr id="trieps" hidden>'+
+                            '<td class="tdmod">Ieps</td>'+
+                            '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="ieps" id="ieps" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                            '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="iepsxml" id="iepsxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                            '</tr>'+
+                            '<tr>'+
+                                '<td class="tdmod">SubTotal</td>'+
+                                '<td class="tdmod">'+
+                                    '<input type="text" class="form-control divorinputmodmd" name="subtotalAux" id="subtotalAux" value="'+number_format(data.movimiento.SubTotal, numerodecimales, '.', ',')+'" required readonly>'+
+                                    '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="subtotal" id="subtotal" value="0.'+numerocerosconfigurados+'" required readonly>'+
+                                '</td>'+
+                            '</tr>'+
+                            '<tr>'+
+                                '<td class="tdmod">Iva</td>'+
+                                '<td class="tdmod">'+
+                                    '<input type="text" class="form-control divorinputmodmd" name="ivaAux" id="ivaAux" value="'+number_format(data.movimiento.Iva, numerodecimales, '.', ',')+'" required readonly>'+
+                                    '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="iva" id="iva" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                '</td>'+
+                            '</tr>'+
+                            '<tr id="trretencioniva" hidden>'+
+                            '<td class="tdmod">Retención Iva</td>'+
+                            '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencioniva" id="retencioniva" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                            '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionivaxml" id="retencionivaxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                            '</tr>'+
+                            '<tr id="trretencionisr" hidden>'+
+                            '<td class="tdmod">Retención Isr</td>'+
+                            '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionisr" id="retencionisr" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                            '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionisrxml" id="retencionisrxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                            '</tr>'+
+                            '<tr id="trretencionieps" hidden>'+
+                            '<td class="tdmod">Retención Ieps</td>'+
+                            '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencionieps" id="retencionieps" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                            '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="retencioniepsxml" id="retencioniepsxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                            '</tr>'+
+                            '<tr>'+
+                                '<td class="tdmod">Total</td>'+
+                                '<td class="tdmod">'+
+                                    '<input type="text" class="form-control divorinputmodmd" name="totalAux" id="totalAux" value="'+number_format(data.movimiento.Total, numerodecimales, '.', ',')+'" required readonly>'+
+                                    '<input type="number" style="display:none;" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="total" id="total" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly>'+
+                                '</td>'+
+                            '</tr>'+
+                        '</table>'+
+                      '</div>'+
+                    '</div>'+
+                  '</div>'+
+                '</div>'+
+              '</div>';
+
+                $("#tabsformTraspaso").html(tabs);
+                $('#tablaproductostraspasos tbody').html(data.filasmovimiento)
+                $('.page-loader-wrapper').css('display', 'none');
+                break;
+            case 'Ajustes':
+                $('#ModalFormularioAjuste').modal('show');
+                tabs ='<div class="col-md-12">'+
+                '<div class="row">'+
+                    '<div class="col-md-2">'+
+                    '<label>Ajuste <b style="color:#F44336 !important;" id="serietexto"> Serie: '+data.movimiento.Serie+'</b>&nbsp;&nbsp <div class="btn btn-xs bg-red waves-effect" id="btnobtenerseriesdocumento" onclick="obtenerseriesdocumento()">Cambiar</div></label>'+
+                    '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);" value="'+data.movimiento.Folio+'">'+
+                    '</div>'+
+                    '<div class="col-md-3">'+
+                    '<label>Almacén <span class="label label-danger" id="textonombrealmacen">'+data.almacen+'</span></label>'+
+                    '<table class="col-md-12">'+
+                        '<tr>'+
+                        '<td>'+
+                            '<div class="form-line">'+
+                            '<input type="text" class="form-control inputnextdet" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer" autocomplete="off" value="'+data.movimiento.Almacen+'">'+
+                            '</div>'+
+                        '</td>'+
+                        '</tr>'+
+                    '</table>'+
+                    '</div>'+
+                    '<div class="col-md-3">'+
+                    '<label>Fecha </label>'+
+                    '<input type="date" class="form-control" name="fecha" id="fecha"  required  data-parsley-excluded="true" onkeydown="return false" value="'+data.movimiento.Fecha+'">'+
+                    '</div>'+
+                '</div>'+
+                '</div>'+
+                '<div class="col-md-12">'+
+                '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                    '<li role="presentation" class="active">'+
+                    '<a href="#productostab" data-toggle="tab">Productos</a>'+
+                    '</li>'+
+                '</ul>'+
+                '<div class="tab-content">'+
+                    '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
+                    '<div class="row">'+
+                        '<div class="col-md-12 table-responsive cabecerafija" style="height: 300px;overflow-y: scroll;padding: 0px 0px;">'+
+                        '<table id="tablaproductosajuste" class="table table-bordered tablaproductosajuste">'+
+                            '<thead class="'+background_tables+'">'+
+                                '<tr>'+
+                                    '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
+                                    '<th class="customercolortheadth"><div style="width:200px !important;">Producto</div></th>'+
+                                    '<th class="'+background_tables+'">Unidad</th>'+
+                                    '<th class="'+background_tables+'">Existencia Actual</th>'+
+                                    '<th class="customercolortheadth">Entradas</th>'+
+                                    '<th class="customercolortheadth">Salidas</th>'+
+                                    '<th class="'+background_tables+'">Existencia Nueva</th>'+
+                                    '<th class="customercolortheadth">Costo $</th>'+
+                                    '<th class="'+background_tables+'">Usuario</th>'+
+                                '</tr>'+
+                            '</thead>'+
+                            '<tbody>'+
+                            '</tbody>'+
+                        '</table>'+
+                        '</div>'+
+                    '</div>'+
+                    '<div class="row">'+
+                    '</div>'+
+                    '<div class="row">'+
+                        '<div class="col-md-6">'+
+                        '<label>Observaciones</label>'+
+                        '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]">'+data.movimiento.Obs+'</textarea>'+
+                        '</div>'+
+                        '<div class="col-md-3 col-md-offset-3">'+
+                        '<table class="table table-striped table-hover">'+
+                            '<tr>'+
+                            '<td class="tdmod">Total</td>'+
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodmd" name="total" id="total" value="'+number_format(data.movimiento.Total,numerodecimales,'.',',')+'" required readonly></td>'+
+                            '</tr>'+
+                        '</table>'+
+                        '</div>'+
+                    '</div>'+
+                    '</div>'+
+                '</div>'+
+                '</div>';
+
+                $("#tabsformAjuste").html(tabs);
+                $('#tablaproductosajuste tbody').html(data.filasmovimiento)
+                $('.page-loader-wrapper').css('display', 'none');
+                break;
+            default:
+                $('#ModalFormularioProd').modal('show');
+                tabs ='<div class="col-md-12">'+
+                    '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                        '<li role="presentation" class="active">'+
+                            '<a href="#remisiontab" data-toggle="tab">Producción</a>'+
+                        '</li>'+
+                    '</ul>'+
+                    '<div class="tab-content">'+
+                        '<div role="tabpanel" class="tab-pane fade in active" id="remisiontab">'+
+                            '<div class="row">'+
+                                '<div class="col-md-3">'+
+                                    '<label>Producción <b style="color:#F44336 !important;" id="serietexto"> Serie: '+data.movimiento.Serie+'</b></label>'+
+                                    '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);" value="'+data.movimiento.Folio+'">'+
+                                    '<input type="hidden" class="form-control" name="serie" id="serie" value="'+data.movimiento.Serie+'" required readonly data-parsley-length="[1, 10]">'+
+                                    '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" value="0" readonly>'+
+                                    '<input type="hidden" class="form-control" name="tipooperacion" id="tipooperacion" value="alta" readonly>'+
+                                '</div>'+
+                                '<div class="col-md-3">'+
+                                    '<label>Cliente <span class="label label-danger" id="textonombrecliente">'+data.cliente+'</span></label>'+
+                                    '<table class="col-md-12">'+
+                                        '<tr>'+
+                                            '<td>'+
+                                                '<div class="form-line">'+
+                                                    '<input type="text" class="form-control inputnextdet" name="numerocliente" id="numerocliente" required data-parsley-type="integer" autocomplete="off" value="'+data.movimiento.Cliente+'">'+
+                                                    '<input type="hidden" class="form-control" name="numeroclienteanterior" id="numeroclienteanterior" required data-parsley-type="integer">'+
+                                                    '<input type="hidden" class="form-control" name="cliente" id="cliente" required readonly>'+
+                                                '</div>'+
+                                            '</td>'+
+                                        '</tr>'+
+                                    '</table>'+
+                                '</div>'+
+                                '<div class="col-md-3">'+
+                                    '<label>Almacén <span class="label label-danger" id="textonombrealmacen">'+data.almacen+'</span></label>'+
+                                    '<table class="col-md-12">'+
+                                        '<tr>'+
+                                            '<td>'+
+                                                '<div class="form-line">'+
+                                                    '<input type="text" class="form-control inputnextdet" name="numeroalmacen" id="numeroalmacen" required data-parsley-type="integer" autocomplete="off" value="'+data.movimiento.Cliente+'">'+
+                                                '</div>'+
+                                            '</td>'+
+                                        '</tr>'+
+                                    '</table>'+
+                                '</div>'+
+                                '<div class="col-md-3">'+
+                                    '<label>Fecha </label>'+
+                                    '<input type="datetime-local" class="form-control" name="fecha" id="fecha"  required data-parsley-excluded="true" onkeydown="return false" value="'+data.movimiento.Fecha+'">'+
+                                '</div>'+
+                            '</div>'+
+                            '<div class="row">'+
+                                '<div class="col-md-3">'+
+                                    '<label>Escribe el código del PT y presiona la tecla ENTER<span class="label label-danger" id="textopt"></span></label>'+
+                                    '<table class="col-md-12">'+
+                                        '<tr>'+
+                                            '<td>'+
+                                                '<div class="form-line">'+
+                                                '<input type="text" class="form-control inputnextdet" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del PT" required autocomplete="off" onkeyup="tipoLetra(this);" value="'+data.movimiento.Codigo+'">'+
+                                                '</div>'+
+                                            '</td>'+
+                                        '</tr>'+
+                                    '</table>'+
+                                '</div>'+
+                                '<div class="col-md-3">'+
+                                    '<label>Cantidad a fabricar PT</label>'+
+                                    '<input type="text" class="form-control inputnextdet" name="cantidad" id="cantidad" value="'+number_format(data.movimiento.Cantidad,numerodecimales,'.',',')+'" data-parsley-min="0.'+numerocerosconfiguradosinputnumberstep+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas();" required>'+
+                                '</div>'+
+                                '<div class="col-md-3">'+
+                                    '<label>Costo PT</label>'+
+                                    '<input type="text" class="form-control inputnextdet" name="costo" id="costo" value="'+number_format(data.movimiento.Costo,numerodecimales,'.',',')+'" readonly required>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+                '<div class="col-md-12">'+
+                    '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                        '<li role="presentation" class="active">'+
+                            '<a href="#productostab" data-toggle="tab">Productos</a>'+
+                        '</li>'+
+                    '</ul>'+
+                    '<div class="tab-content">'+
+                        '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
+                            '<div class="row">'+
+                                '<div class="col-md-12 table-responsive cabecerafija" style="height: 250px;overflow-y: scroll;padding: 0px 0px;">'+
+                                    '<table id="tablaproductosprod" class="table table-bordered tablaproductosremisiones">'+
+                                        '<thead class="'+background_tables+'">'+
+                                            '<tr>'+
+                                                '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
+                                                '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
+                                                '<th class="customercolortheadth">Unidad</th>'+
+                                                '<th class="customercolortheadth">Cantidad</th>'+
+                                                '<th class="customercolortheadth">Merma</th>'+
+                                                '<th class="'+background_tables+'">Consumo</th>'+
+                                                '<th class="customercolortheadth">Costo Unitario</th>'+
+                                                '<th class="'+background_tables+'">Costo Total</th>'+
+                                                '<th class="customercolortheadth">Usuario</th>'+
+                                            '</tr>'+
+                                        '</thead>'+
+                                        '<tbody>'+
+                                        '</tbody>'+
+                                    '</table>'+
+                                '</div>'+
+                            '</div>'+
+                            '<div class="row">'+
+                                '<div class="col-md-6">'+
+                                    '<label>Observaciones de PT</label>'+
+                                    '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" onkeyup="tipoLetra(this);" required data-parsley-length="[1, 255]" rows="2">'+data.movimiento.Obs+'</textarea>'+
+                                '</div>'+
+                                '<div class="col-md-3">'+
+                                '</div>'+
+                                '<div class="col-md-3">'+
+                                    '<table class="table table-striped table-hover">'+
+                                        '<tr>'+
+                                            '<td style="padding:0px !important;">Total</td>'+
+                                            '<td style="padding:0px !important;"><input type="text" class="form-control" style="width:100% !important;height:25px !important;" name="total" id="total" value="'+number_format(data.movimiento.Total,numerodecimales,'.',',')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                        '</tr>'+
+                                    '</table>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>';
+                $("#tabsformProd").html(tabs);
+                $('#tablaproductosprod tbody').html(data.filasmovimiento)
+                $('.page-loader-wrapper').css('display', 'none');
+                break;
+        }
     })
 }
 init();

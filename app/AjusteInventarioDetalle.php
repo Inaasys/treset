@@ -30,7 +30,7 @@ class AjusteInventarioDetalle extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function ajuste(): BelongsTo
+    public function ajuste()
     {
         return $this->belongsTo(Ajuste::class, 'Ajuste', 'Ajuste');
     }
