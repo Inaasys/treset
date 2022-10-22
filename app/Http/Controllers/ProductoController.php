@@ -12,6 +12,7 @@ use DataTables;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ProductosExport;
 use App\Producto;
+use App\Agente;
 use App\Tabla;
 use App\ClaveProdServ;
 use App\ClaveUnidad;
@@ -32,7 +33,10 @@ use App\AjusteInventario;
 use App\Remision;
 use App\Compra;
 use App\Traspaso;
+use App\Proveedor;
+use App\Produccion;
 use App\Exports\KardexProductoExport;
+use App\OrdenTrabajo;
 use DNS1D;
 use DNS2D;
 use PDF;
@@ -1055,38 +1059,198 @@ class ProductoController extends ConfiguracionSistemaController{
         $documento  = $request->documento;
         $numero = $request->numero;
         $codigo = $request->codigo;
-
+        $provedor = '';
+        $almacen = '';
+        $almacen2 = '';
+        $cliente = '';
+        $agente = '';
+        $orden = null;
+        $ordenStatus = '';
         switch ($documento) {
             case 'Ajustes':
                 $movimiento = AjusteInventario::where('Ajuste',$numero)
                 ->first();
+                $provedor = NULL;
+                $almacen = Almacen::where('Numero',$movimiento->Almacen)->select('Nombre')->first();
+                $almacen2 = null;
+                $cliente = null;
+                $agente = null;
+                $orden = null;
+                $ordenStatus = '';
                 break;
             case 'Compras':
                 $movimiento = Compra::where('Compra',$numero)
                 ->first();
+                $provedor = Proveedor::where('Numero',$movimiento->Proveedor)->select('Nombre')->first();
+                $almacen = Almacen::where('Numero',$movimiento->Almacen)->select('Nombre')->first();
+                $almacen2 = null;
+                $cliente = null;
+                $agente = null;
+                $orden = null;
+                $ordenStatus = '';
                 break;
             case 'Remisiones':
                 $movimiento = Remision::where('Remision', $numero)
                 ->first();
+                $almacen = Almacen::where('Numero',$movimiento->De)->select('Nombre')->first();
+                $almacen2 = null;
+                $cliente = Cliente::where('Numero',$movimiento->Cliente)->select('Nombre')->first();
+                $provedor = null;
+                $agente = Agente::where('Numero',$movimiento->Agente)->select('Nombre')->first();
+                $orden = null;
+                $ordenStatus = '';
                 break;
             case 'Traspasos':
                 $movimiento = Traspaso::where('Traspaso', $numero)
                 ->first();
+                $almacen = Almacen::where('Numero',$movimiento->De)->select('Nombre')->first();
+                $almacen2 = Almacen::where('Numero',$movimiento->A)->select('Nombre')->first();
+                $provedor = null;
+                $agente = null;
+                $orden = OrdenTrabajo::where('Orden',$movimiento->Orden)->select('Orden','Status','Cliente')->first();
+                $cliente = (isset($orden) ? Cliente::where('Numero',$orden->Cliente)->select('Nombre')->first() : NULL);
+                break;
             default:
-                # code...
+                $movimiento = Produccion::where('Produccion',$numero)->first();
+                $provedor = NULL;
+                $almacen =  Almacen::where('Numero',$movimiento->Almacen)->select('Nombre')->first();
+                $almacen2 = null;
+                $cliente = Cliente::where('Numero',$movimiento->Cliente)->select('Nombre')->first();
+                $agente = null;
+                $orden = null;
+                $ordenStatus = '';
                 break;
         }
-        $datosmovimiento = '<tr>'.
-            '<td>'.$documento.'</td>'.
-            '<td>'.$numero.'</td>'.
-            '<td>'.$movimiento->Fecha.'</td>'.
-            '<td>'.$movimiento->Usuario.'</td>'.
-            '<td>'.$movimiento->Status.'</td>'.
-        '</tr>';
+        $referencia = '';
+        $filasmovimiento = '';
+        switch ($documento) {
+            case 'Ajustes':
+                foreach ($movimiento->detalles as $detalle) {
+                    $filasmovimiento .= '<tr class="filasproductos">'.
+                        '<td class="tdmod"><b style="font-size:12px;">'.$detalle->Codigo.'</b></td>'.
+                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$detalle->Descripcion.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;" class="codigopartidatexto">'.$detalle->Descripcion.'</b></td>'.
+                        '<td class="tdmod">'.$detalle->Unidad.'</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Existencias),$this->numerodecimales,'.',',').'">'.
+                        '</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Entradas),$this->numerodecimales,'.',',').'">'.
+                        '</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Salidas),$this->numerodecimales,'.',',').'">'.
+                        '</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Real),$this->numerodecimales,'.',',').'">'.
+                        '</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Real),$this->numerodecimales,'.',',').'">'.
+                        '</td>'.
+                        '<td class="tdmod"><input type="text" class="form-control divorinputmodsm" value="'.$movimiento->Usuario.'"><td>'.
+                    '</tr>';
+                }
+                break;
 
+            case 'Consumo Produccion':
+                foreach ($movimiento->detalles as $detalle) {
+                    $filasmovimiento .= '<tr class="filasproductos">'.
+                        '<td class="tdmod"><b style="font-size:12px;">'.$detalle->Codigo.'</b></td>'.
+                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$detalle->Descripcion.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;" class="codigopartidatexto">'.$detalle->Descripcion.'</b></td>'.
+                        '<td class="tdmod">'.$detalle->Unidad.'</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Cantidad),$this->numerodecimales,'.',',').'">'.
+                        '</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Merma),$this->numerodecimales,'.',',').'">'.
+                        '</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Consumo),$this->numerodecimales,'.',',').'">'.
+                        '</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Costo),$this->numerodecimales,'.',',').'">'.
+                        '</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Total),$this->numerodecimales,'.',',').'">'.
+                        '</td>'.
+                        '<td class="tdmod"><input type="text" class="form-control divorinputmodsm" value="'.$movimiento->Usuario.'"><td>'.
+                    '</tr>';
+                }
+                break;
+
+            default:
+                foreach ($movimiento->detalles as $detalle) {
+                    switch ($documento) {
+                        case 'Ajustes':
+                            $movimiento = AjusteInventario::where('Ajuste',$numero)
+                            ->first();
+                            break;
+                        case 'Compras':
+                            $referencia = (isset($detalle->Orden) ? $detalle->Orden : 'NA');
+                            break;
+                        case 'Remisiones':
+                            $referencia = (isset($detalle->Orden) ? $detalle->Orden : 'NA');
+                            break;
+                        case 'Traspasos':
+                            $referencia = (isset($detalle->Requisicion) ? $detalle->Requisicion : 'NA');
+
+                        default:
+                            $provedor = '';
+                            break;
+                    }
+                    $filasmovimiento .= '<tr class="filasproductos">'.
+                        '<td class="tdmod"><b style="font-size:12px;">'.$detalle->Codigo.'</b></td>'.
+                        '<td class="tdmod"><input type="hidden" class="form-control codigoproductopartida" name="codigoproductopartida[]" value="'.$detalle->Descripcion.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;" class="codigopartidatexto">'.$detalle->Descripcion.'</b></td>'.
+                        '<td class="tdmod">'.$detalle->Unidad.'</td>'.
+                        '<td class="tdmod">'.
+                            Helpers::convertirvalorcorrecto($detalle->Cantidad).
+                        '</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Precio),$this->numerodecimales,'.',',').'">'.
+                        '</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Importe),$this->numerodecimales,'.',',').'">'.
+                        '</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.Helpers::convertirvalorcorrecto($detalle->Dcto).'">'.
+                        '</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Descuento), $this->numerodecimales,'.',',').'">'.
+                        '</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'. number_format(Helpers::convertirvalorcorrecto($detalle->ImporteDescuento),$this->numerodecimales,'.',',').'">'.
+                        '</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->SubTotal),$this->numerodecimales,'.',',').'">'.
+                        '</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.number_format(($detalle->Impuesto/100),$this->numerodecimales,'.',',').'">'.
+                        '</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.number_format($detalle->Iva,$this->numerodecimales,'.',',').'">'.
+                        '</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Total),$this->numerodecimales,'.',',').'">'.
+                        '</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.$referencia.'">'.
+                        '</td>'.
+                        '<td class="tdmod"><input type="text" class="form-control divorinputmodsm" value="'.$movimiento->Usuario.'"><td>'.
+                    '</tr>';
+                }
+                break;
+        }
         $data = array(
-            'fila'=> $datosmovimiento
+            'filasmovimiento'=> $filasmovimiento,
+            'movimiento'=> $movimiento,
+            'documento'=> $documento,
+            'proveedor' =>$provedor,
+            'almacen' => (isset($almacen) ? $almacen->Nombre : ''),
+            'almacen2' => (isset($almacen2) ? $almacen2->Nombre : ''),
+            "cliente" => (isset($cliente) ? $cliente->Nombre : ''),
+            'agente' => (isset($agente) ? $agente->Nombre : ''),
+            'orden' =>  (isset($orden) ? $orden->Orden : ''),
+            'ordenStatus' =>(isset($orden) ? $orden->Status : ''),
         );
+
         return response()->json($data);
 
     }

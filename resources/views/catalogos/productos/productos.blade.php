@@ -406,45 +406,130 @@
         </div>
     </div>
 
-    {{-- Modal datos movimiento --}}
-    <div class="modal fade" data-keyboard="false" id="ModalDatosMovimiento" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+    {{-- Modal movimiento Compra --}}
+    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="ModalFormularioCompra" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
-                <div class="modal-header {{$empresa->background_forms_and_modals}}">
-                    <h5 class="modal-title" >
-                        <div class="row">
-                            <div class="col-xs-10 col-sm-10 col-md-11">
-                                <label id="titulomodaldatosmovimiento1"></label><br>
-                                <label id="titulomodaldatosmovimiento2"></label>
-                            </div>
-                            <div class="col-xs-2 col-sm-2 col-md-1">
-                                <button type="button" class="btn btn-link waves-effect" data-dismiss="modal">Cerrar</button>
+                <div id="formulario">
+                    <div class="modal-header {{$empresa->background_forms_and_modals}}">
+                        <h4 class="modal-title" id="titulomodalcompra"></h4>
+                    </div>
+                    <form id="formparsley" action="#">
+                        <div class="modal-body">
+                            <div class="col-md-12" id="tabsformCompra">
+                                <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
                             </div>
                         </div>
-                    </h5>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="table-responsive cabecerafija" style="height: 450px;overflow-y: scroll;padding: 0px 0px;">
-                                <table class="table table-bordered table-striped table-hover" id="tablakardexproducto">
-                                    <thead>
-                                        <tr>
-                                            <td class="{{$empresa->background_tables}}">Documento</td>
-                                            <td class="{{$empresa->background_tables}}">Movimiento</td>
-                                            <td class="{{$empresa->background_tables}}">Fecha</td>
-                                            <td class="{{$empresa->background_tables}}">Usuario</td>
-                                            <td class="{{$empresa->background_tables}}">Status</td>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="filasmovimientosmovimiento"></tbody>
-                                </table>
+                <div id="contenidomodaltablas">
+                    <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Movimiento Remision-->
+    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="ModalFormularioRemision" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div id="formulario">
+                    <div class="modal-header {{$empresa->background_forms_and_modals}}">
+                        <h4 class="modal-title" id="titulomodal"></h4>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formparsley" action="#">
+                            <div class="col-md-12" id="tabsformRemision">
+                                <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
                             </div>
-                        </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <h5 id="infomovimientos"></h5><br>
+                <div id="contenidomodaltablas">
+                    <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Movimiento Traspaso-->
+    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="ModalFormularioTraspaso" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div id="formulario">
+                    <div class="modal-header {{$empresa->background_forms_and_modals}}">
+                        <h4 class="modal-title" id="titulomodal"></h4>
+                    </div>
+                    <form id="formparsley" action="#">
+                        <div class="modal-body">
+                            <div class="col-md-12" id="tabsformTraspaso">
+                                <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
+                        </div>
+                    </form>
+                </div>
+                <div id="contenidomodaltablas">
+                    <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Movimiento Ajuste-->
+    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="ModalFormularioAjuste" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div id="formulario">
+                    <div class="modal-header {{$empresa->background_forms_and_modals}}">
+                        <h4 class="modal-title" id="titulomodal"></h4>
+                    </div>
+                    <form id="formparsley" action="#">
+                        <div class="modal-body">
+                            <div class="col-md-12" id="tabsformAjuste">
+                                <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
+                        </div>
+                    </form>
+                </div>
+                <div id="contenidomodaltablas">
+                    <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Movimiento Producción-->
+    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="ModalFormularioProd" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div id="formulario">
+                    <div class="modal-header {{$empresa->background_forms_and_modals}}">
+                        <h4 class="modal-title" id="titulomodal"></h4>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formparsley" action="#">
+
+                            <div class="col-md-12" id="tabsformProd">
+                                <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="limpiar();limpiarmodales();" data-dismiss="modal">Salir</button>
+                    </div>
+                </div>
+                <div id="contenidomodaltablas">
+                    <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
                 </div>
             </div>
         </div>

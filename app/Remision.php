@@ -11,7 +11,7 @@ class Remision extends Model
     protected $table = 'Remisiones';
     protected $primaryKey = 'Folio';
     protected $fillable = [
-        'Remision', 
+        'Remision',
         'Serie',
         'Folio',
         'Cliente',
@@ -113,5 +113,14 @@ class Remision extends Model
     //encheque
     public function getEnChequeAttribute($value){
         return Helpers::convertirvalorcorrecto($value);
+    }
+    /**
+     * Get all of the detalles for the Remision
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function detalles()
+    {
+        return $this->hasMany(RemisionDetalle::class, 'Remision', 'Remision');
     }
 }
