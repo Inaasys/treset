@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-use App\Http\Helpers;
+use Helpers;
 use DataTables;
 use DB;
 use PDF;
