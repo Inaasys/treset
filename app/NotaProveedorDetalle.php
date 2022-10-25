@@ -39,4 +39,14 @@ class NotaProveedorDetalle extends Model
         'ClaveUnidad',
         'Item'
     ];
+
+    /**
+     * Get the NotaProveedor that owns the NotaProveedorDetalle
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function NotaProveedor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'Nota', 'Nota');
+    }
 }

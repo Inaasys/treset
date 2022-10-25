@@ -34,6 +34,7 @@ use App\Remision;
 use App\Compra;
 use App\Traspaso;
 use App\Proveedor;
+use App\NotaProveedor;
 use App\Produccion;
 use App\Exports\KardexProductoExport;
 use App\OrdenTrabajo;
@@ -101,7 +102,7 @@ class ProductoController extends ConfiguracionSistemaController{
                                         '</div>';
                         return $operaciones;
                     })
-                    ->addColumn('Existencias', function($data){ return $data->Existencias; })
+                    ->addColumn('Existencias', function($data){ return Helpers::convertirvalorcorrecto($data->Existencias); })
                     ->addColumn('Costo', function($data){ return $data->Costo; })
                     ->addColumn('CostoDeLista', function($data){ return $data->CostoDeLista; })
                     ->addColumn('CostoDeVenta', function($data){ return $data->CostoDeVenta; })
@@ -1110,12 +1111,25 @@ class ProductoController extends ConfiguracionSistemaController{
                 $orden = OrdenTrabajo::where('Orden',$movimiento->Orden)->select('Orden','Status','Cliente')->first();
                 $cliente = (isset($orden) ? Cliente::where('Numero',$orden->Cliente)->select('Nombre')->first() : NULL);
                 break;
+            case 'NC Proveedor':
+                $movimiento = NotaProveedor::where('Nota',$numero)->with(['detalles','documentos'])
+                ->first();
+                $almacen = Almacen::where('Numero',$movimiento->Almacen)->select('Nombre')->first();
+                $almacen2 = NULL;
+                $provedor = Proveedor::where('Numero',$movimiento->Proveedor)->select('Nombre')->first();
+                $cliente = NULL;
+                $agente = null;
+                $orden = null;
+                $ordenStatus = '';
+                break;
             default:
-                $movimiento = Produccion::where('Produccion',$numero)->first();
-                $provedor = NULL;
-                $almacen =  Almacen::where('Numero',$movimiento->Almacen)->select('Nombre')->first();
+                $movimiento = collect([
+                    "detalles" => collect([])
+                ]);
+                $provedor = null;
+                $almacen =  null;
                 $almacen2 = null;
-                $cliente = Cliente::where('Numero',$movimiento->Cliente)->select('Nombre')->first();
+                $cliente = null;
                 $agente = null;
                 $orden = null;
                 $ordenStatus = '';
@@ -1123,6 +1137,7 @@ class ProductoController extends ConfiguracionSistemaController{
         }
         $referencia = '';
         $filasmovimiento = '';
+        $filasDescuentos='';
         switch ($documento) {
             case 'Ajustes':
                 foreach ($movimiento->detalles as $detalle) {
@@ -1175,7 +1190,235 @@ class ProductoController extends ConfiguracionSistemaController{
                     '</tr>';
                 }
                 break;
+            case 'NC Proveedor':
+                //Codigos
+                foreach ($movimiento->detalles as $detalle) {
+                    $producto = "";
+                    $Existencia = 0;
+                    if($movimiento->Almacen != 0){
+                        $Existencia = Existencia::where('Codigo', $detalle->Codigo)->where('Almacen', $movimiento->Almacen)->first();
+                        $producto = Producto::where('Codigo', $detalle->Codigo)->first();
+                    }
+                    //$parsleymax = $detalle->Cantidad;
+                    //$cantidadpartidadetalleordencompra = OrdenCompraDetalle::where('Orden', $compra->Orden)->where('Codigo', $detalle->Codigo)->first();
+                    $claveproductopartida = ClaveProdServ::where('Clave', $detalle->ClaveProducto)->first();
+                    $claveunidadpartida = ClaveUnidad::where('Clave', $detalle->ClaveUnidad)->first();
+                    $claveproducto = $claveproductopartida ? $claveproductopartida->Clave : '';
+                    $nombreclaveproducto = $claveproductopartida ? $claveproductopartida->Nombre : '';
+                    $claveunidad = $claveunidadpartida ? $claveunidadpartida->Clave : '';
+                    $nombreclaveunidad = $claveunidadpartida ? $claveunidadpartida->Nombre : '';
+                    //importante porque si se quiere hacer una divison con 0 marca ERROR
+                    $porcentajeieps = 0;
+                    $porcentajeretencioniva = 0;
+                    $porcentajeretencionisr = 0;
+                    $porcentajeretencionieps = 0;
+                    if($detalle->Ieps > 0){
+                        $porcentajeieps = ($detalle->Ieps * 100) / $detalle->ImporteDescuento;
+                    }
+                    if($detalle->IvaRetencion > 0){
+                        $porcentajeretencioniva = ($detalle->IvaRetencion * 100) / $detalle->SubTotal;
+                    }
+                    if($detalle->IsrRetencion > 0){
+                        $porcentajeretencionisr = ($detalle->IsrRetencion * 100) / $detalle->SubTotal;
+                    }
+                    if($detalle->IepsRetencion > 0){
+                        $porcentajeretencionieps = ($detalle->IepsRetencion * 100) / $detalle->SubTotal;
+                    }
+                    if($detalle->Codigo == 'DPPP'){
+                        $filasmovimiento= $filasmovimiento.
+                        '<tr class="filasproductos">'.
+                            '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$detalle->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$detalle->Codigo.'</b></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($detalle->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxs unidadpartida" name="unidadpartida[]" value="'.$detalle->Unidad.'" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)"></td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Cantidad).'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Precio),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Importe),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Dcto).'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Descuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodsm importedescuentopesospartida" name="importedescuentopesospartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->ImporteDescuento),$this->numerodecimales,',','.').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm iepsporcentajepartida" name="iepsporcentajepartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($porcentajeieps),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodsm trasladoiepspesospartida" name="trasladoiepspesospartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Ieps),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->SubTotal),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Impuesto),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodsm trasladoivapesospartida" name="trasladoivapesospartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Iva),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm retencionivaporcentajepartida" name="retencionivaporcentajepartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($porcentajeretencioniva),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodsm retencionivapesospartida" name="retencionivapesospartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->IvaRetencion),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm retencionisrporcentajepartida" name="retencionisrporcentajepartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($porcentajeretencionisr),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodsm retencionisrpesospartida" name="retencionisrpesospartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->IsrRetencion),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm retencioniepsporcentajepartida" name="retencioniepsporcentajepartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($porcentajeretencionieps),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodsm retencioniepspesospartida" name="retencioniepspesospartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->IepsRetencion),$this->numerodecimales).'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Total),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodsm preciomonedapartida" name="preciomonedapartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->PrecioMoneda),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodsm descuentopartida" name="descuentopartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->DescuentoMoneda),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<div class="row divorinputmodxl">'.
+                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.
+                                        '<input type="text" class="form-control inputnextdet divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly data-parsley-length="[1, 20]">'.
+                                    '</div>'.
+                                '</div>'.
+                            '</td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$nombreclaveproducto.'" readonly></td>'.
+                            '<td class="tdmod">'.
+                                '<div class="row divorinputmodxl">'.
+                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.
+                                        '<input type="text" class="form-control inputnextdet divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
+                                    '</div>'.
+                                '</div>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$nombreclaveunidad.'" readonly>'.
+                            '</td>'.
+                        '</tr>';
+                    }else{
+                        $filasmovimiento= $filasmovimiento.
+                        '<tr class="filasproductos">'.
+                            '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$detalle->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$detalle->Codigo.'</b></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($detalle->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
+                            '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxs unidadpartida" name="unidadpartida[]" value="'.$detalle->Unidad.'" required data-parsley-length="[1, 5]" onkeyup="tipoLetra(this)"></td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Cantidad).'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm preciopartida" name="preciopartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Precio),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodsm importepartida" name="importepartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Importe),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm descuentoporcentajepartida" name="descuentoporcentajepartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Dcto).'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm descuentopesospartida" name="descuentopesospartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Descuento).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodsm importedescuentopesospartida" name="importedescuentopesospartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->ImporteDescuento),$this->numerodecimales,',','.').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm iepsporcentajepartida" name="iepsporcentajepartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($porcentajeieps),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodsm trasladoiepspesospartida" name="trasladoiepspesospartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Ieps),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodsm subtotalpartida" name="subtotalpartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->SubTotal),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm ivaporcentajepartida" name="ivaporcentajepartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Impuesto),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodsm trasladoivapesospartida" name="trasladoivapesospartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Iva),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm retencionivaporcentajepartida" name="retencionivaporcentajepartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($porcentajeretencioniva),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodsm retencionivapesospartida" name="retencionivapesospartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->IvaRetencion),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm retencionisrporcentajepartida" name="retencionisrporcentajepartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($porcentajeretencionisr),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodsm retencionisrpesospartida" name="retencionisrpesospartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->IsrRetencion),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control inputnextdet divorinputmodsm retencioniepsporcentajepartida" name="retencioniepsporcentajepartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($porcentajeretencionieps),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodsm retencioniepspesospartida" name="retencioniepspesospartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->IepsRetencion),$this->numerodecimales).'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodsm totalpesospartida" name="totalpesospartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->Total),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodsm preciomonedapartida" name="preciomonedapartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->PrecioMoneda),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodsm descuentopartida" name="descuentopartida[]" value="'.number_format(Helpers::convertirvalorcorrecto($detalle->DescuentoMoneda),$this->numerodecimales,'.',',').'" readonly>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<div class="row divorinputmodxl">'.
+                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.
+                                        '<input type="text" class="form-control inputnextdet divorinputmodsm claveproductopartida" name="claveproductopartida[]"  value="'.$claveproducto.'" readonly data-parsley-length="[1, 20]">'.
+                                    '</div>'.
+                                '</div>'.
+                            '</td>'.
+                            '<td class="tdmod"><input type="text" class="form-control divorinputmodmd nombreclaveproductopartida" name="nombreclaveproductopartida[]"  value="'.$nombreclaveproducto.'" readonly></td>'.
+                            '<td class="tdmod">'.
+                                '<div class="row divorinputmodxl">'.
+                                    '<div class="col-xs-10 col-sm-10 col-md-10">'.
+                                        '<input type="text" class="form-control inputnextdet divorinputmodsm claveunidadpartida" name="claveunidadpartida[]"  value="'.$claveunidad.'" readonly data-parsley-length="[1, 5]">'.
+                                    '</div>'.
+                                '</div>'.
+                            '</td>'.
+                            '<td class="tdmod">'.
+                                '<input type="text" class="form-control divorinputmodmd nombreclaveunidadpartida" name="nombreclaveunidadpartida[]"  value="'.$nombreclaveunidad.'" readonly>'.
+                            '</td>'.
+                        '</tr>';
+                    }
+                }
 
+                //Descuentos
+                foreach ($movimiento->documentos as $descuento) {
+
+                    $filasDescuentos .= '<tr class="filasproductos">'.
+                        '<td class="tdmod"><b style="font-size:12px;">'.$descuento->Compra.'</b></td>'.
+                        '<td class="tdmod"><b style="font-size:12px;">'.$descuento->compra->Fecha.'</b></td>'.
+                        '<td class="tdmod"><b style="font-size:12px;">'.$descuento->compra->Factura.'</b></td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.number_format(Helpers::convertirvalorcorrecto($descuento->Total),$this->numerodecimales,'.',',').'" readonly>'.
+                        '</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.number_format(Helpers::convertirvalorcorrecto($descuento->compra->Abonos),$this->numerodecimales,'.',',').'" readonly>'.
+                        '</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.number_format(Helpers::convertirvalorcorrecto($descuento->Descuento),$this->numerodecimales,'.',',').'" readonly>'.
+                        '</td>'.
+                        '<td class="tdmod">'.
+                            '<input type="text" class="form-control divorinputmodsm" value="'.number_format(Helpers::convertirvalorcorrecto($descuento->compra->Saldo),$this->numerodecimales,'.',',').'" readonly>'.
+                        '</td>'.
+                    '</tr>';
+                }
+                break;
             default:
                 foreach ($movimiento->detalles as $detalle) {
                     switch ($documento) {
@@ -1240,6 +1483,7 @@ class ProductoController extends ConfiguracionSistemaController{
         }
         $data = array(
             'filasmovimiento'=> $filasmovimiento,
+            'filasDescuentos'=> $filasDescuentos,
             'movimiento'=> $movimiento,
             'documento'=> $documento,
             'proveedor' =>$provedor,
