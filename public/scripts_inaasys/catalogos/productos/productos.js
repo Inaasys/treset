@@ -2715,7 +2715,7 @@ function mostrarMovimiento(documento, numero, codigo) {
                 $('#tablaproductosajuste tbody').html(data.filasmovimiento)
                 $('.page-loader-wrapper').css('display', 'none');
                 break;
-            default:
+            case 'Consumo Produccion':
                 $('#ModalFormularioProd').modal('show');
                 tabs ='<div class="col-md-12">'+
                     '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
@@ -2841,7 +2841,262 @@ function mostrarMovimiento(documento, numero, codigo) {
                 $('#tablaproductosprod tbody').html(data.filasmovimiento)
                 $('.page-loader-wrapper').css('display', 'none');
                 break;
+            case 'NC Proveedor':
+                $('#ModalFormularioNota').modal('show');
+
+                tabs =    '<div class="row">'+
+                    '<div class="col-md-12">'+
+                        '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                            '<li role="presentation" class="active">'+
+                                '<a href="#compratab" data-toggle="tab">Compra</a>'+
+                            '</li>'+
+                            '<li role="presentation">'+
+                                '<a href="#emisorreceptortab" data-toggle="tab">Emisor, Receptor</a>'+
+                            '</li>'+
+                        '</ul>'+
+                        '<div class="tab-content">'+
+                            '<div role="tabpanel" class="tab-pane fade in active" id="compratab">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-2">'+
+                                        '<label>Nota <b style="color:#F44336 !important;" id="serietexto"> Serie: '+data.movimiento.Serie+'</b></label>'+
+                                        '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);" value="'+data.movimiento.Folio+'">'+
+                                        '<input type="hidden" class="form-control" name="serie" id="serie" value="'+data.movimiento.Serie+'" required readonly data-parsley-length="[1, 10]">'+
+                                    '</div>'+
+                                    '<div class="col-md-4">'+
+                                        '<label>Proveedor  <span class="label label-danger" id="textonombreproveedor">'+data.proveedor.Nombre+'</span></label>'+
+                                        '<table class="col-md-12">'+
+                                            '<tr>'+
+                                                '<td>'+
+                                                    '<div class="form-line">'+
+                                                        '<input type="text" class="form-control inputnextdet" name="numeroproveedor" id="numeroproveedor" required data-parsley-type="integer" autocomplete="off" value="'+data.movimiento.Proveedor+'">'+
+                                                    '</div>'+
+                                                '</td>'+
+                                            '</tr>'+
+                                        '</table>'+
+                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Nota Proveedor</label>'+
+                                        '<input type="text" class="form-control inputnextdet" name="notaproveedor" id="notaproveedor"  required data-parsley-length="[1, 20]" onkeyup="tipoLetra(this)" autocomplete="off" value="'+data.movimiento.NotaProveedor+'">'+
+                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Fecha</label>'+
+                                        '<input type="datetime-local" class="form-control" name="fecha" id="fecha" required data-parsley-excluded="true" onkeydown="return fals" value="'+data.movimiento.Fecha+'">'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Almacen <span class="label label-danger" id="textonombrealmacen">'+data.almacen+'</span></label>'+
+                                        '<table class="col-md-12">'+
+                                            '<tr>'+
+                                                '<td>'+
+                                                    '<div class="form-line">'+
+                                                        '<input type="text" class="form-control inputnextdet" name="numeroalmacen" id="numeroalmacen" required readonly data-parsley-type="integer" autocomplete="off" value="'+data.movimiento.Almacen+'">'+
+                                                    '</div>'+
+                                                '</td>'+
+                                            '</tr>'+
+                                        '</table>'+
+                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                        '<table class="col-md-12">'+
+                                            '<tr>'+
+                                                '<td>'+
+                                                    '<label>Moneda</label>'+
+                                                    '<select name="moneda" id="moneda" class="form-control select2" style="width:100% !important;" required data-parsley-length="[1, 5]">'+
+                                                        '<option value="MXN">MXN</option>'+
+                                                        '<option value="USD">USD</option>'+
+                                                        '<option value="EUR">EUR</option>'+
+                                                    '</select>'+
+                                                '</td>'+
+                                                '<td>'+
+                                                    '<label>Pesos</label>'+
+                                                    '<input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control inputnextdet" name="pesosmoneda" id="pesosmoneda" value="1.'+numerocerosconfigurados+'" required data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" onchange="formatocorrectoinputcantidades(this);">'+
+                                                '</td>'+
+                                            '</tr>'+
+                                        '</table>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                            '<div role="tabpanel" class="tab-pane fade" id="emisorreceptortab">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Emisor R.F.C.</label>'+
+                                        '<input type="text" class="form-control inputnextdet" name="emisorrfc" id="emisorrfc"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);" value="'+data.movimiento.EmisorRfc+'">'+
+                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Emisor Nombre</label>'+
+                                        '<input type="text" class="form-control inputnextdet" name="emisornombre" id="emisornombre" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);" value="'+data.movimiento.EmisorNombre+'">'+
+                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Receptor R.F.C.</label>'+
+                                        '<input type="text" class="form-control inputnextdet" name="receptorrfc" id="receptorrfc" required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);" value="'+data.movimiento.ReceptorRfc+'">'+
+                                    '</div>'+
+                                    '<div class="col-md-3">'+
+                                        '<label>Receptor Nombre</label>'+
+                                        '<input type="text" class="form-control inputnextdet" name="receptornombre" id="receptornombre" required readonly data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);" value="'+data.movimiento.ReceptorNombre+'">'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-md-3">'+
+                                      '<label>Emitida</label>'+
+                                      '<input type="datetime-local" class="form-control" name="fechaemitida" id="fechaemitida" data-parsley-excluded="true" onkeydown="return false" required readonly value="'+data.movimiento.FechaEmitida+'">'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+                '<div class="row">'+
+                    '<div class="col-md-12">'+
+                        '<ul class="nav nav-tabs tab-col-blue-grey" role="tablist">'+
+                            '<li role="presentation" class="active">'+
+                                '<a href="#productostab" data-toggle="tab">DPPP ó Códigos</a>'+
+                            '</li>'+
+                            '<li role="presentation">'+
+                                '<a href="#comprastab" data-toggle="tab">Compras</a>'+
+                            '</li>'+
+                        '</ul>'+
+                        '<div class="tab-content">'+
+                            '<div role="tabpanel" class="tab-pane fade in active" id="productostab">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-12 table-responsive cabecerafija" style="height: 200px;overflow-y: scroll;padding: 0px 0px;">'+
+                                        '<table id="tabladetallesnotaproveedor" class="table table-bordered tabladetallesnotaproveedor">'+
+                                            '<thead class="'+background_tables+'">'+
+                                                '<tr>'+
+                                                '<th class="customercolortheadth" hidden>Compra</th>'+
+                                                '<th class="'+background_tables+'" hidden><div style="width:250px !important;">UUID</div></th>'+
+                                                '<th class="'+background_tables+'"><div style="width:100px !important;">Código</div></th>'+
+                                                '<th class="customercolortheadth"><div style="width:200px !important;">Descripción</div></th>'+
+                                                '<th class="customercolortheadth">Uda</th>'+
+                                                '<th class="customercolortheadth">Cantidad</th>'+
+                                                '<th class="customercolortheadth">Precio $</th>'+
+                                                '<th class="'+background_tables+'">Importe $</th>'+
+                                                '<th class="customercolortheadth">Dcto %</th>'+
+                                                '<th class="customercolortheadth">Dcto $</th>'+
+                                                '<th class="'+background_tables+'">Importe Descuento $</th>'+
+                                                '<th class="customercolortheadth">Ieps %</th>'+
+                                                '<th class="'+background_tables+'">Traslado Ieps $</th>'+
+                                                '<th class="'+background_tables+'">SubTotal $</th>'+
+                                                '<th class="customercolortheadth">Iva %</th>'+
+                                                '<th class="'+background_tables+'">Traslado Iva $</th>'+
+                                                '<th class="customercolortheadth">Retención Iva %</th>'+
+                                                '<th class="'+background_tables+'">Retención Iva $</th>'+
+                                                '<th class="customercolortheadth">Retención Isr %</th>'+
+                                                '<th class="'+background_tables+'">Retención Isr $</th>'+
+                                                '<th class="customercolortheadth">Retención Ieps %</th>'+
+                                                '<th class="'+background_tables+'">Retención Ieps $</th>'+
+                                                '<th class="'+background_tables+'">Total $</th>'+
+                                                '<th class="'+background_tables+'" hidden>Partida</th>'+
+                                                '<th class="'+background_tables+'">Precio Moneda</th>'+
+                                                '<th class="'+background_tables+'">Descuento</th>'+
+                                                '<th class="customercolortheadth">ClaveProducto</th>'+
+                                                '<th class="'+background_tables+'">Nombre ClaveProducto</th>'+
+                                                '<th class="customercolortheadth">ClaveUnidad</th>'+
+                                                '<th class="'+background_tables+'">Nombre ClaveUnidad</th>'+
+                                                '</tr>'+
+                                            '</thead>'+
+                                            '<tbody>'+
+                                            '</tbody>'+
+                                        '</table>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                            '<div role="tabpanel" class="tab-pane fade" id="comprastab">'+
+                                '<div class="row">'+
+                                  '<div class="col-md-12 table-responsive cabecerafija" style="height: 200px;overflow-y: scroll;padding: 0px 0px;">'+
+                                    '<table id="tabladetallescomprasnotasproveedor" class="table table-bordered tabladetallescomprasnotasproveedor">'+
+                                        '<thead class="'+background_tables+'">'+
+                                            '<tr>'+
+                                            '<th class="'+background_tables+'">Compra</th>'+
+                                            '<th class="'+background_tables+'">Fecha</th>'+
+                                            '<th class="'+background_tables+'">Factura</th>'+
+                                            '<th class="'+background_tables+'">Total $</th>'+
+                                            '<th class="'+background_tables+'">Abonos $</th>'+
+                                            '<th class="customercolortheadth">Descuento $</th>'+
+                                            '<th class="'+background_tables+'">Saldo $</th>'+
+                                            '</tr>'+
+                                        '</thead>'+
+                                        '<tbody>'+
+                                        '</tbody>'+
+                                    '</table>'+
+                                  '</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
+                        '<div class="row">'+
+                          '<div class="col-md-6">'+
+                              '<label>Observaciones</label>'+
+                              '<textarea class="form-control inputnextdet" name="observaciones" id="observaciones" rows="5" onkeyup="tipoLetra(this);"  required data-parsley-length="[1, 255]">'+data.movimiento.Obs+'</textarea>'+
+                          '</div>'+
+                          '<div class="col-md-3">'+
+                              '<table class="table table-striped table-hover">'+
+                                  '<tr>'+
+                                      '<td class="tdmod">Total Nota</td>'+
+                                      '<td class="tdmod">'+
+                                        '<input type="text" class="form-control divorinputmodmd" name="totalnota" id="totalnota" value="'+number_format(data.movimiento.Total,numerodecimales,'.',',')+'" readonly>'+
+                                      '</td>'+
+                                  '</tr>'+
+                                  '<tr>'+
+                                      '<td class="tdmod">Descuentos</td>'+
+                                      '<td class="tdmod">'+
+                                        '<input type="text" class="form-control divorinputmodmd" name="descuentocompras" id="descuentocompras" value="'+number_format(data.movimiento.Total,numerodecimales,'.',',')+'" required readonly>'+
+                                      '</td>'+
+                                  '</tr>'+
+                              '</table>'+
+                          '</div>'+
+                          '<div class="col-md-3">'+
+                              '<table class="table table-striped table-hover">'+
+                                  '<tr>'+
+                                      '<td class="tdmod">Importe</td>'+
+                                      '<td class="tdmod"><input type="text" class="form-control divorinputmodmd" name="importe" id="importe" value="'+number_format(data.movimiento.Importe,numerodecimales,'.',',')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                      '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="importexml" id="importexml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                  '</tr>'+
+                                  '<tr>'+
+                                      '<td class="tdmod">Descuento</td>'+
+                                      '<td class="tdmod"><input type="text" class="form-control divorinputmodmd" name="descuento" id="descuento" value="'+number_format(data.movimiento.Descuento,numerodecimales,'.',',')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                      '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="descuentoxml" id="descuentoxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                  '</tr>'+
+                                  '<tr>'+
+                                      '<td class="tdmod">SubTotal</td>'+
+                                      '<td class="tdmod"><input type="text" class="form-control divorinputmodmd" name="subtotal" id="subtotal" value="'+number_format(data.movimiento.SubTotal,numerodecimales,'.',',')+'" required readonly></td>'+
+                                      '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="subtotalxml" id="subtotalxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                  '</tr>'+
+                                  '<tr>'+
+                                      '<td class="tdmod">Iva</td>'+
+                                      '<td class="tdmod"><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="iva" id="iva" value="'+number_format(data.movimiento.Iva,numerodecimales,'.',',')+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                      '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="ivaxml" id="ivaxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                  '</tr>'+
+                                  '<tr>'+
+                                      '<td class="tdmod">Total</td>'+
+                                      '<td class="tdmod"><input type="text" class="form-control divorinputmodmd" name="total" id="total" value="'+number_format(data.movimiento.Total,numerodecimales,'.',',')+'" required readonly></td>'+
+                                      '<td class="tdmod" hidden><input type="number" step="0.'+numerocerosconfiguradosinputnumberstep+'" class="form-control divorinputmodmd" name="totalxml" id="totalxml" value="0.'+numerocerosconfigurados+'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'+numerodecimales+'}$/" required readonly></td>'+
+                                  '</tr>'+
+                              '</table>'+
+                          '</div>'+
+                        '</div>'+
+                        '<div class="row">'+
+                          '<div class="col-md-12">'+
+                            '<h5 id="mensajecalculoscompra"></h5>'+
+                          '</div>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>';
+                $("#tabsformNota").html(tabs);
+                $('#tabladetallesnotaproveedor tbody').html(data.filasmovimiento)
+                $('#tabladetallescomprasnotasproveedor tbody').html(data.filasDescuentos)
+                $('.page-loader-wrapper').css('display', 'none');
+                break;
+            default:
+
+                $('.page-loader-wrapper').css('display', 'none');
+                break;
         }
+    }).fail( function (){
+        toastr.error( "No se pudo cargar la información del movimiento", "Mensaje", {
+            "timeOut": "6000",
+            "progressBar": true,
+            "extendedTImeout": "6000"
+        });
+        $('.page-loader-wrapper').css('display', 'none');
     })
 }
 init();

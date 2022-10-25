@@ -10,7 +10,7 @@ class NotaProveedor extends Model
     protected $table = 'Notas Proveedor';
     protected $primaryKey = 'Folio';
     protected $fillable = [
-        'Nota', 
+        'Nota',
         'Serie',
         'Folio',
         'Proveedor',
@@ -43,4 +43,24 @@ class NotaProveedor extends Model
         'Usuario',
         'Periodo'
     ];
+    /**
+     * Get all of the detalles for the NotaProveedorDetalle
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function detalles()
+    {
+        return $this->hasMany(NotaProveedorDetalle::class, 'Nota', 'Nota');
+    }
+
+    /**
+     * Get the Documentos associated with the NotaProveedor
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function documentos()
+    {
+        return $this->hasMany(NotaProveedorDocumento::class, 'Nota', 'Nota');
+    }
+
 }

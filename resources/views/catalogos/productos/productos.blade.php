@@ -534,6 +534,31 @@
             </div>
         </div>
     </div>
+    {{-- Modal Movimiento Nota--}}
+    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="ModalFormularioNota" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div id="formulario">
+                    <div class="modal-header {{$empresa->background_forms_and_modals}}">
+                        <h4 class="modal-title" id="titulomodal"></h4>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formparsley" action="#">
+                            <div class="col-md-12" id="tabsformNota">
+                                <!-- aqui van los formularios de alta o modificacion y se agregan automaticamente con jquery -->
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
+                    </div>
+                </div>
+                <div id="contenidomodaltablas">
+                    <!-- aqui van las tablas de seleccion y se agregan automaticamente con jquery -->
+                </div>
+            </div>
+        </div>
+    </div>
 <!-- modal para configuraciones de tablas-->
 @include('secciones.modalconfiguraciontablas')
 <!-- fin modal para configuraciones de tablas-->
