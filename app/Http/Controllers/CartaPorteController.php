@@ -68,7 +68,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             $FolioComprobanteTraslado = FolioComprobanteTraslado::orderBy('Numero','DESC')->take(1)->get();
 
             $serieusuario = (isset($FolioComprobanteTraslado[0]) ? $FolioComprobanteTraslado[0]->Serie : 'CP');
-            $esquema = (isset($FolioComprobanteTraslado[0]) ? $FolioComprobanteTraslado[0]->Esquema : 'CP');
+            $esquema = (isset($FolioComprobanteTraslado[0]) ? $FolioComprobanteTraslado[0]->Esquema : 'TRASLADO');
         }else{
             $FolioComprobanteTraslado = FolioComprobanteTraslado::where('Predeterminar', '+')->first();
             $serieusuario = $FolioComprobanteTraslado->Serie;
@@ -278,10 +278,10 @@ class CartaPorteController extends ConfiguracionSistemaController{
     public function carta_porte_obtener_estados(Request $request){
         if($request->ajax()){
             $tipo = $request->tipo;
-            $data = Estado::query();
+            $data = Estado::where('Pais','MEX')->get();
             return DataTables::of($data)
                 ->addColumn('operaciones', function($data) use ($tipo){
-                    $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarestado('.$data->Numero.',\''.$data->Nombre .'\',\''.$tipo.'\')">Seleccionar</div>';
+                    $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarestado('.$data->Numero.',\''.$data->Clave .'\',\''.$tipo.'\')">Seleccionar</div>';
                     return $boton;
                 })
                 ->rawColumns(['operaciones'])
@@ -402,11 +402,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
             $data = VistaObtenerExistenciaProducto::where('Codigo', 'like', '%' . $codigoabuscar . '%');
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data) use ($numeroalmacen, $tipooperacion, $stringfacturasseleccionadas){
-                        if($data->Almacen == $numeroalmacen || $data->Almacen == NULL){
-                            $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->MaterialPeligroso.'\',\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$tipooperacion.'\',\''.$data->Insumo.'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$data->NombreClaveProducto.'\',\''.$data->NombreClaveUnidad.'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\')">Seleccionar</div>';
-                        }else{
-                            $boton = '';
-                        }
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="agregarfilaproducto(\''.$data->MaterialPeligroso.'\',\''.$data->Codigo .'\',\''.htmlspecialchars($data->Producto, ENT_QUOTES).'\',\''.$data->Unidad .'\',\''.Helpers::convertirvalorcorrecto($data->Costo).'\',\''.Helpers::convertirvalorcorrecto($data->Impuesto).'\',\''.Helpers::convertirvalorcorrecto($data->SubTotal).'\',\''.Helpers::convertirvalorcorrecto($data->Existencias).'\',\''.$tipooperacion.'\',\''.$data->Insumo.'\',\''.$data->ClaveProducto.'\',\''.$data->ClaveUnidad.'\',\''.$data->NombreClaveProducto.'\',\''.$data->NombreClaveUnidad.'\',\''.Helpers::convertirvalorcorrecto($data->CostoDeLista).'\')">Seleccionar</div>';
                         return $boton;
                     })
                     ->addColumn('Existencias', function($data){
@@ -706,12 +702,14 @@ class CartaPorteController extends ConfiguracionSistemaController{
             $CartaPorteDetalle->save();
             $item++;
         }
-        foreach ($request->uuidrelacionado as $key => $uuid) {
-            $documento = new CartaPorteDocumentos;
-            $documento->CartaPorte = $cartaporte;
-            $documento->Factura = $request->factura[$key];
-            $documento->UUID = $request->uuidrelacionado[$key];
-            $documento->save();
+        if(isset($request->uuidrelacionado)){
+            foreach ($request->uuidrelacionado as $key => $uuid) {
+                $documento = new CartaPorteDocumentos;
+                $documento->CartaPorte = $cartaporte;
+                $documento->Factura = $request->factura[$key];
+                $documento->UUID = $request->uuidrelacionado[$key];
+                $documento->save();
+            }
         }
         return response()->json($CartaPorte);
     }
@@ -1110,6 +1108,8 @@ class CartaPorteController extends ConfiguracionSistemaController{
     //cambios
     public function carta_porte_guardar_modificacion(Request $request){
         ini_set('max_input_vars','20000' );
+
+            //dd($request->all());
             $cartaporte = $request->folio.'-'.$request->serie;
             $CartaPorte = CartaPorte::where('CartaPorte', $cartaporte)->first();
             $MaterialPeligroso = null;
@@ -1718,6 +1718,11 @@ class CartaPorteController extends ConfiguracionSistemaController{
         $carta = CartaPorte::where('CartaPorte', $request->cartatimbrado)->first();
         $cliente = Cliente::where('Numero', $carta->Cliente)->first();
         $arraydet = array();
+        $salidaarray = explode(" ",date_create($carta->FechaSalida)->format('Y-m-d H:i:s'));
+        $llegadaarray = explode(" ",date_create($carta->FechaLlegada)->format('Y-m-d H:i:s'));
+        $bienesTransportados = '';
+        $municipioRe = Municipio::where('Nombre','like','%'.$carta->MunicipioRemitente.'%')->select('Clave')->first();
+        $municipioDe = Municipio::where('Nombre','like','%'.$carta->MunicipioDestinatario.'%')->select('Clave')->first();
         foreach($carta->detalles as $detalle){
             array_push($arraydet, array(
                     "quantity" => Helpers::convertirvalorcorrecto($detalle->Cantidad),
@@ -1730,30 +1735,133 @@ class CartaPorteController extends ConfiguracionSistemaController{
                     )
                 )
             );
+
+            $bienesTransportados .=
+            '<cartaporte20:Mercancia BienesTransp="'.$detalle->ClaveProducto.'" Descripcion="'.$detalle->Descripcion.'" Cantidad="'.$detalle->Cantidad.'" ClaveUnidad="'.$detalle->ClaveUnidad.'" Unidad="'.$detalle->Unidad.'" PesoEnKg="'.$detalle->PesoEnKilogramos.'"/>';
         }
+        //Valida si se ingreso referencia para el destinatario
         $arraydoc = array();
         foreach($carta->documentos as $documento){
             array_push($arraydoc, $documento->UUID);
         }
-        //NOTAS DE CREDITO PROVEEDOR
-        $invoice = array(
-            "type" => \Facturapi\InvoiceType::TRASLADO,
-            "customer" => array(
-                "tax_id" => $carta->RfcRemitente,
-                "tax_system" => $carta->RegimenFiscal,
-            ),
-            "related_documents" => array(
-                array(
-                    "relationship" => '05',
-                    "documents" => $arraydoc
-                )
-            ),
-            "items" => $arraydet,
+        //Carta Porte
+        if(sizeof($arraydoc) > 0){
+            $invoice = array(
+                "type" => \Facturapi\InvoiceType::TRASLADO,
+                "customer" => array(
+                    'legal_name' =>$carta->NombreRemitente,
+                    "tax_id" => $carta->RfcRemitente,
+                    "tax_system" => $carta->RegimenFiscal,
+                    "address" => array(
+                        "zip" => $carta->CodigoPostalRemitente
+                    )
+                ),
+                "related_documents" => array(
+                    array(
+                        "relationship" => '05',
+                        "documents" => $arraydoc
+                    )
+                ),
 
-            "folio_number" => $carta->Folio,
-            "series" => $carta->Serie,
-            "currency" => 'XXX'
-        );
+
+
+                "complements" => array(
+                    //"type" => "P",
+                    array(
+                        "type" => "custom",
+                        "data" => "<?xml version='1.0' standalone='yes'?>".
+                        '<cartaporte20:CartaPorte Version="2.0" TranspInternac="No" TotalDistRec="'.$carta->TotalDistanciaRecorrida.'">'.
+                            '<cartaporte20:Ubicaciones>'.
+                                '<cartaporte20:Ubicacion TipoUbicacion="Origen" IDUbicacion="OR000123" RFCRemitenteDestinatario="'.$carta->RfcRemitente.'" NombreRemitenteDestinatario="'.$this->empresa->Nombre.'" FechaHoraSalidaLlegada="'.$salidaarray[0].'T'.$salidaarray[1].'">'.
+                                    '<cartaporte20:Domicilio Municipio="'.$municipioRe->Clave.'" Calle="'.$carta->CalleRemitente.'" Pais="MEX" Estado="'.$carta->EstadoRemitente.'" CodigoPostal="'.$carta->CodigoPostalRemitente.'"/>'.
+                                '</cartaporte20:Ubicacion>'.
+                                '<cartaporte20:Ubicacion TipoUbicacion="Destino" IDUbicacion="DE000456" RFCRemitenteDestinatario="'.$carta->RfcDestinatario.'" NombreRemitenteDestinatario="'.$carta->NombreDestinatario.'" FechaHoraSalidaLlegada="'.$llegadaarray[0].'T'.$llegadaarray[1].'" DistanciaRecorrida="'.$carta->TotalDistanciaRecorrida.'">'.
+                                    '<cartaporte20:Domicilio Municipio="'.$municipioDe->Clave.'" Calle="'.$carta->CalleDestinatario.'" Pais="MEX" Estado="'.$carta->EstadoDestinatario.'" CodigoPostal="'.$carta->CodigoPostalDestinatario.'"/>'.
+                                '</cartaporte20:Ubicacion>'.
+                            '</cartaporte20:Ubicaciones>'.
+                            '<cartaporte20:Mercancias PesoBrutoTotal="'.$carta->PesoBrutoTotal.'" UnidadPeso="KGM" NumTotalMercancias="'.$carta->TotalMercancias.'">'.
+                                $bienesTransportados.
+                                '<cartaporte20:Autotransporte PermSCT="TPXX00" NumPermisoSCT="TPXX00">'.
+                                    '<cartaporte20:IdentificacionVehicular ConfigVehicular="'.$carta->ConfiguracionVehicular.'" PlacaVM="'.$carta->PlacaVehiculoMotor.'" AnioModeloVM="'.$carta->AnoModeloVehiculoMotor.'"/>'.
+                                    '<cartaporte20:Seguros AseguraRespCivil="'.$carta->NombreAsegurado.'" PolizaRespCivil="'.$carta->NumeroPolizaSeguro.'"/>'.
+                                '</cartaporte20:Autotransporte>'.
+                            '</cartaporte20:Mercancias>'.
+                            '<cartaporte20:FiguraTransporte>'.
+                                '<cartaporte20:TiposFigura TipoFigura="'.$carta->ClaveTransporte.'" RFCFigura="'.$carta->RfcOperador.'" NumLicencia="'.$carta->NumeroLicencia.'" NombreFigura="'.$carta->NombreOperador.'">'.
+                                '</cartaporte20:TiposFigura>'.
+                            '</cartaporte20:FiguraTransporte>'.
+                        '</cartaporte20:CartaPorte>'
+                    )
+                ),
+                "namespaces" => array(
+                    array(
+                        "prefix" => 'cartaporte20',
+                        "uri" => 'http://www.sat.gob.mx/CartaPorte20',
+                        "schema_location" => "http://www.sat.gob.mx/CartaPorte20 http://www.sat.gob.mx/sitio_internet/cfd/CartaPorte/CartaPorte20.xsd"
+
+                    )
+                ),
+                "items" => $arraydet,
+                "folio_number" => $carta->Folio,
+                "series" => $carta->Serie,
+                "currency" => 'XXX',
+                "use" => 'S01'
+            );
+        }else{
+            $invoice = array(
+                "type" => \Facturapi\InvoiceType::TRASLADO,
+                "customer" => array(
+                    'legal_name' =>$carta->NombreRemitente,
+                    "tax_id" => $carta->RfcRemitente,
+                    "tax_system" => $carta->RegimenFiscal,
+                    "address" => array(
+                        "zip" => $carta->CodigoPostalRemitente
+                    )
+                ),
+
+                "complements" => array(
+                    //"type" => "P",
+                    array(
+                        "type" => "custom",
+                        "data" => "<?xml version='1.0' standalone='yes'?>".
+                        '<cartaporte20:CartaPorte Version="2.0" TranspInternac="No" TotalDistRec="'.$carta->TotalDistanciaRecorrida.'">'.
+                            '<cartaporte20:Ubicaciones>'.
+                                '<cartaporte20:Ubicacion TipoUbicacion="Origen" IDUbicacion="OR000123" RFCRemitenteDestinatario="'.$carta->RfcRemitente.'" NombreRemitenteDestinatario="'.$this->empresa->Nombre.'" FechaHoraSalidaLlegada="'.$salidaarray[0].'T'.$salidaarray[1].'">'.
+                                    '<cartaporte20:Domicilio Municipio="'.$municipioRe->Clave.'" Calle="'.$carta->CalleRemitente.'" Pais="MEX" Estado="'.$carta->EstadoRemitente.'" CodigoPostal="'.$carta->CodigoPostalRemitente.'"/>'.
+                                '</cartaporte20:Ubicacion>'.
+                                '<cartaporte20:Ubicacion TipoUbicacion="Destino" IDUbicacion="DE000456" RFCRemitenteDestinatario="'.$carta->RfcDestinatario.'" NombreRemitenteDestinatario="'.$carta->NombreDestinatario.'" FechaHoraSalidaLlegada="'.$llegadaarray[0].'T'.$llegadaarray[1].'" DistanciaRecorrida="'.$carta->TotalDistanciaRecorrida.'">'.
+                                    '<cartaporte20:Domicilio Municipio="'.$municipioDe->Clave.'" Calle="'.$carta->CalleDestinatario.'" Pais="MEX" Estado="'.$carta->EstadoDestinatario.'" CodigoPostal="'.$carta->CodigoPostalDestinatario.'"/>'.
+                                '</cartaporte20:Ubicacion>'.
+                            '</cartaporte20:Ubicaciones>'.
+                            '<cartaporte20:Mercancias PesoBrutoTotal="'.$carta->PesoBrutoTotal.'" UnidadPeso="KGM" NumTotalMercancias="'.$carta->TotalMercancias.'">'.
+                                $bienesTransportados.
+                                '<cartaporte20:Autotransporte PermSCT="TPXX00" NumPermisoSCT="TPXX00">'.
+                                    '<cartaporte20:IdentificacionVehicular ConfigVehicular="'.$carta->ConfiguracionVehicular.'" PlacaVM="'.$carta->PlacaVehiculoMotor.'" AnioModeloVM="'.$carta->AnoModeloVehiculoMotor.'"/>'.
+                                    '<cartaporte20:Seguros AseguraRespCivil="'.$carta->NombreAsegurado.'" PolizaRespCivil="'.$carta->NumeroPolizaSeguro.'"/>'.
+                                '</cartaporte20:Autotransporte>'.
+                            '</cartaporte20:Mercancias>'.
+                            '<cartaporte20:FiguraTransporte>'.
+                                '<cartaporte20:TiposFigura TipoFigura="'.$carta->ClaveTransporte.'" RFCFigura="'.$carta->RfcOperador.'" NumLicencia="'.$carta->NumeroLicencia.'" NombreFigura="'.$carta->NombreOperador.'">'.
+                                '</cartaporte20:TiposFigura>'.
+                            '</cartaporte20:FiguraTransporte>'.
+                        '</cartaporte20:CartaPorte>'
+                    )
+                ),
+                "namespaces" => array(
+                    array(
+                        "prefix" => 'cartaporte20',
+                        "uri" => 'http://www.sat.gob.mx/CartaPorte20',
+                        "schema_location" => "http://www.sat.gob.mx/CartaPorte20 http://www.sat.gob.mx/sitio_internet/cfd/CartaPorte/CartaPorte20.xsd"
+
+                    )
+                ),
+                "items" => $arraydet,
+                "folio_number" => $carta->Folio,
+                "series" => $carta->Serie,
+                "currency" => 'XXX',
+                "use" => 'S01'
+            );
+        }
         $new_invoice = $this->facturapi->Invoices->create( $invoice );
         $result = json_encode($new_invoice);
         $result2 = json_decode($result, true);
@@ -1785,20 +1893,20 @@ class CartaPorteController extends ConfiguracionSistemaController{
             $cadenaoriginal = "||".$atributos_complemento['Version']."|".$new_invoice->uuid."|".$atributos_complemento['FechaTimbrado']."|".$atributos_complemento['SelloCFD']."|".$atributos_complemento['NoCertificadoSAT']."||";
             //guardar en tabla comprobante
             $Comprobante = new Comprobante;
-            $Comprobante->Comprobante = 'Carta Porte';
+            $Comprobante->Comprobante = 'CartaPorte';
             $Comprobante->Tipo = $new_invoice->type;
-            $Comprobante->Version = '3.3';
+            $Comprobante->Version = '4.0';
             $Comprobante->Serie = $new_invoice->series;
             $Comprobante->Folio = $new_invoice->folio_number;
             $Comprobante->UUID = $new_invoice->uuid;
-            $Comprobante->Fecha = Helpers::fecha_exacta_accion_datetimestring();
+            $Comprobante->Fecha = $fechatimbrado;
             $Comprobante->SubTotal = $carta->SubTotal;
             $Comprobante->Descuento = $carta->Descuento;
             $Comprobante->Total = $carta->Total;
-            $Comprobante->EmisorRfc = $carta->EmisorRfc;
-            $Comprobante->ReceptorRfc = $carta->ReceptorRfc;
-            $Comprobante->FormaPago = $new_invoice->payment_form;
-            $Comprobante->MetodoPago = $new_invoice->payment_method;
+            $Comprobante->EmisorRfc = $carta->RfcRemitente;
+            $Comprobante->ReceptorRfc = $carta->RfcRemitente;
+            $Comprobante->FormaPago = 'NA';
+            $Comprobante->MetodoPago = 'NA';
             $Comprobante->UsoCfdi = $carta->UsoCfdi;
             $Comprobante->Moneda = $new_invoice->currency;
             $Comprobante->TipoCambio = Helpers::convertirvalorcorrecto($new_invoice->exchange);
@@ -1808,13 +1916,13 @@ class CartaPorteController extends ConfiguracionSistemaController{
             $Comprobante->CadenaOriginal = $cadenaoriginal;
             $Comprobante->selloSAT = $SelloSAT;
             $Comprobante->selloCFD = $SelloCFD;
-            //$Comprobante->CfdiTimbrado = $new_invoice->type;
+            // //$Comprobante->CfdiTimbrado = $new_invoice->type;
             $Comprobante->Periodo = $this->periodohoy;
             $Comprobante->IdFacturapi = $new_invoice->id;
             $Comprobante->UrlVerificarCfdi = $new_invoice->verification_url;
             $Comprobante->save();
             //Colocar UUID en documento
-            CartaPorte::where('Nota', $request->cartatimbrado)
+            CartaPorte::where('CartaPorte', $request->cartatimbrado)
                             ->update([
                                 'FechaTimbrado' => $fechatimbrado,
                                 'UUID' => $new_invoice->uuid
@@ -1872,10 +1980,11 @@ class CartaPorteController extends ConfiguracionSistemaController{
             $data = Factura::where('Cliente', $request->numerocliente)
             ->where('Status','<>','BAJA')
             ->where('Esquema','CFDI')
-            ->where('Depto', '!=','SERVICIOS')
+            ->where('Depto', '<>','SERVICIO')
             ->where('Periodo',$this->periodohoy)
             ->whereNotIn('Factura', CartaPorteDocumentos::select('Factura')->get()->toArray())
-            ->where('UUID', '<>', '');
+            ->where('UUID', '<>', '')
+            ->orderBy('Fecha','Desc')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
                         $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarfacturarel(\''.$data->UUID .'\',\''.$data->Factura.'\')">Seleccionar</div>';

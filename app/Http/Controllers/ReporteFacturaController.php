@@ -40,13 +40,13 @@ class ReporteFacturaController extends ConfiguracionSistemaController{
             $data = Cliente::where('Status', 'ALTA')->where('Numero', 'like', '%' . $numeroabuscar . '%')->orderBy('Numero', 'DESC')->get();
             return DataTables::of($data)
                     ->addColumn('operaciones', function($data){
-                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarcliente('.$data->Numero.',\''.$data->Nombre .',1\')">Seleccionar</div>';
+                        $boton = '<div class="btn bg-green btn-xs waves-effect" onclick="seleccionarcliente('.$data->Numero.',\''.$data->Nombre .'\''.',1)">Seleccionar</div>';
                         return $boton;
                     })
                     ->rawColumns(['operaciones'])
                     ->make(true);
-        }        
-    } 
+        }
+    }
     public function generar_reporte_diario_ventas(Request $request){
         $fechahoy = Carbon::parse($request->fechafinalreporte);//fecha de la que se realizar el reporte
         $diahoy = $fechahoy->toDateString();//dar formato de fecha
@@ -162,6 +162,6 @@ class ReporteFacturaController extends ConfiguracionSistemaController{
         ->make(true);
     }
     public function generar_excel_reporte_diario_ventas(Request $request){
-        return Excel::download(new ReportesDiariosVentasExport($request->fechafinalreporte, $request->objetivofinalpesos, $request->numerocliente, $request->cliente ,$this->numerodecimales), "reportediarioventas.xlsx"); 
+        return Excel::download(new ReportesDiariosVentasExport($request->fechafinalreporte, $request->objetivofinalpesos, $request->numerocliente, $request->cliente ,$this->numerodecimales), "reportediarioventas.xlsx");
     }
 }
