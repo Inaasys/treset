@@ -458,11 +458,11 @@ function obtenerestados(tipo){
     //seleccionar registro al dar doble click
     $('#tbllistadoestado tbody').on('dblclick', 'tr', function () {
         var data = talest.row( this ).data();
-        seleccionarestado(data.Numero, data.Nombre, tipo);
+        seleccionarestado(data.Numero, data.Clave, tipo);
     });
 }
 //seleccionar est
-function seleccionarestado(Numero, Nombre, tipo){
+function seleccionarestado(Numero, Clave, tipo){
   switch(tipo){
     case 'remitente':
         var numeroestadoremitenteanterior = $("#numeroestadoremitenteanterior").val();
@@ -470,9 +470,9 @@ function seleccionarestado(Numero, Nombre, tipo){
         if(numeroestadoremitenteanterior != numeroestadoremitente){
           $("#numeroestadoremitente").val(Numero);
           $("#numeroestadoremitenteanterior").val(Numero);
-          $("#estadoremitente").val(Nombre);
-          if(Nombre != null){
-            $("#textonombreestadoremitente").html(Nombre.substring(0, 40));
+          $("#estadoremitente").val(Clave);
+          if(Clave != null){
+            $("#textonombreestadoremitente").html(Clave.substring(0, 40));
           }
           mostrarformulario();
         }
@@ -483,9 +483,9 @@ function seleccionarestado(Numero, Nombre, tipo){
         if(numeroestadodestinatarioanterior != numeroestadodestinatario){
           $("#numeroestadodestinatario").val(Numero);
           $("#numeroestadodestinatarioanterior").val(Numero);
-          $("#estadodestinatario").val(Nombre);
-          if(Nombre != null){
-            $("#textonombreestadodestinatario").html(Nombre.substring(0, 40));
+          $("#estadodestinatario").val(Clave);
+          if(Clave != null){
+            $("#textonombreestadodestinatario").html(Clave.substring(0, 40));
           }
           mostrarformulario();
         }
@@ -1706,8 +1706,14 @@ function seleccionarvehiculo(id, PermisoSCT, NumeroPermisoSCT, NombreAseguradora
   if(numerovehiculoempresaanterior != numerovehiculoempresa){
     $("#numerovehiculoempresa").val(id);
     $("#numerovehiculoempresaanterior").val(id);
-    $("#permisosct").val(PermisoSCT);
-    $("#numeropermisosct").val(NumeroPermisoSCT);
+    if (PermisoSCT  != '' && NumeroPermisoSCT != "") {
+        $("#permisosct").val(PermisoSCT);
+        $("#numeropermisosct").val(NumeroPermisoSCT);
+
+    } else {
+        $("#permisosct").val('TPX00');
+        $("#numeropermisosct").val('TPX00');
+    }
     $("#nombreaseguradora").val(NombreAseguradora);
     $("#numeropolizaseguro").val(NumeroPolizaSeguro);
     $("#placavehiculo").val(Placa);
@@ -3296,10 +3302,10 @@ function alta(){
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
-                                    '<div class="col-md-8">'+
+                                    '<div class="col-md-9">'+
                                         '<div class="row">'+
                                             '<div class="col-md-12 table-responsive cabecerafija" style="height: 125px;overflow-y: scroll;padding: 0px 0px;">'+
-                                                '<input type="hidden" class="form-control" name="numerofilasuuid" id="numerofilasuuid" value="0" readonly>'+
+                                                '<input type="number" style="display:none;" class="form-control" name="numerofilasuuid" id="numerofilasuuid" value="0" data-parsley-min-message="Debe relacionar al menos una factura" readonly>'+
                                                 '<table id="tablauuidrelacionados" class="table table-bordered tablauuidrelacionados">'+
                                                     '<thead class="'+background_tables+'">'+
                                                         '<tr>'+
@@ -3343,7 +3349,7 @@ function alta(){
                                     '</div>'+
                                     '<div class="col-md-1">'+
                                         '<label>Número Int</label>'+
-                                        '<input type="text" class="form-control inputnextdet" name="numerointremitente" id="numerointremitente" value="'+nointeriorempresa+'" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnextdet" name="numerointremitente" id="numerointremitente" value="'+nointeriorempresa+'" data-parsley-length="[0, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                     '<div class="col-md-2">'+
                                         '<label>Colonia</label>'+
@@ -3355,7 +3361,7 @@ function alta(){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Referencia</label>'+
-                                        '<input type="text" class="form-control inputnextdet" name="referenciaremitente" id="referenciaremitente" value="'+referenciaempresa+'" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnextdet" name="referenciaremitente" id="referenciaremitente" value="'+referenciaempresa+'" data-parsley-length="[0, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                       '<label>Municipio <span class="label label-danger" id="textonombremunicipioremitente"></span></label>'+
@@ -3455,7 +3461,7 @@ function alta(){
                                   '</div>'+
                                   '<div class="col-md-1">'+
                                       '<label>Número Int</label>'+
-                                      '<input type="text" class="form-control inputnextdet" name="numerointdestinatario" id="numerointdestinatario" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                      '<input type="text" class="form-control inputnextdet" name="numerointdestinatario" id="numerointdestinatario" data-parsley-length="[0, 150]" onkeyup="tipoLetra(this);">'+
                                   '</div>'+
                                   '<div class="col-md-2">'+
                                       '<label>Colonia</label>'+
@@ -3467,7 +3473,7 @@ function alta(){
                                   '</div>'+
                                   '<div class="col-md-3">'+
                                       '<label>Referencia</label>'+
-                                      '<input type="text" class="form-control inputnextdet" name="referenciadestinatario" id="referenciadestinatario" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                      '<input type="text" class="form-control inputnextdet" name="referenciadestinatario" id="referenciadestinatario" data-parsley-length="[0, 150]" onkeyup="tipoLetra(this);">'+
                                   '</div>'+
                                   '<div class="col-md-3">'+
                                     '<label>Municipio <span class="label label-danger" id="textonombremunicipiodestinatario"></span></label>'+
@@ -3562,11 +3568,11 @@ function alta(){
                                 '</div>'+
                                 '<div class="col-md-2">'+
                                     '<label>Permiso de la SCT</label>'+
-                                    '<input type="text" class="form-control inputnextdet" name="permisosct" id="permisosct" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '<input type="text" class="form-control inputnextdet" name="permisosct" value="TPX00" id="permisosct" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                                 '<div class="col-md-2">'+
                                     '<label>Número de Permiso de la SCT</label>'+
-                                    '<input type="text" class="form-control inputnextdet" name="numeropermisosct" id="numeropermisosct" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '<input type="text" class="form-control inputnextdet" name="numeropermisosct" value="TPX00" id="numeropermisosct" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                                 '<div class="col-md-2">'+
                                     '<label>Nombre de Aseguradora</label>'+
@@ -4461,7 +4467,7 @@ function obtenerdatos(cartaporte){
                                         '</td>'+
                                         '<td>'+
                                             '<div class="form-line">'+
-                                            '<input type="text" class="form-control inputnextdet" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" readonly autocomplete="off">'+
+                                                '<input type="text" class="form-control inputnextdet" name="codigoabuscar" id="codigoabuscar" placeholder="Escribe el código del producto" readonly autocomplete="off">'+
                                             '</div>'+
                                         '</td>'+
                                         '</tr>'+
@@ -4469,8 +4475,23 @@ function obtenerdatos(cartaporte){
                                     '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
-                                    '<div class="col-md-8">'+
-                                    '</div>'
+                                    '<div class="col-md-9">'+
+                                        '<div class="row">'+
+                                            '<div class="col-md-12 table-responsive" style="height: 125px;overflow-y: scroll;padding: 0px 0px;">'+
+                                                '<input type="hidden" class="form-control" name="numerofilasuuid" id="numerofilasuuid" value="0" readonly>'+
+                                                '<table id="tablauuidrelacionados" class="table table-bordered tablauuidrelacionados">'+
+                                                    '<thead class="'+background_tables+'">'+
+                                                        '<tr>'+
+                                                            '<th class="customercolortheadth">Factura relacionada</th>'+
+                                                            '<th class="customercolortheadth">'+
+                                                            '</th>'+
+                                                        '</tr>'+
+                                                    '</thead>'+
+                                                    '<tbody></tbody>'+
+                                                '</table>'+
+                                            '</div>'+
+                                        '</div>'+
+                                    '</div>'+
                                 '</div>'+
                             '</div>'+
                             //Datos Origen
@@ -4500,7 +4521,7 @@ function obtenerdatos(cartaporte){
                                     '</div>'+
                                     '<div class="col-md-1">'+
                                         '<label>Número Int</label>'+
-                                        '<input type="text" class="form-control inputnextdet" name="numerointremitente" id="numerointremitente" value="'+nointeriorempresa+'" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnextdet" name="numerointremitente" id="numerointremitente" value="'+nointeriorempresa+'" data-parsley-length="[0, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                     '<div class="col-md-2">'+
                                         '<label>Colonia</label>'+
@@ -4512,7 +4533,7 @@ function obtenerdatos(cartaporte){
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                         '<label>Referencia</label>'+
-                                        '<input type="text" class="form-control inputnextdet" name="referenciaremitente" id="referenciaremitente" value="'+referenciaempresa+'" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                        '<input type="text" class="form-control inputnextdet" name="referenciaremitente" id="referenciaremitente" value="'+referenciaempresa+'" data-parsley-length="[0, 150]" onkeyup="tipoLetra(this);">'+
                                     '</div>'+
                                     '<div class="col-md-3">'+
                                       '<label>Municipio <span class="label label-danger" id="textonombremunicipioremitente"></span></label>'+
@@ -4613,7 +4634,7 @@ function obtenerdatos(cartaporte){
                                   '</div>'+
                                   '<div class="col-md-1">'+
                                       '<label>Número Int</label>'+
-                                      '<input type="text" class="form-control inputnextdet" name="numerointdestinatario" id="numerointdestinatario" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                      '<input type="text" class="form-control inputnextdet" name="numerointdestinatario" id="numerointdestinatario" data-parsley-length="[0, 150]" onkeyup="tipoLetra(this);">'+
                                   '</div>'+
                                   '<div class="col-md-2">'+
                                       '<label>Colonia</label>'+
@@ -4625,7 +4646,7 @@ function obtenerdatos(cartaporte){
                                   '</div>'+
                                   '<div class="col-md-3">'+
                                       '<label>Referencia</label>'+
-                                      '<input type="text" class="form-control inputnextdet" name="referenciadestinatario" id="referenciadestinatario" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                      '<input type="text" class="form-control inputnextdet" name="referenciadestinatario" id="referenciadestinatario" data-parsley-length="[0, 150]" onkeyup="tipoLetra(this);">'+
                                   '</div>'+
                                   '<div class="col-md-3">'+
                                     '<label>Municipio <span class="label label-danger" id="textonombremunicipiodestinatario"></span></label>'+
@@ -4972,6 +4993,7 @@ function obtenerdatos(cartaporte){
                     '</div>'+
                   '</div>';
     $("#tabsform").html(tabs);
+    $('#tablauuidrelacionados').append(data.filasdocumentosrelacionados)
     //colocar autocomplette off  todo el formulario
     $(".form-control").attr('autocomplete','off');
     //esconder el div del boton listar ordenes
@@ -4982,7 +5004,7 @@ function obtenerdatos(cartaporte){
     $("#periodohoy").val(data.cartaporte.Periodo);
     $('#totaldistanciarecorrida').val(parseFloat(data.cartaporte.TotalDistanciaRecorrida).toFixed(parseInt(numerodecimales)))
     $('#numerototalmercancias').val(data.cartaporte.TotalMercancias)
-    $('#pesoTotalBruto').val(number_format(data.cartaporte.PesoBrutoTotal,numerodecimales))
+    $('#pesoTotalBruto').val(number_format(data.cartaporte.PesoBrutoTotal,numerodecimales,'.',''))
     $('#fechasalida').val(data.cartaporte.FechaSalida)
     $('#referenciaremitente').val(data.cartaporte.ReferenciaRemitente)
     $('#numerointremitente').val(data.cartaporte.NoInteriorRemitente)
@@ -5464,31 +5486,35 @@ $("#btnenviarpdfemail").on('click', function (e) {
   }
 });
 //timbrar pago
-function timbrarnota(nota){
-  $.get(notas_credito_clientes_verificar_si_continua_timbrado,{nota:nota}, function(data){
-      if(data.Esquema == 'INTERNA' || data.Esquema == 'NOTA'){
-        $("#notatimbrado").val(0);
-        $("#textomodaltimbrado").html('Aviso, las Notas de crédito cliente con Esquema INTERNA o NOTA no se pueden timbrar');
+function timbrarcarta(carta){
+  $.get(carta_porte_verificar_si_continua_timbrado,{carta:carta}, function(data){
+
+    console.log(data)
+    //   if(data.Esquema == 'INTERNA' || data.Esquema == 'NOTA'){
+    //     $("#notatimbrado").val(0);
+    //     $("#textomodaltimbrado").html('Aviso, las Notas de crédito cliente con Esquema INTERNA o NOTA no se pueden timbrar');
+    //     $('#modaltimbrado').modal('show');
+    //     $("#btntimbrarnota").hide();
+    if(data.Status == 'BAJA'){
+        $("#cartatimbrado").val(0);
+        $("#textomodaltimbrado").html('Aviso, esta Nota se encuentra dada de baja');
         $('#modaltimbrado').modal('show');
         $("#btntimbrarnota").hide();
-      }else if(data.Status == 'BAJA'){
-          $("#notatimbrado").val(0);
-          $("#textomodaltimbrado").html('Aviso, esta Nota se encuentra dada de baja');
-          $('#modaltimbrado').modal('show');
-          $("#btntimbrarnota").hide();
-      }else{
-          if(data.UUID != ""){
-              $("#notatimbrado").val(0);
-              $("#textomodaltimbrado").html('Aviso, esta Nota ya se timbro');
-              $('#modaltimbrado').modal('show');
-              $("#btntimbrarnota").hide();
-          }else{
-              $("#modaltimbrado").modal("show");
-              $("#textomodaltimbrado").html("Esta seguro de timbrar la Nota? No"+nota);
-              $("#notatimbrado").val(nota);
-              $("#btntimbrarnota").show();
-          }
-      }
+    }else{
+        if(typeof(data.UUID) == "string" && data.UUID != null) {
+
+            $("#cartatimbrado").val(0);
+            $("#textomodaltimbrado").html('Aviso, esta Nota ya se timbro');
+            $('#modaltimbrado').modal('show');
+            $("#btntimbrarnota").hide();
+        }else{
+
+            $("#modaltimbrado").modal("show");
+            $("#textomodaltimbrado").html("¿Está seguro de timbrar el comprobande de traslado? No "+ carta);
+            $("#cartatimbrado").val(carta);
+            $("#btntimbrarnota").show()
+        }
+    }
   })
 }
 $("#btntimbrarnota").on('click', function(e){
@@ -5499,7 +5525,7 @@ $("#btntimbrarnota").on('click', function(e){
     $('.page-loader-wrapper').css('display', 'block');
     $.ajax({
       headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-      url:notas_credito_clientes_timbrar_nota,
+      url:carta_porte_timbrar_carta,
       type: "post",
       dataType: "html",
       data: formData,
@@ -5699,13 +5725,17 @@ function renumerarfilasuuid(){
     var lista;
     //renumerar filas tr
     lista = document.getElementsByClassName("filasuuid");
+    let contador = 0;
     for (var i = 0; i < lista.length; i++) {
         lista[i].setAttribute("id", "filauuid"+i);
+        contador++
     }
+    $('#numerototalmercancias').val(contador)
     //renumerar btn eliminar fila
     lista = document.getElementsByClassName("btneliminaruuid");
     for (var i = 0; i < lista.length; i++) {
         lista[i].setAttribute("onclick", "eliminarfilauuid("+i+')');
+
     }
 }
 function comprobarfilasuuid(){
@@ -5713,10 +5743,11 @@ function comprobarfilasuuid(){
     $("#numerofilasuuid").val(numerofilasuuid);
 }
 //eliminar una fila en la tabla
-function eliminarfilauuid(fila){
+function eliminarfilauuid(fila,factura){
     var confirmacion = confirm("Esta seguro de eliminar la fila?");
     if (confirmacion == true) {
         $("#filauuid"+fila).remove();
+        $('.'+factura).remove()
         renumerarfilasuuid();
         comprobarfilasuuid();
     }

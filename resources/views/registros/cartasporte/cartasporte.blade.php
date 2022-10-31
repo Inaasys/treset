@@ -152,7 +152,7 @@
       		<div class="modal-body">
 		      	<form id="formtimbrado" action="#">
 		        	<h5 id="textomodaltimbrado"> </h5>
-                    <input type="hidden" class="form-control" id="notatimbrado" name="notatimbrado">
+                    <input type="hidden" class="form-control" id="cartatimbrado" name="cartatimbrado">
 		        </form>
       		</div>
 	      	<div class="modal-footer">
@@ -215,7 +215,7 @@
         var formatercerordenamiento = '{{$configuracion_tabla->formatercerordenamiento}}';
         var campos_busquedas = '{{$configuracion_tabla->campos_busquedas}}';
         var rfcempresa = '{{$empresa->Rfc}}';
-        var nombreempresa = '{{$empresa->Nombre}}';
+        var nombreempresa = '{{$empresa->Empresa}}';
         var calleempresa = '{{$empresa->Calle}}';
         var noexteriorempresa = '{{$empresa->NoExterior}}';
         var nointeriorempresa = '{{$empresa->NoInterior}}';
@@ -255,6 +255,8 @@
         var carta_porte_obtener_clavetransporte_por_clave = '{!!URL::to('carta_porte_obtener_clavetransporte_por_clave')!!}';
         var carta_porte_obtener_facturas_cliente = '{!!URL::to('carta_porte_obtener_facturas_cliente')!!}'
         var carta_porte_obtener_datos_factura = '{!!URL::to('carta_porte_obtener_datos_factura')!!}'
+        var carta_porte_verificar_si_continua_timbrado = '{!!URL::to('carta_porte_verificar_si_continua_timbrado')!!}'
+        var carta_porte_timbrar_carta = '{!!URL::to('carta_porte_timbrar_carta')!!}'
 
         var notas_credito_clientes_obtener_almacenes = '{!!URL::to('notas_credito_clientes_obtener_almacenes')!!}';
         var notas_credito_clientes_obtener_almacen_por_numero = '{!!URL::to('notas_credito_clientes_obtener_almacen_por_numero')!!}';
@@ -289,7 +291,7 @@
         var notas_credito_clientes_enviar_pdfs_email = '{!!URL::to('notas_credito_clientes_enviar_pdfs_email')!!}';
         var notas_credito_clientes_buscar_folio_string_like = '{!!URL::to('notas_credito_clientes_buscar_folio_string_like')!!}';
         var notas_credito_clientes_verificar_si_continua_timbrado=  '{!!URL::to('notas_credito_clientes_verificar_si_continua_timbrado')!!}';
-        var notas_credito_clientes_timbrar_nota=  '{!!URL::to('notas_credito_clientes_timbrar_nota')!!}';
+
         var notas_credito_clientes_verificar_si_continua_baja_timbre=  '{!!URL::to('notas_credito_clientes_verificar_si_continua_baja_timbre')!!}';
         var notas_credito_clientes_baja_timbre=  '{!!URL::to('notas_credito_clientes_baja_timbre')!!}';
         var carta_porte_obtener_claves_materiales_peligrosos = '{!!URL::to('carta_porte_obtener_claves_materiales_peligrosos')!!}'
