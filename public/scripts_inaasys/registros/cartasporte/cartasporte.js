@@ -5359,31 +5359,31 @@ $("#btnGuardarModificacion").on('click', function (e) {
   form.parsley().validate();
 });
 //verificar si hay existencias suficientes en los almacenes para dar de baja nota de credito
-function desactivar(notadesactivar){
-  $.get(notas_credito_clientes_verificar_si_continua_baja,{notadesactivar:notadesactivar}, function(data){
+function desactivar(cartadesactivar){
+  $.get(carta_porte_verificar_si_continua_baja,{cartadesactivar:cartadesactivar}, function(data){
     if(data.Status == 'BAJA'){
-      $("#notadesactivar").val(0);
-      $("#textomodaldesactivar").html('Error, esta nota credito cliente ya fue dado de baja');
+      $("#cartadesactivar").val(0);
+      $("#textomodaldesactivar").html('Error, esta carta porte ya fue dada de baja');
       $("#divmotivobaja").hide();
       $("#btnbaja").hide();
       $('#estatusregistro').modal('show');
     }else{
       if(data.resultadofechas != ''){
-        $("#notadesactivar").val(0);
+        $("#cartadesactivar").val(0);
         $("#textomodaldesactivar").html('Error solo se pueden dar de baja las notas del mes actual, fecha de la nota: ' + data.resultadofechas);
         $("#divmotivobaja").hide();
         $("#btnbaja").hide();
         $('#estatusregistro').modal('show');
       }else{
         if(data.errores != ''){
-          $("#notadesactivar").val(0);
+          $("#cartadesactivar").val(0);
           $("#textomodaldesactivar").html(data.errores);
           $("#divmotivobaja").hide();
           $("#btnbaja").hide();
           $('#estatusregistro').modal('show');
         }else{
-          $("#notadesactivar").val(notadesactivar);
-          $("#textomodaldesactivar").html('Estas seguro de dar de baja la nota de crédito cliente? No'+notadesactivar);
+          $("#cartadesactivar").val(cartadesactivar);
+          $("#textomodaldesactivar").html('Estas seguro de dar de baja el comprobante de traslado? No '+cartadesactivar);
           $("#motivobaja").val("");
           $("#divmotivobaja").show();
           $("#btnbaja").show();
@@ -5401,7 +5401,7 @@ $("#btnbaja").on('click', function(e){
     $('.page-loader-wrapper').css('display', 'block');
     $.ajax({
       headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-      url:notas_credito_clientes_alta_o_baja,
+      url:carta_porte_alta_o_baja,
       type: "post",
       dataType: "html",
       data: formData,
@@ -5488,8 +5488,6 @@ $("#btnenviarpdfemail").on('click', function (e) {
 //timbrar pago
 function timbrarcarta(carta){
   $.get(carta_porte_verificar_si_continua_timbrado,{carta:carta}, function(data){
-
-    console.log(data)
     //   if(data.Esquema == 'INTERNA' || data.Esquema == 'NOTA'){
     //     $("#notatimbrado").val(0);
     //     $("#textomodaltimbrado").html('Aviso, las Notas de crédito cliente con Esquema INTERNA o NOTA no se pueden timbrar');
@@ -5497,18 +5495,17 @@ function timbrarcarta(carta){
     //     $("#btntimbrarnota").hide();
     if(data.Status == 'BAJA'){
         $("#cartatimbrado").val(0);
-        $("#textomodaltimbrado").html('Aviso, esta Nota se encuentra dada de baja');
+        $("#textomodaltimbrado").html('Aviso, esta Carta Porte se encuentra dada de baja');
         $('#modaltimbrado').modal('show');
         $("#btntimbrarnota").hide();
     }else{
         if(typeof(data.UUID) == "string" && data.UUID != null) {
 
             $("#cartatimbrado").val(0);
-            $("#textomodaltimbrado").html('Aviso, esta Nota ya se timbro');
+            $("#textomodaltimbrado").html('Aviso, esta Carta Porte ya se timbro');
             $('#modaltimbrado').modal('show');
             $("#btntimbrarnota").hide();
         }else{
-
             $("#modaltimbrado").modal("show");
             $("#textomodaltimbrado").html("¿Está seguro de timbrar el comprobande de traslado? No "+ carta);
             $("#cartatimbrado").val(carta);

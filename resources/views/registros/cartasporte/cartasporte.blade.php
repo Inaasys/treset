@@ -128,7 +128,7 @@
       		<div class="modal-body">
 		      	<form id="formdesactivar" action="#">
 		        	<h5 id="textomodaldesactivar"> </h5>
-                    <input type="hidden" id="notadesactivar" name="notadesactivar">
+                    <input type="hidden" id="cartadesactivar" name="cartadesactivar">
                     <div id="divmotivobaja">
                         <label>Motivo Baja</label>
                         <textarea class="form-control" name="motivobaja" id="motivobaja" rows=2 required data-parsley-length="[1, 200]" onkeyup="tipoLetra(this)"></textarea>
@@ -283,8 +283,8 @@
         var notas_credito_clientes_obtener_datos_almacen  = '{!!URL::to('notas_credito_clientes_obtener_datos_almacen')!!}';
         var notas_credito_cliente_comprobar_cantidad_nota_vs_cantidad_factura = '{!!URL::to('notas_credito_cliente_comprobar_cantidad_nota_vs_cantidad_factura')!!}';
         var carta_porte_guardar = '{!!URL::to('carta_porte_guardar')!!}';
-        var notas_credito_clientes_verificar_si_continua_baja = '{!!URL::to('notas_credito_clientes_verificar_si_continua_baja')!!}';
-        var notas_credito_clientes_alta_o_baja = '{!!URL::to('notas_credito_clientes_alta_o_baja')!!}';
+        var carta_porte_verificar_si_continua_baja = '{!!URL::to('carta_porte_verificar_si_continua_baja')!!}';
+        var carta_porte_alta_o_baja = '{!!URL::to('carta_porte_alta_o_baja')!!}';
         var carta_porte_obtener_carta_porte = '{!!URL::to('carta_porte_obtener_carta_porte')!!}';
         var carta_porte_guardar_modificacion = '{!!URL::to('carta_porte_guardar_modificacion')!!}';
         var notas_credito_clientes_obtener_datos_envio_email = '{!!URL::to('notas_credito_clientes_obtener_datos_envio_email')!!}';
