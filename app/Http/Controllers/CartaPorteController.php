@@ -106,7 +106,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                                             '</button>'.
                                             '<ul class="dropdown-menu">'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->CartaPorte .'\')">Cambios</a></li>'.
-                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);">Bajas</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->CartaPorte .'\')">Bajas</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="timbrarcarta(\''. $data->CartaPorte .'\')">Timbrar</a></li>'.
                                                 '<li><a class="paddingmenuopciones">Ver Documento PDF</a></li>'.
                                                 '<li><a class="paddingmenuopciones">Enviar Documento por Correo</a></li>'.
@@ -715,61 +715,33 @@ class CartaPorteController extends ConfiguracionSistemaController{
     }
 
     //verificar si se puede dar de bajar nota cliente
-    public function notas_credito_clientes_verificar_si_continua_baja(Request $request){
+    public function carta_porte_verificar_si_continua_baja(Request $request){
         $errores = '';
-        $NotaCliente = NotaCliente::where('Nota', $request->notadesactivar)->first();
-        $DetallesNotaCliente = NotaClienteDetalle::where('Nota', $request->notadesactivar)->get();
-        foreach($DetallesNotaCliente as $detalle){
-            if($detalle->Codigo != 'DPPP'){
-                $existencias = Existencia::where('Codigo', $detalle->Codigo)->where('Almacen', $NotaCliente->Almacen)->first();
-                if($existencias->Existencias < $detalle->Cantidad){
-                    $errores = $errores.'Error la nota de cliente no se puede dar de baja porque no hay existencias suficientes en el almacen: '.$NotaCliente->Almacen.' para el código: '.$detalle->Codigo.'<br>';
-                }
-            }
-        }
-        $resultadofechas = Helpers::compararanoymesfechas($NotaCliente->Fecha);
+        $CartaPorte = CartaPorte::where('CartaPorte', $request->cartadesactivar)->first();
+        $resultadofechas = Helpers::compararanoymesfechas($CartaPorte->Fecha);
         $data = array(
             'resultadofechas' => $resultadofechas,
             'errores' => $errores,
-            'Status' => $NotaCliente->Status
+            'Status' => $CartaPorte->Status
         );
         return response()->json($data);
     }
 
     //bajas
-    public function notas_credito_clientes_alta_o_baja(Request $request){
-        $NotaCliente = NotaCliente::where('Nota', $request->notadesactivar)->first();
+    public function carta_porte_alta_o_baja(Request $request){
+        $CartaPorte = CartaPorte::where('CartaPorte', $request->cartadesactivar)->first();
         //cambiar status y colocar valores en 0
         $MotivoBaja = $request->motivobaja.', '.Helpers::fecha_exacta_accion_datetimestring().', '.Auth::user()->user;
-        NotaCliente::where('Nota', $request->notadesactivar)
+        CartaPorte::where('CartaPorte', $request->cartadesactivar)
                 ->update([
                     'MotivoBaja' => $MotivoBaja,
                     'Status' => 'BAJA',
-                    'Importe' => '0.000000',
-                    'Descuento' => '0.000000',
-                    'Ieps' => '0.000000',
-                    'SubTotal' => '0.000000',
-                    'Iva' => '0.000000',
-                    'IvaRetencion' => '0.000000',
-                    'IsrRetencion' => '0.000000',
-                    'IepsRetencion' => '0.000000',
-                    'ImpLocRetenciones' => '0.000000',
-                    'ImpLocTraslados' => '0.000000',
-                    'Total' => '0.000000'
+                    'PesoBrutoTotal' => '0.000000',
+                    'TotalDistanciaRecorrida' => '0.000000'
                 ]);
-        $detalles = NotaClienteDetalle::where('Nota', $request->notadesactivar)->get();
+        $detalles = CartaPorteDetalles::where('CartaPorte', $request->cartadesactivar)->get();
         //notas proveedor detalles
         foreach($detalles as $detalle){
-            if($detalle->Codigo != 'DPPP'){
-                //restar existencias al almacen
-                $ExistenciaAlmacen = Existencia::where('Codigo', $detalle->Codigo)->where('Almacen', $NotaCliente->Almacen)->first();
-                $ExistenciaNuevaAlmacen = $ExistenciaAlmacen->Existencias-$detalle->Cantidad;
-                Existencia::where('Codigo', $detalle->Codigo)
-                            ->where('Almacen', $NotaCliente->Almacen)
-                            ->update([
-                                'Existencias' => Helpers::convertirvalorcorrecto($ExistenciaNuevaAlmacen)
-                            ]);
-            }
             //colocar en ceros cantidades nota proveedor detalles
             NotaClienteDetalle::where('Nota', $request->notadesactivar)
                             ->where('Item', $detalle->Item)
@@ -788,45 +760,22 @@ class CartaPorteController extends ConfiguracionSistemaController{
                                 'Total' => '0.000000'
                             ]);
         }
-        //nota cliente documentos
-        $detallesdocumentos = NotaClienteDocumento::where('Nota', $request->notadesactivar)->get();
-        foreach($detallesdocumentos as $detalledocumento){
-            $notaclientedocumento = NotaClienteDocumento::where('Nota', $request->notadesactivar)->where('Factura', $detalledocumento->Factura)->first();
-            $facturadocumento = Factura::where('Factura', $detalledocumento->Factura)->first();
-            //Regresar saldo y descuentos a la factura
-            $NuevoDescuentos = $facturadocumento->Descuentos - $notaclientedocumento->Descuento;
-            $NuevoSaldo = $facturadocumento->Saldo + $notaclientedocumento->Descuento;
-            Factura::where('Factura', $detalledocumento->Factura)
-            ->update([
-                'Descuentos' => Helpers::convertirvalorcorrecto($NuevoDescuentos),
-                'Saldo' => Helpers::convertirvalorcorrecto($NuevoSaldo)
-            ]);
-            //Si el saldo es mayor a 0 cambiar status de factura a POR COBRAR
-            if($NuevoSaldo > Helpers::convertirvalorcorrecto(0)){
-                Factura::where('Factura', $detalledocumento->Factura)
-                        ->update([
-                            'Status' => "POR COBRAR"
-                        ]);
-            }
-            //colocar en cero cantidades nota proveedor documentos
-            NotaClienteDocumento::where('Nota', $request->notadesactivar)
-                                    ->where('Factura', $detalledocumento->Factura)
-                                    ->update([
-                                        'Descuento' => '0.000000',
-                                        'Total' => '0.000000'
-                                    ]);
+        //carta porte documentos
+
+        foreach($CartaPorte->documentos as $detalledocumento){
+            $detalledocumento->forceDelete();
         }
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO
         $BitacoraDocumento = new BitacoraDocumento;
-        $BitacoraDocumento->Documento = "NOTAS CLIENTE";
-        $BitacoraDocumento->Movimiento = $request->notadesactivar;
+        $BitacoraDocumento->Documento = "CARTAPORTE";
+        $BitacoraDocumento->Movimiento = $request->cartadesactivar;
         $BitacoraDocumento->Aplicacion = "BAJA";
         $BitacoraDocumento->Fecha = Helpers::fecha_exacta_accion_datetimestring();
-        $BitacoraDocumento->Status = $NotaCliente->Status;
+        $BitacoraDocumento->Status = $CartaPorte->Status;
         $BitacoraDocumento->Usuario = Auth::user()->user;
         $BitacoraDocumento->Periodo = $this->periodohoy;
         $BitacoraDocumento->save();
-        return response()->json($NotaCliente);
+        return response()->json($CartaPorte);
     }
 
     //obtener nota cliente
@@ -997,14 +946,14 @@ class CartaPorteController extends ConfiguracionSistemaController{
                             '<td class="tdmod"><input type="hidden" class="form-control codigopartida" name="codigopartida[]" value="'.$cpd->Codigo.'" readonly data-parsley-length="[1, 20]"><b style="font-size:12px;">'.$cpd->Codigo.'</b></td>'.
                             '<td class="tdmod"><input type="text" class="form-control inputnextdet divorinputmodxl descripcionpartida" name="descripcionpartida[]" value="'.htmlspecialchars($cpd->Descripcion, ENT_QUOTES).'" required data-parsley-length="[1, 255]" onkeyup="tipoLetra(this)"></td>'.
                             '<td class="tdmod">'.
-                                '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadPartida" name="cantidadPartida[]" value="'.Helpers::convertirvalorcorrecto($cpd->Cantidad).'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularPesoPartida('.$contadorfilas.')"></td>'.
-                                '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($cpd->Cantidad).'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');revisarcantidadnotavscantidadfactura('.$contadorfilas.');">'.
+                                '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadPartida" name="cantidadPartida[]" value="'.Helpers::convertirvalorcorrecto($cpd->Cantidad).'" data-parsley-min="0.000001" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularPesoPartida('.$contadorfilas.')"></td>'.
+                                '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="'.Helpers::convertirvalorcorrecto($cpd->Cantidad).'" data-parsley-min="0.000001" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorfilas.');revisarcantidadnotavscantidadfactura('.$contadorfilas.');">'.
                                 '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="'.Helpers::convertirvalorcorrecto($cpd->Cantidad).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);">'.
                                 '<input type="hidden" class="form-control cantidadincorrecta" name="cantidadincorrecta[]" >'.
                                 '<input type="hidden" class="form-control realizarbusquedaexistencias" name="realizarbusquedaexistencias[]" value="1" >'.
                                 '<div class="cantidaderrorexistencias" style="color:#dc3545;font-size:9px; display:none"></div>'.
                             '</td>'.
-                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm pesopartida" name="pesobrutopartida[]" value="'.Helpers::convertirvalorcorrecto($pesoUnitario).'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularPesoPartida('.$contadorfilas.');"></td>'.
+                            '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm pesopartida" name="pesobrutopartida[]" value="'.Helpers::convertirvalorcorrecto($pesoUnitario).'" data-parsley-min="0.0000001" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularPesoPartida('.$contadorfilas.');"></td>'.
                             '<td class="tdmod"><input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm pesototalpartida" name="pesototal[]" value="'.Helpers::convertirvalorcorrecto($cpd->PesoEnKilogramos).'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" readonly></td>'.
                             '<td class="tdmod">'.
                                 '<input type="hidden" name="materialpeligrosopartida[]" value="'.$cpd->MaterialPeligroso.'"></input>'.
@@ -1736,8 +1685,25 @@ class CartaPorteController extends ConfiguracionSistemaController{
                 )
             );
 
-            $bienesTransportados .=
-            '<cartaporte20:Mercancia BienesTransp="'.$detalle->ClaveProducto.'" Descripcion="'.$detalle->Descripcion.'" Cantidad="'.$detalle->Cantidad.'" ClaveUnidad="'.$detalle->ClaveUnidad.'" Unidad="'.$detalle->Unidad.'" PesoEnKg="'.$detalle->PesoEnKilogramos.'"/>';
+            switch ($detalle->MaterialPeligroso) {
+                case '0,1':
+                    if (!isset($detalle->CveMaterialPeligroso)) {
+                        $bienesTransportados .=
+                        '<cartaporte20:Mercancia BienesTransp="'.$detalle->ClaveProducto.'" Descripcion="'.$detalle->Descripcion.'" Cantidad="'.$detalle->Cantidad.'" ClaveUnidad="'.$detalle->ClaveUnidad.'" Unidad="'.$detalle->Unidad.'" PesoEnKg="'.$detalle->PesoEnKilogramos.'" MaterialPeligroso="No" />';
+                    }else{
+                        $bienesTransportados .=
+                        '<cartaporte20:Mercancia BienesTransp="'.$detalle->ClaveProducto.'" Descripcion="'.$detalle->Descripcion.'" Cantidad="'.$detalle->Cantidad.'" ClaveUnidad="'.$detalle->ClaveUnidad.'" Unidad="'.$detalle->Unidad.'" PesoEnKg="'.$detalle->PesoEnKilogramos.'" MaterialPeligroso="Sí" CveMaterialPeligroso="'.$detalle->CveMaterialPeligroso.'" Embalaje="'.$detalle->Embalaje.'" DescripEmbalaje="'.$detalle->DescripEmbalaje.'" />';
+                    }
+                    break;
+                case '0':
+                    $bienesTransportados .=
+                    '<cartaporte20:Mercancia BienesTransp="'.$detalle->ClaveProducto.'" Descripcion="'.$detalle->Descripcion.'" Cantidad="'.$detalle->Cantidad.'" ClaveUnidad="'.$detalle->ClaveUnidad.'" Unidad="'.$detalle->Unidad.'" PesoEnKg="'.$detalle->PesoEnKilogramos.'" />';
+                    break;
+                default:
+                    $bienesTransportados .=
+                    '<cartaporte20:Mercancia BienesTransp="'.$detalle->ClaveProducto.'" Descripcion="'.$detalle->Descripcion.'" Cantidad="'.$detalle->Cantidad.'" ClaveUnidad="'.$detalle->ClaveUnidad.'" Unidad="'.$detalle->Unidad.'" PesoEnKg="'.$detalle->PesoEnKilogramos.'" MaterialPeligroso="Si" CveMaterialPeligroso="'.$detalle->CveMaterialPeligroso.'" Embalaje="'.$detalle->Embalaje.'" DescripEmbalaje="'.$detalle->DescripEmbalaje.'" />';
+                    break;
+            }
         }
         //Valida si se ingreso referencia para el destinatario
         $arraydoc = array();
@@ -1762,8 +1728,6 @@ class CartaPorteController extends ConfiguracionSistemaController{
                         "documents" => $arraydoc
                     )
                 ),
-
-
 
                 "complements" => array(
                     //"type" => "P",
@@ -2051,7 +2015,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                         '<input type="hidden" class="form-control descripcionpartida" name="descripcionpartida[]" value="'.$detalle->Descripcion.'" readonly data-parsley-length="[1, 20]">'.$detalle->Descripcion.
                     '</td>'.
                     '<td class="tdmod">'.
-                        '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadPartida" name="cantidadPartida[]" value="1.'.$this->numerocerosconfigurados.'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularPesoPartida('.$contadorfilas.')" >'.
+                        '<input type="number" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadPartida" name="cantidadPartida[]" value="'.Helpers::convertirvalorcorrecto($detalle->Cantidad).'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calcularPesoPartida('.$contadorfilas.')" >'.
                         '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control inputnextdet divorinputmodsm cantidadpartida" name="cantidadpartida[]" value="1.'.$this->numerocerosconfigurados.'" data-parsley-min="0.1" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);calculartotalesfilas('.$contadorproductos.');revisarcantidadnotavscantidadfactura('.$contadorfilas.');">'.
                         '<input type="hidden" step="0.'.$this->numerocerosconfiguradosinputnumberstep.'" class="form-control divorinputmodsm cantidadpartidadb" name="cantidadpartidadb[]" value="0.'.$this->numerocerosconfigurados.'" data-parsley-decimalesconfigurados="/^[0-9]+[.]+[0-9]{'.$this->numerodecimales.'}$/" onchange="formatocorrectoinputcantidades(this);">'.
                         '<input type="hidden" class="form-control cantidadincorrecta" name="cantidadincorrecta[]" >'.

@@ -994,6 +994,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/carta_porte_obtener_datos_factura','CartaPorteController@carta_porte_obtener_datos_factura')->name('carta_porte_obtener_datos_factura')->middleware('revisaraccesomenu:menuregistroscartasporte');
     Route::POST('/carta_porte_timbrar_carta','CartaPorteController@carta_porte_timbrar_carta')->name('carta_porte_timbrar_carta');
     Route::get('/carta_porte_verificar_si_continua_timbrado','CartaPorteController@carta_porte_verificar_si_continua_timbrado')->name('carta_porte_verificar_si_continua_timbrado')->middleware('revisaraccesomenu:menuregistroscartasporte');
+    Route::get('/carta_porte_verificar_si_continua_baja','CartaPorteController@carta_porte_verificar_si_continua_baja')->name('carta_porte_verificar_si_continua_baja')->middleware('revisaraccesomenu:menuregistroscartasporte');
+    Route::POST('/carta_porte_alta_o_baja','CartaPorteController@carta_porte_alta_o_baja')->name('carta_porte_alta_o_baja')->middleware('revisaraccesomenu:menuregistroscartasporte');
     //Produccion
     Route::get('/produccion', 'ProduccionController@produccion')->name('produccion')->middleware('revisaraccesomenu:menuregistrosproduccion');
     Route::get('/produccion_obtener', 'ProduccionController@produccion_obtener')->name('produccion_obtener')->middleware('revisaraccesomenu:menuregistrosproduccion');
