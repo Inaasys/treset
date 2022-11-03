@@ -106,8 +106,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->CartaPorte .'\')">Cambios</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->CartaPorte .'\')">Bajas</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="timbrarcarta(\''. $data->CartaPorte .'\')">Timbrar</a></li>'.
-                                                '<li><a class="paddingmenuopciones" href="'.route('carta_porte_generar_pdfs_indiv',$data->CartaPorte).'" target="_blank">Ver Documento Carta Porte</a></li>'.
-                                                '<li><a class="paddingmenuopciones">Enviar Documento por Correo</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="'.route('carta_porte_generar_pdfs_indiv',$data->CartaPorte).'" target="_blank">Ver Documento</a></li>'.
                                                 //'<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="timbrarnota(\''.$data->Nota .'\')">Timbrar Nota</a></li>'.
                                                 //'<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="cancelartimbre(\''.$data->Nota .'\')">Cancelar Timbre</a></li>'.
                                             '</ul>'.
@@ -1306,12 +1305,67 @@ class CartaPorteController extends ConfiguracionSistemaController{
         $usocfdi = UsoCFDI::where('Clave',$cartaporte->UsoCfdi)->first();
         $regimenEmisor = c_RegimenFiscal::where('Clave',$cartaporte->RegimenFiscal)->first();
         $numerodecimalesdocumento = $this->numerodecimalesendocumentos;
+        $estadoCliente = Estado::where('Clave',$cartaporte->EstadoDestinatario)->first();
+        $tipoPermiso = \DB::table('c_TipoPermiso')->where('Clave',$cartaporte->PermisoSCT)->first();
+        $configuracionVehicular = c_ConfiguracionAutoTransporte::where('Clave',$cartaporte->ConfiguracionVehicular)->first();
         $data=array();
         $datadetalle =collect([]);
+        $dataDomicilioEmisor = array(
+            'pais'=> $this->paisempresa,
+            'cp' => $this->cpempresa,
+            'estado' =>$this->estadoempresa,
+            'municipio'=>$this->municipioempresa,
+            'colonia'=>$this->coloniaempresa,
+            'calle'=>$this->calleempresa,
+            'exterior'=>$this->noexteriorempresa,
+            'interior'=>$this->nointeriorempresa,
+            'referencia'=>$this->referenciaempresa
+        );
+        $dataDestino = array(
+            'nombre' => $cliente->Nombre,
+            'pais'=> 'México',
+            'cp' => $cliente->CodigoPostal,
+            'estado' => $estadoCliente->Nombre,
+            'municipio'=>$cliente->Municipio,
+            'colonia'=>$cliente->Colonia,
+            'calle'=>$cliente->Calle,
+            'exterior'=>$cliente->noExterior,
+            'interior'=>$cliente->noInterior,
+            'referencia'=>$cliente->Referencia,
+            'localidad'=>$cliente->Localidad
+        );
+        $datosAutoTransporte = array(
+            'tipoPermiso' => $tipoPermiso->Descripcion,
+            'numeroPermiso' => $cartaporte->NumeroPermisoSCT,
+            'confVehiculo' =>$configuracionVehicular->Descripcion,
+        );
         $detalles = CartaPorteDetalles::where('CartaPorte', $cartaporte->CartaPorte)->get();
         foreach($detalles as $detalle){
             $claveproducto = ClaveProdServ::where('Clave', $detalle->ClaveProducto)->first();
             $claveunidad = ClaveUnidad::where('Clave', $detalle->ClaveUnidad)->first();
+            switch ($detalle->MaterialPeligroso) {
+                case '0,1':
+                    if (!isset($detalle->CveMaterialPeligroso)) {
+                        $MaterialPeligrosoMaterialPeligroso="No";
+                        $claveMaterial = '';
+                        $embalaje = '';
+                    }else{
+                        $MaterialPeligrosoMaterialPeligroso="Sí" ;
+                        $claveMaterial = $detalle->CveMaterialPeligroso;
+                        $embalaje = $detalle->Embalaje;
+                    }
+                    break;
+                case '0':
+                    $MaterialPeligroso = 'No';
+                    $claveMaterial = '';
+                    $embalaje = '';
+                    break;
+                default:
+                    $MaterialPeligrosorialPeligroso = "Sí";
+                    $claveMaterial = $detalle->CveMaterialPeligroso;
+                    $embalaje = $detalle->Embalaje;
+                    break;
+            }
             $datadetalle[]=collect([
                 "cantidaddetalle"=> Helpers::convertirvalorcorrecto($detalle->Cantidad),
                 "codigodetalle"=>$detalle->Codigo,
@@ -1325,6 +1379,9 @@ class CartaPorteController extends ConfiguracionSistemaController{
                 "subtotal" => Helpers::convertirvalorcorrecto(0),
                 "claveproducto" => $claveproducto,
                 "claveunidad" => $claveunidad,
+                'materialPeligroso' => $MaterialPeligroso,
+                'claveMaterial' => $claveMaterial,
+                'embalaje' => $embalaje
                 ]);
         }
         $comprobantetimbrado = Comprobante::where('Comprobante', 'CartaPorte')->where('Folio', '' . $cartaporte->Folio . '')->where('Serie', '' . $cartaporte->Serie . '')->count();
@@ -1333,7 +1390,8 @@ class CartaPorteController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300000); // 5 minutos
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.cartasporte.formato_traslado', compact('cliente','cartaporte','usocfdi','regimenfiscal',
-        'datadetalle','comprobantetimbrado','comprobante','regimenEmisor', 'numerodecimalesdocumento'))
+        'datadetalle','comprobantetimbrado','comprobante','regimenEmisor', 'numerodecimalesdocumento','dataDomicilioEmisor'
+        ,'dataDestino','datosAutoTransporte'))
         ->setPaper('Letter')
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
         ->setOption('footer-center', 'Página [page] de [toPage]')

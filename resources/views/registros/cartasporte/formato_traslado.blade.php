@@ -119,10 +119,321 @@
                         <div style="width:100%;">
                             <table style="width: 100%;max-width: 100%;border: 1px solid #ddd;">
                                 <tr style="background-color:#a6a6b3;font-size:9px;">
-                                    <td style="font-size:9px;">Carta Porte</td>
+                                    <td style="font-size:9px;">Complemento Carta Porte</td>
                                 </tr>
                                 <tr style="text-align:justify;font-size:9px;">
                                     <td style="font-size:9px;">
+                                        <li>Carta Porte</li>
+                                        <br>
+                                        <table style="width: 100%;max-width: 100%;border: 1px solid #ddd;">
+                                            <tbody style="font-size:9px; text-align: justify;">
+                                                <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                    <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                        <th>Transporte Internacional</th>
+                                                        <th>Distancia Recorrida</th>
+                                                    </tr>
+                                                </tr>
+                                                <tr>
+                                                    <td>{{$cartaporte->TransporteInternacional}}</td>
+                                                    <td>{{number_format($cartaporte->TotalDistanciaRecorrida,$numerodecimalesdocumento,'.',',')}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr style="text-align:justify;font-size:9px;">
+                                    <td style="font-size:9px;">
+                                        <li>Ubicaciones</li>
+                                        <br>
+                                        <table style="width: 100%;max-width: 100%;border: 1px solid #ddd;">
+                                            <tbody style="font-size:9px; text-align: justify;">
+                                                <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                    <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                        <th>Tipo de Ubicación</th>
+                                                        <th>Identificación de la ubicación</th>
+                                                        <th>RFC del Remitente o Destinatario</th>
+                                                        <th>Nombre del Remitente o Destinatario</th>
+
+                                                    </tr>
+                                                </tr>
+                                                <tr>
+                                                    <td>Origen</td>
+                                                    <td>OR000123</td>
+                                                    <td>{{$cartaporte->RfcRemitente}}</td>
+                                                    <td>{{$cartaporte->NombreRemitente}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><ul><li>Domicilio</li></ul></td>
+                                                </tr>
+                                                <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                    <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                        <th></th>
+                                                        <th>País</th>
+                                                        <th>C.P</th>
+                                                        <th>Estado</th>
+                                                        <th>Municipio</th>
+                                                        <th>Localidad</th>
+                                                    </tr>
+                                                </tr>
+                                                <tr>
+                                                    <td></td>
+                                                    <td>México</td>
+                                                    <td>{{$dataDomicilioEmisor['cp']}}</td>
+                                                    <td>{{$dataDomicilioEmisor['estado']}}</td>
+                                                    <td>{{$dataDomicilioEmisor['municipio']}}</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                    <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                        <th></th>
+                                                        <th>Colonia</th>
+                                                        <th>Calle</th>
+                                                        <th>Número Exterior</th>
+                                                        <th>Numero Interior</th>
+                                                        <th>Referencia</th>
+                                                    </tr>
+                                                </tr>
+                                                <tr>
+                                                    <td></td>
+                                                    <td>{{$dataDomicilioEmisor['colonia']}}</td>
+                                                    <td>{{$dataDomicilioEmisor['calle']}}</td>
+                                                    <td>{{$dataDomicilioEmisor['exterior']}}</td>
+                                                    <td>{{$dataDomicilioEmisor['interior']}}</td>
+                                                    <td>{{$dataDomicilioEmisor['referencia']}}</td>
+                                                    <td></td>
+                                                </tr>
+                                            </tbody>
+                                        </table><br>
+                                        <table style="width: 100%;max-width: 100%;border: 1px solid #ddd;">
+                                            <tbody style="font-size:9px; text-align: justify;">
+                                                <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                    <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                        <th>Tipo de Ubicación</th>
+                                                        <th>Identificación de la ubicación</th>
+                                                        <th>RFC del Remitente o Destinatario</th>
+                                                        <th>Nombre del Remitente o Destinatario</th>
+
+                                                    </tr>
+                                                </tr>
+                                                <tr>
+                                                    <td>Destino</td>
+                                                    <td>DE000456</td>
+                                                    <td>{{$cartaporte->RfcDestinatario}}</td>
+                                                    <td>{{$dataDestino['nombre']}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><ul><li>Domicilio</li></ul></td>
+                                                </tr>
+                                                <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                    <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                        <th></th>
+                                                        <th>País</th>
+                                                        <th>C.P</th>
+                                                        <th>Estado</th>
+                                                        <th>Municipio</th>
+                                                        <th>Localidad</th>
+                                                    </tr>
+                                                </tr>
+                                                <tr>
+                                                    <td></td>
+                                                    <td>México</td>
+                                                    <td>{{$dataDestino['cp']}}</td>
+                                                    <td>{{$dataDestino['estado']}}</td>
+                                                    <td>{{$dataDestino['municipio']}}</td>
+                                                    <td>{{$dataDestino['localidad']}}</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                    <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                        <th></th>
+                                                        <th>Colonia</th>
+                                                        <th>Calle</th>
+                                                        <th>Número Exterior</th>
+                                                        <th>Numero Interior</th>
+                                                        <th>Referencia</th>
+                                                    </tr>
+                                                </tr>
+                                                <tr>
+                                                    <td></td>
+                                                    <td>{{$dataDestino['colonia']}}</td>
+                                                    <td>{{$dataDestino['calle']}}</td>
+                                                    <td>{{$dataDestino['exterior']}}</td>
+                                                    <td>{{$dataDestino['interior']}}</td>
+                                                    <td>{{$dataDestino['referencia']}}</td>
+                                                    <td></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr style="text-align:justify;font-size:9px;">
+                                    <td style="font-size:9px;">
+                                        <li>Mercancias</li>
+                                        <br>
+                                        <table style="width: 100%;max-width: 100%;border: 1px solid #ddd;">
+                                            <tbody style="font-size:9px; text-align: justify;">
+                                                <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                    <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                        <th>Peso Bruto Total</th>
+                                                        <th>Unidad Peso</th>
+                                                        <th>Peso Neto Total</th>
+                                                        <th>Total Mercancias</th>
+                                                    </tr>
+                                                </tr>
+                                                <tr>
+                                                    <td>{{number_format($cartaporte->PesoBrutoTotal,$numerodecimalesdocumento,'.',',')}}</td>
+                                                    <td>Una unidad de masa igual a mil gramos (KGM).</td>
+                                                    <td>{{number_format($cartaporte->PesoBrutoTotal,$numerodecimalesdocumento,'.',',')}}</td>
+                                                    <td>{{$cartaporte->TotalMercancias}}</td>
+                                                </tr>
+                                                @foreach ($datadetalle as $detalle)
+                                                    <tr>
+                                                        <td><ul><li>Mercancia</li></ul></td>
+                                                    </tr>
+                                                    <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                        <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                            <th></th>
+                                                            <th>Bienes Transportados</th>
+                                                            <th>Descripcion</th>
+                                                            <th>Cantiad</th>
+                                                            <th>Clave Unidad</th>
+                                                        </tr>
+                                                    </tr>
+                                                    <tr>
+                                                        <td></td>
+                                                        <td>{{$detalle['claveproducto']->Nombre}}</td>
+                                                        <td>{{$detalle['descripciondetalle']}}</td>
+                                                        <td>{{$detalle['cantidaddetalle']}}</td>
+                                                        <td>{{$detalle['claveunidad']->Nombre}}</td>
+                                                    </tr>
+                                                    <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                        <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                            <th></th>
+                                                            <th>Unidad</th>
+                                                            <th>Material Peligroso</th>
+                                                            <th>Clave Material Peligroso</th>
+                                                            <th>Embalaje</th>
+                                                        </tr>
+                                                    </tr>
+                                                    <tr>
+                                                        <td></td>
+                                                        <td>{{$detalle['claveunidad']->Clave}}</td>
+                                                        <td>{{$detalle['materialPeligroso']}}</td>
+                                                        <td>{{$detalle['claveMaterial']}}</td>
+                                                        <td>{{$detalle['embalaje']}}</td>
+                                                    </tr>
+                                                    <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                        <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                            <th></th>
+                                                            <th>Peso En Kg</th>
+                                                            <th>Fracción Arancelaria</th>
+                                                        </tr>
+                                                    </tr>
+                                                    <tr>
+                                                        <td></td>
+                                                        <td>{{$detalle['pesoBruto']}}</td>
+                                                        <td></td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <br>
+                                <tr style="text-align:justify;font-size:9px;">
+                                    <td style="font-size:9px;">
+                                        <li>Autotransporte</li>
+                                        <br>
+                                        <table style="width: 100%;max-width: 100%;border: 1px solid #ddd;">
+                                            <tbody style="font-size:9px; text-align: justify;">
+                                                <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                    <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                        <th>Tipo PermisoSCT</th>
+                                                        <th>Número de permiso SCT</th>
+                                                    </tr>
+                                                </tr>
+                                                <tr>
+                                                    <td>{{$datosAutoTransporte['tipoPermiso']}}</td>
+                                                    <td>{{$datosAutoTransporte['numeroPermiso']}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><ul><li>Identificación Vehicular</li></ul></td>
+                                                </tr>
+                                                <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                    <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                        <th></th>
+                                                        <th>Configuración vehicular</th>
+                                                        <th>Placa VM</th>
+                                                        <th>Año modelo VM</th>
+                                                    </tr>
+                                                </tr>
+                                                <tr>
+                                                    <td></td>
+                                                    <td>{{$datosAutoTransporte['confVehiculo']}}</td>
+                                                    <td>{{$cartaporte->PlacaVehiculoMotor}}</td>
+                                                    <td>{{$cartaporte->AnoModeloVehiculoMotor}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><ul><li>Seguros</li></ul></td>
+                                                </tr>
+                                                <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                    <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                        <th></th>
+                                                        <th>Aseguradora de Responsabilidad Civil</th>
+                                                        <th>Poliza de responsabilidad Civil</th>
+                                                    </tr>
+                                                </tr>
+                                                <tr>
+                                                    <td></td>
+                                                    <td>{{$cartaporte->NombreAsegurado}}</td>
+                                                    <td>{{$cartaporte->NumeroPolizaSeguro}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <br>
+                                    </td>
+                                </tr>
+                                <tr style="text-align:justify;font-size:9px;">
+                                    <td style="font-size:9px;">
+                                        <li>Figura Transporte</li>
+                                        <br>
+                                        <table style="width: 100%;max-width: 100%;border: 1px solid #ddd;">
+                                            <tbody style="font-size:9px; text-align: justify;">
+                                                <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                    <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                        <th>Tipo de Figura</th>
+                                                        <th>RFC Figura</th>
+                                                        <th>Número de Licencia</th>
+                                                        <th>Número de Registro de Identidad Tributaria de la Figura</th>
+                                                        <th>Residencia Fiscal de la Figura</th>
+
+                                                    </tr>
+                                                </tr>
+                                                <tr>
+                                                    <td>Operador</td>
+                                                    <td>{{$cartaporte->RfcOperador}}</td>
+                                                    <td>{{$cartaporte->NumeroLicencia}}</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><ul><li>Domicilio</li></ul></td>
+                                                </tr>
+                                                <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                    <tr style="background-color:#a6a6b3;font-size:10px;">
+                                                        <th></th>
+                                                        <th>País</th>
+                                                        <th>C.P</th>
+                                                        <th>Estado</th>
+                                                </tr>
+                                                <tr>
+                                                    <td></td>
+                                                    <td>México</td>
+                                                    <td>{{$cartaporte->CodigoPostalOperador}}</td>
+                                                    <td>{{$cartaporte->EstadoOperador}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table><br>
                                     </td>
                                 </tr>
                             </table>
