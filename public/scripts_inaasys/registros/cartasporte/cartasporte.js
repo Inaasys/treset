@@ -4565,7 +4565,7 @@ function obtenerdatos(cartaporte){
                                             '<div class="form-line">'+
                                               '<input type="hidden" class="form-control" name="numeroestadoremitente" id="numeroestadoremitente" required data-parsley-type="integer" autocomplete="off">'+
                                               '<input type="hidden" class="form-control" name="numeroestadoremitenteanterior" id="numeroestadoremitenteanterior" required data-parsley-type="integer">'+
-                                              '<input type="text" class="form-control inputnextdet" name="estadoremitente" id="estadoremitente" value="'+estadoempresa+'" required>'+
+                                              '<input type="text" class="form-control inputnextdet" name="estadoremitente" id="estadoremitente" value="'+data.cartaporte.EstadoRemitente+'" required>'+
                                             '</div>'+
                                           '</td>'+
                                         '</tr>'+
