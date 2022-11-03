@@ -659,6 +659,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
         $CartaPorte->PlacaRemolque = $request->placaremolque;
         $CartaPorte->TotalMercancias = $request->numerototalmercancias;
         $CartaPorte->PesoBrutoTotal = $request->pesoTotalBruto;
+        $CartaPorte->carreteraFederal = (int)$request->carreteraFederal;
         $CartaPorte->save();
 
         //INGRESAR LOS DATOS A LA BITACORA DE DOCUMENTO NOTAS PROVEEDOR
@@ -1303,6 +1304,8 @@ class CartaPorteController extends ConfiguracionSistemaController{
         $regimenfiscal = c_RegimenFiscal::where('Clave',$cliente->RegimenFiscal)->first();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
         $usocfdi = UsoCFDI::where('Clave',$cartaporte->UsoCfdi)->first();
+        $regimenEmisor = c_RegimenFiscal::where('Clave',$cartaporte->RegimenFiscal)->first();
+        $numerodecimalesdocumento = $this->numerodecimalesendocumentos;
         $data=array();
         $datadetalle =collect([]);
         $detalles = CartaPorteDetalles::where('CartaPorte', $cartaporte->CartaPorte)->get();
@@ -1330,7 +1333,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
         ini_set('max_execution_time', 300000); // 5 minutos
         ini_set('memory_limit', '-1');
         $pdf = PDF::loadView('registros.cartasporte.formato_traslado', compact('cliente','cartaporte','usocfdi','regimenfiscal',
-        'datadetalle','comprobantetimbrado','comprobante'))
+        'datadetalle','comprobantetimbrado','comprobante','regimenEmisor', 'numerodecimalesdocumento'))
         ->setPaper('Letter')
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
         ->setOption('footer-center', 'Página [page] de [toPage]')
@@ -1641,7 +1644,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
         );
         return response()->json($data);
     }
-    //timbrar factura
+    //timbrar carta
     public function carta_porte_timbrar_carta(Request $request){
 
         $carta = CartaPorte::where('CartaPorte', $request->cartatimbrado)->first();
@@ -1694,196 +1697,288 @@ class CartaPorteController extends ConfiguracionSistemaController{
         }
         //Carta Porte
         if(sizeof($arraydoc) > 0){
-            $invoice = array(
-                "type" => \Facturapi\InvoiceType::TRASLADO,
-                "customer" => array(
-                    'legal_name' =>$carta->NombreRemitente,
-                    "tax_id" => $carta->RfcRemitente,
-                    "tax_system" => $carta->RegimenFiscal,
-                    "address" => array(
-                        "zip" => $carta->CodigoPostalRemitente
-                    )
-                ),
-                "related_documents" => array(
-                    array(
-                        "relationship" => '05',
-                        "documents" => $arraydoc
-                    )
-                ),
+            switch ((int)$carta->carreteraFederal) {
+                case 1:
+                    $invoice = array(
+                        "type" => \Facturapi\InvoiceType::TRASLADO,
+                        "customer" => array(
+                            'legal_name' =>$carta->NombreRemitente,
+                            "tax_id" => $carta->RfcRemitente,
+                            "tax_system" => $carta->RegimenFiscal,
+                            "address" => array(
+                                "zip" => $carta->CodigoPostalRemitente
+                            )
+                        ),
+                        "related_documents" => array(
+                            array(
+                                "relationship" => '05',
+                                "documents" => $arraydoc
+                            )
+                        ),
 
-                "complements" => array(
-                    //"type" => "P",
-                    array(
-                        "type" => "custom",
-                        "data" => "<?xml version='1.0' standalone='yes'?>".
-                        '<cartaporte20:CartaPorte Version="2.0" TranspInternac="No" TotalDistRec="'.$carta->TotalDistanciaRecorrida.'">'.
-                            '<cartaporte20:Ubicaciones>'.
-                                '<cartaporte20:Ubicacion TipoUbicacion="Origen" IDUbicacion="OR000123" RFCRemitenteDestinatario="'.$carta->RfcRemitente.'" NombreRemitenteDestinatario="'.$this->empresa->Nombre.'" FechaHoraSalidaLlegada="'.$salidaarray[0].'T'.$salidaarray[1].'">'.
-                                    '<cartaporte20:Domicilio Municipio="'.$municipioRe->Clave.'" Calle="'.$carta->CalleRemitente.'" Pais="MEX" Estado="'.$carta->EstadoRemitente.'" CodigoPostal="'.$carta->CodigoPostalRemitente.'"/>'.
-                                '</cartaporte20:Ubicacion>'.
-                                '<cartaporte20:Ubicacion TipoUbicacion="Destino" IDUbicacion="DE000456" RFCRemitenteDestinatario="'.$carta->RfcDestinatario.'" NombreRemitenteDestinatario="'.$carta->NombreDestinatario.'" FechaHoraSalidaLlegada="'.$llegadaarray[0].'T'.$llegadaarray[1].'" DistanciaRecorrida="'.$carta->TotalDistanciaRecorrida.'">'.
-                                    '<cartaporte20:Domicilio Municipio="'.$municipioDe->Clave.'" Calle="'.$carta->CalleDestinatario.'" Pais="MEX" Estado="'.$carta->EstadoDestinatario.'" CodigoPostal="'.$carta->CodigoPostalDestinatario.'"/>'.
-                                '</cartaporte20:Ubicacion>'.
-                            '</cartaporte20:Ubicaciones>'.
-                            '<cartaporte20:Mercancias PesoBrutoTotal="'.$carta->PesoBrutoTotal.'" UnidadPeso="KGM" NumTotalMercancias="'.$carta->TotalMercancias.'">'.
-                                $bienesTransportados.
-                                '<cartaporte20:Autotransporte PermSCT="TPXX00" NumPermisoSCT="TPXX00">'.
-                                    '<cartaporte20:IdentificacionVehicular ConfigVehicular="'.$carta->ConfiguracionVehicular.'" PlacaVM="'.$carta->PlacaVehiculoMotor.'" AnioModeloVM="'.$carta->AnoModeloVehiculoMotor.'"/>'.
-                                    '<cartaporte20:Seguros AseguraRespCivil="'.$carta->NombreAsegurado.'" PolizaRespCivil="'.$carta->NumeroPolizaSeguro.'"/>'.
-                                '</cartaporte20:Autotransporte>'.
-                            '</cartaporte20:Mercancias>'.
-                            '<cartaporte20:FiguraTransporte>'.
-                                '<cartaporte20:TiposFigura TipoFigura="'.$carta->ClaveTransporte.'" RFCFigura="'.$carta->RfcOperador.'" NumLicencia="'.$carta->NumeroLicencia.'" NombreFigura="'.$carta->NombreOperador.'">'.
-                                '</cartaporte20:TiposFigura>'.
-                            '</cartaporte20:FiguraTransporte>'.
-                        '</cartaporte20:CartaPorte>'
-                    )
-                ),
+                        "complements" => array(
+                            //"type" => "P",
+                            array(
+                                "type" => "custom",
+                                "data" => "<?xml version='1.0' standalone='yes'?>".
+                                '<cartaporte20:CartaPorte Version="2.0" TranspInternac="No" TotalDistRec="'.$carta->TotalDistanciaRecorrida.'">'.
+                                    '<cartaporte20:Ubicaciones>'.
+                                        '<cartaporte20:Ubicacion TipoUbicacion="Origen" IDUbicacion="OR000123" RFCRemitenteDestinatario="'.$carta->RfcRemitente.'" NombreRemitenteDestinatario="'.$this->empresa->Nombre.'" FechaHoraSalidaLlegada="'.$salidaarray[0].'T'.$salidaarray[1].'">'.
+                                            '<cartaporte20:Domicilio Municipio="'.$municipioRe->Clave.'" Calle="'.$carta->CalleRemitente.'" Pais="MEX" Estado="'.$carta->EstadoRemitente.'" CodigoPostal="'.$carta->CodigoPostalRemitente.'"/>'.
+                                        '</cartaporte20:Ubicacion>'.
+                                        '<cartaporte20:Ubicacion TipoUbicacion="Destino" IDUbicacion="DE000456" RFCRemitenteDestinatario="'.$carta->RfcDestinatario.'" NombreRemitenteDestinatario="'.$carta->NombreDestinatario.'" FechaHoraSalidaLlegada="'.$llegadaarray[0].'T'.$llegadaarray[1].'" DistanciaRecorrida="'.$carta->TotalDistanciaRecorrida.'">'.
+                                            '<cartaporte20:Domicilio Municipio="'.$municipioDe->Clave.'" Calle="'.$carta->CalleDestinatario.'" Pais="MEX" Estado="'.$carta->EstadoDestinatario.'" CodigoPostal="'.$carta->CodigoPostalDestinatario.'"/>'.
+                                        '</cartaporte20:Ubicacion>'.
+                                    '</cartaporte20:Ubicaciones>'.
+                                    '<cartaporte20:Mercancias PesoBrutoTotal="'.$carta->PesoBrutoTotal.'" UnidadPeso="KGM" NumTotalMercancias="'.$carta->TotalMercancias.'">'.
+                                        $bienesTransportados.
+                                        '<cartaporte20:Autotransporte PermSCT="TPXX00" NumPermisoSCT="TPXX00">'.
+                                            '<cartaporte20:IdentificacionVehicular ConfigVehicular="'.$carta->ConfiguracionVehicular.'" PlacaVM="'.$carta->PlacaVehiculoMotor.'" AnioModeloVM="'.$carta->AnoModeloVehiculoMotor.'"/>'.
+                                            '<cartaporte20:Seguros AseguraRespCivil="'.$carta->NombreAsegurado.'" PolizaRespCivil="'.$carta->NumeroPolizaSeguro.'"/>'.
+                                        '</cartaporte20:Autotransporte>'.
+                                    '</cartaporte20:Mercancias>'.
+                                    '<cartaporte20:FiguraTransporte>'.
+                                        '<cartaporte20:TiposFigura TipoFigura="'.$carta->ClaveTransporte.'" RFCFigura="'.$carta->RfcOperador.'" NumLicencia="'.$carta->NumeroLicencia.'" NombreFigura="'.$carta->NombreOperador.'">'.
+                                        '</cartaporte20:TiposFigura>'.
+                                    '</cartaporte20:FiguraTransporte>'.
+                                '</cartaporte20:CartaPorte>'
+                            )
+                        ),
+                        "items" => $arraydet,
+                        "folio_number" => $carta->Folio,
+                        "series" => $carta->Serie,
+                        "currency" => 'XXX',
+                        "use" => 'S01'
+                    );
+                    break;
+                default:
+                    $invoice = array(
+                        "type" => \Facturapi\InvoiceType::TRASLADO,
+                        "customer" => array(
+                            'legal_name' =>$carta->NombreRemitente,
+                            "tax_id" => $carta->RfcRemitente,
+                            "tax_system" => $carta->RegimenFiscal,
+                            "address" => array(
+                                "zip" => $carta->CodigoPostalRemitente
+                            )
+                        ),
+                        "related_documents" => array(
+                            array(
+                                "relationship" => '05',
+                                "documents" => $arraydoc
+                            )
+                        ),
 
-                // "pdf_custom_section" =>
-                // //Datos extra (Permisos)
-                // '<ul><li>Datos Auto Transporte</li></ul><br>'.
-                // '<table>'.
-                //     '<thead>'.
-                //         '<tr><th>Permiso de la SCT</th><th>Numero de Permiso</th></tr>'.
-                //     '</thead>'.
-                //     '<tbody>'.
-                //         '<tr>'.
-                //             '<td><b>'.$carta->PermisoSCT.'</b></td>'.
-                //             '<td><b>'.$carta->NumeroPermisoSCT.'</b></td>'.
-                //         '</tr>'.
-                //     '</tbody>'.
-                // '</table>'.
-                // //Datos extra (Autotransporte)
-                // '<ul><li>Datos Vehiculares</li></ul><br>'.
-                // '<table>'.
-                //     '<thead>'.
-                //         '<tr><th>Marca</th><th>Modelo</th><th>Año</th><th>Placa</th></tr>'.
-                //     '</thead>'.
-                //     '<tbody>'.
-                //         '<tr>'.
-                //             '<td><b>'.$vehiculo->Marca.'</b></td>'.
-                //             '<td><b>'.$vehiculo->Modelo.'</b></td>'.
-                //             '<td><b>'.$vehiculo->Año.'</b></td>'.
-                //             '<td><b>'.$vehiculo->Placa.'</b></td>'.
-                //         '</tr>'.
-                //     '</tbody>'.
-                //     '<tfoot>'.
-                //         '<tr>'.
-                //             '<th><b>Configuración vehicular </b></th>'.
-                //             '<th>'.$confVehicular->Clave.'(<b>'.$confVehicular->Descripcion.'</b>)</th>'.
-                //         '</tr>'.
-                //     '</tfoot>'.
-                // '</table>',
+                        // "pdf_custom_section" =>
+                        // //Datos extra (Permisos)
+                        // '<ul><li>Datos Auto Transporte</li></ul><br>'.
+                        // '<table>'.
+                        //     '<thead>'.
+                        //         '<tr><th>Permiso de la SCT</th><th>Numero de Permiso</th></tr>'.
+                        //     '</thead>'.
+                        //     '<tbody>'.
+                        //         '<tr>'.
+                        //             '<td><b>'.$carta->PermisoSCT.'</b></td>'.
+                        //             '<td><b>'.$carta->NumeroPermisoSCT.'</b></td>'.
+                        //         '</tr>'.
+                        //     '</tbody>'.
+                        // '</table>'.
+                        // //Datos extra (Autotransporte)
+                        // '<ul><li>Datos Vehiculares</li></ul><br>'.
+                        // '<table>'.
+                        //     '<thead>'.
+                        //         '<tr><th>Marca</th><th>Modelo</th><th>Año</th><th>Placa</th></tr>'.
+                        //     '</thead>'.
+                        //     '<tbody>'.
+                        //         '<tr>'.
+                        //             '<td><b>'.$vehiculo->Marca.'</b></td>'.
+                        //             '<td><b>'.$vehiculo->Modelo.'</b></td>'.
+                        //             '<td><b>'.$vehiculo->Año.'</b></td>'.
+                        //             '<td><b>'.$vehiculo->Placa.'</b></td>'.
+                        //         '</tr>'.
+                        //     '</tbody>'.
+                        //     '<tfoot>'.
+                        //         '<tr>'.
+                        //             '<th><b>Configuración vehicular </b></th>'.
+                        //             '<th>'.$confVehicular->Clave.'(<b>'.$confVehicular->Descripcion.'</b>)</th>'.
+                        //         '</tr>'.
+                        //     '</tfoot>'.
+                        // '</table>',
 
-                "namespaces" => array(
-                    array(
-                        "prefix" => 'cartaporte20',
-                        "uri" => 'http://www.sat.gob.mx/CartaPorte20',
-                        "schema_location" => "http://www.sat.gob.mx/CartaPorte20 http://www.sat.gob.mx/sitio_internet/cfd/CartaPorte/CartaPorte20.xsd"
+                        "namespaces" => array(
+                            array(
+                                "prefix" => 'cartaporte20',
+                                "uri" => 'http://www.sat.gob.mx/CartaPorte20',
+                                "schema_location" => "http://www.sat.gob.mx/CartaPorte20 http://www.sat.gob.mx/sitio_internet/cfd/CartaPorte/CartaPorte20.xsd"
 
-                    )
-                ),
-                "items" => $arraydet,
-                "folio_number" => $carta->Folio,
-                "series" => $carta->Serie,
-                "currency" => 'XXX',
-                "use" => 'S01'
-            );
+                            )
+                        ),
+                        "items" => $arraydet,
+                        "folio_number" => $carta->Folio,
+                        "series" => $carta->Serie,
+                        "currency" => 'XXX',
+                        "use" => 'S01'
+                    );
+                    break;
+            }
+
         }else{
-            $invoice = array(
-                "type" => \Facturapi\InvoiceType::TRASLADO,
-                "customer" => array(
-                    'legal_name' =>$carta->NombreRemitente,
-                    "tax_id" => $carta->RfcRemitente,
-                    "tax_system" => $carta->RegimenFiscal,
-                    "address" => array(
-                        "zip" => $carta->CodigoPostalRemitente
-                    )
-                ),
+            switch ((int)$carta->carreteraFederal) {
+                case 1:
+                    $invoice = array(
+                        "type" => \Facturapi\InvoiceType::TRASLADO,
+                        "customer" => array(
+                            'legal_name' =>$carta->NombreRemitente,
+                            "tax_id" => $carta->RfcRemitente,
+                            "tax_system" => $carta->RegimenFiscal,
+                            "address" => array(
+                                "zip" => $carta->CodigoPostalRemitente
+                            )
+                        ),
 
-                // "pdf_custom_section" =>
-                //     //Datos extra (Permisos)
-                //     '<ul><li>Datos Auto Transporte</li></ul><br>'.
-                //     '<table>'.
-                //         '<thead>'.
-                //             '<tr><th>Permiso de la SCT</th><th>Numero de Permiso</th></tr>'.
-                //         '</thead>'.
-                //         '<tbody>'.
-                //             '<tr>'.
-                //                 '<td><b>'.$carta->PermisoSCT.'</b></td>'.
-                //                 '<td><b>'.$carta->NumeroPermisoSCT.'</b></td>'.
-                //             '</tr>'.
-                //         '</tbody>'.
-                //     '</table> <br>'.
-                //     //Datos extra (Autotransporte)
-                //     '<ul><li>Datos Vehiculares</li></ul><br>'.
-                //     '<table>'.
-                //         '<thead>'.
-                //             '<tr><th>Marca</th><th>Modelo</th><th>Año</th><th>Placa</th></tr>'.
-                //         '</thead>'.
-                //         '<tbody>'.
-                //             '<tr>'.
-                //                 '<td><b>'.$vehiculo->Marca.'</b></td>'.
-                //                 '<td><b>'.$vehiculo->Modelo.'</b></td>'.
-                //                 '<td><b>'.$vehiculo->Año.'</b></td>'.
-                //                 '<td><b>'.$vehiculo->Placa.'</b></td>'.
-                //             '</tr>'.
-                //         '</tbody>'.
-                //         '<tfoot>'.
-                //             '<tr>'.
-                //                 '<th><b></b></th>'.
-                //                 '<th></th>'.
-                //             '</tr>'.
-                //             '<tr>'.
-                //                 '<th><b>Configuración vehicular </b></th>'.
-                //                 '<th>'.$confVehicular->Clave.'; '.$confVehicular->Descripcion.'</th>'.
-                //             '</tr>'.
-                //         '</tfoot>'.
-                //     '</table>',
+                        // "pdf_custom_section" =>
+                        //     //Datos extra (Permisos)
+                        //     '<ul><li>Datos Auto Transporte</li></ul><br>'.
+                        //     '<table>'.
+                        //         '<thead>'.
+                        //             '<tr><th>Permiso de la SCT</th><th>Numero de Permiso</th></tr>'.
+                        //         '</thead>'.
+                        //         '<tbody>'.
+                        //             '<tr>'.
+                        //                 '<td><b>'.$carta->PermisoSCT.'</b></td>'.
+                        //                 '<td><b>'.$carta->NumeroPermisoSCT.'</b></td>'.
+                        //             '</tr>'.
+                        //         '</tbody>'.
+                        //     '</table> <br>'.
+                        //     //Datos extra (Autotransporte)
+                        //     '<ul><li>Datos Vehiculares</li></ul><br>'.
+                        //     '<table>'.
+                        //         '<thead>'.
+                        //             '<tr><th>Marca</th><th>Modelo</th><th>Año</th><th>Placa</th></tr>'.
+                        //         '</thead>'.
+                        //         '<tbody>'.
+                        //             '<tr>'.
+                        //                 '<td><b>'.$vehiculo->Marca.'</b></td>'.
+                        //                 '<td><b>'.$vehiculo->Modelo.'</b></td>'.
+                        //                 '<td><b>'.$vehiculo->Año.'</b></td>'.
+                        //                 '<td><b>'.$vehiculo->Placa.'</b></td>'.
+                        //             '</tr>'.
+                        //         '</tbody>'.
+                        //         '<tfoot>'.
+                        //             '<tr>'.
+                        //                 '<th><b></b></th>'.
+                        //                 '<th></th>'.
+                        //             '</tr>'.
+                        //             '<tr>'.
+                        //                 '<th><b>Configuración vehicular </b></th>'.
+                        //                 '<th>'.$confVehicular->Clave.'; '.$confVehicular->Descripcion.'</th>'.
+                        //             '</tr>'.
+                        //         '</tfoot>'.
+                        //     '</table>',
 
-                "complements" => array(
-                    //"type" => "P",
-                    array(
-                        "type" => "custom",
-                        "data" => "<?xml version='1.0' standalone='yes'?>".
-                        '<cartaporte20:CartaPorte Version="2.0" TranspInternac="No" TotalDistRec="'.$carta->TotalDistanciaRecorrida.'">'.
-                            '<cartaporte20:Ubicaciones>'.
-                                '<cartaporte20:Ubicacion TipoUbicacion="Origen" IDUbicacion="OR000123" RFCRemitenteDestinatario="'.$carta->RfcRemitente.'" NombreRemitenteDestinatario="'.$this->empresa->Nombre.'" FechaHoraSalidaLlegada="'.$salidaarray[0].'T'.$salidaarray[1].'">'.
-                                    '<cartaporte20:Domicilio Municipio="'.$municipioRe->Clave.'" Calle="'.$carta->CalleRemitente.'" Pais="MEX" Estado="'.$carta->EstadoRemitente.'" CodigoPostal="'.$carta->CodigoPostalRemitente.'"/>'.
-                                '</cartaporte20:Ubicacion>'.
-                                '<cartaporte20:Ubicacion TipoUbicacion="Destino" IDUbicacion="DE000456" RFCRemitenteDestinatario="'.$carta->RfcDestinatario.'" NombreRemitenteDestinatario="'.$carta->NombreDestinatario.'" FechaHoraSalidaLlegada="'.$llegadaarray[0].'T'.$llegadaarray[1].'" DistanciaRecorrida="'.$carta->TotalDistanciaRecorrida.'">'.
-                                    '<cartaporte20:Domicilio Municipio="'.$municipioDe->Clave.'" Calle="'.$carta->CalleDestinatario.'" Pais="MEX" Estado="'.$carta->EstadoDestinatario.'" CodigoPostal="'.$carta->CodigoPostalDestinatario.'"/>'.
-                                '</cartaporte20:Ubicacion>'.
-                            '</cartaporte20:Ubicaciones>'.
-                            '<cartaporte20:Mercancias PesoBrutoTotal="'.$carta->PesoBrutoTotal.'" UnidadPeso="KGM" NumTotalMercancias="'.$carta->TotalMercancias.'">'.
-                                $bienesTransportados.
-                                '<cartaporte20:Autotransporte PermSCT="TPXX00" NumPermisoSCT="TPXX00">'.
-                                    '<cartaporte20:IdentificacionVehicular ConfigVehicular="'.$carta->ConfiguracionVehicular.'" PlacaVM="'.$carta->PlacaVehiculoMotor.'" AnioModeloVM="'.$carta->AnoModeloVehiculoMotor.'"/>'.
-                                    '<cartaporte20:Seguros AseguraRespCivil="'.$carta->NombreAsegurado.'" PolizaRespCivil="'.$carta->NumeroPolizaSeguro.'"/>'.
-                                '</cartaporte20:Autotransporte>'.
-                            '</cartaporte20:Mercancias>'.
-                            '<cartaporte20:FiguraTransporte>'.
-                                '<cartaporte20:TiposFigura TipoFigura="'.$carta->ClaveTransporte.'" RFCFigura="'.$carta->RfcOperador.'" NumLicencia="'.$carta->NumeroLicencia.'" NombreFigura="'.$carta->NombreOperador.'">'.
-                                '</cartaporte20:TiposFigura>'.
-                            '</cartaporte20:FiguraTransporte>'.
-                        '</cartaporte20:CartaPorte>'
-                    )
-                ),
-                "namespaces" => array(
-                    array(
-                        "prefix" => 'cartaporte20',
-                        "uri" => 'http://www.sat.gob.mx/CartaPorte20',
-                        "schema_location" => "http://www.sat.gob.mx/CartaPorte20 http://www.sat.gob.mx/sitio_internet/cfd/CartaPorte/CartaPorte20.xsd"
+                        "complements" => array(
+                            //"type" => "P",
+                            array(
+                                "type" => "custom",
+                                "data" => "<?xml version='1.0' standalone='yes'?>".
+                                '<cartaporte20:CartaPorte Version="2.0" TranspInternac="No" TotalDistRec="'.$carta->TotalDistanciaRecorrida.'">'.
+                                    '<cartaporte20:Ubicaciones>'.
+                                        '<cartaporte20:Ubicacion TipoUbicacion="Origen" IDUbicacion="OR000123" RFCRemitenteDestinatario="'.$carta->RfcRemitente.'" NombreRemitenteDestinatario="'.$this->empresa->Nombre.'" FechaHoraSalidaLlegada="'.$salidaarray[0].'T'.$salidaarray[1].'">'.
+                                            '<cartaporte20:Domicilio Municipio="'.$municipioRe->Clave.'" Calle="'.$carta->CalleRemitente.'" Pais="MEX" Estado="'.$carta->EstadoRemitente.'" CodigoPostal="'.$carta->CodigoPostalRemitente.'"/>'.
+                                        '</cartaporte20:Ubicacion>'.
+                                        '<cartaporte20:Ubicacion TipoUbicacion="Destino" IDUbicacion="DE000456" RFCRemitenteDestinatario="'.$carta->RfcDestinatario.'" NombreRemitenteDestinatario="'.$carta->NombreDestinatario.'" FechaHoraSalidaLlegada="'.$llegadaarray[0].'T'.$llegadaarray[1].'" DistanciaRecorrida="'.$carta->TotalDistanciaRecorrida.'">'.
+                                            '<cartaporte20:Domicilio Municipio="'.$municipioDe->Clave.'" Calle="'.$carta->CalleDestinatario.'" Pais="MEX" Estado="'.$carta->EstadoDestinatario.'" CodigoPostal="'.$carta->CodigoPostalDestinatario.'"/>'.
+                                        '</cartaporte20:Ubicacion>'.
+                                    '</cartaporte20:Ubicaciones>'.
+                                    '<cartaporte20:Mercancias PesoBrutoTotal="'.$carta->PesoBrutoTotal.'" UnidadPeso="KGM" NumTotalMercancias="'.$carta->TotalMercancias.'">'.
+                                        $bienesTransportados.
+                                        '<cartaporte20:Autotransporte PermSCT="TPXX00" NumPermisoSCT="TPXX00">'.
+                                            '<cartaporte20:IdentificacionVehicular ConfigVehicular="'.$carta->ConfiguracionVehicular.'" PlacaVM="'.$carta->PlacaVehiculoMotor.'" AnioModeloVM="'.$carta->AnoModeloVehiculoMotor.'"/>'.
+                                            '<cartaporte20:Seguros AseguraRespCivil="'.$carta->NombreAsegurado.'" PolizaRespCivil="'.$carta->NumeroPolizaSeguro.'"/>'.
+                                        '</cartaporte20:Autotransporte>'.
+                                    '</cartaporte20:Mercancias>'.
+                                    '<cartaporte20:FiguraTransporte>'.
+                                        '<cartaporte20:TiposFigura TipoFigura="'.$carta->ClaveTransporte.'" RFCFigura="'.$carta->RfcOperador.'" NumLicencia="'.$carta->NumeroLicencia.'" NombreFigura="'.$carta->NombreOperador.'">'.
+                                        '</cartaporte20:TiposFigura>'.
+                                    '</cartaporte20:FiguraTransporte>'.
+                                '</cartaporte20:CartaPorte>'
+                            )
+                        ),
+                        "namespaces" => array(
+                            array(
+                                "prefix" => 'cartaporte20',
+                                "uri" => 'http://www.sat.gob.mx/CartaPorte20',
+                                "schema_location" => "http://www.sat.gob.mx/CartaPorte20 http://www.sat.gob.mx/sitio_internet/cfd/CartaPorte/CartaPorte20.xsd"
 
-                    )
-                ),
-                "items" => $arraydet,
-                "folio_number" => $carta->Folio,
-                "series" => $carta->Serie,
-                "currency" => 'XXX',
-                "use" => 'S01'
-            );
+                            )
+                        ),
+                        "items" => $arraydet,
+                        "folio_number" => $carta->Folio,
+                        "series" => $carta->Serie,
+                        "currency" => 'XXX',
+                        "use" => 'S01'
+                    );
+                    break;
+                default:
+                    $invoice = array(
+                        "type" => \Facturapi\InvoiceType::TRASLADO,
+                        "customer" => array(
+                            'legal_name' =>$carta->NombreRemitente,
+                            "tax_id" => $carta->RfcRemitente,
+                            "tax_system" => $carta->RegimenFiscal,
+                            "address" => array(
+                                "zip" => $carta->CodigoPostalRemitente
+                            )
+                        ),
+
+                        // "pdf_custom_section" =>
+                        //     //Datos extra (Permisos)
+                        //     '<ul><li>Datos Auto Transporte</li></ul><br>'.
+                        //     '<table>'.
+                        //         '<thead>'.
+                        //             '<tr><th>Permiso de la SCT</th><th>Numero de Permiso</th></tr>'.
+                        //         '</thead>'.
+                        //         '<tbody>'.
+                        //             '<tr>'.
+                        //                 '<td><b>'.$carta->PermisoSCT.'</b></td>'.
+                        //                 '<td><b>'.$carta->NumeroPermisoSCT.'</b></td>'.
+                        //             '</tr>'.
+                        //         '</tbody>'.
+                        //     '</table> <br>'.
+                        //     //Datos extra (Autotransporte)
+                        //     '<ul><li>Datos Vehiculares</li></ul><br>'.
+                        //     '<table>'.
+                        //         '<thead>'.
+                        //             '<tr><th>Marca</th><th>Modelo</th><th>Año</th><th>Placa</th></tr>'.
+                        //         '</thead>'.
+                        //         '<tbody>'.
+                        //             '<tr>'.
+                        //                 '<td><b>'.$vehiculo->Marca.'</b></td>'.
+                        //                 '<td><b>'.$vehiculo->Modelo.'</b></td>'.
+                        //                 '<td><b>'.$vehiculo->Año.'</b></td>'.
+                        //                 '<td><b>'.$vehiculo->Placa.'</b></td>'.
+                        //             '</tr>'.
+                        //         '</tbody>'.
+                        //         '<tfoot>'.
+                        //             '<tr>'.
+                        //                 '<th><b></b></th>'.
+                        //                 '<th></th>'.
+                        //             '</tr>'.
+                        //             '<tr>'.
+                        //                 '<th><b>Configuración vehicular </b></th>'.
+                        //                 '<th>'.$confVehicular->Clave.'; '.$confVehicular->Descripcion.'</th>'.
+                        //             '</tr>'.
+                        //         '</tfoot>'.
+                        //     '</table>',
+                        "items" => $arraydet,
+                        "folio_number" => $carta->Folio,
+                        "series" => $carta->Serie,
+                        "currency" => 'XXX',
+                        "use" => 'S01'
+                    );
+                    break;
+            }
+
         }
         $new_invoice = $this->facturapi->Invoices->create( $invoice );
         $result = json_encode($new_invoice);

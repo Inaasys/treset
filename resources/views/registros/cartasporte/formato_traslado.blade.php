@@ -64,7 +64,8 @@
                     </div>
                     <div style="width:45%; height:110px; float:left; text-align: left; border-style: groove;">
                         <ul style="list-style:none;margin-left:-35px;margin-top:5px;">
-                            <li style="font-size:18px; margin-left: 5px;"><b>Carta Porte:</b> <b style="color:red">{{$cartaporte->CartaPorte}}</b></li>
+                            <li style="font-size:18px; margin-left: 5px;"><b>FOLIO:</b> <b style="color:red">{{$cartaporte->CartaPorte}}</b></li>
+                            <li style="font-size:10px; margin-left: 5px;">Efecto de comprobante: Traslado</li>
                             <li style="font-size:10px; margin-left: 5px;">UsoCfdi: {{$usocfdi->Clave .' '.$usocfdi->Nombre}}</li>
                             <li style="font-size:10px; margin-left: 5px;">Emitida: {{$cartaporte->FechaTimbrado}}</li>
                         </ul>
@@ -100,9 +101,34 @@
                                     <td colspan="4"><b>Peso Bruto Total: </b>{{ $detalle['pesoBruto']}} KG Peso Unitario: {{$detalle['pesounitario']}} KG</td>
                                 </tr>
                             @endforeach
+                            <tr>
+                                <td colspan="4" style="font-size:10px"></td>
+                                <td style="font-size:11px;text-align: right;">SubTotal $ : </td>
+                                <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"> <b>{{ number_format(0, $numerodecimalesdocumento) }}</b></td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" style="font-size:10px"></td>
+                                <td style="font-size:11px;text-align: right;">Total $ : </td>
+                                <td colspan="2" style="font-size:11px;text-align: right;background-color:#ddd;"> <b>{{ number_format(0, $numerodecimalesdocumento) }}</b></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
+                @if ($cartaporte->carreteraFederal)
+                    <div id ="contenedor" style="margin-top:10px;">
+                        <div style="width:100%;">
+                            <table style="width: 100%;max-width: 100%;border: 1px solid #ddd;">
+                                <tr style="background-color:#a6a6b3;font-size:9px;">
+                                    <td style="font-size:9px;">Carta Porte</td>
+                                </tr>
+                                <tr style="text-align:justify;font-size:9px;">
+                                    <td style="font-size:9px;">
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                @endif
                 <div id ="contenedor" style="margin-top:20px;">
                     <div style="width:100%;">
                         <table style="width: 100%;max-width: 100%;">
@@ -116,7 +142,82 @@
                         </table>
                     </div>
                 </div>
-
+                <div id ="contenedor" style="margin-top:10px;">
+                    <div style="width:100%;">
+                        <table style="width: 100%;max-width: 100%;">
+                            <tr><td style="font-size:9px;">{{$regimenEmisor->Clave}} {{$regimenEmisor->Nombre}}</td></tr>
+                        </table>
+                    </div>
+                </div>
+                <div id ="contenedor" style="margin-top:10px;">
+                    <div style="width:100%;">
+                        <table style="width: 100%;max-width: 100%;">
+                            <tr>
+                                <td style="font-size:9px;">Folio Fiscal / UUID:</td>
+                                <td style="font-size:9px;">Fecha Timbrado:</td>
+                                <td style="font-size:9px;">Certificado SAT:</td>
+                                <td style="font-size:9px;">Certificado del Emisor:</td>
+                            </tr>
+                            @if($comprobantetimbrado > 0)
+                                <tr>
+                                    <td style="font-size:9px;">{{$comprobante->UUID}}</td>
+                                    <td style="font-size:9px;">{{$comprobante->Fecha}}</td>
+                                    <td style="font-size:9px;">{{$comprobante->CertificadoSAT}}</td>
+                                    <td style="font-size:9px;">{{$comprobante->CertificadoCFD}}</td>
+                                </tr>
+                            @endif
+                        </table>
+                    </div>
+                </div>
+                <div id ="contenedor" style="margin-top:10px;">
+                    <div style="width:100%;">
+                        <table style="width: 100%;max-width: 100%;">
+                            <tbody style="font-size:9px; text-align: justify;">
+                                <tr>
+                                    <td style="font-size:9px;">Sello Digital CFD:</td>
+                                    @if($comprobantetimbrado > 0)
+                                        <td rowspan="4">
+                                            @if($comprobante->UrlVerificarCfdi != "")
+                                                {!!QrCode::size(150)->margin(0)->generate($comprobante->UrlVerificarCfdi) !!}
+                                            @else
+                                                {!!QrCode::size(150)->margin(0)->generate("https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx") !!}
+                                            @endif
+                                        </td>
+                                    @endif
+                                </tr>
+                                @if($comprobantetimbrado > 0)
+                                    <tr>
+                                        <td style="font-size:9px;"><div style="width:700px;white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;">{{$comprobante->selloCFD}}</div></td>
+                                    </tr>
+                                @endif
+                                <tr>
+                                    <td style="font-size:9px;">Sello Digital SAT:</td>
+                                </tr>
+                                @if($comprobantetimbrado > 0)
+                                    <tr>
+                                        <td style="font-size:9px;"><div style="width:700px;white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;">{{$comprobante->selloSAT}}</div></td>
+                                    </tr>
+                                @endif
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id ="contenedor" style="margin-top:10px;">
+                        <div style="width:100%;">
+                            <table style="width: 100%;max-width: 100%;">
+                                <tbody style="font-size:9px; text-align: justify;">
+                                    <tr>
+                                        <td style="font-size:9px;">Cadena Original del Complemento de Certificación Digital del SAT:</td>
+                                    </tr>
+                                    @if($comprobantetimbrado > 0)
+                                        <tr>
+                                            <td style="font-size:9px;"><div style="width:915px;white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;">{{$comprobante->CadenaOriginal}}</div></td>
+                                        </tr>
+                                    @endif
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </section>
         </div>
     </body>

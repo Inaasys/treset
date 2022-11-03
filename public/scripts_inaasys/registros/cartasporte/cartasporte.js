@@ -3203,6 +3203,14 @@ function alta(){
   $("#titulomodal").html('Alta Carta Porte');
   mostrarmodalformulario('ALTA', 1);
   mostrarformulario();
+    let carreteraFederal = 0
+    let otrosTab = ''
+    let required = ''
+    if (confirm("¿Requiere Complemento Carta Porte") == true) {
+        carreteraFederal = 1;
+        otrosTab = 'hidden'
+        required = ' required '
+    }
   //formulario alta
   var tabs =    '<div class="row">'+
                     '<div class="col-md-12">'+
@@ -3211,7 +3219,7 @@ function alta(){
                                 '<a href="#cartaportetab" data-toggle="tab">Carta Porte</a>'+
                             '</li>'+
                             '<li role="presentation">'+
-                                '<a href="#origentab" data-toggle="tab">Datos Remitente</a>'+
+                                '<a href="#origentab" data-toggle="tab" hidden>Datos Remitente</a>'+
                             '</li>'+
                             '<li role="presentation">'+
                                 '<a href="#destinotab" data-toggle="tab">Datos Destinatario</a>'+
@@ -3227,6 +3235,7 @@ function alta(){
                             '<div role="tabpanel" class="tab-pane fade in active" id="cartaportetab">'+
                                 '<div class="row">'+
                                     '<div class="col-md-3">'+
+                                        '<input type="hidden" name="carreteraFederal" id="carreteraFederal" value="'+carreteraFederal+'">'+
                                         '<label>Nota <b style="color:#F44336 !important;" id="serietexto"> Serie: '+serieusuario+'</b>&nbsp;&nbsp; <b style="color:#F44336 !important;" id="esquematexto"> Esquema: '+esquema+'</b>  <div class="btn btn-xs bg-red waves-effect" id="btnobtenerfoliosnotas" onclick="obtenerfoliosnotas()">Cambiar</div></label>'+
                                         '<input type="text" class="form-control inputnextdet" name="folio" id="folio" required readonly onkeyup="tipoLetra(this);">'+
                                         '<input type="hidden" class="form-control" name="serie" id="serie" value="'+serieusuario+'" required readonly data-parsley-length="[1, 10]">'+
@@ -3235,7 +3244,6 @@ function alta(){
                                         '<input type="hidden" class="form-control" name="numerofilas" id="numerofilas" readonly>'+
                                         '<input type="hidden" class="form-control" name="numerofilasfacturas" id="numerofilasfacturas" readonly>'+
                                         '<input type="hidden" class="form-control" name="tipodetalles" id="tipodetalles" readonly>'+
-                                        '<input type="hidden" class="form-control" name="diferenciatotales" id="diferenciatotales" readonly required>'+
                                         '<input type="hidden" class="form-control" name="esquema" id="esquema" value="'+esquema+'" readonly data-parsley-length="[1, 10]">'+
                                         '<input type="hidden" class="form-control" name="lugarexpedicion" id="lugarexpedicion" value="'+lugarexpedicion+'" readonly>'+
                                         '<input type="hidden" class="form-control" name="claveregimenfiscal" id="claveregimenfiscal" value="'+claveregimenfiscal+'" readonly>'+
@@ -3439,7 +3447,7 @@ function alta(){
                               '<div class="row">'+
                                   '<div class="col-md-2">'+
                                       '<label>R.F.C.</label>'+
-                                      '<input type="text" class="form-control inputnextdet" name="rfcdestinatario" id="rfcdestinatario"  required readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                      '<input type="text" class="form-control inputnextdet" name="rfcdestinatario" id="rfcdestinatario" readonly data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                   '</div>'+
                                   '<div class="col-md-4">'+
                                       '<label>Nombre</label>'+
@@ -3558,9 +3566,9 @@ function alta(){
                                       '</td>'+
                                       '<td>'+
                                         '<div class="form-line">'+
-                                          '<input type="text" class="form-control inputnextdet" name="numerovehiculoempresa" id="numerovehiculoempresa" required data-parsley-type="integer" autocomplete="off">'+
-                                          '<input type="hidden" class="form-control" name="numerovehiculoempresaanterior" id="numerovehiculoempresaanterior" required data-parsley-type="integer">'+
-                                          '<input type="hidden" class="form-control" name="vehiculoempresa" id="vehiculoempresa" required readonly>'+
+                                          '<input type="text" class="form-control inputnextdet" name="numerovehiculoempresa" id="numerovehiculoempresa"'+required+' data-parsley-type="integer" autocomplete="off">'+
+                                          '<input type="hidden" class="form-control" name="numerovehiculoempresaanterior" id="numerovehiculoempresaanterior"'+required+' data-parsley-type="integer">'+
+                                          '<input type="hidden" class="form-control" name="vehiculoempresa" id="vehiculoempresa"'+required+' readonly>'+
                                         '</div>'+
                                       '</td>'+
                                     '</tr>'+
@@ -3568,19 +3576,19 @@ function alta(){
                                 '</div>'+
                                 '<div class="col-md-2">'+
                                     '<label>Permiso de la SCT</label>'+
-                                    '<input type="text" class="form-control inputnextdet" name="permisosct" value="TPX00" id="permisosct" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '<input type="text" class="form-control inputnextdet" name="permisosct" value="TPX00" id="permisosct"'+required+' data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                                 '<div class="col-md-2">'+
                                     '<label>Número de Permiso de la SCT</label>'+
-                                    '<input type="text" class="form-control inputnextdet" name="numeropermisosct" value="TPX00" id="numeropermisosct" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '<input type="text" class="form-control inputnextdet" name="numeropermisosct" value="TPX00" id="numeropermisosct"'+required+'d data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                                 '<div class="col-md-2">'+
                                     '<label>Nombre de Aseguradora</label>'+
-                                    '<input type="text" class="form-control inputnextdet" name="nombreaseguradora" id="nombreaseguradora" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '<input type="text" class="form-control inputnextdet" name="nombreaseguradora" id="nombreaseguradora"'+required+' data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                                 '<div class="col-md-2">'+
                                     '<label>Número de Póliza de Seguro</label>'+
-                                    '<input type="text" class="form-control inputnextdet" name="numeropolizaseguro" id="numeropolizaseguro" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '<input type="text" class="form-control inputnextdet" name="numeropolizaseguro" id="numeropolizaseguro"'+required+' data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                               '</div>'+
                               '<div class="row">'+
@@ -3593,9 +3601,9 @@ function alta(){
                                       '</td>'+
                                       '<td>'+
                                         '<div class="form-line">'+
-                                          '<input type="text" class="form-control inputnextdet" name="claveconfigautotransporte" id="claveconfigautotransporte" required autocomplete="off" onkeyup="tipoLetra(this);">'+
-                                          '<input type="hidden" class="form-control" name="claveconfigautotransporteanterior" id="claveconfigautotransporteanterior" required data-parsley-type="integer">'+
-                                          '<input type="hidden" class="form-control" name="configautotransporte" id="configautotransporte" required readonly>'+
+                                          '<input type="text" class="form-control inputnextdet" name="claveconfigautotransporte" id="claveconfigautotransporte"'+required+' autocomplete="off" onkeyup="tipoLetra(this);">'+
+                                          '<input type="hidden" class="form-control" name="claveconfigautotransporteanterior" id="claveconfigautotransporteanterior"'+required+' data-parsley-type="integer">'+
+                                          '<input type="hidden" class="form-control" name="configautotransporte" id="configautotransporte"'+required+' readonly>'+
                                         '</div>'+
                                       '</td>'+
                                     '</tr>'+
@@ -3603,19 +3611,19 @@ function alta(){
                                 '</div>'+
                                 '<div class="col-md-2">'+
                                     '<label>Placa Vehículo Motor</label>'+
-                                    '<input type="text" class="form-control inputnextdet" name="placavehiculo" id="placavehiculo" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '<input type="text" class="form-control inputnextdet" name="placavehiculo" id="placavehiculo"'+required+' data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                                 '<div class="col-md-2">'+
                                     '<label>Año Modelo Vehículo Motor</label>'+
-                                    '<input type="text" class="form-control inputnextdet" name="anovehiculo" id="anovehiculo" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '<input type="text" class="form-control inputnextdet" name="anovehiculo" id="anovehiculo"'+required+' data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                                 '<div class="col-md-2">'+
                                     '<label>SubTipo de Remolque</label>'+
-                                    '<input type="text" class="form-control inputnextdet" name="subtiporemolque" id="subtiporemolque" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '<input type="text" class="form-control inputnextdet" name="subtiporemolque" id="subtiporemolque"'+required+' data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                                 '<div class="col-md-2">'+
                                     '<label>Placa Remolque</label>'+
-                                    '<input type="text" class="form-control inputnextdet" name="placaremolque" id="placaremolque" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '<input type="text" class="form-control inputnextdet" name="placaremolque" id="placaremolque"'+required+' data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                               '</div>'+
                             '</div>'+
@@ -3630,9 +3638,9 @@ function alta(){
                                       '</td>'+
                                       '<td>'+
                                         '<div class="form-line">'+
-                                          '<input type="text" class="form-control inputnextdet" name="numerooperador" id="numerooperador" required data-parsley-type="integer" autocomplete="off">'+
-                                          '<input type="hidden" class="form-control" name="numerooperadoranterior" id="numerooperadoranterior" required data-parsley-type="integer">'+
-                                          '<input type="hidden" class="form-control" name="operador" id="operador" required readonly>'+
+                                          '<input type="text" class="form-control inputnextdet" name="numerooperador" id="numerooperador"'+required+' data-parsley-type="integer" autocomplete="off">'+
+                                          '<input type="hidden" class="form-control" name="numerooperadoranterior" id="numerooperadoranterior"'+required+' data-parsley-type="integer">'+
+                                          '<input type="hidden" class="form-control" name="operador" id="operador"'+required+' readonly>'+
                                         '</div>'+
                                       '</td>'+
                                     '</tr>'+
@@ -3647,9 +3655,9 @@ function alta(){
                                       '</td>'+
                                       '<td>'+
                                         '<div class="form-line">'+
-                                          '<input type="text" class="form-control inputnextdet" name="clavetransporte" id="clavetransporte" required autocomplete="off">'+
-                                          '<input type="hidden" class="form-control" name="clavetransporteanterior" id="clavetransporteanterior" required data-parsley-type="integer">'+
-                                          '<input type="hidden" class="form-control" name="nombreclavetransporte" id="nombreclavetransporte" required readonly>'+
+                                          '<input type="text" class="form-control inputnextdet" name="clavetransporte" id="clavetransporte"'+required+' autocomplete="off">'+
+                                          '<input type="hidden" class="form-control" name="clavetransporteanterior" id="clavetransporteanterior"'+required+' data-parsley-type="integer">'+
+                                          '<input type="hidden" class="form-control" name="nombreclavetransporte" id="nombreclavetransporte"'+required+' readonly>'+
                                         '</div>'+
                                       '</td>'+
                                     '</tr>'+
@@ -3657,41 +3665,41 @@ function alta(){
                                 '</div>'+
                                 '<div class="col-md-2">'+
                                     '<label>R.F.C.</label>'+
-                                    '<input type="text" class="form-control inputnextdet" name="rfcoperador" id="rfcoperador" required data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
+                                    '<input type="text" class="form-control inputnextdet" name="rfcoperador" id="rfcoperador"'+required+' data-parsley-regexrfc="^[A-Z,0-9]{12,13}$" data-parsley-length="[1, 20]" onkeyup="tipoLetra(this);mayusculas(this);">'+
                                 '</div>'+
                                 '<div class="col-md-2">'+
                                     '<label>Nombre</label>'+
-                                    '<input type="text" class="form-control inputnextdet" name="nombreoperador" id="nombreoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '<input type="text" class="form-control inputnextdet" name="nombreoperador" id="nombreoperador"'+required+' data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                                 '<div class="col-md-2">'+
                                     '<label>Número de Licencia</label>'+
-                                    '<input type="text" class="form-control inputnextdet" name="numerolicenciaoperador" id="numerolicenciaoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '<input type="text" class="form-control inputnextdet" name="numerolicenciaoperador" id="numerolicenciaoperador"'+required+' data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                               '</div>'+
                               '<div class="row">'+
                                 '<div class="col-md-4">'+
                                     '<label>Calle</label>'+
-                                    '<input type="text" class="form-control inputnextdet" name="calleoperador" id="calleoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '<input type="text" class="form-control inputnextdet" name="calleoperador" id="calleoperador" '+required+' data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                                 '<div class="col-md-1">'+
                                     '<label>Número Ext</label>'+
-                                    '<input type="text" class="form-control inputnextdet" name="numeroextoperador" id="numeroextoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '<input type="text" class="form-control inputnextdet" name="numeroextoperador" id="numeroextoperador" '+required+' data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                                 '<div class="col-md-1">'+
                                     '<label>Número Int</label>'+
-                                    '<input type="text" class="form-control inputnextdet" name="numerointoperador" id="numerointoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '<input type="text" class="form-control inputnextdet" name="numerointoperador" id="numerointoperador" '+required+' data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                                 '<div class="col-md-2">'+
                                     '<label>Colonia</label>'+
-                                    '<input type="text" class="form-control inputnextdet" name="coloniaoperador" id="coloniaoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '<input type="text" class="form-control inputnextdet" name="coloniaoperador" id="coloniaoperador"'+required+' data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                                 '<div class="col-md-2">'+
                                     '<label>Localidad</label>'+
-                                    '<input type="text" class="form-control inputnextdet" name="localidadoperador" id="localidadoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '<input type="text" class="form-control inputnextdet" name="localidadoperador" id="localidadoperador"'+required+' data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                                 '<div class="col-md-2">'+
                                     '<label>Referencia</label>'+
-                                    '<input type="text" class="form-control inputnextdet" name="referenciaoperador" id="referenciaoperador" required data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
+                                    '<input type="text" class="form-control inputnextdet" name="referenciaoperador" id="referenciaoperador"'+required+' data-parsley-length="[1, 150]" onkeyup="tipoLetra(this);">'+
                                 '</div>'+
                               '</div>'+
                               '<div class="row">'+
@@ -3704,9 +3712,9 @@ function alta(){
                                     '</td>'+
                                     '<td>'+
                                       '<div class="form-line">'+
-                                        '<input type="hidden" class="form-control" name="numeromunicipiooperador" id="numeromunicipiooperador" required data-parsley-type="integer" autocomplete="off">'+
-                                        '<input type="hidden" class="form-control" name="numeromunicipiooperadoranterior" id="numeromunicipiooperadoranterior" required data-parsley-type="integer">'+
-                                        '<input type="text" class="form-control inputnextdet" name="municipiooperador" id="municipiooperador" required>'+
+                                        '<input type="hidden" class="form-control" name="numeromunicipiooperador" id="numeromunicipiooperador" '+required+' data-parsley-type="integer" autocomplete="off">'+
+                                        '<input type="hidden" class="form-control" name="numeromunicipiooperadoranterior" id="numeromunicipiooperadoranterior"'+required+' data-parsley-type="integer">'+
+                                        '<input type="text" class="form-control inputnextdet" name="municipiooperador" id="municipiooperador"'+required+'>'+
                                       '</div>'+
                                     '</td>'+
                                   '</tr>'+
@@ -3721,9 +3729,9 @@ function alta(){
                                     '</td>'+
                                     '<td>'+
                                       '<div class="form-line">'+
-                                        '<input type="hidden" class="form-control" name="numeroestadooperador" id="numeroestadooperador" required data-parsley-type="integer" autocomplete="off">'+
-                                        '<input type="hidden" class="form-control" name="numeroestadooperadoranterior" id="numeroestadooperadoranterior" required data-parsley-type="integer">'+
-                                        '<input type="text" class="form-control inputnextdet" name="estadooperador" id="estadooperador"  required>'+
+                                        '<input type="hidden" class="form-control" name="numeroestadooperador" id="numeroestadooperador"'+required+' data-parsley-type="integer" autocomplete="off">'+
+                                        '<input type="hidden" class="form-control" name="numeroestadooperadoranterior" id="numeroestadooperadoranterior"'+required+' data-parsley-type="integer">'+
+                                        '<input type="text" class="form-control inputnextdet" name="estadooperador" id="estadooperador"'+required+'>'+
                                       '</div>'+
                                     '</td>'+
                                   '</tr>'+
@@ -3738,9 +3746,9 @@ function alta(){
                                     '</td>'+
                                     '<td>'+
                                       '<div class="form-line">'+
-                                        '<input type="hidden" class="form-control" name="numeropaisoperador" id="numeropaisoperador" required data-parsley-type="integer" autocomplete="off">'+
-                                        '<input type="hidden" class="form-control" name="numeropaisoperadoranterior" id="numeropaisoperadoranterior" required data-parsley-type="integer">'+
-                                        '<input type="text" class="form-control inputnextdet" name="paisoperador" id="paisoperador"  required>'+
+                                        '<input type="hidden" class="form-control" name="numeropaisoperador" id="numeropaisoperador"'+required+' data-parsley-type="integer" autocomplete="off">'+
+                                        '<input type="hidden" class="form-control" name="numeropaisoperadoranterior" id="numeropaisoperadoranterior"'+required+' data-parsley-type="integer">'+
+                                        '<input type="text" class="form-control inputnextdet" name="paisoperador" id="paisoperador"'+required+'>'+
                                       '</div>'+
                                     '</td>'+
                                   '</tr>'+
@@ -3755,9 +3763,9 @@ function alta(){
                                     '</td>'+
                                     '<td>'+
                                       '<div class="form-line">'+
-                                        '<input type="hidden" class="form-control" name="numerocpoperador" id="numerocpoperador" required data-parsley-type="integer" autocomplete="off">'+
-                                        '<input type="hidden" class="form-control" name="numerocpoperadoranterior" id="numerocpoperadoranterior" required data-parsley-type="integer">'+
-                                        '<input type="text" class="form-control inputnextdet" name="cpoperador" id="cpoperador" required>'+
+                                        '<input type="hidden" class="form-control" name="numerocpoperador" id="numerocpoperador" '+required+' data-parsley-type="integer" autocomplete="off">'+
+                                        '<input type="hidden" class="form-control" name="numerocpoperadoranterior" id="numerocpoperadoranterior"'+required+' data-parsley-type="integer">'+
+                                        '<input type="text" class="form-control inputnextdet" name="cpoperador" id="cpoperador"'+required+'>'+
                                       '</div>'+
                                     '</td>'+
                                   '</tr>'+
@@ -4376,6 +4384,10 @@ function obtenerdatos(cartaporte){
   $('.page-loader-wrapper').css('display', 'block');
   $.get(carta_porte_obtener_carta_porte,{cartaporte:cartaporte },function(data){
     $("#titulomodal").html('Modificación Carta Porte --- STATUS : MODIFICACIÓN');
+    let required = ''
+    if (data.cartaporte.carreteraFederal) {
+        required = ' required'
+    }
     //formulario modificacion
     var tabs =    '<div class="row">'+
                     '<div class="col-md-12">'+
@@ -4913,9 +4925,9 @@ function obtenerdatos(cartaporte){
                                     '</td>'+
                                     '<td>'+
                                       '<div class="form-line">'+
-                                        '<input type="hidden" class="form-control" name="numeropaisoperador" id="numeropaisoperador" required data-parsley-type="integer" autocomplete="off">'+
-                                        '<input type="hidden" class="form-control" name="numeropaisoperadoranterior" id="numeropaisoperadoranterior" required data-parsley-type="integer">'+
-                                        '<input type="text" class="form-control inputnextdet" name="paisoperador" id="paisoperador"  required>'+
+                                        '<input type="hidden" class="form-control" name="numeropaisoperador" id="numeropaisoperador"'+required+' data-parsley-type="integer" autocomplete="off">'+
+                                        '<input type="hidden" class="form-control" name="numeropaisoperadoranterior" id="numeropaisoperadoranterior"'+required+'data-parsley-type="integer">'+
+                                        '<input type="text" class="form-control inputnextdet" name="paisoperador" id="paisoperador"'+required+'>'+
                                       '</div>'+
                                     '</td>'+
                                   '</tr>'+
@@ -4930,9 +4942,9 @@ function obtenerdatos(cartaporte){
                                     '</td>'+
                                     '<td>'+
                                       '<div class="form-line">'+
-                                        '<input type="hidden" class="form-control" name="numerocpoperador" id="numerocpoperador" required data-parsley-type="integer" autocomplete="off">'+
-                                        '<input type="hidden" class="form-control" name="numerocpoperadoranterior" id="numerocpoperadoranterior" required data-parsley-type="integer">'+
-                                        '<input type="text" class="form-control inputnextdet" name="cpoperador" id="cpoperador" required>'+
+                                        '<input type="hidden" class="form-control" name="numerocpoperador" id="numerocpoperador"'+required+'data-parsley-type="integer" autocomplete="off">'+
+                                        '<input type="hidden" class="form-control" name="numerocpoperadoranterior" id="numerocpoperadoranterior"'+required+' data-parsley-type="integer">'+
+                                        '<input type="text" class="form-control inputnextdet" name="cpoperador" id="cpoperador"'+required+'>'+
                                       '</div>'+
                                     '</td>'+
                                   '</tr>'+
@@ -5022,46 +5034,50 @@ function obtenerdatos(cartaporte){
     $('#estadodestinatario').val(data.cartaporte.EstadoDestinatario)
     $('#paisdestinatario').val(data.cliente.Pais)
     $('#cpdestinatario').val(data.cartaporte.CodigoPostalDestinatario)
-    //Datos transporte
-    $('#numerovehiculoempresa').val(data.vehiculoEmpresa.id)
-    $('#numerovehiculoempresaanterior').val(data.vehiculoEmpresa.id)
-    $('#textonombrevehiculoempresa').text(data.vehiculoEmpresa.Marca+' - '+data.vehiculoEmpresa.Modelo)
-    $('#vehiculoempresa').val(data.vehiculoEmpresa.Marca)
-    $('#permisosct').val(data.cartaporte.PermisoSCT)
-    $('#numeropermisosct').val(data.cartaporte.NumeroPermisoSCT)
-    $('#nombreaseguradora').val(data.cartaporte.NombreAsegurado)
-    $('#numeropolizaseguro').val(data.cartaporte.NumeroPolizaSeguro)
-    let cutStringConfAuto = data.configuracionVehicular.Descripcion.substr(0, 30)
-    $('#textonombreconfigautotransporte').text(cutStringConfAuto)
-    $('#claveconfigautotransporte').val(data.configuracionVehicular.Clave)
-    $('#claveconfigautotransporteanterior').val(data.configuracionVehicular.Clave)
-    $('#configautotransporte').val(data.configuracionVehicular.Numero)
-    $('#placavehiculo').val(data.cartaporte.PlacaVehiculoMotor)
-    $('#anovehiculo').val(data.cartaporte.AnoModeloVehiculoMotor)
-    $('#subtiporemolque').val(data.cartaporte.SubTipoRemolque)
-    $('#placaremolque').val(data.cartaporte.PlacaRemolque)
 
-    //Datos Operador
-    $('#textonombreoperador').text(data.Operador.Nombre)
-    $('#numerooperador').val(data.Operador.id)
-    $('#numerooperadoranterior').val(data.Operador.id)
-    $('#rfcoperador').val(data.Operador.Rfc)
-    $('#nombreoperador').val(data.Operador.Nombre)
-    $('#textonombreclavetransporte').text(data.clavetransporte.Descripcion)
-    $('#clavetransporte').val(data.clavetransporte.Clave)
-    $('#clavetransporteanterior').val(data.clavetransporte.Clave)
-    $('#nombreclavetransporte').val(data.clavetransporte.Descripcion)
-    $('#numerolicenciaoperador').val(data.cartaporte.NumeroLicencia)
-    $('#calleoperador').val(data.cartaporte.CalleOperador)
-    $('#numeroextoperador').val(data.cartaporte.NoExteriorOperador)
-    $('#numerointoperador').val(data.cartaporte.NoInteriorOperador)
-    $('#coloniaoperador').val(data.cartaporte.ColoniaOperador)
-    $('#localidadoperador').val(data.cartaporte.LocalidadOperador)
-    $('#referenciaoperador').val(data.cartaporte.ReferenciaOperador)
-    $('#municipiooperador').val(data.cartaporte.MunicipioOperador)
-    $('#estadooperador').val(data.cartaporte.EstadoOperador)
-    $('#paisoperador').val(data.cartaporte.PaisOperador)
-    $('#cpoperador').val(data.cartaporte.CodigoPostalOperador)
+    if (parseInt(data.cartaporte.carreteraFederal)) {
+        //Datos transporte
+        $('#numerovehiculoempresa').val(data.vehiculoEmpresa.id)
+        $('#numerovehiculoempresaanterior').val(data.vehiculoEmpresa.id)
+        $('#textonombrevehiculoempresa').text(data.vehiculoEmpresa.Marca+' - '+data.vehiculoEmpresa.Modelo)
+        $('#vehiculoempresa').val(data.vehiculoEmpresa.Marca)
+        $('#permisosct').val(data.cartaporte.PermisoSCT)
+        $('#numeropermisosct').val(data.cartaporte.NumeroPermisoSCT)
+        $('#nombreaseguradora').val(data.cartaporte.NombreAsegurado)
+        $('#numeropolizaseguro').val(data.cartaporte.NumeroPolizaSeguro)
+        let cutStringConfAuto = data.configuracionVehicular.Descripcion.substr(0, 30)
+        $('#textonombreconfigautotransporte').text(cutStringConfAuto)
+        $('#claveconfigautotransporte').val(data.configuracionVehicular.Clave)
+        $('#claveconfigautotransporteanterior').val(data.configuracionVehicular.Clave)
+        $('#configautotransporte').val(data.configuracionVehicular.Numero)
+        $('#placavehiculo').val(data.cartaporte.PlacaVehiculoMotor)
+        $('#anovehiculo').val(data.cartaporte.AnoModeloVehiculoMotor)
+        $('#subtiporemolque').val(data.cartaporte.SubTipoRemolque)
+        $('#placaremolque').val(data.cartaporte.PlacaRemolque)
+
+        //Datos Operador
+        $('#textonombreoperador').text(data.Operador.Nombre)
+        $('#numerooperador').val(data.Operador.id)
+        $('#numerooperadoranterior').val(data.Operador.id)
+        $('#rfcoperador').val(data.Operador.Rfc)
+        $('#nombreoperador').val(data.Operador.Nombre)
+        $('#textonombreclavetransporte').text(data.clavetransporte.Descripcion)
+        $('#clavetransporte').val(data.clavetransporte.Clave)
+        $('#clavetransporteanterior').val(data.clavetransporte.Clave)
+        $('#nombreclavetransporte').val(data.clavetransporte.Descripcion)
+        $('#numerolicenciaoperador').val(data.cartaporte.NumeroLicencia)
+        $('#calleoperador').val(data.cartaporte.CalleOperador)
+        $('#numeroextoperador').val(data.cartaporte.NoExteriorOperador)
+        $('#numerointoperador').val(data.cartaporte.NoInteriorOperador)
+        $('#coloniaoperador').val(data.cartaporte.ColoniaOperador)
+        $('#localidadoperador').val(data.cartaporte.LocalidadOperador)
+        $('#referenciaoperador').val(data.cartaporte.ReferenciaOperador)
+        $('#municipiooperador').val(data.cartaporte.MunicipioOperador)
+        $('#estadooperador').val(data.cartaporte.EstadoOperador)
+        $('#paisoperador').val(data.cartaporte.PaisOperador)
+        $('#cpoperador').val(data.cartaporte.CodigoPostalOperador)
+    }
+
 
 
     //Otros datos
@@ -5083,19 +5099,8 @@ function obtenerdatos(cartaporte){
     $("#numerocliente").val(data.cliente.Numero);
     $("#numeroclienteanterior").val(data.cliente.Numero);
     $("#rfccliente").val(data.cliente.Rfc);
-    // if(parseInt(data.almacen) == parseInt(0)){
-    //   $("#almacen").val(0);
-    //   $("#textonombrealmacen").html("");
-    //   $("#numeroalmacen").val(0);
-    //   $("#numeroalmacenanterior").val(0);
-    // }else{
-    //   $("#almacen").val(data.almacen.Nombre);
-    //   if(data.almacen.Nombre != null){
-    //     $("#textonombrealmacen").html(data.almacen.Nombre.substring(0, 40));
-    //   }
-    //   $("#numeroalmacen").val(data.almacen.Numero);
-    //   $("#numeroalmacenanterior").val(data.almacen.Numero);
-    // }
+
+
     $("#moneda").val(data.cartaporte.Moneda).change();
     //$("#pesosmoneda").val(data.tipocambio);
     $("#observaciones").val(data.cartaporte.Obs);
