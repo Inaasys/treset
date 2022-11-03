@@ -19,7 +19,6 @@ use App\NotaClienteDocumento;
 use App\Factura;
 use App\FacturaDetalle;
 use App\Cliente;
-use App\Almacen;
 use App\Producto;
 use App\Pais;
 use App\Estado;
@@ -31,7 +30,6 @@ use App\UsoCFDI;
 use App\c_TipoRelacion;
 use App\c_RegimenFiscal;
 use App\BitacoraDocumento;
-Use App\Existencia;
 use App\ClaveProdServ;
 use App\ClaveUnidad;
 use App\Configuracion_Tabla;
@@ -108,7 +106,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="obtenerdatos(\''.$data->CartaPorte .'\')">Cambios</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="desactivar(\''.$data->CartaPorte .'\')">Bajas</a></li>'.
                                                 '<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="timbrarcarta(\''. $data->CartaPorte .'\')">Timbrar</a></li>'.
-                                                '<li><a class="paddingmenuopciones">Ver Documento PDF</a></li>'.
+                                                '<li><a class="paddingmenuopciones" href="'.route('carta_porte_generar_pdfs_indiv',$data->CartaPorte).'" target="_blank">Ver Documento Carta Porte</a></li>'.
                                                 '<li><a class="paddingmenuopciones">Enviar Documento por Correo</a></li>'.
                                                 //'<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="timbrarnota(\''.$data->Nota .'\')">Timbrar Nota</a></li>'.
                                                 //'<li><a class="paddingmenuopciones" href="javascript:void(0);" onclick="cancelartimbre(\''.$data->Nota .'\')">Cancelar Timbre</a></li>'.
@@ -606,7 +604,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
         $CartaPorte->Usuario=Auth::user()->user;
         $CartaPorte->LugarExpedicion=$request->lugarexpedicion;
         $CartaPorte->RegimenFiscal=$request->claveregimenfiscal;
-        $CartaPorte->UsoCfdi = 'P01' ;
+        $CartaPorte->UsoCfdi = 'S01' ;
         $CartaPorte->Hora=Carbon::parse($request->fecha)->toDateTimeString();
         $CartaPorte->TransporteInternacional = $request->transporteinternacional;
         $CartaPorte->TotalDistanciaRecorrida = $request->totaldistanciarecorrida;
@@ -710,6 +708,9 @@ class CartaPorteController extends ConfiguracionSistemaController{
                 $documento->UUID = $request->uuidrelacionado[$key];
                 $documento->save();
             }
+            CartaPorte::where('CartaPorte', $cartaporte)->update([
+                "TipoRelacion" => '05'
+            ]);
         }
         return response()->json($CartaPorte);
     }
@@ -1295,62 +1296,41 @@ class CartaPorteController extends ConfiguracionSistemaController{
     }
 
     //generacion de formato en PDF
-    public function notas_credito_clientes_generar_pdfs_indiv($documento){
-        $notascreditocliente = NotaCliente::where('Nota', $documento)->get();
+    public function carta_porte_generar_pdfs_indiv($documento){
+
+        $cartaporte = CartaPorte::where('CartaPorte', $documento)->with(['documentos'])->first();
+        $cliente = Cliente::where('Rfc',$cartaporte->RfcDestinatario)->first();
+        $regimenfiscal = c_RegimenFiscal::where('Clave',$cliente->RegimenFiscal)->first();
         $fechaformato =Helpers::fecha_exacta_accion_datetimestring();
+        $usocfdi = UsoCFDI::where('Clave',$cartaporte->UsoCfdi)->first();
         $data=array();
-        foreach ($notascreditocliente as $ncc){
-            $notascreditoclientedetalle = NotaClienteDetalle::where('Nota', $ncc->Nota)->get();
-            $datadetalle=array();
-            foreach($notascreditoclientedetalle as $nccd){
-                $claveproducto = ClaveProdServ::where('Clave', $nccd->ClaveProducto)->first();
-                $claveunidad = ClaveUnidad::where('Clave', $nccd->ClaveUnidad)->first();
-                $datadetalle[]=array(
-                    "cantidaddetalle"=> Helpers::convertirvalorcorrecto($nccd->Cantidad),
-                    "codigodetalle"=>$nccd->Codigo,
-                    "descripciondetalle"=>$nccd->Descripcion,
-                    "preciodetalle" => Helpers::convertirvalorcorrecto($nccd->Precio),
-                    "porcentajedescuentodetalle" => Helpers::convertirvalorcorrecto($nccd->Dcto),
-                    "pesosdescuentodetalle" => Helpers::convertirvalorcorrecto($nccd->Descuento),
-                    "subtotaldetalle" => Helpers::convertirvalorcorrecto($nccd->SubTotal),
-                    "impuestodetalle" => Helpers::convertirvalorcorrecto($nccd->Impuesto),
-                    "ivadetalle" => Helpers::convertirvalorcorrecto($nccd->Iva),
-                    "claveproducto" => $claveproducto,
-                    "claveunidad" => $claveunidad
-                );
-            }
-            $cliente = Cliente::where('Numero', $ncc->Cliente)->first();
-            $formapago = FormaPago::where('Clave', $ncc->FormaPago)->first();
-            $metodopago = MetodoPago::where('Clave', $ncc->MetodoPago)->first();
-            $usocfdi = UsoCFDI::where('Clave', $ncc->UsoCfdi)->first();
-            $formatter = new NumeroALetras;
-            $totalletras = $formatter->toInvoice($ncc->Total, 2, 'M.N.');
-            $notaclientedocumento = NotaClienteDocumento::where('Nota', $ncc->Nota)->first();
-            $comprobantetimbrado = Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->count();
-            $comprobante = Comprobante::where('Comprobante', 'Nota')->where('Folio', '' . $ncc->Folio . '')->where('Serie', '' . $ncc->Serie . '')->first();
-            $regimenfiscal = c_RegimenFiscal::where('Clave', $ncc->RegimenFiscal)->first();
-            $data[]=array(
-                "notacreditocliente"=>$ncc,
-                "notaclientedocumento"=>$notaclientedocumento,
-                "comprobante" => $comprobante,
-                "comprobantetimbrado" => $comprobantetimbrado,
-                "regimenfiscal"=> $regimenfiscal,
-                "subtotalnotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->SubTotal),
-                "ivanotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->Iva),
-                "totalnotacreditocliente"=>Helpers::convertirvalorcorrecto($ncc->Total),
-                "cliente" => $cliente,
-                "formapago" => $formapago,
-                "metodopago" => $metodopago,
-                "usocfdi" => $usocfdi,
-                "datadetalle" => $datadetalle,
-                "tipocambiofactura"=>Helpers::convertirvalorcorrecto($ncc->TipoCambio),
-                "totalletras"=>$totalletras,
-                "numerodecimalesdocumento"=> $this->numerodecimalesendocumentos
-            );
+        $datadetalle =collect([]);
+        $detalles = CartaPorteDetalles::where('CartaPorte', $cartaporte->CartaPorte)->get();
+        foreach($detalles as $detalle){
+            $claveproducto = ClaveProdServ::where('Clave', $detalle->ClaveProducto)->first();
+            $claveunidad = ClaveUnidad::where('Clave', $detalle->ClaveUnidad)->first();
+            $datadetalle[]=collect([
+                "cantidaddetalle"=> Helpers::convertirvalorcorrecto($detalle->Cantidad),
+                "codigodetalle"=>$detalle->Codigo,
+                "descripciondetalle"=>$detalle->Descripcion,
+                "pesounitario" => number_format(($detalle->PesoEnKilogramos/$detalle->Cantidad),$this->numerodecimales,'.',','),
+                "pesoBruto" => number_format($detalle->PesoEnKilogramos,$this->numerodecimales,'.',','),
+                "precio" => Helpers::convertirvalorcorrecto($detalle->Costo),
+                "importe" => Helpers::convertirvalorcorrecto($detalle->Costo),
+                "descuento" => Helpers::convertirvalorcorrecto(0),
+                "descuentopesos" => Helpers::convertirvalorcorrecto(0),
+                "subtotal" => Helpers::convertirvalorcorrecto(0),
+                "claveproducto" => $claveproducto,
+                "claveunidad" => $claveunidad,
+                ]);
         }
-        ini_set('max_execution_time', 300); // 5 minutos
+        $comprobantetimbrado = Comprobante::where('Comprobante', 'CartaPorte')->where('Folio', '' . $cartaporte->Folio . '')->where('Serie', '' . $cartaporte->Serie . '')->count();
+        $comprobante = Comprobante::where('Comprobante', 'CartaPorte')->where('Folio', '' . $cartaporte->Folio . '')->where('Serie', '' . $cartaporte->Serie . '')->first();
+
+        ini_set('max_execution_time', 300000); // 5 minutos
         ini_set('memory_limit', '-1');
-        $pdf = PDF::loadView('registros.notascreditoclientes.formato_pdf_notascreditoclientes', compact('data'))
+        $pdf = PDF::loadView('registros.cartasporte.formato_traslado', compact('cliente','cartaporte','usocfdi','regimenfiscal',
+        'datadetalle','comprobantetimbrado','comprobante'))
         ->setPaper('Letter')
         //->setOption('footer-left', 'E.R. '.Auth::user()->user.'')
         ->setOption('footer-center', 'Página [page] de [toPage]')
@@ -1672,6 +1652,8 @@ class CartaPorteController extends ConfiguracionSistemaController{
         $bienesTransportados = '';
         $municipioRe = Municipio::where('Nombre','like','%'.$carta->MunicipioRemitente.'%')->select('Clave')->first();
         $municipioDe = Municipio::where('Nombre','like','%'.$carta->MunicipioDestinatario.'%')->select('Clave')->first();
+        $vehiculo = Vehiculo::where('Placa',$carta->PlacaVehiculoMotor)->first();
+        $confVehicular = c_ConfiguracionAutoTransporte::where('Clave',$carta->ConfiguracionVehicular)->first();
         foreach($carta->detalles as $detalle){
             array_push($arraydet, array(
                     "quantity" => Helpers::convertirvalorcorrecto($detalle->Cantidad),
@@ -1757,6 +1739,43 @@ class CartaPorteController extends ConfiguracionSistemaController{
                         '</cartaporte20:CartaPorte>'
                     )
                 ),
+
+                // "pdf_custom_section" =>
+                // //Datos extra (Permisos)
+                // '<ul><li>Datos Auto Transporte</li></ul><br>'.
+                // '<table>'.
+                //     '<thead>'.
+                //         '<tr><th>Permiso de la SCT</th><th>Numero de Permiso</th></tr>'.
+                //     '</thead>'.
+                //     '<tbody>'.
+                //         '<tr>'.
+                //             '<td><b>'.$carta->PermisoSCT.'</b></td>'.
+                //             '<td><b>'.$carta->NumeroPermisoSCT.'</b></td>'.
+                //         '</tr>'.
+                //     '</tbody>'.
+                // '</table>'.
+                // //Datos extra (Autotransporte)
+                // '<ul><li>Datos Vehiculares</li></ul><br>'.
+                // '<table>'.
+                //     '<thead>'.
+                //         '<tr><th>Marca</th><th>Modelo</th><th>Año</th><th>Placa</th></tr>'.
+                //     '</thead>'.
+                //     '<tbody>'.
+                //         '<tr>'.
+                //             '<td><b>'.$vehiculo->Marca.'</b></td>'.
+                //             '<td><b>'.$vehiculo->Modelo.'</b></td>'.
+                //             '<td><b>'.$vehiculo->Año.'</b></td>'.
+                //             '<td><b>'.$vehiculo->Placa.'</b></td>'.
+                //         '</tr>'.
+                //     '</tbody>'.
+                //     '<tfoot>'.
+                //         '<tr>'.
+                //             '<th><b>Configuración vehicular </b></th>'.
+                //             '<th>'.$confVehicular->Clave.'(<b>'.$confVehicular->Descripcion.'</b>)</th>'.
+                //         '</tr>'.
+                //     '</tfoot>'.
+                // '</table>',
+
                 "namespaces" => array(
                     array(
                         "prefix" => 'cartaporte20',
@@ -1782,6 +1801,46 @@ class CartaPorteController extends ConfiguracionSistemaController{
                         "zip" => $carta->CodigoPostalRemitente
                     )
                 ),
+
+                // "pdf_custom_section" =>
+                //     //Datos extra (Permisos)
+                //     '<ul><li>Datos Auto Transporte</li></ul><br>'.
+                //     '<table>'.
+                //         '<thead>'.
+                //             '<tr><th>Permiso de la SCT</th><th>Numero de Permiso</th></tr>'.
+                //         '</thead>'.
+                //         '<tbody>'.
+                //             '<tr>'.
+                //                 '<td><b>'.$carta->PermisoSCT.'</b></td>'.
+                //                 '<td><b>'.$carta->NumeroPermisoSCT.'</b></td>'.
+                //             '</tr>'.
+                //         '</tbody>'.
+                //     '</table> <br>'.
+                //     //Datos extra (Autotransporte)
+                //     '<ul><li>Datos Vehiculares</li></ul><br>'.
+                //     '<table>'.
+                //         '<thead>'.
+                //             '<tr><th>Marca</th><th>Modelo</th><th>Año</th><th>Placa</th></tr>'.
+                //         '</thead>'.
+                //         '<tbody>'.
+                //             '<tr>'.
+                //                 '<td><b>'.$vehiculo->Marca.'</b></td>'.
+                //                 '<td><b>'.$vehiculo->Modelo.'</b></td>'.
+                //                 '<td><b>'.$vehiculo->Año.'</b></td>'.
+                //                 '<td><b>'.$vehiculo->Placa.'</b></td>'.
+                //             '</tr>'.
+                //         '</tbody>'.
+                //         '<tfoot>'.
+                //             '<tr>'.
+                //                 '<th><b></b></th>'.
+                //                 '<th></th>'.
+                //             '</tr>'.
+                //             '<tr>'.
+                //                 '<th><b>Configuración vehicular </b></th>'.
+                //                 '<th>'.$confVehicular->Clave.'; '.$confVehicular->Descripcion.'</th>'.
+                //             '</tr>'.
+                //         '</tfoot>'.
+                //     '</table>',
 
                 "complements" => array(
                     //"type" => "P",
