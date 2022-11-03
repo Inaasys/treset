@@ -157,7 +157,7 @@
       		</div>
 	      	<div class="modal-footer">
 	        	<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Salir</button>
-	        	<button type="button" class="btn btn-success btn-sm" id="btntimbrarnota">Timbrar Nota</button>
+	        	<button type="button" class="btn btn-success btn-sm" id="btntimbrarnota">Timbrar Documento</button>
 	      	</div>
     	</div>
   	</div>

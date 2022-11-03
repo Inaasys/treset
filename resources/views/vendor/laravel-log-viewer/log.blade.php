@@ -16,7 +16,7 @@
     body {
       padding: 25px;
     }
-    
+
     h1 {
       font-size: 1.5em;
       margin-top: 0;
@@ -172,7 +172,6 @@
   <div class="row">
     <div class="col sidebar mb-3">
       <h1><i class="fa fa-calendar" aria-hidden="true"></i> INAASYS LOGS - ERRORES</h1>
-      <p class="text-muted"><i>por Osbaldo</i></p>
       <p class="text-muted"><i><span class="fa fa-reply fa-lg"></span><a href="{{route('inicio')}}">Regresar a Inaasys</a></i></p>
 
       <div class="custom-control custom-switch" style="padding-bottom:20px;">
@@ -303,7 +302,7 @@
   const darkSwitch = document.getElementById('darkSwitch');
 
   // this is here so we can get the body dark mode before the page displays
-  // otherwise the page will be white for a second... 
+  // otherwise the page will be white for a second...
   initTheme();
 
   window.addEventListener('load', () => {
@@ -316,7 +315,7 @@
   });
 
   // end darkmode js
-        
+
   $(document).ready(function () {
     $('.table-container tr').on('click', function () {
       $('#' + $(this).data('display')).toggle();
