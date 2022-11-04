@@ -1310,6 +1310,7 @@ class CartaPorteController extends ConfiguracionSistemaController{
         $configuracionVehicular = c_ConfiguracionAutoTransporte::where('Clave',$cartaporte->ConfiguracionVehicular)->first();
         $data=array();
         $datadetalle =collect([]);
+        $MaterialPeligrosoMaterialPeligroso = '';
         $dataDomicilioEmisor = array(
             'pais'=> $this->paisempresa,
             'cp' => $this->cpempresa,
@@ -1335,14 +1336,15 @@ class CartaPorteController extends ConfiguracionSistemaController{
             'localidad'=>$cliente->Localidad
         );
         $datosAutoTransporte = array(
-            'tipoPermiso' => $tipoPermiso->Descripcion,
+            'tipoPermiso' => (isset($tipoPermiso) ? $tipoPermiso->Descripcion : 'NA'),
             'numeroPermiso' => $cartaporte->NumeroPermisoSCT,
-            'confVehiculo' =>$configuracionVehicular->Descripcion,
+            'confVehiculo' => (isset($$configuracionVehicular) ? $tipoPermiso->Descripcion : 'NA'),
         );
         $detalles = CartaPorteDetalles::where('CartaPorte', $cartaporte->CartaPorte)->get();
         foreach($detalles as $detalle){
             $claveproducto = ClaveProdServ::where('Clave', $detalle->ClaveProducto)->first();
             $claveunidad = ClaveUnidad::where('Clave', $detalle->ClaveUnidad)->first();
+            $MaterialPeligroso = 'No';
             switch ($detalle->MaterialPeligroso) {
                 case '0,1':
                     if (!isset($detalle->CveMaterialPeligroso)) {
